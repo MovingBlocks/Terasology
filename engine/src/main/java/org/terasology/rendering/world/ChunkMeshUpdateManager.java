@@ -18,11 +18,13 @@ package org.terasology.rendering.world;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -35,7 +37,6 @@ import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
 
-import javax.vecmath.Vector3f;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;

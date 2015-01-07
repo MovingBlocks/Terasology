@@ -76,6 +76,14 @@
                                 "id" : "screenshotSize"
                             },
                             {
+                                "type" : "UILabel",
+                                "text" : "Screenshot format: "
+                            },
+                            {
+                                "type" : "UIDropdown",
+                                "id" : "screenshotFormat"
+                            },
+                            {
                                 "type": "UILabel",
                                 "text": "V-Sync: "
                             },

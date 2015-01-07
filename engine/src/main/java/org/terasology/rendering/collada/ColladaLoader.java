@@ -15,13 +15,22 @@
  */
 package org.terasology.rendering.collada;
 
+import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.eaxy.Document;
+import org.eaxy.Element;
+import org.eaxy.ElementSet;
+import org.eaxy.NonMatchingPathException;
+import org.eaxy.Xml;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,32 +43,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
-import org.eaxy.Document;
-import org.eaxy.Element;
-import org.eaxy.ElementSet;
-import org.eaxy.NonMatchingPathException;
-import org.eaxy.Xml;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
-
-import com.google.common.collect.Lists;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Importer for Collada data exchange model files.
- *
+ * <p/>
  * The development of this loader was greatly influenced by
  * http://www.wazim.com/Collada_Tutorial_1.htm
- *
+ * <p/>
  * TODO: Consider documenting this class similar to what has been done at this web page:
- *
+ * <p/>
  * http://docs.garagegames.com/torque-3d/official/content/documentation/Artist%20Guide/Formats/ColladaLoader.html
  *
  * @author mkienenb@gmail.com
@@ -151,7 +147,7 @@ public class ColladaLoader {
             ElementSet vertexWeightsSet = skin.find("vertex_weights");
             if (1 != vertexWeightsSet.size()) {
                 throw new ColladaParseException("Found " + vertexWeightsSet.size() + " vertex weights sets for controller id=" + controller.id() + " name="
-                                                + controller.name());
+                        + controller.name());
             }
             Element vertexWeights = vertexWeightsSet.first();
             String vertexWeightsCountString = vertexWeights.attr("count");
@@ -195,7 +191,7 @@ public class ColladaLoader {
                 Input input = vertexWeightsInputList.get(i);
                 if (input.offset != i) {
                     throw new ColladaParseException("vertex weights input list offset does not match list index for vertex weights input " + input
-                                                    + " for controller id=" + controller.id() + " name=" + controller.name());
+                            + " for controller id=" + controller.id() + " name=" + controller.name());
                 }
             }
 
@@ -215,20 +211,20 @@ public class ColladaLoader {
             ElementSet vertexWeightsVCountDataSet = vertexWeights.find("vcount");
             if (1 != vertexWeightsVCountDataSet.size()) {
                 throw new ColladaParseException("Found " + vertexWeightsVCountDataSet.size()
-                                                + " vertex weights vcount sets for controller id=" + controller.id() + " name=" + controller.name());
+                        + " vertex weights vcount sets for controller id=" + controller.id() + " name=" + controller.name());
             }
             Element vertexWeightsVCountData = vertexWeightsVCountDataSet.first();
             String vertexWeightsVCountString = vertexWeightsVCountData.text();
             String[] vertexWeightsVCountStrings = getItemsInString(vertexWeightsVCountString);
             if (vertexWeightsVCountStrings.length != vertexWeightsCount) {
                 throw new ColladaParseException("Expected " + vertexWeightsCount + " but was "
-                                                + vertexWeightsVCountStrings.length + " for controller id=" + controller.id() + " name=" + controller.name());
+                        + vertexWeightsVCountStrings.length + " for controller id=" + controller.id() + " name=" + controller.name());
             }
 
             ElementSet vertexWeightsVDataSet = vertexWeights.find("v");
             if (1 != vertexWeightsVDataSet.size()) {
                 throw new ColladaParseException("Found " + vertexWeightsVDataSet.size()
-                                                + " vertex weights v sets for controller id=" + controller.id() + " name=" + controller.name());
+                        + " vertex weights v sets for controller id=" + controller.id() + " name=" + controller.name());
             }
             Element vertexWeightsVData = vertexWeightsVDataSet.first();
             String vertexWeightsVDataString = vertexWeightsVData.text();
@@ -279,7 +275,7 @@ public class ColladaLoader {
                             // logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "weight=" + vertexWeightsArray[vertexWeightsIndex]);
                         } else {
                             throw new ColladaParseException("Found unexpected vertex weights Input semantic " + vertexWeightsInput.semantic +
-                                                            " for controller id=" + controller.id() + " name=" + controller.name());
+                                    " for controller id=" + controller.id() + " name=" + controller.name());
                         }
                     }
                 }
@@ -494,8 +490,7 @@ public class ColladaLoader {
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
             Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Vector3f translationVector = new Vector3f();
-            matrix4f.get(translationVector);
+            Vector3f translationVector = matrix4f.getTranslation();
             translationVectorArray[i] = translationVector;
         }
 
@@ -565,7 +560,7 @@ public class ColladaLoader {
                     ElementSet vCountSet = polylist.find("vcount");
                     if (1 != vCountSet.size()) {
                         throw new ColladaParseException("Found " + vCountSet.size() + " vcount sets for polylist in geometry id="
-                                                        + geometry.id() + " name=" + geometry.name());
+                                + geometry.id() + " name=" + geometry.name());
                     }
                     Element vCountElement = vCountSet.first();
 
@@ -613,7 +608,7 @@ public class ColladaLoader {
         if (0 != libraryMaterialsSet.size()) {
             if (1 != libraryMaterialsSet.size()) {
                 throw new ColladaParseException("Found " + libraryMaterialsSet.size() + " library Material sets for geometry id="
-                                                + geometry.id() + " name=" + geometry.name());
+                        + geometry.id() + " name=" + geometry.name());
             }
             Element libraryMaterials = libraryMaterialsSet.first();
 
@@ -627,7 +622,7 @@ public class ColladaLoader {
                 ElementSet instanceEffectSet = material.find("instance_effect");
                 if (1 != instanceEffectSet.size()) {
                     throw new ColladaParseException("Found " + instanceEffectSet.size() + " instance_effect sets for material " + facesMaterial + " for geometry id="
-                                                    + geometry.id() + " name=" + geometry.name());
+                            + geometry.id() + " name=" + geometry.name());
                 }
                 Element instanceEffect = instanceEffectSet.first();
 
@@ -637,7 +632,7 @@ public class ColladaLoader {
                 if (0 != libraryEffectsSet.size()) {
                     if (1 != libraryEffectsSet.size()) {
                         throw new ColladaParseException("Found " + libraryEffectsSet.size() + " library effects sets for geometry id=" + geometry.id() + " name="
-                                                        + geometry.name());
+                                + geometry.name());
                     }
                     Element libraryEffects = libraryEffectsSet.first();
 
@@ -654,7 +649,7 @@ public class ColladaLoader {
                         String[] colorString = getItemsInString(colorListString);
                         if (4 != colorString.length) {
                             throw new ColladaParseException("mesh only supports 4-float color arrays but color list was '" + colorListString + "' for geometry id="
-                                                            + geometry.id() + " name=" + geometry.name());
+                                    + geometry.id() + " name=" + geometry.name());
                         }
                         vertexColors = new float[colorString.length];
                         for (int i = 0; i < colorString.length; i++) {
@@ -664,6 +659,7 @@ public class ColladaLoader {
                 }
             } catch (NonMatchingPathException e) {
                 // If we don't find the material, then we're done.
+                logger.debug("Material not found, skipping", e);
             }
         }
 
@@ -685,7 +681,7 @@ public class ColladaLoader {
                         faceInput.vertexNormalSource = parseSource(normalSourceElement);
                     } else {
                         throw new ColladaParseException("Found unexpected vertex Input semantic " + vertexInput.semantic +
-                                                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
                     }
                 }
             } else if ("NORMAL".equals(faceInput.semantic)) {
@@ -693,8 +689,8 @@ public class ColladaLoader {
                 faceInput.normalSource = parseSource(normalSourceElement);
                 if (3 != faceInput.normalSource.stride) {
                     throw new ColladaParseException("Found stride of " + faceInput.normalSource.stride
-                                                    + " for triangle Input semantic " + faceInput.semantic +
-                                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                            + " for triangle Input semantic " + faceInput.semantic +
+                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
                 }
             } else if ("TEXCOORD".equals(faceInput.semantic)) {
                 Element texCoordSourceElement = mesh.select(faceInput.sourceName);
@@ -702,14 +698,14 @@ public class ColladaLoader {
 
                 if (2 != faceInput.texCoordSource.stride) {
                     logger.warn("Found non-2 stride of " + faceInput.texCoordSource.stride
-                                + " for vertex Input semantic " + faceInput.semantic +
-                                " for geometry id=" + geometry.id() + " name=" + geometry.name()
-                                + ". Ignoring all but first two texture coordinate values.");
+                            + " for vertex Input semantic " + faceInput.semantic +
+                            " for geometry id=" + geometry.id() + " name=" + geometry.name()
+                            + ". Ignoring all but first two texture coordinate values.");
                 }
 
             } else {
                 throw new ColladaParseException("Found unexpected triangle Input semantic " + faceInput.semantic +
-                                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
             }
         }
         ElementSet faceDataSet = faces.find("p");
@@ -731,7 +727,7 @@ public class ColladaLoader {
             Input input = faceInputs.get(i);
             if (input.offset != i) {
                 throw new ColladaParseException("Triangle input list offset does not match list index for triangle input " + input + " for geometry id=" + geometry.id()
-                                                + " name=" + geometry.name());
+                        + " name=" + geometry.name());
             }
         }
 
@@ -753,8 +749,8 @@ public class ColladaLoader {
                         int vertexStride = faceInput.vertexPositionSource.stride;
                         if (3 != vertexStride) {
                             throw new ColladaParseException("Found non-3 stride of " + faceInput.vertexPositionSource.stride
-                                                            + " for vertex Input semantic " + faceInput.semantic +
-                                                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                    + " for vertex Input semantic " + faceInput.semantic +
+                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
                         float vertexX = faceInput.vertexPositionSource.floatValues[index * vertexStride + 0];
@@ -788,8 +784,8 @@ public class ColladaLoader {
                             int normalStride = faceInput.vertexNormalSource.stride;
                             if (3 != normalStride) {
                                 throw new ColladaParseException("Found non-3 stride of " + faceInput.vertexNormalSource.stride
-                                                                + " for vertex Input semantic " + faceInput.semantic +
-                                                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                        + " for vertex Input semantic " + faceInput.semantic +
+                                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
                             }
                             // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
                             float normalX = faceInput.vertexNormalSource.floatValues[index * normalStride + 0];
@@ -815,8 +811,8 @@ public class ColladaLoader {
                         int normalStride = faceInput.normalSource.stride;
                         if (3 != normalStride) {
                             throw new ColladaParseException("Found non-3 stride of " + faceInput.normalSource.stride
-                                                            + " for vertex Input semantic " + faceInput.semantic +
-                                                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                    + " for vertex Input semantic " + faceInput.semantic +
+                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
                         float normalX = faceInput.normalSource.floatValues[index * normalStride + 0];
@@ -835,8 +831,8 @@ public class ColladaLoader {
                         int texCoordStride = faceInput.texCoordSource.stride;
                         if (2 > texCoordStride) {
                             throw new ColladaParseException("Found non-2 stride of " + faceInput.texCoordSource.stride
-                                                            + " for vertex Input semantic " + faceInput.semantic +
-                                                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                    + " for vertex Input semantic " + faceInput.semantic +
+                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming S,T order
                         float texCoordS = faceInput.texCoordSource.floatValues[index * texCoordStride + 0];
@@ -849,7 +845,7 @@ public class ColladaLoader {
                         // texCoord0.add(texCoordT);
                     } else {
                         throw new ColladaParseException("Found unexpected triangle Input semantic " + faceInput.semantic +
-                                                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
                     }
                 }
             }
@@ -912,7 +908,7 @@ public class ColladaLoader {
         Element objectArray = sourceElement.select(accessorSource);
         if (null == objectArray) {
             throw new ColladaParseException("Unable to find id " + accessorSource + " for float array in sourceElement id=" + sourceElement.id() + " name="
-                                            + sourceElement.name());
+                    + sourceElement.name());
         }
         String arraySizeString = objectArray.attr("count");
         int arraySize = Integer.parseInt(arraySizeString);
@@ -920,13 +916,13 @@ public class ColladaLoader {
 
         // TODO: we should really parse each parameter type, but we'll assume they are homogeneneous for now
         if (("float".equalsIgnoreCase(source.parameterTypes[0]))
-            || ("float4x4".equalsIgnoreCase(source.parameterTypes[0]))) {
+                || ("float4x4".equalsIgnoreCase(source.parameterTypes[0]))) {
             source.floatValues = new float[arraySize];
             String[] floatStrings = getItemsInString(objectArrayDataString);
             if (floatStrings.length != arraySize) {
                 throw new ColladaParseException("Expected float array size " + arraySize + " but was " + floatStrings.length + " for sourceElement id=" + sourceElement.id()
-                                                + " name="
-                                                + sourceElement.name());
+                        + " name="
+                        + sourceElement.name());
             }
             for (int i = 0; i < floatStrings.length; i++) {
                 String floatString = floatStrings[i];
@@ -937,8 +933,8 @@ public class ColladaLoader {
             String[] nameStrings = getItemsInString(objectArrayDataString);
             if (nameStrings.length != arraySize) {
                 throw new ColladaParseException("Expected name array size " + arraySize + " but was " + nameStrings.length + " for sourceElement id=" + sourceElement.id()
-                                                + " name="
-                                                + sourceElement.name());
+                        + " name="
+                        + sourceElement.name());
             }
             for (int i = 0; i < nameStrings.length; i++) {
                 source.nameValues[i] = nameStrings[i];
@@ -1007,9 +1003,9 @@ public class ColladaLoader {
         @Override
         public String toString() {
             return "name=" + name
-                   + ", element=" + element
-                   + ", position=" + position
-                   + ", orientation=" + orientation;
+                    + ", element=" + element
+                    + ", position=" + position
+                    + ", orientation=" + orientation;
         }
     }
 
@@ -1021,8 +1017,8 @@ public class ColladaLoader {
         @Override
         public String toString() {
             return "jointIndex=" + jointIndex
-                   + ", bias=" + bias
-                   + ", position=" + position;
+                    + ", bias=" + bias
+                    + ", position=" + position;
         }
     }
 

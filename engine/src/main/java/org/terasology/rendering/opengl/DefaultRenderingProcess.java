@@ -51,7 +51,7 @@ import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
@@ -1355,10 +1355,6 @@ public class DefaultRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        // TODO: Used to be huge for super screenies, shrunk down for performance until size is an in-game option
-        overwriteRtWidth = 1152;
-        overwriteRtHeight = 700;
-
         if(config.getRendering().getScreenshotSize() == 0) {
             overwriteRtWidth = Display.getWidth() * 2;
             overwriteRtHeight = Display.getHeight() * 2;
@@ -1371,7 +1367,12 @@ public class DefaultRenderingProcess {
         } else if(config.getRendering().getScreenshotSize() == 3) {
             overwriteRtWidth = Display.getWidth() / 4;
             overwriteRtHeight = Display.getHeight() / 4;
+        } else {
+            //In case its another config value use default values
+            overwriteRtWidth = 1152;
+            overwriteRtHeight = 700;
         }
+
         createOrUpdateFullscreenFbos();
     }
 
@@ -1395,10 +1396,10 @@ public class DefaultRenderingProcess {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String fileName = "Terasology-" + sdf.format(cal.getTime()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + ".png";
+                final String format = config.getRendering().getScreenshotFormat();
+                final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
 
@@ -1413,7 +1414,7 @@ public class DefaultRenderingProcess {
                 }
 
                 try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
-                    ImageIO.write(image, "png", out);
+                    ImageIO.write(image, format, out);
                     logger.info("Screenshot '" + fileName + "' saved! ");
                 } catch (IOException e) {
                     logger.warn("Failed to save screenshot!", e);

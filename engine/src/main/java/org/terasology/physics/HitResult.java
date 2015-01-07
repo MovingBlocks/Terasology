@@ -18,8 +18,7 @@ package org.terasology.physics;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * A HitResult holds the result of a ray-trace.

@@ -18,9 +18,8 @@ package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ServerEvent;
-
-import javax.vecmath.Vector3f;
 
 /**
  * A request for a player to drop an item. Is replicated onto the server

@@ -20,23 +20,27 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.collision.shapes.CompoundShapeChild;
 import com.bulletphysics.collision.shapes.ConvexHullShape;
-import com.bulletphysics.linearmath.QuaternionUtil;
+
+import org.terasology.math.QuaternionUtil;
+
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Maps;
+
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Pitch;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.math.VecMath;
 import org.terasology.math.Yaw;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -127,8 +131,8 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     private CollisionShape rotate(CollisionShape shape, Quat4f rot) {
         if (shape instanceof BoxShape) {
             BoxShape box = (BoxShape) shape;
-            Vector3f extents = box.getHalfExtentsWithMargin(new Vector3f());
-            QuaternionUtil.quatRotate(rot, extents, extents);
+            javax.vecmath.Vector3f extents = box.getHalfExtentsWithMargin(new javax.vecmath.Vector3f());
+            com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), extents, extents);
             extents.absolute();
             return new BoxShape(extents);
         } else if (shape instanceof CompoundShape) {
@@ -136,15 +140,15 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
             CompoundShape newShape = new CompoundShape();
             for (CompoundShapeChild child : compound.getChildList()) {
                 CollisionShape rotatedChild = rotate(child.childShape, rot);
-                Vector3f offset = QuaternionUtil.quatRotate(rot, child.transform.origin, new Vector3f());
-                newShape.addChildShape(new Transform(new Matrix4f(Rotation.none().getQuat4f(), offset, 1.0f)), rotatedChild);
+                javax.vecmath.Vector3f offset = com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), child.transform.origin, new javax.vecmath.Vector3f());
+                newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), offset, 1.0f)), rotatedChild);
             }
             return newShape;
         } else if (shape instanceof ConvexHullShape) {
             ConvexHullShape convexHull = (ConvexHullShape) shape;
-            ObjectArrayList<Vector3f> transformedVerts = new ObjectArrayList<>();
-            for (Vector3f vert : convexHull.getPoints()) {
-                transformedVerts.add(QuaternionUtil.quatRotate(rot, vert, new Vector3f()));
+            ObjectArrayList<javax.vecmath.Vector3f> transformedVerts = new ObjectArrayList<>();
+            for (javax.vecmath.Vector3f vert : convexHull.getPoints()) {
+                transformedVerts.add(com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), vert, new javax.vecmath.Vector3f()));
             }
             return new ConvexHullShape(transformedVerts);
         }

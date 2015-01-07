@@ -16,7 +16,6 @@
 package org.terasology.world.block;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.asset.Assets;
 import org.terasology.audio.StaticSound;
 
 import java.util.Collections;
@@ -36,10 +35,10 @@ public class BlockSounds {
      * Default block sounds. Used instead of a null value to avoid additional null-checks.
      */
     public static final BlockSounds NULL = new BlockSounds(
-        "engine:null",
-        Collections.<StaticSound>emptyList(),
-        Collections.<StaticSound>emptyList(),
-        Collections.<StaticSound>emptyList()
+            "engine:null",
+            Collections.<StaticSound>emptyList(),
+            Collections.<StaticSound>emptyList(),
+            Collections.<StaticSound>emptyList()
     );
 
     private final String uri;

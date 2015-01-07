@@ -15,16 +15,19 @@
  */
 package org.terasology.math;
 
-import javax.vecmath.Tuple3i;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3d;
+import org.terasology.math.geom.Vector3f;
+
+import java.io.Serializable;
 
 /**
  * Vector3i - integer vector class in the style of VecMath.
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class Vector3i extends javax.vecmath.Tuple3i  {
+public class Vector3i extends org.terasology.math.geom.Vector3i implements Serializable {
+    private static final long serialVersionUID = -1965792038041767639L;
+
     /**
      * Constructor instantiates a new <code>Vector3i</code> with default
      * values of (0,0,0).
@@ -89,7 +92,7 @@ public class Vector3i extends javax.vecmath.Tuple3i  {
      *
      * @param other The Vector3i to copy
      */
-    public Vector3i(Tuple3i other) {
+    public Vector3i(Vector3i other) {
         this.x = other.x;
         this.y = other.y;
         this.z = other.z;
@@ -159,11 +162,6 @@ public class Vector3i extends javax.vecmath.Tuple3i  {
         return new Vector3i(0, -1, 0);
     }
 
-    @Override
-    public Vector3i clone() {
-        return (Vector3i) super.clone();
-    }
-
     /**
      * Returns true if this vector is a unit vector (lengthSquared() == 1),
      * returns false otherwise.
@@ -212,7 +210,7 @@ public class Vector3i extends javax.vecmath.Tuple3i  {
     /**
      * @return the magnitude of the vector.
      */
-    public float length() {
+    public double length() {
         return (float) Math.sqrt(lengthSquared());
     }
 
@@ -239,18 +237,6 @@ public class Vector3i extends javax.vecmath.Tuple3i  {
      */
     public float distance(Vector3i v) {
         return (float) Math.sqrt(distanceSquared(v));
-    }
-
-    public void add(int x, int y, int z) {
-        this.x += x;
-        this.y += y;
-        this.z += z;
-    }
-
-    public void sub(int x, int y, int z) {
-        this.x -= x;
-        this.y -= y;
-        this.z -= z;
     }
 
     /**
@@ -350,44 +336,6 @@ public class Vector3i extends javax.vecmath.Tuple3i  {
         y = 0;
         z = 0;
         return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Vector3i)) {
-            return false;
-        }
-
-        if (this == o) {
-            return true;
-        }
-
-        Vector3i comp = (Vector3i) o;
-        return x == comp.x && y == comp.y && z == comp.z;
-    }
-
-    /**
-     * <code>hashCode</code> returns a unique code for this vector object based
-     * on it's values. If two vectors are logically equivalent, they will return
-     * the same hash code value.
-     *
-     * @return the hash code value of this vector.
-     */
-    @Override
-    public int hashCode() {
-        // idea: use the 10 least significant bits of each dimension and merge
-        // them next to each other into one 32 bit
-        // its less likely that the cache contains chunks that are far away from
-        // x and z use 11 instead of 10 bits
-        int hash = 0;
-
-        hash += (x - Integer.MIN_VALUE) & 0x07FF;
-        hash <<= 10;
-        hash += (y - Integer.MIN_VALUE) & 0x03FF;
-        hash <<= 11;
-        hash += (z - Integer.MIN_VALUE) & 0x07FF;
-
-        return hash;
     }
 
     @Override

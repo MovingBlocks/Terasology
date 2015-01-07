@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
@@ -27,7 +28,6 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.block.ForceBlockActive;
 
-import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.Map;
 

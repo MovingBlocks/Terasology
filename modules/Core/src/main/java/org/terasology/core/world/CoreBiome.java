@@ -15,7 +15,6 @@
  */
 package org.terasology.core.world;
 
-import org.terasology.engine.SimpleUri;
 import org.terasology.world.biomes.Biome;
 
 public enum CoreBiome implements Biome {

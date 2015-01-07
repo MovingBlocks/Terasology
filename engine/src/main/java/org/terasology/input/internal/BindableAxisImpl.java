@@ -17,6 +17,7 @@
 package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindAxisSubscriber;
@@ -25,8 +26,8 @@ import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.SendEventMode;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**

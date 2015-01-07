@@ -16,7 +16,11 @@
 
 package org.terasology.input.binds.movement;
 
-import org.terasology.input.*;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Florian <florian@fkoeberle.de>

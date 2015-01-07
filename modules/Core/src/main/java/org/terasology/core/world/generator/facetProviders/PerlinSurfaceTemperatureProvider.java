@@ -16,6 +16,7 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -24,8 +25,6 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius

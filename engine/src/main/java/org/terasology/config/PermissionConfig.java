@@ -25,7 +25,6 @@ import java.util.List;
 public class PermissionConfig {
     /**
      * Used for first time authentication at a headless server which may be at a remote location.
-     *
      */
     private String oneTimeAuthorizationKey = createRandomKey();
 
@@ -55,7 +54,7 @@ public class PermissionConfig {
         possibleCharacters.remove(Character.valueOf('O'));
 
         StringBuilder codeBuilder = new StringBuilder();
-        for (int i = 0; i< 20; i++) {
+        for (int i = 0; i < 20; i++) {
             if ((i != 0) && (i % 4 == 0)) {
                 codeBuilder.append("-");
             }

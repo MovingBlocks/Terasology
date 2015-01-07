@@ -16,7 +16,7 @@
 
 package org.terasology.physics.engine;
 
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * A character collider is a non-blocking collider for use calculating character movement.
@@ -31,10 +31,9 @@ public interface CharacterCollider {
     /**
      * Retrieves the location of this collider.
      *
-     * @param out output parameter to put the results in.
-     * @return out, for easy of use.
+     * @return out the result.
      */
-    Vector3f getLocation(Vector3f out);
+    Vector3f getLocation();
 
     /**
      * Sets the worlds location of this collider.

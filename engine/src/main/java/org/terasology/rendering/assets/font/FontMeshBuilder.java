@@ -20,8 +20,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-import javax.vecmath.Vector3f;
-
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;

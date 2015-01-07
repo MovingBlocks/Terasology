@@ -21,8 +21,8 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -61,8 +61,9 @@ public class ShaderParametersPost extends ShaderParametersBase {
             DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++, true);
 
-            if (cameraTargetSystem != null)
-                program.setFloat("focalDistance", cameraTargetSystem.getFocalDistance(), true);//for use in DOF effect
+            if (cameraTargetSystem != null) {
+                program.setFloat("focalDistance", cameraTargetSystem.getFocalDistance(), true); //for use in DOF effect
+            }
         }
 
         Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1");

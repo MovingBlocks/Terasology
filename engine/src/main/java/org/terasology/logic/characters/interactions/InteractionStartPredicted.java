@@ -18,17 +18,14 @@ package org.terasology.logic.characters.interactions;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.module.sandbox.API;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.logic.characters.interactions.InteractionUtil;
 
 /**
- *
  * Sent to the client by itself at the start of an interaction between a character and a target.
- *
+ * <p/>
  * THe event is sent to the target entity.
- *
+ * <p/>
  * This event is not intended to be sent by modules.
- *
+ * <p/>
  * When event handler runs, the  predictedInteractionTarget field of the instigator's
  * CharacterComponent will already be updated to the new value.
  *

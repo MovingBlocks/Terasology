@@ -15,7 +15,9 @@
  */
 package org.terasology.rendering.world;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -24,6 +26,7 @@ import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
@@ -35,7 +38,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
-import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.Collections;
 import java.util.Iterator;
@@ -444,21 +446,19 @@ public class RenderableWorldImpl implements RenderableWorld {
 
         @Override
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
+            Preconditions.checkNotNull(chunk1);
+            Preconditions.checkNotNull(chunk2);
             Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (chunk1 == null) {
-                return -1;
-            } else if (chunk2 == null) {
-                return 1;
-            }
-
             if (distance1 == distance2) {
                 return 0;
+            } else if (distance1 > distance2) {
+                return 1;
+            } else {
+                return -1;
             }
-
-            return distance2 > distance1 ? -1 : 1;
         }
     }
 
@@ -466,21 +466,19 @@ public class RenderableWorldImpl implements RenderableWorld {
 
         @Override
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
+            Preconditions.checkNotNull(chunk1);
+            Preconditions.checkNotNull(chunk2);
             Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (chunk1 == null) {
-                return 1;
-            } else if (chunk2 == null) {
-                return -1;
-            }
-
             if (distance1 == distance2) {
                 return 0;
+            } else if (distance2 > distance1) {
+                return 1;
+            } else {
+                return -1;
             }
-
-            return distance2 > distance1 ? 1 : -1;
         }
     }
 

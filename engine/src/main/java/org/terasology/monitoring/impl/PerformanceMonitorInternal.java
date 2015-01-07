@@ -16,6 +16,7 @@
 package org.terasology.monitoring.impl;
 
 import gnu.trove.map.TObjectDoubleMap;
+import org.terasology.monitoring.Activity;
 
 /**
  * Base interface for performance monitor implementations.
@@ -25,7 +26,7 @@ import gnu.trove.map.TObjectDoubleMap;
 public interface PerformanceMonitorInternal {
     void rollCycle();
 
-    void startActivity(String activity);
+    Activity startActivity(String activity);
 
     void endActivity();
 

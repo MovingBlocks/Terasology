@@ -17,17 +17,11 @@ package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.iterator.TLongObjectIterator;
-import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.TIntSet;
 import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.terasology.entitySystem.Component;
 

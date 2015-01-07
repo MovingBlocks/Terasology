@@ -20,8 +20,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Vector3f;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -159,7 +159,7 @@ public class Vector3iTest {
         assertTrue(Vector3i.unitY().isUnitVector());
         assertTrue(Vector3i.unitZ().isUnitVector());
         Vector3i v = Vector3i.unitX();
-        v.negate();
+        v.scale(-1);
         assertTrue(v.isUnitVector());
         assertFalse(Vector3i.one().isUnitVector());
     }

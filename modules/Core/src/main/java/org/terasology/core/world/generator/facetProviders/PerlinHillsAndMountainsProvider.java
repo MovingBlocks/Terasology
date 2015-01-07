@@ -18,6 +18,7 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
@@ -32,7 +33,6 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generation.facets.SurfaceHumidityFacet;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
-import javax.vecmath.Vector2f;
 import java.util.Iterator;
 
 /**

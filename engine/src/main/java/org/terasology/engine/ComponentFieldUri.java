@@ -45,13 +45,14 @@ public final class ComponentFieldUri implements Uri {
 
         if (seperatorIndex != -1) {
             componentUri = new SimpleUri(textVersion.substring(0, seperatorIndex));
-            fieldName = textVersion.substring(seperatorIndex+1);
+            fieldName = textVersion.substring(seperatorIndex + 1);
         } else {
             // create invalid uri
             fieldName = null;
             componentUri = new SimpleUri();
         }
     }
+
     public Name getObjectName() {
         return componentUri.getObjectName();
     }

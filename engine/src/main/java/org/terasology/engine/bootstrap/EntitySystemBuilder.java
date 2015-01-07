@@ -40,7 +40,12 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -49,6 +54,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
@@ -73,11 +79,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 /**
  * @author Immortius
@@ -139,6 +140,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
         serializationLibrary.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
         serializationLibrary.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
+        serializationLibrary.add(Name.class, new NameTypeHandler());
         serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
         serializationLibrary.add(TextureRegion.class, new TextureRegionTypeHandler());

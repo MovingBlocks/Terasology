@@ -20,12 +20,11 @@ import java.util.Collection;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

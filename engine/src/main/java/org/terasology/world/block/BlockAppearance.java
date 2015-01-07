@@ -17,9 +17,10 @@ package org.terasology.world.block;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+
+import org.terasology.math.geom.Vector2f;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
-import javax.vecmath.Vector2f;
 import java.util.EnumMap;
 import java.util.Map;
 

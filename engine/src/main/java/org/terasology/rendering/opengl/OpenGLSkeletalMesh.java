@@ -22,14 +22,14 @@ import org.lwjgl.opengl.GL15;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;

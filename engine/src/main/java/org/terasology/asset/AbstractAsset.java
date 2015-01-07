@@ -31,11 +31,11 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     private static final Logger logger = LoggerFactory.getLogger(AbstractAsset.class);
     private final AssetUri uri;
 
+    private boolean disposed;
+
     public AbstractAsset(AssetUri uri) {
         this.uri = uri;
     }
-
-    private boolean disposed;
 
     /**
      * @return This asset's identifying URI.

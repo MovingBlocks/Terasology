@@ -29,7 +29,10 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -136,7 +139,7 @@ public class InventoryCell extends ItemCell {
     private void moveItemSmartly() {
         EntityRef fromEntity = getTargetInventory();
         int fromSlot = getTargetSlot();
-        EntityRef playerEntity= localPlayer.getCharacterEntity();
+        EntityRef playerEntity = localPlayer.getCharacterEntity();
         InventoryComponent playerInventory = playerEntity.getComponent(InventoryComponent.class);
         if (playerInventory == null) {
             return;
@@ -156,20 +159,20 @@ public class InventoryCell extends ItemCell {
         List<Integer> toSlots = new ArrayList<>(totalSlotCount);
         if (fromEntity.equals(playerEntity)) {
 
-        if (interactionTarget.exists() && interactionTargetInventory != null) {
-            targetEntity = interactionTarget;
-            toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
-        } else {
-            targetEntity = playerEntity;
-            int hudSlotCount = 10; // TODO use a constant once there is one
-            boolean fromHud = (fromSlot < hudSlotCount);
-            boolean toHud = !fromHud;
-            if (toHud) {
-                toSlots = numbersBetween(0, hudSlotCount);
+            if (interactionTarget.exists() && interactionTargetInventory != null) {
+                targetEntity = interactionTarget;
+                toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
             } else {
-                toSlots = numbersBetween(hudSlotCount, totalSlotCount);
+                targetEntity = playerEntity;
+                int hudSlotCount = 10; // TODO use a constant once there is one
+                boolean fromHud = (fromSlot < hudSlotCount);
+                boolean toHud = !fromHud;
+                if (toHud) {
+                    toSlots = numbersBetween(0, hudSlotCount);
+                } else {
+                    toSlots = numbersBetween(hudSlotCount, totalSlotCount);
+                }
             }
-        }
         } else {
             targetEntity = playerEntity;
             toSlots = numbersBetween(0, totalSlotCount);

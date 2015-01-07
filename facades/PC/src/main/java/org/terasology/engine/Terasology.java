@@ -18,7 +18,6 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -42,7 +41,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,31 +50,31 @@ import java.util.List;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
- *
+ * <p/>
  * Through the following launch arguments default locations to store logs and
  * game saves can be overridden, by using the current directory or a specified
  * one as the home directory. Furthermore, Terasology can be launched headless,
  * to save resources while acting as a server or to run in an environment with
  * no graphics, audio or input support. Additional arguments are available to
  * reload the latest game on startup and to disable crash reporting.
- *
+ * <p/>
  * Available launch arguments:
- *
+ * <p/>
  * <table>
- *  <tbody>
- *      <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
- *      <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
- *      <tr><td>-headless</td><td>Start headless.</td></tr>
- *      <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
- *      <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
- *      <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
- *  </tbody>
+ * <tbody>
+ * <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
+ * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
+ * <tr><td>-headless</td><td>Start headless.</td></tr>
+ * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
+ * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
+ * <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
+ * </tbody>
  * </table>
- *
+ * <p/>
  * When used via command line an usage help and some examples can be obtained via:
- *
- *      terasology -help    or    terasology /?
- *
+ * <p/>
+ * terasology -help    or    terasology /?
+ * <p/>
  * In case of crashes Terasology logs available information in <logpath>/Terasology.log
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

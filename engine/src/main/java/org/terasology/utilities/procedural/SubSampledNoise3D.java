@@ -16,11 +16,11 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
+
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * @author Immortius

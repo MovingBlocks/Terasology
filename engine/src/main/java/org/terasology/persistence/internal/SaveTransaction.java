@@ -27,7 +27,15 @@ import org.terasology.utilities.concurrency.AbstractTask;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.*;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
@@ -35,7 +43,7 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
- *
+ * <p/>
  * The result of this task can be obtained via {@link #getResult()}.
  *
  * @author Florian <florian@fkoeberle.de>
@@ -104,7 +112,6 @@ public class SaveTransaction extends AbstractTask {
     }
 
 
-
     private void createSaveTransactionDirectory() throws IOException {
         Path directory = storagePathProvider.getUnfinishedSaveTransactionPath();
         Files.createDirectories(directory);
@@ -113,7 +120,7 @@ public class SaveTransaction extends AbstractTask {
     private void perpareChangesForMerge() throws IOException {
         try {
             renameMergeFolder();
-        }catch (AccessDeniedException e) {
+        } catch (AccessDeniedException e) {
             /*
              * On some windows systems the rename fails sometimes with a AccessDeniedException, The exact cause is
              * unknown, but it is propablz a virus scanner. Renaming the folder 1 second later works.
@@ -161,7 +168,7 @@ public class SaveTransaction extends AbstractTask {
     private void writeChunkStores() throws IOException {
         FileSystemProvider zipProvider = getZipFileSystemProvider();
 
-        Path chunksPath =  storagePathProvider.getWorldTempPath();
+        Path chunksPath = storagePathProvider.getWorldTempPath();
         Files.createDirectories(chunksPath);
         if (storeChunksInZips) {
             Map<Vector3i, FileSystem> newChunkZips = Maps.newHashMap();
@@ -235,7 +242,6 @@ public class SaveTransaction extends AbstractTask {
 
 
     /**
-     *
      * @return the result if there is one yet or null. This method returns the value of a volatile variable and
      * can thus be used even from another thread.
      */

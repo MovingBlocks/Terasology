@@ -16,9 +16,8 @@
 
 package org.terasology.math;
 
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.ChunkConstants;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Collection of math functions.
@@ -712,7 +711,7 @@ public final class TeraMath {
         Side surfaceDir = Side.inDirection(normal);
         Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
         Vector3f rawDirection = new Vector3f(direction);
-        float dot = rawDirection.dot(attachDir);
+        float dot = (float) rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }

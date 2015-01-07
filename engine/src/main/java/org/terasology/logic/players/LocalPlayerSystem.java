@@ -15,7 +15,8 @@
  */
 package org.terasology.logic.players;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
@@ -28,8 +29,12 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.*;
+import org.terasology.input.binds.movement.ForwardsMovementAxis;
+import org.terasology.input.binds.movement.JumpButton;
+import org.terasology.input.binds.movement.StrafeMovementAxis;
+import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
+import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
@@ -45,6 +50,8 @@ import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -58,9 +65,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -134,17 +138,17 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quat4f viewRot = new Quat4f();
+        Quat4f viewRot;
         switch (characterMovementComponent.mode) {
             case WALKING:
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
+                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
                 break;
             default:
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
+                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
@@ -156,8 +160,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent,
                               CharacterComponent characterComp, LocationComponent location) {
         // TODO: Remove, use component camera, breaks spawn camera anyway
-        Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
+        Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
         updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
     }
 
@@ -259,8 +262,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         // The camera position is the player's position plus the eye offset
-        Vector3f cameraPosition = new Vector3f();
-        cameraPosition.add(new Vector3f(position), new Vector3f(0, characterComponent.eyeOffset, 0));
+        Vector3f cameraPosition = new Vector3f(position);
+        cameraPosition.add(0, characterComponent.eyeOffset, 0);
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = Direction.FORWARD.getVector3f();

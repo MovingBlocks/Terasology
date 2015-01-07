@@ -25,6 +25,7 @@ import org.terasology.asset.Assets;
 import org.terasology.editor.EditorRange;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -34,7 +35,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import javax.vecmath.Vector3f;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 

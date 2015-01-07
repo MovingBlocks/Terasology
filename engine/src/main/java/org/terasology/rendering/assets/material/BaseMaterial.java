@@ -17,15 +17,15 @@ package org.terasology.rendering.assets.material;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.math.geom.Matrix3f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Tuple2f;
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Tuple4f;
 import java.nio.FloatBuffer;
 
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {
@@ -98,12 +98,12 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     }
 
     @Override
-    public void setFloat2(String name, Tuple2f value) {
+    public void setFloat2(String name, Vector2f value) {
         setFloat2(name, value.x, value.y);
     }
 
     @Override
-    public void setFloat2(String name, Tuple2f value, boolean currentOnly) {
+    public void setFloat2(String name, Vector2f value, boolean currentOnly) {
         setFloat2(name, value.x, value.y, currentOnly);
     }
 
@@ -118,11 +118,11 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     }
 
     @Override
-    public void setFloat3(String name, Tuple3f value) {
+    public void setFloat3(String name, Vector3f value) {
         setFloat3(name, value.x, value.y, value.z);
     }
 
-    public void setFloat3(String name, Tuple3f value, boolean currentOnly) {
+    public void setFloat3(String name, Vector3f value, boolean currentOnly) {
         setFloat3(name, value.x, value.y, value.z, currentOnly);
     }
 
@@ -137,12 +137,12 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     }
 
     @Override
-    public void setFloat4(String name, Tuple4f value) {
+    public void setFloat4(String name, Vector4f value) {
         setFloat4(name, value.x, value.y, value.z, value.w);
     }
 
     @Override
-    public void setFloat4(String name, Tuple4f value, boolean currentOnly) {
+    public void setFloat4(String name, Vector4f value, boolean currentOnly) {
         setFloat4(name, value.x, value.y, value.z, value.w, currentOnly);
     }
 

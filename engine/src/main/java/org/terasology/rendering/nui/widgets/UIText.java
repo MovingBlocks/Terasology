@@ -30,9 +30,14 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -123,7 +128,7 @@ public class UIText extends CoreWidget {
         canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         correctCursor();
 
-        int widthForDraw = (multiline) ?  canvas.size().x : lastFont.getWidth(getText());
+        int widthForDraw = (multiline) ? canvas.size().x : lastFont.getWidth(getText());
 
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {

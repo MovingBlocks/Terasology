@@ -33,10 +33,10 @@ import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
-import org.terasology.logic.console.commands.CommandParameterSuggester;
-import org.terasology.logic.console.commands.referenced.CommandDefinition;
-import org.terasology.logic.console.commands.referenced.CommandParameter;
-import org.terasology.logic.console.commands.referenced.Sender;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.logic.console.ui.MiniChatOverlay;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -94,10 +94,10 @@ public class ChatSystem extends BaseComponentSystem {
         }
     }
 
-    @CommandDefinition(runOnServer = true, shortDescription = "Sends a message to all other players")
+    @Command(runOnServer = true, shortDescription = "Sends a message to all other players")
     public String say(
             @Sender EntityRef sender,
-            @CommandParameter(value = "message") String message
+            @CommandParam(value = "message") String message
     ) {
         logger.debug("Received chat message from {} : '{}'", sender, message);
 
@@ -108,11 +108,11 @@ public class ChatSystem extends BaseComponentSystem {
         return "Message sent.";
     }
 
-    @CommandDefinition(runOnServer = true, shortDescription = "Sends a private message to a specified user")
+    @Command(runOnServer = true, shortDescription = "Sends a private message to a specified user")
     public String whisper(
             @Sender EntityRef sender,
-            @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
-            @CommandParameter("message") String message
+            @CommandParam(value = "user", suggester = UsernameSuggester.class) String username,
+            @CommandParam("message") String message
     ) {
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;

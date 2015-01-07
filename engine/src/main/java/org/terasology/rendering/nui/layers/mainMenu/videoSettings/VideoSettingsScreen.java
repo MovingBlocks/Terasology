@@ -85,6 +85,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             screenshotSize.bindSelection(new ScreenshotSizeBinding(config.getRendering()));
         }
 
+        UIDropdown<ScreenshotFormat> screenhotFormat = find("screenshotFormat", UIDropdown.class);
+        if(screenhotFormat != null) {
+            screenhotFormat.setOptions(Lists.newArrayList(ScreenshotFormat.JPEG, ScreenshotFormat.PNG));
+            screenhotFormat.bindSelection(new ScreenshotFormatBinding(config.getRendering()));
+        }
+
         UIDropdown<Integer> blur = find("blur", UIDropdown.class);
         if (blur != null) {
             blur.setOptions(Lists.newArrayList(0, 1, 2, 3));

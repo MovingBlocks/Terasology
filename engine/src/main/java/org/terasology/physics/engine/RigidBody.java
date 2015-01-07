@@ -16,8 +16,8 @@
 
 package org.terasology.physics.engine;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * A rigid body is a physics object whose movement and location is controlled by the physics engine. Rigid bodies move under gravity and bounce off each other and the world.

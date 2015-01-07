@@ -25,7 +25,6 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.generation.Region;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;

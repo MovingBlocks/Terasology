@@ -16,13 +16,13 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TFloatList;
+
+import org.terasology.math.geom.Quat4f;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
-
-import javax.vecmath.Quat4f;
 
 /**
  * @author Immortius <immortius@gmail.com>

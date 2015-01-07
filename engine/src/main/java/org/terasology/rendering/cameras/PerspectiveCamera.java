@@ -19,10 +19,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 import java.util.Deque;
 import java.util.LinkedList;
 

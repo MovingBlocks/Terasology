@@ -17,6 +17,7 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -25,9 +26,9 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.console.commands.referenced.CommandDefinition;
-import org.terasology.logic.console.commands.referenced.CommandParameter;
-import org.terasology.logic.console.commands.referenced.Sender;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
@@ -38,6 +39,8 @@ import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -56,8 +59,6 @@ import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generator.WorldGenerator;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.Iterator;
 import java.util.List;
 
@@ -280,7 +281,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @CommandDefinition(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true)
+    @Command(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true)
     public void killCommand(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -289,8 +290,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @CommandDefinition(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true)
-    public String teleportCommand(@Sender EntityRef sender, @CommandParameter("x") float x, @CommandParameter("y") float y, @CommandParameter("z") float z) {
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true)
+    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
         if (location != null) {

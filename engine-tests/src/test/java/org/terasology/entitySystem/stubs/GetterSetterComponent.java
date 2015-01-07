@@ -16,8 +16,7 @@
 package org.terasology.entitySystem.stubs;
 
 import org.terasology.entitySystem.Component;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

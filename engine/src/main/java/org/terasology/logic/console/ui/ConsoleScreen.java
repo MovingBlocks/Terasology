@@ -15,15 +15,11 @@
  */
 package org.terasology.logic.console.ui;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
-import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -35,7 +31,6 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -67,8 +62,6 @@ public class ConsoleScreen extends CoreScreenLayer {
     public void initialise() {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
-
-        Collection<Command> commands = console.getCommands();
 
         commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);
@@ -109,12 +102,12 @@ public class ConsoleScreen extends CoreScreenLayer {
 
         if (!welcomePrinted) {
             console.addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
-                Message.NEW_LINE +
-                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
-                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
-                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
-                "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
-                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
+                    Message.NEW_LINE +
+                    "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
+                    "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
+                    "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
+                    "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
+                    "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
             welcomePrinted = true;
         }
     }

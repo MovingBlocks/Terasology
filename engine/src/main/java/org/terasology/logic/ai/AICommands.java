@@ -19,7 +19,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.commands.referenced.CommandDefinition;
+import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.registry.In;
 
 /**
@@ -30,7 +30,7 @@ public class AICommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @CommandDefinition(runOnServer = true, shortDescription = "Count all AIs in the world")
+    @Command(runOnServer = true, shortDescription = "Count all AIs in the world")
     public String countAI() {
         int simpleAIs = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
@@ -43,7 +43,7 @@ public class AICommands extends BaseComponentSystem {
         return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
     }
 
-    @CommandDefinition(runOnServer = true, shortDescription = "Destroys all AIs in the world")
+    @Command(runOnServer = true, shortDescription = "Destroys all AIs in the world")
     public String destroyAI() {
         int simpleAI = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {

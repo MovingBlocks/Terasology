@@ -30,7 +30,10 @@ import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 /**
  * @author Immortius
  */
-public class ChunkSerializer {
+public final class ChunkSerializer {
+
+    private ChunkSerializer() {
+    }
 
     public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray liquidData, TeraArray biomeData) {
         final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()

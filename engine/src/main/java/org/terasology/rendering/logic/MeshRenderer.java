@@ -19,6 +19,7 @@ import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
+
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,10 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -46,10 +51,6 @@ import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Map;
@@ -193,9 +194,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 glPushMatrix();
 
                 glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-                AxisAngle4f rot = new AxisAngle4f();
-                rot.set(worldRot);
-                glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
+                Vector3f axis = worldRot.getAxis();
+                float angle = (float) worldRot.getAngle();
+                glRotatef(TeraMath.RAD_TO_DEG * angle, axis.getX(), axis.getY(), axis.getZ());
                 glScalef(worldScale, worldScale, worldScale);
 
                 meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
@@ -229,9 +230,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        Matrix4f matrixWorldSpace = new Matrix4f();
         Transform transWorldSpace = new Transform();
-        Matrix4f matrixCameraSpace = new Matrix4f();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -262,12 +261,12 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 location.getWorldPosition(worldPos);
                 float worldScale = location.getWorldScale();
 
-                matrixWorldSpace.set(worldRot, worldPos, worldScale);
+                javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
                 transWorldSpace.set(matrixWorldSpace);
 
                 Vector3f worldPositionCameraSpace = new Vector3f();
                 worldPositionCameraSpace.sub(worldPos, cameraPosition);
-                matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);
+                Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
                 AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
                 if (worldRenderer.getActiveCamera().hasInSight(aabb)) {

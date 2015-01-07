@@ -15,13 +15,11 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
@@ -59,6 +57,7 @@ public interface StorageManager {
 
     /**
      * Deactivates the player and stores it at the next possible time.
+     *
      * @param client
      */
     void deactivatePlayer(Client client);

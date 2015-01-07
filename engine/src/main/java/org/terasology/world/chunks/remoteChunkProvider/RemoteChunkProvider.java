@@ -19,6 +19,7 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,6 +28,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -44,8 +46,11 @@ import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
-import javax.vecmath.Vector3f;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -273,6 +278,34 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         return chunkCache.get(pos);
     }
 
+    private boolean areAdjacentChunksReady(Chunk chunk) {
+        Vector3i centerChunkPos = chunk.getPosition();
+        for (Side side : Side.values()) {
+            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            Chunk adjChunk = chunkCache.get(adjChunkPos);
+            boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
+            if (!adjChunkReady) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
+        chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
+    }
+
+    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
+        Vector3i centerChunkPos = chunkInCenter.getPosition();
+        for (Side side : Side.values()) {
+            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            Chunk adjChunk = chunkCache.get(adjChunkPos);
+            if (adjChunk != null) {
+                updateAdjacentChunksReadyFieldOf(adjChunk);
+            }
+        }
+    }
+
     private static class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
 
         private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -303,33 +336,4 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             return vec.lengthSquared();
         }
     }
-
-    private boolean areAdjacentChunksReady(Chunk chunk) {
-        Vector3i centerChunkPos = chunk.getPosition();
-        for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = chunkCache.get(adjChunkPos);
-            boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
-            if (!adjChunkReady) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
-        chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
-    }
-
-    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
-        Vector3i centerChunkPos = chunkInCenter.getPosition();
-        for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = chunkCache.get(adjChunkPos);
-            if (adjChunk != null) {
-                updateAdjacentChunksReadyFieldOf(adjChunk);
-            }
-        }
-    }
-
 }

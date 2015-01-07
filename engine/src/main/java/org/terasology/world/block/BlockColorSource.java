@@ -15,9 +15,8 @@
  */
 package org.terasology.world.block;
 
+import org.terasology.math.geom.Vector4f;
 import org.terasology.world.biomes.Biome;
-
-import javax.vecmath.Vector4f;
 
 /**
  * Used to determine a multiplicative color for certain blocks based on the biome the block is in.

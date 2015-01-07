@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -25,11 +26,14 @@ import org.terasology.asset.Assets;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
@@ -45,10 +49,6 @@ import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -170,9 +170,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.scale(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f(Quat4fUtil.IDENTITY, centerOffset, 1.0f);
+        Matrix4f centerTransform = new Matrix4f(Quat4f.IDENTITY, centerOffset, 1.0f);
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(Quat4fUtil.IDENTITY,
+        Matrix4f translateTransform = new Matrix4f(Quat4f.IDENTITY,
                 new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
                         drawRegion.minY() + drawRegion.height() / 2, 0), 1);
 

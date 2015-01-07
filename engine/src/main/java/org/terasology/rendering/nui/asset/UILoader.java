@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
@@ -39,7 +40,12 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -47,6 +53,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHan
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
@@ -85,10 +92,6 @@ import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -129,6 +132,7 @@ public class UILoader implements AssetLoader<UIData> {
         library.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         library.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         library.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
+        library.add(Name.class, new NameTypeHandler());
         library.add(UISkin.class, new AssetTypeHandler<>(AssetType.UI_SKIN, UISkin.class));
         library.add(Vector4f.class, new Vector4fTypeHandler());
         library.add(Vector3f.class, new Vector3fTypeHandler());

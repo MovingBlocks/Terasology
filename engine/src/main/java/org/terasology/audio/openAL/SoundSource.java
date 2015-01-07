@@ -16,8 +16,7 @@
 package org.terasology.audio.openAL;
 
 import org.terasology.audio.Sound;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 public interface SoundSource<T extends Sound<?>> {
 

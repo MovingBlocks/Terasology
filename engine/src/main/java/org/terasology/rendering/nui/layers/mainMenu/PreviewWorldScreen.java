@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -363,7 +362,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
-    private static class ByteBufferResult {
+    private static final class ByteBufferResult {
         public boolean success;
         public ByteBuffer buf;
         public Exception exception;

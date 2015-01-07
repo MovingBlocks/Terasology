@@ -27,6 +27,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -36,7 +37,6 @@ import org.terasology.world.block.entity.CreateBlockDropsEvent;
 import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.items.BlockItemFactory;
 
-import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**

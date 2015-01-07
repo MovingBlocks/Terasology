@@ -16,11 +16,13 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
@@ -28,7 +30,6 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
-import javax.vecmath.Vector2f;
 import java.util.Iterator;
 import java.util.List;
 

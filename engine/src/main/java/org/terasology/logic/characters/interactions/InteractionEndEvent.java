@@ -15,17 +15,14 @@
  */
 package org.terasology.logic.characters.interactions;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.network.OwnerEvent;
 
 /**
  * Represents the end of an interaction between for example a character and a container.
- *
+ * <p/>
  * The event is sent via the character.
- *
+ * <p/>
  * The event is sent by the server to the owner of the character..
  *
  * @author Florian <florian@fkoeberle.de>

@@ -24,12 +24,8 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
-
-import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntLongMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntLongHashMap;
-
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -59,7 +55,12 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.module.Module;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.*;
+import org.terasology.network.Client;
+import org.terasology.network.JoinStatus;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.Server;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;

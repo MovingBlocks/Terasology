@@ -28,7 +28,7 @@ import org.terasology.module.sandbox.API;
  * Utility class for entities with the {@link org.terasology.logic.characters.CharacterComponent}.
  */
 @API
-public class InteractionUtil {
+public final class InteractionUtil {
     private static final Logger logger = LoggerFactory.getLogger(InteractionUtil.class);
 
     private InteractionUtil() {
@@ -72,7 +72,7 @@ public class InteractionUtil {
         int oldInteractionId = characterComponent.authorizedInteractionId;
         EntityRef oldTarget = characterComponent.authorizedInteractionTarget;
         if (oldTarget.exists()) {
-            characterComponent.authorizedInteractionTarget =EntityRef.NULL;
+            characterComponent.authorizedInteractionTarget = EntityRef.NULL;
             character.saveComponent(characterComponent);
         }
 
@@ -80,7 +80,6 @@ public class InteractionUtil {
     }
 
     /**
-     *
      * @return the active interaction screen uri of the specified character.
      * The method returns null if the player has no interaction screen open.
      * The method is only intended to be called for the own character.

@@ -32,7 +32,6 @@ import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
-import org.terasology.world.block.loader.BlockDefinition;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -448,7 +447,7 @@ public class InventoryAuthoritySystemTest {
         toInventoryComp.itemSlots.set(2, itemB1);
         toInventoryComp.itemSlots.set(3, itemA2);
 
-        EntityRef fromInventory =  Mockito.mock(EntityRef.class);
+        EntityRef fromInventory = Mockito.mock(EntityRef.class);
         InventoryComponent fromInventoryComp = new InventoryComponent(5);
         Mockito.when(fromInventory.getComponent(InventoryComponent.class)).thenReturn(fromInventoryComp);
         EntityRef itemA3 = createItem("A", 4, stackSize);
@@ -477,7 +476,7 @@ public class InventoryAuthoritySystemTest {
         toInventoryComp.itemSlots.set(2, itemB1);
         toInventoryComp.itemSlots.set(3, itemA2);
 
-        EntityRef fromInventory =  Mockito.mock(EntityRef.class);
+        EntityRef fromInventory = Mockito.mock(EntityRef.class);
         InventoryComponent fromInventoryComp = new InventoryComponent(5);
         Mockito.when(fromInventory.getComponent(InventoryComponent.class)).thenReturn(fromInventoryComp);
         EntityRef itemA3 = createItem("A", 8, stackSize);
@@ -509,7 +508,7 @@ public class InventoryAuthoritySystemTest {
         toInventoryComp.itemSlots.set(2, itemB1);
         toInventoryComp.itemSlots.set(3, itemA2);
 
-        EntityRef fromInventory =  Mockito.mock(EntityRef.class);
+        EntityRef fromInventory = Mockito.mock(EntityRef.class);
         InventoryComponent fromInventoryComp = new InventoryComponent(5);
         Mockito.when(fromInventory.getComponent(InventoryComponent.class)).thenReturn(fromInventoryComp);
         EntityRef itemA3 = createItem("A", 4, stackSize);
@@ -529,7 +528,6 @@ public class InventoryAuthoritySystemTest {
     }
 
 
-
     @Test
     public void testMoveItemToSlotsWithTargetVetos() {
         int stackSize = 10;
@@ -538,7 +536,7 @@ public class InventoryAuthoritySystemTest {
         EntityRef itemA1 = createItem("A", 8, stackSize);
         toInventoryComp.itemSlots.set(0, itemA1);
 
-        EntityRef fromInventory =  Mockito.mock(EntityRef.class);
+        EntityRef fromInventory = Mockito.mock(EntityRef.class);
         InventoryComponent fromInventoryComp = new InventoryComponent(5);
         Mockito.when(fromInventory.getComponent(InventoryComponent.class)).thenReturn(fromInventoryComp);
         EntityRef itemA2 = createItem("A", 5, stackSize);
@@ -581,7 +579,6 @@ public class InventoryAuthoritySystemTest {
     }
 
 
-
     /**
      * A shift click isn't possible because the removal of the item gets blocked
      */
@@ -593,7 +590,7 @@ public class InventoryAuthoritySystemTest {
         EntityRef itemA1 = createItem("A", 8, stackSize);
         toInventoryComp.itemSlots.set(0, itemA1);
 
-        EntityRef fromInventory =  Mockito.mock(EntityRef.class);
+        EntityRef fromInventory = Mockito.mock(EntityRef.class);
         InventoryComponent fromInventoryComp = new InventoryComponent(5);
         Mockito.when(fromInventory.getComponent(InventoryComponent.class)).thenReturn(fromInventoryComp);
         EntityRef itemA2 = createItem("A", 5, stackSize);
@@ -643,7 +640,7 @@ public class InventoryAuthoritySystemTest {
         toInventoryComp.itemSlots.set(1, itemB1);
         toInventoryComp.itemSlots.set(2, itemA2);
 
-        EntityRef fromInventory =  Mockito.mock(EntityRef.class);
+        EntityRef fromInventory = Mockito.mock(EntityRef.class);
         InventoryComponent fromInventoryComp = new InventoryComponent(5);
         Mockito.when(fromInventory.getComponent(InventoryComponent.class)).thenReturn(fromInventoryComp);
         EntityRef itemA3 = createItem("A", 4, stackSize);

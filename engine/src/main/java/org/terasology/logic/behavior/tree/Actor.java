@@ -88,7 +88,7 @@ public class Actor {
         if (component == null) {
             return null;
         }
-        FieldMetadata<?,?> fieldMetadata = metadata.getField(uri.getFieldName());
+        FieldMetadata<?, ?> fieldMetadata = metadata.getField(uri.getFieldName());
         if (fieldMetadata == null) {
             return null;
         }

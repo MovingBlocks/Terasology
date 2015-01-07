@@ -16,7 +16,8 @@
 
 package org.terasology.math;
 
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
+
 import java.util.Iterator;
 
 /**
