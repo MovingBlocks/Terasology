@@ -25,7 +25,9 @@ import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -34,30 +36,35 @@ import java.util.Map;
 final class GlobalStoreBuilder {
 
     private final long nextEntityId;
-    private final EntityData.GlobalStore.Builder store;
-    private final Map<Class<? extends Component>, Integer> componentIdTable;
+    private final PrefabSerializer prefabSerializer;
 
     public GlobalStoreBuilder(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.nextEntityId = entityManager.getNextId();
-        this.store = EntityData.GlobalStore.newBuilder();
+        this.prefabSerializer = prefabSerializer;
+    }
+    
+    public EntityData.GlobalStore build(EngineEntityManager entityManager, Iterable<EntityRef> entities) {
+        EntityData.GlobalStore.Builder store = EntityData.GlobalStore.newBuilder();
 
-        // TODO move complete store creation in build method, so that the serialization happens off the main thread
-        // when this is done then the build method needs a prefab manager.
-
-        this.componentIdTable = Maps.newHashMap();
+        Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             store.addComponentClass(componentMetadata.getUri().toString());
             componentIdTable.put(componentMetadata.getType(), componentIdTable.size());
         }
         prefabSerializer.setComponentIdMapping(componentIdTable);
-        for (Prefab prefab : entityManager.getPrefabManager().listPrefabs()) {
+        /*
+         * The prefabs can't be obtained from  entityManager.getPrefabManager().listPrefabs() as that might not
+         * be thread save.
+         */
+        Set<Prefab> prefabsRequiredForEntityStorage = new HashSet<>();
+        for (EntityRef entityRef : entityManager.getAllEntities()) {
+            Prefab prefab = entityRef.getParentPrefab();
+            prefabsRequiredForEntityStorage.add(prefab);
+        }
+        for (Prefab prefab: prefabsRequiredForEntityStorage) {
             store.addPrefab(prefabSerializer.serialize(prefab));
         }
-    }
 
-
-
-    public EntityData.GlobalStore build(EngineEntityManager entityManager, Iterable<EntityRef> entities) {
         EntitySerializer entitySerializer = new EntitySerializer(entityManager);
         entitySerializer.setComponentIdMapping(componentIdTable);
         for (EntityRef entity: entities) {
