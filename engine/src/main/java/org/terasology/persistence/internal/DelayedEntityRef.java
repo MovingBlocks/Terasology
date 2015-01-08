@@ -23,29 +23,34 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
+ * The class represents a future entity ref that has yet to be bound to an entity manager.
  *
- * This entity will a certain {@link EntityManager} once they get accessed for the first time to obtain a real {@link EntityRef}.
- * Afterwards it will return always the values of that {@link EntityRef}.
+ * Currently it gets used by the StorageManager to create entity refs on the main thread for storage off the main
+ * thread. During the storage the entities will be bound to the entity manager that is private the the saving thread.
  *
- * This makes it possible to create copies of components ont he main thread which contain
- * entity refs which will use a entity manager that is private to the saving thread.
  * @author Florian <florian@fkoeberle.de>
  */
 public class DelayedEntityRef extends EntityRef {
     private final long id;
-    private final EntityManager entityManager;
     private EntityRef entityRef;
 
-    public DelayedEntityRef(long id, EntityManager entityManager) {
+    public DelayedEntityRef(long id) {
         this.id = id;
-        this.entityManager = entityManager;
+        this.entityRef = null;
     }
 
     private EntityRef getEntityRef() {
         if (entityRef == null) {
-            entityRef = entityManager.getEntity(id);
+            throw new IllegalStateException("The entity ref must be bound to an entity manager before it can be used");
         }
         return entityRef;
+    }
+
+    public void bindTo(EntityManager entityManager) {
+        if (entityRef != null) {
+            throw new IllegalStateException("Entity was already bound to an entity manager");
+        }
+        entityRef = entityManager.getEntity(id);
     }
 
     @Override
@@ -75,7 +80,7 @@ public class DelayedEntityRef extends EntityRef {
 
     @Override
     public long getId() {
-        return getEntityRef().getId();
+        return id;
     }
 
     @Override

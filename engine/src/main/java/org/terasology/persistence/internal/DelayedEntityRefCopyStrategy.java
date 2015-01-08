@@ -15,31 +15,24 @@
  */
 package org.terasology.persistence.internal;
 
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.reflection.copy.CopyStrategy;
 
 /**
- * This copy strategy return {@link EntityRef}s that will use another {@link EntityManager} once they get accessed
- * for the first time. This makes it possible to create copies of components ont he main thread which contain
- * entity refs which will use a entity manager that is private to the saving thread.
+ * This copy strategy return {@link DelayedEntityRef}s. See that class for more info.
  *
  * @author Florian <florian@fkoeberle.de>
  */
 class DelayedEntityRefCopyStrategy implements CopyStrategy<EntityRef> {
 
-    private EntityManager entityManager;
+    private DelayedEntityRefFactory delayedEntityRefFactory;
 
-    /**
-     *
-     * @param entityManager the entity manager that the copies will use.
-     */
-    DelayedEntityRefCopyStrategy(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    DelayedEntityRefCopyStrategy(DelayedEntityRefFactory delayedEntityRefFactory) {
+        this.delayedEntityRefFactory = delayedEntityRefFactory;
     }
 
     @Override
     public EntityRef copy(EntityRef value) {
-        return new DelayedEntityRef(value.getId(), entityManager);
+        return delayedEntityRefFactory.createDelayedEntityRef(value.getId());
     }
 }

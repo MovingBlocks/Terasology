@@ -263,6 +263,14 @@ public class SaveTransaction extends AbstractTask {
                 return true;
             }
         });
+        /*
+         * Bind the delayed entities refs, before destroying the entities:
+         *
+         * That way delayed entity refs will reference the enttiy refs that got marked as destroyed and now new
+         * unloaded ones.
+         */
+        deltaToSave.bindAllDelayedEntityRefsTo(privateEntityManager);
+
         deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
             @Override
             public boolean execute(long entityId) {

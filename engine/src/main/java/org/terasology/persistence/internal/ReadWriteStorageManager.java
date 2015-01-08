@@ -79,7 +79,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Immortius
  * @author Florian <florian@fkoeberle.de>
  */
-public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber {
+public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -137,7 +137,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
-                .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(privateEntityManager));
+                .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(this));
         this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
 
     }
@@ -534,5 +534,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public void onBeforeDeactivation(EntityRef entity, Collection<Component> components) {
         entitySetDeltaRecorder.onBeforeDeactivation(entity, components);
 
+    }
+
+    @Override
+    public DelayedEntityRef createDelayedEntityRef(long id) {
+        DelayedEntityRef delayedEntityRef = new DelayedEntityRef(id);
+        entitySetDeltaRecorder.registerDelayedEntityRef(delayedEntityRef);
+        return delayedEntityRef;
     }
 }

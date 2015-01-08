@@ -15,15 +15,18 @@
  */
 package org.terasology.persistence.internal;
 
+import com.google.common.collect.MapMaker;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *
@@ -40,7 +43,11 @@ class EntitySetDeltaRecorder {
     private TLongObjectMap<EntityDelta> entityDeltas = new TLongObjectHashMap<>();
     private TLongSet destroyedEntities = new TLongHashSet();
     private TLongSet deactivatedEntities = new TLongHashSet();
-
+    /**
+     * The used keys are unique, so that it is a collection of {@link DelayedEntityRef}s that cleans itself up
+     * when the{@link DelayedEntityRef}s get no longer referenced
+     * */
+    private Map<Object, DelayedEntityRef> delayedEntityRefs =  new MapMaker().weakValues().makeMap();
 
     /**
      *
@@ -103,5 +110,15 @@ class EntitySetDeltaRecorder {
 
     public void onBeforeDeactivation(EntityRef entity, Collection<Component> components) {
         deactivatedEntities.add(entity.getId());
+    }
+
+    public void registerDelayedEntityRef(DelayedEntityRef delayedEntity) {
+        delayedEntityRefs.put(new Object(), delayedEntity);
+    }
+
+    public void bindAllDelayedEntityRefsTo(EntityManager entityManager) {
+        for (DelayedEntityRef delayedEntityRef: delayedEntityRefs.values()) {
+            delayedEntityRef.bindTo(entityManager);
+        }
     }
 }
