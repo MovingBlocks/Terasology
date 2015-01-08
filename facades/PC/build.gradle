@@ -74,9 +74,11 @@ task runPC(type:JavaExec) {
     workingDir = rootDir
     String[] runArgs = ["-homedir"]
     args runArgs
+    jvmArgs "-splash:${sourceSets.main.output.resourcesDir}/splash.jpg"
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.resourcesDir
     classpath project(':engine').sourceSets.main.output.classesDir
     classpath project(':engine').configurations.runtime
 }
@@ -155,6 +157,7 @@ task startServer(type:JavaExec) {
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.resourcesDir
     classpath project(':engine').sourceSets.main.output.classesDir
     classpath project(':engine').configurations.runtime
 }
