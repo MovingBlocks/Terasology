@@ -392,12 +392,17 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     }
 
     @Override
-    public void paintDebugOutline() {
+    public void paintDebugOutline(boolean showVisualPadding) {
     }
 
     @Override
-    public int getComponetType(boolean disregardScrollPane) {
+    public int getComponentType(boolean disregardScrollPane) {
         return 0;
+    }
+
+    @Override
+    public int getContentBias() {
+        return -1;
     }
 
     @Override
