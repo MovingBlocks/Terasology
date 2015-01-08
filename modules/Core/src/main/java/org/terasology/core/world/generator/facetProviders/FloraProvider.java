@@ -36,7 +36,11 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  * Determines where plants can be placed.  Will put plants one block above the surface if it is in the correct biome.
  */
 @Produces(PlantFacet.class)
-@Requires({@Facet(SurfaceHeightFacet.class), @Facet(BiomeFacet.class), @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))})
+@Requires({
+    @Facet(SurfaceHeightFacet.class),
+    @Facet(BiomeFacet.class),
+    @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))
+})
 public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
 
     private NoiseTable noiseTable;
@@ -58,19 +62,45 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
         int maxY = facet.getWorldRegion().maxY();
         for (int z = facet.getRelativeRegion().minZ(); z <= facet.getRelativeRegion().maxZ(); ++z) {
             for (int x = facet.getRelativeRegion().minX(); x <= facet.getRelativeRegion().maxX(); ++x) {
-                int height = TeraMath.floorToInt(surface.get(x, z));
-                if (height >= minY && height < maxY) {
+                int height = TeraMath.ceilToInt(surface.get(x, z));
+                if (height >= minY && height <= maxY) {
                     CoreBiome biome = biomeFacet.get(x, z);
                     height = height - minY + facet.getRelativeRegion().minY();
 
-                    if ((biome == CoreBiome.FOREST || biome == CoreBiome.PLAINS) && density.get(x, height, z) > 0
-                            && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) < configuration.density) {
-                        facet.set(x, height + 1, z, true);
+                    float below = density.get(x, height - 1, z);
+                    float curr = density.get(x, height, z);
+                    if (below >= 0 && curr < 0) {
+                        float plantProb = getPlantProb(biome);
+                        if (noiseTable.noise(x, z) / 255.0f < plantProb) {
+                            facet.set(x, height, z, true);
+                        }
                     }
                 }
             }
         }
         region.setRegionFacet(PlantFacet.class, facet);
+    }
+
+    private float getPlantProb(CoreBiome biome) {
+        switch (biome) {
+            case DESERT:
+                return configuration.desertGrassDensity;
+
+            case FOREST:
+                return configuration.forestGrassDensity;
+
+            case MOUNTAINS:
+                return configuration.mountainGrassDensity;
+
+            case PLAINS:
+                return configuration.plainsGrassDensity;
+
+            case SNOW:
+                return configuration.snowGrassDensity;
+
+            default:
+                return 0;
+        }
     }
 
     @Override
@@ -89,8 +119,20 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
     }
 
     private static class FloraProviderConfiguration implements Component {
-        @Range(min = 0, max = 360f, increment = 10f, precision = 0, description = "Define the tree density for flora")
-        private float density = 180f;
 
+        @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for forests")
+        private float forestGrassDensity = 0.3f;
+
+        @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for plains")
+        private float plainsGrassDensity = 0.2f;
+
+        @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for snow")
+        private float snowGrassDensity = 0.001f;
+
+        @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for mountains")
+        private float mountainGrassDensity = 0.2f;
+
+        @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for deserts")
+        private float desertGrassDensity = 0.001f;
     }
 }
