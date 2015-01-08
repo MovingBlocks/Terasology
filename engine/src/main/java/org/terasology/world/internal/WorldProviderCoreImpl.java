@@ -82,7 +82,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private Map<Vector3i, BiomeChange> biomeChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
-
+    
+    //hack to stop unavaible chunk logging from flooding log
+    private int unavaibleBlock=0;
+    private int unavaibleLight=0;
+    private int unavaibleSunLight=0;
+    
     public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
@@ -267,7 +272,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getBlock(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", x, y, z);
+        if(unavaibleBlock==0 && unavaibleBlock%100==1)
+        	logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", x, y, z);
+        unavaibleBlock++;
         return BlockManager.getAir();
     }
 
@@ -279,7 +286,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = TeraMath.calcBlockPos(pos);
             return chunk.getBiome(blockPos.x, blockPos.y, blockPos.z);
         }
-        logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", pos.x, pos.y, pos.z);
+        logger.warn("Attempted to access unavailable chunk via biome at {}, {}, {}", pos.x, pos.y, pos.z);
         return BiomeManager.getUnknownBiome();
     }
 
@@ -321,7 +328,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via light at {}, {}, {}", x, y, z);
+        if(unavaibleLight==0 && unavaibleLight%100==1)
+        	logger.warn("Attempted to access unavailable chunk via light at {}, {}, {}", x, y, z);
+        unavaibleLight++;
         return 0;
     }
 
@@ -333,7 +342,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via sunlight at {}, {}, {}", x, y, z);
+        if(unavaibleSunLight==0 && unavaibleSunLight%100==1)
+        	logger.warn("Attempted to access unavailable chunk via sunlight at {}, {}, {}", x, y, z);
+        unavaibleSunLight++;
         return 0;
     }
 
