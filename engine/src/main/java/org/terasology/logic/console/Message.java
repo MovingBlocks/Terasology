@@ -24,25 +24,32 @@ public class Message {
      * JAVA8: consider moving this to the {@link Console} interface as soon as Java 8 is around
      */
     public static final String NEW_LINE = "\n";
+    public static final String TYPE_INFO = "info";
+    public static final String TYPE_WARNING = "warning";
+    public static final String TYPE_ERROR = "error";
+    public static final String TYPE_NOTIFICATION = "notification";
+    public static final String TYPE_CHAT = "chat";
 
-    private final MessageType type;
     private final String message;
+    private final String type;
 
-    public Message(String message) {
-        this.message = message;
-        this.type = CoreMessageType.CONSOLE;
-    }
-
-    public Message(String message, MessageType type) {
+    public Message(String message, String type) {
         this.message = message;
         this.type = type;
+    }
+
+    /**
+     * Creates a new Message with the 'info' type
+     */
+    public Message(String message) {
+        this(message, TYPE_INFO);
     }
 
     public String getMessage() {
         return message;
     }
 
-    public MessageType getType() {
+    public String getType() {
         return type;
     }
     

@@ -74,7 +74,7 @@ public class ConsoleImpl implements Console {
         if (commandRegistry.containsKey(commandName)) {
             logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
                     commandName, commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
-                    command.getClass().getCanonicalName());
+                    command.getSource().getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
             logger.debug("Command '{}' successfully registered for class '{}'.", commandName,
@@ -88,29 +88,13 @@ public class ConsoleImpl implements Console {
         messageHistory.clear();
     }
 
-    /**
-     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
-     *
-     * @param message The message content
-     */
-    @Override
-    public void addMessage(String message) {
-        addMessage(new Message(message));
-    }
+    private void sendMessage(Message message, EntityRef target) {
+        if (target.exists() && !target.getComponent(ClientComponent.class).local) {
+            target.send(new ConsoleMessageEvent(message));
+            return;
+        }
 
-    /**
-     * Adds a message to the console
-     *
-     * @param message The content of the message
-     * @param type    The type of the message
-     */
-    @Override
-    public void addMessage(String message, MessageType type) {
-        addMessage(new Message(message, type));
-    }
-
-    private void addErrorMessage(String message) {
-        addMessage(new Message(message, CoreMessageType.ERROR));
+        addMessage(message);
     }
 
     /**
@@ -126,6 +110,20 @@ public class ConsoleImpl implements Console {
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
         }
+    }
+
+    @Override
+    public void addMessage(String message, String messageType) {
+        addMessage(new Message(message, messageType));
+    }
+
+    @Override
+    public void addMessage(String message) {
+        addMessage(message, Message.TYPE_INFO);
+    }
+
+    private void sendErrorMessage(String message, EntityRef client) {
+        sendMessage(new Message(FontColor.getColored(message, ConsoleColors.ERROR), Message.TYPE_ERROR), client);
     }
 
     @Override
@@ -150,8 +148,8 @@ public class ConsoleImpl implements Console {
     }
 
     @Override
-    public Iterable<Message> getMessages(MessageType... types) {
-        final List<MessageType> allowedTypes = Arrays.asList(types);
+    public Iterable<Message> getMessages(String... types) {
+        final List<String> allowedTypes = Arrays.asList(types);
 
         // JAVA8: this can be simplified using Stream.filter()
         return Collections2.filter(messageHistory, new Predicate<Message>() {
@@ -209,20 +207,20 @@ public class ConsoleImpl implements Console {
 
         //check if the command is loaded
         if (cmd == null) {
-            addErrorMessage("Unknown command '" + commandName + "'");
+            sendErrorMessage("Unknown command '" + commandName + "'", callingClient);
             return false;
         }
 
         String requiredPermission = cmd.getRequiredPermission();
 
         if (!clientHasPermission(callingClient, requiredPermission)) {
-            addErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").");
+            sendErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").", callingClient);
             return false;
         }
 
         if (params.size() < cmd.getRequiredParameterCount()) {
-            addErrorMessage("Please, provide required arguments marked by <>.");
-            addMessage(cmd.getUsage());
+            sendErrorMessage("Please, provide required arguments marked by <>.", callingClient);
+            sendMessage(new Message(cmd.getUsage()), callingClient);
             return false;
         }
 
@@ -233,11 +231,7 @@ public class ConsoleImpl implements Console {
             try {
                 String result = cmd.execute(params, callingClient);
                 if (!Strings.isNullOrEmpty(result)) {
-                    if (callingClient.exists()) {
-                        callingClient.send(new ConsoleMessageEvent(result));
-                    } else {
-                        addMessage(result);
-                    }
+                    sendMessage(new Message(result), callingClient);
                 }
 
                 return true;
@@ -259,15 +253,11 @@ public class ConsoleImpl implements Console {
                     }
                 }
 
-                String errorReport = FontColor.getColored("An error occurred while executing command '"
-                                                          + cmd.getName() + "': " + causeMessage, ConsoleColors.ERROR);
+                String errorReport = "An error occurred while executing command '"
+                        + cmd.getName() + "': " + causeMessage;
 
-                if (callingClient.exists()) {
-                    callingClient.send(new ConsoleMessageEvent(errorReport));
-                } else {
-                    addErrorMessage(errorReport);
-                }
-
+                sendErrorMessage(errorReport, callingClient);
+                logger.error(errorReport, e);
                 return false;
             }
         }

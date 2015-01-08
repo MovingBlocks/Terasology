@@ -26,16 +26,32 @@ import org.terasology.network.OwnerEvent;
 public class ConsoleMessageEvent implements MessageEvent {
 
     private String message;
+    private String messageType;
 
     protected ConsoleMessageEvent() {
     }
 
-    public ConsoleMessageEvent(String message) {
+    public ConsoleMessageEvent(String message, String messageType) {
         this.message = message;
+        this.messageType = messageType;
+    }
+
+    public ConsoleMessageEvent(Message message) {
+        this(message.getMessage(), message.getType());
     }
 
     @Override
-    public Message getFormattedMessage() {
-        return new Message(message, CoreMessageType.CONSOLE);
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public String getFormattedMessage() {
+        return message;
+    }
+
+    @Override
+    public String getMessageType() {
+        return messageType;
     }
 }

@@ -36,26 +36,26 @@ public interface Console {
     void dispose();
 
     /**
-     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
-     *
-     * @param message
-     */
-    void addMessage(String message);
-
-    /**
-     * Adds a message to the console
-     *
-     * @param message
-     * @param type
-     */
-    void addMessage(String message, MessageType type);
-
-    /**
-     * Adds a message to the console
+     * Adds a message to the console.
      *
      * @param message
      */
     void addMessage(Message message);
+
+    /**
+     * Creates and adds a message to the console.
+     *
+     * @param message the content String
+     * @param messageType the type of the message
+     */
+    void addMessage(String message, String messageType);
+
+    /**
+     * Creates and adds an 'info' message to the console.
+     *
+     * @param message the content String
+     */
+    void addMessage(String message);
 
     /**
      * @return An iterator over all messages in the console
@@ -66,7 +66,7 @@ public interface Console {
      * @param types a set of allowed message types
      * @return All messages in the console, filtered by message type (OR)
      */
-    Iterable<Message> getMessages(MessageType... types);
+    Iterable<Message> getMessages(String... types);
 
     List<String> getPreviousCommands();
 

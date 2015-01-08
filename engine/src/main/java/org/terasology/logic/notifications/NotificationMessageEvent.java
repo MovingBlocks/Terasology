@@ -18,7 +18,6 @@ package org.terasology.logic.notifications;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ColorComponent;
@@ -54,17 +53,23 @@ public class NotificationMessageEvent implements MessageEvent {
         return new NotificationMessageEvent("Player \"" + playerName + "\" has left the game", client);
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public EntityRef getFrom() {
         return from;
     }
     
     @Override
-    public Message getFormattedMessage() {
-        return new Message(message, CoreMessageType.NOTIFICATION);
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public String getFormattedMessage() {
+        return message;
+    }
+
+    @Override
+    public String getMessageType() {
+        return Message.TYPE_NOTIFICATION;
     }
 
     @Override

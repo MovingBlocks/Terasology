@@ -22,7 +22,6 @@ import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
@@ -109,7 +108,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 }
             }
 
-            console.addMessage("Error when suggesting command: " + causeMessage, CoreMessageType.ERROR);
+            console.addMessage("Error when suggesting command: " + causeMessage, Message.TYPE_ERROR);
             return null;
         }
     }

@@ -17,7 +17,6 @@ package org.terasology.logic.console.ui;
 
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
@@ -90,7 +89,7 @@ public class ChatScreen extends CoreScreenLayer {
             @Override
             public String get() {
                 StringBuilder messageList = new StringBuilder();
-                for (Message msg : console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION)) {
+                for (Message msg : console.getMessages(Message.TYPE_CHAT, Message.TYPE_NOTIFICATION)) {
                     messageList.append(msg.getMessage());
                     messageList.append(Message.NEW_LINE);
                 }
