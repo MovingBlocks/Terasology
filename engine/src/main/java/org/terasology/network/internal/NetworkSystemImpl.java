@@ -24,8 +24,10 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
+
 import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntLongHashMap;
+
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -89,7 +91,12 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.generator.WorldGenerator;
 
 import java.net.BindException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -162,14 +169,29 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 bootstrap.setOption("child.keepAlive", true);
                 Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
                 allChannels.add(listenChannel);
-                logger.info("Started server");
+                logger.info("Started server on port {}", port);
+
+                // enumerate all network interfaces that listen
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface ifc = interfaces.nextElement();
+                    if (!ifc.isLoopback()) {
+                        for (InterfaceAddress ifadr : ifc.getInterfaceAddresses()) {
+                            InetAddress adr = ifadr.getAddress();
+                            logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
+                                    ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
+                        }
+                    }
+                }
 
                 nextNetworkTick = time.getRawTimeInMs();
+            } catch (SocketException e) {
+                throw new HostingFailedException("Could not identify network interfaces", e);
             } catch (ChannelException e) {
                 if (e.getCause() instanceof BindException) {
-                    throw new HostingFailedException("Port already in use (are you already hosting a game?)");
+                    throw new HostingFailedException("Port already in use (are you already hosting a game?)", e.getCause());
                 } else {
-                    throw new HostingFailedException("Failed to host game");
+                    throw new HostingFailedException("Failed to host game", e.getCause());
                 }
 
             }
