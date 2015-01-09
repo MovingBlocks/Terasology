@@ -24,7 +24,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
-import org.terasology.world.generation.facets.SeaLevelFacet;
 
 /**
  * @author Immortius
@@ -42,9 +41,8 @@ public class FloraRasterizer implements WorldRasterizer {
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         PlantFacet facet = chunkRegion.getFacet(PlantFacet.class);
-        SeaLevelFacet seaLevel = chunkRegion.getFacet(SeaLevelFacet.class);
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            if (pos.y + chunk.getChunkWorldOffsetY() > seaLevel.getSeaLevel() && facet.get(pos)) {
+            if (facet.get(pos)) {
                 chunk.setBlock(pos, tallGrass);
             }
         }

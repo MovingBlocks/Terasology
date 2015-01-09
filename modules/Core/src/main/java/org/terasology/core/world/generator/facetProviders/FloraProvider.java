@@ -30,6 +30,7 @@ import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.DensityFacet;
+import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
@@ -37,6 +38,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  */
 @Produces(PlantFacet.class)
 @Requires({
+    @Facet(SeaLevelFacet.class),
     @Facet(SurfaceHeightFacet.class),
     @Facet(BiomeFacet.class),
     @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))
@@ -54,6 +56,7 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
     @Override
     public void process(GeneratingRegion region) {
         PlantFacet facet = new PlantFacet(region.getRegion(), region.getBorderForFacet(PlantFacet.class));
+        SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
         BiomeFacet biomeFacet = region.getRegionFacet(BiomeFacet.class);
@@ -63,7 +66,7 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
         for (int z = facet.getRelativeRegion().minZ(); z <= facet.getRelativeRegion().maxZ(); ++z) {
             for (int x = facet.getRelativeRegion().minX(); x <= facet.getRelativeRegion().maxX(); ++x) {
                 int height = TeraMath.ceilToInt(surface.get(x, z));
-                if (height >= minY && height <= maxY) {
+                if (height >= minY && height <= maxY && height > seaLevel.getSeaLevel()) {
                     CoreBiome biome = biomeFacet.get(x, z);
                     height = height - minY + facet.getRelativeRegion().minY();
 
