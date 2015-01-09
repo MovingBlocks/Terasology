@@ -18,9 +18,7 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.Border3D;
@@ -38,11 +36,12 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  * Determines where trees can be placed.  Will put trees one block above the surface.
  */
 @Produces(TreeFacet.class)
-@Requires({@Facet(SeaLevelFacet.class),
-        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
-        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
-        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
-        @Facet(value = BiomeFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
+@Requires({
+        @Facet(value = SeaLevelFacet.class, border = @FacetBorder(sides = 10)),
+        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10 + 1)),
+        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15 + 1, sides = 10)),
+        @Facet(value = BiomeFacet.class, border = @FacetBorder(bottom = 15, sides = 10))
+})
 public class TreeProvider implements ConfigurableFacetProvider {
 
     private NoiseTable treeNoise;
@@ -63,29 +62,30 @@ public class TreeProvider implements ConfigurableFacetProvider {
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
-        Rect2i worldRegion2D = Rect2i.createFromMinAndMax(facet.getWorldRegion().minX(),
-                facet.getWorldRegion().minZ(),
-                facet.getWorldRegion().maxX(),
-                facet.getWorldRegion().maxZ());
+        int minY = facet.getWorldRegion().minY();
+        int maxY = facet.getWorldRegion().maxY();
 
-        for (Vector2i pos : worldRegion2D) {
-            int x = pos.getX();
-            int z = pos.getY();
-            int height = TeraMath.floorToInt(surface.getWorld(x, z));
-            // if the surface is in range, and if we are above sea level
-            if (facet.getWorldRegion().encompasses(x, height, z) && facet.getWorldRegion().encompasses(x, height + 1, z) && height >= seaLevel.getSeaLevel()) {
+        for (int z = facet.getWorldRegion().minZ(); z <= facet.getWorldRegion().maxZ(); z++) {
+            for (int x = facet.getWorldRegion().minX(); x <= facet.getWorldRegion().maxX(); x++) {
+                int height = TeraMath.ceilToInt(surface.getWorld(x, z));
+                // if the surface is in range, and if we are above sea level
+                if (height >= minY && height <= maxY) {
 
-                // if the block on the surface is dense enough
-                if (density.getWorld(x, height, z) >= 0
-                        && density.getWorld(x, height + 1, z) < 0
-                        // and if there is a level surface in adjacent directions
-                        && (x > facet.getWorldRegion().minX() && TeraMath.floorToInt(surface.getWorld(x - 1, z)) == height)
-                        && (x < facet.getWorldRegion().maxX() && TeraMath.floorToInt(surface.getWorld(x + 1, z)) == height)
-                        && (z > facet.getWorldRegion().minZ() && TeraMath.floorToInt(surface.getWorld(x, z - 1)) == height)
-                        && (z < facet.getWorldRegion().maxZ() && TeraMath.floorToInt(surface.getWorld(x, z + 1)) == height)
-                        // and if it selects a % of them
-                        && treeNoise.noise(x, z) / 256f < configuration.density) {
-                    facet.setWorld(x, height + 1, z, Integer.valueOf(treeSeedNoise.noise(x, z)));
+                    if (height > seaLevel.getSeaLevel()) {
+                        // if the block on the surface is dense enough
+                        float densBelow = density.getWorld(x, height - 1, z);
+                        float densThis = density.getWorld(x, height, z);
+                        if (densBelow >= 0 && densThis < 0
+                                // and if there is a level surface in adjacent directions
+                                && (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == height)
+                                && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == height)
+                                && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == height)
+                                && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == height)
+                                // and if it selects a % of them
+                                && treeNoise.noise(x, z) / 255f < configuration.density) {
+                            facet.setWorld(x, height, z, Integer.valueOf(treeSeedNoise.noise(x, z)));
+                        }
+                    }
                 }
             }
         }
