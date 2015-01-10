@@ -17,10 +17,14 @@ package org.terasology.core.world.generator.facetProviders;
 
 import java.util.List;
 
+import org.terasology.core.world.CoreBiome;
+import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.NoiseTable;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
@@ -29,8 +33,11 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 /**
  * Determines where trees can be placed.  Will put trees one block above the surface.
@@ -41,12 +48,19 @@ public abstract class AbstractTreeProvider implements FacetProvider {
 
     private NoiseTable treeSeedNoise;
 
+    private final Table<Biome, TreeGenerator, Float> treeGeneratorLookup = HashBasedTable.create();
+
     @Override
     public void setSeed(long seed) {
         treeSeedNoise = new NoiseTable(seed + 1);
     }
 
-    protected TreeFacet createFacet(GeneratingRegion region, List<Predicate<Vector3i>> filters) {
+    protected void registerTree(CoreBiome biome, TreeGenerator tree, float probability) {
+        Preconditions.checkArgument(probability > 0, "probability must be > 0");
+        treeGeneratorLookup.put(biome, tree, Float.valueOf(probability));
+    }
+
+    protected TreeFacet createFacet(GeneratingRegion region, List<Predicate<Vector3i>> filters, BiomeFacet biomeFacet) {
         Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
         TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 15, 10));
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
@@ -64,7 +78,15 @@ public abstract class AbstractTreeProvider implements FacetProvider {
                     Vector3i pos = new Vector3i(x, height, z);
 
                     if (Predicates.and(filters).apply(pos)) {
-                        facet.setWorld(x, height, z, Integer.valueOf(treeSeedNoise.noise(x, z)));
+                        CoreBiome biome = biomeFacet.getWorld(pos.x, pos.z);
+                        float facetValue = treeSeedNoise.noise(x, z) / 255f;
+                        for (TreeGenerator generator : treeGeneratorLookup.row(biome).keySet()) {
+                            if (treeGeneratorLookup.get(biome, generator) > facetValue) {
+
+                                facet.setWorld(x, height, z, generator);
+                                break;
+                            }
+                        }
                     }
                 }
             }

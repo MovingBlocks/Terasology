@@ -27,6 +27,7 @@ import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
@@ -40,43 +41,21 @@ import java.util.Map;
 public class TreeRasterizer implements WorldRasterizer {
 
     private Block tallGrass;
-    private Table<CoreBiome, TreeGenerator, Float> treeGeneratorLookup = HashBasedTable.create();
 
     @Override
     public void initialize() {
-        // Add the trees to the generator lists
-        treeGeneratorLookup.put(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.08f);
-        treeGeneratorLookup.put(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.05f);
-
-        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.oakTree(), 0.08f);
-        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.pineTree(), 0.05f);
-        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.oakVariationTree(), 0.08f);
-
-        treeGeneratorLookup.put(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
-
-        treeGeneratorLookup.put(CoreBiome.PLAINS, Trees.redTree(), 0.05f);
-        treeGeneratorLookup.put(CoreBiome.PLAINS, Trees.oakTree(), 0.08f);
-
-        treeGeneratorLookup.put(CoreBiome.DESERT, Trees.cactus(), 0.05f);
+        // nothing to do
     }
 
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         TreeFacet facet = chunkRegion.getFacet(TreeFacet.class);
-        BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
 
-        for (Map.Entry<Vector3i, Number> entry : facet.getRelativeEntries().entrySet()) {
-            float facetValue = entry.getValue().floatValue();
-            if (facetValue > 0) {
-                Vector3i pos = entry.getKey();
-                CoreBiome biome = biomeFacet.get(pos.x, pos.z);
-                for (TreeGenerator generator : treeGeneratorLookup.row(biome).keySet()) {
-                    if (treeGeneratorLookup.get(biome, generator) > (facetValue / 256f)) {
-                        generator.generate(chunk, new FastRandom((long) facetValue), pos.x, pos.y, pos.z);
-                        break;
-                    }
-                }
-            }
+        for (Map.Entry<Vector3i, TreeGenerator> entry : facet.getRelativeEntries().entrySet()) {
+            Vector3i pos = entry.getKey();
+            TreeGenerator treeGen = entry.getValue();
+            treeGen.generate(chunk, new FastRandom(pos.hashCode()), pos.x, pos.y, pos.z);
         }
     }
+
 }

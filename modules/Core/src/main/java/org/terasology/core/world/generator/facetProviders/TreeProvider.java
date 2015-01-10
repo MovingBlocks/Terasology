@@ -17,6 +17,9 @@ package org.terasology.core.world.generator.facetProviders;
 
 import java.util.List;
 
+import org.terasology.core.world.CoreBiome;
+import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
+import org.terasology.core.world.generator.chunkGenerators.Trees;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.entitySystem.Component;
@@ -58,12 +61,28 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
         super.setSeed(seed);
 
         treeNoise = new NoiseTable(seed);
+
+        // Add the trees to the generator lists
+        registerTree(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.08f);
+        registerTree(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.05f);
+
+        registerTree(CoreBiome.FOREST, Trees.oakTree(), 0.08f);
+        registerTree(CoreBiome.FOREST, Trees.pineTree(), 0.05f);
+        registerTree(CoreBiome.FOREST, Trees.oakVariationTree(), 0.08f);
+
+        registerTree(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
+
+        registerTree(CoreBiome.PLAINS, Trees.redTree(), 0.05f);
+        registerTree(CoreBiome.PLAINS, Trees.oakTree(), 0.08f);
+
+        registerTree(CoreBiome.DESERT, Trees.cactus(), 0.05f);
     }
 
     @Override
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
+        BiomeFacet biome = region.getRegionFacet(BiomeFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
@@ -113,7 +132,7 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
             }
         });
 
-        TreeFacet facet = createFacet(region, filters);
+        TreeFacet facet = createFacet(region, filters, biome);
 
         region.setRegionFacet(TreeFacet.class, facet);
 
