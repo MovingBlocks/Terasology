@@ -105,7 +105,7 @@ public abstract class BaseEntityRef extends EntityRef {
     public AssetUri getPrefabURI() {
         if (exists()) {
             EntityInfoComponent info = getComponent(EntityInfoComponent.class);
-            if (info != null && !info.parentPrefab.exists()) {
+            if (info != null && info.parentPrefab.exists()) {
                 return new AssetUri(AssetType.PREFAB, info.parentPrefab.getName());
             }
         }
