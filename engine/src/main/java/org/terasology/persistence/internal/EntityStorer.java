@@ -16,8 +16,7 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -28,6 +27,7 @@ import org.terasology.persistence.serializers.FieldSerializeCheck;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class for the construction of a EntityData.EntityStore structure for storing the entities on disk..
@@ -40,7 +40,7 @@ final class EntityStorer {
     private final EntitySerializer serializer;
     private final EntityData.EntityStore.Builder entityStoreBuilder;
     private final OwnershipHelper helper;
-    private TLongSet storedEntityIds = new TLongHashSet();
+    private Set<EntityRef> storedEntities = Sets.newHashSet();
 
     public EntityStorer(EngineEntityManager entityManager) {
         this.entityStoreBuilder = EntityData.EntityStore.newBuilder();
@@ -55,7 +55,6 @@ final class EntityStorer {
         }
         serializer.setComponentIdMapping(componentIds);
     }
-
     public void store(EntityRef entity) {
         store(entity, "");
     }
@@ -75,7 +74,7 @@ final class EntityStorer {
                 entityStoreBuilder.addEntityName(name);
                 entityStoreBuilder.addEntityNamed(entityData.getId());
             }
-            storedEntityIds.add(entityData.getId());
+            storedEntities.add(entity);
         }
     }
 
@@ -83,4 +82,11 @@ final class EntityStorer {
         return entityStoreBuilder.build();
     }
 
+    /**
+     *
+     * @return all entities stored directly or indirectly (owned entities) via the store methods.
+     */
+    public Set<EntityRef> getStoredEntities() {
+        return storedEntities;
+    }
 }

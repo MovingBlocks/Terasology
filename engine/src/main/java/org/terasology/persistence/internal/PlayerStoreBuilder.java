@@ -15,11 +15,13 @@
  */
 package org.terasology.persistence.internal;
 
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.protobuf.EntityData;
 
-import org.terasology.math.geom.Vector3f;
+import java.util.Set;
 
 /**
  *
@@ -30,6 +32,7 @@ import org.terasology.math.geom.Vector3f;
 class PlayerStoreBuilder {
     private Long characterEntityId;
     private Vector3f relevanceLocation;
+    private Set<EntityRef> storedEntities;
 
     public PlayerStoreBuilder(Long characterEntityId, Vector3f relevanceLocation) {
         this.characterEntityId = characterEntityId;
@@ -46,13 +49,23 @@ class PlayerStoreBuilder {
             EntityRef character = entityManager.getEntity(characterEntityId);
             EntityStorer storer = new EntityStorer(entityManager);
             storer.store(character, PlayerStoreInternal.CHARACTER);
+            storedEntities = storer.getStoredEntities();
             playerEntityStore.setStore(storer.finaliseStore());
+        } else {
+            storedEntities = Sets.newHashSet();
         }
-
         return playerEntityStore.build();
     }
 
     public Long getCharacterEntityId() {
         return characterEntityId;
+    }
+
+    /**
+     *
+     * @return all entitites that got stored when {@link #build(EngineEntityManager)} got called.
+     */
+    public Set<EntityRef> getStoredEntities() {
+        return storedEntities;
     }
 }

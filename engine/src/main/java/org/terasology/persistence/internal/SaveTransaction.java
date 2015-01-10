@@ -150,7 +150,7 @@ public class SaveTransaction extends AbstractTask {
          */
         Set<EntityRef> unsavedEntities = new HashSet<>();
         for (EntityRef entity: privateEntityManager.getAllEntities()) {
-            if (entity.isPersistent() && !entity.getOwner().exists()) {
+            if (entity.isPersistent()) {
                 unsavedEntities.add(entity);
             }
         }
@@ -166,7 +166,7 @@ public class SaveTransaction extends AbstractTask {
      *                        This method removes entities it saves.
      */
     private void prepareCompressedChunkBuilders(Set<EntityRef> unsavedEntities) {
-        Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = createChunkPosToUnsavedEntitiesMap();
+        Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = createChunkPosToUnsavedOwnerLessEntitiesMap();
 
         allChunks = Maps.newHashMap();
         allChunks.putAll(unloadedChunks);
@@ -179,6 +179,7 @@ public class SaveTransaction extends AbstractTask {
             unsavedEntities.removeAll(entitiesToStore);
             CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(privateEntityManager, chunk,
                     entitiesToStore, false);
+            unsavedEntities.removeAll(compressedChunkBuilder.getStoredEntities());
             allChunks.put(chunkEntry.getKey(), compressedChunkBuilder);
         }
     }
@@ -194,6 +195,7 @@ public class SaveTransaction extends AbstractTask {
         for (Map.Entry<String,PlayerStoreBuilder> playerEntry: loadedPlayers.entrySet()) {
             PlayerStoreBuilder playerStoreBuilder = playerEntry.getValue();
             EntityData.PlayerStore playerStore = playerStoreBuilder.build(privateEntityManager);
+            unsavedEntities.removeAll(playerStoreBuilder.getStoredEntities());
             Long characterEntityId = playerStoreBuilder.getCharacterEntityId();
             if (characterEntityId != null) {
                 EntityRef character = privateEntityManager.getEntity(characterEntityId);
@@ -203,7 +205,7 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
-    private Map<Vector3i, Collection<EntityRef>> createChunkPosToUnsavedEntitiesMap() {
+    private Map<Vector3i, Collection<EntityRef>> createChunkPosToUnsavedOwnerLessEntitiesMap() {
         Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = Maps.newHashMap();
         for (EntityRef entity : privateEntityManager.getEntitiesWith(LocationComponent.class)) {
             /*

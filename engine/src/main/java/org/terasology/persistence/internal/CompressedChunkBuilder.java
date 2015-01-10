@@ -23,6 +23,7 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -36,6 +37,7 @@ public class CompressedChunkBuilder {
     private ChunkImpl chunk;
     private boolean viaSnapshot;
     private byte[] result;
+    private Set<EntityRef> storedEntities;
 
     /**
      *
@@ -53,6 +55,7 @@ public class CompressedChunkBuilder {
                 storer.store(entityRef);
             }
         }
+        storedEntities = storer.getStoredEntities();
         this.entityStore = storer.finaliseStore();
 
         this.chunk = chunk;
@@ -99,5 +102,9 @@ public class CompressedChunkBuilder {
             throw new RuntimeException(e);
         }
         return baos.toByteArray();
+    }
+
+    public Set<EntityRef> getStoredEntities() {
+        return storedEntities;
     }
 }
