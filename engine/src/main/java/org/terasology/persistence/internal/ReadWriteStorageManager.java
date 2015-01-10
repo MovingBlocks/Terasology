@@ -23,8 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
@@ -76,7 +79,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Immortius
  * @author Florian <florian@fkoeberle.de>
  */
-public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber {
+public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -108,6 +111,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
+    private EntitySetDeltaRecorder entitySetDeltaRecorder;
+
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) throws IOException {
         this(savePath, environment, entityManager, true);
     }
@@ -116,10 +121,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         super(savePath, environment, entityManager, storeChunksInZips);
 
         entityManager.subscribeDestroyListener(this);
+        entityManager.subscribeChangeListener(this);
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
+        this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(entityManager.getComponentLibrary());
 
     }
 
@@ -430,7 +437,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     public void onEntityDestroyed(long entityId) {
-
+        entitySetDeltaRecorder.onEntityDestroyed(entityId);
     }
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {
@@ -499,6 +506,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
         scheduleNextAutoSave();
         PerformanceMonitor.endActivity();
+        entitySetDeltaRecorder = new EntitySetDeltaRecorder(getEntityManager().getComponentLibrary());
         logger.info("Saving - Snapshot created: Writing phase starts");
     }
 
@@ -555,4 +563,17 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
     }
 
+    public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
+        entitySetDeltaRecorder.onEntityComponentAdded(entity, component);
+    }
+
+    @Override
+    public void onEntityComponentChange(EntityRef entity, Class<? extends Component> component) {
+        entitySetDeltaRecorder.onEntityComponentChange(entity, component);
+    }
+
+    @Override
+    public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
+        entitySetDeltaRecorder.onEntityComponentRemoved(entity, component);
+    }
 }
