@@ -53,12 +53,29 @@ class ComponentTable {
         return entityMap.put(entityId, component);
     }
 
+    /**
+     *
+     * @return removes the component with the specified class from the entity and returns it.
+     *         Returns null if no component could be removed.
+     */
     public <T extends Component> Component remove(long entityId, Class<T> componentClass) {
         TLongObjectMap<Component> entityMap = store.get(componentClass);
         if (entityMap != null) {
             return entityMap.remove(entityId);
         }
         return null;
+    }
+
+
+    public List<Component> removeAndReturnComponentsOf(long entityId) {
+        List<Component> componentList = Lists.newArrayList();
+        for (TLongObjectMap<Component> entityMap : store.values()) {
+            Component component = entityMap.remove(entityId);
+            if (component != null) {
+                componentList.add(component);
+            }
+        }
+        return componentList;
     }
 
     public void remove(long entityId) {
@@ -76,7 +93,22 @@ class ComponentTable {
         return (map == null) ? 0 : map.size();
     }
 
+    /**
+     *
+     * @return an iterable that should be only used for iteration over the components. It can't be used to remove
+     *         components. It should not be used after components have been added or removed from the entity.
+     *
+     */
     public Iterable<Component> iterateComponents(long entityId) {
+        return getComponentsInNewList(entityId);
+    }
+
+    /**
+     *
+     * @return a new modifable list instance that contains all the components the entity had at the
+     *         time this method got called.
+     */
+    public List<Component> getComponentsInNewList(long entityId) {
         List<Component> components = Lists.newArrayList();
         for (TLongObjectMap<Component> componentMap : store.values()) {
             Component comp = componentMap.get(entityId);

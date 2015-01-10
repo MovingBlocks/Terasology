@@ -101,7 +101,7 @@ public class EntitySystemBuilder {
 
         // Entity System Library
         EntitySystemLibrary library = CoreRegistry.put(EntitySystemLibrary.class, new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, typeSerializationLibrary));
-        entityManager.setEntitySystemLibrary(library);
+        entityManager.setComponentLibrary(library.getComponentLibrary());
         CoreRegistry.put(ComponentLibrary.class, library.getComponentLibrary());
         CoreRegistry.put(EventLibrary.class, library.getEventLibrary());
 

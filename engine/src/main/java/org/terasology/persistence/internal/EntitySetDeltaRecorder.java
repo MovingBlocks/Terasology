@@ -23,6 +23,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
+import java.util.Collection;
+
 /**
  *
  * Records changes made to all entities. It gets used by {@link }StorageManagerInternal} to determine which changes
@@ -37,6 +39,7 @@ class EntitySetDeltaRecorder {
 
     private TLongObjectMap<EntityDelta> entityDeltas = new TLongObjectHashMap<>();
     private TLongSet destroyedEntities = new TLongHashSet();
+    private TLongSet deactivatedEntities = new TLongHashSet();
 
 
 
@@ -83,4 +86,19 @@ class EntitySetDeltaRecorder {
         return destroyedEntities;
     }
 
+    public TLongSet getDeactivatedEntities() {
+        return deactivatedEntities;
+    }
+
+    public void onReactivation(EntityRef entity, Collection<Component> components) {
+        EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
+        for (Component component : components) {
+            Component componentSnapshot = componentLibrary.copy(component);
+            entityDelta.setChangedComponent(componentSnapshot);
+        }
+    }
+
+    public void onBeforeDeactivation(EntityRef entity, Collection<Component> components) {
+        deactivatedEntities.add(entity.getId());
+    }
 }

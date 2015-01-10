@@ -29,44 +29,45 @@ import java.util.Map;
 
 /**
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
-final class GlobalStoreSaver {
+final class GlobalStoreBuilder {
 
-    private EngineEntityManager entityManager;
-    private EntityData.GlobalStore.Builder store;
-    private EntitySerializer entitySerializer;
+    private final long nextEntityId;
+    private final EntityData.GlobalStore.Builder store;
+    private final Map<Class<? extends Component>, Integer> componentIdTable;
 
-    public GlobalStoreSaver(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
-        this.entityManager = entityManager;
+    public GlobalStoreBuilder(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
+        this.nextEntityId = entityManager.getNextId();
         this.store = EntityData.GlobalStore.newBuilder();
-        this.entitySerializer = new EntitySerializer(entityManager);
 
-        Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
+        // TODO move complete store creation in build method, so that the serialization happens off the main thread
+        // when this is done then the build method needs a prefab manager.
+
+        this.componentIdTable = Maps.newHashMap();
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             store.addComponentClass(componentMetadata.getUri().toString());
             componentIdTable.put(componentMetadata.getType(), componentIdTable.size());
         }
-        entitySerializer.setComponentIdMapping(componentIdTable);
-
         prefabSerializer.setComponentIdMapping(componentIdTable);
         for (Prefab prefab : entityManager.getPrefabManager().listPrefabs()) {
             store.addPrefab(prefabSerializer.serialize(prefab));
         }
     }
 
-    public void store(EntityRef entity) {
-        if (entity.isPersistent()) {
-            store.addEntity(entitySerializer.serialize(entity));
+
+
+    public EntityData.GlobalStore build(EngineEntityManager entityManager, Iterable<EntityRef> entities) {
+        EntitySerializer entitySerializer = new EntitySerializer(entityManager);
+        entitySerializer.setComponentIdMapping(componentIdTable);
+        for (EntityRef entity: entities) {
+            if (entity.isPersistent()) {
+                store.addEntity(entitySerializer.serialize(entity));
+            }
         }
-    }
-
-    public EntityData.GlobalStore save() {
-        writeIdInfo();
-
+        store.setNextEntityId(nextEntityId);
         return store.build();
     }
 
-    private void writeIdInfo() {
-        store.setNextEntityId(entityManager.getNextId());
-    }
+
 }

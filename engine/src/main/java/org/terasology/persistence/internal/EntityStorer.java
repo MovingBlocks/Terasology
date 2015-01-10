@@ -49,6 +49,7 @@ final class EntityStorer {
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
 
         Map<Class<? extends Component>, Integer> componentIds = Maps.newHashMap();
+
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             entityStoreBuilder.addComponentClass(componentMetadata.getUri().toString());
             componentIds.put(componentMetadata.getType(), componentIds.size());

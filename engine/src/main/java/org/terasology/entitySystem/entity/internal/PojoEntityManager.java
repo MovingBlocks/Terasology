@@ -42,7 +42,6 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
@@ -52,6 +51,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -90,8 +90,8 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         this.typeSerializerLibrary = serializerLibrary;
     }
 
-    public void setEntitySystemLibrary(EntitySystemLibrary entitySystemLibrary) {
-        componentLibrary = entitySystemLibrary.getComponentLibrary();
+    public void setComponentLibrary(ComponentLibrary componentLibrary) {
+        this.componentLibrary = componentLibrary;
     }
 
     public void setPrefabManager(PrefabManager prefabManager) {
@@ -163,6 +163,9 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         if (eventSystem != null) {
             eventSystem.send(entity, OnAddedComponent.newInstance());
             eventSystem.send(entity, OnActivatedComponent.newInstance());
+        }
+        for (Component component: components) {
+            notifyComponentAdded(entity, component.getClass());
         }
         return entity;
     }
@@ -424,6 +427,9 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         if (eventSystem != null) {
             eventSystem.send(entity, OnActivatedComponent.newInstance());
         }
+        for (Component component: components) {
+            notifyComponentAdded(entity, component.getClass());
+        }
         return entity;
     }
 
@@ -459,8 +465,13 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
             if (eventSystem != null) {
                 eventSystem.send(entity, BeforeDeactivateComponent.newInstance());
             }
+            List<Component> components = store.getComponentsInNewList(entityId);
+            components = Collections.unmodifiableList(components);
+            notifyBeforeDeactivation(entity, components);
+            for (Component component: components) {
+                store.remove(entityId, component.getClass());
+            }
             loadedIds.remove(entityId);
-            store.remove(entityId);
         }
     }
 
@@ -673,6 +684,25 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     private void notifyComponentChanged(EntityRef changedEntity, Class<? extends Component> component) {
         for (EntityChangeSubscriber subscriber : subscribers) {
             subscriber.onEntityComponentChange(changedEntity, component);
+        }
+    }
+
+    /**
+     * This method gets called when the entity gets reactivated. e.g. after storage an entity needs to be reactivated.
+     */
+    private void notifyReactivation(EntityRef entity, Collection<Component> components) {
+        for (EntityChangeSubscriber subscriber : subscribers) {
+            subscriber.onReactivation(entity, components);
+        }
+    }
+
+
+    /**
+     * This method gets called before an entity gets deactivated (e.g. for storage).
+     */
+    private void notifyBeforeDeactivation(EntityRef entity, Collection<Component> components) {
+        for (EntityChangeSubscriber subscriber : subscribers) {
+            subscriber.onBeforeDeactivation(entity, components);
         }
     }
 

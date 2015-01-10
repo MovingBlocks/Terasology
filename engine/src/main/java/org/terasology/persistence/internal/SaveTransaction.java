@@ -16,19 +16,25 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.procedure.TLongObjectProcedure;
 import gnu.trove.procedure.TLongProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.concurrency.AbstractTask;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
+import javax.vecmath.Vector3f;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,7 +49,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -59,14 +69,22 @@ public class SaveTransaction extends AbstractTask {
     private static final ImmutableMap<String, String> CREATE_ZIP_OPTIONS = ImmutableMap.of("create", "true", "encoding", "UTF-8");
     private final GameManifest gameManifest;
     private final Lock worldDirectoryWriteLock;
-    private final EntityManager privateEntityManager;
+    private final EngineEntityManager privateEntityManager;
     private final EntitySetDeltaRecorder deltaToSave;
     private volatile SaveTransactionResult result;
 
     // Unprocessed data to save:
-    private final Map<String, EntityData.PlayerStore> playerStores;
-    private final Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilders;
-    private final EntityData.GlobalStore globalStore;
+    private final Map<String, EntityData.PlayerStore> unloadedPlayers;
+    private final Map<String, PlayerStoreBuilder> loadedPlayers;
+    private final Map<Vector3i, CompressedChunkBuilder> unloadedChunks;
+    private final Map<Vector3i, ChunkImpl> loadedChunks;
+    private final GlobalStoreBuilder globalStoreBuilder;
+
+    // processed data:
+    private EntityData.GlobalStore globalStore;
+    private Map<String, EntityData.PlayerStore> allPlayers;
+    private Map<Vector3i, CompressedChunkBuilder> allChunks;
+
 
     // Save parameters:
     private final boolean storeChunksInZips;
@@ -76,16 +94,19 @@ public class SaveTransaction extends AbstractTask {
     private final SaveTransactionHelper saveTransactionHelper;
 
 
-    public SaveTransaction(EntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
-                           Map<String, EntityData.PlayerStore> playerStores, EntityData.GlobalStore globalStore,
-                           Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilder, GameManifest gameManifest,
-                           boolean storeChunksInZips, StoragePathProvider storagePathProvider,
-                           Lock worldDirectoryWriteLock) {
+    public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+                           Map<String, EntityData.PlayerStore> unloadedPlayers,
+                           Map<String, PlayerStoreBuilder> loadedPlayers, GlobalStoreBuilder globalStoreBuilder,
+                           Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
+                           GameManifest gameManifest, boolean storeChunksInZips,
+                           StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
-        this.playerStores = playerStores;
-        this.compressedChunkBuilders = compressedChunkBuilder;
-        this.globalStore = globalStore;
+        this.unloadedPlayers = unloadedPlayers;
+        this.loadedPlayers = loadedPlayers;
+        this.unloadedChunks = unloadedChunks;
+        this.loadedChunks = loadedChunks;
+        this.globalStoreBuilder = globalStoreBuilder;
         this.gameManifest = gameManifest;
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
@@ -107,6 +128,7 @@ public class SaveTransaction extends AbstractTask {
             }
             saveTransactionHelper.cleanupSaveTransactionDirectory();
             applyDeltaToPrivateEntityManager();
+            prepareChunksPlayersAndGlobalStore();
             createSaveTransactionDirectory();
             writePlayerStores();
             writeGlobalStore();
@@ -122,20 +144,111 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
+    private void prepareChunksPlayersAndGlobalStore() {
+        /**
+         * Currently loaded persistent entities without owner that have not been saved yet.
+         */
+        Set<EntityRef> unsavedEntities = new HashSet<>();
+        for (EntityRef entity: privateEntityManager.getAllEntities()) {
+            if (entity.isPersistent() && !entity.getOwner().exists()) {
+                unsavedEntities.add(entity);
+            }
+        }
+        preparePlayerStores(unsavedEntities);
+        prepareCompressedChunkBuilders(unsavedEntities);
+        this.globalStore = globalStoreBuilder.build(privateEntityManager, unsavedEntities);
+    }
+
+
+    /**
+     *
+     * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
+     *                        This method removes entities it saves.
+     */
+    private void prepareCompressedChunkBuilders(Set<EntityRef> unsavedEntities) {
+        Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = createChunkPosToUnsavedEntitiesMap();
+
+        allChunks = Maps.newHashMap();
+        allChunks.putAll(unloadedChunks);
+        for (Map.Entry<Vector3i,ChunkImpl> chunkEntry: loadedChunks.entrySet()) {
+            Collection<EntityRef> entitiesToStore = chunkPosToEntitiesMap.get(chunkEntry.getKey());
+            if (entitiesToStore == null) {
+                entitiesToStore = Collections.emptySet();
+            }
+            ChunkImpl chunk = chunkEntry.getValue();
+            unsavedEntities.removeAll(entitiesToStore);
+            CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(privateEntityManager, chunk,
+                    entitiesToStore, false);
+            allChunks.put(chunkEntry.getKey(), compressedChunkBuilder);
+        }
+    }
+
+    /**
+     *
+     * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
+     *                        This method removes entities it saves.
+     */
+    private void preparePlayerStores(Set<EntityRef> unsavedEntities) {
+        allPlayers = Maps.newHashMap();
+        allPlayers.putAll(unloadedPlayers);
+        for (Map.Entry<String,PlayerStoreBuilder> playerEntry: loadedPlayers.entrySet()) {
+            PlayerStoreBuilder playerStoreBuilder = playerEntry.getValue();
+            EntityData.PlayerStore playerStore = playerStoreBuilder.build(privateEntityManager);
+            Long characterEntityId = playerStoreBuilder.getCharacterEntityId();
+            if (characterEntityId != null) {
+                EntityRef character = privateEntityManager.getEntity(characterEntityId);
+                unsavedEntities.remove(character);
+            }
+            allPlayers.put(playerEntry.getKey(), playerStore);
+        }
+    }
+
+    private Map<Vector3i, Collection<EntityRef>> createChunkPosToUnsavedEntitiesMap() {
+        Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = Maps.newHashMap();
+        for (EntityRef entity : privateEntityManager.getEntitiesWith(LocationComponent.class)) {
+            /*
+             * Note: Entities with owners get saved with the owner. Entities that are always relevant don't get stored
+             * in chunk as the chunk is not always loaded
+             */
+            if (entity.isPersistent() && !entity.getOwner().exists() && !entity.hasComponent(ClientComponent.class)
+                    && !entity.isAlwaysRelevant()) {
+                LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+                if (locationComponent != null) {
+                    Vector3f loc = locationComponent.getWorldPosition();
+                    Vector3i chunkPos = TeraMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z);
+                    Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
+                    if (collection == null) {
+                        collection = Lists.newArrayList();
+                        chunkPosToEntitiesMap.put(chunkPos, collection);
+                    }
+                    collection.add(entity);
+                }
+            }
+        }
+        return chunkPosToEntitiesMap;
+    }
 
 
     private void applyDeltaToPrivateEntityManager() {
         deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
             @Override
             public boolean execute(long entityId, EntityDelta delta) {
-                EntityRef entity = privateEntityManager.getEntity(entityId);
-                for (Component changedComponent: delta.getChangedComponents().values()) {
-                    entity.removeComponent(changedComponent.getClass());
-                    entity.addComponent(changedComponent);
+                if (entityId >= privateEntityManager.getNextId()) {
+                    privateEntityManager.setNextId(entityId + 1);
                 }
-                for (Class<? extends Component> c: delta.getRemovedComponents()) {
-                    entity.removeComponent(c);
+                if (privateEntityManager.isActiveEntity(entityId)) {
+                    EntityRef entity = privateEntityManager.getEntity(entityId);
+                    for (Component changedComponent: delta.getChangedComponents().values()) {
+                        entity.removeComponent(changedComponent.getClass());
+                        entity.addComponent(changedComponent);
+                    }
+                    for (Class<? extends Component> c: delta.getRemovedComponents()) {
+                        entity.removeComponent(c);
+                    }
+                } else {
+                    EntityRef created = privateEntityManager.createEntityWithId(entityId, delta.getChangedComponents().values());
                 }
+
                 return true;
             }
         });
@@ -143,6 +256,15 @@ public class SaveTransaction extends AbstractTask {
             @Override
             public boolean execute(long entityId) {
                 privateEntityManager.getEntity(entityId).destroy();
+                return true;
+            }
+        });
+
+        deltaToSave.getDeactivatedEntities().forEach(new TLongProcedure() {
+            @Override
+            public boolean execute(long entityId) {
+                EntityRef entityRef = privateEntityManager.getEntity(entityId);
+                privateEntityManager.deactivateForStorage(entityRef);
                 return true;
             }
         });
@@ -186,7 +308,7 @@ public class SaveTransaction extends AbstractTask {
 
     private void writePlayerStores() throws IOException {
         Files.createDirectories(storagePathProvider.getPlayersTempPath());
-        for (Map.Entry<String, EntityData.PlayerStore> playerStoreEntry : playerStores.entrySet()) {
+        for (Map.Entry<String, EntityData.PlayerStore> playerStoreEntry : allPlayers.entrySet()) {
             Path playerFile = storagePathProvider.getPlayerFileTempPath(playerStoreEntry.getKey());
             try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerFile))) {
                 playerStoreEntry.getValue().writeTo(out);
@@ -208,7 +330,7 @@ public class SaveTransaction extends AbstractTask {
         Files.createDirectories(chunksPath);
         if (storeChunksInZips) {
             Map<Vector3i, FileSystem> newChunkZips = Maps.newHashMap();
-            for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : compressedChunkBuilders.entrySet()) {
+            for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : allChunks.entrySet()) {
                 Vector3i chunkPos = entry.getKey();
                 Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
                 FileSystem zip = newChunkZips.get(chunkZipPos);
@@ -249,7 +371,7 @@ public class SaveTransaction extends AbstractTask {
                 zip.close();
             }
         } else {
-            for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : compressedChunkBuilders.entrySet()) {
+            for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : allChunks.entrySet()) {
                 Vector3i chunkPos = entry.getKey();
                 CompressedChunkBuilder compressedChunkBuilder = entry.getValue();
                 byte[] compressedChunk = compressedChunkBuilder.buildEncodedChunk();

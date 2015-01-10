@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -57,6 +56,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -494,5 +494,15 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                 }
             }
         }
+    }
+
+    @Override
+    public void onReactivation(EntityRef entity, Collection<Component> components) {
+        // TODO check if implementation makes sense
+    }
+
+    @Override
+    public void onBeforeDeactivation(EntityRef entity, Collection<Component> components) {
+        // TODO check if implementation makes sense
     }
 }

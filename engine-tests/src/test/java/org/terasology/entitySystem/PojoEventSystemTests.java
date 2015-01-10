@@ -64,7 +64,7 @@ public class PojoEventSystemTests {
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, serializationLibrary);
         compLibrary = entitySystemLibrary.getComponentLibrary();
         entityManager = new PojoEntityManager();
-        entityManager.setEntitySystemLibrary(entitySystemLibrary);
+        entityManager.setComponentLibrary(entitySystemLibrary.getComponentLibrary());
         entityManager.setPrefabManager(new PojoPrefabManager());
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);

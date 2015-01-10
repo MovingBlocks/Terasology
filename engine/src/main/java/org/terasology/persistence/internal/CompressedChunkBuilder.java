@@ -15,11 +15,14 @@
  */
 package org.terasology.persistence.internal;
 
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -35,6 +38,32 @@ public class CompressedChunkBuilder {
     private byte[] result;
 
     /**
+     *
+     * @param entitiesToSave all persistent entities within the given chunk
+     * @param chunkUnloaded if true the chunk data will be used directly.  If deactivate is false then the chunk will be
+     *                      but in snapshot mode so that concurrent modifications (and possibly future unload) is
+     *                      possible.
+     */
+    public CompressedChunkBuilder(EngineEntityManager entityManager, ChunkImpl chunk,
+                                  Collection<EntityRef> entitiesToSave,
+                                  boolean chunkUnloaded) {
+        EntityStorer storer = new EntityStorer(entityManager);
+        for (EntityRef entityRef : entitiesToSave) {
+            if (entityRef.isPersistent()) {
+                storer.store(entityRef);
+            }
+        }
+        this.entityStore = storer.finaliseStore();
+
+        this.chunk = chunk;
+        this.viaSnapshot = !chunkUnloaded;
+        if (viaSnapshot) {
+            this.chunk.createSnapshot();
+        }
+    }
+
+    /**
+     *
      * @param entityStore encoded entities to be stored.
      * @param chunk       chunk for which {@link ChunkImpl#createSnapshot()} has been called.
      * @param viaSnapshot specifies if the previously taken snapshot will be encoded or if
