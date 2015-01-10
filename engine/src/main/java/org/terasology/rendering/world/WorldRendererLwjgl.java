@@ -225,44 +225,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         statRenderedTriangles = 0;
     }
 
-    private void combineRefractiveReflectiveAndOpaquePasses() {
-        PerformanceMonitor.startActivity("Render Combined Scene");
-        DefaultRenderingProcess.getInstance().renderPreCombinedScene();
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderSimpleBlendMaterialsIntoCombinedPass() {
-        PerformanceMonitor.startActivity("Render Objects (Transparent)");
-        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDepthMask(false);
-
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderAlphaBlend();
-        }
-
-        glDisable(GL_BLEND);
-        glDepthMask(true);
-
-        DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderFinalPostProcessedScene(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
-        PerformanceMonitor.startActivity("Render Post-Processing");
-        DefaultRenderingProcess.getInstance().renderPost(stereoRenderState);
-        PerformanceMonitor.endActivity();
-    }
-
-    /**
-     * Renders the world.
-     */
-    @Override
-    public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
-        resetStats();
-
+    private void preRenderUpdate(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
         switch (stereoRenderState) {
             case MONO:
                 currentRenderingStage = WorldRenderingStage.DEFAULT;
@@ -281,15 +244,22 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
 
         renderableWorld.updateAndQueueVisibleChunks(isFirstRenderingStageForCurrentFrame);
+    }
+
+    /**
+     * Renders the world.
+     */
+    @Override
+    public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
+        resetStats();
+        preRenderUpdate(stereoRenderState);
 
         renderShadowMap();
         renderWorldReflection();
 
-        toggleWireFrameON(); // if wireframe is enabled
+        preRenderSetup();
 
-        DefaultRenderingProcess.getInstance().clear();
         DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
-
         renderSky();
 
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
@@ -301,15 +271,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
             DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 
-            PerformanceMonitor.startActivity("Render Light Geometry");
-            //renderLightGeometryStencil();
             renderLightGeometry();
-            PerformanceMonitor.endActivity();
-
             renderChunksRefractiveReflective();
         }
 
-        toggleWireFrameOFF(); // if wireframe is enabled
+        postRenderCleanup();
 
         combineRefractiveReflectiveAndOpaquePasses();
         renderSimpleBlendMaterialsIntoCombinedPass();
@@ -352,13 +318,12 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         playerCamera.lookThroughNormalized();
         skysphere.render(playerCamera);
+        playerCamera.lookThrough();
 
         Material chunkShader = Assets.getMaterial("engine:prog.chunk");
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
-        if (renderingConfig.isReflectiveWater()) {     // TODO: move this check out of the method?  --emanuele3d
-            playerCamera.lookThrough();
-
+        if (renderingConfig.isReflectiveWater()) {
             glEnable(GL_LIGHT0);
 
             while (renderQueues.chunksOpaqueReflection.size() > 0) {
@@ -444,8 +409,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
     }
 
-    private void renderLightGeometryStencil() {
-
+    private void renderLightGeometry() {
+        PerformanceMonitor.startActivity("Render Light Geometry");
+        // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
+        /*
         DefaultRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
 
         Material program = Assets.getMaterial("engine:prog.simple");
@@ -461,10 +428,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
 
         DefaultRenderingProcess.getInstance().endRenderLightGeometryStencilPass();
-
-    }
-
-    private void renderLightGeometry() {
+        */
 
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
         Material program = Assets.getMaterial("engine:prog.lightGeometryPass");
@@ -487,6 +451,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         renderLightComponent(mainDirectionalLight, sunlightWorldPosition, program, false);
 
         DefaultRenderingProcess.getInstance().endRenderDirectionalLights();
+        PerformanceMonitor.endActivity();
     }
 
     private boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly) {
@@ -568,21 +533,53 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             renderChunk(renderQueues.chunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
         }
-        PerformanceMonitor.endActivity();
         if (isHeadUnderWater) {
             glEnable(GL11.GL_CULL_FACE);
         }
-        PerformanceMonitor.endActivity();
+
         DefaultRenderingProcess.getInstance().endRenderSceneReflectiveRefractive();
+        PerformanceMonitor.endActivity();
     }
 
-    private void toggleWireFrameON() {
+    private void combineRefractiveReflectiveAndOpaquePasses() {
+        PerformanceMonitor.startActivity("Render Combined Scene");
+        DefaultRenderingProcess.getInstance().renderPreCombinedScene();
+        PerformanceMonitor.endActivity();
+    }
+
+    private void renderSimpleBlendMaterialsIntoCombinedPass() {
+        PerformanceMonitor.startActivity("Render Objects (Transparent)");
+        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(false);
+
+        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
+            renderer.renderAlphaBlend();
+        }
+
+        glDisable(GL_BLEND);
+        glDepthMask(true);
+
+        DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
+        PerformanceMonitor.endActivity();
+    }
+
+    private void renderFinalPostProcessedScene(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
+        PerformanceMonitor.startActivity("Render Post-Processing");
+        DefaultRenderingProcess.getInstance().renderPost(stereoRenderState);
+        PerformanceMonitor.endActivity();
+    }
+
+    private void preRenderSetup() {
         if (renderingDebugConfig.isWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
+        DefaultRenderingProcess.getInstance().clear();
     }
 
-    private void toggleWireFrameOFF() {
+    private void postRenderCleanup() {
         if (renderingDebugConfig.isWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
