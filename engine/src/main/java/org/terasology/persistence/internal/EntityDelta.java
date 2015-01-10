@@ -44,4 +44,12 @@ public class EntityDelta {
         changedComponents.remove(clazz);
         removedComponents.add(clazz);
     }
+
+    public Map<Class<? extends Component>, Component> getChangedComponents() {
+        return changedComponents;
+    }
+
+    public Set<Class<? extends Component>> getRemovedComponents() {
+        return removedComponents;
+    }
 }

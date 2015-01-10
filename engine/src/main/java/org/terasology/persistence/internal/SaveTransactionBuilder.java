@@ -16,6 +16,7 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
@@ -29,6 +30,8 @@ import java.util.concurrent.locks.Lock;
  */
 class SaveTransactionBuilder {
     private final Lock worldDirectoryWriteLock;
+    private final EntityManager privateEntityManager;
+    private final EntitySetDeltaRecorder deltaToSave;
     private Map<String, EntityData.PlayerStore> playerStores = Maps.newHashMap();
     private Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilders = Maps.newHashMap();
     private EntityData.GlobalStore globalStore;
@@ -36,8 +39,11 @@ class SaveTransactionBuilder {
     private final StoragePathProvider storagePathProvider;
     private GameManifest gameManifest;
 
-    SaveTransactionBuilder(boolean storeChunksInZips, StoragePathProvider storagePathProvider,
+    SaveTransactionBuilder(EntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+                           boolean storeChunksInZips, StoragePathProvider storagePathProvider,
                            Lock worldDirectoryWriteLock) {
+        this.privateEntityManager = privateEntityManager;
+        this.deltaToSave = deltaToSave;
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
@@ -56,8 +62,8 @@ class SaveTransactionBuilder {
     }
 
     public SaveTransaction build() {
-        return new SaveTransaction(playerStores, globalStore, compressedChunkBuilders, gameManifest, storeChunksInZips,
-                storagePathProvider, worldDirectoryWriteLock);
+        return new SaveTransaction(privateEntityManager, deltaToSave, playerStores, globalStore,
+                compressedChunkBuilders, gameManifest, storeChunksInZips, storagePathProvider, worldDirectoryWriteLock);
     }
 
     public void setGameManifest(GameManifest gameManifest) {

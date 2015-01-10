@@ -17,19 +17,19 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
+import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
@@ -112,6 +112,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
+
+    private EntityManager privateEntityManager = new PojoEntityManager();
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) throws IOException {
@@ -305,9 +307,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private SaveTransaction createSaveTransaction() {
-        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(
-                isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock);
-
+        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
+                entitySetDeltaRecorder ,isStoreChunksInZips(),
+                getStoragePathProvider(), worldDirectoryWriteLock);
         /**
          * Currently loaded persistent entities without owner that have not been saved yet.
          */

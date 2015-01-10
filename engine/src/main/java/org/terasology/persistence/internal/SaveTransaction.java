@@ -17,8 +17,13 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import gnu.trove.procedure.TLongObjectProcedure;
+import gnu.trove.procedure.TLongProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.game.GameManifest;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
@@ -54,6 +59,8 @@ public class SaveTransaction extends AbstractTask {
     private static final ImmutableMap<String, String> CREATE_ZIP_OPTIONS = ImmutableMap.of("create", "true", "encoding", "UTF-8");
     private final GameManifest gameManifest;
     private final Lock worldDirectoryWriteLock;
+    private final EntityManager privateEntityManager;
+    private final EntitySetDeltaRecorder deltaToSave;
     private volatile SaveTransactionResult result;
 
     // Unprocessed data to save:
@@ -69,10 +76,13 @@ public class SaveTransaction extends AbstractTask {
     private final SaveTransactionHelper saveTransactionHelper;
 
 
-    public SaveTransaction(Map<String, EntityData.PlayerStore> playerStores, EntityData.GlobalStore globalStore,
+    public SaveTransaction(EntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+                           Map<String, EntityData.PlayerStore> playerStores, EntityData.GlobalStore globalStore,
                            Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilder, GameManifest gameManifest,
                            boolean storeChunksInZips, StoragePathProvider storagePathProvider,
                            Lock worldDirectoryWriteLock) {
+        this.privateEntityManager = privateEntityManager;
+        this.deltaToSave = deltaToSave;
         this.playerStores = playerStores;
         this.compressedChunkBuilders = compressedChunkBuilder;
         this.globalStore = globalStore;
@@ -96,6 +106,7 @@ public class SaveTransaction extends AbstractTask {
                 throw new IOException("Save rand while there were unmerged changes");
             }
             saveTransactionHelper.cleanupSaveTransactionDirectory();
+            applyDeltaToPrivateEntityManager();
             createSaveTransactionDirectory();
             writePlayerStores();
             writeGlobalStore();
@@ -111,6 +122,31 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
+
+
+    private void applyDeltaToPrivateEntityManager() {
+        deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
+            @Override
+            public boolean execute(long entityId, EntityDelta delta) {
+                EntityRef entity = privateEntityManager.getEntity(entityId);
+                for (Component changedComponent: delta.getChangedComponents().values()) {
+                    entity.removeComponent(changedComponent.getClass());
+                    entity.addComponent(changedComponent);
+                }
+                for (Class<? extends Component> c: delta.getRemovedComponents()) {
+                    entity.removeComponent(c);
+                }
+                return true;
+            }
+        });
+        deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
+            @Override
+            public boolean execute(long entityId) {
+                privateEntityManager.getEntity(entityId).destroy();
+                return true;
+            }
+        });
+    }
 
     private void createSaveTransactionDirectory() throws IOException {
         Path directory = storagePathProvider.getUnfinishedSaveTransactionPath();
