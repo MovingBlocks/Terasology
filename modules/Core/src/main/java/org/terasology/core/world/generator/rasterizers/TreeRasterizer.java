@@ -16,7 +16,9 @@
 package org.terasology.core.world.generator.rasterizers;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
@@ -38,24 +40,24 @@ import java.util.Map;
 public class TreeRasterizer implements WorldRasterizer {
 
     private Block tallGrass;
-    private Multimap<CoreBiome, TreeGenerator> treeGeneratorLookup = ArrayListMultimap.create();
+    private Table<CoreBiome, TreeGenerator, Float> treeGeneratorLookup = HashBasedTable.create();
 
     @Override
     public void initialize() {
         // Add the trees to the generator lists
-        treeGeneratorLookup.put(CoreBiome.MOUNTAINS, Trees.oakTree());
-        treeGeneratorLookup.put(CoreBiome.MOUNTAINS, Trees.pineTree());
+        treeGeneratorLookup.put(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.08f);
+        treeGeneratorLookup.put(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.05f);
 
-        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.oakTree());
-        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.pineTree());
-        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.oakVariationTree());
+        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.oakTree(), 0.08f);
+        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.pineTree(), 0.05f);
+        treeGeneratorLookup.put(CoreBiome.FOREST, Trees.oakVariationTree(), 0.08f);
 
-        treeGeneratorLookup.put(CoreBiome.SNOW, Trees.birkTree());
+        treeGeneratorLookup.put(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
 
-        treeGeneratorLookup.put(CoreBiome.PLAINS, Trees.redTree());
-        treeGeneratorLookup.put(CoreBiome.PLAINS, Trees.oakTree());
+        treeGeneratorLookup.put(CoreBiome.PLAINS, Trees.redTree(), 0.05f);
+        treeGeneratorLookup.put(CoreBiome.PLAINS, Trees.oakTree(), 0.08f);
 
-        treeGeneratorLookup.put(CoreBiome.DESERT, Trees.cactus());
+        treeGeneratorLookup.put(CoreBiome.DESERT, Trees.cactus(), 0.05f);
     }
 
     @Override
@@ -68,8 +70,8 @@ public class TreeRasterizer implements WorldRasterizer {
             if (facetValue > 0) {
                 Vector3i pos = entry.getKey();
                 CoreBiome biome = biomeFacet.get(pos.x, pos.z);
-                for (TreeGenerator generator : treeGeneratorLookup.get(biome)) {
-                    if (generator.getGenerationProbability() > (facetValue / 256f)) {
+                for (TreeGenerator generator : treeGeneratorLookup.row(biome).keySet()) {
+                    if (treeGeneratorLookup.get(biome, generator) > (facetValue / 256f)) {
                         generator.generate(chunk, new FastRandom((long) facetValue), pos.x, pos.y, pos.z);
                         break;
                     }

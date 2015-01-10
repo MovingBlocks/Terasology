@@ -38,8 +38,7 @@ public final class Trees {
             .put('B', new LSystemRule("[&FFFA]////[&FFFA]////[&FFFA]", 0.8f)).build(),
             4, (float) Math.toRadians(30))
             .setLeafType(blockManager.getBlock("core:GreenLeaf"))
-            .setBarkType(blockManager.getBlock("core:OakTrunk"))
-            .setGenerationProbability(0.08f);
+            .setBarkType(blockManager.getBlock("core:OakTrunk"));
     }
 
     public static TreeGenerator oakVariationTree() {
@@ -50,8 +49,7 @@ public final class Trees {
             .put('B', new LSystemRule("[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]", 0.8f)).build(),
             4, (float) Math.toRadians(35))
             .setLeafType(blockManager.getBlock("core:GreenLeaf"))
-            .setBarkType(blockManager.getBlock("core:OakTrunk"))
-            .setGenerationProbability(0.08f);
+            .setBarkType(blockManager.getBlock("core:OakTrunk"));
     }
 
     public static TreeGenerator pineTree() {
@@ -61,8 +59,7 @@ public final class Trees {
             .put('A', new LSystemRule("[&FFFFFA]////[&FFFFFA]////[&FFFFFA]", 1.0f)).build(),
             4, (float) Math.toRadians(35))
             .setLeafType(blockManager.getBlock("core:DarkLeaf"))
-            .setBarkType(blockManager.getBlock("core:PineTrunk"))
-            .setGenerationProbability(0.05f);
+            .setBarkType(blockManager.getBlock("core:PineTrunk"));
     }
 
     public static TreeGenerator birkTree() {
@@ -72,8 +69,7 @@ public final class Trees {
             .put('A', new LSystemRule("[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", 1.0f))
             .put('B', new LSystemRule("[&FAF]////[&FAF]////[&FAF]", 0.8f)).build(), 4, (float) Math.toRadians(35))
             .setLeafType(blockManager.getBlock("core:DarkLeaf"))
-            .setBarkType(blockManager.getBlock("core:BirkTrunk"))
-            .setGenerationProbability(0.02f);
+            .setBarkType(blockManager.getBlock("core:BirkTrunk"));
     }
 
     public static TreeGenerator redTree() {
@@ -82,14 +78,12 @@ public final class Trees {
             .put('A', new LSystemRule("[&FFAFF]////[&FFAFF]////[&FFAFF]", 1.0f)).build(),
             4, (float) Math.toRadians(40))
             .setLeafType(blockManager.getBlock("core:RedLeaf"))
-            .setBarkType(blockManager.getBlock("core:OakTrunk"))
-            .setGenerationProbability(0.05f);
+            .setBarkType(blockManager.getBlock("core:OakTrunk"));
     }
 
     public static TreeGenerator cactus() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorCactus()
-            .setTrunkType(blockManager.getBlock("core:Cactus"))
-            .setGenerationProbability(0.05f);
+            .setTrunkType(blockManager.getBlock("core:Cactus"));
     }
 }
