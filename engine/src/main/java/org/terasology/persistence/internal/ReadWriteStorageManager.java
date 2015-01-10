@@ -29,6 +29,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
+import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
@@ -83,7 +84,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
-
+    private final OwnershipHelper helper;
     private final SaveTransactionHelper saveTransactionHelper;
 
     /**
@@ -120,6 +121,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) throws IOException {
         super(savePath, environment, entityManager, storeChunksInZips);
 
+        this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
         entityManager.subscribeDestroyListener(this);
         entityManager.subscribeChangeListener(this);
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
@@ -260,27 +262,23 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      *This method should only be called by the main thread.
      *
      * @param entitiesToSave all persistent entities within the given chunk
-     * @param deactivate if true the entities of the chunk will be deaktivated and the chunk data will be used directly.
-     *                 If deactivate is false then the entities won't be touched and a chunk will be but in
-     *                 snapshot mode so that concurrent modifcations (and possibly future unload) is possible.
+     * @param chunkUnloaded if true the chunk data will be used directly.  If deactivate is false then the chunk will be
+     *                      but in snapshot mode so that concurrent modifications (and possibly future unload) is
+     *                      possible.
      */
     private CompressedChunkBuilder createCompressedChunkBuilder(Chunk chunk,
                                                                 Collection<EntityRef> entitiesToSave,
-                                                                boolean deactivate) {
+                                                                boolean chunkUnloaded) {
         EntityStorer storer = new EntityStorer(getEntityManager());
         for (EntityRef entityRef : entitiesToSave) {
             if (entityRef.isPersistent()) {
-                storer.store(entityRef, deactivate);
-            } else {
-                if (deactivate) {
-                    entityRef.destroy();
-                }
+                storer.store(entityRef);
             }
         }
         EntityData.EntityStore entityStore = storer.finaliseStore();
 
         ChunkImpl chunkImpl = (ChunkImpl) chunk;
-        boolean viaSnapshot = !deactivate;
+        boolean viaSnapshot = !chunkUnloaded;
         if (viaSnapshot) {
             chunkImpl.createSnapshot();
         }
@@ -386,7 +384,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         playerEntityStore.setCharacterPosZ(relevanceLocation.z);
         playerEntityStore.setHasCharacter(hasCharacter);
         EntityStorer storer = new EntityStorer(getEntityManager());
-        storer.store(character, PlayerStoreInternal.CHARACTER, deactivate);
+        storer.store(character, PlayerStoreInternal.CHARACTER);
+        deactivateOrDestroyEntityRecursive(character);
         playerEntityStore.setStore(storer.finaliseStore());
 
         return playerEntityStore.build();
@@ -414,6 +413,27 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public void deactivateChunk(Chunk chunk) {
         Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
         unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, entitiesOfChunk, true));
+
+        for (EntityRef entity: entitiesOfChunk) {
+            deactivateOrDestroyEntityRecursive(entity);
+        }
+    }
+
+
+    private void deactivateOrDestroyEntityRecursive(EntityRef entity) {
+        if (entity.isActive()) {
+            for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
+                if (!ownedEntity.isAlwaysRelevant()) {
+                    if (!ownedEntity.isPersistent()) {
+                        // TODO check if destroy is recursive
+                        ownedEntity.destroy();
+                    } else {
+                        deactivateOrDestroyEntityRecursive(ownedEntity);
+                    }
+                }
+            }
+            getEntityManager().deactivateForStorage(entity);
+        }
     }
 
     @Override

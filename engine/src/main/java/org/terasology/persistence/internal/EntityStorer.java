@@ -30,11 +30,13 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 
 /**
+ * Utility class for the construction of a EntityData.EntityStore structure for storing the entities on disk..
+ *
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 final class EntityStorer {
 
-    private final EngineEntityManager entityManager;
     private final EntitySerializer serializer;
     private final EntityData.EntityStore.Builder entityStoreBuilder;
     private final OwnershipHelper helper;
@@ -42,7 +44,6 @@ final class EntityStorer {
     private TLongSet storedEntityIds = new TLongHashSet();
 
     public EntityStorer(EngineEntityManager entityManager) {
-        this.entityManager = entityManager;
         this.entityStoreBuilder = EntityData.EntityStore.newBuilder();
         this.serializer = new EntitySerializer(entityManager);
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
@@ -55,20 +56,16 @@ final class EntityStorer {
         serializer.setComponentIdMapping(componentIds);
     }
 
-    public void store(EntityRef entity, boolean deactivate) {
-        store(entity, "", deactivate);
+    public void store(EntityRef entity) {
+        store(entity, "");
     }
 
-    public void store(EntityRef entity, String name, boolean deactivate) {
+    public void store(EntityRef entity, String name) {
         if (entity.isActive()) {
             for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
                 if (!ownedEntity.isAlwaysRelevant()) {
-                    if (!ownedEntity.isPersistent()) {
-                        if (deactivate) {
-                            ownedEntity.destroy();
-                        }
-                    } else {
-                        store(ownedEntity, deactivate);
+                    if (ownedEntity.isPersistent()) {
+                        store(ownedEntity);
                     }
                 }
             }
@@ -80,9 +77,6 @@ final class EntityStorer {
             }
             storedEntityIds.add(entityData.getId());
             externalReferences.remove(entityData.getId());
-            if (deactivate) {
-                entityManager.deactivateForStorage(entity);
-            }
         }
     }
 
