@@ -15,10 +15,13 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import java.util.List;
+
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.Border3D;
@@ -32,6 +35,9 @@ import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
+
 /**
  * Determines where trees can be placed.  Will put trees one block above the surface.
  */
@@ -42,55 +48,76 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
         @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15 + 1, sides = 10)),
         @Facet(value = BiomeFacet.class, border = @FacetBorder(bottom = 15, sides = 10))
 })
-public class TreeProvider implements ConfigurableFacetProvider {
+public class TreeProvider extends AbstractTreeProvider implements ConfigurableFacetProvider {
 
     private NoiseTable treeNoise;
-    private NoiseTable treeSeedNoise;
     private TreeProviderConfiguration configuration = new TreeProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
+        super.setSeed(seed);
+
         treeNoise = new NoiseTable(seed);
-        treeSeedNoise = new NoiseTable(seed + 1);
     }
 
     @Override
     public void process(GeneratingRegion region) {
-        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
-        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 15, 10));
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
-        int minY = facet.getWorldRegion().minY();
-        int maxY = facet.getWorldRegion().maxY();
+        List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
-        for (int z = facet.getWorldRegion().minZ(); z <= facet.getWorldRegion().maxZ(); z++) {
-            for (int x = facet.getWorldRegion().minX(); x <= facet.getWorldRegion().maxX(); x++) {
-                int height = TeraMath.ceilToInt(surface.getWorld(x, z));
-                // if the surface is in range, and if we are above sea level
-                if (height >= minY && height <= maxY) {
-
-                    if (height > seaLevel.getSeaLevel()) {
-                        // if the block on the surface is dense enough
-                        float densBelow = density.getWorld(x, height - 1, z);
-                        float densThis = density.getWorld(x, height, z);
-                        if (densBelow >= 0 && densThis < 0
-                                // and if there is a level surface in adjacent directions
-                                && (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == height)
-                                && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == height)
-                                && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == height)
-                                && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == height)
-                                // and if it selects a % of them
-                                && treeNoise.noise(x, z) / 255f < configuration.density) {
-                            facet.setWorld(x, height, z, Integer.valueOf(treeSeedNoise.noise(x, z)));
-                        }
-                    }
-                }
+        // TODO: JAVA8: Use lambda expressions instead
+        filters.add(new Predicate<Vector3i>() {
+            @Override
+            public boolean apply(Vector3i input) {
+                return input.getY() > seaLevel.getSeaLevel();
             }
-        }
+        });
+
+        // TODO: JAVA8: Use lambda expressions instead
+        filters.add(new Predicate<Vector3i>() {
+            @Override
+            public boolean apply(Vector3i input) {
+                // if the block on the surface is dense enough
+                float densBelow = density.getWorld(input.getX(), input.getY() - 1, input.getZ());
+                float densThis = density.getWorld(input);
+                return (densBelow >= 0 && densThis < 0);
+            }
+        });
+
+        // TODO: JAVA8: Use lambda expressions instead
+        filters.add(new Predicate<Vector3i>() {
+            @Override
+            public boolean apply(Vector3i input) {
+                // and if there is a level surface in adjacent directions
+                int x = input.getX();
+                int z = input.getZ();
+                int height = input.getY();
+
+                return (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == height)
+                    && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == height)
+                    && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == height)
+                    && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == height);
+            }
+        });
+
+
+        // TODO: JAVA8: Use lambda expressions instead
+        filters.add(new Predicate<Vector3i>() {
+            @Override
+            public boolean apply(Vector3i input) {
+                // and if it selects a % of them
+                return treeNoise.noise(input.getX(), input.getZ()) / 255f < configuration.density;
+            }
+        });
+
+        TreeFacet facet = createFacet(region, filters);
 
         region.setRegionFacet(TreeFacet.class, facet);
+
+
     }
 
     @Override
