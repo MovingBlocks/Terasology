@@ -16,22 +16,23 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import java.util.List;
+import java.util.Map;
 
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
-import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.biomes.Biome;
-import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
+import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.base.ObjectFacet2D;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -60,9 +61,7 @@ public abstract class AbstractTreeProvider implements FacetProvider {
         treeGeneratorLookup.put(biome, tree, Float.valueOf(probability));
     }
 
-    protected TreeFacet createFacet(GeneratingRegion region, List<Predicate<Vector3i>> filters, BiomeFacet biomeFacet) {
-        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
-        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 15, 10));
+    protected void fillFacet(TreeFacet facet, GeneratingRegion region, List<Predicate<Vector3i>> filters, ObjectFacet2D<? extends Biome> biomeFacet) {
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
 
         int minY = facet.getWorldRegion().minY();
@@ -72,27 +71,134 @@ public abstract class AbstractTreeProvider implements FacetProvider {
             for (int x = facet.getWorldRegion().minX(); x <= facet.getWorldRegion().maxX(); x++) {
                 int height = TeraMath.ceilToInt(surface.getWorld(x, z));
 
-                // if the surface is in range, check filters
+                // if the surface is in range
                 if (height >= minY && height <= maxY) {
 
                     Vector3i pos = new Vector3i(x, height, z);
 
+                    // if all predicates match
                     if (Predicates.and(filters).apply(pos)) {
-                        CoreBiome biome = biomeFacet.getWorld(pos.x, pos.z);
-                        float facetValue = treeSeedNoise.noise(x, z) / 255f;
-                        for (TreeGenerator generator : treeGeneratorLookup.row(biome).keySet()) {
-                            if (treeGeneratorLookup.get(biome, generator) > facetValue) {
-
-                                facet.setWorld(x, height, z, generator);
-                                break;
-                            }
-                        }
+                        Biome biome = biomeFacet.getWorld(pos.x, pos.z);
+                        Map<TreeGenerator, Float> gens = treeGeneratorLookup.row(biome);
+                        putTree(facet, pos, gens);
                     }
                 }
             }
         }
+    }
 
-        return facet;
+    protected void putTree(TreeFacet facet, Vector3i pos, Map<TreeGenerator, Float> gens) {
+        float random = treeSeedNoise.noise(pos.x, pos.z) / 255f;
+
+        for (TreeGenerator generator : gens.keySet()) {
+            float threshold = gens.get(generator).floatValue();
+            if (random < threshold) {
+                facet.setWorld(pos, generator);
+                break;
+            } else {
+                random -= threshold;
+            }
+        }
+    }
+
+    protected static class SeaLevelFilter implements Predicate<Vector3i> {
+
+        private int seaLevel;
+
+        public SeaLevelFilter(int seaLevel) {
+            this.seaLevel = seaLevel;
+        }
+
+        @Override
+        public boolean apply(Vector3i input) {
+            return input.getY() > seaLevel;
+        }
+    }
+
+    protected static class DensityFilter implements Predicate<Vector3i> {
+
+        private DensityFacet density;
+
+        public DensityFilter(DensityFacet density) {
+            this.density = density;
+        }
+
+        @Override
+        public boolean apply(Vector3i input) {
+            // pass if the block on the surface is dense enough
+            float densBelow = density.getWorld(input.getX(), input.getY() - 1, input.getZ());
+            float densThis = density.getWorld(input);
+            return (densBelow >= 0 && densThis < 0);
+        }
+    }
+
+    protected static class FlatnessFilter implements Predicate<Vector3i> {
+        private SurfaceHeightFacet surface;
+
+        public FlatnessFilter(SurfaceHeightFacet surface) {
+            this.surface = surface;
+        }
+
+        @Override
+        public boolean apply(Vector3i input) {
+            // pass if there is a level surface in adjacent directions
+            int x = input.getX();
+            int z = input.getZ();
+            int height = input.getY();
+
+            return (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == height)
+                && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == height)
+                && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == height)
+                && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == height);
+        }
+    }
+
+    protected static class ProbabilityFilter implements Predicate<Vector3i> {
+
+        private NoiseTable treeNoise;
+        private float density;
+
+        public ProbabilityFilter(NoiseTable treeNoise, float density) {
+            this.treeNoise = treeNoise;
+            this.density = density;
+        }
+
+        @Override
+        public boolean apply(Vector3i input) {
+            return treeNoise.noise(input.getX(), input.getZ()) / 255f < density;
+        }
+    }
+
+    protected static class MinDistanceFilter implements Predicate<Vector3i> {
+        private TreeFacet facet;
+        private float minDist;
+
+        public MinDistanceFilter(TreeFacet facet, float minDist) {
+            this.facet = facet;
+            this.minDist = minDist;
+        }
+
+        @Override
+        public boolean apply(Vector3i input) {
+            Map<Vector3i, TreeGenerator> relativeEntries = facet.getRelativeEntries();
+            if (relativeEntries.isEmpty()) {
+                return true;
+            }
+
+            // convert world coords. to relative coords
+            // TODO: consider making SparseFacet3D.worldToRelative() public (and all related ones)
+            Vector3i rel = new Vector3i(
+                    input.getX() - facet.getWorldRegion().minX() + facet.getRelativeRegion().minX(),
+                    input.getY() - facet.getWorldRegion().minY() + facet.getRelativeRegion().minY(),
+                    input.getZ() - facet.getWorldRegion().minZ() + facet.getRelativeRegion().minZ());
+
+            for (Vector3i other : relativeEntries.keySet()) {
+                if (rel.distance(other) < minDist) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
-

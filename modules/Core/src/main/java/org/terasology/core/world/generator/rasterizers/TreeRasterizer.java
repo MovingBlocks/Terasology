@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,23 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Table;
+import java.util.Map;
 
-import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
-import org.terasology.core.world.generator.chunkGenerators.Trees;
-import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.block.Block;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 
-import java.util.Map;
-
 /**
- * Creates trees based on the original
+ * Creates trees based on the {@link TreeGenerator} that is
+ * defined by the {@link TreeFacet}.
+ * @author Martin Steiger
  */
 public class TreeRasterizer implements WorldRasterizer {
-
-    private Block tallGrass;
 
     @Override
     public void initialize() {
@@ -54,7 +45,8 @@ public class TreeRasterizer implements WorldRasterizer {
         for (Map.Entry<Vector3i, TreeGenerator> entry : facet.getRelativeEntries().entrySet()) {
             Vector3i pos = entry.getKey();
             TreeGenerator treeGen = entry.getValue();
-            treeGen.generate(chunk, new FastRandom(pos.hashCode()), pos.x, pos.y, pos.z);
+            Random random = new FastRandom(pos.hashCode());
+            treeGen.generate(chunk, random, pos.x, pos.y, pos.z);
         }
     }
 

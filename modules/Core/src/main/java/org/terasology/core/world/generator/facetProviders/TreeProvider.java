@@ -18,12 +18,10 @@ package org.terasology.core.world.generator.facetProviders;
 import java.util.List;
 
 import org.terasology.core.world.CoreBiome;
-import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.chunkGenerators.Trees;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
@@ -34,7 +32,6 @@ import org.terasology.world.generation.FacetBorder;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
@@ -47,9 +44,9 @@ import com.google.common.collect.Lists;
 @Produces(TreeFacet.class)
 @Requires({
         @Facet(value = SeaLevelFacet.class, border = @FacetBorder(sides = 10)),
-        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10 + 1)),
-        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15 + 1, sides = 10)),
-        @Facet(value = BiomeFacet.class, border = @FacetBorder(bottom = 15, sides = 10))
+        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(sides = 10 + 1)),
+//        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 25 + 1, sides = 10)),
+        @Facet(value = BiomeFacet.class, border = @FacetBorder(sides = 10))
 })
 public class TreeProvider extends AbstractTreeProvider implements ConfigurableFacetProvider {
 
@@ -63,8 +60,8 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
         treeNoise = new NoiseTable(seed);
 
         // Add the trees to the generator lists
-        registerTree(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.08f);
-        registerTree(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.05f);
+        registerTree(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);
+        registerTree(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.02f);
 
         registerTree(CoreBiome.FOREST, Trees.oakTree(), 0.08f);
         registerTree(CoreBiome.FOREST, Trees.pineTree(), 0.05f);
@@ -72,71 +69,33 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
 
         registerTree(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
 
-        registerTree(CoreBiome.PLAINS, Trees.redTree(), 0.05f);
-        registerTree(CoreBiome.PLAINS, Trees.oakTree(), 0.08f);
+        registerTree(CoreBiome.PLAINS, Trees.redTree(), 0.01f);
+        registerTree(CoreBiome.PLAINS, Trees.oakTree(), 0.02f);
 
-        registerTree(CoreBiome.DESERT, Trees.cactus(), 0.05f);
+        registerTree(CoreBiome.DESERT, Trees.cactus(), 0.04f);
     }
 
     @Override
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
-        DensityFacet density = region.getRegionFacet(DensityFacet.class);
+//        DensityFacet density = region.getRegionFacet(DensityFacet.class);
         BiomeFacet biome = region.getRegionFacet(BiomeFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
+        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
+        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 25, 10));
+
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
-        // TODO: JAVA8: Use lambda expressions instead
-        filters.add(new Predicate<Vector3i>() {
-            @Override
-            public boolean apply(Vector3i input) {
-                return input.getY() > seaLevel.getSeaLevel();
-            }
-        });
+        filters.add(new SeaLevelFilter(seaLevel.getSeaLevel()));
+        filters.add(new ProbabilityFilter(treeNoise, configuration.density * 0.1f));
+//        filters.add(new DensityFilter(density));
+        filters.add(new FlatnessFilter(surface));
+        filters.add(new MinDistanceFilter(facet, 4.0f));
 
-        // TODO: JAVA8: Use lambda expressions instead
-        filters.add(new Predicate<Vector3i>() {
-            @Override
-            public boolean apply(Vector3i input) {
-                // if the block on the surface is dense enough
-                float densBelow = density.getWorld(input.getX(), input.getY() - 1, input.getZ());
-                float densThis = density.getWorld(input);
-                return (densBelow >= 0 && densThis < 0);
-            }
-        });
-
-        // TODO: JAVA8: Use lambda expressions instead
-        filters.add(new Predicate<Vector3i>() {
-            @Override
-            public boolean apply(Vector3i input) {
-                // and if there is a level surface in adjacent directions
-                int x = input.getX();
-                int z = input.getZ();
-                int height = input.getY();
-
-                return (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == height)
-                    && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == height)
-                    && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == height)
-                    && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == height);
-            }
-        });
-
-
-        // TODO: JAVA8: Use lambda expressions instead
-        filters.add(new Predicate<Vector3i>() {
-            @Override
-            public boolean apply(Vector3i input) {
-                // and if it selects a % of them
-                return treeNoise.noise(input.getX(), input.getZ()) / 255f < configuration.density;
-            }
-        });
-
-        TreeFacet facet = createFacet(region, filters, biome);
+        fillFacet(facet, region, filters, biome);
 
         region.setRegionFacet(TreeFacet.class, facet);
-
-
     }
 
     @Override
@@ -155,8 +114,8 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
     }
 
     private static class TreeProviderConfiguration implements Component {
-        @Range(min = 0, max = 0.3f, increment = 0.01f, precision = 2, description = "Define the tree density for forests")
-        private float density = 0.12f;
+        @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall tree density")
+        private float density = 0.4f;
 
     }
 }
