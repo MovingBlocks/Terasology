@@ -40,7 +40,6 @@ final class EntityStorer {
     private final EntitySerializer serializer;
     private final EntityData.EntityStore.Builder entityStoreBuilder;
     private final OwnershipHelper helper;
-    private TLongSet externalReferences = new TLongHashSet();
     private TLongSet storedEntityIds = new TLongHashSet();
 
     public EntityStorer(EngineEntityManager entityManager) {
@@ -77,16 +76,11 @@ final class EntityStorer {
                 entityStoreBuilder.addEntityNamed(entityData.getId());
             }
             storedEntityIds.add(entityData.getId());
-            externalReferences.remove(entityData.getId());
         }
     }
 
     public EntityData.EntityStore finaliseStore() {
         return entityStoreBuilder.build();
-    }
-
-    public TLongSet getExternalReferences() {
-        return externalReferences;
     }
 
 }
