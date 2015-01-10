@@ -21,7 +21,21 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetType;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
+import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
@@ -35,13 +49,40 @@ import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.SetTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
+import org.terasology.physics.CollisionGroup;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -88,6 +129,38 @@ public class TypeSerializationLibrary {
         add(String.class, new StringTypeHandler());
         add(Number.class, new NumberTypeHandler());
     }
+
+    public static TypeSerializationLibrary createDefaultLibrary(PojoEntityManager entityManager,
+                                                                                ReflectFactory factory,
+                                                                                CopyStrategyLibrary copyStrategies) {
+        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
+        serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
+        serializationLibrary.add(Block.class, new BlockTypeHandler());
+        serializationLibrary.add(Color.class, new ColorTypeHandler());
+        serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
+        serializationLibrary.add(UIElement.class, new AssetTypeHandler<>(AssetType.UI_ELEMENT, UIElement.class));
+        serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
+        serializationLibrary.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
+        serializationLibrary.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
+        serializationLibrary.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
+        serializationLibrary.add(Name.class, new NameTypeHandler());
+        serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
+        serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
+        serializationLibrary.add(TextureRegion.class, new TextureRegionTypeHandler());
+        serializationLibrary.add(TextureRegionAsset.class, new TextureRegionTypeHandler());
+        serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
+        serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
+        serializationLibrary.add(Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler());
+        serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
+        serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
+        serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
+        serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(AssetType.BEHAVIOR, BehaviorTree.class));
+        return serializationLibrary;
+    }
+
 
     /**
      * Creates a copy of an existing serialization library. This copy is initialised with all type handlers that were added to the original, but does not retain any

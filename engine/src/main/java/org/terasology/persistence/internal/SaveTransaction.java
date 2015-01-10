@@ -29,12 +29,12 @@ import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
-import javax.vecmath.Vector3f;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
