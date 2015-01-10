@@ -302,8 +302,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
 
             PerformanceMonitor.startActivity("Render Light Geometry");
-            renderLightGeometryStencil();
-            //renderLightGeometry();
+            //renderLightGeometryStencil();
+            renderLightGeometry();
             PerformanceMonitor.endActivity();
 
             renderChunksRefractiveReflective();
@@ -447,7 +447,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private void renderLightGeometryStencil() {
 
         DefaultRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
-        /*
+
         Material program = Assets.getMaterial("engine:prog.simple");
         program.enable();
         program.setCamera(playerCamera);
@@ -457,19 +457,17 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
 
             final Vector3f worldPosition = locationComponent.getWorldPosition();
-            //renderLightComponent(lightComponent, worldPosition, program, true);
+            renderLightComponent(lightComponent, worldPosition, program, true);
         }
-        */
+
         DefaultRenderingProcess.getInstance().endRenderLightGeometryStencilPass();
 
-    //}
+    }
 
-    //private void renderLightGeometry() {
+    private void renderLightGeometry() {
 
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
-        Material program = Assets.getMaterial("engine:prog.lightGeometryPass"); // TODO: should this be enabled, its camera set, as above? Verify. --emanuele3d
-        //program.enable();
-        //program.setCamera(playerCamera);
+        Material program = Assets.getMaterial("engine:prog.lightGeometryPass");
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
@@ -479,9 +477,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             renderLightComponent(lightComponent, worldPosition, program, false);
         }
         DefaultRenderingProcess.getInstance().endRenderLightGeometry();
-        DefaultRenderingProcess.getInstance().beginRenderDirectionalLights();
 
         // Sunlight
+        DefaultRenderingProcess.getInstance().beginRenderDirectionalLights();
+
         Vector3f sunlightWorldPosition = new Vector3f(skysphere.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
         sunlightWorldPosition.add(playerCamera.getPosition());
