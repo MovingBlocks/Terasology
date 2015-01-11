@@ -128,8 +128,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         super(savePath, environment, entityManager, storeChunksInZips);
 
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
-        entityManager.subscribeDestroyListener(this);
-        entityManager.subscribeChangeListener(this);
+        entityManager.subscribeForDestruction(this);
+        entityManager.subscribeForChanges(this);
         // TODO Ensure that the component library and the type serializer library are thread save (e.g. immutable)
         this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary());
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());

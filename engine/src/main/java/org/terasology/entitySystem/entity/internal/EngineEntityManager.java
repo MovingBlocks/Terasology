@@ -109,14 +109,14 @@ public interface EngineEntityManager extends LowLevelEntityManager {
      *
      * @param subscriber
      */
-    void subscribeChangeListener(EntityChangeSubscriber subscriber);
+    void subscribeForChanges(EntityChangeSubscriber subscriber);
 
     /**
      * Subscribe for notification the destruction of entities.
      *
      * @param subscriber
      */
-    void subscribeDestroyListener(EntityDestroySubscriber subscriber);
+    void subscribeForDestruction(EntityDestroySubscriber subscriber);
 
     /**
      * Unsubscribes from changes relating to entities. Used by engine systems.

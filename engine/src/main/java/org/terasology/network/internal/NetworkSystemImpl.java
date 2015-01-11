@@ -516,7 +516,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             this.entityManager.unsubscribe(this);
         }
         this.entityManager = newEntityManager;
-        this.entityManager.subscribeChangeListener(this);
+        this.entityManager.subscribeForChanges(this);
         this.blockManager = CoreRegistry.get(BlockManager.class);
         this.biomeManager = CoreRegistry.get(BiomeManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
