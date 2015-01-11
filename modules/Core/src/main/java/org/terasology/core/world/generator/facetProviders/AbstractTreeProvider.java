@@ -25,6 +25,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.biomes.Biome;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -61,7 +62,12 @@ public abstract class AbstractTreeProvider implements FacetProvider {
         treeGeneratorLookup.put(biome, tree, Float.valueOf(probability));
     }
 
-    protected void fillFacet(TreeFacet facet, GeneratingRegion region, List<Predicate<Vector3i>> filters, ObjectFacet2D<? extends Biome> biomeFacet) {
+    protected TreeFacet createFacet(int maxRad, int maxHeight, GeneratingRegion region,
+                                    List<Predicate<Vector3i>> filters, ObjectFacet2D<? extends Biome> biomeFacet) {
+
+        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
+        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, maxHeight, maxRad));
+
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
 
         int minY = facet.getWorldRegion().minY();
@@ -85,6 +91,8 @@ public abstract class AbstractTreeProvider implements FacetProvider {
                 }
             }
         }
+
+        return facet;
     }
 
     protected void putTree(TreeFacet facet, Vector3i pos, Map<TreeGenerator, Float> gens) {
@@ -166,39 +174,6 @@ public abstract class AbstractTreeProvider implements FacetProvider {
         @Override
         public boolean apply(Vector3i input) {
             return treeNoise.noise(input.getX(), input.getZ()) / 255f < density;
-        }
-    }
-
-    protected static class MinDistanceFilter implements Predicate<Vector3i> {
-        private TreeFacet facet;
-        private float minDist;
-
-        public MinDistanceFilter(TreeFacet facet, float minDist) {
-            this.facet = facet;
-            this.minDist = minDist;
-        }
-
-        @Override
-        public boolean apply(Vector3i input) {
-            Map<Vector3i, TreeGenerator> relativeEntries = facet.getRelativeEntries();
-            if (relativeEntries.isEmpty()) {
-                return true;
-            }
-
-            // convert world coords. to relative coords
-            // TODO: consider making SparseFacet3D.worldToRelative() public (and all related ones)
-            Vector3i rel = new Vector3i(
-                    input.getX() - facet.getWorldRegion().minX() + facet.getRelativeRegion().minX(),
-                    input.getY() - facet.getWorldRegion().minY() + facet.getRelativeRegion().minY(),
-                    input.getZ() - facet.getWorldRegion().minZ() + facet.getRelativeRegion().minZ());
-
-            for (Vector3i other : relativeEntries.keySet()) {
-                if (rel.distance(other) < minDist) {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

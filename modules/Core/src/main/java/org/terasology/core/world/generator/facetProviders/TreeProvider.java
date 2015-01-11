@@ -25,7 +25,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
-import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
@@ -45,7 +44,7 @@ import com.google.common.collect.Lists;
 @Requires({
         @Facet(value = SeaLevelFacet.class, border = @FacetBorder(sides = 10)),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(sides = 10 + 1)),
-//        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 25 + 1, sides = 10)),
+//        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 32 + 1, sides = 10)),
         @Facet(value = BiomeFacet.class, border = @FacetBorder(sides = 10))
 })
 public class TreeProvider extends AbstractTreeProvider implements ConfigurableFacetProvider {
@@ -63,9 +62,9 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
         registerTree(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);
         registerTree(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.02f);
 
-        registerTree(CoreBiome.FOREST, Trees.oakTree(), 0.08f);
-        registerTree(CoreBiome.FOREST, Trees.pineTree(), 0.05f);
-        registerTree(CoreBiome.FOREST, Trees.oakVariationTree(), 0.08f);
+        registerTree(CoreBiome.FOREST, Trees.oakTree(), 0.25f);
+        registerTree(CoreBiome.FOREST, Trees.pineTree(), 0.10f);
+        registerTree(CoreBiome.FOREST, Trees.oakVariationTree(), 0.25f);
 
         registerTree(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
 
@@ -82,18 +81,16 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
         BiomeFacet biome = region.getRegionFacet(BiomeFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
-        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
-        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 25, 10));
-
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
         filters.add(new SeaLevelFilter(seaLevel.getSeaLevel()));
         filters.add(new ProbabilityFilter(treeNoise, configuration.density * 0.1f));
 //        filters.add(new DensityFilter(density));
         filters.add(new FlatnessFilter(surface));
-        filters.add(new MinDistanceFilter(facet, 4.0f));
 
-        fillFacet(facet, region, filters, biome);
+        int maxRad = 10;
+        int maxHeight = 32;
+        TreeFacet facet = createFacet(maxRad, maxHeight, region, filters, biome);
 
         region.setRegionFacet(TreeFacet.class, facet);
     }
