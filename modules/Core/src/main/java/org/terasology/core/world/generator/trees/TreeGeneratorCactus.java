@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.chunkGenerators;
+package org.terasology.core.world.generator.trees;
 
 import org.terasology.utilities.random.Random;
-import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.chunks.CoreChunk;
 
 /**
@@ -24,19 +25,19 @@ import org.terasology.world.chunks.CoreChunk;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TreeGeneratorCactus extends TreeGenerator {
+public class TreeGeneratorCactus extends AbstractTreeGenerator {
 
-    private Block cactus;
+    private BlockUri cactusType;
 
     @Override
-    public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
+    public void generate(BlockManager blockManager, CoreChunk view, Random rand, int posX, int posY, int posZ) {
         for (int y = posY; y < posY + 3; y++) {
-            safelySetBlock(view, posX, y, posZ, cactus);
+            safelySetBlock(view, posX, y, posZ, blockManager.getBlock(cactusType));
         }
     }
 
-    public TreeGenerator setTrunkType(Block b) {
-        cactus = b;
+    public TreeGenerator setTrunkType(BlockUri b) {
+        cactusType = b;
         return this;
     }
 }

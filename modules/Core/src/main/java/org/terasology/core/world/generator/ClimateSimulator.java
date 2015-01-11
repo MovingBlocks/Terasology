@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.core.world.generator.chunkGenerators;
+package org.terasology.core.world.generator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -18,9 +18,9 @@ package org.terasology.core.world.generator.facetProviders;
 import java.util.List;
 
 import org.terasology.core.world.CoreBiome;
-import org.terasology.core.world.generator.chunkGenerators.Trees;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
+import org.terasology.core.world.generator.trees.Trees;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;

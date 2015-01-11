@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.chunkGenerators;
+package org.terasology.core.world.generator.trees;
 
 import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
@@ -23,6 +23,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Map;
@@ -32,15 +34,15 @@ import java.util.Map;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TreeGeneratorLSystem extends TreeGenerator {
+public class TreeGeneratorLSystem extends AbstractTreeGenerator {
 
     public static final float MAX_ANGLE_OFFSET = (float) Math.toRadians(5);
 
     /* SETTINGS */
     private int maxDepth;
     private float angle;
-    private Block leafType;
-    private Block barkType;
+    private BlockUri leafType;
+    private BlockUri barkType;
 
     /* RULES */
     private final String initialAxiom;
@@ -63,17 +65,22 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     }
 
     @Override
-    public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
+    public void generate(BlockManager blockManager, CoreChunk view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
         Matrix4f rotation = new Matrix4f(new Quat4f(new Vector3f(0f, 0f, 1f), (float) Math.PI / 2f), Vector3f.ZERO, 1.0f);
 
         float angleOffset = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
-        recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
+
+        Block bark = blockManager.getBlock(barkType);
+        Block leaf = blockManager.getBlock(leafType);
+        recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom),
+                position, rotation, bark, leaf, 0);
     }
 
     private void recurse(CoreChunk view, Random rand, int posX, int posY, int posZ, float angleOffset,
-                         CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
+                         CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation,
+                         Block bark, Block leaf, int depth) {
         Matrix4f tempRotation = new Matrix4f();
         while (axiomIterator.hasNext()) {
             char c = axiomIterator.nextChar();
@@ -82,10 +89,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'F':
                     // Tree trunk
 
-                    safelySetBlock(view, posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType);
-                    safelySetBlock(view, posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType);
-                    safelySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType);
-                    safelySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
+                    safelySetBlock(view, posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, bark);
+                    safelySetBlock(view, posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, bark);
+                    safelySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, bark);
+                    safelySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, bark);
 
                     // Generate leaves
                     if (depth > 1) {
@@ -98,10 +105,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                         continue;
                                     }
 
-                                    safelySetBlock(view, posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
-                                    safelySetBlock(view, posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
-                                    safelySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType);
-                                    safelySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType);
+                                    safelySetBlock(view, posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leaf);
+                                    safelySetBlock(view, posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leaf);
+                                    safelySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leaf);
+                                    safelySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leaf);
                                 }
                             }
                         }
@@ -113,7 +120,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     position.add(dir);
                     break;
                 case '[':
-                    recurse(view, rand, posX, posY, posZ, angleOffset, axiomIterator, new Vector3f(position), new Matrix4f(rotation), depth);
+                    recurse(view, rand, posX, posY, posZ, angleOffset, axiomIterator, new Vector3f(position), new Matrix4f(rotation), bark, leaf, depth);
                     break;
                 case ']':
                     return;
@@ -156,17 +163,18 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                         break;
                     }
 
-                    recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(rule.getAxiom()), position, rotation, depth + 1);
+                    recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(rule.getAxiom()),
+                            position, rotation, bark, leaf, depth + 1);
             }
         }
     }
 
-    public TreeGeneratorLSystem setLeafType(Block b) {
+    public TreeGeneratorLSystem setLeafType(BlockUri b) {
         leafType = b;
         return this;
     }
 
-    public TreeGeneratorLSystem setBarkType(Block b) {
+    public TreeGeneratorLSystem setBarkType(BlockUri b) {
         barkType = b;
         return this;
     }

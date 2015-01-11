@@ -17,11 +17,13 @@ package org.terasology.core.world.generator.rasterizers;
 
 import java.util.Map;
 
-import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.facets.TreeFacet;
+import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.math.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
@@ -33,9 +35,11 @@ import org.terasology.world.generation.WorldRasterizer;
  */
 public class TreeRasterizer implements WorldRasterizer {
 
+    private BlockManager blockManager;
+
     @Override
     public void initialize() {
-        // nothing to do
+        blockManager = CoreRegistry.get(BlockManager.class);
     }
 
     @Override
@@ -46,7 +50,7 @@ public class TreeRasterizer implements WorldRasterizer {
             Vector3i pos = entry.getKey();
             TreeGenerator treeGen = entry.getValue();
             Random random = new FastRandom(pos.hashCode());
-            treeGen.generate(chunk, random, pos.x, pos.y, pos.z);
+            treeGen.generate(blockManager, chunk, random, pos.x, pos.y, pos.z);
         }
     }
 

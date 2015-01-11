@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.chunkGenerators;
+package org.terasology.core.world.generator.trees;
 
 import org.terasology.math.LSystemRule;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -31,59 +30,53 @@ public final class Trees {
     }
 
     public static TreeGenerator oakTree() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorLSystem(
             "FFFFFFA", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFBFA]////[&BFFFA]////[&FBFFA]", 1.0f))
             .put('B', new LSystemRule("[&FFFA]////[&FFFA]////[&FFFA]", 0.8f)).build(),
             4, (float) Math.toRadians(30))
-            .setLeafType(blockManager.getBlock("core:GreenLeaf"))
-            .setBarkType(blockManager.getBlock("core:OakTrunk"));
+            .setLeafType(new BlockUri("core:GreenLeaf"))
+            .setBarkType(new BlockUri("core:OakTrunk"));
     }
 
     public static TreeGenerator oakVariationTree() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorLSystem(
             "FFFFFFA", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFBFA]////[&BFFFA]////[&FBFFAFFA]", 1.0f))
             .put('B', new LSystemRule("[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]", 0.8f)).build(),
             4, (float) Math.toRadians(35))
-            .setLeafType(blockManager.getBlock("core:GreenLeaf"))
-            .setBarkType(blockManager.getBlock("core:OakTrunk"));
+            .setLeafType(new BlockUri("core:GreenLeaf"))
+            .setBarkType(new BlockUri("core:OakTrunk"));
     }
 
     public static TreeGenerator pineTree() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorLSystem(
             "FFFFAFFFFFFFAFFFFA", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFFFFA]////[&FFFFFA]////[&FFFFFA]", 1.0f)).build(),
             4, (float) Math.toRadians(35))
-            .setLeafType(blockManager.getBlock("core:DarkLeaf"))
-            .setBarkType(blockManager.getBlock("core:PineTrunk"));
+            .setLeafType(new BlockUri("core:DarkLeaf"))
+            .setBarkType(new BlockUri("core:PineTrunk"));
     }
 
     public static TreeGenerator birkTree() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorLSystem(
             "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", 1.0f))
             .put('B', new LSystemRule("[&FAF]////[&FAF]////[&FAF]", 0.8f)).build(), 4, (float) Math.toRadians(35))
-            .setLeafType(blockManager.getBlock("core:DarkLeaf"))
-            .setBarkType(blockManager.getBlock("core:BirkTrunk"));
+            .setLeafType(new BlockUri("core:DarkLeaf"))
+            .setBarkType(new BlockUri("core:BirkTrunk"));
     }
 
     public static TreeGenerator redTree() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorLSystem("FFFFFAFAFAF", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFAFF]////[&FFAFF]////[&FFAFF]", 1.0f)).build(),
             4, (float) Math.toRadians(40))
-            .setLeafType(blockManager.getBlock("core:RedLeaf"))
-            .setBarkType(blockManager.getBlock("core:OakTrunk"));
+            .setLeafType(new BlockUri("core:RedLeaf"))
+            .setBarkType(new BlockUri("core:OakTrunk"));
     }
 
     public static TreeGenerator cactus() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         return new TreeGeneratorCactus()
-            .setTrunkType(blockManager.getBlock("core:Cactus"));
+            .setTrunkType(new BlockUri("core:Cactus"));
     }
 }

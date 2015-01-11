@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.terasology.core.world.CoreBiome;
-import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.facets.TreeFacet;
+import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.NoiseTable;
