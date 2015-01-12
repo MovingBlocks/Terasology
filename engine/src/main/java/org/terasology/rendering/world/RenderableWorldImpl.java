@@ -256,17 +256,12 @@ public class RenderableWorldImpl implements RenderableWorld {
      * Updates the currently visible chunks (in sight of the player).
      */
     @Override
-    public void updateAndQueueVisibleChunks() {
-        updateAndQueueVisibleChunks(true, true);
-    }
-
-    @Override
-    public int updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
+    public int updateAndQueueVisibleChunks(boolean isFirstRenderingStageForCurrentFrame) {
         statDirtyChunks = 0;
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
 
-        if (processChunkUpdates) {
+        if (isFirstRenderingStageForCurrentFrame) {
             PerformanceMonitor.startActivity("Building Mesh VBOs");
             chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
             for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
@@ -305,7 +300,7 @@ public class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && fillShadowRenderQueue && chunkCounter < maxChunksForShadows && isChunkVisibleLight(chunk)) {
+                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {
@@ -346,7 +341,7 @@ public class RenderableWorldImpl implements RenderableWorld {
                 }
 
                 // Process all chunks in the area, not only the visible ones
-                if (processChunkUpdates && processChunkUpdate(chunk)) {
+                if (isFirstRenderingStageForCurrentFrame && processChunkUpdate(chunk)) {
                     processedChunks++;
                 }
             }

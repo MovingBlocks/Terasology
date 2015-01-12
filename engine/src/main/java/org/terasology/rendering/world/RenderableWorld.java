@@ -34,8 +34,7 @@ public interface RenderableWorld {
     boolean updateChunksInProximity(Region3i renderableRegion);
     boolean updateChunksInProximity(ViewDistance viewDistance);
 
-    void updateAndQueueVisibleChunks();
-    int updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates);
+    int updateAndQueueVisibleChunks(boolean isFirstRenderingStageForCurrentFrame);
 
     void dispose();
 
