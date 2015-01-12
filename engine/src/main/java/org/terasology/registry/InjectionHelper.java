@@ -50,18 +50,6 @@ public final class InjectionHelper {
                     }
                 }
 
-                for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(org.terasology.entitySystem.systems.In.class))) {
-                    Object value = CoreRegistry.get(field.getType());
-                    if (value != null) {
-                        try {
-                            field.setAccessible(true);
-                            field.set(object, value);
-                            logger.warn("Injection into field {} of {} using old @In annotation - please update", field, object);
-                        } catch (IllegalAccessException e) {
-                            logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
-                        }
-                    }
-                }
                 return null;
             }
         });
@@ -94,13 +82,6 @@ public final class InjectionHelper {
         Share share = object.getClass().getAnnotation(Share.class);
         if (share != null && share.value() != null) {
             for (Class interfaceType : share.value()) {
-                CoreRegistry.put(interfaceType, object);
-            }
-        }
-
-        org.terasology.entitySystem.systems.Share oldshare = object.getClass().getAnnotation(org.terasology.entitySystem.systems.Share.class);
-        if (oldshare != null && oldshare.value() != null) {
-            for (Class interfaceType : oldshare.value()) {
                 CoreRegistry.put(interfaceType, object);
             }
         }
