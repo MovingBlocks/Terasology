@@ -30,6 +30,10 @@ import org.terasology.network.OwnerEvent;
 public class ScreenLayerClosedEvent implements Event {
     private AssetUri closedScreenUri;
 
+    // Default constructor for serialization
+    ScreenLayerClosedEvent() {
+    }
+
     public ScreenLayerClosedEvent(AssetUri closedScreenUri) {
         this.closedScreenUri = closedScreenUri;
     }

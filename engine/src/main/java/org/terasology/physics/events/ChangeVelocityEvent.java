@@ -28,6 +28,10 @@ public class ChangeVelocityEvent implements Event {
     private Vector3f linearVelocity;
     private Vector3f angularVelocity;
 
+    // Default constructor for serialization
+    ChangeVelocityEvent() {
+    }
+
     public ChangeVelocityEvent(Vector3f linearVelocity) {
         this(linearVelocity, null);
     }

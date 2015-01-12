@@ -23,15 +23,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
@@ -47,8 +44,11 @@ import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
+import org.terasology.persistence.typeHandling.DeserializationException;
+import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
@@ -102,7 +102,6 @@ public class ServerImpl implements Server {
     private EngineTime time;
 
 
-
     public ServerImpl(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
         metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
@@ -137,7 +136,7 @@ public class ServerImpl implements Server {
     public ServerInfoMessage getInfo() {
         return new ServerInfoMessageImpl(serverInfo);
     }
-    
+
     public NetData.ServerInfoMessage getRawInfo() {
         return serverInfo;
     }
@@ -146,9 +145,13 @@ public class ServerImpl implements Server {
     public void send(Event event, EntityRef target) {
         NetworkComponent netComp = target.getComponent(NetworkComponent.class);
         if (netComp != null) {
-            queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                    .setEvent(eventSerializer.serialize(event))
-                    .setTargetId(netComp.getNetworkId()).build());
+            try {
+                queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                        .setEvent(eventSerializer.serialize(event))
+                        .setTargetId(netComp.getNetworkId()).build());
+            } catch (SerializationException e) {
+                logger.error("Failed to serialize event", e);
+            }
         }
     }
 
@@ -219,17 +222,21 @@ public class ServerImpl implements Server {
 
 
     private void processEvent(NetData.EventMessage message) {
-        Event event = eventSerializer.deserialize(message.getEvent());
-        EntityRef target = EntityRef.NULL;
-        if (message.hasTargetBlockPos()) {
-            target = blockEntityRegistry.getBlockEntityAt(NetMessageUtil.convert(message.getTargetBlockPos()));
-        } else if (message.hasTargetId()) {
-            target = networkSystem.getEntity(message.getTargetId());
-        }
-        if (target.exists()) {
-            target.send(event);
-        } else {
-            logger.info("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
+        try {
+            Event event = eventSerializer.deserialize(message.getEvent());
+            EntityRef target = EntityRef.NULL;
+            if (message.hasTargetBlockPos()) {
+                target = blockEntityRegistry.getBlockEntityAt(NetMessageUtil.convert(message.getTargetBlockPos()));
+            } else if (message.hasTargetId()) {
+                target = networkSystem.getEntity(message.getTargetId());
+            }
+            if (target.exists()) {
+                target.send(event);
+            } else {
+                logger.info("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
+            }
+        } catch (DeserializationException e) {
+            logger.error("Failed to deserialize event", e);
         }
     }
 
@@ -259,7 +266,11 @@ public class ServerImpl implements Server {
                 updateEntity(updateEntity);
             }
             for (NetData.EventMessage event : message.getEventList()) {
-                processEvent(event);
+                try {
+                    processEvent(event);
+                } catch (RuntimeException e) {
+                    logger.error("Error processing server event", e);
+                }
             }
         }
     }

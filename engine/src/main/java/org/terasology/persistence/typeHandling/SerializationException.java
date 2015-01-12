@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console;
-
-import org.terasology.network.OwnerEvent;
+package org.terasology.persistence.typeHandling;
 
 /**
- * Use to send error messages to a client
- *
- * @author Martin Steiger
+ * This exception is thrown when deserializing a type fails
+ * @author Immortius
  */
-@OwnerEvent
-public class ErrorMessageEvent implements MessageEvent {
+public class SerializationException extends RuntimeException {
 
-    private String message = "";
-
-    // Default constructor for serialization
-    ErrorMessageEvent() {
+    public SerializationException() {
     }
 
-    public ErrorMessageEvent(String message) {
-        this.message = message;
+    public SerializationException(String message) {
+        super(message);
     }
 
-    @Override
-    public Message getFormattedMessage() {
-        return new Message(message, CoreMessageType.ERROR);
+    public SerializationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SerializationException(Throwable cause) {
+        super(cause);
     }
 }
