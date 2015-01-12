@@ -119,6 +119,9 @@ public class StorageManagerTest {
         entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem,
                 new ReflectionReflectFactory());
 
+        esm = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), entityManager, false);
+        CoreRegistry.put(StorageManager.class, esm);
+
         this.character = entityManager.create();
         Client client = createClientMock(PLAYER_ID, character);
 
@@ -132,8 +135,7 @@ public class StorageManagerTest {
         testBlock2.setId((short) 2);
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
 
-        esm = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), entityManager, false);
-        CoreRegistry.put(StorageManager.class, esm);
+
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
