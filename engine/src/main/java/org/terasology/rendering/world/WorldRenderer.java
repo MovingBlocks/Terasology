@@ -16,10 +16,8 @@
 package org.terasology.rendering.world;
 
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
 import org.terasology.world.WorldProvider;
@@ -60,8 +58,6 @@ public interface WorldRenderer {
 
     void changeViewDistance(ViewDistance viewDistance);
 
-    float getDaylight();
-
     float getSunlightValue();
 
     float getBlockLightValue();
@@ -79,8 +75,6 @@ public interface WorldRenderer {
     Vector3f getTint();
 
     float getTick();
-
-    Skysphere getSkysphere();
 
     WorldRenderingStage getCurrentRenderStage();
 

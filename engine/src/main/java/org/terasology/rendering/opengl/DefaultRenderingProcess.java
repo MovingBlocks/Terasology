@@ -38,6 +38,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -595,7 +596,7 @@ public class DefaultRenderingProcess {
 
             float maxExposure = hdrMaxExposure;
 
-            if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
+            if (CoreRegistry.get(BackdropProvider.class).getDaylight() == 0.0) {
                 maxExposure = hdrMaxExposureNight;
             }
 
@@ -608,7 +609,7 @@ public class DefaultRenderingProcess {
             currentExposure = (float) TeraMath.lerp(currentExposure, targetExposure, hdrExposureAdjustmentSpeed);
 
         } else {
-            if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
+            if (CoreRegistry.get(BackdropProvider.class).getDaylight() == 0.0) {
                 currentExposure = hdrMaxExposureNight;
             } else {
                 currentExposure = hdrExposureDefault;
