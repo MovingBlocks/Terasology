@@ -1,6 +1,6 @@
 {
     "text-shadowed" : true,
-    "font" : "default",
+    "font" : "NotoSans-Regular",
     "elements" : {
         "UILabel" : {
             "text-align-vertical" : "top"
