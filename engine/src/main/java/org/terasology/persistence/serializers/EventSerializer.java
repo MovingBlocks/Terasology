@@ -27,7 +27,9 @@ import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.persistence.typeHandling.DeserializationContext;
+import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
@@ -80,18 +82,22 @@ public class EventSerializer {
 
     /**
      * @param eventData
-     * @return The event described by the eventData, or null if it couldn't be deserialized
+     * @return The event described by the eventData
+     * @throws org.terasology.persistence.typeHandling.DeserializationException if an error occurs when deserializing
      */
     public Event deserialize(EntityData.Event eventData) {
         Class<? extends Event> eventClass = getEventClass(eventData);
         if (eventClass != null) {
             EventMetadata<?> eventMetadata = eventLibrary.getMetadata(eventClass);
-            Event event = eventMetadata.newInstance();
-            return deserializeOnto(event, eventData, eventMetadata);
+            if (!eventMetadata.isConstructable()) {
+                throw new DeserializationException("Cannot deserialize " + eventMetadata + " - lacks default constructor");
+            } else {
+                Event event = eventMetadata.newInstance();
+                return deserializeOnto(event, eventData, eventMetadata);
+            }
         } else {
-            logger.warn("Unable to deserialize unknown event type: {}", eventData.getType());
+            throw new DeserializationException("Unable to deserialize unknown event type: " + eventData.getType());
         }
-        return null;
     }
 
 
@@ -115,13 +121,15 @@ public class EventSerializer {
      * Serializes an event.
      *
      * @param event
-     * @return The serialized event, or null if it could not be serialized.
+     * @return The serialized event
+     * @throws org.terasology.persistence.typeHandling.SerializationException if an error occurs during serialization
      */
     public EntityData.Event serialize(Event event) {
         EventMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());
         if (eventMetadata == null) {
-            logger.error("Unregistered event type: {}", event.getClass());
-            return null;
+            throw new SerializationException("Unregistered event type: " + event.getClass());
+        } else if (!eventMetadata.isConstructable()) {
+            throw new SerializationException("Cannot serialize event '" + eventMetadata + "' - lacks default constructor so cannot be deserialized");
         }
         EntityData.Event.Builder eventData = EntityData.Event.newBuilder();
         serializeEventType(event, eventData);

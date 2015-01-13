@@ -16,6 +16,7 @@
 package org.terasology.reflection.metadata;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -162,6 +163,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @return A new instance of this class.
      */
     public T newInstance() {
+        Preconditions.checkState(isConstructable(), "Cannot construct '" + this + "' - no accessible default constructor");
         return constructor.construct();
     }
 

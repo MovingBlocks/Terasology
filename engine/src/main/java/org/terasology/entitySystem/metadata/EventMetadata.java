@@ -16,6 +16,8 @@
 package org.terasology.entitySystem.metadata;
 
 import com.google.common.base.Predicates;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -28,11 +30,13 @@ import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * @author Immortius
  */
 public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedFieldMetadata<T, ?>> {
+    private static final Logger logger = LoggerFactory.getLogger(EventMetadata.class);
 
     private NetworkEventType networkEventType = NetworkEventType.NONE;
     private boolean lagCompensated;
@@ -48,6 +52,9 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
         } else if (simpleClass.getAnnotation(BroadcastEvent.class) != null) {
             networkEventType = NetworkEventType.BROADCAST;
             skipInstigator = simpleClass.getAnnotation(BroadcastEvent.class).skipInstigator();
+        }
+        if (networkEventType != NetworkEventType.NONE && !isConstructable() && !Modifier.isAbstract(simpleClass.getModifiers())) {
+            logger.error("Event '{}' is a network event but lacks a default constructor - will not be replicated", this);
         }
     }
 

@@ -51,6 +51,8 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
+import org.terasology.persistence.typeHandling.DeserializationException;
+import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.registry.CoreRegistry;
@@ -203,11 +205,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     @Override
     public void disconnect() {
         super.disconnect();
-        
+
         if (channel.isOpen()) {
             channel.close().awaitUninterruptibly();
         }
-        
+
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.unregisterListener(this);
@@ -337,22 +339,26 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void send(Event event, EntityRef target) {
-        BlockComponent blockComp = target.getComponent(BlockComponent.class);
-        if (blockComp != null) {
-            if (relevantChunks.contains(TeraMath.calcChunkPos(blockComp.getPosition()))) {
-                queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
-                        .setEvent(eventSerializer.serialize(event)).build());
-            }
-        } else {
-            NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
-            if (networkComponent != null) {
-                if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
+        try {
+            BlockComponent blockComp = target.getComponent(BlockComponent.class);
+            if (blockComp != null) {
+                if (relevantChunks.contains(TeraMath.calcChunkPos(blockComp.getPosition()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                            .setTargetId(networkComponent.getNetworkId())
+                            .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
                             .setEvent(eventSerializer.serialize(event)).build());
                 }
+            } else {
+                NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
+                if (networkComponent != null) {
+                    if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
+                        queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                                .setTargetId(networkComponent.getNetworkId())
+                                .setEvent(eventSerializer.serialize(event)).build());
+                    }
+                }
             }
+        } catch (SerializationException e) {
+            logger.error("Failed to serialize event", e);
         }
     }
 
@@ -401,9 +407,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         Vector3i chunkPos = TeraMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBiomeChanges.add(NetData.BiomeChangeMessage.newBuilder()
-                .setPos(NetMessageUtil.convert(pos))
-                .setNewBiome(biomeManager.getBiomeShortId(newBiome))
-                .build());
+                    .setPos(NetMessageUtil.convert(pos))
+                    .setNewBiome(biomeManager.getBiomeShortId(newBiome))
+                    .build());
         }
     }
 
@@ -501,28 +507,34 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         boolean lagCompensated = false;
         PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
         for (NetData.EventMessage eventMessage : message.getEventList()) {
-            Event event = eventSerializer.deserialize(eventMessage.getEvent());
-            EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(event.getClass());
-            if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
-                continue;
-            }
-            if (!lagCompensated && metadata.isLagCompensated()) {
-                if (predictionSystem != null) {
-                    predictionSystem.lagCompensate(getEntity(), lastReceivedTime);
+            try {
+                Event event = eventSerializer.deserialize(eventMessage.getEvent());
+                EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(event.getClass());
+                if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
+                    logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                    continue;
                 }
-                lagCompensated = true;
-            }
-            EntityRef target = EntityRef.NULL;
-            if (eventMessage.hasTargetId()) {
-                target = networkSystem.getEntity(eventMessage.getTargetId());
-            }
-            if (target.exists()) {
-                if (Objects.equal(networkSystem.getOwner(target), this)) {
-                    target.send(event);
-                } else {
-                    logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
+                if (!lagCompensated && metadata.isLagCompensated()) {
+                    if (predictionSystem != null) {
+                        predictionSystem.lagCompensate(getEntity(), lastReceivedTime);
+                    }
+                    lagCompensated = true;
                 }
+                EntityRef target = EntityRef.NULL;
+                if (eventMessage.hasTargetId()) {
+                    target = networkSystem.getEntity(eventMessage.getTargetId());
+                }
+                if (target.exists()) {
+                    if (Objects.equal(networkSystem.getOwner(target), this)) {
+                        target.send(event);
+                    } else {
+                        logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
+                    }
+                }
+            } catch (DeserializationException e) {
+                logger.error("Failed to deserialize event", e);
+            } catch (RuntimeException e) {
+                logger.error("Error processing event", e);
             }
         }
         if (lagCompensated && predictionSystem != null) {
