@@ -227,7 +227,7 @@ public class EntitySerializerTest {
         EntityRef newEntity = entitySerializer.deserialize(entityData);
         assertTrue(newEntity.hasComponent(EntityInfoComponent.class));
         EntityInfoComponent comp = newEntity.getComponent(EntityInfoComponent.class);
-        assertEquals(prefab.getName(), comp.parentPrefab);
+        assertEquals(prefab, comp.parentPrefab);
     }
 
     @Test

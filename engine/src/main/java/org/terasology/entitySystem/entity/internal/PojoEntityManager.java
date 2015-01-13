@@ -141,7 +141,13 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
 
     @Override
     public EntityRef create() {
-        return createEntityRef(createEntity());
+        EntityRef entityRef = createEntityRef(createEntity());
+        /*
+         * The entity change listener are also used to detect new entities. By adding one component we inform those
+         * listeners about the new entity.
+         */
+        entityRef.addComponent(new EntityInfoComponent());
+        return entityRef;
     }
 
     private long createEntity() {
