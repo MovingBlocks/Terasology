@@ -234,7 +234,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Max health set to " + max;
     }
 
-    @Command(shortDescription = "Set regen rate", runOnServer = true)
+    @Command(shortDescription = "Set health regen rate", runOnServer = true)
     public String setRegenRate(@Sender EntityRef client, @CommandParam("rate") float rate) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -242,7 +242,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
             health.regenRate = rate;
             clientComp.character.saveComponent(health);
         }
-        return "Set regeneration rate to " + rate;
+        return "Set health regeneration rate to " + rate;
     }
 
     @Command(shortDescription = "Show your health")

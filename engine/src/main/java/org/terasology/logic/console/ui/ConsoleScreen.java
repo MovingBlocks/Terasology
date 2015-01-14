@@ -103,11 +103,13 @@ public class ConsoleScreen extends CoreScreenLayer {
         if (!welcomePrinted) {
             console.addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
                     Message.NEW_LINE +
-                    "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
-                    "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
-                    "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
-                    "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
-                    "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
+                    "Type 'help' to see a list with available commands or 'help <commandName>' for command details." + Message.NEW_LINE +
+                    "Text parameters do not need quotes, unless containing spaces. No commas between parameters." + Message.NEW_LINE +
+                    "You can use auto-completion by typing a partial command then hitting [tab] - examples:" + Message.NEW_LINE + Message.NEW_LINE +
+                    "gh + [tab] => 'ghost'" + Message.NEW_LINE +
+                    "help gh + [tab] => 'help ghost' (can auto complete commands fed to help)" + Message.NEW_LINE +
+                    "giv + [tab] => 'giveBlock giveItem givePermission' (use [tab] again to cycle between choices)" + Message.NEW_LINE +
+                    "lS + [tab] => 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
             welcomePrinted = true;
         }
     }
