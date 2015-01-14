@@ -27,6 +27,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
@@ -149,6 +150,11 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
     public void save() {
         storageManager.requestSaving();
+    }
+
+    @Command(shortDescription = "Deletes the specified chunk and re-generate it", runOnServer = true)
+    public void purgeChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
+        chunkProvider.purgeChunk(new Vector3i(x, y, z));
     }
 
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)

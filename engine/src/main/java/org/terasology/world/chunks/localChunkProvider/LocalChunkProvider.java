@@ -363,48 +363,55 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             if (!keep) {
                 // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
                 // Note: Above won't matter if all changes are on the main thread
-                Chunk chunk = nearCache.get(pos);
-                if (chunk.isLocked()) {
-                    continue;
-                }
-                chunk.lock();
-                try {
-                    if (!chunk.isReady()) {
-                        // Chunk hasn't been finished or changed, so just drop it.
-                        iterator.remove();
-                        Iterator<ReadyChunkInfo> infoIterator = sortedReadyChunks.iterator();
-                        while (infoIterator.hasNext()) {
-                            ReadyChunkInfo next = infoIterator.next();
-                            if (next.getPos().equals(chunk.getPosition())) {
-                                infoIterator.remove();
-                                break;
-                            }
-                        }
-                        continue;
-                    }
-                    worldEntity.send(new BeforeChunkUnload(pos));
-                    for (ChunkRelevanceRegion region : regions.values()) {
-                        region.chunkUnloaded(pos);
-                    }
-                    storageManager.deactivateChunk(chunk);
-                    chunk.dispose();
-                    updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
-
-                    try {
-                        unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
-                    } catch (InterruptedException e) {
-                        logger.error("Failed to enqueue unload request for {}", chunk.getPosition(), e);
-                    }
+                if (unloadChunkInternal(pos)) {
                     iterator.remove();
                     if (++unloaded >= UNLOAD_PER_FRAME) {
                         break;
                     }
-                } finally {
-                    chunk.unlock();
                 }
             }
         }
         PerformanceMonitor.endActivity();
+    }
+
+    private boolean unloadChunkInternal(Vector3i pos) {
+        Chunk chunk = nearCache.get(pos);
+        if (chunk.isLocked()) {
+            return false;
+        }
+
+        chunk.lock();
+        try {
+            if (!chunk.isReady()) {
+                // Chunk hasn't been finished or changed, so just drop it.
+                Iterator<ReadyChunkInfo> infoIterator = sortedReadyChunks.iterator();
+                while (infoIterator.hasNext()) {
+                    ReadyChunkInfo next = infoIterator.next();
+                    if (next.getPos().equals(chunk.getPosition())) {
+                        infoIterator.remove();
+                        break;
+                    }
+                }
+                return true;
+            }
+            worldEntity.send(new BeforeChunkUnload(pos));
+            for (ChunkRelevanceRegion region : regions.values()) {
+                region.chunkUnloaded(pos);
+            }
+            storageManager.deactivateChunk(chunk);
+            chunk.dispose();
+            updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
+
+            try {
+                unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
+            } catch (InterruptedException e) {
+                logger.error("Failed to enqueue unload request for {}", chunk.getPosition(), e);
+            }
+
+            return true;
+        } finally {
+            chunk.unlock();
+        }
     }
 
     private boolean areAdjacentChunksReady(Chunk chunk) {
@@ -551,6 +558,21 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
          * that no new chunk get created
          */
         ChunkMonitor.fireChunkProviderDisposed(this);
+    }
+
+    @Override
+    public boolean purgeChunk(Vector3i coords) {
+        if (!nearCache.containsKey(coords)) {
+            return false;
+        }
+
+        if (unloadChunkInternal(coords)) {
+            nearCache.remove(coords);
+            createOrLoadChunk(coords);
+            return true;
+        }
+
+        return false;
     }
 
     @Override

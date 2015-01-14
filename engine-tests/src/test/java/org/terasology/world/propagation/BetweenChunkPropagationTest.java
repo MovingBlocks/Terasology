@@ -224,6 +224,11 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
+        public boolean purgeChunk(Vector3i pos) {
+            return false;
+        }
+
+        @Override
         public void setWorldEntity(EntityRef entity) {
             // do nothing
         }
