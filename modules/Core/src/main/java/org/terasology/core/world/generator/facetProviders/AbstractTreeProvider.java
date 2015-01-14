@@ -18,7 +18,6 @@ package org.terasology.core.world.generator.facetProviders;
 import java.util.List;
 import java.util.Map;
 
-import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.math.TeraMath;
@@ -31,7 +30,6 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generation.facets.base.ObjectFacet2D;
 
@@ -42,7 +40,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 /**
- * Determines where trees can be placed.  Will put trees one block above the surface.
+ * Determines where trees can be placed based on a set of filter predicates.
  */
 @Produces(TreeFacet.class)
 @Requires(@Facet(SurfaceHeightFacet.class))
@@ -57,7 +55,7 @@ public abstract class AbstractTreeProvider implements FacetProvider {
         treeSeedNoise = new NoiseTable(seed + 1);
     }
 
-    protected void registerTree(CoreBiome biome, TreeGenerator tree, float probability) {
+    protected void registerTree(Biome biome, TreeGenerator tree, float probability) {
         Preconditions.checkArgument(probability > 0, "probability must be > 0");
         treeGeneratorLookup.put(biome, tree, Float.valueOf(probability));
     }
@@ -106,74 +104,6 @@ public abstract class AbstractTreeProvider implements FacetProvider {
             } else {
                 random -= threshold;
             }
-        }
-    }
-
-    protected static class SeaLevelFilter implements Predicate<Vector3i> {
-
-        private int seaLevel;
-
-        public SeaLevelFilter(int seaLevel) {
-            this.seaLevel = seaLevel;
-        }
-
-        @Override
-        public boolean apply(Vector3i input) {
-            return input.getY() > seaLevel;
-        }
-    }
-
-    protected static class DensityFilter implements Predicate<Vector3i> {
-
-        private DensityFacet density;
-
-        public DensityFilter(DensityFacet density) {
-            this.density = density;
-        }
-
-        @Override
-        public boolean apply(Vector3i input) {
-            // pass if the block on the surface is dense enough
-            float densBelow = density.getWorld(input.getX(), input.getY() - 1, input.getZ());
-            float densThis = density.getWorld(input);
-            return (densBelow >= 0 && densThis < 0);
-        }
-    }
-
-    protected static class FlatnessFilter implements Predicate<Vector3i> {
-        private SurfaceHeightFacet surface;
-
-        public FlatnessFilter(SurfaceHeightFacet surface) {
-            this.surface = surface;
-        }
-
-        @Override
-        public boolean apply(Vector3i input) {
-            // pass if there is a level surface in adjacent directions
-            int x = input.getX();
-            int z = input.getZ();
-            int height = input.getY();
-
-            return (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == height)
-                && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == height)
-                && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == height)
-                && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == height);
-        }
-    }
-
-    protected static class ProbabilityFilter implements Predicate<Vector3i> {
-
-        private NoiseTable treeNoise;
-        private float density;
-
-        public ProbabilityFilter(NoiseTable treeNoise, float density) {
-            this.treeNoise = treeNoise;
-            this.density = density;
-        }
-
-        @Override
-        public boolean apply(Vector3i input) {
-            return treeNoise.noise(input.getX(), input.getZ()) / 255f < density;
         }
     }
 }

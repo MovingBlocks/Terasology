@@ -83,10 +83,10 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
 
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
-        filters.add(new SeaLevelFilter(seaLevel.getSeaLevel()));
-        filters.add(new ProbabilityFilter(treeNoise, configuration.density * 0.1f));
-//        filters.add(new DensityFilter(density));
-        filters.add(new FlatnessFilter(surface));
+        filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
+        filters.add(PositionFilters.probability(treeNoise, configuration.density * 0.1f));
+//        filters.add(PositionFilters.density(density));
+        filters.add(PositionFilters.flatness(surface));
 
         int maxRad = 10;
         int maxHeight = 32;
