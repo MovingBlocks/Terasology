@@ -97,6 +97,15 @@ public interface ChunkProvider {
      */
     void beginUpdate();
 
+    /**
+     * @param pos the chunk coordinates
+     * @return whether this chunk was purged successfully or not
+     */
+    boolean purgeChunk(Vector3i pos);
+
+    /**
+     * Purges all chunks that are currently loaded and force their re-generation.
+     */
     void purgeWorld();
 
     /**
