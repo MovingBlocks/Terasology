@@ -15,13 +15,18 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import java.util.List;
+import java.util.Map;
+
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
-import org.terasology.core.world.generator.facets.PlantFacet;
+import org.terasology.core.world.generator.facets.FloraFacet;
+import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
+import org.terasology.world.block.Block;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
@@ -33,10 +38,13 @@ import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Determines where plants can be placed.  Will put plants one block above the surface if it is in the correct biome.
  */
-@Produces(PlantFacet.class)
+@Produces(FloraFacet.class)
 @Requires({
     @Facet(SeaLevelFacet.class),
     @Facet(SurfaceHeightFacet.class),
@@ -46,16 +54,26 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
 
     private NoiseTable noiseTable;
+    private NoiseTable noiseTypeTable;
     private FloraProviderConfiguration configuration = new FloraProviderConfiguration();
+
+    /**
+     * Probabilities must add up to 1.0
+     */
+    private Map<FloraType, Float> probs = ImmutableMap.of(
+            FloraType.GRASS, 0.85f,
+            FloraType.FLOWER, 0.1f,
+            FloraType.MUSHROOM, 0.05f);
 
     @Override
     public void setSeed(long seed) {
         noiseTable = new NoiseTable(seed);
+        noiseTypeTable = new NoiseTable(seed + 1);
     }
 
     @Override
     public void process(GeneratingRegion region) {
-        PlantFacet facet = new PlantFacet(region.getRegion(), region.getBorderForFacet(PlantFacet.class));
+        FloraFacet facet = new FloraFacet(region.getRegion(), region.getBorderForFacet(FloraFacet.class));
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
@@ -75,13 +93,30 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
                     if (below >= 0 && curr < 0) {
                         float plantProb = getPlantProb(biome);
                         if (noiseTable.noise(x, z) / 255.0f < plantProb) {
-                            facet.set(x, height, z, true);
+                            FloraType type = getType(x, z);
+                            facet.set(x, height, z, type);
                         }
                     }
                 }
             }
         }
-        region.setRegionFacet(PlantFacet.class, facet);
+        region.setRegionFacet(FloraFacet.class, facet);
+    }
+
+    protected FloraType getType(int x, int z) {
+        float random = noiseTypeTable.noise(x, z) / 255.0f;
+
+        for (FloraType generator : probs.keySet()) {
+            float threshold = probs.get(generator).floatValue();
+            if (random <= threshold) {
+                return generator;
+            } else {
+                random -= threshold;
+            }
+        }
+
+        // this should never happen, but if it does: return first element
+        return FloraType.values()[0];
     }
 
     private float getPlantProb(CoreBiome biome) {
