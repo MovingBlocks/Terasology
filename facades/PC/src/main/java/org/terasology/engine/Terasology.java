@@ -219,6 +219,8 @@ public final class Terasology {
         Path homePath = null;
 
         for (String arg : args) {
+            boolean recognized = true;
+
             if (arg.startsWith(USE_SPECIFIED_DIR_AS_HOME)) {
                 homePath = Paths.get(arg.substring(USE_SPECIFIED_DIR_AS_HOME.length()));
             } else if (arg.equals(USE_CURRENT_DIR_AS_HOME)) {
@@ -232,7 +234,11 @@ public final class Terasology {
                 crashReportEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else {
+                recognized = false;
             }
+
+            System.out.println((recognized ? "Recognized" : "Invalid") + " argument: " + arg);
         }
 
         try {
