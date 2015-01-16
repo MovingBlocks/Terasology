@@ -16,8 +16,9 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
+import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.EnsureSpawnableChunkZeroProvider;
-import org.terasology.core.world.generator.facetProviders.FloraProvider;
+import org.terasology.core.world.generator.facetProviders.AbstractFloraProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinBaseSurfaceProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHillsAndMountainsProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
@@ -59,7 +60,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
                 .addProvider(new PerlinHillsAndMountainsProvider())
                 .addProvider(new BiomeProvider())
                 .addProvider(new SurfaceToDensityProvider())
-                .addProvider(new FloraProvider())
+                .addProvider(new DefaultFloraProvider())
                 .addProvider(new TreeProvider())
                 .addProvider(new EnsureSpawnableChunkZeroProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))

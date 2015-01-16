@@ -16,8 +16,8 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
+import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.FlatSurfaceHeightProvider;
-import org.terasology.core.world.generator.facetProviders.FloraProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
@@ -48,7 +48,7 @@ public class FlatWorldGenerator extends BaseFacetedWorldGenerator {
                 .addProvider(new PerlinSurfaceTemperatureProvider())
                 .addProvider(new BiomeProvider())
                 .addProvider(new SurfaceToDensityProvider())
-                .addProvider(new FloraProvider())
+                .addProvider(new DefaultFloraProvider())
                 .addProvider(new TreeProvider())
                 .addRasterizer(new FloraRasterizer())
                 .addRasterizer(new TreeRasterizer())

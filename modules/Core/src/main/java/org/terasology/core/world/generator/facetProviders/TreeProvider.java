@@ -59,19 +59,19 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
         treeNoise = new NoiseTable(seed);
 
         // Add the trees to the generator lists
-        registerTree(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);
-        registerTree(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.02f);
+        register(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);
+        register(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.02f);
 
-        registerTree(CoreBiome.FOREST, Trees.oakTree(), 0.25f);
-        registerTree(CoreBiome.FOREST, Trees.pineTree(), 0.10f);
-        registerTree(CoreBiome.FOREST, Trees.oakVariationTree(), 0.25f);
+        register(CoreBiome.FOREST, Trees.oakTree(), 0.25f);
+        register(CoreBiome.FOREST, Trees.pineTree(), 0.10f);
+        register(CoreBiome.FOREST, Trees.oakVariationTree(), 0.25f);
 
-        registerTree(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
+        register(CoreBiome.SNOW, Trees.birkTree(), 0.02f);
 
-        registerTree(CoreBiome.PLAINS, Trees.redTree(), 0.01f);
-        registerTree(CoreBiome.PLAINS, Trees.oakTree(), 0.02f);
+        register(CoreBiome.PLAINS, Trees.redTree(), 0.01f);
+        register(CoreBiome.PLAINS, Trees.oakTree(), 0.02f);
 
-        registerTree(CoreBiome.DESERT, Trees.cactus(), 0.04f);
+        register(CoreBiome.DESERT, Trees.cactus(), 0.04f);
     }
 
     @Override

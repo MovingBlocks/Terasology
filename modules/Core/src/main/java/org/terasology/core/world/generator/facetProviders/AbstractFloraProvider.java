@@ -18,13 +18,12 @@ package org.terasology.core.world.generator.facetProviders;
 import java.util.List;
 import java.util.Map;
 
-import org.terasology.core.world.generator.facets.TreeFacet;
-import org.terasology.core.world.generator.trees.TreeGenerator;
+import org.terasology.core.world.generator.facets.FloraFacet;
+import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.biomes.Biome;
-import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -40,32 +39,30 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 /**
- * Determines where trees can be placed based on a set of filter predicates.
+ * Determines where plants can be placed.  Will put plants one block above the surface if it is in the correct biome.
  */
-@Produces(TreeFacet.class)
+@Produces(FloraFacet.class)
 @Requires(@Facet(SurfaceHeightFacet.class))
-public abstract class AbstractTreeProvider implements FacetProvider {
+public abstract class AbstractFloraProvider implements FacetProvider {
 
-    private NoiseTable treeSeedNoise;
+    private NoiseTable noiseTable;
+    private NoiseTable noiseTypeTable;
 
-    private final Table<Biome, TreeGenerator, Float> treeGeneratorLookup = HashBasedTable.create();
+    private final Table<Biome, FloraType, Float> probsTable = HashBasedTable.create();
 
     @Override
     public void setSeed(long seed) {
-        treeSeedNoise = new NoiseTable(seed + 1);
+        noiseTable = new NoiseTable(seed);
+        noiseTypeTable = new NoiseTable(seed + 1);
     }
 
-    protected void register(Biome biome, TreeGenerator tree, float probability) {
-        Preconditions.checkArgument(probability > 0, "probability must be > 0");
-        treeGeneratorLookup.put(biome, tree, Float.valueOf(probability));
+    protected void register(Biome biome, FloraType tree, float probability) {
+        Preconditions.checkArgument(probability >= 0, "probability must be >= 0");
+        probsTable.put(biome, tree, Float.valueOf(probability));
     }
 
-    protected TreeFacet createFacet(int maxRad, int maxHeight, GeneratingRegion region,
-                                    List<Predicate<Vector3i>> filters, ObjectFacet2D<? extends Biome> biomeFacet) {
-
-        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
-        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, maxHeight, maxRad));
-
+    protected FloraFacet createFacet(GeneratingRegion region, List<Predicate<Vector3i>> filters, ObjectFacet2D<? extends Biome> biomeFacet) {
+        FloraFacet facet = new FloraFacet(region.getRegion(), region.getBorderForFacet(FloraFacet.class));
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
 
         int minY = facet.getWorldRegion().minY();
@@ -82,11 +79,11 @@ public abstract class AbstractTreeProvider implements FacetProvider {
 
                     // if all predicates match
                     if (Predicates.and(filters).apply(pos)) {
-                        Biome biome = biomeFacet.getWorld(pos.x, pos.z);
-                        Map<TreeGenerator, Float> gens = treeGeneratorLookup.row(biome);
-                        TreeGenerator tree = getType(pos, gens);
-                        if (tree != null) {
-                            facet.setWorld(pos, tree);
+                        Biome biome = biomeFacet.getWorld(x, z);
+                        Map<FloraType, Float> plantProb = probsTable.row(biome);
+                        FloraType type = getType(x, z, plantProb);
+                        if (type != null) {
+                            facet.setWorld(x, height, z, type);
                         }
                     }
                 }
@@ -96,17 +93,18 @@ public abstract class AbstractTreeProvider implements FacetProvider {
         return facet;
     }
 
-    protected TreeGenerator getType(Vector3i pos, Map<TreeGenerator, Float> gens) {
-        float random = treeSeedNoise.noise(pos.x, pos.z) / 255f;
+    protected FloraType getType(int x, int z, Map<FloraType, Float> probs) {
+        float random = noiseTypeTable.noise(x, z) / 255.0f;
 
-        for (TreeGenerator generator : gens.keySet()) {
-            float threshold = gens.get(generator).floatValue();
-            if (random < threshold) {
+        for (FloraType generator : probs.keySet()) {
+            float threshold = probs.get(generator).floatValue();
+            if (random <= threshold) {
                 return generator;
             } else {
                 random -= threshold;
             }
         }
+
         return null;
     }
 }
