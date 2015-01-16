@@ -56,20 +56,20 @@ public class NoiseTable {
     }
 
     public int noise(int x) {
-        int xInt = (int) TeraMath.fastFloor(x) & 255;
+        int xInt = x & 255;
         return noisePermutations[xInt];
     }
 
     public int noise(int x, int y) {
-        int xInt = (int) TeraMath.fastFloor(x) & 255;
-        int yInt = (int) TeraMath.fastFloor(y) & 255;
+        int xInt = x & 255;
+        int yInt = y & 255;
         return noisePermutations[noisePermutations[xInt] + yInt];
     }
 
     public int noise(int x, int y, int z) {
-        int xInt = (int) TeraMath.fastFloor(x) & 255;
-        int yInt = (int) TeraMath.fastFloor(y) & 255;
-        int zInt = (int) TeraMath.fastFloor(z) & 255;
+        int xInt = x & 255;
+        int yInt = y & 255;
+        int zInt = z & 255;
         return noisePermutations[noisePermutations[noisePermutations[xInt] + yInt] + zInt];
     }
 }
