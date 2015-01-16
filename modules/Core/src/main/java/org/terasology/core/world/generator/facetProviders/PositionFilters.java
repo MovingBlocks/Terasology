@@ -77,13 +77,13 @@ public final class PositionFilters {
             @Override
             public boolean apply(Vector3i input) {
                 int x = input.getX();
-                int y = input.getY();
                 int z = input.getZ();
+                int level = input.getY() - 1;
 
-                return (TeraMath.ceilToInt(surface.getWorld(x - 1, z)) == y)
-                    && (TeraMath.ceilToInt(surface.getWorld(x + 1, z)) == y)
-                    && (TeraMath.ceilToInt(surface.getWorld(x, z - 1)) == y)
-                    && (TeraMath.ceilToInt(surface.getWorld(x, z + 1)) == y);
+                return (TeraMath.floorToInt(surface.getWorld(x - 1, z)) == level)
+                    && (TeraMath.floorToInt(surface.getWorld(x + 1, z)) == level)
+                    && (TeraMath.floorToInt(surface.getWorld(x, z - 1)) == level)
+                    && (TeraMath.floorToInt(surface.getWorld(x, z + 1)) == level);
             }
         };
     }

@@ -83,7 +83,7 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
         int maxY = facet.getWorldRegion().maxY();
         for (int z = facet.getRelativeRegion().minZ(); z <= facet.getRelativeRegion().maxZ(); ++z) {
             for (int x = facet.getRelativeRegion().minX(); x <= facet.getRelativeRegion().maxX(); ++x) {
-                int height = TeraMath.ceilToInt(surface.get(x, z));
+                int height = TeraMath.floorToInt(surface.get(x, z)) + 1;
                 if (height >= minY && height <= maxY && height > seaLevel.getSeaLevel()) {
                     CoreBiome biome = biomeFacet.get(x, z);
                     height = height - minY + facet.getRelativeRegion().minY();

@@ -73,7 +73,8 @@ public abstract class AbstractTreeProvider implements FacetProvider {
 
         for (int z = facet.getWorldRegion().minZ(); z <= facet.getWorldRegion().maxZ(); z++) {
             for (int x = facet.getWorldRegion().minX(); x <= facet.getWorldRegion().maxX(); x++) {
-                int height = TeraMath.ceilToInt(surface.getWorld(x, z));
+                float fh = surface.getWorld(x, z);
+                int height = TeraMath.floorToInt(fh) + 1;
 
                 // if the surface is in range
                 if (height >= minY && height <= maxY) {
