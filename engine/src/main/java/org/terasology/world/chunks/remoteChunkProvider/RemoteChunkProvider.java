@@ -175,7 +175,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public boolean purgeChunk(Vector3i pos) {
+    public boolean reloadChunk(Vector3i pos) {
         return false;
     }
 

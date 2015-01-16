@@ -563,12 +563,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
-    public boolean purgeChunk(Vector3i coords) {
+    public boolean reloadChunk(Vector3i coords) {
         if (!nearCache.containsKey(coords)) {
             return false;
         }
 
         if (unloadChunkInternal(coords, false)) {
+            // TODO: destroy all entities in this chunk similar to the storage manager
+
             nearCache.remove(coords);
             createOrLoadChunk(coords);
             return true;
