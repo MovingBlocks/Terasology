@@ -153,8 +153,12 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Deletes the specified chunk and re-generate it", runOnServer = true)
-    public void purgeChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
-        chunkProvider.purgeChunk(new Vector3i(x, y, z));
+    public String purgeChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
+        boolean success = chunkProvider.purgeChunk(new Vector3i(x, y, z));
+
+        return success
+            ? "Cleared chunk from cache and triggered reload"
+            : "Chunk did not exist in the cache";
     }
 
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
