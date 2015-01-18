@@ -42,6 +42,11 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private static final int RETAINED_CYCLES = 60;
     private static final double DECAY_RATE = 0.98;
     private static final Activity OFF_THREAD_ACTIVITY = new NullActivity();
+    // NullActivity instances are used by the NullPerformanceMonitor and for processes NOT running
+    // on the main thread. Not strictly necessary (these processes are ignored by the PerformanceMonitor
+    // anyway) an instance of this class offers a slight performance improvement over standard Activity
+    // implementations as it doesn't call the PerformanceMonitor.endActivity() method.
+
     private final Activity activityInstance = new ActivityInstance();
 
     private Deque<ActivityInfo> activityStack;
