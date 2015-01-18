@@ -25,6 +25,8 @@ import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.utilities.procedural.FastNoise;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.generation.ConfigurableFacetProvider;
@@ -55,7 +57,7 @@ import com.google.common.collect.Table;
 })
 public class DefaultFloraProvider extends AbstractFloraProvider implements ConfigurableFacetProvider {
 
-    private NoiseTable noiseTable;
+    private Noise3D noiseGen;
 
     private DensityConfiguration configuration = new DensityConfiguration();
 
@@ -77,7 +79,7 @@ public class DefaultFloraProvider extends AbstractFloraProvider implements Confi
     public void setSeed(long seed) {
         super.setSeed(seed);
 
-        noiseTable = new NoiseTable(seed);
+        noiseGen = new FastNoise(seed);
 
         for (CoreBiome biome : CoreBiome.values()) {
             float biomeProb = biomeProbs.get(biome);
@@ -100,7 +102,7 @@ public class DefaultFloraProvider extends AbstractFloraProvider implements Confi
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
         filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
-        filters.add(PositionFilters.probability(noiseTable, configuration.density * 0.1f));
+        filters.add(PositionFilters.probability(noiseGen, configuration.density));
 //        filters.add(PositionFilters.density(density));
 
         FloraFacet facet = createFacet(region, filters, biomeFacet);

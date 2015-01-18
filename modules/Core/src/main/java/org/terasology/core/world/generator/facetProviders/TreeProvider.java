@@ -24,6 +24,8 @@ import org.terasology.core.world.generator.trees.Trees;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.utilities.procedural.FastNoise;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
@@ -49,14 +51,14 @@ import com.google.common.collect.Lists;
 })
 public class TreeProvider extends AbstractTreeProvider implements ConfigurableFacetProvider {
 
-    private NoiseTable treeNoise;
+    private Noise3D treeNoise;
     private TreeProviderConfiguration configuration = new TreeProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
         super.setSeed(seed);
 
-        treeNoise = new NoiseTable(seed);
+        treeNoise = new FastNoise(seed);
 
         // Add the trees to the generator lists
         register(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);

@@ -22,6 +22,8 @@ import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.procedural.FastNoise;
+import org.terasology.utilities.procedural.Noise2D;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.generation.Facet;
@@ -45,15 +47,13 @@ import com.google.common.collect.Table;
 @Requires(@Facet(SurfaceHeightFacet.class))
 public abstract class AbstractFloraProvider implements FacetProvider {
 
-    private NoiseTable noiseTable;
-    private NoiseTable noiseTypeTable;
+    private Noise2D typeNoiseGen;
 
     private final Table<Biome, FloraType, Float> probsTable = HashBasedTable.create();
 
     @Override
     public void setSeed(long seed) {
-        noiseTable = new NoiseTable(seed);
-        noiseTypeTable = new NoiseTable(seed + 1);
+        typeNoiseGen = new FastNoise(seed + 1);
     }
 
     protected void register(Biome biome, FloraType tree, float probability) {
@@ -94,11 +94,11 @@ public abstract class AbstractFloraProvider implements FacetProvider {
     }
 
     protected FloraType getType(int x, int z, Map<FloraType, Float> probs) {
-        float random = noiseTypeTable.noise(x, z) / 255.0f;
+        float random = typeNoiseGen.noise(x, z);
 
         for (FloraType generator : probs.keySet()) {
             float threshold = probs.get(generator).floatValue();
-            if (random <= threshold) {
+            if (random < threshold) {
                 return generator;
             } else {
                 random -= threshold;

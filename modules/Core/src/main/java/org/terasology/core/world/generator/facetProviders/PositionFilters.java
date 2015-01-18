@@ -18,6 +18,7 @@ package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
@@ -90,16 +91,16 @@ public final class PositionFilters {
 
     /**
      * Filters based on a random noise
-     * @param treeNoise the noise table
+     * @param noiseGen the noise generator that produces noise in [0..1]
      * @param density the threshold in [0..1]
-     * @return true if the noise value is below the threshold
+     * @return true if the noise value is <b>below</b> the threshold
      */
-    public static Predicate<Vector3i> probability(NoiseTable treeNoise, float density) {
+    public static Predicate<Vector3i> probability(Noise3D noiseGen, float density) {
         return new Predicate<Vector3i>() {
 
             @Override
             public boolean apply(Vector3i input) {
-                return treeNoise.noise(input.getX(), input.getZ()) / 255f < density;
+                return noiseGen.noise(input.getX(), input.getY(), input.getZ()) < density;
             }
         };
     }
