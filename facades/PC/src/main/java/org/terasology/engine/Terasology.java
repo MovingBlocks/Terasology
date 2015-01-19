@@ -90,10 +90,12 @@ public final class Terasology {
     private static final String LOAD_LAST_GAME = "-loadlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
+    private static final String NO_SOUND = "-noSound";
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
     private static boolean writeSaveGamesEnabled = true;
+    private static boolean soundEnabled = true;
     private static boolean loadLastGame;
 
     private Terasology() {
@@ -165,7 +167,8 @@ public final class Terasology {
                 START_HEADLESS,
                 LOAD_LAST_GAME,
                 NO_CRASH_REPORT,
-                NO_SAVE_GAMES);
+                NO_SAVE_GAMES,
+                NO_SOUND);
 
         StringBuilder optText = new StringBuilder();
 
@@ -193,6 +196,8 @@ public final class Terasology {
         System.out.println("By default Crash Reporting is enabled.");
         System.out.println("To disable this feature use the " + NO_CRASH_REPORT + " launch argument.");
         System.out.println();
+        System.out.println("To disable sound use the " + NO_SOUND + " launch argument (default in headless mode).");
+        System.out.println();
         System.out.println("Examples:");
         System.out.println();
         System.out.println("    Use the current directory as the home directory:");
@@ -219,6 +224,8 @@ public final class Terasology {
         Path homePath = null;
 
         for (String arg : args) {
+            boolean recognized = true;
+
             if (arg.startsWith(USE_SPECIFIED_DIR_AS_HOME)) {
                 homePath = Paths.get(arg.substring(USE_SPECIFIED_DIR_AS_HOME.length()));
             } else if (arg.equals(USE_CURRENT_DIR_AS_HOME)) {
@@ -230,9 +237,15 @@ public final class Terasology {
                 writeSaveGamesEnabled = false;
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
+            } else if (arg.equals(NO_SOUND)) {
+                soundEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else {
+                recognized = false;
             }
+
+            System.out.println((recognized ? "Recognized" : "Invalid") + " argument: " + arg);
         }
 
         try {
@@ -254,7 +267,8 @@ public final class Terasology {
         if (isHeadless) {
             return Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
         } else {
-            return Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
+            EngineSubsystem audio = soundEnabled ? new LwjglAudio() : new HeadlessAudio();
+            return Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), audio, new LwjglInput());
         }
     }
 
