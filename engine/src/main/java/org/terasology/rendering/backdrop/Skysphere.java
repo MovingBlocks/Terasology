@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.world;
+package org.terasology.rendering.backdrop;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
@@ -41,7 +41,7 @@ import static org.lwjgl.opengl.GL11.glNewList;
  * @author Anthony Kireev <adeon.k87@gmail.com>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Skysphere {
+public class Skysphere implements BackdropProvider, BackdropRenderer{
 
     private static int displayListSphere = -1;
 
@@ -97,12 +97,12 @@ public class Skysphere {
         glCallList(displayListSphere);
     }
 
-    public float getSunPosAngle() {
+    public float getSunPositionAngle() {
         return celSystem.getSunPosAngle();
     }
 
     public float getDaylight() {
-        float angle = (float) Math.toDegrees(TeraMath.clamp(Math.cos(getSunPosAngle())));
+        float angle = (float) Math.toDegrees(TeraMath.clamp(Math.cos(getSunPositionAngle())));
         float daylight = 1.0f;
 
         if (angle < 24.0f) {
@@ -121,7 +121,7 @@ public class Skysphere {
     }
 
     public Vector3f getQuantizedSunDirection(float stepSize) {
-        float sunAngle = (float) Math.floor(getSunPosAngle() * stepSize) / stepSize + 0.0001f;
+        float sunAngle = (float) Math.floor(getSunPositionAngle() * stepSize) / stepSize + 0.0001f;
         Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
 
         // Moonlight flip
@@ -133,7 +133,7 @@ public class Skysphere {
     }
 
     public Vector3f getSunDirection(boolean moonlightFlip) {
-        float sunAngle = getSunPosAngle() + 0.0001f;
+        float sunAngle = getSunPositionAngle() + 0.0001f;
         Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
 
         // Moonlight flip

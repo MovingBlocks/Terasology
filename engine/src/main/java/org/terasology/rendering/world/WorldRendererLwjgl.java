@@ -42,6 +42,8 @@ import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
@@ -84,7 +86,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     private final int verticalMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
-    private final Skysphere skysphere;
+    private final BackdropRenderer backdropRenderer;
+    private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
 
@@ -121,9 +124,16 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private RenderingConfig renderingConfig = config.getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
-    public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
+    // TODO: work on the update/preRenderUpdate methods
+    // TODO: rendering process as constructor input and setRenderingProcess method
+    // TODO: move config-provided variables in preRenderUpdate() method?
+    // TODO: examine the potential to avoid allocation of variables such as Materials
+
+    public WorldRendererLwjgl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
+                              WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
         this.worldProvider = worldProvider;
-        skysphere = new Skysphere();
+        this.backdropProvider = backdropProvider;
+        this.backdropRenderer = backdropRenderer;
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         if (renderingConfig.isOculusVrSupport()) {
@@ -204,7 +214,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
         float stepSize = 50f;
-        Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
+        Vector3f sunDirection = backdropProvider.getQuantizedSunDirection(stepSize);
 
         Vector3f sunPosition = new Vector3f(sunDirection);
         sunPosition.scale(256.0f + 64.0f);
@@ -317,7 +327,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         playerCamera.setReflected(true);
 
         playerCamera.lookThroughNormalized();
-        skysphere.render(playerCamera);
+        backdropRenderer.render(playerCamera);
         playerCamera.lookThrough();
 
         Material chunkShader = Assets.getMaterial("engine:prog.chunk");
@@ -344,7 +354,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Sky");
         playerCamera.lookThroughNormalized();
         DefaultRenderingProcess.getInstance().beginRenderSceneSky();
-        skysphere.render(playerCamera);
+        backdropRenderer.render(playerCamera);
         DefaultRenderingProcess.getInstance().endRenderSceneSky();
         playerCamera.lookThrough();
         PerformanceMonitor.endActivity();
@@ -445,7 +455,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         // Sunlight
         DefaultRenderingProcess.getInstance().beginRenderDirectionalLights();
 
-        Vector3f sunlightWorldPosition = new Vector3f(skysphere.getSunDirection(true));
+        Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
         sunlightWorldPosition.add(playerCamera.getPosition());
         renderLightComponent(mainDirectionalLight, sunlightWorldPosition, program, false);
@@ -727,7 +737,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
 
         float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0f) * rawLightValueSun;
-        lightValueSun *= getDaylight();
+        lightValueSun *= backdropProvider.getDaylight();
         // TODO: Hardcoded factor and value to compensate for daylight tint and night brightness
         lightValueSun *= 0.9f;
         lightValueSun += 0.05f;
@@ -739,7 +749,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     @Override
     public float getSunlightValueAt(Vector3f position) {
-        return getDaylight() * worldProvider.getSunlight(position) / 15.0f;
+        return backdropProvider.getDaylight() * worldProvider.getSunlight(position) / 15.0f;
     }
 
     @Override
@@ -768,11 +778,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     @Override
-    public float getDaylight() {
-        return skysphere.getDaylight();
-    }
-
-    @Override
     public WorldProvider getWorldProvider() {
         return worldProvider;
     }
@@ -780,11 +785,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     @Override
     public ChunkProvider getChunkProvider() {
         return renderableWorld.getChunkProvider();
-    }
-
-    @Override
-    public Skysphere getSkysphere() {
-        return skysphere;
     }
 
     public Time getTime() {

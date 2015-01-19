@@ -24,6 +24,9 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.backdrop.BackdropRenderer;
+import org.terasology.rendering.backdrop.Skysphere;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
@@ -71,8 +74,15 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         CoreRegistry.get(ComponentSystemManager.class).register(celestialSystem);
 
         // Init. a new world
+        Skysphere skysphere = new Skysphere();
+        BackdropProvider backdropProvider = skysphere;
+        BackdropRenderer backdropRenderer = skysphere;
+        CoreRegistry.put(BackdropProvider.class, backdropProvider);
+        CoreRegistry.put(BackdropRenderer.class, backdropRenderer);
+
         RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
-        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(backdropProvider, backdropRenderer,
+                                                                                 worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         float reflectionHeight = CoreRegistry.get(NetworkSystem.class).getServer().getInfo().getReflectionHeight();
         worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);

@@ -20,17 +20,13 @@ import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.physics.bullet.BulletPhysics;
-import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
-import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -144,12 +140,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public float getDaylight() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public float getSunlightValue() {
         // TODO Auto-generated method stub
         return 0;
@@ -201,12 +191,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public float getTick() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public Skysphere getSkysphere() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

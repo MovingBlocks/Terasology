@@ -21,6 +21,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -64,10 +65,12 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         program.setFloat("decay", decay, true);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        if (worldRenderer != null) {
-            Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(true);
+        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        if (worldRenderer != null) {
+            Vector3f sunDirection = backdropProvider.getSunDirection(true);
+
+            Camera activeCamera = worldRenderer.getActiveCamera();
 
             Vector4f sunPositionWorldSpace4 = new Vector4f(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
             Vector4f sunPositionScreenSpace = new Vector4f(sunPositionWorldSpace4);

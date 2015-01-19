@@ -24,7 +24,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.world.WorldProvider;
 
 /**
@@ -76,17 +76,17 @@ public class ShaderParametersSky extends ShaderParametersBase {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky180").getId());
         program.setInt("texSky180", texId++, true);
 
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-        if (worldProvider != null && worldRenderer != null) {
-            program.setFloat("colorExp", worldRenderer.getSkysphere().getColorExp(), true);
+        if (worldProvider != null && backdropProvider != null) {
+            program.setFloat("colorExp", backdropProvider.getColorExp(), true);
 
-            Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(false);
-            Vector3d zenithColor = getAllWeatherZenith(sunDirection.y, worldRenderer.getSkysphere().getTurbidity());
+            Vector3f sunDirection = backdropProvider.getSunDirection(false);
+            Vector3d zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
 
-            program.setFloat("sunAngle", worldRenderer.getSkysphere().getSunPosAngle(), true);
-            program.setFloat("turbidity", (Float) worldRenderer.getSkysphere().getTurbidity(), true);
+            program.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
+            program.setFloat("turbidity", backdropProvider.getTurbidity(), true);
             program.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
         }
 

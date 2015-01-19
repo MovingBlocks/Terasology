@@ -16,12 +16,15 @@
 package org.terasology.engine.subsystem;
 
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
 
 public interface RenderingSubsystemFactory {
 
-    WorldRenderer createWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem);
+    WorldRenderer createWorldRenderer(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
+                                      WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem);
 
 }

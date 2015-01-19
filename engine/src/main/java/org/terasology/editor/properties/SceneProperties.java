@@ -17,8 +17,10 @@ package org.terasology.editor.properties;
 
 import com.google.common.collect.Lists;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
-import org.terasology.rendering.world.Skysphere;
+import org.terasology.rendering.backdrop.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.List;
@@ -30,9 +32,13 @@ public class SceneProperties implements PropertyProvider {
     @Override
     public List<Property<?>> getProperties() {
         List<Property<?>> result = Lists.newArrayList();
-        Skysphere skysphere = CoreRegistry.get(WorldRenderer.class).getSkysphere();
-        if (skysphere != null) {
-            result.addAll(new ReflectionProvider(skysphere).getProperties());
+        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
+        if (backdropProvider != null) {
+            result.addAll(new ReflectionProvider(backdropProvider).getProperties());
+        }
+        BackdropRenderer backdropRenderer = CoreRegistry.get(BackdropRenderer.class);
+        if (backdropRenderer != null) {
+            result.addAll(new ReflectionProvider(backdropRenderer).getProperties());
         }
         DefaultRenderingProcess postRenderer = DefaultRenderingProcess.getInstance();
         if (postRenderer != null) {

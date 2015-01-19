@@ -17,6 +17,8 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererLwjgl;
 import org.terasology.world.WorldProvider;
@@ -31,7 +33,8 @@ public class LwjglRenderingSubsystemFactory implements RenderingSubsystemFactory
     }
 
     @Override
-    public WorldRenderer createWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
-        return new WorldRendererLwjgl(worldProvider, chunkProvider, localPlayerSystem, bufferPool);
+    public WorldRenderer createWorldRenderer(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
+                                             WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
+        return new WorldRendererLwjgl(backdropProvider, backdropRenderer, worldProvider, chunkProvider, localPlayerSystem, bufferPool);
     }
 }
