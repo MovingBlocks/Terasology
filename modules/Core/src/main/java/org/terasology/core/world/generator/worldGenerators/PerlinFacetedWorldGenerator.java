@@ -18,7 +18,6 @@ package org.terasology.core.world.generator.worldGenerators;
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.EnsureSpawnableChunkZeroProvider;
-import org.terasology.core.world.generator.facetProviders.AbstractFloraProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinBaseSurfaceProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHillsAndMountainsProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
@@ -27,7 +26,7 @@ import org.terasology.core.world.generator.facetProviders.PerlinRiverProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.facetProviders.TreeProvider;
+import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
 import org.terasology.core.world.generator.facetProviders.World2dPreviewProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
@@ -61,7 +60,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
                 .addProvider(new BiomeProvider())
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new DefaultFloraProvider())
-                .addProvider(new TreeProvider())
+                .addProvider(new DefaultTreeProvider())
                 .addProvider(new EnsureSpawnableChunkZeroProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))
                 .addRasterizer(new SolidRasterizer())

@@ -20,13 +20,15 @@ import java.util.List;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
+import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.core.world.generator.trees.Trees;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.FastNoise;
 import org.terasology.utilities.procedural.Noise3D;
-import org.terasology.utilities.procedural.NoiseTable;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
@@ -46,21 +48,14 @@ import com.google.common.collect.Lists;
 @Requires({
         @Facet(value = SeaLevelFacet.class, border = @FacetBorder(sides = 10)),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(sides = 10 + 1)),
-//        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 32 + 1, sides = 10)),
         @Facet(value = BiomeFacet.class, border = @FacetBorder(sides = 10))
 })
-public class TreeProvider extends AbstractTreeProvider implements ConfigurableFacetProvider {
+public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenerator> implements ConfigurableFacetProvider {
 
-    private Noise3D treeNoise;
+    private Noise3D densityNoiseGen;
     private TreeProviderConfiguration configuration = new TreeProviderConfiguration();
 
-    @Override
-    public void setSeed(long seed) {
-        super.setSeed(seed);
-
-        treeNoise = new FastNoise(seed);
-
-        // Add the trees to the generator lists
+    public DefaultTreeProvider() {
         register(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);
         register(CoreBiome.MOUNTAINS, Trees.pineTree(), 0.02f);
 
@@ -77,22 +72,30 @@ public class TreeProvider extends AbstractTreeProvider implements ConfigurableFa
     }
 
     @Override
+    public void setSeed(long seed) {
+        super.setSeed(seed);
+
+        densityNoiseGen = new FastNoise(seed);
+    }
+
+    @Override
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
-//        DensityFacet density = region.getRegionFacet(DensityFacet.class);
         BiomeFacet biome = region.getRegionFacet(BiomeFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
         filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
-        filters.add(PositionFilters.probability(treeNoise, configuration.density * 0.1f));
-//        filters.add(PositionFilters.density(density));
+        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density * 0.1f));
         filters.add(PositionFilters.flatness(surface));
 
         int maxRad = 10;
         int maxHeight = 32;
-        TreeFacet facet = createFacet(maxRad, maxHeight, region, filters, biome);
+        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
+        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, maxHeight, maxRad));
+
+        populateFacet(facet, surface, biome, filters);
 
         region.setRegionFacet(TreeFacet.class, facet);
     }

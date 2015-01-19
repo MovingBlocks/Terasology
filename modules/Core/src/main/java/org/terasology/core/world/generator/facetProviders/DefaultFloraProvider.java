@@ -27,23 +27,18 @@ import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.FastNoise;
 import org.terasology.utilities.procedural.Noise3D;
-import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
-import org.terasology.world.generation.FacetBorder;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
 
 /**
  * Determines where plants can be placed.  Will put plants one block above the surface if it is in the correct biome.
@@ -52,12 +47,12 @@ import com.google.common.collect.Table;
 @Requires({
     @Facet(SeaLevelFacet.class),
     @Facet(SurfaceHeightFacet.class),
-    @Facet(BiomeFacet.class),
-    @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))
+    @Facet(BiomeFacet.class)
+//    @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))
 })
-public class DefaultFloraProvider extends AbstractFloraProvider implements ConfigurableFacetProvider {
+public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType> implements ConfigurableFacetProvider {
 
-    private Noise3D noiseGen;
+    private Noise3D densityNoiseGen;
 
     private DensityConfiguration configuration = new DensityConfiguration();
 
@@ -73,13 +68,7 @@ public class DefaultFloraProvider extends AbstractFloraProvider implements Confi
             CoreBiome.SNOW, 0.001f,
             CoreBiome.DESERT, 0.001f);
 
-    private final Table<Biome, FloraType, Float> probsTable = HashBasedTable.create();
-
-    @Override
-    public void setSeed(long seed) {
-        super.setSeed(seed);
-
-        noiseGen = new FastNoise(seed);
+    public DefaultFloraProvider() {
 
         for (CoreBiome biome : CoreBiome.values()) {
             float biomeProb = biomeProbs.get(biome);
@@ -95,17 +84,26 @@ public class DefaultFloraProvider extends AbstractFloraProvider implements Confi
     }
 
     @Override
+    public void setSeed(long seed) {
+        super.setSeed(seed);
+
+        densityNoiseGen = new FastNoise(seed);
+    }
+
+    @Override
     public void process(GeneratingRegion region) {
+        SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         BiomeFacet biomeFacet = region.getRegionFacet(BiomeFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
+
+        FloraFacet facet = new FloraFacet(region.getRegion(), region.getBorderForFacet(FloraFacet.class));
 
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
         filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
-        filters.add(PositionFilters.probability(noiseGen, configuration.density));
-//        filters.add(PositionFilters.density(density));
+        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density));
 
-        FloraFacet facet = createFacet(region, filters, biomeFacet);
+        populateFacet(facet, surface, biomeFacet, filters);
 
         region.setRegionFacet(FloraFacet.class, facet);
     }
@@ -126,7 +124,7 @@ public class DefaultFloraProvider extends AbstractFloraProvider implements Confi
     }
 
     private static class DensityConfiguration implements Component {
-        @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall tree density")
+        @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall flora density")
         private float density = 0.4f;
 
     }
