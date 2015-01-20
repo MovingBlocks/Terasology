@@ -174,17 +174,18 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
-        top.y += 0.25f * movementComp.height;
-        bottom.y -= 0.25f * movementComp.height;
+        top.y += 0.5f * movementComp.height;
+        bottom.y -= 0.5f * movementComp.height;
 
         final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
         final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
 
-        final boolean newSwimming = topUnderwater && bottomUnderwater;
+        final boolean newSwimming = !topUnderwater && bottomUnderwater;
+        final boolean newDiving = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
 
         //TODO: refactor this knot of if-else statements into something easy to read. Some sub-methods and switch statements would be nice.
-        if (!newSwimming) {
+        if (!newSwimming && !newDiving) { //TODO: generalize to isClimbingAllowed() or similar
             Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
                     worldPos), new Vector3f(worldPos)};
             float factor = 1.0f;
@@ -230,18 +231,22 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
 
-        if (newSwimming) {
-            //Note that you cannot climb under water!
+        if (newDiving) {
+            if (state.getMode() != MovementMode.DIVING) {
+                state.setMode(MovementMode.DIVING);
+            }
+        } else if (newSwimming) {
             if (state.getMode() != MovementMode.SWIMMING) {
                 state.setMode(MovementMode.SWIMMING);
             }
+            state.getVelocity().y += 0.02;
         } else if (state.getMode() == MovementMode.SWIMMING) {
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
                 state.getVelocity().y = 0;
             } else {
                 if (state.getVelocity().y > 0) {
-                    state.getVelocity().y += 8;
+                    state.getVelocity().y += 4;
                 }
                 state.setMode(MovementMode.WALKING);
             }

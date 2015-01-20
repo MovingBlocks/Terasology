@@ -22,7 +22,8 @@ package org.terasology.logic.characters;
 public enum MovementMode {
     WALKING(1f, 8f, true, true, true, 3f, false),
     CLIMBING(0f, 8f, true, true, true, 3f, false),
-    SWIMMING(0.05f, 2f, true, false, true, 2f, true),
+    SWIMMING(0.05f, 1.5f, true, false, true, 2f, true),
+    DIVING(0f, 2f, true, false, true, 2f, true),
     GHOSTING(0f, 4f, false, false, false, 5f, true),
     FLYING(0f, 4f, true, false, false, 3f, true),
     NONE(0f, 0f, false, false, false, 0f, true);
@@ -44,6 +45,5 @@ public enum MovementMode {
         this.respondToEnvironment = respondToEnvironment;
         this.maxSpeed = maxSpeed;
         this.applyInertiaToVertical = applyInertiaToVertical;
-
     }
 }
