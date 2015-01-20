@@ -638,7 +638,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
             entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
         }
-        if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING) {
+        if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
             state.setFootstepDelta(
                     state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
             if (state.getFootstepDelta() > 1) {
@@ -648,6 +648,7 @@ public class KinematicCharacterMover implements CharacterMover {
                         case WALKING:
                             entity.send(new FootstepEvent());
                             break;
+                        case DIVING:
                         case SWIMMING:
                             entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
                             break;
