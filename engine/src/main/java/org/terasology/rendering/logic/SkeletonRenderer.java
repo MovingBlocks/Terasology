@@ -113,55 +113,72 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
-            SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
-
-            if (skeletalMeshComp.animation == null && skeletalMeshComp.animationPool != null) {
-                skeletalMeshComp.animation = randomAnimationData(skeletalMeshComp, random);
-            }
-
-            if (skeletalMeshComp.animation == null) {
-                continue;
-            }
-
-            if (skeletalMeshComp.animation.getFrameCount() <= 0) {
-                continue;
-            }
-
-            skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
-            float framePos = skeletalMeshComp.animationTime / skeletalMeshComp.animation.getTimePerFrame();
-
-            if ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
-                while ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
-                    framePos -= skeletalMeshComp.animation.getFrameCount();
-                    skeletalMeshComp.animationTime -= skeletalMeshComp.animation.getTimePerFrame() * skeletalMeshComp.animation.getFrameCount();
-                }
-                if (!skeletalMeshComp.loop) {
-                    skeletalMeshComp.animation = null;
-                    entity.send(new AnimEndEvent(skeletalMeshComp.animation));
-                }
-                MeshAnimation newAnimation = randomAnimationData(skeletalMeshComp, random);
-
-                if (newAnimation == null) {
-                    MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(
-                            skeletalMeshComp.animation.getFrameCount() - 1);
-                    updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
-                    skeletalMeshComp.animation = null;
-                    entity.saveComponent(skeletalMeshComp);
-                    continue;
-                }
-                skeletalMeshComp.animation = newAnimation;
-            }
-            int frameId = (int) framePos;
-            MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameId);
-            MeshAnimationFrame frameB;
-            if (skeletalMeshComp.loop) {
-                frameB = skeletalMeshComp.animation.getFrame((frameId + 1) % skeletalMeshComp.animation.getFrameCount());
-            } else {
-                frameB = (frameId + 1 >= skeletalMeshComp.animation.getFrameCount()) ? frameA : skeletalMeshComp.animation.getFrame(frameId + 1);
-            }
-            updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameId);
-            entity.saveComponent(skeletalMeshComp);
+            updateSkeletalMeshOfEntity(entity, delta);
         }
+    }
+
+    private void updateSkeletalMeshOfEntity(EntityRef entity, float delta) {
+        SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
+
+        if (skeletalMeshComp.animation == null && skeletalMeshComp.animationPool != null) {
+            skeletalMeshComp.animation = randomAnimationData(skeletalMeshComp, random);
+        }
+
+        if (skeletalMeshComp.animation == null) {
+            return;
+        }
+
+        if (skeletalMeshComp.animation.getFrameCount() < 1) {
+            return;
+        }
+        skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
+        float animationDuration = getDurationOfAnimation(skeletalMeshComp);
+        while (skeletalMeshComp.animationTime >= animationDuration) {
+            MeshAnimation newAnimation;
+            if (!skeletalMeshComp.loop) {
+                newAnimation = null;
+            } else {
+                newAnimation = randomAnimationData(skeletalMeshComp, random);
+            }
+
+            if (newAnimation == null) {
+                MeshAnimation finishedAnimation = skeletalMeshComp.animation;
+                skeletalMeshComp.animationTime = animationDuration;
+                /*
+                 * Set animation to null so that AnimEndEvent fires only once
+                 */
+                skeletalMeshComp.animation = null;
+                MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(
+                        skeletalMeshComp.animation.getFrameCount() - 1);
+                updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
+                entity.saveComponent(skeletalMeshComp);
+                entity.send(new AnimEndEvent(finishedAnimation));
+                return;
+            }
+            skeletalMeshComp.animationTime -= animationDuration;
+            if (skeletalMeshComp.animationTime < 0) {
+                // In case the float calculation wasn't exact:
+                skeletalMeshComp.animationTime = 0;
+            }
+            skeletalMeshComp.animation = newAnimation;
+            animationDuration = getDurationOfAnimation(skeletalMeshComp);
+        }
+        float framePos = skeletalMeshComp.animationTime / skeletalMeshComp.animation.getTimePerFrame();
+        int frameAId = (int) framePos;
+        int frameBId = frameAId + 1;
+        if (frameBId >= skeletalMeshComp.animation.getFrameCount()) {
+            // In case the float calcuation wasn't exact:
+            frameBId = skeletalMeshComp.animation.getFrameCount() - 1;
+        }
+        MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameAId);
+        MeshAnimationFrame frameB = skeletalMeshComp.animation.getFrame(frameBId);
+        updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameAId);
+        entity.saveComponent(skeletalMeshComp);
+    }
+
+
+    private float getDurationOfAnimation(SkeletalMeshComponent skeletalMeshComp) {
+        return skeletalMeshComp.animation.getTimePerFrame() * (skeletalMeshComp.animation.getFrameCount() - 1);
     }
 
 
