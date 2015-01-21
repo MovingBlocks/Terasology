@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
@@ -64,6 +65,9 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
+    private final int verticalChunkMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+    private final int chunkHalfHeight = ChunkConstants.SIZE_Y / verticalChunkMeshSegments / 2;
+
     private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;
@@ -72,7 +76,6 @@ public class ChunkImpl implements Chunk {
     private TeraArray sunlightData;
     private TeraArray sunlightRegenData;
     private TeraArray lightData;
-
 
     private TeraArray blockData;
     private volatile TeraArray blockDataSnapshot;
@@ -510,13 +513,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public AABB getSubMeshAABB(int subMesh) {
         if (subMeshAABB == null) {
-            subMeshAABB = new AABB[ChunkConstants.VERTICAL_SEGMENTS];
-
-            int heightHalf = ChunkConstants.SIZE_Y / ChunkConstants.VERTICAL_SEGMENTS / 2;
+            subMeshAABB = new AABB[verticalChunkMeshSegments];
 
             for (int i = 0; i < subMeshAABB.length; i++) {
-                Vector3f dimensions = new Vector3f(8, heightHalf, 8);
-                Vector3f position = new Vector3f(getChunkWorldOffsetX() - 0.5f, (i * heightHalf * 2) - 0.5f, getChunkWorldOffsetZ() - 0.5f);
+                Vector3f dimensions = new Vector3f(8, chunkHalfHeight, 8);
+                Vector3f position = new Vector3f(getChunkWorldOffsetX() - 0.5f, (i * chunkHalfHeight * 2) - 0.5f, getChunkWorldOffsetZ() - 0.5f);
                 position.add(dimensions);
                 subMeshAABB[i] = AABB.createCenterExtent(position, dimensions);
             }

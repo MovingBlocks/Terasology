@@ -31,13 +31,15 @@ public final class ChunkConstants {
     public static final int SIZE_X = 32;
     public static final int SIZE_Y = 64;
     public static final int SIZE_Z = 32;
+
     public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Y = TeraMath.ceilPowerOfTwo(SIZE_Y) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
+
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
     public static final int POWER_Y = TeraMath.sizeOfPower(SIZE_Y);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
-    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+
     public static final byte MAX_LIGHT = 0x0f;
     public static final byte MAX_SUNLIGHT = 0x0f;
     public static final byte MAX_SUNLIGHT_REGEN = 63;

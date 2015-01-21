@@ -57,8 +57,8 @@ public class RenderableWorldImpl implements RenderableWorld {
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private final int maxChunksForShadows = TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
-    private final int verticalChunkMeshSegements = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-    private final int chunkYsizeToSegmentsRatio = ChunkConstants.SIZE_Y / verticalChunkMeshSegements;
+    private final int verticalChunkMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+    private final int chunkYsizeToSegmentsRatio = ChunkConstants.SIZE_Y / verticalChunkMeshSegments;
 
     private final WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
@@ -131,7 +131,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         chunkProvider.beginUpdate();
 
         RenderableChunk chunk;
-        ChunkMesh[] newMesh = new ChunkMesh[verticalChunkMeshSegements];
+        ChunkMesh[] newMesh = new ChunkMesh[verticalChunkMeshSegments];
         ChunkView localView;
         for (Vector3i chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
             chunk = chunkProvider.getChunk(chunkCoordinates);
@@ -144,7 +144,7 @@ public class RenderableWorldImpl implements RenderableWorld {
                 }
                 chunk.setDirty(false);
 
-                for (int segment = 0; segment < verticalChunkMeshSegements; segment++) {
+                for (int segment = 0; segment < verticalChunkMeshSegments; segment++) {
                     newMesh[segment] = chunkTessellator.generateMesh(localView, chunkYsizeToSegmentsRatio, segment * chunkYsizeToSegmentsRatio);
                     newMesh[segment].generateVBOs();
                 }
@@ -252,41 +252,43 @@ public class RenderableWorldImpl implements RenderableWorld {
                             (int) (cameraCoordinates.z / ChunkConstants.SIZE_Z));
     }
 
+    @Override
+    public void generateVBOs() {
+        PerformanceMonitor.startActivity("Building Mesh VBOs");
+        chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
+        for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
+            if (chunksInProximityOfCamera.contains(chunk) && chunk.hasPendingMesh()) {
+                for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
+                    pendingMesh.generateVBOs();
+                }
+                if (chunk.hasMesh()) {
+                    for (ChunkMesh mesh: chunk.getMesh()) {
+                        mesh.dispose();
+                    }
+                }
+                chunk.setMesh(chunk.getPendingMesh());
+                chunk.setPendingMesh(null);
+            } else {
+                if (chunk.hasPendingMesh()) {
+                    for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
+                        pendingMesh.dispose();
+                    }
+                    chunk.setPendingMesh(null);
+                }
+            }
+        }
+        PerformanceMonitor.endActivity();
+    }
+
     /**
      * Updates the currently visible chunks (in sight of the player).
      */
     @Override
-    public int updateAndQueueVisibleChunks(boolean isFirstRenderingStageForCurrentFrame) {
+    public int queueVisibleChunks(boolean isFirstRenderingStageForCurrentFrame) {
+        PerformanceMonitor.startActivity("Queueing Visible Chunks");
         statDirtyChunks = 0;
         statVisibleChunks = 0;
         statIgnoredPhases = 0;
-
-        if (isFirstRenderingStageForCurrentFrame) {
-            PerformanceMonitor.startActivity("Building Mesh VBOs");
-            chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
-            for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
-                if (chunksInProximityOfCamera.contains(chunk) && chunk.hasPendingMesh()) {
-                    for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
-                        pendingMesh.generateVBOs();
-                    }
-                    if (chunk.hasMesh()) {
-                        for (ChunkMesh mesh: chunk.getMesh()) {
-                            mesh.dispose();
-                        }
-                    }
-                    chunk.setMesh(chunk.getPendingMesh());
-                    chunk.setPendingMesh(null);
-                } else {
-                    if (chunk.hasPendingMesh()) {
-                        for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
-                            pendingMesh.dispose();
-                        }
-                        chunk.setPendingMesh(null);
-                    }
-                }
-            }
-            PerformanceMonitor.endActivity();
-        }
 
         int processedChunks = 0;
         int chunkCounter = 0;
@@ -341,12 +343,18 @@ public class RenderableWorldImpl implements RenderableWorld {
                 }
 
                 // Process all chunks in the area, not only the visible ones
-                if (isFirstRenderingStageForCurrentFrame && processChunkUpdate(chunk)) {
-                    processedChunks++;
+                if (isFirstRenderingStageForCurrentFrame) {
+                    if ((chunk.isDirty() || !chunk.hasMesh())) {
+                        statDirtyChunks++;
+                        chunkMeshUpdateManager.queueChunkUpdate(chunk);
+                        processedChunks++;
+                    }
                 }
             }
             chunkCounter++;
         }
+
+        PerformanceMonitor.endActivity();
         return processedChunks;
     }
 
@@ -360,15 +368,6 @@ public class RenderableWorldImpl implements RenderableWorld {
         }
 
         return count;
-    }
-
-    private boolean processChunkUpdate(RenderableChunk chunk) {
-        if ((chunk.isDirty() || !chunk.hasMesh())) {
-            statDirtyChunks++;
-            chunkMeshUpdateManager.queueChunkUpdate(chunk);
-            return true;
-        }
-        return false;
     }
 
     @Override
