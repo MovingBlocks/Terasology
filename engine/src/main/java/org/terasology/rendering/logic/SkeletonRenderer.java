@@ -144,13 +144,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             if (newAnimation == null) {
                 MeshAnimation finishedAnimation = skeletalMeshComp.animation;
                 skeletalMeshComp.animationTime = animationDuration;
-                /*
-                 * Set animation to null so that AnimEndEvent fires only once
-                 */
-                skeletalMeshComp.animation = null;
-                MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(
-                        skeletalMeshComp.animation.getFrameCount() - 1);
+                MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(skeletalMeshComp.animation.getFrameCount() - 1);
                 updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
+                // Set animation to null so that AnimEndEvent fires only once
+                skeletalMeshComp.animation = null;
                 entity.saveComponent(skeletalMeshComp);
                 entity.send(new AnimEndEvent(finishedAnimation));
                 return;
