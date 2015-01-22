@@ -25,6 +25,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.engine.ComponentFieldUri;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -177,8 +178,9 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     private void refreshPrefabs() {
         Collection<Prefab> prefabs = prefabManager.listPrefabs(BehaviorNodeComponent.class);
         for (Prefab prefab : prefabs) {
-            EntityRef entityRef = entityManager.create(prefab);
-            entityRef.setPersistent(false);
+            EntityBuilder entityBuilder = entityManager.newBuilder(prefab);
+            entityBuilder.setPersistent(false);
+            EntityRef entityRef =entityBuilder.build();
             BehaviorNodeComponent component = entityRef.getComponent(BehaviorNodeComponent.class);
             ClassMetadata<? extends Node, ?> classMetadata = nodesClassLibrary.resolve(component.type);
             if (classMetadata != null) {
