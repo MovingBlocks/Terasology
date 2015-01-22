@@ -16,8 +16,9 @@
 
 {
     "basedOn" : "core:wood",
+    "displayName": "Birch Log",
     "tiles" : {
-        "topBottom" : "OakTrunk",
-        "sides" : "BirkBark"
+        "topBottom" : "BirchTrunk",
+        "sides" : "BirchBark"
     }
 }
