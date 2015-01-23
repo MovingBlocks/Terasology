@@ -23,6 +23,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -74,8 +75,10 @@ public class WorldSerializerTest {
 
     @Test
     public void testNotPersistedIfFlagedOtherwise() throws Exception {
-        EntityRef entity = entityManager.create();
-        entity.setPersistent(false);
+        EntityBuilder entityBuilder = entityManager.newBuilder();
+        entityBuilder.setPersistent(false);
+        @SuppressWarnings("unused") // just used to express that an entity got created
+        EntityRef entity = entityBuilder.build();
 
         EntityData.GlobalStore worldData = worldSerializer.serializeWorld(false);
         assertEquals(0, worldData.getEntityCount());

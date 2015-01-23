@@ -40,11 +40,13 @@ public class BlockItemFactory {
         return newInstance(blockFamily, 1);
     }
 
-    public EntityRef newInstance(BlockFamily blockFamily, int quantity) {
-        if (blockFamily == null) {
-            return EntityRef.NULL;
-        }
-
+    /**
+     * Use this method instead of {@link #newInstance(BlockFamily)} to modify entity properties like the persistence
+     * flag before it gets created.
+     *
+     * @param blockFamily must not be null
+     */
+    public EntityBuilder newBuilder(BlockFamily blockFamily, int quantity) {
         EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             builder.addComponent(new LightComponent());
@@ -72,6 +74,14 @@ public class BlockItemFactory {
         BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;
 
+        return builder;
+    }
+
+    public EntityRef newInstance(BlockFamily blockFamily, int quantity) {
+        if (blockFamily == null) {
+            return EntityRef.NULL;
+        }
+        EntityBuilder builder = newBuilder(blockFamily, quantity);
         return builder.build();
     }
 
