@@ -49,7 +49,8 @@ public class TreeRasterizer implements WorldRasterizer {
         for (Map.Entry<Vector3i, TreeGenerator> entry : facet.getRelativeEntries().entrySet()) {
             Vector3i pos = entry.getKey();
             TreeGenerator treeGen = entry.getValue();
-            Random random = new FastRandom(pos.hashCode());
+            int seed = facet.getWorld(pos).hashCode();
+            Random random = new FastRandom(seed);
             treeGen.generate(blockManager, chunk, random, pos.x, pos.y, pos.z);
         }
     }

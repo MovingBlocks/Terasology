@@ -33,9 +33,9 @@ public interface TreeGenerator {
      * @param blockManager the block manager to resolve the block uris
      * @param view Chunk view
      * @param rand The random number generator
-     * @param posX Position on the x-axis
-     * @param posY Position on the y-axis
-     * @param posZ Position on the z-axis
+     * @param posX Relative position on the x-axis (wrt. the chunk)
+     * @param posY Relative position on the y-axis (wrt. the chunk)
+     * @param posZ Relative position on the z-axis (wrt. the chunk)
      */
     void generate(BlockManager blockManager, CoreChunk view, Random rand, int posX, int posY, int posZ);
 }

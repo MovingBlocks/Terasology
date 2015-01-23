@@ -33,12 +33,12 @@ import org.terasology.world.generation.facets.base.ObjectFacet3D;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 /**
- * TODO Type description
+ * Places objects on the surface based on population densities
+ * for a environmental variable (e.g. biome).
  * @author Martin Steiger
  */
 @Requires(@Facet(SurfaceHeightFacet.class))
@@ -48,12 +48,18 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
     private final Table<B, T, Float> probsTable = HashBasedTable.create();
 
-
     @Override
     public void setSeed(long seed) {
         typeNoiseGen = new FastNoise(seed + 1);
     }
 
+    /**
+     * Populates a given facet based on filters and population densities
+     * @param facet the facet to populate
+     * @param surfaceFacet the surface height facet
+     * @param typeFacet the facet that provides the environment
+     * @param filters a set of filters
+     */
     protected void populateFacet(ObjectFacet3D<T> facet, SurfaceHeightFacet surfaceFacet, ObjectFacet2D<? extends B> typeFacet, List<Predicate<Vector3i>> filters) {
 
         Region3i worldRegion = facet.getWorldRegion();
@@ -71,7 +77,7 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
                     Vector3i pos = new Vector3i(x, height, z);
 
                     // if all predicates match
-                    if (Predicates.and(filters).apply(pos)) {
+                    if (applyAll(filters, pos)) {
                         B biome = typeFacet.getWorld(x, z);
                         Map<T, Float> plantProb = probsTable.row(biome);
                         T type = getType(x, z, plantProb);
@@ -85,6 +91,25 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
     }
 
+    private boolean applyAll(List<Predicate<Vector3i>> components, Vector3i pos) {
+        // Similar to guava's implementation of Predicates#all
+        // According to google, using indices is superior to using an Iterator
+        // This implementation also avoids duplicating the list
+        for (int i = 0; i < components.size(); i++) {
+            if (!components.get(i).apply(pos)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Registers an object type with a certain population density based on an environmental variable
+     * @param type the environment type (e.g. biome)
+     * @param tree the object type
+     * @param probability the population density in [0..1]
+     * @throws IllegalArgumentException if probability is not in [0..1]
+     */
     protected void register(B biome, T tree, float probability) {
         Preconditions.checkArgument(probability >= 0, "probability must be >= 0");
         Preconditions.checkArgument(probability <= 1, "probability must be <= 1");
@@ -92,15 +117,31 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
         probsTable.put(biome, tree, Float.valueOf(probability));
     }
 
-    protected T getType(int x, int z, Map<T, Float> gens) {
+    /**
+     * Clears all registered population densities
+     * @see SurfaceObjectProvider#register(B, T, float)
+     */
+    protected void clearProbabilities() {
+        probsTable.clear();
+    }
+
+    /**
+     * @param x the x coordinate
+     * @param z the z coordinate
+     * @param objs a map (objType -> probability)
+     * @return a random pick from the map or <code>null</code>
+     */
+    protected T getType(int x, int z, Map<T, Float> objs) {
         float random = typeNoiseGen.noise(x, z);
 
-        for (T generator : gens.keySet()) {
-            float threshold = gens.get(generator).floatValue();
-            if (random < threshold) {
-                return generator;
-            } else {
-                random -= threshold;
+        for (T generator : objs.keySet()) {
+            Float threshold = objs.get(generator);
+            if (threshold != null) {
+                if (random < threshold) {
+                    return generator;
+                } else {
+                    random -= threshold;
+                }
             }
         }
         return null;
