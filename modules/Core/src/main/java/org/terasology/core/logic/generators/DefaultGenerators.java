@@ -32,13 +32,13 @@ package org.terasology.core.logic.generators;
         TreeGenerator pineTree = new TreeGeneratorLSystem("FFFFAFFFFFFFAFFFFA", rules, 4, (float) Math.toRadians(35)).setLeafType(blockManager.getBlock("core:DarkLeaf"))
                 .setBarkType(blockManager.getBlock("core:PineTrunk")).setGenerationProbability(0.05f);
 
-        // Birk
+        // Birch
         rules = ImmutableMap.<Character, LSystemRule>builder()
                 .put('A', new LSystemRule("[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", 1.0f))
                 .put('B', new LSystemRule("[&FAF]////[&FAF]////[&FAF]", 0.8f)).build();
-        TreeGenerator birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, 4, (float) Math.toRadians(35))
+        TreeGenerator birchTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, 4, (float) Math.toRadians(35))
                 .setLeafType(blockManager.getBlock("core:DarkLeaf"))
-                .setBarkType(blockManager.getBlock("core:BirkTrunk")).setGenerationProbability(0.02f);
+                .setBarkType(blockManager.getBlock("core:BirchTrunk")).setGenerationProbability(0.02f);
 
         // Oak variation tree
         rules = ImmutableMap.<Character, LSystemRule>builder()
@@ -64,7 +64,7 @@ package org.terasology.core.logic.generators;
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, pineTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
 
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, birkTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, birchTree);
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, redTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
