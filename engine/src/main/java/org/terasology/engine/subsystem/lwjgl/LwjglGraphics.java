@@ -265,6 +265,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().GL_ARB_half_float_pixel,
                 GLContext.getCapabilities().GL_ARB_shader_objects};
 
+        requiredCapabilities[3] = false;
+
         String[] capabilityNames = {"OpenGL11",
                                     "OpenGL12",
                                     "OpenGL14",
@@ -305,14 +307,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         if (GLContext.getCapabilities().OpenGL11) {
             // If we are lucky the graphic card has at least an opengl 1.1 implementation.
             // This helps, as it should provide very specific information.
-            String openglVendor = GL11.glGetString(GL11.GL_VENDOR);
-            String openglRenderer = GL11.glGetString(GL11.GL_RENDERER);
-            String openglVersion = GL11.glGetString(GL11.GL_VERSION);
-
             completeErrorMessage = completeErrorMessage +
-                    "    Vendor:  " + openglVendor + "\n" +
-                    "    Model:   " + openglRenderer + "\n" +
-                    "    Drivers: " + openglVersion + "\n";
+                    "    Vendor:  " + GL11.glGetString(GL11.GL_VENDOR) + "\n" +
+                    "    Model:   " + GL11.glGetString(GL11.GL_RENDERER) + "\n" +
+                    "    Drivers: " + GL11.glGetString(GL11.GL_VERSION) + "\n";
         } else {
             // If we are NOT lucky LWJGL supplies these Display.get* methods, but they are less reliable
             // as they might provide only generic information. See: http://forum.lwjgl.org/index.php?topic=2398.0
