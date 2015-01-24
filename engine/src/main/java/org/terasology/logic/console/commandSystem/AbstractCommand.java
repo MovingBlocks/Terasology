@@ -26,7 +26,6 @@ import com.google.common.primitives.Primitives;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandInitializationException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandParameterParseException;
@@ -37,6 +36,7 @@ import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -246,10 +246,10 @@ public abstract class AbstractCommand implements ConsoleCommand {
     @Override
     public final Set<String> suggest(final String currentValue, List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
         //Generate an array to be used as a parameter in the 'suggest' method
-        Object[] processedParametersWithoutSender;
+        Object[] processedParameters;
 
         try {
-            processedParametersWithoutSender = processParametersMethod(rawParameters, sender);
+            processedParameters = processParametersMethod(rawParameters, sender);
         } catch (CommandParameterParseException e) {
             String warning = "Invalid parameter '" + e.getParameter() + "'";
             String message = e.getMessage();
@@ -263,12 +263,17 @@ public abstract class AbstractCommand implements ConsoleCommand {
 
         //Get the suggested parameter to compare the result with
         CommandParameter suggestedParameter = null;
+        Iterator<CommandParameter> paramIter = commandParameters.iterator();
 
-        for (int i = 0; i < processedParametersWithoutSender.length; i++) {
-            if (processedParametersWithoutSender[i] == null) {
-                suggestedParameter = commandParameters.get(i);
+        for (Object processedParameter : processedParameters) {
+            if (sender.equals(processedParameter)) {
+                continue;
+            }
+            if (processedParameter == null) {
+                suggestedParameter = paramIter.next();
                 break;
             }
+            paramIter.next();
         }
 
         if (suggestedParameter == null) {
@@ -278,7 +283,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
         Set<Object> result = null;
 
         try {
-            result = suggestedParameter.suggest(sender, processedParametersWithoutSender);
+            result = suggestedParameter.suggest(sender, processedParameters);
         } catch (Throwable t) {
             throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
         }
