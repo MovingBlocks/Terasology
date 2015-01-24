@@ -254,9 +254,6 @@ public class SaveTransaction extends AbstractTask {
         deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
             @Override
             public boolean execute(long entityId, EntityDelta delta) {
-                if (entityId >= privateEntityManager.getNextId()) {
-                    privateEntityManager.setNextId(entityId + 1);
-                }
                 if (privateEntityManager.isActiveEntity(entityId)) {
                     EntityRef entity = privateEntityManager.getEntity(entityId);
                     for (Component changedComponent: delta.getChangedComponents().values()) {
@@ -267,7 +264,7 @@ public class SaveTransaction extends AbstractTask {
                         entity.removeComponent(c);
                     }
                 } else {
-                    EntityRef created = privateEntityManager.createEntityWithId(entityId, delta.getChangedComponents().values());
+                    privateEntityManager.createEntityWithId(entityId, delta.getChangedComponents().values());
                 }
 
                 return true;
