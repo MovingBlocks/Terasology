@@ -363,7 +363,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             if (!keep) {
                 // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
                 // Note: Above won't matter if all changes are on the main thread
-                if (unloadChunkInternal(pos, true)) {
+                if (unloadChunkInternal(pos)) {
                     iterator.remove();
                     if (++unloaded >= UNLOAD_PER_FRAME) {
                         break;
@@ -374,7 +374,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         PerformanceMonitor.endActivity();
     }
 
-    private boolean unloadChunkInternal(Vector3i pos, boolean storeChunk) {
+    private boolean unloadChunkInternal(Vector3i pos) {
         Chunk chunk = nearCache.get(pos);
         if (chunk.isLocked()) {
             return false;
@@ -398,9 +398,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             for (ChunkRelevanceRegion region : regions.values()) {
                 region.chunkUnloaded(pos);
             }
-            if (storeChunk) {
-                storageManager.deactivateChunk(chunk);
-            }
+            storageManager.deactivateChunk(chunk);
             chunk.dispose();
             updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
 
@@ -568,9 +566,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             return false;
         }
 
-        if (unloadChunkInternal(coords, false)) {
-            // TODO: destroy all entities in this chunk similar to the storage manager
-
+        if (unloadChunkInternal(coords)) {
             nearCache.remove(coords);
             createOrLoadChunk(coords);
             return true;

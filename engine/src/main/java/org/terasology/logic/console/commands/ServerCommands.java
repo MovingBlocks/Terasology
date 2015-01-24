@@ -17,6 +17,7 @@ package org.terasology.logic.console.commands;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -152,9 +153,12 @@ public class ServerCommands extends BaseComponentSystem {
         storageManager.requestSaving();
     }
 
-    @Command(shortDescription = "Invalidates the specified chunk and reload/recreate it", runOnServer = true)
+    @Command(shortDescription = "Invalidates the specified chunk and recreates it (requires storage manager disabled)", runOnServer = true)
     public String reloadChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
         Vector3i pos = new Vector3i(x, y, z);
+        if (CoreRegistry.get(Config.class).getTransients().isWriteSaveGamesEnabled()) {
+            return "Writing save games is enabled! Invalidating chunk has no effect";
+        }
         boolean success = chunkProvider.reloadChunk(pos);
         return success
             ? "Cleared chunk " + pos + " from cache and triggered reload"
