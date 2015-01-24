@@ -89,11 +89,6 @@ public class DelayedEntityRef extends EntityRef {
     }
 
     @Override
-    public void setPersistent(boolean persistent) {
-        getEntityRef().setPersistent(persistent);
-    }
-
-    @Override
     public boolean isAlwaysRelevant() {
         return getEntityRef().isAlwaysRelevant();
     }

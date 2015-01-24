@@ -45,17 +45,6 @@ public abstract class BaseEntityRef extends EntityRef {
     }
 
     @Override
-    public void setPersistent(boolean persistent) {
-        if (exists()) {
-            EntityInfoComponent info = getEntityInfo();
-            if (info.persisted != persistent) {
-                info.persisted = persistent;
-                saveComponent(info);
-            }
-        }
-    }
-
-    @Override
     public boolean isAlwaysRelevant() {
         return isActive() && getEntityInfo().alwaysRelevant;
     }

@@ -73,13 +73,6 @@ public abstract class EntityRef implements MutableComponentContainer {
     public abstract boolean isPersistent();
 
     /**
-     * Sets whether this entity should be saved
-     *
-     * @param persistent
-     */
-    public abstract void setPersistent(boolean persistent);
-
-    /**
      * @return Whether this entity should remain active even when the part of the world/owner of the entity is not
      *         relevant
      */

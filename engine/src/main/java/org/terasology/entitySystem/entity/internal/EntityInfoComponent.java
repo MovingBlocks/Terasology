@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.internal.NullPrefab;
 import org.terasology.network.Replicate;
+import org.terasology.persistence.StorageManager;
 
 /**
  * Component for storing entity system information on an entity
@@ -28,6 +29,10 @@ import org.terasology.network.Replicate;
  */
 public class EntityInfoComponent implements Component {
     public Prefab parentPrefab = new NullPrefab();
+    /**
+     * To simplify things for the {@link StorageManager} the persistent property of entities must not be changed
+     * after creation.
+     */
     public boolean persisted = true;
 
     @Replicate
