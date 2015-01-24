@@ -242,6 +242,15 @@ public class SaveTransaction extends AbstractTask {
                 return true;
             }
         });
+        deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
+            @Override
+            public boolean execute(long entityId) {
+                if (entityId >= privateEntityManager.getNextId()) {
+                    privateEntityManager.setNextId(entityId + 1);
+                }
+                return true;
+            }
+        });
         deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
             @Override
             public boolean execute(long entityId, EntityDelta delta) {
