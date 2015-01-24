@@ -136,7 +136,7 @@ void main() {
     bool isOceanWater = false;
 
     if (checkFlag(BLOCK_HINT_WATER_SURFACE, blockHint) && isUpside > 0.99) {
-        vec2 scaledVertexWorldPos = vertexWorldPos.xz / 32.0f;
+        vec2 scaledVertexWorldPos = vertexWorldPos.xz / 32.0;
 
         vec2 waterOffset = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.0075), scaledVertexWorldPos.y + timeToTick(time, 0.0075));
         vec2 waterOffset2 = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.005), scaledVertexWorldPos.y - timeToTick(time, 0.005));
