@@ -19,7 +19,6 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.Noise3D;
-import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
@@ -40,15 +39,31 @@ public final class PositionFilters {
      * @return a predicate that returns true only if (y > height)
      */
     public static Predicate<Vector3i> minHeight(final int height) {
+        return heightRange(height, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Filters based on the vector's y value
+     * @return a predicate that returns true only if (y < height)
+     */
+    public static Predicate<Vector3i> maxHeight(final int height) {
+        return heightRange(Integer.MIN_VALUE, height);
+    }
+
+    /**
+     * Filters based on the vector's y value
+     * @return a predicate that returns true only if (y > minHeight) and (y < maxHeight)
+     */
+    public static Predicate<Vector3i> heightRange(final int minHeight, final int maxHeight) {
         return new Predicate<Vector3i>() {
 
             @Override
             public boolean apply(Vector3i input) {
-                return input.getY() > height;
+                int y = input.getY();
+                return y > minHeight && y < maxHeight;
             }
         };
     }
-
     /**
      * Filters based on the density
      * @param density the density facet that contains all tested coords.
@@ -69,10 +84,22 @@ public final class PositionFilters {
 
     /**
      * Filters based on surface flatness
-     * @param surface the surface height facet that contains all tested coords.
+     * @param surfaceFacet the surface height facet that contains all tested coords.
      * @return a predicate that returns true only if there is a level surface in adjacent directions
      */
-    public static Predicate<Vector3i> flatness(final SurfaceHeightFacet surface) {
+    public static Predicate<Vector3i> flatness(final SurfaceHeightFacet surfaceFacet) {
+        return flatness(surfaceFacet, 0, 0);
+    }
+
+    /**
+     * Filters based on surface flatness
+     * @param surfaceFacet the surface height facet that contains all tested coords.
+     * @param divUp surface can be higher up to <code>divUp</code>.
+     * @param divDown surface can be lower up to <code>divDown</code>.
+     * @return a predicate that returns true only if there is a level surface in adjacent directions
+     */
+    public static Predicate<Vector3i> flatness(final SurfaceHeightFacet surfaceFacet, final int divUp, final int divDown) {
+
         return new Predicate<Vector3i>() {
 
             @Override
@@ -80,11 +107,21 @@ public final class PositionFilters {
                 int x = input.getX();
                 int z = input.getZ();
                 int level = input.getY() - 1;
+                int min = level - divDown;
+                int max = level + divUp;
 
-                return (TeraMath.floorToInt(surface.getWorld(x - 1, z)) == level)
-                    && (TeraMath.floorToInt(surface.getWorld(x + 1, z)) == level)
-                    && (TeraMath.floorToInt(surface.getWorld(x, z - 1)) == level)
-                    && (TeraMath.floorToInt(surface.getWorld(x, z + 1)) == level);
+                return inBounds(blockHeightAt(x - 1, z), min, max)
+                    && inBounds(blockHeightAt(x + 1, z), min, max)
+                    && inBounds(blockHeightAt(x, z - 1), min, max)
+                    && inBounds(blockHeightAt(x, z + 1), min, max);
+            }
+
+            private boolean inBounds(int height, int min, int max) {
+                return height >= min && height <= max;
+            }
+
+            private int blockHeightAt(int x, int z) {
+                return TeraMath.floorToInt(surfaceFacet.getWorld(x, z));
             }
         };
     }
@@ -95,7 +132,7 @@ public final class PositionFilters {
      * @param density the threshold in [0..1]
      * @return true if the noise value is <b>below</b> the threshold
      */
-    public static Predicate<Vector3i> probability(Noise3D noiseGen, float density) {
+    public static Predicate<Vector3i> probability(final Noise3D noiseGen, final float density) {
         return new Predicate<Vector3i>() {
 
             @Override
