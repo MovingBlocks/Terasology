@@ -16,6 +16,10 @@
 
 package org.terasology.engine.splash;
 
+import com.google.common.collect.Queues;
+
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -25,11 +29,6 @@ import java.awt.SplashScreen;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Queue;
-
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-
-import com.google.common.collect.Queues;
 
 /**
  * The actual implementation of {@link SplashScreenCore} that
@@ -83,6 +82,7 @@ final class SplashScreenImpl implements SplashScreenCore {
 
     @Override
     public void close() {
+        timer.stop();
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
