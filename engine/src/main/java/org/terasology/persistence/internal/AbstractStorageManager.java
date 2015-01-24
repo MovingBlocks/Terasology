@@ -18,14 +18,22 @@ package org.terasology.persistence.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.entitySystem.entity.internal.OwnershipHelper;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.network.ClientComponent;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.chunks.Chunk;
+
+import com.google.common.collect.Lists;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -35,6 +43,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -54,6 +64,7 @@ public abstract class AbstractStorageManager implements StorageManager {
     private final ModuleEnvironment environment;
     private final EngineEntityManager entityManager;
     private final PrefabSerializer prefabSerializer;
+    private final OwnershipHelper helper;
 
     private boolean storeChunksInZips = true;
 
@@ -64,6 +75,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
 
         this.storagePathProvider = new StoragePathProvider(savePath);
+        this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
     }
 
     @Override
@@ -163,6 +175,39 @@ public abstract class AbstractStorageManager implements StorageManager {
         }
 
         return null;
+    }
+
+    protected Collection<EntityRef> getEntitiesOfChunk(Chunk chunk) {
+        List<EntityRef> entitiesToStore = Lists.newArrayList();
+
+        AABB aabb = chunk.getAABB();
+        for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
+            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    if (aabb.contains(loc.getWorldPosition())) {
+                        entitiesToStore.add(entity);
+                    }
+                }
+            }
+        }
+        return entitiesToStore;
+    }
+
+    protected void deactivateOrDestroyEntityRecursive(EntityRef entity) {
+        if (entity.isActive()) {
+            for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
+                if (!ownedEntity.isAlwaysRelevant()) {
+                    if (!ownedEntity.isPersistent()) {
+                        // TODO check if destroy is recursive
+                        ownedEntity.destroy();
+                    } else {
+                        deactivateOrDestroyEntityRecursive(ownedEntity);
+                    }
+                }
+            }
+            getEntityManager().deactivateForStorage(entity);
+        }
     }
 
     protected StoragePathProvider getStoragePathProvider() {

@@ -101,7 +101,7 @@ public interface ChunkProvider {
      * @param pos the chunk coordinates
      * @return whether this chunk was purged successfully or not
      */
-    boolean purgeChunk(Vector3i pos);
+    boolean reloadChunk(Vector3i pos);
 
     /**
      * Purges all chunks that are currently loaded and force their re-generation.

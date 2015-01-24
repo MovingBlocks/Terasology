@@ -224,7 +224,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public boolean purgeChunk(Vector3i pos) {
+        public boolean reloadChunk(Vector3i pos) {
             return false;
         }
 

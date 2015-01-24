@@ -17,6 +17,7 @@ package org.terasology.logic.console.commands;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -152,9 +153,16 @@ public class ServerCommands extends BaseComponentSystem {
         storageManager.requestSaving();
     }
 
-    @Command(shortDescription = "Deletes the specified chunk and re-generate it", runOnServer = true)
-    public void purgeChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
-        chunkProvider.purgeChunk(new Vector3i(x, y, z));
+    @Command(shortDescription = "Invalidates the specified chunk and recreates it (requires storage manager disabled)", runOnServer = true)
+    public String reloadChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
+        Vector3i pos = new Vector3i(x, y, z);
+        if (CoreRegistry.get(Config.class).getTransients().isWriteSaveGamesEnabled()) {
+            return "Writing save games is enabled! Invalidating chunk has no effect";
+        }
+        boolean success = chunkProvider.reloadChunk(pos);
+        return success
+            ? "Cleared chunk " + pos + " from cache and triggered reload"
+            : "Chunk " + pos + " did not exist in the cache";
     }
 
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)

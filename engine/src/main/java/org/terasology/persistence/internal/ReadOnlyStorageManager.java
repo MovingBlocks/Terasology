@@ -18,10 +18,13 @@ package org.terasology.persistence.internal;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
 import org.terasology.world.chunks.Chunk;
 
 /**
@@ -55,7 +58,11 @@ public final class ReadOnlyStorageManager extends AbstractStorageManager {
 
     @Override
     public void deactivateChunk(Chunk chunk) {
-        // don't care
+        Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
+
+        for (EntityRef entity : entitiesOfChunk) {
+            deactivateOrDestroyEntityRecursive(entity);
+        }
     }
 
     @Override
@@ -79,6 +86,7 @@ public final class ReadOnlyStorageManager extends AbstractStorageManager {
 
     @Override
     public void deactivatePlayer(Client client) {
-        // don't care
+        EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
+        deactivateOrDestroyEntityRecursive(character);
     }
 }

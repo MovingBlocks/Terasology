@@ -83,7 +83,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
-    private final OwnershipHelper helper;
     private final SaveTransactionHelper saveTransactionHelper;
 
     /**
@@ -127,7 +126,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) throws IOException {
         super(savePath, environment, entityManager, storeChunksInZips);
 
-        this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
         entityManager.subscribeForDestruction(this);
         entityManager.subscribeForChanges(this);
         // TODO Ensure that the component library and the type serializer library are thread save (e.g. immutable)
@@ -316,24 +314,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         return new PlayerStoreBuilder(characterId, relevanceLocation);
     }
 
-
-    private Collection<EntityRef> getEntitiesOfChunk(Chunk chunk) {
-        List<EntityRef> entitiesToStore = Lists.newArrayList();
-
-        AABB aabb = chunk.getAABB();
-        for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
-            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
-                LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
-                    if (aabb.contains(loc.getWorldPosition())) {
-                        entitiesToStore.add(entity);
-                    }
-                }
-            }
-        }
-        return entitiesToStore;
-    }
-
     @Override
     public void deactivateChunk(Chunk chunk) {
         Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
@@ -343,23 +323,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
         for (EntityRef entity: entitiesOfChunk) {
             deactivateOrDestroyEntityRecursive(entity);
-        }
-    }
-
-
-    private void deactivateOrDestroyEntityRecursive(EntityRef entity) {
-        if (entity.isActive()) {
-            for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
-                if (!ownedEntity.isAlwaysRelevant()) {
-                    if (!ownedEntity.isPersistent()) {
-                        // TODO check if destroy is recursive
-                        ownedEntity.destroy();
-                    } else {
-                        deactivateOrDestroyEntityRecursive(ownedEntity);
-                    }
-                }
-            }
-            getEntityManager().deactivateForStorage(entity);
         }
     }
 
