@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Queue;
 
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import com.google.common.collect.Queues;
@@ -82,11 +83,17 @@ final class SplashScreenImpl implements SplashScreenCore {
 
     @Override
     public void close() {
-        SplashScreen splashScreen = SplashScreen.getSplashScreen();
+        SwingUtilities.invokeLater(new Runnable() {
 
-        if (splashScreen != null && splashScreen.isVisible()) {
-            splashScreen.close();
-        }
+            @Override
+            public void run() {
+                SplashScreen splashScreen = SplashScreen.getSplashScreen();
+
+                if (splashScreen != null) {
+                    splashScreen.close();
+                }
+            }
+        });
     }
 
     private void update(SplashScreen splashScreen) {
