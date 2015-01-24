@@ -18,9 +18,10 @@ package org.terasology.engine.subsystem.lwjgl;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.KHRDebugCallback;
+import org.lwjgl.opengl.GLContext;
 import org.newdawn.slick.opengl.ImageIOImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,22 +255,87 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     private void checkOpenGL() {
-        boolean canRunGame = GLContext.getCapabilities().OpenGL11
-                & GLContext.getCapabilities().OpenGL12
-                & GLContext.getCapabilities().OpenGL14
-                & GLContext.getCapabilities().OpenGL15
-                & GLContext.getCapabilities().GL_ARB_framebuffer_object
-                & GLContext.getCapabilities().GL_ARB_texture_float
-                & GLContext.getCapabilities().GL_ARB_half_float_pixel
-                & GLContext.getCapabilities().GL_ARB_shader_objects;
+        boolean[] requiredCapabilities = {
+                GLContext.getCapabilities().OpenGL11,
+                GLContext.getCapabilities().OpenGL12,
+                GLContext.getCapabilities().OpenGL14,
+                GLContext.getCapabilities().OpenGL15,
+                GLContext.getCapabilities().GL_ARB_framebuffer_object,
+                GLContext.getCapabilities().GL_ARB_texture_float,
+                GLContext.getCapabilities().GL_ARB_half_float_pixel,
+                GLContext.getCapabilities().GL_ARB_shader_objects};
 
-        if (!canRunGame) {
-            String message = "Your GPU driver is not supporting the mandatory versions or extensions of OpenGL. Considered updating your GPU drivers? Exiting...";
-            logger.error(message);
-            JOptionPane.showMessageDialog(null, message, "Mandatory OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
-            throw new RuntimeException(message);
+        String[] capabilityNames = {"OpenGL11",
+                                    "OpenGL12",
+                                    "OpenGL14",
+                                    "OpenGL15",
+                                    "GL_ARB_framebuffer_object",
+                                    "GL_ARB_texture_float",
+                                    "GL_ARB_half_float_pixel",
+                                    "GL_ARB_shader_objects"};
+
+        boolean canRunTheGame = true;
+        String missingCapabilitiesMessage = "";
+
+        for (int index = 0; index < requiredCapabilities.length; index++) {
+            if (!requiredCapabilities[index]) {
+                missingCapabilitiesMessage += "    - " + capabilityNames[index] + "\n";
+                canRunTheGame = false;
+            }
         }
 
+        if (!canRunTheGame) {
+            String completeErrorMessage = completeErrorMessage(missingCapabilitiesMessage);
+            logger.error(completeErrorMessage);
+            JOptionPane.showMessageDialog(null, completeErrorMessage, "Required OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+    }
+
+    private String completeErrorMessage(String errorMessage) {
+
+        String completeErrorMessage = "\n" +
+                "\nThe following OpenGL versions/extensions are required but are not supported by your GPU driver:\n" +
+                "\n" +
+                errorMessage +
+                "\n" +
+                "GPU Information:\n" +
+                "\n";
+
+        if (GLContext.getCapabilities().OpenGL11) {
+            // If we are lucky the graphic card has at least an opengl 1.1 implementation.
+            // This helps, as it should provide very specific information.
+            String openglVendor = GL11.glGetString(GL11.GL_VENDOR);
+            String openglRenderer = GL11.glGetString(GL11.GL_RENDERER);
+            String openglVersion = GL11.glGetString(GL11.GL_VERSION);
+
+            completeErrorMessage = completeErrorMessage +
+                    "    Vendor:  " + openglVendor + "\n" +
+                    "    Model:   " + openglRenderer + "\n" +
+                    "    Drivers: " + openglVersion + "\n";
+        } else {
+            // If we are NOT lucky LWJGL supplies these Display.get* methods, but they are less reliable
+            // as they might provide only generic information. See: http://forum.lwjgl.org/index.php?topic=2398.0
+            String adapterName = Display.getAdapter();
+            if (adapterName == null) {
+                adapterName = "unknown";
+            }
+
+            String driverVersion = Display.getVersion();
+            if (driverVersion == null) {
+                driverVersion = "unknown";
+            }
+
+            completeErrorMessage = completeErrorMessage +
+                    "    GPU in use:         " + adapterName + "\n" +
+                    "    GPU Driver Version: " + driverVersion + "\n";
+        }
+
+        completeErrorMessage += "\n";
+        completeErrorMessage += "Try updating the drivers to the latest version available.\n" +
+                                "If that fails you might need a different GPU. Sorry!\n";
+
+        return completeErrorMessage;
     }
 
     public void initOpenGLParams() {
