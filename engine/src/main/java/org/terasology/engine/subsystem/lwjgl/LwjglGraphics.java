@@ -16,12 +16,7 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.ContextAttribs;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.KHRDebugCallback;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.*;
 import org.newdawn.slick.opengl.ImageIOImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,7 +251,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private void checkOpenGL() {
         boolean[] requiredCapabilities = {
-                GLContext.getCapabilities().OpenGL11,
                 GLContext.getCapabilities().OpenGL12,
                 GLContext.getCapabilities().OpenGL14,
                 GLContext.getCapabilities().OpenGL15,
@@ -265,10 +259,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().GL_ARB_half_float_pixel,
                 GLContext.getCapabilities().GL_ARB_shader_objects};
 
-        requiredCapabilities[3] = false;
-
-        String[] capabilityNames = {"OpenGL11",
-                                    "OpenGL12",
+        String[] capabilityNames = {"OpenGL12",
                                     "OpenGL14",
                                     "OpenGL15",
                                     "GL_ARB_framebuffer_object",
@@ -288,9 +279,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         if (!canRunTheGame) {
             String completeErrorMessage = completeErrorMessage(missingCapabilitiesMessage);
-            logger.error(completeErrorMessage);
-            JOptionPane.showMessageDialog(null, completeErrorMessage, "Required OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
+            throw new IllegalStateException(completeErrorMessage);
         }
     }
 
@@ -302,36 +291,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 errorMessage +
                 "\n" +
                 "GPU Information:\n" +
-                "\n";
-
-        if (GLContext.getCapabilities().OpenGL11) {
-            // If we are lucky the graphic card has at least an opengl 1.1 implementation.
-            // This helps, as it should provide very specific information.
-            completeErrorMessage = completeErrorMessage +
-                    "    Vendor:  " + GL11.glGetString(GL11.GL_VENDOR) + "\n" +
-                    "    Model:   " + GL11.glGetString(GL11.GL_RENDERER) + "\n" +
-                    "    Drivers: " + GL11.glGetString(GL11.GL_VERSION) + "\n";
-        } else {
-            // If we are NOT lucky LWJGL supplies these Display.get* methods, but they are less reliable
-            // as they might provide only generic information. See: http://forum.lwjgl.org/index.php?topic=2398.0
-            String adapterName = Display.getAdapter();
-            if (adapterName == null) {
-                adapterName = "unknown";
-            }
-
-            String driverVersion = Display.getVersion();
-            if (driverVersion == null) {
-                driverVersion = "unknown";
-            }
-
-            completeErrorMessage = completeErrorMessage +
-                    "    GPU in use:         " + adapterName + "\n" +
-                    "    GPU Driver Version: " + driverVersion + "\n";
-        }
-
-        completeErrorMessage += "\n";
-        completeErrorMessage += "Try updating the drivers to the latest version available.\n" +
-                                "If that fails you might need a different GPU. Sorry!\n";
+                "\n" +
+                "    Vendor:  " + GL11.glGetString(GL11.GL_VENDOR) + "\n" +
+                "    Model:   " + GL11.glGetString(GL11.GL_RENDERER) + "\n" +
+                "    Driver:  " + GL11.glGetString(GL11.GL_VERSION) + "\n" +
+                "\n" +
+                "Try updating the driver to the latest version available.\n" +
+                "If that fails you might need a different GPU. Sorry!\n";
 
         return completeErrorMessage;
     }
