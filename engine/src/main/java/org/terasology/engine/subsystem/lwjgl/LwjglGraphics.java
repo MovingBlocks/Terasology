@@ -297,7 +297,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "    Driver:  " + GL11.glGetString(GL11.GL_VERSION) + "\n" +
                 "\n" +
                 "Try updating the driver to the latest version available.\n" +
-                "If that fails you might need a different GPU. Sorry!\n";
+                "If that fails you might need to use a different GPU (graphics card). Sorry!\n";
 
         return completeErrorMessage;
     }
