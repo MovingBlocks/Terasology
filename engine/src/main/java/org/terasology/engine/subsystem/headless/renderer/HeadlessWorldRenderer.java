@@ -26,7 +26,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -116,7 +115,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void render(StereoRenderState mono) {
+    public void render(WorldRenderingStage mono) {
         // TODO Auto-generated method stub
 
     }

@@ -101,7 +101,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private float smoothedPlayerSunlightValue;
 
     private final RenderQueuesHelper renderQueues;
-    private WorldRenderingStage currentRenderingStage = WorldRenderingStage.DEFAULT;
+    private WorldRenderingStage currentRenderingStage;
     private boolean isFirstRenderingStageForCurrentFrame;
 
     private final Time time = CoreRegistry.get(Time.class);
@@ -137,8 +137,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         if (renderingConfig.isOculusVrSupport()) {
             playerCamera = new OculusStereoCamera();
+            currentRenderingStage = WorldRenderingStage.OCULUS_LEFT_EYE;
+
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+            currentRenderingStage = WorldRenderingStage.MONO;
         }
         localPlayerSystem.setPlayerCamera(playerCamera);
 
@@ -177,11 +180,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     @Override
     public void update(float deltaInSeconds) {
-
         secondsSinceLastFrame += deltaInSeconds;
-        tick += deltaInSeconds * 1000;  // Updates the tick variable that animation is based on.
-
-        smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), deltaInSeconds);
     }
 
     public void positionShadowMapCamera() {
@@ -222,26 +221,21 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         statRenderedTriangles = 0;
     }
 
-    private void preRenderUpdate(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
+    private void preRenderUpdate(WorldRenderingStage renderingStage) {
 
-        switch (stereoRenderState) {
-            case MONO:
-                currentRenderingStage = WorldRenderingStage.DEFAULT;
-                isFirstRenderingStageForCurrentFrame = true;
-                break;
-            case OCULUS_LEFT_EYE:
-                currentRenderingStage = WorldRenderingStage.OCULUS_LEFT_EYE;
-                isFirstRenderingStageForCurrentFrame = true;
-                break;
-            case OCULUS_RIGHT_EYE:
-                currentRenderingStage = WorldRenderingStage.OCULUS_RIGHT_EYE;
-                isFirstRenderingStageForCurrentFrame = false;
-                break;
+        currentRenderingStage = renderingStage;
+        if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.OCULUS_LEFT_EYE) {
+            isFirstRenderingStageForCurrentFrame = true;
+        } else {
+            isFirstRenderingStageForCurrentFrame = false;
         }
 
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
+            tick += secondsSinceLastFrame * 1000;  // Updates the tick variable that animation is based on.
+            smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), secondsSinceLastFrame);
+
             playerCamera.update(secondsSinceLastFrame);
             positionShadowMapCamera();
             shadowMapCamera.update(secondsSinceLastFrame);
@@ -251,7 +245,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             secondsSinceLastFrame = 0;
         }
 
-        if (stereoRenderState != DefaultRenderingProcess.StereoRenderState.MONO) {
+        if (currentRenderingStage != WorldRenderingStage.MONO) {
             playerCamera.updateFrustum();
         }
 
@@ -263,9 +257,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      * Renders the world.
      */
     @Override
-    public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
+    public void render(WorldRenderingStage renderingStage) {
         resetStats();
-        preRenderUpdate(stereoRenderState);
+        preRenderUpdate(renderingStage);
 
         renderShadowMap();
         renderWorldReflection();
@@ -293,7 +287,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         combineRefractiveReflectiveAndOpaquePasses();
         renderSimpleBlendMaterialsIntoCombinedPass();
 
-        renderFinalPostProcessedScene(stereoRenderState);
+        renderFinalPostProcessedScene();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
@@ -581,9 +575,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderFinalPostProcessedScene(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
+    private void renderFinalPostProcessedScene() {
         PerformanceMonitor.startActivity("Render Post-Processing");
-        DefaultRenderingProcess.getInstance().renderPost(stereoRenderState);
+        DefaultRenderingProcess.getInstance().renderPost(currentRenderingStage);
         PerformanceMonitor.endActivity();
     }
 

@@ -46,6 +46,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 import org.terasology.world.block.BlockManager;
 
 import java.util.Collections;
@@ -192,10 +193,10 @@ public class StateIngame implements GameState {
 
         if (worldRenderer != null) {
             if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
-                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.MONO);
+                worldRenderer.render(WorldRenderingStage.MONO);
             } else {
-                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE);
-                worldRenderer.render(DefaultRenderingProcess.StereoRenderState.OCULUS_RIGHT_EYE);
+                worldRenderer.render(WorldRenderingStage.OCULUS_LEFT_EYE);
+                worldRenderer.render(WorldRenderingStage.OCULUS_RIGHT_EYE);
             }
         }
 
