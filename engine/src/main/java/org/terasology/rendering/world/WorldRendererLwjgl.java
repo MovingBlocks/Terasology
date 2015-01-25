@@ -66,16 +66,6 @@ import static org.lwjgl.opengl.GL11.GL_LIGHT0;
 import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -249,7 +239,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             playerCamera.updateFrustum();
         }
 
-        // this line needs to be here as deep down it relies on the camera's frustrum.
+        // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
     }
 
@@ -297,7 +287,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             PerformanceMonitor.startActivity("Render World (Shadow Map)");
 
             DefaultRenderingProcess.getInstance().beginRenderSceneShadowMap();
-            glDisable(GL_CULL_FACE);
+            GL11.glDisable(GL_CULL_FACE);
 
             shadowMapCamera.lookThrough();
 
@@ -311,7 +301,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
             playerCamera.lookThrough(); // not strictly needed: just defensive programming here.
 
-            glEnable(GL_CULL_FACE);
+            GL11.glEnable(GL_CULL_FACE);
             DefaultRenderingProcess.getInstance().endRenderSceneShadowMap();
 
             PerformanceMonitor.endActivity();
@@ -322,7 +312,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render World (Reflection)");
 
         DefaultRenderingProcess.getInstance().beginRenderReflectedScene();
-        glCullFace(GL11.GL_FRONT);
+        GL11.glCullFace(GL11.GL_FRONT);
         playerCamera.setReflected(true);
 
         playerCamera.lookThroughNormalized();
@@ -333,7 +323,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         if (renderingConfig.isReflectiveWater()) {
-            glEnable(GL_LIGHT0);
+            GL11.glEnable(GL_LIGHT0);
 
             while (renderQueues.chunksOpaqueReflection.size() > 0) {
                 renderChunk(renderQueues.chunksOpaqueReflection.poll(), ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.REFLECTION);
@@ -343,7 +333,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         playerCamera.setReflected(false);
-        glCullFace(GL11.GL_BACK);
+        GL11.glCullFace(GL11.GL_BACK);
         DefaultRenderingProcess.getInstance().endRenderReflectedScene();
 
         PerformanceMonitor.endActivity();
@@ -395,24 +385,24 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
 
-            glPushMatrix();
-            glLoadIdentity();
+            GL11.glPushMatrix();
+            GL11.glLoadIdentity();
 
             playerCamera.updateMatrices(90f);
             playerCamera.loadProjectionMatrix();
 
-            glDepthFunc(GL11.GL_ALWAYS);
+            GL11.glDepthFunc(GL11.GL_ALWAYS);
 
             for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
                 renderer.renderFirstPerson();
             }
 
-            glDepthFunc(GL_LEQUAL);
+            GL11.glDepthFunc(GL_LEQUAL);
 
             playerCamera.updateMatrices();
             playerCamera.loadProjectionMatrix();
 
-            glPopMatrix();
+            GL11.glPopMatrix();
 
             PerformanceMonitor.endActivity();
         }
@@ -537,13 +527,13 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         // Make sure the water surface is rendered if the player is swimming
         boolean isHeadUnderWater = isHeadUnderWater();
         if (isHeadUnderWater) {
-            glDisable(GL11.GL_CULL_FACE);
+            GL11.glDisable(GL11.GL_CULL_FACE);
         }
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             renderChunk(renderQueues.chunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
         }
         if (isHeadUnderWater) {
-            glEnable(GL11.GL_CULL_FACE);
+            GL11.glEnable(GL11.GL_CULL_FACE);
         }
 
         DefaultRenderingProcess.getInstance().endRenderSceneReflectiveRefractive();
@@ -560,16 +550,16 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
         DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDepthMask(false);
+        GL11.glEnable(GL_BLEND);
+        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDepthMask(false);
 
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderAlphaBlend();
         }
 
-        glDisable(GL_BLEND);
-        glDepthMask(true);
+        GL11.glDisable(GL_BLEND);
+        GL11.glDepthMask(true);
 
         DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
         PerformanceMonitor.endActivity();
@@ -583,14 +573,14 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     private void preRenderSetup() {
         if (renderingDebugConfig.isWireframe()) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
         DefaultRenderingProcess.getInstance().clear();
     }
 
     private void postRenderCleanup() {
         if (renderingDebugConfig.isWireframe()) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
     }
 
