@@ -21,11 +21,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -164,12 +166,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean isBlockRelevant(int x, int y, int z) {
-        return chunkProvider.isChunkReady(TeraMath.calcChunkPos(x, y, z));
+        return chunkProvider.isChunkReady(ChunkMath.calcChunkPos(x, y, z));
     }
 
     @Override
     public boolean isRegionRelevant(Region3i region) {
-        for (Vector3i chunkPos : TeraMath.calcChunkPos(region)) {
+        for (Vector3i chunkPos : ChunkMath.calcChunkPos(region)) {
             if (!chunkProvider.isChunkReady(chunkPos)) {
                 return false;
             }
@@ -179,10 +181,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3i worldPos, Block type) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(worldPos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(worldPos);
+            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
             chunk.lock();
             Block oldBlockType = chunk.setBlock(blockPos, type);
             chunk.unlock();
@@ -193,7 +195,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     oldChange.setTo(type);
                 }
-                for (Vector3i pos : TeraMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
+                for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
                     RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
                     if (dirtiedChunk != null) {
                         dirtiedChunk.setDirty(true);
@@ -229,12 +231,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             chunk.lock();
             try {
-                Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+                Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
                 LiquidData liquidState = chunk.getLiquid(blockPos);
                 if (liquidState.equals(oldState)) {
                     chunk.setLiquid(blockPos, newState);
@@ -249,10 +251,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public LiquidData getLiquid(int x, int y, int z) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getLiquid(blockPos);
         }
         logger.warn("Attempted to access unavailable chunk via liquid data at {}, {}, {}", x, y, z);
@@ -261,10 +263,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getBlock(blockPos);
         }
         logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", x, y, z);
@@ -273,10 +275,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Biome getBiome(Vector3i pos) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(pos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(pos);
+            Vector3i blockPos = ChunkMath.calcBlockPos(pos);
             return chunk.getBiome(blockPos.x, blockPos.y, blockPos.z);
         }
         logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", pos.x, pos.y, pos.z);
@@ -285,10 +287,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Biome setBiome(Vector3i worldPos, Biome biome) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(worldPos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(worldPos);
+            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
             chunk.lock();
             Biome oldBiomeType = chunk.setBiome(blockPos.x, blockPos.y, blockPos.z, biome);
             chunk.unlock();
@@ -299,7 +301,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     oldChange.setTo(biome);
                 }
-                for (Vector3i pos : TeraMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
+                for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
                     RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
                     if (dirtiedChunk != null) {
                         dirtiedChunk.setDirty(true);
@@ -315,10 +317,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getLight(int x, int y, int z) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
         logger.warn("Attempted to access unavailable chunk via light at {}, {}, {}", x, y, z);
@@ -327,10 +329,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getSunlight(int x, int y, int z) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
         logger.warn("Attempted to access unavailable chunk via sunlight at {}, {}, {}", x, y, z);
@@ -339,10 +341,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getTotalLight(int x, int y, int z) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         logger.warn("Attempted to access unavailable chunk via total light at {}, {}, {}", x, y, z);

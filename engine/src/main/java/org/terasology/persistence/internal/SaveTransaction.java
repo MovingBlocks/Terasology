@@ -18,8 +18,10 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import gnu.trove.procedure.TLongObjectProcedure;
 import gnu.trove.procedure.TLongProcedure;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -27,6 +29,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
@@ -218,7 +221,7 @@ public class SaveTransaction extends AbstractTask {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
                     Vector3f loc = locationComponent.getWorldPosition();
-                    Vector3i chunkPos = TeraMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z);
+                    Vector3i chunkPos = ChunkMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z);
                     Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
                     if (collection == null) {
                         collection = Lists.newArrayList();

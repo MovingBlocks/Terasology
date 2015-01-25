@@ -16,9 +16,11 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -76,7 +78,7 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
 
         Set<Vector3i> chunkCoordinates = Sets.newHashSet();
         for (Vector3i pos : border.expandTo3D(region.getRegion())) {
-            chunkCoordinates.add(TeraMath.calcChunkPos(pos));
+            chunkCoordinates.add(ChunkMath.calcChunkPos(pos));
         }
 
         for (Vector3i chunkCoordinate : chunkCoordinates) {
@@ -101,7 +103,7 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
                     chunkWorldRegion.sizeZ());
 
             for (Vector2i pos : worldRegion) {
-                Vector3i localPos = TeraMath.calcBlockPos(new Vector3i(pos.x, 0, pos.y));
+                Vector3i localPos = ChunkMath.calcBlockPos(new Vector3i(pos.x, 0, pos.y));
                 int x = localPos.x;
                 int z = localPos.z;
                 //calculate avg height

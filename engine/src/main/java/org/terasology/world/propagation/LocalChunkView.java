@@ -15,6 +15,7 @@
  */
 package org.terasology.world.propagation;
 
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -38,16 +39,16 @@ public class LocalChunkView implements PropagatorWorldView {
     }
 
     private int chunkIndexOf(Vector3i blockPos) {
-        return TeraMath.calcChunkPosX(blockPos.x, ChunkConstants.POWER_X) - topLeft.x
-                + 3 * (TeraMath.calcChunkPosY(blockPos.y, ChunkConstants.POWER_Y) - topLeft.y
-                + 3 * (TeraMath.calcChunkPosZ(blockPos.z, ChunkConstants.POWER_Z) - topLeft.z));
+        return ChunkMath.calcChunkPosX(blockPos.x, ChunkConstants.POWER_X) - topLeft.x
+                + 3 * (ChunkMath.calcChunkPosY(blockPos.y, ChunkConstants.POWER_Y) - topLeft.y
+                + 3 * (ChunkMath.calcChunkPosZ(blockPos.z, ChunkConstants.POWER_Z) - topLeft.z));
     }
 
     @Override
     public byte getValueAt(Vector3i pos) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            return rules.getValue(chunk, TeraMath.calcBlockPos(pos));
+            return rules.getValue(chunk, ChunkMath.calcBlockPos(pos));
         }
         return UNAVAILABLE;
     }
@@ -56,7 +57,7 @@ public class LocalChunkView implements PropagatorWorldView {
     public void setValueAt(Vector3i pos, byte value) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            rules.setValue(chunk, TeraMath.calcBlockPos(pos), value);
+            rules.setValue(chunk, ChunkMath.calcBlockPos(pos), value);
         }
     }
 
@@ -65,7 +66,7 @@ public class LocalChunkView implements PropagatorWorldView {
         int index = chunkIndexOf(pos);
         Chunk chunk = chunks[index];
         if (chunk != null) {
-            return chunk.getBlock(TeraMath.calcBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcBlockPos(pos));
         }
         return null;
     }

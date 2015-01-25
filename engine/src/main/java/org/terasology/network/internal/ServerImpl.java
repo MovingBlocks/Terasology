@@ -23,9 +23,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetMetricSource;
@@ -297,7 +300,7 @@ public class ServerImpl implements Server {
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setBlock(pos, newBlock);
             } else {
-                awaitingChunkReadyBlockUpdates.put(TeraMath.calcChunkPos(pos), blockChange);
+                awaitingChunkReadyBlockUpdates.put(ChunkMath.calcChunkPos(pos), blockChange);
             }
         }
     }
@@ -312,7 +315,7 @@ public class ServerImpl implements Server {
                 Biome newBiome = biomeManager.getBiomeByShortId((short) biomeChange.getNewBiome());
                 worldProvider.setBiome(pos, newBiome);
             } else {
-                awaitingChunkReadyBiomeUpdates.put(TeraMath.calcChunkPos(pos), biomeChange);
+                awaitingChunkReadyBiomeUpdates.put(ChunkMath.calcChunkPos(pos), biomeChange);
             }
         }
     }

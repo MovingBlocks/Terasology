@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -209,7 +210,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
-        Region3i region = TeraMath.getChunkRegionAroundWorldPos(blockPos, extent);
+        Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
     }
 
@@ -321,7 +322,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private int score(Vector3i chunk) {
-            Vector3i playerChunk = TeraMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), 0.5f));
+            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), 0.5f));
             return playerChunk.distanceSquared(chunk);
         }
     }

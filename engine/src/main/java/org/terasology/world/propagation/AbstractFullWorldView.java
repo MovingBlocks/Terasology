@@ -15,6 +15,7 @@
  */
 package org.terasology.world.propagation;
 
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -38,14 +39,14 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     private Chunk getChunk(Vector3i pos) {
 
-        return chunkProvider.getChunk(TeraMath.calcChunkPos(pos));
+        return chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
     }
 
     @Override
     public byte getValueAt(Vector3i pos) {
         LitChunk chunk = getChunk(pos);
         if (chunk != null) {
-            return getValueAt(chunk, TeraMath.calcBlockPos(pos.x, pos.y, pos.z));
+            return getValueAt(chunk, ChunkMath.calcBlockPos(pos.x, pos.y, pos.z));
         }
         return UNAVAILABLE;
     }
@@ -61,8 +62,8 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        setValueAt(getChunk(pos), TeraMath.calcBlockPos(pos.x, pos.y, pos.z), value);
-        for (Vector3i affectedChunkPos : TeraMath.getChunkRegionAroundWorldPos(pos, 1)) {
+        setValueAt(getChunk(pos), ChunkMath.calcBlockPos(pos.x, pos.y, pos.z), value);
+        for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(pos, 1)) {
             Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
@@ -81,9 +82,9 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public Block getBlockAt(Vector3i pos) {
-        CoreChunk chunk = chunkProvider.getChunk(TeraMath.calcChunkPos(pos));
+        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
         if (chunk != null) {
-            return chunk.getBlock(TeraMath.calcBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcBlockPos(pos));
         }
         return null;
     }

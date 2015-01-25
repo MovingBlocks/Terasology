@@ -27,7 +27,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.Physics;
@@ -70,7 +70,7 @@ public class BlockItemSystem extends BaseComponentSystem {
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
         BlockFamily type = blockItem.blockFamily;
         Side surfaceSide = Side.inDirection(event.getHitNormal());
-        Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
+        Side secondaryDirection = ChunkMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
         BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
         if (blockComponent == null) {

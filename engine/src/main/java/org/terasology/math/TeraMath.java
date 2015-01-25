@@ -494,7 +494,9 @@ public final class TeraMath {
      *
      * @param x The X-coordinate of the block
      * @return The X-coordinate of the chunk
+     * @deprecated use ChunkMath instead
      */
+    @Deprecated
     public static int calcChunkPosX(int x, int chunkPowerX) {
         return (x >> chunkPowerX);
     }
@@ -504,7 +506,9 @@ public final class TeraMath {
      *
      * @param y The Y-coordinate of the block
      * @return The Y-coordinate of the chunk
+     * @deprecated use ChunkMath instead
      */
+    @Deprecated
     public static int calcChunkPosY(int y, int chunkPowerY) {
         return (y >> chunkPowerY);
     }
@@ -514,35 +518,65 @@ public final class TeraMath {
      *
      * @param z The Z-coordinate of the block
      * @return The Z-coordinate of the chunk
+     * @deprecated use ChunkMath instead
      */
+    @Deprecated
     public static int calcChunkPosZ(int z, int chunkPowerZ) {
         return (z >> chunkPowerZ);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
         return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(Vector3f pos) {
         return calcChunkPos(new Vector3i(pos, 0.5f));
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(Vector3i pos) {
         return calcChunkPos(pos.x, pos.y, pos.z);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(int x, int y, int z) {
         return calcChunkPos(x, y, z, ChunkConstants.CHUNK_POWER);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i[] calcChunkPos(Region3i region) {
         return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
         return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
         int minX = calcChunkPosX(region.minX(), chunkPower.x);
         int minY = calcChunkPosY(region.minY(), chunkPower.y);
@@ -571,11 +605,17 @@ public final class TeraMath {
      *
      * @param blockX The X-coordinate of the block in the world
      * @return The X-coordinate of the block within the chunk
+     * @deprecated use ChunkMath instead
      */
+    @Deprecated
     public static int calcBlockPosX(int blockX, int chunkPosFilterX) {
         return blockX & chunkPosFilterX;
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static int calcBlockPosY(int blockY, int chunkPosFilterY) {
         return blockY & chunkPosFilterY;
     }
@@ -585,23 +625,41 @@ public final class TeraMath {
      *
      * @param blockZ The Z-coordinate of the block in the world
      * @return The Z-coordinate of the block within the chunk
+     * @deprecated use ChunkMath instead
      */
+    @Deprecated
     public static int calcBlockPosZ(int blockZ, int chunkPosFilterZ) {
         return blockZ & chunkPosFilterZ;
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcBlockPos(Vector3i worldPos) {
         return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcBlockPos(int x, int y, int z) {
         return calcBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
         return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y, chunkFilterSize.y), calcBlockPosZ(z, chunkFilterSize.z));
     }
 
+    /**
+     * @deprecated use ChunkMath instead
+     */
+    @Deprecated
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
         Vector3i minPos = new Vector3i(-extent, -extent, -extent);
         minPos.add(pos);
@@ -648,7 +706,9 @@ public final class TeraMath {
     /**
      * @param value
      * @return The size of a power of two - that is, the exponent.
+     * @deprecated use ChunkMath instead
      */
+    @Deprecated
     public static int sizeOfPower(int value) {
         int power = 0;
         int val = value;
@@ -707,6 +767,10 @@ public final class TeraMath {
     }
 
     // TODO: This doesn't belong in this class, move it.
+    /**
+     * @deprecated use {@link ChunkMath#getSecondaryPlacementDirection(Vector3f, Vector3f)} instead
+     */
+    @Deprecated
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
         Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
@@ -722,7 +786,9 @@ public final class TeraMath {
      * @param region
      * @param side
      * @return
+     * @deprecated use {@link ChunkMath#getEdgeRegion(Region3i, Side)}
      */
+    @Deprecated
     public static Region3i getEdgeRegion(Region3i region, Side side) {
         Vector3i sideDir = side.getVector3i();
         Vector3i min = region.min();
@@ -765,7 +831,9 @@ public final class TeraMath {
      * @param source
      * @param target
      * @param populateMargins Whether to populate the edges of the target array
+     * @deprecated move to a new class AbstractBatchPropagator
      */
+    @Deprecated
     public static void populateMinAdjacent2D(int[] source, int[] target, int dimX, int dimY, boolean populateMargins) {
         System.arraycopy(source, 0, target, 0, target.length);
 

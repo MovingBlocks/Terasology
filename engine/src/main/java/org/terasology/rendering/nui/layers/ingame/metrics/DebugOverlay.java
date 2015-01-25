@@ -24,6 +24,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
@@ -117,7 +118,7 @@ public class DebugOverlay extends CoreScreenLayer {
                     Vector3f pos = localPlayer.getPosition();
                     CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
                     float yaw = (character != null) ? character.yaw : 0;
-                    Vector3i chunkPos = TeraMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
+                    Vector3i chunkPos = ChunkMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
                     return String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Yaw %.2f", pos.x, pos.y, pos.z, chunkPos.x, chunkPos.y, chunkPos.z, yaw);
                 }
             });

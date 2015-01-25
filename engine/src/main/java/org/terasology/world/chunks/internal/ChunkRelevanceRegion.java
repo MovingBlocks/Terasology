@@ -18,10 +18,11 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
@@ -51,7 +52,7 @@ public class ChunkRelevanceRegion {
         if (loc == null) {
             dirty = false;
         } else {
-            center.set(TeraMath.calcChunkPos(loc.getWorldPosition()));
+            center.set(ChunkMath.calcChunkPos(loc.getWorldPosition()));
             currentRegion = calculateRegion();
             dirty = true;
         }
@@ -122,7 +123,7 @@ public class ChunkRelevanceRegion {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
-            return Region3i.createFromCenterExtents(TeraMath.calcChunkPos(loc.getWorldPosition()), extents);
+            return Region3i.createFromCenterExtents(ChunkMath.calcChunkPos(loc.getWorldPosition()), extents);
         }
         return Region3i.EMPTY;
     }
@@ -130,7 +131,7 @@ public class ChunkRelevanceRegion {
     private Vector3i calculateCenter() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            return TeraMath.calcChunkPos(loc.getWorldPosition());
+            return ChunkMath.calcChunkPos(loc.getWorldPosition());
         }
         return new Vector3i();
     }

@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
@@ -101,7 +102,7 @@ public final class ChunkMeshUpdateManager {
      * immediately.
      */
     public void setCameraPosition(Vector3f cameraPosition) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(cameraPosition);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(cameraPosition);
         cameraChunkPosX = chunkPos.x;
         cameraChunkPosY = chunkPos.y;
         cameraChunkPosZ = chunkPos.z;

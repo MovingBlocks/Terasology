@@ -20,15 +20,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -138,7 +141,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
-        Region3i region = TeraMath.getChunkRegionAroundWorldPos(blockPos, extent);
+        Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
     }
 

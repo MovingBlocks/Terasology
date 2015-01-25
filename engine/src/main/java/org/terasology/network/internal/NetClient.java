@@ -23,9 +23,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.ChunkMath;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
@@ -253,7 +256,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(TeraMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
+                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
                 }
                 Vector3i pos = null;
                 int distance = Integer.MAX_VALUE;
@@ -342,7 +345,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                if (relevantChunks.contains(TeraMath.calcChunkPos(blockComp.getPosition()))) {
+                if (relevantChunks.contains(ChunkMath.calcChunkPos(blockComp.getPosition()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
                             .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
                             .setEvent(eventSerializer.serialize(event)).build());
@@ -393,7 +396,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(pos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
                     .setPos(NetMessageUtil.convert(pos))
@@ -404,7 +407,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(pos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBiomeChanges.add(NetData.BiomeChangeMessage.newBuilder()
                     .setPos(NetMessageUtil.convert(pos))

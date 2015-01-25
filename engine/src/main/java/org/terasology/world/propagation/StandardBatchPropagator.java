@@ -17,9 +17,10 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
@@ -240,7 +241,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
 
         int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
         int[] depth = new int[edgeSize];
@@ -255,7 +256,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         int[] adjDepth = new int[depths.length];
         int dimA = (side == Side.LEFT || side == Side.RIGHT) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_X;
         int dimB = (side == Side.FRONT || side == Side.BACK) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_Z;
-        TeraMath.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
+        ChunkMath.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
 
         if (propagateExternal) {
             for (int y = 0; y < dimB; ++y) {

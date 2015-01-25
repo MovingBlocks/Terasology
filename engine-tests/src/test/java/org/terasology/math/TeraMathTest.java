@@ -16,8 +16,6 @@
 package org.terasology.math;
 
 import org.junit.Test;
-import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,13 +25,6 @@ import static org.junit.Assert.fail;
 public class TeraMathTest {
 
     private static final double MAX_DOUBLE_ERROR = 0.00001;
-
-
-    @Test
-    public void getEdgeRegion() {
-        Region3i region = Region3i.createFromMinAndSize(new Vector3i(16, 0, 16), new Vector3i(16, 128, 16));
-        assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), TeraMath.getEdgeRegion(region, Side.LEFT));
-    }
 
     // This function mimicks a power function using ints only
     private long longPow(int base, int exp) {
@@ -71,9 +62,9 @@ public class TeraMathTest {
                 }
 
                 try {
-                    int result = TeraMath.pow(base, exp);
+                    long result = TeraMath.pow(base, exp);
                     assertFalse("(int)" + base + "^" + exp + " did not throw an exception as expected", exception);
-                    assertEquals(base + "^" + exp, javaMathResult, (long) result);
+                    assertEquals(base + "^" + exp, javaMathResult, result);
                 } catch (ArithmeticException e) {
                     assertTrue("(int)" + base + "^" + exp + " threw an unexpected exception", exception);
                 }
@@ -108,21 +99,5 @@ public class TeraMathTest {
         if (ratio >= error) {
             fail(msg);
         }
-    }
-
-    @Test
-    public void regionPositions() {
-        CoreRegistry.put(Config.class, new Config());
-
-        assertEquals(1, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0))).length);
-        assertEquals(1, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31))).length);
-        assertEquals(2, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31))).length);
-        assertEquals(4, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 32))).length);
-        assertEquals(8, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 64, 32))).length);
-        assertEquals(12, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(-1, 0, 0), new Vector3i(32, 64, 32))).length);
-
-        Vector3i[] chunks = TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31)));
-        assertEquals(new Vector3i(0, 0, 0), chunks[0]);
-        assertEquals(new Vector3i(1, 0, 0), chunks[1]);
     }
 }
