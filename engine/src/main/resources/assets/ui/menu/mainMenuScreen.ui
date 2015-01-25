@@ -76,6 +76,11 @@
                         "text" : "Layout Test"
                     },
                     {
+                        "type" : "UIButton",
+                        "id" : "behavioreditor",
+                        "text" : "Behavior Editor"
+                    },
+                    {
                         "type" : "UISpace",
                         "size" : [1, 64]
                     },

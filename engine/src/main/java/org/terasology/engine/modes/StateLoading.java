@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,9 +86,6 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for server or single player games
-     *
-     * @param gameManifest
-     * @param netMode
      */
     public StateLoading(GameManifest gameManifest, NetworkMode netMode) {
         Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
@@ -100,8 +97,6 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for client of multiplayer game
-     *
-     * @param joinStatus
      */
     public StateLoading(JoinStatus joinStatus) {
         this.gameManifest = new GameManifest();

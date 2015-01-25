@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,12 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.logic.behavior.BehaviorSystem;
+import org.terasology.logic.behavior.nui.BehaviorNodeFactory;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.logic.console.ConsoleSystem;
+import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -58,6 +60,7 @@ public class StateMainMenu implements GameState {
     private InputSystem inputSystem;
 
     private String messageOnLoad = "";
+    private BehaviorSystem behaviorSystem;
 
     public StateMainMenu() {
     }
@@ -105,6 +108,14 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.initialise();
 
+        behaviorSystem = new BehaviorSystem();
+        componentSystemManager.register(behaviorSystem);
+        CoreRegistry.put(BehaviorSystem.class, behaviorSystem);
+
+        BehaviorNodeFactory nodeFactory = new BehaviorNodeFactory();
+        componentSystemManager.register(nodeFactory);
+        nodeFactory.refreshLibrary();
+
         playBackgroundMusic();
 
         //guiManager.openWindow("main");
@@ -144,6 +155,8 @@ public class StateMainMenu implements GameState {
         updateUserInterface(delta);
 
         eventSystem.process();
+
+        behaviorSystem.update(delta);
     }
 
     @Override

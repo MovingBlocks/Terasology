@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ import org.terasology.rendering.iconmesh.IconMeshResolver;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLMesh;
@@ -66,7 +67,7 @@ import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -101,6 +102,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         initOpenGL();
 
         CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new LwjglCanvasRenderer()));
+        CoreRegistry.putPermanently(OneOfProviderFactory.class, new OneOfProviderFactory());
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
@@ -170,6 +172,12 @@ public class HeadlessEnvironment extends Environment {
             @Override
             public UISkin buildAsset(AssetUri uri, UISkinData data) {
                 return new UISkin(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.BEHAVIOR, new AssetFactory<BehaviorTreeData, BehaviorTree>() {
+            @Override
+            public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
+                return new BehaviorTree(uri, data);
             }
         });
 

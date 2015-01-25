@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -35,9 +33,10 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
-import org.terasology.logic.behavior.tree.Actor;
-import org.terasology.logic.behavior.tree.Interpreter;
-import org.terasology.logic.behavior.tree.Node;
+import org.terasology.logic.behavior.core.Actor;
+import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -49,7 +48,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Behavior tree system
@@ -72,18 +70,17 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     private PrefabManager prefabManager;
     @In
     private AssetManager assetManager;
+    @In
+    private BehaviorTreeBuilder treeBuilder;
 
-    private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
     private List<BehaviorTree> trees = Lists.newArrayList();
+
+    private EntityRef dummy;
+
 
     @Override
     public void initialise() {
-        List<AssetUri> uris = Lists.newArrayList();
-        for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
-            uris.add(uri);
-        }
         for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
-
             BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
             if (asset != null) {
                 trees.add(asset);
@@ -101,21 +98,15 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         addEntity(entityRef, behaviorComponent);
     }
 
-    @ReceiveEvent
-    public void onBehaviorRemoved(BeforeRemoveComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        if (behaviorComponent.tree != null) {
-            entityInterpreters.remove(entityRef);
-        }
-    }
-
     @Override
     public void update(float delta) {
-        for (Interpreter interpreter : entityInterpreters.values()) {
-            interpreter.tick(delta);
+        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+            BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            behaviorComponent.interpreter.tick(delta);
         }
     }
 
-    public BehaviorTree createTree(String name, Node root) {
+    public BehaviorTree createTree(String name, BehaviorNode root) {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(root);
         BehaviorTree behaviorTree = new BehaviorTree(new AssetUri(AssetType.BEHAVIOR, BEHAVIORS, name.replaceAll("\\W+", "")), data);
@@ -127,9 +118,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     public void save(BehaviorTree tree) {
         Path savePath;
         AssetUri uri = tree.getURI();
-        if (BEHAVIORS.equals(uri.getModuleName())) {
+        /*if (BEHAVIORS.equals(uri.getModuleName())) {
             savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("assets").resolve("behaviors");
-        } else {
+        } else */
+        {
             Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("overrides");
             savePath = overridesPath.resolve(uri.getModuleName().toString()).resolve("behaviors");
         }
@@ -150,32 +142,47 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     }
 
     public List<Interpreter> getInterpreter() {
-        List<Interpreter> interpreters = Lists.newArrayList();
-        interpreters.addAll(entityInterpreters.values());
-        Collections.sort(interpreters, new Comparator<Interpreter>() {
+        List<Interpreter> runners = Lists.newArrayList();
+        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+            BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            if (behaviorComponent.interpreter != null) {
+                runners.add(behaviorComponent.interpreter);
+            }
+        }
+        if (runners.size() == 0) {
+            BehaviorComponent behaviorComponent = new BehaviorComponent();
+            behaviorComponent.tree = assetManager.resolveAndLoad(AssetType.BEHAVIOR, "engine:default", BehaviorTree.class);
+            dummy = entityManager.create(behaviorComponent);
+            DisplayNameComponent nameComponent = new DisplayNameComponent();
+            nameComponent.name = "Main";
+            dummy.addComponent(nameComponent);
+            dummy.addComponent(behaviorComponent);
+        }
+        Collections.sort(runners, new Comparator<Interpreter>() {
             @Override
             public int compare(Interpreter o1, Interpreter o2) {
                 return o1.toString().compareTo(o2.toString());
             }
         });
-        return interpreters;
+        return runners;
     }
 
     public void treeModified(BehaviorTree tree) {
-        for (Interpreter interpreter : entityInterpreters.values()) {
-            interpreter.reset();
+        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+            BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            if (behaviorComponent.tree == tree) {
+                behaviorComponent.interpreter.reset();
+            }
         }
         save(tree);
     }
 
     private void addEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        Interpreter interpreter = entityInterpreters.get(entityRef);
-        if (interpreter == null) {
-            interpreter = new Interpreter(new Actor(entityRef));
+        if (behaviorComponent.interpreter == null) {
+            behaviorComponent.interpreter = new Interpreter(new Actor(entityRef));
             BehaviorTree tree = behaviorComponent.tree;
-            entityInterpreters.put(entityRef, interpreter);
             if (tree != null) {
-                interpreter.start(tree.getRoot());
+                behaviorComponent.interpreter.setTree(tree);
             }
         }
     }

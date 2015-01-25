@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,16 +17,11 @@ package org.terasology.logic.behavior.asset;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.logic.behavior.nui.RenderableNode;
-import org.terasology.logic.behavior.tree.Node;
-
-import java.util.List;
+import org.terasology.logic.behavior.core.BehaviorNode;
 
 /**
- * Behavior tree asset. Can be loaded and saved into json.
- * <p/>
- * This asset keeps track of the tree of Nodes and the associated RenderableNodes. If there are no RenderableNodes,
- * the helper class will generate and layout some.
+ * Behavior tree asset. Can be loaded and saved into json. Actors should never run the nodes behind a asset directly.
+ * Instead, use a runner which operates on copies, so actors can share one tree asset.
  *
  * @author synopia
  */
@@ -38,28 +33,12 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
         this.data = data;
     }
 
-    public Node getRoot() {
+    public BehaviorNode getRoot() {
         return data.getRoot();
     }
 
     public BehaviorTreeData getData() {
         return data;
-    }
-
-    public RenderableNode getRenderableNode(Node node) {
-        return data.getRenderableNode(node);
-    }
-
-    public List<RenderableNode> getRenderableNodes() {
-        if (!data.hasRenderable()) {
-            data.createRenderable();
-            layout(null);
-        }
-        return data.getRenderableNodes();
-    }
-
-    public void layout(RenderableNode start) {
-        data.layout(start);
     }
 
     @Override
@@ -75,11 +54,5 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
     @Override
     protected void onDispose() {
         this.data = null;
-    }
-
-    public RenderableNode createNode(Node node) {
-        RenderableNode renderable = data.createRenderable(node);
-        data.layout(renderable);
-        return renderable;
     }
 }

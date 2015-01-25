@@ -1,0 +1,12 @@
+{
+    "BehaviorNode" : {
+        "action"      : "timer",
+        "name"        : "timer",
+        "displayName"      : "Timer",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Runs child for specified time",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}
