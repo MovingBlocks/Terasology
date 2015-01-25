@@ -106,6 +106,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     private final Time time = CoreRegistry.get(Time.class);
     private float tick;
+    private float secondsSinceLastFrame;
 
     private int statChunkMeshEmpty;
     private int statChunkNotReady;
@@ -124,9 +125,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private RenderingConfig renderingConfig = config.getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
-    // TODO: work on the update/preRenderUpdate methods
     // TODO: rendering process as constructor input and setRenderingProcess method
-    // TODO: move config-provided variables in preRenderUpdate() method?
     // TODO: examine the potential to avoid allocation of variables such as Materials
 
     public WorldRendererLwjgl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
@@ -179,22 +178,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     @Override
     public void update(float deltaInSeconds) {
 
-        updateTick(deltaInSeconds);
-
-        playerCamera.update(deltaInSeconds);
-        positionShadowMapCamera();
-        shadowMapCamera.update(deltaInSeconds);
-
-        renderableWorld.update();
+        secondsSinceLastFrame += deltaInSeconds;
+        tick += deltaInSeconds * 1000;  // Updates the tick variable that animation is based on.
 
         smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), deltaInSeconds);
-    }
-
-    /**
-     * Updates the tick variable that animation is based on. tick is in milliseconds.
-     */
-    private void updateTick(float deltaInSeconds) {
-        tick += deltaInSeconds * 1000;
     }
 
     public void positionShadowMapCamera() {
@@ -236,6 +223,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     private void preRenderUpdate(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
+
         switch (stereoRenderState) {
             case MONO:
                 currentRenderingStage = WorldRenderingStage.DEFAULT;
@@ -243,17 +231,32 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 break;
             case OCULUS_LEFT_EYE:
                 currentRenderingStage = WorldRenderingStage.OCULUS_LEFT_EYE;
-                playerCamera.updateFrustum();
                 isFirstRenderingStageForCurrentFrame = true;
                 break;
             case OCULUS_RIGHT_EYE:
                 currentRenderingStage = WorldRenderingStage.OCULUS_RIGHT_EYE;
-                playerCamera.updateFrustum();
                 isFirstRenderingStageForCurrentFrame = false;
                 break;
         }
 
-        renderableWorld.updateAndQueueVisibleChunks(isFirstRenderingStageForCurrentFrame);
+        // this is done to execute this code block only once per frame
+        // instead of once per eye in a stereo setup.
+        if (isFirstRenderingStageForCurrentFrame) {
+            playerCamera.update(secondsSinceLastFrame);
+            positionShadowMapCamera();
+            shadowMapCamera.update(secondsSinceLastFrame);
+
+            renderableWorld.update();
+            renderableWorld.generateVBOs();
+            secondsSinceLastFrame = 0;
+        }
+
+        if (stereoRenderState != DefaultRenderingProcess.StereoRenderState.MONO) {
+            playerCamera.updateFrustum();
+        }
+
+        // this line needs to be here as deep down it relies on the camera's frustrum.
+        renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
     }
 
     /**
@@ -311,6 +314,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
                 renderer.renderShadows();
             }
+
+            playerCamera.lookThrough(); // not strictly needed: just defensive programming here.
 
             glEnable(GL_CULL_FACE);
             DefaultRenderingProcess.getInstance().endRenderSceneShadowMap();
@@ -785,10 +790,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     @Override
     public ChunkProvider getChunkProvider() {
         return renderableWorld.getChunkProvider();
-    }
-
-    public Time getTime() {
-        return time;
     }
 
     @Override
