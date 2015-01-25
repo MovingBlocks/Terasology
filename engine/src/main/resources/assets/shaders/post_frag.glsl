@@ -111,7 +111,7 @@ void main() {
 
 #ifdef FILM_GRAIN
     vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
-    finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0f, 1.0f);
+    finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0, 1.0);
 #endif
 
     // In the case the color is > 1.0 or < 0.0 despite tonemapping
