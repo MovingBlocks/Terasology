@@ -343,9 +343,4 @@ public class StorageManagerTest {
 
         assertTrue(character.isActive());
     }
-
-    @Test
-    public void ignoresDestroyOfUnreferencedEntity() {
-        esm.onEntityDestroyed(3);
-    }
 }

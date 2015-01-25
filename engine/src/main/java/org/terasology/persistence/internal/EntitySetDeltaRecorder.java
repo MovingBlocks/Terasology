@@ -83,9 +83,9 @@ class EntitySetDeltaRecorder {
         return entityDelta;
     }
 
-    public void onEntityDestroyed(long entityId) {
-        entityDeltas.remove(entityId);
-        destroyedEntities.add(entityId);
+    public void onEntityDestroyed(EntityRef entity) {
+        entityDeltas.remove(entity.getId());
+        destroyedEntities.add(entity.getId());
     }
 
     public TLongObjectMap<EntityDelta> getEntityDeltas() {
