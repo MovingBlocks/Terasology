@@ -19,12 +19,14 @@ package org.terasology.utilities;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.utilities.procedural.FastNoise;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.utilities.random.FastRandom;
 
 /**
- * A simple test for {@link SimplexNoise}
+ * A few tests for different {@link Noise3D} implementations.
  *
  * @author Martin Steiger
  */
@@ -35,53 +37,46 @@ public class NoiseTest {
     @Test
     public void speedTest() {
         int seed = "asdf".hashCode();
-        int warmUp = 10000;
         int count = 1000000;
-        FastRandom pfr = new FastRandom(seed);
-        FastRandom sfr = new FastRandom(seed);
+        int warmUp = 10000;
 
         PerlinNoise pn = new PerlinNoise(seed);
         SimplexNoise sn = new SimplexNoise(seed);
+        FastNoise fn = new FastNoise(seed);
 
-        for (int i = 0; i < warmUp; i++) {
-            float posX = pfr.nextFloat() * 1000f;
-            float posY = pfr.nextFloat() * 1000f;
-            float posZ = pfr.nextFloat() * 1000f;
-
-            pn.noise(posX, posY, posZ);
-        }
-
-        for (int i = 0; i < warmUp; i++) {
-            float posX = sfr.nextFloat() * 1000f;
-            float posY = sfr.nextFloat() * 1000f;
-            float posZ = sfr.nextFloat() * 1000f;
-
-            sn.noise(posX, posY, posZ);
-        }
+        run(pn, warmUp);
+        run(sn, warmUp);
+        run(fn, warmUp);
 
         long start = System.nanoTime();
 
-        for (int i = 0; i < count; i++) {
-            float posX = pfr.nextFloat() * 1000f;
-            float posY = pfr.nextFloat() * 1000f;
-            float posZ = pfr.nextFloat() * 1000f;
-
-            pn.noise(posX, posY, posZ);
-        }
+        run(pn, count);
 
         logger.info("Perlin Noise : " + (System.nanoTime() - start) / 1000000 + "ms.");
 
         start = System.nanoTime();
 
-        for (int i = 0; i < count; i++) {
-            float posX = sfr.nextFloat() * 1000f;
-            float posY = sfr.nextFloat() * 1000f;
-            float posZ = sfr.nextFloat() * 1000f;
-
-            sn.noise(posX, posY, posZ);
-        }
+        run(sn, count);
 
         logger.info("Simplex Noise : " + (System.nanoTime() - start) / 1000000 + "ms.");
 
+        start = System.nanoTime();
+
+        run(fn, count);
+
+        logger.info("Fast Noise : " + (System.nanoTime() - start) / 1000000 + "ms.");
+
+    }
+
+    private void run(Noise3D noise, int iterations) {
+        FastRandom rng = new FastRandom(23479832);
+
+        for (int i = 0; i < iterations; i++) {
+            float posX = rng.nextFloat() * 1000f;
+            float posY = rng.nextFloat() * 1000f;
+            float posZ = rng.nextFloat() * 1000f;
+
+            noise.noise(posX, posY, posZ);
+        }
     }
 }
