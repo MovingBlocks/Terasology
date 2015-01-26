@@ -61,17 +61,6 @@ public final class Example {
 
     }
 
-    @ActionName("print")
-    public static class Print extends BaseAction {
-        private String msg;
-
-        @Override
-        public BehaviorState modify(Actor actor, BehaviorState result) {
-            System.out.print(msg);
-            return BehaviorState.SUCCESS;
-        }
-    }
-
     @ActionName("delay")
     public static class Delay extends BaseAction {
         private float duration;

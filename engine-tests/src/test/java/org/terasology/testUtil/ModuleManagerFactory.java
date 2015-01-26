@@ -16,7 +16,6 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Sets;
-
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ClasspathModule;
@@ -40,10 +39,7 @@ public final class ModuleManagerFactory {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
         }
-        moduleManager.loadEnvironment(
-                Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name("engine")),
-                        moduleManager.getRegistry().getLatestModuleVersion(new Name("unittest"))), true
-        );
+        moduleManager.loadEnvironment(Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
         return moduleManager;
     }
 }

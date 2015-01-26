@@ -29,8 +29,8 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
+import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.Visitor;
-import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.registry.CoreRegistry;
@@ -66,6 +66,10 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         @Override
         public void onMouseOver(Vector2i pos, boolean topMostElement) {
             mousePos = screenToWorld(pos);
+            if (newNode != null) {
+                Vector2f diff = screenToWorld(pos).sub(newNode.getPosition());
+                newNode.move(diff);
+            }
         }
 
         @Override
@@ -98,6 +102,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         if (selectionBinding != null) {
             selectionBinding.set(null);
         }
+        stateMap.clear();
         removeAll();
         List<RenderableNode> renderables = createRenderables(tree);
         for (RenderableNode widget : renderables) {
@@ -124,7 +129,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
+    public void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
         canvas.addInteractionRegion(moveOver);
         try (SubRegion subRegion = canvas.subRegion(canvas.getRegion(), false)) {
@@ -162,11 +167,12 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
                 drawConnection(canvas, bottomLeft, topLeft, Color.GREEN);
             }
             if (newNode != null) {
-                Vector2i screenStart = worldToScreen(mousePos);
-                Vector2f worldEnd = new Vector2f(mousePos);
-                worldEnd.add(newNode.getSize());
-                Vector2i screenEnd = worldToScreen(worldEnd);
-                canvas.drawWidget(newNode, Rect2i.createFromMinAndMax(screenStart, screenEnd));
+                newNode.visit(new RenderableNode.Visitor() {
+                    @Override
+                    public void visit(RenderableNode node) {
+                        drawWidget(canvas, node);
+                    }
+                });
             }
 
             canvas.setDrawOnTop(false);
@@ -246,37 +252,18 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         return stateMap.get(node);
     }
 
-    /**
-     * copy the given node. the new copy replaces the given one, so you should manipulate the original node, instead of the copy.
-     * This is useful when in interaction listener, especially.
-     */
     public void copyNode(RenderableNode node) {
-//        BehaviorTreeData data = new BehaviorTreeData();
-//        data.setRoot(node.getNode());
-//        BehaviorTreeLoader loader = new BehaviorTreeLoader();
-//        ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
-//
-//        try {
-//            loader.save(os, data);
-//            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null, Collections.<URL>emptyList());
-//            Port.OutputPort parent = node.getInputPort().getTargetPort();
-//            copy.createRenderable();
-//            RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());
-//            addNode(copyRenderable);
-//            RenderableNode nodeToLayout;
-//            if (parent != null && copyRenderable.getInputPort() != null) {
-//                parent.setTarget(copyRenderable.getInputPort());
-//                nodeToLayout = parent.node;
-//            } else {
-//                nodeToLayout = copyRenderable;
-//            }
-//            Vector2f oldPos = nodeToLayout.getPosition();
-//            tree.layout(nodeToLayout);
-//            oldPos.sub(nodeToLayout.getPosition());
-//            nodeToLayout.move(oldPos);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        BehaviorTreeBuilder treeBuilder = CoreRegistry.get(BehaviorTreeBuilder.class);
+        String json = treeBuilder.toJson(node.getNode());
+        BehaviorNode nodeCopy = treeBuilder.fromJson(json);
+        List<RenderableNode> renderables = createRenderables(nodeCopy);
+        if (renderables.size() > 0) {
+            newNode = renderables.get(0);
+            Vector2f oldPos = newNode.getPosition();
+            layout(newNode);
+            oldPos.sub(newNode.getPosition());
+            newNode.move(oldPos);
+        }
     }
 
     private RenderableNode createRenderableNode(BehaviorNode node) {
@@ -287,8 +274,12 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     private List<RenderableNode> createRenderables(BehaviorTree aTree) {
+        return createRenderables(aTree.getRoot());
+    }
+
+    private List<RenderableNode> createRenderables(BehaviorNode root) {
         final List<RenderableNode> renderables = Lists.newArrayList();
-        aTree.getRoot().visit(null, new Visitor<RenderableNode>() {
+        root.visit(null, new Visitor<RenderableNode>() {
             @Override
             public RenderableNode visit(RenderableNode parent, BehaviorNode node) {
                 RenderableNode self = createRenderableNode(node);

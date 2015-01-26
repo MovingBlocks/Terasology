@@ -108,7 +108,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     public BehaviorTree createTree(String name, BehaviorNode root) {
         BehaviorTreeData data = new BehaviorTreeData();
-        data.setRoot(root);
+        data.setRoot(root.deepCopy());
         BehaviorTree behaviorTree = new BehaviorTree(new AssetUri(AssetType.BEHAVIOR, BEHAVIORS, name.replaceAll("\\W+", "")), data);
         trees.add(behaviorTree);
         save(behaviorTree);
