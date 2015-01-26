@@ -94,7 +94,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private WorldRenderingStage currentRenderingStage;
     private boolean isFirstRenderingStageForCurrentFrame;
 
-    private final Time time = CoreRegistry.get(Time.class);
+    private Material chunkShader;
+    private Material lightGeometryShader;
+    private Material simpleShader;
+    private Material shadowMapShader;
+
     private float tick;
     private float secondsSinceLastFrame;
 
@@ -116,7 +120,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
     // TODO: rendering process as constructor input and setRenderingProcess method
-    // TODO: examine the potential to avoid allocation of variables such as Materials
 
     public WorldRendererLwjgl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
                               WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
@@ -233,6 +236,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             renderableWorld.update();
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
+
+            updateMaterials(); // TODO: this should happen only if necessary, i.e. upon notification from the Asset system.
         }
 
         if (currentRenderingStage != WorldRenderingStage.MONO) {
@@ -241,6 +246,17 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
+    }
+
+    /**
+     * This allows for materials to be swapped at runtime, i.e. if a module provides new ones.
+     */
+    private void updateMaterials() {
+        // TODO: review - perhaps only the chunk shader would ever need to be swapped at runtime? All the others could be final?
+        chunkShader         = Assets.getMaterial("engine:prog.chunk");
+        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass");
+        simpleShader        = Assets.getMaterial("engine:prog.simple");
+        shadowMapShader     = Assets.getMaterial("engine:prog.shadowMap");
     }
 
     /**
@@ -319,7 +335,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         backdropRenderer.render(playerCamera);
         playerCamera.lookThrough();
 
-        Material chunkShader = Assets.getMaterial("engine:prog.chunk");
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         if (renderingConfig.isReflectiveWater()) {
@@ -414,30 +429,28 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         /*
         DefaultRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
 
-        Material program = Assets.getMaterial("engine:prog.simple");
-        program.enable();
-        program.setCamera(playerCamera);
+        simple.enable();
+        simple.setCamera(playerCamera);
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
 
             final Vector3f worldPosition = locationComponent.getWorldPosition();
-            renderLightComponent(lightComponent, worldPosition, program, true);
+            renderLightComponent(lightComponent, worldPosition, simple, true);
         }
 
         DefaultRenderingProcess.getInstance().endRenderLightGeometryStencilPass();
         */
 
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
-        Material program = Assets.getMaterial("engine:prog.lightGeometryPass");
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
 
             final Vector3f worldPosition = locationComponent.getWorldPosition();
-            renderLightComponent(lightComponent, worldPosition, program, false);
+            renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
         DefaultRenderingProcess.getInstance().endRenderLightGeometry();
 
@@ -447,7 +460,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
         sunlightWorldPosition.add(playerCamera.getPosition());
-        renderLightComponent(mainDirectionalLight, sunlightWorldPosition, program, false);
+        renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
 
         DefaultRenderingProcess.getInstance().endRenderDirectionalLights();
         PerformanceMonitor.endActivity();
@@ -586,8 +599,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     private void renderChunk(RenderableChunk chunk, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         if (chunk.hasMesh()) {
-            Material shader = null;
-
             final Vector3f cameraPosition = camera.getPosition();
             final Vector3f chunkPositionRelToCamera =
                     new Vector3f(chunk.getPosition().x * ChunkConstants.SIZE_X - cameraPosition.x,
@@ -595,28 +606,27 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                             chunk.getPosition().z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                shader = Assets.getMaterial("engine:prog.chunk");
-                shader.enable();
+                chunkShader.enable();
 
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                    shader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+                    chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
                 } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                    shader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+                    chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
 
-                shader.setFloat3("chunkPositionWorld", chunk.getPosition().x * ChunkConstants.SIZE_X,
+                chunkShader.setFloat3("chunkPositionWorld", chunk.getPosition().x * ChunkConstants.SIZE_X,
                         chunk.getPosition().y * ChunkConstants.SIZE_Y, chunk.getPosition().z * ChunkConstants.SIZE_Z);
-                shader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f);
+                chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f);
 
                 if (mode == ChunkRenderMode.REFLECTION) {
-                    shader.setFloat("clip", camera.getClipHeight());
+                    chunkShader.setFloat("clip", camera.getClipHeight());
                 } else {
-                    shader.setFloat("clip", 0.0f);
+                    chunkShader.setFloat("clip", 0.0f);
                 }
 
             } else if (mode == ChunkRenderMode.SHADOW_MAP) {
-                shader = Assets.getMaterial("engine:prog.shadowMap");
-                shader.enable();
+                shadowMapShader.enable();
+
             } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
                 CoreRegistry.get(ShaderManager.class).disableShader();
             }
@@ -633,23 +643,16 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                         statRenderedTriangles += 12;
                     }
 
-                    if (shader != null) {
-                        shader.enable();
-                    }
-
                     chunk.getMesh()[i].render(phase);
                     statRenderedTriangles += chunk.getMesh()[i].triangleCount();
                 }
             }
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                // eclipse is paranoid about this - it thinks that shader could be null here
-                if (shader != null) {
-                    if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                        shader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-                    } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                        shader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-                    }
+                if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
+                    chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+                } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
+                    chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
             }
 
