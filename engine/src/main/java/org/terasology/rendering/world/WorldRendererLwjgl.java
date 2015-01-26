@@ -96,7 +96,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     private Material chunkShader;
     private Material lightGeometryShader;
-    private Material simpleShader;
+    // private Material simpleShader; // in use by the currently commented out light stencil pass
     private Material shadowMapShader;
 
     private float tick;
@@ -255,7 +255,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         // TODO: review - perhaps only the chunk shader would ever need to be swapped at runtime? All the others could be final?
         chunkShader         = Assets.getMaterial("engine:prog.chunk");
         lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass");
-        simpleShader        = Assets.getMaterial("engine:prog.simple");
+        //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
         shadowMapShader     = Assets.getMaterial("engine:prog.shadowMap");
     }
 
@@ -600,22 +600,22 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private void renderChunk(RenderableChunk chunk, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         if (chunk.hasMesh()) {
             final Vector3f cameraPosition = camera.getPosition();
+            final Vector3f chunkPosition = chunk.getPosition().toVector3f();
             final Vector3f chunkPositionRelToCamera =
-                    new Vector3f(chunk.getPosition().x * ChunkConstants.SIZE_X - cameraPosition.x,
-                            chunk.getPosition().y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                            chunk.getPosition().z * ChunkConstants.SIZE_Z - cameraPosition.z);
+                    new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
+                                 chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
+                                 chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                chunkShader.enable();
-
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
                     chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
                 } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
                     chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
 
-                chunkShader.setFloat3("chunkPositionWorld", chunk.getPosition().x * ChunkConstants.SIZE_X,
-                        chunk.getPosition().y * ChunkConstants.SIZE_Y, chunk.getPosition().z * ChunkConstants.SIZE_Z);
+                chunkShader.setFloat3("chunkPositionWorld", chunkPosition.x * ChunkConstants.SIZE_X,
+                                                            chunkPosition.y * ChunkConstants.SIZE_Y,
+                                                            chunkPosition.z * ChunkConstants.SIZE_Z);
                 chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f);
 
                 if (mode == ChunkRenderMode.REFLECTION) {
@@ -623,6 +623,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 } else {
                     chunkShader.setFloat("clip", 0.0f);
                 }
+
+                chunkShader.enable();
 
             } else if (mode == ChunkRenderMode.SHADOW_MAP) {
                 shadowMapShader.enable();
@@ -632,7 +634,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             }
 
             GL11.glPushMatrix();
-
             GL11.glTranslatef(chunkPositionRelToCamera.x, chunkPositionRelToCamera.y, chunkPositionRelToCamera.z);
 
             for (int i = 0; i < verticalMeshSegments; i++) {
@@ -648,6 +649,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 }
             }
 
+            // TODO: review - moving the deactivateFeature commands to the analog codeblock above doesn't work. Why?
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
                     chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
