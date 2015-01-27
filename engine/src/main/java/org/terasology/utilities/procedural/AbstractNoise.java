@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,21 +17,24 @@
 package org.terasology.utilities.procedural;
 
 /**
- * Provides or generates 3D noise
+ * An abstract implementation of most methods.
+ * The int-based methods delegate to float-bases ones.
  * @author Martin Steiger
- * @deprecated use {@link Noise} instead
  */
-@Deprecated
-public interface Noise3D {
+public abstract class AbstractNoise implements Noise {
 
-    /**
-     * Returns the noise value at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The noise value
-     */
-    float noise(float x, float y, float z);
+    @Override
+    public float noise(int x, int y) {
+        return noise((float) x, (float) y);
+    }
 
+    @Override
+    public float noise(int x, int y, int z) {
+        return noise((float) x, (float) y, (float) z);
+    }
+
+    @Override
+    public float noise(float x, float y) {
+        return noise(x, y, 0);
+    }
 }

@@ -22,8 +22,10 @@ import org.terasology.utilities.random.FastRandom;
  * A simple integer noise table. This can be used for semi-random eventually repeating data - good for low level noise like the positioning of plants.
  *
  * It is based off of the noisePermutation table used by Perlin noise.
+ * @deprecated use {@link WhiteNoise} or {@link DiscreteWhiteNoise} instead
  * @author Immortius
  */
+@Deprecated
 public class NoiseTable {
 
     private final int[] noisePermutations;

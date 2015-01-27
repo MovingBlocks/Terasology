@@ -21,8 +21,10 @@ package org.terasology.utilities.procedural;
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
  *
  * @author Martin Steiger
+ * @deprecated Use {@link BrownianNoise} instead and adjust the scale factor: the new impl. returns [-1..1].
  */
-public class BrownianNoise2D extends BrownianNoise implements Noise2D {
+@Deprecated
+public class BrownianNoise2D extends BrownianNoiseOld implements Noise2D {
 
     private final Noise2D other;
 

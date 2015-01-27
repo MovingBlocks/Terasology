@@ -23,7 +23,7 @@ import org.terasology.utilities.random.FastRandom;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PerlinNoise implements Noise3D {
+public class PerlinNoise extends AbstractNoise {
 
     private final int[] noisePermutations;
 
@@ -88,14 +88,23 @@ public class PerlinNoise implements Noise3D {
         int ba = noisePermutations[b] + zInt;
         int bb = noisePermutations[(b + 1)] + zInt;
 
-        return TeraMath.lerp(TeraMath.lerp(TeraMath.lerp(grad(noisePermutations[aa], x, y, z), grad(noisePermutations[ba], x - 1, y, z), u
-                        ), TeraMath.lerp(grad(noisePermutations[ab], x, y - 1, z), grad(noisePermutations[bb], x - 1, y - 1, z), u
-                        ), v
-                ), TeraMath.lerp(TeraMath.lerp(grad(noisePermutations[(aa + 1)], x, y, z - 1), grad(noisePermutations[(ba + 1)], x - 1, y, z - 1), u
-                        ), TeraMath.lerp(grad(noisePermutations[(ab + 1)], x, y - 1, z - 1), grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1), u
-                        ), v
-                ), w
-        );
+        float gradAA = grad(noisePermutations[aa], x, y, z);
+        float gradBA = grad(noisePermutations[ba], x - 1, y, z);
+
+        float gradAB = grad(noisePermutations[ab], x, y - 1, z);
+        float gradBB = grad(noisePermutations[bb], x - 1, y - 1, z);
+
+        float val1 = TeraMath.lerp(TeraMath.lerp(gradAA, gradBA, u), TeraMath.lerp(gradAB, gradBB, u), v);
+
+        float gradAA1 = grad(noisePermutations[(aa + 1)], x, y, z - 1);
+        float gradBA1 = grad(noisePermutations[(ba + 1)], x - 1, y, z - 1);
+
+        float gradAB1 = grad(noisePermutations[(ab + 1)], x, y - 1, z - 1);
+        float gradBB1 = grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1);
+
+        float val2 = TeraMath.lerp(TeraMath.lerp(gradAA1, gradBA1, u), TeraMath.lerp(gradAB1, gradBB1, u), v);
+
+        return TeraMath.lerp(val1, val2, w);
     }
 
     private static float grad(int hash, float x, float y, float z) {

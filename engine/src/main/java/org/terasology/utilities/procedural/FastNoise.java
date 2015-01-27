@@ -24,7 +24,9 @@ import org.terasology.math.TeraMath;
  * for most applications.
  * Noise is created at discrete intervals only, i.e. noise(3.4) == noise(2.6) == noise(2).
  * @author Martin Steiger
+ * @deprecated Use {@link WhiteNoise} or {@link DiscreteWhiteNoise} instead. They are superior in every aspect.
  */
+@Deprecated
 public class FastNoise implements Noise2D, Noise3D {
 
     private final NoiseTable table1;
