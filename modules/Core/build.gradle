@@ -219,7 +219,7 @@ task createSkeleton() {
 
 task cacheReflections {
     description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files project.classes.outputs.files
+    inputs.files sourceSets.main.output
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
     doFirst {
