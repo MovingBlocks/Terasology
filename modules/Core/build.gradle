@@ -219,14 +219,16 @@ task createSkeleton() {
 
 task cacheReflections {
     description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files sourceSets.main.output
+    // TODO: The extra "org" qualifier excludes test classes otherwise sucked up in Jenkins, causing issues. Redo later
+    File dirToReflect = new File(sourceSets.main.output.classesDir, "org")
+    inputs.files dirToReflect
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
     doFirst {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-        file(sourceSets.main.output.classesDir.toString()).mkdirs()
+        dirToReflect.mkdirs()
         Reflections reflections = new ConfigurationBuilder()
-                .addUrls(sourceSets.main.output.classesDir.toURI().toURL())
+                .addUrls(dirToReflect.toURI().toURL())
                 .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
                 .build()
         reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
