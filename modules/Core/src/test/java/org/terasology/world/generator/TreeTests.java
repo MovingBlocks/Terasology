@@ -19,6 +19,7 @@ package org.terasology.world.generator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +54,16 @@ public class TreeTests {
 
         BlockManager blockManager = Mockito.mock(BlockManager.class);
         Block air = BlockManager.getAir();
-        BlockUri any = Mockito.any();
-        Mockito.when(blockManager.getBlock(any)).thenReturn(air);
+
+        Mockito.when(blockManager.getBlock(Matchers.<BlockUri>any())).thenReturn(air);
+        Mockito.when(blockManager.getBlock(Matchers.<String>any())).thenReturn(air);
 
         CoreRegistry.putPermanently(BlockManager.class, blockManager);
     }
 
     @Test
     public void testBirchDims() {
-        Assert.assertEquals(new Vector3i(22, 32, 22), estimateExtent(Trees.birkTree()));
+        Assert.assertEquals(new Vector3i(22, 32, 22), estimateExtent(Trees.birchTree()));
     }
 
     @Test
@@ -98,8 +100,8 @@ public class TreeTests {
     private Vector3i computeAABB(TreeGenerator treeGen, long seed) {
         Vector3i pos = new Vector3i(ChunkConstants.SIZE_X / 2, 0, ChunkConstants.SIZE_Z / 2);
 
-        Vector3i min = new Vector3i(pos);
-        Vector3i max = new Vector3i(pos);
+        final Vector3i min = new Vector3i(pos);
+        final Vector3i max = new Vector3i(pos);
 
         Rect2i chunks = Rect2i.createFromMinAndMax(-1, -1, 1, 1);
         for (Vector2i chunkPos : chunks) {
