@@ -1,6 +1,6 @@
 {
     "id" : "Core",
-    "version" : "0.47.1",
+    "version" : "0.48.0",
     "displayName" : "Core Gameplay",
     "description" : "This mandatory module introduces the core Terasology mechanics",
     "isGameplay" : "true",
