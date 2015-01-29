@@ -23,7 +23,7 @@ import org.terasology.utilities.random.FastRandom;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PerlinNoise extends AbstractNoise {
+public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     private final int[] noisePermutations;
 
