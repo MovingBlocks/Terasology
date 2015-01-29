@@ -18,7 +18,7 @@ package org.terasology.utilities;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.terasology.utilities.procedural.FastNoise;
+import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.utilities.random.FastRandom;
 
 /**
@@ -26,14 +26,14 @@ import org.terasology.utilities.random.FastRandom;
  *
  * @author Martin Steiger
  */
-public class FastNoiseTest {
+public class WhiteNoiseTest {
 
     @Test
     public void distributionTest() {
         FastRandom rng = new FastRandom(0xBEEF);
-        FastNoise noiseGen = new FastNoise(0xDEADC0DE);
+        WhiteNoise noiseGen = new WhiteNoise(0xDEADC0DE);
 
-        int count = 1000000;
+        int count = 100000;
         int bucketCount = 20;
         int[] buckets = new int[bucketCount];
 
@@ -42,7 +42,7 @@ public class FastNoiseTest {
             float posY = rng.nextFloat() * 100f;
             float posZ = rng.nextFloat() * 100f;
 
-            float noise = noiseGen.noise(posX, posY, posZ);
+            float noise = 0.5f + 0.5f * noiseGen.noise(posX, posY, posZ);
             int idx = (int) (noise * bucketCount);
             if (idx == bucketCount) {
                 idx = bucketCount - 1;
@@ -58,25 +58,5 @@ public class FastNoiseTest {
             Assert.assertTrue(val < 0.05);
         }
     }
-
-    @Test
-    public void resolutionTest() {
-        FastRandom rng = new FastRandom(0xBEEF);
-        FastNoise noiseGen = new FastNoise(0xDEADC0DE);
-
-        int count = 1000000;
-
-        for (int i = 0; i < count; i++) {
-            float posX = rng.nextFloat() * 100f;
-            float posY = rng.nextFloat() * 100f;
-            float posZ = rng.nextFloat() * 100f;
-
-            float noise = noiseGen.noise(posX, posY, posZ);
-            if (noise > 0 && noise < 0.00005) {
-                return;
-            }
-        }
-
-        Assert.fail();
-    }
 }
+
