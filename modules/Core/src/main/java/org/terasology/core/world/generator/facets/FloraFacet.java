@@ -15,16 +15,17 @@
  */
 package org.terasology.core.world.generator.facets;
 
+import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.math.Region3i;
 import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseBooleanFieldFacet3D;
+import org.terasology.world.generation.facets.base.SparseObjectFacet3D;
 
 /**
  * Stores where plants can be placed
  */
-public class PlantFacet extends BaseBooleanFieldFacet3D {
+public class FloraFacet extends SparseObjectFacet3D<FloraType> {
 
-    public PlantFacet(Region3i targetRegion, Border3D border) {
+    public FloraFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }

@@ -15,37 +15,76 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
-import org.terasology.core.world.generator.facets.PlantFacet;
+import java.util.List;
+import java.util.Map;
+
+import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.utilities.procedural.FastNoise;
+import org.terasology.utilities.procedural.NoiseTable;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius
  */
 public class FloraRasterizer implements WorldRasterizer {
 
-    private Block tallGrass;
+    private final Map<FloraType, List<Block>> flora = Maps.newEnumMap(FloraType.class);
 
     @Override
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        tallGrass = blockManager.getBlock("core:TallGrass1");
+
+        flora.put(FloraType.GRASS, ImmutableList.<Block>of(
+                blockManager.getBlock("core:TallGrass1"),
+                blockManager.getBlock("core:TallGrass2"),
+                blockManager.getBlock("core:TallGrass3")));
+
+        flora.put(FloraType.FLOWER, ImmutableList.<Block>of(
+                blockManager.getBlock("core:Dandelion"),
+                blockManager.getBlock("core:Glowbell"),
+                blockManager.getBlock("core:Iris"),
+                blockManager.getBlock("core:Lavender"),
+                blockManager.getBlock("core:RedClover"),
+                blockManager.getBlock("core:RedFlower"),
+                blockManager.getBlock("core:Tulip"),
+                blockManager.getBlock("core:YellowFlower")));
+
+        flora.put(FloraType.MUSHROOM, ImmutableList.<Block>of(
+                blockManager.getBlock("core:BigBrownShroom"),
+                blockManager.getBlock("core:BrownShroom"),
+                blockManager.getBlock("core:RedShroom")));
     }
 
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
-        PlantFacet facet = chunkRegion.getFacet(PlantFacet.class);
-        SeaLevelFacet seaLevel = chunkRegion.getFacet(SeaLevelFacet.class);
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            if (pos.y + chunk.getChunkWorldOffsetY() > seaLevel.getSeaLevel() && facet.get(pos)) {
-                chunk.setBlock(pos, tallGrass);
+        FloraFacet facet = chunkRegion.getFacet(FloraFacet.class);
+        Block air = BlockManager.getAir();
+
+        NoiseTable noise = new NoiseTable(chunk.getPosition().hashCode());
+
+        Map<Vector3i, FloraType> entries = facet.getRelativeEntries();
+        for (Vector3i pos : entries.keySet()) {
+
+            // check if some other rasterizer has already placed something here
+            if (chunk.getBlock(pos).equals(air)) {
+
+                FloraType type = entries.get(pos);
+                List<Block> list = flora.get(type);
+                int blockIdx = noise.noise(pos.x, pos.y, pos.z) % list.size();
+                Block block = list.get(blockIdx);
+                chunk.setBlock(pos, block);
             }
         }
     }

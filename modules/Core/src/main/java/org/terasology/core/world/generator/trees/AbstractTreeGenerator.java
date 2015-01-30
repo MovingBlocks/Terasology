@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.utilities.random.Random;
+package org.terasology.core.world.generator.trees;
+
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 
 /**
- * Cactus generator.
+ * Object generators are used to generate objects like trees etc.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TreeGeneratorCactus extends TreeGenerator {
+public abstract class AbstractTreeGenerator implements TreeGenerator {
 
-    private Block cactus;
-
-    @Override
-    public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
-        for (int y = posY; y < posY + 3; y++) {
-            safelySetBlock(view, posX, y, posZ, cactus);
+    protected void safelySetBlock(CoreChunk chunk, int x, int y, int z, Block block) {
+        if (ChunkConstants.CHUNK_REGION.encompasses(x, y, z)) {
+            chunk.setBlock(x, y, z, block);
         }
-    }
-
-    public TreeGenerator setTrunkType(Block b) {
-        cactus = b;
-        return this;
     }
 }
