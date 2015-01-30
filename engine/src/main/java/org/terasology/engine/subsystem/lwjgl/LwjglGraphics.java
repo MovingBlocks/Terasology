@@ -254,18 +254,18 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().OpenGL12,
                 GLContext.getCapabilities().OpenGL14,
                 GLContext.getCapabilities().OpenGL15,
-                GLContext.getCapabilities().GL_ARB_framebuffer_object,
-                GLContext.getCapabilities().GL_ARB_texture_float,
-                GLContext.getCapabilities().GL_ARB_half_float_pixel,
-                GLContext.getCapabilities().GL_ARB_shader_objects};
+                GLContext.getCapabilities().OpenGL20,
+                GLContext.getCapabilities().GL_ARB_framebuffer_object,  // Extensions eventually included in
+                GLContext.getCapabilities().GL_ARB_texture_float,       // OpenGl 3.0 according to
+                GLContext.getCapabilities().GL_ARB_half_float_pixel};   // http://en.wikipedia.org/wiki/OpenGL#OpenGL_3.0
 
         String[] capabilityNames = {"OpenGL12",
                                     "OpenGL14",
                                     "OpenGL15",
+                                    "OpenGL20",
                                     "GL_ARB_framebuffer_object",
                                     "GL_ARB_texture_float",
-                                    "GL_ARB_half_float_pixel",
-                                    "GL_ARB_shader_objects"};
+                                    "GL_ARB_half_float_pixel"};
 
         boolean canRunTheGame = true;
         String missingCapabilitiesMessage = "";
