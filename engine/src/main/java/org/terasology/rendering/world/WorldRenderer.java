@@ -33,8 +33,8 @@ public interface WorldRenderer {
 
     public enum WorldRenderingStage {
         MONO,
-        OCULUS_LEFT_EYE,
-        OCULUS_RIGHT_EYE
+        LEFT_EYE,
+        RIGHT_EYE
     }
 
     Camera getActiveCamera();

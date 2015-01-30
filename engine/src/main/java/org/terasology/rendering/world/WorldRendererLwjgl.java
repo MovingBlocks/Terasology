@@ -22,7 +22,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -130,7 +129,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         if (renderingConfig.isOculusVrSupport()) {
             playerCamera = new OculusStereoCamera();
-            currentRenderingStage = WorldRenderingStage.OCULUS_LEFT_EYE;
+            currentRenderingStage = WorldRenderingStage.LEFT_EYE;
 
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
@@ -139,6 +138,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         localPlayerSystem.setPlayerCamera(playerCamera);
 
         initMainDirectionalLight();
+        initMaterials();
 
         renderableWorld = new RenderableWorldImpl(worldProvider, chunkProvider, bufferPool, playerCamera, shadowMapCamera);
         renderQueues = renderableWorld.getRenderQueues();
@@ -151,6 +151,13 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         mainDirectionalLight.lightAmbientIntensity = 1.0f;
         mainDirectionalLight.lightDiffuseIntensity = 2.0f;
         mainDirectionalLight.lightSpecularIntensity = 0.0f;
+    }
+
+    private void initMaterials() {
+        chunkShader         = Assets.getMaterial("engine:prog.chunk");
+        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass");
+        //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
+        shadowMapShader     = Assets.getMaterial("engine:prog.shadowMap");
     }
 
     @Override
@@ -217,7 +224,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private void preRenderUpdate(WorldRenderingStage renderingStage) {
 
         currentRenderingStage = renderingStage;
-        if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.LEFT_EYE) {
             isFirstRenderingStageForCurrentFrame = true;
         } else {
             isFirstRenderingStageForCurrentFrame = false;
@@ -236,8 +243,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             renderableWorld.update();
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
-
-            updateMaterials(); // TODO: this should happen only if necessary, i.e. upon notification from the Asset system.
         }
 
         if (currentRenderingStage != WorldRenderingStage.MONO) {
@@ -246,17 +251,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
-    }
-
-    /**
-     * This allows for materials to be swapped at runtime, i.e. if a module provides new ones.
-     */
-    private void updateMaterials() {
-        // TODO: review - perhaps only the chunk shader would ever need to be swapped at runtime? All the others could be final?
-        chunkShader         = Assets.getMaterial("engine:prog.chunk");
-        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass");
-        //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
-        shadowMapShader     = Assets.getMaterial("engine:prog.shadowMap");
     }
 
     /**

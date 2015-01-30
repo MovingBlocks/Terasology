@@ -854,8 +854,8 @@ public class DefaultRenderingProcess {
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Rendering final scene");
-        if (worldRenderingStage == WorldRenderingStage.OCULUS_LEFT_EYE
-                || worldRenderingStage == WorldRenderingStage.OCULUS_RIGHT_EYE
+        if (worldRenderingStage == WorldRenderingStage.LEFT_EYE
+                || worldRenderingStage == WorldRenderingStage.RIGHT_EYE
                 || (worldRenderingStage == WorldRenderingStage.MONO && takeScreenshot)) {
 
             renderFinalSceneToRT(worldRenderingStage);
@@ -866,7 +866,7 @@ public class DefaultRenderingProcess {
         }
 
         if (worldRenderingStage == WorldRenderingStage.MONO
-                || worldRenderingStage == WorldRenderingStage.OCULUS_RIGHT_EYE) {
+                || worldRenderingStage == WorldRenderingStage.RIGHT_EYE) {
             renderFinalScene();
         }
         PerformanceMonitor.endActivity();
@@ -885,7 +885,7 @@ public class DefaultRenderingProcess {
 
         bindFbo("sceneFinal");
 
-        if (renderingStage == WorldRenderingStage.MONO || renderingStage == WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderingStage.MONO || renderingStage == WorldRenderingStage.LEFT_EYE) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
@@ -893,10 +893,10 @@ public class DefaultRenderingProcess {
             case MONO:
                 renderFullscreenQuad(0, 0, rtFullWidth, rtFullHeight);
                 break;
-            case OCULUS_LEFT_EYE:
+            case LEFT_EYE:
                 renderFullscreenQuad(0, 0, rtFullWidth / 2, rtFullHeight);
                 break;
-            case OCULUS_RIGHT_EYE:
+            case RIGHT_EYE:
                 renderFullscreenQuad(rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight);
                 break;
         }
@@ -915,7 +915,7 @@ public class DefaultRenderingProcess {
         program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
                 OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3], true);
 
-        float ocLensCenter = (renderingStage == WorldRenderingStage.OCULUS_RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
+        float ocLensCenter = (renderingStage == WorldRenderingStage.RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 
         program.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f, true);
         program.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f, true);
@@ -934,7 +934,7 @@ public class DefaultRenderingProcess {
             material = Assets.getMaterial("engine:prog.ocDistortion");
             material.enable();
 
-            updateOcShaderParametersForVP(material, 0, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.OCULUS_LEFT_EYE);
+            updateOcShaderParametersForVP(material, 0, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.LEFT_EYE);
         } else {
             if (config.getRendering().getDebug().isEnabled()) {
                 material = Assets.getMaterial("engine:prog.debug");
@@ -948,7 +948,7 @@ public class DefaultRenderingProcess {
         renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), org.lwjgl.opengl.Display.getHeight());
 
         if (config.getRendering().isOculusVrSupport()) {
-            updateOcShaderParametersForVP(material, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.OCULUS_RIGHT_EYE);
+            updateOcShaderParametersForVP(material, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.RIGHT_EYE);
 
             renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), Display.getHeight());
         }

@@ -78,9 +78,9 @@ public class OculusStereoCamera extends Camera {
     public ViewFrustum getViewFrustum() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             return viewFrustumLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             return viewFrustumRightEye;
         }
 
@@ -90,9 +90,9 @@ public class OculusStereoCamera extends Camera {
     public ViewFrustum getViewFrustumReflected() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             return viewFrustumReflectedLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             return viewFrustumReflectedRightEye;
         }
 
@@ -102,9 +102,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             return viewProjectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             return viewProjectionMatrixRightEye;
         }
 
@@ -114,12 +114,12 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getViewMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             if (!isReflected()) {
                 return viewMatrixLeftEye;
             }
             return viewMatrixReflectedLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             if (!isReflected()) {
                 return viewMatrixRightEye;
             }
@@ -132,9 +132,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             return projectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             return projectionMatrixRightEye;
         }
 
@@ -144,9 +144,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getInverseProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             return inverseProjectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             return inverseProjectionMatrixRightEye;
         }
 
@@ -156,9 +156,9 @@ public class OculusStereoCamera extends Camera {
     public Matrix4f getInverseViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_LEFT_EYE) {
+        if (renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             return inverseViewProjectionMatrixLeftEye;
-        } else if (renderingStage == WorldRenderer.WorldRenderingStage.OCULUS_RIGHT_EYE) {
+        } else if (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
             return inverseViewProjectionMatrixRightEye;
         }
 

@@ -194,8 +194,8 @@ public class StateIngame implements GameState {
             if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
                 worldRenderer.render(WorldRenderingStage.MONO);
             } else {
-                worldRenderer.render(WorldRenderingStage.OCULUS_LEFT_EYE);
-                worldRenderer.render(WorldRenderingStage.OCULUS_RIGHT_EYE);
+                worldRenderer.render(WorldRenderingStage.LEFT_EYE);
+                worldRenderer.render(WorldRenderingStage.RIGHT_EYE);
             }
         }
 
