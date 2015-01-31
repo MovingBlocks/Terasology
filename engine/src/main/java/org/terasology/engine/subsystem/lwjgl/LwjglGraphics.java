@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,12 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.ContextAttribs;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.KHRDebugCallback;
 import org.newdawn.slick.opengl.ImageIOImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,18 +71,11 @@ import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
 
@@ -284,8 +282,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     private String completeErrorMessage(String errorMessage) {
-
-        String completeErrorMessage = "\n" +
+        return "\n" +
                 "\nThe following OpenGL versions/extensions are required but are not supported by your GPU driver:\n" +
                 "\n" +
                 errorMessage +
@@ -298,8 +295,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "\n" +
                 "Try updating the driver to the latest version available.\n" +
                 "If that fails you might need to use a different GPU (graphics card). Sorry!\n";
-
-        return completeErrorMessage;
     }
 
     public void initOpenGLParams() {
