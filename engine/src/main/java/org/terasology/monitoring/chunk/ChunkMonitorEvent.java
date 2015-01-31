@@ -98,7 +98,7 @@ public abstract class ChunkMonitorEvent {
 
         public final ChunkMeshInfo meshInfo;
 
-        public Tessellated(Vector3i position, ChunkMesh[] mesh) {
+        public Tessellated(Vector3i position, ChunkMesh mesh) {
             super(position);
             this.meshInfo = new ChunkMeshInfo(mesh);
         }

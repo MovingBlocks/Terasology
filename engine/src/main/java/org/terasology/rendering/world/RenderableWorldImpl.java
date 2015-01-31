@@ -57,8 +57,6 @@ public class RenderableWorldImpl implements RenderableWorld {
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private final int maxChunksForShadows = TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
-    private final int verticalChunkMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-    private final int chunkYsizeToSegmentsRatio = ChunkConstants.SIZE_Y / verticalChunkMeshSegments;
 
     private final WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
@@ -131,7 +129,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         chunkProvider.beginUpdate();
 
         RenderableChunk chunk;
-        ChunkMesh[] newMesh = new ChunkMesh[verticalChunkMeshSegments];
+        ChunkMesh newMesh;
         ChunkView localView;
         for (Vector3i chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
             chunk = chunkProvider.getChunk(chunkCoordinates);
@@ -144,15 +142,11 @@ public class RenderableWorldImpl implements RenderableWorld {
                 }
                 chunk.setDirty(false);
 
-                for (int segment = 0; segment < verticalChunkMeshSegments; segment++) {
-                    newMesh[segment] = chunkTessellator.generateMesh(localView, chunkYsizeToSegmentsRatio, segment * chunkYsizeToSegmentsRatio);
-                    newMesh[segment].generateVBOs();
-                }
+                newMesh = chunkTessellator.generateMesh(localView, ChunkConstants.SIZE_Y, 0);
+                newMesh.generateVBOs();
 
                 if (chunk.hasMesh()) {
-                    for (ChunkMesh mesh : chunk.getMesh()) {
-                        mesh.dispose();
-                    }
+                    chunk.getMesh().dispose();
                 }
                 chunk.setMesh(newMesh);
 
@@ -255,24 +249,23 @@ public class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void generateVBOs() {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
+        ChunkMesh pendingMesh;
+        ChunkMesh mesh;
         chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
         for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
-            if (chunksInProximityOfCamera.contains(chunk) && chunk.hasPendingMesh()) {
-                for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
-                    pendingMesh.generateVBOs();
-                }
+
+            if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
+                pendingMesh = chunk.getPendingMesh();
+                pendingMesh.generateVBOs();
                 if (chunk.hasMesh()) {
-                    for (ChunkMesh mesh: chunk.getMesh()) {
-                        mesh.dispose();
-                    }
+                    chunk.getMesh().dispose();
                 }
-                chunk.setMesh(chunk.getPendingMesh());
+                chunk.setMesh(pendingMesh);
                 chunk.setPendingMesh(null);
+
             } else {
                 if (chunk.hasPendingMesh()) {
-                    for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
-                        pendingMesh.dispose();
-                    }
+                    chunk.getPendingMesh().dispose();
                     chunk.setPendingMesh(null);
                 }
             }
@@ -292,7 +285,7 @@ public class RenderableWorldImpl implements RenderableWorld {
 
         int processedChunks = 0;
         int chunkCounter = 0;
-        ChunkMesh[] mesh;
+        ChunkMesh mesh;
         RenderableChunk chunk;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
         Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
@@ -358,16 +351,12 @@ public class RenderableWorldImpl implements RenderableWorld {
         return processedChunks;
     }
 
-    private int triangleCount(ChunkMesh[] mesh, ChunkMesh.RenderPhase renderPhase) {
-        int count = 0;
-
+    private int triangleCount(ChunkMesh mesh, ChunkMesh.RenderPhase renderPhase) {
         if (mesh != null) {
-            for (ChunkMesh subMesh : mesh) {
-                count += subMesh.triangleCount(renderPhase);
-            }
+            return mesh.triangleCount(renderPhase);
+        } else {
+            return 0;
         }
-
-        return count;
     }
 
     @Override

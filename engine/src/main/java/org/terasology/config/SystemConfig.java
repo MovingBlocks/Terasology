@@ -22,7 +22,6 @@ package org.terasology.config;
 public class SystemConfig {
     private long dayNightLengthInMs = 1800000;
     private int maxThreads = 2;
-    private int verticalChunkMeshSegments = 1;
     private int maxSecondsBetweenSaves = 60;
     private int maxUnloadedChunksPercentageTillSave = 40;
     private boolean debugEnabled;
@@ -42,14 +41,6 @@ public class SystemConfig {
 
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
-    }
-
-    public int getVerticalChunkMeshSegments() {
-        return verticalChunkMeshSegments;
-    }
-
-    public void setVerticalChunkMeshSegments(int verticalChunkMeshSegments) {
-        this.verticalChunkMeshSegments = verticalChunkMeshSegments;
     }
 
     public int getMaxSecondsBetweenSaves() {

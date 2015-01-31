@@ -137,8 +137,6 @@ public final class ChunkMeshUpdateManager {
 
     private static class ChunkUpdateTask implements ChunkTask {
 
-        private final int numberOfMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-
         private RenderableChunk c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
@@ -168,17 +166,14 @@ public final class ChunkMeshUpdateManager {
 
         @Override
         public void run() {
-            ChunkMesh[] newMeshes = new ChunkMesh[numberOfMeshSegments];
+            ChunkMesh newMesh;
             ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
             if (chunkView != null) {
                 c.setDirty(false);
-                int meshHeight = ChunkConstants.SIZE_Y / numberOfMeshSegments;
-                for (int seg = 0; seg < numberOfMeshSegments; seg++) {
-                    newMeshes[seg] = tessellator.generateMesh(chunkView, meshHeight, seg * (ChunkConstants.SIZE_Y / numberOfMeshSegments));
-                }
+                newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
 
-                c.setPendingMesh(newMeshes);
-                ChunkMonitor.fireChunkTessellated(c.getPosition(), newMeshes);
+                c.setPendingMesh(newMesh);
+                ChunkMonitor.fireChunkTessellated(c.getPosition(), newMesh);
 
             }
             chunkMeshUpdateManager.finishedProcessing(c);

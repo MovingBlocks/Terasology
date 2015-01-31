@@ -65,9 +65,6 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
-    private final int verticalChunkMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-    private final int chunkHalfHeight = ChunkConstants.SIZE_Y / verticalChunkMeshSegments / 2;
-
     private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;
@@ -95,9 +92,8 @@ public class ChunkImpl implements Chunk {
     private boolean animated;
 
     // Rendering
-    private ChunkMesh[] activeMesh;
-    private ChunkMesh[] pendingMesh;
-    private AABB[] subMeshAABB;
+    private ChunkMesh activeMesh;
+    private ChunkMesh pendingMesh;
     private boolean adjacentChunksReady;
 
     public ChunkImpl(int x, int y, int z) {
@@ -471,12 +467,12 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setMesh(ChunkMesh[] mesh) {
+    public void setMesh(ChunkMesh mesh) {
         this.activeMesh = mesh;
     }
 
     @Override
-    public void setPendingMesh(ChunkMesh[] mesh) {
+    public void setPendingMesh(ChunkMesh mesh) {
         this.pendingMesh = mesh;
     }
 
@@ -501,29 +497,13 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public ChunkMesh[] getMesh() {
+    public ChunkMesh getMesh() {
         return activeMesh;
     }
 
     @Override
-    public ChunkMesh[] getPendingMesh() {
+    public ChunkMesh getPendingMesh() {
         return pendingMesh;
-    }
-
-    @Override
-    public AABB getSubMeshAABB(int subMesh) {
-        if (subMeshAABB == null) {
-            subMeshAABB = new AABB[verticalChunkMeshSegments];
-
-            for (int i = 0; i < subMeshAABB.length; i++) {
-                Vector3f dimensions = new Vector3f(8, chunkHalfHeight, 8);
-                Vector3f position = new Vector3f(getChunkWorldOffsetX() - 0.5f, (i * chunkHalfHeight * 2) - 0.5f, getChunkWorldOffsetZ() - 0.5f);
-                position.add(dimensions);
-                subMeshAABB[i] = AABB.createCenterExtent(position, dimensions);
-            }
-        }
-
-        return subMeshAABB[subMesh];
     }
 
     @Override
@@ -545,12 +525,7 @@ public class ChunkImpl implements Chunk {
     public void dispose() {
         disposed = true;
         ready = false;
-        if (activeMesh != null) {
-            for (ChunkMesh chunkMesh : activeMesh) {
-                chunkMesh.dispose();
-            }
-            activeMesh = null;
-        }
+        disposeMesh();
         lightData = null;
         sunlightData = null;
         sunlightRegenData = null;
@@ -560,9 +535,7 @@ public class ChunkImpl implements Chunk {
     @Override
     public void disposeMesh() {
         if (activeMesh != null) {
-            for (ChunkMesh chunkMesh : activeMesh) {
-                chunkMesh.dispose();
-            }
+            activeMesh.dispose();
             activeMesh = null;
         }
     }

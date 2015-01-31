@@ -27,32 +27,25 @@ public class ChunkMeshInfo {
     public final int totalTimeToGenerateBlockVertices;
     public final int totalTimeToGenerateOptimizedBuffers;
 
-    public ChunkMeshInfo(ChunkMesh[] mesh) {
+    public ChunkMeshInfo(ChunkMesh mesh) {
         checkNotNull(mesh, "The parameter 'mesh' must not be null");
 
         int vertices = 0;
         int indices = 0;
-        int timeToGenerateBlockVertices = 0;
-        int timeToGenerateOptimizedBuffers = 0;
 
-        for (int i = 0; i < mesh.length; i++) {
-            final ChunkMesh segment = checkNotNull(mesh[i], "Chunk mesh segment #" + i + " must not be null");
-            if (!segment.isGenerated()) {
-                for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
-                    final ChunkMesh.VertexElements element = segment.getVertexElements(type);
-                    vertices += element.finalVertices.limit();
-                    indices += element.finalIndices.limit();
-                }
+        if (!mesh.isGenerated()) {
+            for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
+                final ChunkMesh.VertexElements element = mesh.getVertexElements(type);
+                vertices += element.finalVertices.limit();
+                indices += element.finalIndices.limit();
             }
-            timeToGenerateBlockVertices += segment.getTimeToGenerateBlockVertices();
-            timeToGenerateOptimizedBuffers += segment.getTimeToGenerateOptimizedBuffers();
         }
 
         this.totalFinalVertices = vertices;
         this.totalFinalIndices = indices;
         this.totalTriangles = indices / 3;
-        this.totalTimeToGenerateBlockVertices = timeToGenerateBlockVertices;
-        this.totalTimeToGenerateOptimizedBuffers = timeToGenerateOptimizedBuffers;
+        this.totalTimeToGenerateBlockVertices = mesh.getTimeToGenerateBlockVertices();
+        this.totalTimeToGenerateOptimizedBuffers = mesh.getTimeToGenerateOptimizedBuffers();
     }
 }
 

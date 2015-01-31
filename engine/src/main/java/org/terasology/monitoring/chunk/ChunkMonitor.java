@@ -87,7 +87,7 @@ public final class ChunkMonitor {
         post(new ChunkMonitorEvent.Deflated(chunk.getPosition(), oldSize, newSize));
     }
 
-    public static void fireChunkTessellated(Vector3i chunkPos, ChunkMesh[] mesh) {
+    public static void fireChunkTessellated(Vector3i chunkPos, ChunkMesh mesh) {
         Preconditions.checkNotNull(chunkPos, "The parameter 'chunkPos' must not be null");
         post(new ChunkMonitorEvent.Tessellated(chunkPos, mesh));
     }

@@ -31,9 +31,9 @@ public interface RenderableChunk extends LitChunk {
 
     AABB getAABB();
 
-    void setMesh(ChunkMesh[] mesh);
+    void setMesh(ChunkMesh newMesh);
 
-    void setPendingMesh(ChunkMesh[] mesh);
+    void setPendingMesh(ChunkMesh newPendingMesh);
 
     void setAnimated(boolean animated);
 
@@ -43,11 +43,9 @@ public interface RenderableChunk extends LitChunk {
 
     boolean hasPendingMesh();
 
-    ChunkMesh[] getMesh();
+    ChunkMesh getMesh();
 
-    ChunkMesh[] getPendingMesh();
-
-    AABB getSubMeshAABB(int subMesh);
+    ChunkMesh getPendingMesh();
 
     void disposeMesh();
 

@@ -73,8 +73,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
-    private final int verticalMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-
     private final BackdropRenderer backdropRenderer;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
@@ -630,18 +628,17 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             GL11.glPushMatrix();
             GL11.glTranslatef(chunkPositionRelToCamera.x, chunkPositionRelToCamera.y, chunkPositionRelToCamera.z);
 
-            for (int i = 0; i < verticalMeshSegments; i++) {
-                if (!chunk.getMesh()[i].isEmpty()) {
-                    if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
-                        AABBRenderer aabbRenderer = new AABBRenderer(chunk.getSubMeshAABB(i));
-                        aabbRenderer.renderLocally(1f);
-                        statRenderedTriangles += 12;
-                    }
-
-                    chunk.getMesh()[i].render(phase);
-                    statRenderedTriangles += chunk.getMesh()[i].triangleCount();
+            if (chunk.hasMesh()) {
+                if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
+                    AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
+                    aabbRenderer.renderLocally(1f);
+                    statRenderedTriangles += 12;
                 }
+
+                chunk.getMesh().render(phase);
+                statRenderedTriangles += chunk.getMesh().triangleCount();
             }
+
 
             // TODO: review - moving the deactivateFeature commands to the analog codeblock above doesn't work. Why?
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
