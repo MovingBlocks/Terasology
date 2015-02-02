@@ -32,8 +32,8 @@ public class WhiteNoise implements Noise {
      *
      * @param seed The seed to use
      */
-    public WhiteNoise(int seed) {
-        this.seed = seed ^ 780291637; // flip some bits
+    public WhiteNoise(long seed) {
+        this.seed = (int) (seed ^ 780291637); // flip some bits
     }
 
     @Override
@@ -83,6 +83,14 @@ public class WhiteNoise implements Noise {
     public float noise(int x) {
         float noise = intNoise(x);
         return noise / Integer.MAX_VALUE;
+    }
+
+    public int intNoise(int x, int y) {
+        return intNoise(intNoise(x) + y);
+    }
+
+    public int intNoise(int x, int y, int z) {
+        return intNoise(intNoise(intNoise(x) + y) + z);
     }
 
     /**

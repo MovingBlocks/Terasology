@@ -21,13 +21,9 @@ import java.util.Map;
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.procedural.FastNoise;
-import org.terasology.utilities.procedural.NoiseTable;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
+import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
@@ -72,7 +68,7 @@ public class FloraRasterizer implements WorldRasterizer {
         FloraFacet facet = chunkRegion.getFacet(FloraFacet.class);
         Block air = BlockManager.getAir();
 
-        NoiseTable noise = new NoiseTable(chunk.getPosition().hashCode());
+        WhiteNoise noise = new WhiteNoise(chunk.getPosition().hashCode());
 
         Map<Vector3i, FloraType> entries = facet.getRelativeEntries();
         for (Vector3i pos : entries.keySet()) {
@@ -82,7 +78,7 @@ public class FloraRasterizer implements WorldRasterizer {
 
                 FloraType type = entries.get(pos);
                 List<Block> list = flora.get(type);
-                int blockIdx = noise.noise(pos.x, pos.y, pos.z) % list.size();
+                int blockIdx = noise.intNoise(pos.x, pos.y, pos.z) % list.size();
                 Block block = list.get(blockIdx);
                 chunk.setBlock(pos, block);
             }

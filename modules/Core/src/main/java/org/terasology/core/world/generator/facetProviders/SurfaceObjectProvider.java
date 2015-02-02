@@ -22,8 +22,8 @@ import java.util.Map;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.utilities.procedural.FastNoise;
-import org.terasology.utilities.procedural.Noise2D;
+import org.terasology.utilities.procedural.Noise;
+import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Requires;
@@ -44,13 +44,13 @@ import com.google.common.collect.Table;
 @Requires(@Facet(SurfaceHeightFacet.class))
 public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
-    private Noise2D typeNoiseGen;
+    private Noise typeNoiseGen;
 
     private final Table<B, T, Float> probsTable = HashBasedTable.create();
 
     @Override
     public void setSeed(long seed) {
-        typeNoiseGen = new FastNoise(seed + 1);
+        typeNoiseGen = new WhiteNoise(seed + 1);
     }
 
     /**

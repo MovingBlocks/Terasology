@@ -18,7 +18,7 @@ package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.utilities.procedural.Noise3D;
+import org.terasology.utilities.procedural.Noise;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
@@ -132,7 +132,7 @@ public final class PositionFilters {
      * @param density the threshold in [0..1]
      * @return true if the noise value is <b>below</b> the threshold
      */
-    public static Predicate<Vector3i> probability(final Noise3D noiseGen, final float density) {
+    public static Predicate<Vector3i> probability(final Noise noiseGen, final float density) {
         return new Predicate<Vector3i>() {
 
             @Override
