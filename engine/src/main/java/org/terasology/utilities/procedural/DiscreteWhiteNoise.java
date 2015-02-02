@@ -40,16 +40,16 @@ public class DiscreteWhiteNoise extends WhiteNoise {
 
     @Override
     public float noise(float x, float y, float z) {
-        int fx = TeraMath.floorToInt(x);
-        int fy = TeraMath.floorToInt(y);
-        int fz = TeraMath.floorToInt(z);
+        int fx = TeraMath.floorToInt(x + 0.5f);
+        int fy = TeraMath.floorToInt(y + 0.5f);
+        int fz = TeraMath.floorToInt(z + 0.5f);
         return noise(fx, fy, fz);
     }
 
     @Override
     public float noise(float x, float y) {
-        int fx = TeraMath.floorToInt(x);
-        int fy = TeraMath.floorToInt(y);
+        int fx = TeraMath.floorToInt(x + 0.5f);
+        int fy = TeraMath.floorToInt(y + 0.5f);
         return noise(fx, fy);
     }
 }

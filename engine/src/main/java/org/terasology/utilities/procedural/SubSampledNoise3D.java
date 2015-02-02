@@ -24,7 +24,9 @@ import org.terasology.math.geom.Vector3f;
 
 /**
  * @author Immortius
+ * @deprecated Use {@link SubSampledNoise} instead
  */
+@Deprecated
 public class SubSampledNoise3D implements Noise3D {
 
     private Noise3D source;

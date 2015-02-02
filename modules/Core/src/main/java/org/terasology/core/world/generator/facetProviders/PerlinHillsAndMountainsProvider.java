@@ -15,15 +15,16 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import java.util.Iterator;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
+import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.PerlinNoise;
-import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.GeneratingRegion;
@@ -33,8 +34,6 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generation.facets.SurfaceHumidityFacet;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
-import java.util.Iterator;
-
 /**
  * Adds surface height for hill and mountain regions. Mountain and hill regions are based off of temperature and humidity.
  */
@@ -42,14 +41,15 @@ import java.util.Iterator;
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvider {
 
-    private SubSampledNoise2D mountainNoise;
-    private SubSampledNoise2D hillNoise;
+    private SubSampledNoise mountainNoise;
+    private SubSampledNoise hillNoise;
     private PerlinHillsAndMountainsProviderConfiguration configuration = new PerlinHillsAndMountainsProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
-        mountainNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 3))), new Vector2f(0.0002f, 0.0002f), 4);
-        hillNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 4))), new Vector2f(0.0008f, 0.0008f), 4);
+        // TODO: reduce the number of octaves in BrownianNoise
+        mountainNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 3)), new Vector2f(0.0002f, 0.0002f), 4);
+        hillNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 4)), new Vector2f(0.0008f, 0.0008f), 4);
     }
 
     @Override
@@ -69,8 +69,8 @@ public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvide
             float tempHumid = temp * humidityData.get(pos);
             Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, tempHumid - 0.35f);
             float mIntens = TeraMath.clamp(1.0f - distanceToMountainBiome.length() * 3.0f);
-            float densityMountains = Math.max(mountainData[i], 0) * mIntens * configuration.mountainAmplitude;
-            float densityHills = Math.max(hillData[i] - 0.1f, 0) * (1.0f - mIntens) * configuration.hillAmplitude;
+            float densityMountains = Math.max(mountainData[i] * 2.12f, 0) * mIntens * configuration.mountainAmplitude;
+            float densityHills = Math.max(hillData[i] * 2.12f - 0.1f, 0) * (1.0f - mIntens) * configuration.hillAmplitude;
 
             heightData[i] = heightData[i] + 1024 * densityMountains + 128 * densityHills;
         }

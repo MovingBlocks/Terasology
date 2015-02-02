@@ -20,6 +20,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 
 import com.google.common.math.IntMath;
@@ -32,6 +33,15 @@ public class SubSampledNoise extends AbstractNoise {
     private Noise source;
     private Vector3f zoom = new Vector3f(1, 1, 1);
     private int sampleRate = 1;
+
+    /**
+     * @param source the source noise generator
+     * @param zoom the zoom factor for x, y (z will be 1)
+     * @param sampleRate the sampling rate of the noise
+     */
+    public SubSampledNoise(Noise source, Vector2f zoom, int sampleRate) {
+        this(source, new Vector3f(zoom.x, zoom.y, 1), sampleRate);
+    }
 
     public SubSampledNoise(Noise source, Vector3f zoom, int sampleRate) {
         this.source = source;
