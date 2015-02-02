@@ -58,19 +58,25 @@ class EntitySetDeltaRecorder {
     }
 
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> componentClass) {
-        onEntityComponentChange(entity, componentClass);
+        if (entity.isPersistent()) {
+            onEntityComponentChange(entity, componentClass);
+        }
     }
 
     public void onEntityComponentChange(EntityRef entity, Class<? extends Component> componentClass) {
-        EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
-        Component component = entity.getComponent(componentClass);
-        Component componentSnapshot = componentLibrary.copy(component);
-        entityDelta.setChangedComponent(componentSnapshot);
+        if (entity.isPersistent()) {
+            EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
+            Component component = entity.getComponent(componentClass);
+            Component componentSnapshot = componentLibrary.copy(component);
+            entityDelta.setChangedComponent(componentSnapshot);
+        }
     }
 
     public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component){
-        EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
-        entityDelta.removeComponent(component);
+        if (entity.isPersistent()) {
+            EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
+            entityDelta.removeComponent(component);
+        }
     }
 
     private EntityDelta getOrCreateEntityDeltaFor(EntityRef entity) {
@@ -84,8 +90,10 @@ class EntitySetDeltaRecorder {
     }
 
     public void onEntityDestroyed(EntityRef entity) {
-        entityDeltas.remove(entity.getId());
-        destroyedEntities.add(entity.getId());
+        if (entity.isPersistent()) {
+            entityDeltas.remove(entity.getId());
+            destroyedEntities.add(entity.getId());
+        }
     }
 
     public TLongObjectMap<EntityDelta> getEntityDeltas() {
@@ -101,15 +109,19 @@ class EntitySetDeltaRecorder {
     }
 
     public void onReactivation(EntityRef entity, Collection<Component> components) {
-        EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
-        for (Component component : components) {
-            Component componentSnapshot = componentLibrary.copy(component);
-            entityDelta.setChangedComponent(componentSnapshot);
+        if (entity.isPersistent()) {
+            EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
+            for (Component component : components) {
+                Component componentSnapshot = componentLibrary.copy(component);
+                entityDelta.setChangedComponent(componentSnapshot);
+            }
         }
     }
 
     public void onBeforeDeactivation(EntityRef entity, Collection<Component> components) {
-        deactivatedEntities.add(entity.getId());
+        if (entity.isPersistent()) {
+            deactivatedEntities.add(entity.getId());
+        }
     }
 
     public void registerDelayedEntityRef(DelayedEntityRef delayedEntity) {
