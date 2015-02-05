@@ -53,26 +53,23 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Player Color (RGB):"
+                            "text" : "Player Color:"
                         },
                         {
                             "type" : "RowLayout",
+                            "horizontalSpacing" : 10,
                             "contents" : [
                                 {
                                     "type" : "UISlider",
-                                    "id" : "red"
-                                },
-                                {
-                                    "type" : "UISlider",
-                                    "id" : "green"
-                                },
-                                {
-                                    "type" : "UISlider",
-                                    "id" : "blue"
+                                    "id" : "tone",
+                                    "layoutInfo" : {
+                                        "relativeWidth" : 0.88
+                                    }
                                 },
                                 {
                                     "type" : "UIImage",
-                                    "id"   : "image"
+                                    "skin" : "framed_image",
+                                    "id" : "image"
                                 }
                             ]
                         }

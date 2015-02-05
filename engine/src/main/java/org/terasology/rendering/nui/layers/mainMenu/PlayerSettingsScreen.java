@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.math.RoundingMode;
+import java.util.List;
+
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
@@ -32,6 +35,10 @@ import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.math.DoubleMath;
+
 /**
  * @author Martin Steiger
  */
@@ -40,9 +47,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private UISlider sliderBlue;
-    private UISlider sliderGreen;
-    private UISlider sliderRed;
+    private final List<Color> colors = CieCamColors.L65C65;
+
+    private UISlider slider;
     private UIImage img;
 
     @Override
@@ -56,13 +63,11 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         img = find("image", UIImage.class);
 
-        sliderRed = find("red", UISlider.class);
-        sliderGreen = find("green", UISlider.class);
-        sliderBlue = find("blue", UISlider.class);
-
-        sliderRed.bindValue(new NotifyingBinding(color.rf()));
-        sliderGreen.bindValue(new NotifyingBinding(color.gf()));
-        sliderBlue.bindValue(new NotifyingBinding(color.bf()));
+        slider = find("tone", UISlider.class);
+        slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
+        slider.setIncrement(0.01f);
+        Function<Object, String> constant = Functions.constant("  ");   // ensure a certain width
+        slider.setLabelFunction(constant);
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -74,18 +79,42 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         updateImage();
     }
 
-    private void updateImage() {
-        float red = sliderRed.getValue();
-        float green = sliderGreen.getValue();
-        float blue = sliderBlue.getValue();
+    private float findClosestIndex(Color color) {
+        int best = 0;
+        float minDist = Float.MAX_VALUE;
+        for (int i = 0; i < colors.size(); i++) {
+            Color other = colors.get(i);
+            float dr = other.rf() - color.rf();
+            float dg = other.gf() - color.gf();
+            float db = other.bf() - color.bf();
 
-        Color color = new Color(red, green, blue);
+            // there are certainly smarter ways to measure color distance,
+            // but Euclidean distance is good enough for the purpose
+            float dist = dr * dr + dg * dg + db * db;
+            if (dist < minDist) {
+                minDist = dist;
+                best = i;
+            }
+        }
+
+        float max = colors.size() - 1;
+        return best / max;
+    }
+
+    private Color findClosestColor(float findex) {
+        int index = DoubleMath.roundToInt(findex * (colors.size() - 1), RoundingMode.HALF_UP);
+        Color color = colors.get(index);
+        return color;
+    }
+
+    private void updateImage() {
+        float index = slider.getValue();
+        Color color = findClosestColor(index);
 
         config.getPlayer().setColor(color);
 
         AssetUri uri = TextureUtil.getTextureUriForColor(color);
         Texture tex = (Texture) Assets.get(uri);
-
         img.setImage(tex);
     }
 

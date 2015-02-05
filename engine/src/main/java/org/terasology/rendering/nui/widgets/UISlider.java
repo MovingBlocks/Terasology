@@ -85,7 +85,7 @@ public class UISlider extends CoreWidget {
     private int sliderWidth;
     private boolean active;
     private String formatString = "0.0";
-    private Function<Float, String> labelFunction;
+    private Function<? super Float, String> labelFunction;
 
     public UISlider() {
     }
@@ -102,7 +102,7 @@ public class UISlider extends CoreWidget {
         }
     }
 
-    public void setLabelFunction(Function<Float, String> labelFunction) {
+    public void setLabelFunction(Function<? super Float, String> labelFunction) {
         this.labelFunction = labelFunction;
     }
 
