@@ -18,6 +18,7 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -41,7 +42,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -101,7 +102,7 @@ public final class Terasology {
     private Terasology() {
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         // To have the splash screen in your favorite IDE add
         //
@@ -138,9 +139,10 @@ public final class Terasology {
                 SplashScreen.getInstance().close();
                 engine.run(new StateMainMenu());
             }
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
+            // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
             if (!GraphicsEnvironment.isHeadless()) {
-                logException(e);
+                reportException(e);
             }
         } finally {
             SplashScreen.getInstance().close();
@@ -257,7 +259,7 @@ public final class Terasology {
 
         } catch (IOException e) {
             if (!isHeadless) {
-                logException(e);
+                reportException(e);
             }
             System.exit(0);
         }
@@ -272,7 +274,7 @@ public final class Terasology {
         }
     }
 
-    private static void logException(Exception e) {
+    private static void reportException(Throwable throwable) {
         Path logPath = Paths.get(".");
         try {
             Path gameLogPath = PathManager.getInstance().getLogPath();
@@ -280,12 +282,12 @@ public final class Terasology {
                 logPath = gameLogPath;
             }
         } catch (Exception pathManagerConstructorFailure) {
-            e.addSuppressed(pathManagerConstructorFailure);
+            throwable.addSuppressed(pathManagerConstructorFailure);
         }
 
         if (crashReportEnabled) {
             Path logFile = logPath.resolve("Terasology.log");
-            CrashReporter.report(e, logFile);
+            CrashReporter.report(throwable, logFile);
         }
     }
 
