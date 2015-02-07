@@ -45,7 +45,7 @@ dependencies {
 jar {
     manifest {
         //TODO: Maybe later add the engine's version number into here?
-        def manifestClasspath = "$subDirLibs/" + configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
+        def manifestClasspath = configurations.runtime.collect { it.getName() }.join(" ")
         attributes("Main-Class": mainClassName)
         attributes("Class-Path" : manifestClasspath)
         attributes("Implementation-Title": "Terasology-" + project.name)
@@ -192,24 +192,21 @@ task distApp (type: Sync) {
     from ("$rootDir/NOTICE") {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
     }
-    from ("$buildDir/libs") {
-        include "*.jar"
-        rename {
-            'Terasology.jar'
-        }
-    }
     from('launchScripts') {
         exclude('TeraEd.exe')
     }
-	
-    // launch4j requires the splash screen to also exist next to the exe
-    from("${sourceSets.main.output.resourcesDir}/splash.jpg")
 
     from("$buildDir/$versionFileName") {}
 
     into(subDirLibs) {
         from configurations.runtime
         from project(':engine').jar
+        from ("$buildDir/libs") {
+            include "*.jar"
+            rename {
+                'Terasology.jar'
+            }
+        }
     }
     into(dirNatives) {
         from "$rootDir/$dirNatives"
