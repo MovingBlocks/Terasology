@@ -16,14 +16,20 @@
 
 package org.terasology.config;
 
+import java.util.List;
+
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.layers.mainMenu.CieCamColors;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 /**
  * @author Immortius
  */
 public class PlayerConfig {
-    private String name = "Player";
-    private Color color = Color.RED;
+    private String name = defaultPlayerName();
+
+    private Color color = defaultPlayerColor();
 
     public String getName() {
         return name;
@@ -36,8 +42,27 @@ public class PlayerConfig {
     public Color getColor() {
         return color;
     }
-    
+
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    private static String defaultPlayerName() {
+        try {
+            String login = System.getProperty("user.name");
+            if (login != null && !login.isEmpty()) {
+                return login;
+            }
+        } catch (SecurityException e) {
+            // thrown by all Sandbox RIAs (Webstart, Applets)
+            e.getMessage(); // dummy method call to trick CheckStyle
+        }
+        return "Player_" + new FastRandom().nextInt(10000, 99999);
+    }
+
+    private Color defaultPlayerColor() {
+        Random rng = new FastRandom();
+        List<Color> colors = CieCamColors.L65C65;
+        return colors.get(rng.nextInt(colors.size()));
     }
 }
