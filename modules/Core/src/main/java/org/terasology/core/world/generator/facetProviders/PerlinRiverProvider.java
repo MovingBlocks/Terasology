@@ -19,10 +19,9 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
+import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.PerlinNoise;
-import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
@@ -37,12 +36,12 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
-    private SubSampledNoise2D riverNoise;
+    private SubSampledNoise riverNoise;
     private PerlinRiverProviderConfiguration configuration = new PerlinRiverProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
-        riverNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 2), 8)), new Vector2f(0.0008f, 0.0008f), SAMPLE_RATE);
+        riverNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 2), 8), new Vector2f(0.0008f, 0.0008f), SAMPLE_RATE);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProv
 
         float[] surfaceHeights = facet.getInternal();
         for (int i = 0; i < noise.length; ++i) {
-            surfaceHeights[i] += configuration.maxDepth * TeraMath.clamp(7f * (TeraMath.sqrt(Math.abs(noise[i])) - 0.1f) + 0.25f);
+            surfaceHeights[i] += configuration.maxDepth * TeraMath.clamp(7f * (TeraMath.sqrt(Math.abs(noise[i] * 2.11f)) - 0.1f) + 0.25f);
         }
     }
 

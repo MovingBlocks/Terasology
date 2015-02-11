@@ -24,7 +24,9 @@ import org.terasology.math.geom.Vector2f;
 
 /**
  * @author Immortius
+ * @deprecated Use {@link SubSampledNoise} instead
  */
+@Deprecated
 public class SubSampledNoise2D implements Noise2D {
 
     private Noise2D source;

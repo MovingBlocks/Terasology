@@ -17,7 +17,9 @@ package org.terasology.utilities.procedural;
 
 /**
  * @author Immortius
+ * @deprecated use {@link Noise} instead
  */
+@Deprecated
 public class Noise3DTo2DAdapter implements Noise2D {
 
     private Noise3D noise;

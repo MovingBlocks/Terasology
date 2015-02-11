@@ -17,10 +17,9 @@ package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
+import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.PerlinNoise;
-import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
@@ -33,11 +32,11 @@ import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 public class PerlinSurfaceTemperatureProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
-    private SubSampledNoise2D temperatureNoise;
+    private SubSampledNoise temperatureNoise;
 
     @Override
     public void setSeed(long seed) {
-        temperatureNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 5), 8)), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
+        temperatureNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 5), 8), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
     }
 
     @Override
@@ -46,7 +45,7 @@ public class PerlinSurfaceTemperatureProvider implements FacetProvider {
         float[] noise = this.temperatureNoise.noise(facet.getWorldRegion());
 
         for (int i = 0; i < noise.length; ++i) {
-            noise[i] = TeraMath.clamp((noise[i] + 1f) * 0.5f);
+            noise[i] = TeraMath.clamp((noise[i] * 2.11f + 1f) * 0.5f);
         }
 
         facet.set(noise);

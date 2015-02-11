@@ -25,8 +25,8 @@ import org.terasology.core.world.generator.trees.Trees;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.utilities.procedural.FastNoise;
-import org.terasology.utilities.procedural.Noise3D;
+import org.terasology.utilities.procedural.Noise;
+import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
@@ -52,7 +52,7 @@ import com.google.common.collect.Lists;
 })
 public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenerator> implements ConfigurableFacetProvider {
 
-    private Noise3D densityNoiseGen;
+    private Noise densityNoiseGen;
     private TreeProviderConfiguration configuration = new TreeProviderConfiguration();
 
     public DefaultTreeProvider() {
@@ -78,7 +78,7 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
     public void setSeed(long seed) {
         super.setSeed(seed);
 
-        densityNoiseGen = new FastNoise(seed);
+        densityNoiseGen = new WhiteNoise(seed);
     }
 
     @Override
