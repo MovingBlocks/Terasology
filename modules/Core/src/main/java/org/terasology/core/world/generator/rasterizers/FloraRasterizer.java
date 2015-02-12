@@ -78,7 +78,7 @@ public class FloraRasterizer implements WorldRasterizer {
 
                 FloraType type = entries.get(pos);
                 List<Block> list = flora.get(type);
-                int blockIdx = noise.intNoise(pos.x, pos.y, pos.z) % list.size();
+                int blockIdx = Math.abs(noise.intNoise(pos.x, pos.y, pos.z)) % list.size();
                 Block block = list.get(blockIdx);
                 chunk.setBlock(pos, block);
             }
