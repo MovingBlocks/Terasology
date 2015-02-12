@@ -13,6 +13,7 @@ gradle.properties
 # Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
 /out/
 modules/Core/Core.iml
+modules/CoreSampleGameplay/CoreSampleGameplay.iml
 facades/PC/PC.iml
 engine/engine.iml
 engine-tests/engine-tests.iml
@@ -64,6 +65,7 @@ extensions
 !/facades/subprojects.gradle
 /modules/*
 !/modules/Core
+!/modules/CoreSampleGameplay
 !/modules/subprojects.gradle
 /meta/*
 !/meta/subprojects.gradle

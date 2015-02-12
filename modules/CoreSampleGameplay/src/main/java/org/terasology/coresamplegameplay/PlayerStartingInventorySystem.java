@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.logic;
+package org.terasology.coresamplegameplay;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +97,7 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
 
 
     @Command
-    public String test(@CommandParam("first") String first, @CommandParam("remainder") String ... remainder) {
+    public String test(@CommandParam("first") String first, @CommandParam("remainder") String... remainder) {
         logger.info("test run with arguments '{}', '{}'", first, Arrays.asList(remainder));
         return first + " " + Arrays.asList(remainder).toString();
     }
