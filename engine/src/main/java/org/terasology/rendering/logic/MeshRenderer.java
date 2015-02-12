@@ -113,15 +113,17 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         addMesh(entity);
     }
 
+
+    private boolean isHidden(EntityRef entity, MeshComponent mesh) {
+        if (!mesh.hideFromOwner) {
+            return false;
+        }
+        ClientComponent owner = network.getOwnerEntity(entity).getComponent(ClientComponent.class);
+        return (owner != null && owner.local);
+    }
+
     private void addMesh(EntityRef entity) {
         MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-        // Don't render if hidden from owner (need to improve for third person)
-        if (meshComp.hideFromOwner) {
-            ClientComponent owner = network.getOwnerEntity(entity).getComponent(ClientComponent.class);
-            if (owner != null && owner.local) {
-                return;
-            }
-        }
         if (meshComp.material != null) {
             if (meshComp.translucent) {
                 translucentMesh.put(meshComp.material, entity);
@@ -183,6 +185,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
             meshComp.material.enable();
             LocationComponent location = entity.getComponent(LocationComponent.class);
             if (location == null) {
+                continue;
+            }
+            if (isHidden(entity, meshComp)) {
                 continue;
             }
 
@@ -249,7 +254,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                 LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                if (location == null || meshComp.mesh == null || !worldProvider.isBlockRelevant(location.getWorldPosition())) {
+                if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null
+                        || !worldProvider.isBlockRelevant(location.getWorldPosition())) {
                     continue;
                 }
                 if (meshComp.mesh.isDisposed()) {
