@@ -16,13 +16,12 @@
 
 package org.terasology.core.world.generator.facetProviders;
 
+import com.google.common.base.Predicate;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.Noise;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
-
-import com.google.common.base.Predicate;
 
 /**
  * A collection of filters that restrict the placement of objects
@@ -137,7 +136,7 @@ public final class PositionFilters {
 
             @Override
             public boolean apply(Vector3i input) {
-                return noiseGen.noise(input.getX(), input.getY(), input.getZ()) < density;
+                return Math.abs(noiseGen.noise(input.getX(), input.getY(), input.getZ())) < density;
             }
         };
     }
