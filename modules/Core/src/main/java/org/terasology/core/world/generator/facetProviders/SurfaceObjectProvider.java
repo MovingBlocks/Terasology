@@ -16,9 +16,10 @@
 
 package org.terasology.core.world.generator.facetProviders;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -31,10 +32,8 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generation.facets.base.ObjectFacet2D;
 import org.terasology.world.generation.facets.base.ObjectFacet3D;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Places objects on the surface based on population densities
@@ -132,7 +131,7 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
      * @return a random pick from the map or <code>null</code>
      */
     protected T getType(int x, int z, Map<T, Float> objs) {
-        float random = typeNoiseGen.noise(x, z);
+        float random = Math.abs(typeNoiseGen.noise(x, z));
 
         for (T generator : objs.keySet()) {
             Float threshold = objs.get(generator);

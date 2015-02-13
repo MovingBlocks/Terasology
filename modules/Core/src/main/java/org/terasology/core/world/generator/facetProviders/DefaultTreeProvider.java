@@ -15,8 +15,8 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import java.util.List;
-
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
@@ -38,8 +38,7 @@ import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * Determines where trees can be placed.  Will put trees one block above the surface.
@@ -90,7 +89,7 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
         List<Predicate<Vector3i>> filters = Lists.newArrayList();
 
         filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
-        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density * 0.1f));
+        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density * 0.05f));
         filters.add(PositionFilters.flatness(surface, 1, 0));
 
         // these value are derived from the maximum tree extents as
