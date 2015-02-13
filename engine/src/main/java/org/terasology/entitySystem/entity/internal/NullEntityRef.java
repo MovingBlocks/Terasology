@@ -99,11 +99,7 @@ public final class NullEntityRef extends EntityRef {
     public boolean isPersistent() {
         return false;
     }
-
-    @Override
-    public void setPersistent(boolean persistent) {
-    }
-
+    
     @Override
     public boolean isAlwaysRelevant() {
         return false;

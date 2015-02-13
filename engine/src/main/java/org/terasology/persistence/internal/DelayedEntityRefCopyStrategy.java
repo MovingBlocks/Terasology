@@ -19,7 +19,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.reflection.copy.CopyStrategy;
 
 /**
- * This copy strategy return {@link DelayedEntityRef}s. See that class for more info.
+ * This copy strategy return {@link DelayedEntityRef}s for persistent entities that exists.
+ * For non persistent entities or entities that do no longer exist it returns {@link EntityRef#NULL}.
  *
  * @author Florian <florian@fkoeberle.de>
  */
@@ -34,7 +35,11 @@ class DelayedEntityRefCopyStrategy implements CopyStrategy<EntityRef> {
     @Override
     public EntityRef copy(EntityRef value) {
         if (value != null) {
-            return delayedEntityRefFactory.createDelayedEntityRef(value.getId());
+            if (value.exists() && value.isPersistent()) {
+                return delayedEntityRefFactory.createDelayedEntityRef(value.getId());
+            } else {
+                return EntityRef.NULL;
+            }
         } else {
             return null;
         }

@@ -27,14 +27,12 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
-import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.module.Module;
@@ -346,8 +344,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     @Override
-    public void onEntityDestroyed(long entityId) {
-        entitySetDeltaRecorder.onEntityDestroyed(entityId);
+    public void onEntityDestroyed(EntityRef entity) {
+        entitySetDeltaRecorder.onEntityDestroyed(entity);
     }
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {

@@ -548,10 +548,10 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         for (Component comp : store.iterateComponents(entityId)) {
             notifyComponentRemoved(ref, comp.getClass());
         }
-        destroy(ref);
         for (EntityDestroySubscriber destroySubscriber : destroySubscribers) {
-            destroySubscriber.onEntityDestroyed(entityId);
+            destroySubscriber.onEntityDestroyed(ref);
         }
+        destroy(ref);
     }
 
     private void destroy(EntityRef ref) {
