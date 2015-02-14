@@ -233,6 +233,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [SubstanceMatters](https://github.com/Terasology/SubstanceMatters) - library for the definition and usage of materials in various contexts, such as tools with dynamic looks based on material
 * [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
+* [Valentines](https://github.com/Terasology/Valentines) - What is love? Gooey don't hurt me, don't hurt me, no more ... ♫
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
