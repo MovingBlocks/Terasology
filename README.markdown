@@ -101,13 +101,12 @@ Only works when the F3 debug mode is enabled (and may come and go)
 Tools
 --------
 
-May move slot or disappear as development continues
+May vary by version and based on what modules are enabled
 
 * Axe / Pickaxe / Shovel - Faster right-click removal of some blocks
 * Torch - Shiny! Place with left click. Try throwing these in water at night
 * Explosion tool - Big bada boom!
 * Railgun  - Bigger bada boom, in a straight line!
-* ~~Minituarizer (scissors) - Left click one block, then another, then somewhere else to "clone" your selection in a tiny accurate representation~~
 * Goodie chest - place it and open with 'e' for assorted goodies
 
 More or completely alternative line-ups with certain modules / world types selected
