@@ -33,9 +33,11 @@ You can host a local server using the game client and have friends connect to yo
 
 Unlike in single player in a multiplayer situation permissions are enforced for console commands. On a local server the player who started the game gets "op" rights.
 
-You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, Windows example:
+You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, for example with a downloaded version:
 
-`Terasology.exe -headless -homedir=server`
+*Note: This changed to include the `/libs` after stable 49. The name of the .exe also may differ*
+
+`java -jar libs/Terasology.jar -headless -homedir=server`
 
 This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system)
 
@@ -45,13 +47,13 @@ Join the server and run the console command `usePermissionKey <key>` where you r
 
 In either server situation you can "op" other players by executing `givePermission <player> op` in the console, replacing `<player>` with the desired player's name (case sensitive).
 
-With "op" rights you can terminate the server gracefully via `shutdownServer` in the console. Note that the server *detaches* (at least on Windows via .exe) from its command prompt, so you get no handy logging there. If you cannot connect or get "op" you may have to terminate the `javaw` process manually.
+With "op" rights you can terminate the server gracefully via `shutdownServer` in the console. Otherwise you can kill the server with `CTRL-C` in a terminal / command prompt. Running headless with the .exe on Windows is not recommended as it "detaches" from its command prompt so you get no handy logging there or any way to issue a break to the process. If you cannot connect or get "op" you may have to terminate the process manually via Task Manager or comparable.
 
 Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
 
 Alternatively you can run from source and supply parameters for game configuration. For instance here is how you would launch with ThroughoutTheAges active, our most complete setting. Keep in mind the module list may change any day, check in the game client what modules highlight with TTA selected to confirm.
 
-`gradlew -PworldGen="WoodAndStone:throughoutTheAges" -PextraModules="AlterationEffects,AnotherWorld,ClimateConditions,CopperAndBronze,Core,Crops,Fences,Fluid,Genome,GrowingFlora,Hunger,Journal,MultiBlock,PlantPack,NameGenerator,Seasons,StructuralResources,WoodAndStone,Workstation" startServer`
+`gradlew -PworldGen="WoodAndStone:throughoutTheAges" -PextraModules="AlterationEffects,AnotherWorld,ClimateConditions,CopperAndBronze,Core,Crops,Fences,Fluid,Genome,GrowingFlora,Hunger,Journal,MarkovChains,MultiBlock,PlantPack,NameGenerator,Seasons,StructuralResources,ThroughoutTheAges,WoodAndStone,Workstation" startServer`
 
 This will all become easier as the project and especially the launcher mature further :-)
 
