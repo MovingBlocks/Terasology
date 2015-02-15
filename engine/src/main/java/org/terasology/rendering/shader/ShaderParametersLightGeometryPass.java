@@ -24,7 +24,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -40,7 +40,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        DefaultRenderingProcess.FBO sceneOpaque = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess.FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         int texId = 0;
         if (sceneOpaque != null) {
@@ -59,7 +59,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
+            LwjglRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
             program.setInt("texSceneShadowMap", texId++, true);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();

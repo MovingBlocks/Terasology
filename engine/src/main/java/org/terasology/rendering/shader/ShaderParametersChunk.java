@@ -24,7 +24,7 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -108,10 +108,10 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         program.setInt("textureEffects", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().bindFboTexture("sceneReflected");
+        LwjglRenderingProcess.getInstance().bindFboTexture("sceneReflected");
         program.setInt("textureWaterReflection", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
+        LwjglRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
 import org.terasology.asset.AssetManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
@@ -125,6 +126,8 @@ public class StateIngame implements GameState {
         eventSystem.process();
         GameThread.processWaitingProcesses();
         nuiManager.clear();
+
+        CoreRegistry.get(AudioManager.class).stopAllSounds();
 
         if (worldRenderer != null) {
             worldRenderer.dispose();

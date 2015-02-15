@@ -78,7 +78,7 @@ public class HeadlessGraphics implements EngineSubsystem {
 
         CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new HeadlessCanvasRenderer()));
 
-        //        CoreRegistry.putPermanently(DefaultRenderingProcess.class, new HeadlessRenderingProcess());
+        //        CoreRegistry.putPermanently(LwjglRenderingProcess.class, new HeadlessRenderingProcess());
     }
 
     @Override

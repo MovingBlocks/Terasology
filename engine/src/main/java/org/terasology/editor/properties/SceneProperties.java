@@ -19,9 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
-import org.terasology.rendering.opengl.DefaultRenderingProcess;
-import org.terasology.rendering.backdrop.Skysphere;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
 import java.util.List;
 
@@ -40,7 +38,7 @@ public class SceneProperties implements PropertyProvider {
         if (backdropRenderer != null) {
             result.addAll(new ReflectionProvider(backdropRenderer).getProperties());
         }
-        DefaultRenderingProcess postRenderer = DefaultRenderingProcess.getInstance();
+        LwjglRenderingProcess postRenderer = LwjglRenderingProcess.getInstance();
         if (postRenderer != null) {
             result.addAll(new ReflectionProvider(postRenderer).getProperties());
         }
