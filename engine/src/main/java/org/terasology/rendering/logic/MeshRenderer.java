@@ -180,6 +180,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     private void renderAlphaBlend(Iterable<EntityRef> entityRefs) {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
+        FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
+        FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
+
         for (EntityRef entity : entityRefs) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             meshComp.material.enable();
@@ -196,20 +199,24 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
             float worldScale = location.getWorldScale();
             AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
             if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
-                glPushMatrix();
+                Vector3f worldPositionCameraSpace = new Vector3f();
+                worldPositionCameraSpace.sub(worldPos, cameraPosition);
+                Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
+                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-                glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-                Vector3f axis = worldRot.getAxis();
-                float angle = (float) worldRot.getAngle();
-                glRotatef(TeraMath.RAD_TO_DEG * angle, axis.getX(), axis.getY(), axis.getZ());
-                glScalef(worldScale, worldScale, worldScale);
+                meshComp.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                meshComp.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
+                MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                meshComp.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
                 meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
                 meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
+                meshComp.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
 
-                meshComp.mesh.render();
-
-                glPopMatrix();
+                OpenGLMesh mesh = (OpenGLMesh) meshComp.mesh;
+                meshComp.material.bindTextures();
+                mesh.render();
             }
         }
     }
