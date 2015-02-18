@@ -18,7 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.EditorRange;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -36,7 +36,7 @@ public class ShaderParametersSobel extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess.FBO scene = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);

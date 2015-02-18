@@ -26,7 +26,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -53,12 +53,12 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        DefaultRenderingProcess.getInstance().bindFboTexture("sceneToneMapped");
+        LwjglRenderingProcess.getInstance().bindFboTexture("sceneToneMapped");
         program.setInt("texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
+            LwjglRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
@@ -74,7 +74,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess.FBO sceneCombined = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (sceneCombined != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

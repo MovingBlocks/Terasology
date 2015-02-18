@@ -32,6 +32,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.editor.EditorRange;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
@@ -87,49 +88,7 @@ import static org.lwjgl.opengl.EXTPixelBufferObject.glBufferDataARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glGenBuffersARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glMapBufferARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glUnmapBufferARB;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DECR;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_INCR;
-import static org.lwjgl.opengl.GL11.GL_KEEP;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glReadPixels;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.lwjgl.opengl.GL11.glTexCoord2d;
-import static org.lwjgl.opengl.GL11.glVertex3i;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
@@ -138,11 +97,11 @@ import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class DefaultRenderingProcess {
+public class LwjglRenderingProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultRenderingProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(LwjglRenderingProcess.class);
 
-    private static DefaultRenderingProcess instance;
+    private static LwjglRenderingProcess instance;
 
     /* PROPERTIES */
     @EditorRange(min = 0.0f, max = 10.0f)
@@ -207,7 +166,7 @@ public class DefaultRenderingProcess {
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
-    public DefaultRenderingProcess() {
+    public LwjglRenderingProcess() {
         initialize();
     }
 
@@ -217,9 +176,9 @@ public class DefaultRenderingProcess {
      *
      * @return The instance
      */
-    public static DefaultRenderingProcess getInstance() {
+    public static LwjglRenderingProcess getInstance() {
         if (instance == null) {
-            instance = new DefaultRenderingProcess();
+            instance = new LwjglRenderingProcess();
         }
 
         return instance;
@@ -630,6 +589,19 @@ public class DefaultRenderingProcess {
         unbindFbo("sceneOpaque");
     }
 
+    public void beginRenderSimpleBlendMaterialsIntoCombinedPass() {
+        beginRenderSceneOpaque();
+        GL11.glEnable(GL_BLEND);
+        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDepthMask(false);
+    }
+
+    public void endRenderSimpleBlendMaterialsIntoCombinedPass() {
+        GL11.glDisable(GL_BLEND);
+        GL11.glDepthMask(true);
+        endRenderSceneOpaque();
+    }
+
     public void beginRenderLightGeometryStencilPass() {
         bindFbo("sceneOpaque");
         setRenderBufferMask(false, false, false);
@@ -693,6 +665,27 @@ public class DefaultRenderingProcess {
         applyLightBufferPass("sceneOpaque");
     }
 
+    public void preChunkRenderSetup(Vector3f chunkPositionRelativeToCamera) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
+    }
+
+    public void postChunkRenderCleanup() {
+        GL11.glPopMatrix();
+    }
+
+    public void enableWireframeIf(boolean isWireframeEnabledInRenderingDebugConfig) {
+        if (isWireframeEnabledInRenderingDebugConfig) {
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+    }
+
+    public void disableWireframeIf(boolean isWireframeEnabledInRenderingDebugConfig) {
+        if (isWireframeEnabledInRenderingDebugConfig) {
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+    }
+
     public void setRenderBufferMask(boolean color, boolean normal, boolean lightBuffer) {
         setRenderBufferMask(currentlyBoundFboName, color, normal, lightBuffer);
     }
@@ -737,11 +730,20 @@ public class DefaultRenderingProcess {
         GL20.glDrawBuffers(bufferIds);
     }
 
-    public void beginRenderSceneReflectiveRefractive() {
+    public void beginRenderSceneReflectiveRefractive(boolean isHeadUnderWater) {
         bindFbo("sceneReflectiveRefractive");
+
+        // Make sure the water surface is rendered if the player is underwater.
+        if (isHeadUnderWater) {
+            GL11.glDisable(GL11.GL_CULL_FACE);
+        }
     }
 
-    public void endRenderSceneReflectiveRefractive() {
+    public void endRenderSceneReflectiveRefractive(boolean isHeadUnderWater) {
+        if (isHeadUnderWater) {
+            GL11.glEnable(GL11.GL_CULL_FACE);
+        }
+
         unbindFbo("sceneReflectiveRefractive");
     }
 
@@ -756,9 +758,11 @@ public class DefaultRenderingProcess {
 
         glViewport(0, 0, reflected.width, reflected.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GL11.glCullFace(GL11.GL_FRONT);
     }
 
     public void endRenderReflectedScene() {
+        GL11.glCullFace(GL11.GL_BACK);
         unbindFbo("sceneReflected");
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
@@ -774,9 +778,11 @@ public class DefaultRenderingProcess {
 
         glViewport(0, 0, shadowMap.width, shadowMap.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GL11.glDisable(GL_CULL_FACE);
     }
 
     public void endRenderSceneShadowMap() {
+        GL11.glEnable(GL_CULL_FACE);
         unbindFbo("sceneShadowMap");
         glViewport(0, 0, rtFullWidth, rtFullHeight);
     }
@@ -794,6 +800,17 @@ public class DefaultRenderingProcess {
         }
 
         bindFbo("sceneOpaque");
+    }
+
+    public void beginRenderFirstPerson() {
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
+    }
+
+    public void endRenderFirstPerson() {
+        GL11.glDepthFunc(GL_LEQUAL);
+        GL11.glPopMatrix();
     }
 
     public void renderPreCombinedScene() {
@@ -973,7 +990,7 @@ public class DefaultRenderingProcess {
         Material program = Assets.getMaterial("engine:prog.lightBufferPass");
         program.enable();
 
-        DefaultRenderingProcess.FBO targetFbo = getFBO(target);
+        LwjglRenderingProcess.FBO targetFbo = getFBO(target);
 
         int texId = 0;
         if (targetFbo != null) {
@@ -1350,16 +1367,16 @@ public class DefaultRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if(config.getRendering().getScreenshotSize() == 0) {
+        if (config.getRendering().getScreenshotSize() == 0) {
             overwriteRtWidth = Display.getWidth() * 2;
             overwriteRtHeight = Display.getHeight() * 2;
-        } else if(config.getRendering().getScreenshotSize() == 1) {
+        } else if (config.getRendering().getScreenshotSize() == 1) {
             overwriteRtWidth = Display.getWidth();
             overwriteRtHeight = Display.getHeight();
-        } else if(config.getRendering().getScreenshotSize() == 2) {
+        } else if (config.getRendering().getScreenshotSize() == 2) {
             overwriteRtWidth = Display.getWidth() / 2;
             overwriteRtHeight = Display.getHeight() / 2;
-        } else if(config.getRendering().getScreenshotSize() == 3) {
+        } else if (config.getRendering().getScreenshotSize() == 3) {
             overwriteRtWidth = Display.getWidth() / 4;
             overwriteRtHeight = Display.getHeight() / 4;
         } else {

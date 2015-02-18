@@ -22,7 +22,7 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -49,7 +49,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         int texId = 0;
 
-        DefaultRenderingProcess.FBO sceneOpaque = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess.FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -69,7 +69,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        DefaultRenderingProcess.FBO sceneReflectiveRefractive = DefaultRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
+        LwjglRenderingProcess.FBO sceneReflectiveRefractive = LwjglRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -93,13 +93,13 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("ssaoBlurred");
+            LwjglRenderingProcess.getInstance().bindFboTexture("ssaoBlurred");
             program.setInt("texSsao", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("sobel");
+            LwjglRenderingProcess.getInstance().bindFboTexture("sobel");
             program.setInt("texEdges", texId++, true);
 
             program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
@@ -108,7 +108,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
+            LwjglRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();
