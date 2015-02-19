@@ -16,6 +16,7 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
@@ -84,7 +86,10 @@ public class PojoEntityManagerTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = (PojoEntityManager) builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());
+        ModuleEnvironment environment = moduleManager.getEnvironment();
+        NetworkSystem network = mock(NetworkSystem.class);
+        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+        entityManager = (PojoEntityManager) builder.build(environment, network, reflectFactory);
 
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.addComponent(new StringComponent("Test"));

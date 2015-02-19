@@ -7,6 +7,16 @@ apply from: "$rootDir/config/gradle/artifactory.gradle"
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Put resources in the same folder as java classes to make them available in the sandbox
+sourceSets {
+    main {
+        java {
+            output.classesDir 'build/classes/main'
+            output.resourcesDir 'build/classes/main'
+        }
+    }
+}
+
 // Base the engine tests on the same version number as the engine
 version = project(':engine').version
 println "ENGINE TESTS VERSION: $version"
