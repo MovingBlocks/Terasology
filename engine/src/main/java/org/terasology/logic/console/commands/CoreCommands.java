@@ -43,12 +43,16 @@ import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
+import org.terasology.logic.health.DestroyEvent;
+import org.terasology.logic.health.EngineDamageTypes;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -66,6 +70,7 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
@@ -176,6 +181,15 @@ public class CoreCommands extends BaseComponentSystem {
 
 	}
 
+    @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)
+    public void kill(EntityRef client) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
+        if (health != null) {
+            clientComp.character.send(new DestroyEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
+        }
+    }
+
 	@Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
 	public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
 		Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
@@ -187,6 +201,16 @@ public class CoreCommands extends BaseComponentSystem {
 			}
 		}
 	}
+
+    @Command(shortDescription = "Teleports you to a location", runOnServer = true)
+    public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
+        if (location != null) {
+            location.setWorldPosition(new Vector3f(x, y, z));
+            clientComp.character.saveComponent(location);
+        }
+    }
 
 	@Command(shortDescription = "Exits the game")
 	public void exit() {
@@ -238,6 +262,12 @@ public class CoreCommands extends BaseComponentSystem {
 			return "Not connected";
 		}
 	}
+
+    @Command(shortDescription = "Displays debug information on the target entity")
+    public String debugTarget() {
+        EntityRef cameraTarget = cameraTargetSystem.getTarget();
+        return cameraTarget.toFullDescription();
+    }
 
 	@Command(shortDescription = "Writes out information on all entities to a text file for debugging",
 			helpText = "Writes entity information out into a file named \"entityDump.txt\".")
@@ -298,6 +328,14 @@ public class CoreCommands extends BaseComponentSystem {
 		pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
 		return "Spawned block.";
 	}
+
+    @Command(shortDescription = "Sets the current world time in days")
+    public String setWorldTime(@CommandParam("day") float day) {
+        WorldProvider world = CoreRegistry.get(WorldProvider.class);
+        world.getTime().setDays(day);
+
+        return "World time changed";
+    }
 
 	@Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
 	public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
