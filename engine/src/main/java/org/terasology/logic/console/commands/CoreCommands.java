@@ -15,9 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
-
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
