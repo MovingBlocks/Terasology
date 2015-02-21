@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.terasology.config.Config;
+import org.terasology.config.TransientConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
@@ -43,6 +44,7 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
 import java.awt.GraphicsEnvironment;
+import java.beans.Transient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -254,9 +256,9 @@ public final class Terasology {
                 loadLastGame = true;
             } else if(arg.startsWith(SERVER_PORT)) {
                 try {
-                    config.getTransients().setServerPort(Integer.parseInt(arg.substring(SERVER_PORT.length())));
+                    new TransientConfig().setServerPort(Integer.parseInt(arg.substring(SERVER_PORT.length())));
                 } catch (NumberFormatException e) {
-                    config.getTransients().setServerPort(TerasologyConstants.DEFAULT_PORT);
+                    new TransientConfig().setServerPort(TerasologyConstants.DEFAULT_PORT);
                     System.out.println("Couldn't parse server port. Using default port.");
                 }
             } else {
