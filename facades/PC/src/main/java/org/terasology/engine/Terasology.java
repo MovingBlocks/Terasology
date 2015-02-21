@@ -118,11 +118,17 @@ public final class Terasology {
         handleLaunchArguments(args);
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
+
+            Config config = CoreRegistry.get(Config.class);
+
             if (!writeSaveGamesEnabled) {
-                CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
+                config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
 
-            CoreRegistry.get(Config.class).getTransients().setServerPort(serverPort);
+            config.getTransients().setServerPort(config.getNetwork().getServerPort());
+            if(serverPort != config.getNetwork().getServerPort()) {
+                config.getTransients().setServerPort(serverPort);
+            }
 
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
@@ -174,7 +180,8 @@ public final class Terasology {
                 LOAD_LAST_GAME,
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
-                NO_SOUND);
+                NO_SOUND,
+                SERVER_PORT);
 
         StringBuilder optText = new StringBuilder();
 
