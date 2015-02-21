@@ -37,6 +37,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.game.GameManifest;
+import org.terasology.logic.characters.interactions.InteractionEndEvent;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -92,12 +93,14 @@ public final class Terasology {
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
     private static final String NO_SOUND = "-noSound";
+    private static final String SERVER_PORT = "-serverPort=";
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
     private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
+    private static int serverPort = 25777;
 
     private Terasology() {
     }
@@ -120,6 +123,9 @@ public final class Terasology {
             if (!writeSaveGamesEnabled) {
                 CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
+
+            CoreRegistry.get(Config.class).getNetwork().setServerPort(serverPort);
+
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
                 engine.run(new StateHeadlessSetup());
@@ -243,6 +249,8 @@ public final class Terasology {
                 soundEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else if(arg.startsWith(SERVER_PORT)) {
+                serverPort = Integer.parseInt(arg.substring(SERVER_PORT.length()));
             } else {
                 recognized = false;
             }
