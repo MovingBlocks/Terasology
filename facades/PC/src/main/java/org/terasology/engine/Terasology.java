@@ -102,6 +102,7 @@ public final class Terasology {
     private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
+    private static int serverPort = -1;
 
     private static Config config = CoreRegistry.get(Config.class);
 
@@ -126,6 +127,10 @@ public final class Terasology {
 
             if (!writeSaveGamesEnabled) {
                 config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
+            }
+
+            if(serverPort != -1) {
+                config.getTransients().setServerPort(serverPort);
             }
 
             if (isHeadless) {
@@ -256,7 +261,7 @@ public final class Terasology {
                 loadLastGame = true;
             } else if(arg.startsWith(SERVER_PORT)) {
                 try {
-                    new TransientConfig().setServerPort(Integer.parseInt(arg.substring(SERVER_PORT.length())));
+                    serverPort = Integer.parseInt(arg.substring(SERVER_PORT.length()));
                 } catch (NumberFormatException e) {
                     new TransientConfig().setServerPort(TerasologyConstants.DEFAULT_PORT);
                     System.out.println("Couldn't parse server port. Using default port.");
