@@ -41,7 +41,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -98,7 +98,7 @@ public final class Terasology {
     private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
-    private static int serverPort = 25777;
+    private static int serverPort = TerasologyConstants.DEFAULT_PORT;
 
     private Terasology() {
     }
