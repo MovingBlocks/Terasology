@@ -109,7 +109,7 @@ dependencies {
     compile group: 'java3d', name: 'vecmath', version: '1.3.1' // Note: Downgraded to this release until TeraMath ready
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.1'
     compile group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
-    compile group: 'org.newdawn.slick', name: 'slick', version: '237'
+    compile group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
     // Logging and audio
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.9'

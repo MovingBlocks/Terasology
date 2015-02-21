@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block;
 
-import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Vector4f;
@@ -73,8 +72,8 @@ public enum DefaultColorSource implements BlockColorSource {
     static {
         try {
             // TODO: Read these from asset manager
-            colorLut = ImageIO.read(ResourceLoader.getResource("assets/textures/grasscolor.png").openStream());
-            foliageLut = ImageIO.read(ResourceLoader.getResource("assets/textures/foliagecolor.png").openStream());
+            colorLut = ImageIO.read(DefaultColorSource.class.getResource("/assets/textures/grasscolor.png"));
+            foliageLut = ImageIO.read(DefaultColorSource.class.getResource("/assets/textures/foliagecolor.png"));
         } catch (IOException e) {
             logger.error("Failed to load LUTs", e);
         }

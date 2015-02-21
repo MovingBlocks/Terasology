@@ -19,7 +19,9 @@ package org.terasology.rendering.assets.texture;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.newdawn.slick.opengl.PNGDecoder;
+
+import de.matthiasmann.twl.utils.PNGDecoder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
@@ -66,7 +68,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             PNGDecoder decoder = new PNGDecoder(pngStream);
 
             ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
+            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
             buf.flip();
 
             ByteBuffer data = buf;
