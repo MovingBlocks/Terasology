@@ -16,6 +16,8 @@
 
 package org.terasology.config;
 
+import org.terasology.engine.TerasologyConstants;
+
 /**
  * Options that should <b>not</b> be stored in the config
  * file such as command line parameters.
@@ -24,6 +26,8 @@ package org.terasology.config;
 public class TransientConfig {
 
     private boolean writeSaveGamesEnabled = true;
+    //The port that is used for hosting
+    private int serverPort = TerasologyConstants.DEFAULT_PORT;
 
     /**
      * Enables/disables write access for the storage manager.
@@ -34,9 +38,17 @@ public class TransientConfig {
     }
 
     /**
-     * @param storeSaveGames if save games should be (periodically) stored on the file system
+     * @param writeSaveGamesEnabled if save games should be (periodically) stored on the file system
      */
     public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
         this.writeSaveGamesEnabled = writeSaveGamesEnabled;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 }

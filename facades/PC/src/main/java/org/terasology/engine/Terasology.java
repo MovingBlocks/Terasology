@@ -122,7 +122,7 @@ public final class Terasology {
                 CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
 
-            CoreRegistry.get(Config.class).getNetwork().setServerPort(serverPort);
+            CoreRegistry.get(Config.class).getTransients().setServerPort(serverPort);
 
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
