@@ -204,6 +204,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("To disable sound use the " + NO_SOUND + " launch argument (default in headless mode).");
         System.out.println();
+        System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
+        System.out.println();
         System.out.println("Examples:");
         System.out.println();
         System.out.println("    Use the current directory as the home directory:");
