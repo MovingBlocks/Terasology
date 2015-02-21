@@ -24,6 +24,14 @@ package org.terasology.config;
 public class TransientConfig {
 
     private boolean writeSaveGamesEnabled = true;
+    //The port that is used for hosting
+    private int serverPort = -1;
+
+    private Config config;
+
+    public TransientConfig(Config config) {
+        this.config = config;
+    }
 
     /**
      * Enables/disables write access for the storage manager.
@@ -34,9 +42,21 @@ public class TransientConfig {
     }
 
     /**
-     * @param storeSaveGames if save games should be (periodically) stored on the file system
+     * @param writeSaveGamesEnabled if save games should be (periodically) stored on the file system
      */
     public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
         this.writeSaveGamesEnabled = writeSaveGamesEnabled;
+    }
+
+    public int getServerPort() {
+        if (serverPort == -1) {
+            return config.getNetwork().getServerPort();
+        } else {
+            return serverPort;
+        }
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 }
