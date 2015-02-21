@@ -18,7 +18,6 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -37,13 +36,12 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.game.GameManifest;
-import org.terasology.logic.characters.interactions.InteractionEndEvent;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
