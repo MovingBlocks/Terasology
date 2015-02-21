@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,101 +83,100 @@ import java.util.concurrent.Callable;
 @RegisterSystem
 public class CoreCommands extends BaseComponentSystem {
 
-	@In
-	private EntityManager entityManager;
+    @In
+    private EntityManager entityManager;
 
-	@In
-	private CameraTargetSystem cameraTargetSystem;
+    @In
+    private CameraTargetSystem cameraTargetSystem;
 
-	@In
-	private WorldRenderer worldRenderer;
+    @In
+    private WorldRenderer worldRenderer;
 
-	@In
-	private PrefabManager prefabManager;
+    @In
+    private PrefabManager prefabManager;
 
-	@In
-	private BlockManager blockManager;
+    @In
+    private BlockManager blockManager;
 
-	@In
-	private Console console;
+    @In
+    private Console console;
 
-	private PickupBuilder pickupBuilder;
+    private PickupBuilder pickupBuilder;
 
-	@Override
-	public void initialise() {
-		pickupBuilder = new PickupBuilder(entityManager);
-	}
+    @Override
+    public void initialise() {
+        pickupBuilder = new PickupBuilder(entityManager);
+    }
 
-	@Command(shortDescription = "Reloads a skin")
-	public String reloadSkin(@CommandParam("skin") String skin) {
-		AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
-		UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
-		if (uiSkinData != null) {
-			CoreRegistry.get(AssetManager.class).generateAsset(uri, uiSkinData);
-			return "Success";
-		} else {
-			return "Unable to resolve skin '" + skin + "'";
-		}
-	}
+    @Command(shortDescription = "Reloads a skin")
+    public String reloadSkin(@CommandParam("skin") String skin) {
+        AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
+        UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
+        if (uiSkinData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiSkinData);
+            return "Success";
+        } else {
+            return "Unable to resolve skin '" + skin + "'";
+        }
+    }
 
-	@Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
-	public String enableAutoScreenReloading() {
-		CoreRegistry.get(NUIManager.class).enableAutoReload();
-		return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
-	}
+    @Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
+    public String enableAutoScreenReloading() {
+        CoreRegistry.get(NUIManager.class).enableAutoReload();
+        return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
+    }
 
-	@Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
-	public String reloadUI(@CommandParam("ui") String ui) {
-		CoreRegistry.get(NUIManager.class).clear();
+    @Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
+    public String reloadUI(@CommandParam("ui") String ui) {
+        CoreRegistry.get(NUIManager.class).clear();
 
-		AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
-		UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
-		if (uiData != null) {
-			CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
-			return "Success";
-		} else {
-			return "Unable to resolve ui '" + ui + "'";
-		}
-	}
+        AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
+        UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
+        if (uiData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
+            return "Success";
+        } else {
+            return "Unable to resolve ui '" + ui + "'";
+        }
+    }
 
+    @Command(shortDescription = "Reloads a shader")
+    public String reloadShader(@CommandParam("shader") String shader) {
+        AssetUri uri = new AssetUri(AssetType.SHADER, shader);
+        ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
+        if (shaderData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, shaderData);
+            return "Success";
+        } else {
+            return "Unable to resolve shader '" + shader + "'";
+        }
+    }
 
-	@Command(shortDescription = "Reloads a shader")
-	public String reloadShader(@CommandParam("shader") String shader) {
-		AssetUri uri = new AssetUri(AssetType.SHADER, shader);
-		ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
-		if (shaderData != null) {
-			CoreRegistry.get(AssetManager.class).generateAsset(uri, shaderData);
-			return "Success";
-		} else {
-			return "Unable to resolve shader '" + shader + "'";
-		}
-	}
+    @Command(shortDescription = "Reloads a material")
+    public String reloadMaterial(@CommandParam("material") String material) {
+        AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
+        MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
+        if (materialData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, materialData);
+            return "Success";
+        } else {
+            return "Unable to resolve material '" + material + "'";
+        }
+    }
 
-	@Command(shortDescription = "Reloads a material")
-	public String reloadMaterial(@CommandParam("material") String material) {
-		AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
-		MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
-		if (materialData != null) {
-			CoreRegistry.get(AssetManager.class).generateAsset(uri, materialData);
-			return "Success";
-		} else {
-			return "Unable to resolve material '" + material + "'";
-		}
-	}
+    @Command(shortDescription = "Toggles Fullscreen Mode")
+    public String fullscreen() {
+        TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
 
-	@Command(shortDescription = "Toggles Fullscreen Mode")
-	public String fullscreen() {
-		TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+        te.setFullscreen(!te.isFullscreen());
 
-		te.setFullscreen(!te.isFullscreen());
+        if (te.isFullscreen()) {
+            return "Switched to fullscreen mode";
+        } else {
+            return "Switched to windowed mode";
+        }
 
-		if (te.isFullscreen()) {
-			return "Switched to fullscreen mode";
-		} else {
-			return "Switched to windowed mode";
-		}
-
-	}
+    }
 
     @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)
     public void kill(EntityRef client) {
@@ -188,17 +187,17 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-	@Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
-	public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
-		Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
-		if (prefab != null) {
-			for (EntityRef entity : entityManager.getAllEntities()) {
-				if (prefab.getURI().equals(entity.getPrefabURI())) {
-					entity.destroy();
-				}
-			}
-		}
-	}
+    @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
+    public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
+        Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+        if (prefab != null) {
+            for (EntityRef entity : entityManager.getAllEntities()) {
+                if (prefab.getURI().equals(entity.getPrefabURI())) {
+                    entity.destroy();
+                }
+            }
+        }
+    }
 
     @Command(shortDescription = "Teleports you to a location", runOnServer = true)
     public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
@@ -210,56 +209,56 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-	@Command(shortDescription = "Exits the game")
-	public void exit() {
-		CoreRegistry.get(GameEngine.class).shutdown();
-	}
+    @Command(shortDescription = "Exits the game")
+    public void exit() {
+        CoreRegistry.get(GameEngine.class).shutdown();
+    }
 
-	@Command(shortDescription = "Join a game")
-	public void join(@CommandParam("address") final String address, @CommandParam(value = "port", required = false) Integer portParam) {
-		final int port = portParam != null ? portParam : TerasologyConstants.DEFAULT_PORT;
+    @Command(shortDescription = "Join a game")
+    public void join(@CommandParam("address") final String address, @CommandParam(value = "port", required = false) Integer portParam) {
+        final int port = portParam != null ? portParam : TerasologyConstants.DEFAULT_PORT;
 
-		Callable<JoinStatus> operation = new Callable<JoinStatus>() {
+        Callable<JoinStatus> operation = new Callable<JoinStatus>() {
 
-			@Override
-			public JoinStatus call() throws InterruptedException {
-				NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-				JoinStatus joinStatus = networkSystem.join(address, port);
-				return joinStatus;
-			}
-		};
+            @Override
+            public JoinStatus call() throws InterruptedException {
+                NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+                JoinStatus joinStatus = networkSystem.join(address, port);
+                return joinStatus;
+            }
+        };
 
-		final NUIManager manager = CoreRegistry.get(NUIManager.class);
-		final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-		popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
-		popup.onSuccess(new Function<JoinStatus, Void>() {
+        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
+        popup.onSuccess(new Function<JoinStatus, Void>() {
 
-			@Override
-			public Void apply(JoinStatus result) {
-				GameEngine engine = CoreRegistry.get(GameEngine.class);
-				if (result.getStatus() != JoinStatus.Status.FAILED) {
-					engine.changeState(new StateLoading(result));
-				} else {
-					MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-					screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
-				}
+            @Override
+            public Void apply(JoinStatus result) {
+                GameEngine engine = CoreRegistry.get(GameEngine.class);
+                if (result.getStatus() != JoinStatus.Status.FAILED) {
+                    engine.changeState(new StateLoading(result));
+                } else {
+                    MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
+                }
 
-				return null;
-			}
-		});
-		popup.startOperation(operation, true);
-	}
+                return null;
+            }
+        });
+        popup.startOperation(operation, true);
+    }
 
-	@Command(shortDescription = "Leaves the current game and returns to main menu")
-	public String leave() {
-		NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-		if (networkSystem.getMode() != NetworkMode.NONE) {
-			CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
-			return "Leaving..";
-		} else {
-			return "Not connected";
-		}
-	}
+    @Command(shortDescription = "Leaves the current game and returns to main menu")
+    public String leave() {
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        if (networkSystem.getMode() != NetworkMode.NONE) {
+            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            return "Leaving..";
+        } else {
+            return "Not connected";
+        }
+    }
 
     @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
@@ -267,65 +266,65 @@ public class CoreCommands extends BaseComponentSystem {
         return cameraTarget.toFullDescription();
     }
 
-	@Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-			helpText = "Writes entity information out into a file named \"entityDump.txt\".")
-	public void dumpEntities() throws IOException {
-		EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
-		PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
-		WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
-		worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
-	}
+    @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
+            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
+    public void dumpEntities() throws IOException {
+        EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
+        PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
+        WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
+        worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+    }
 
-	// TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
-	@Command(shortDescription = "Spawns an instance of a prefab in the world")
-	public String spawnPrefab(@CommandParam("prefabId") String prefabName) {
-		Camera camera = worldRenderer.getActiveCamera();
-		Vector3f spawnPos = camera.getPosition();
-		Vector3f offset = new Vector3f(camera.getViewingDirection());
-		offset.scale(2);
-		spawnPos.add(offset);
-		Vector3f dir = new Vector3f(camera.getViewingDirection());
-		dir.y = 0;
-		if (dir.lengthSquared() > 0.001f) {
-			dir.normalize();
-		} else {
-			dir.set(Direction.FORWARD.getVector3f());
-		}
-		Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
+    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
+    @Command(shortDescription = "Spawns an instance of a prefab in the world")
+    public String spawnPrefab(@CommandParam("prefabId") String prefabName) {
+        Camera camera = worldRenderer.getActiveCamera();
+        Vector3f spawnPos = camera.getPosition();
+        Vector3f offset = new Vector3f(camera.getViewingDirection());
+        offset.scale(2);
+        spawnPos.add(offset);
+        Vector3f dir = new Vector3f(camera.getViewingDirection());
+        dir.y = 0;
+        if (dir.lengthSquared() > 0.001f) {
+            dir.normalize();
+        } else {
+            dir.set(Direction.FORWARD.getVector3f());
+        }
+        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
-		Prefab prefab = Assets.getPrefab(prefabName);
-		if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-			entityManager.create(prefab, spawnPos, rotation);
-			return "Done";
-		} else if (prefab == null) {
-			return "Unknown prefab";
-		} else {
-			return "Prefab cannot be spawned (no location component)";
-		}
-	}
+        Prefab prefab = Assets.getPrefab(prefabName);
+        if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
+            entityManager.create(prefab, spawnPos, rotation);
+            return "Done";
+        } else if (prefab == null) {
+            return "Unknown prefab";
+        } else {
+            return "Prefab cannot be spawned (no location component)";
+        }
+    }
 
-	// TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera), also applied required
-	// TODO: permission
-	@Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-			"item in front of the player. You can simply pick it up.")
-	public String spawnBlock(@CommandParam("blockName") String blockName) {
-		Camera camera = worldRenderer.getActiveCamera();
-		Vector3f spawnPos = camera.getPosition();
-		Vector3f offset = camera.getViewingDirection();
-		offset.scale(3);
-		spawnPos.add(offset);
+    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera), also applied required
+    // TODO: permission
+    @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
+            "item in front of the player. You can simply pick it up.")
+    public String spawnBlock(@CommandParam("blockName") String blockName) {
+        Camera camera = worldRenderer.getActiveCamera();
+        Vector3f spawnPos = camera.getPosition();
+        Vector3f offset = camera.getViewingDirection();
+        offset.scale(3);
+        spawnPos.add(offset);
 
-		BlockFamily block = blockManager.getBlockFamily(blockName);
-		if (block == null) {
-			return "";
-		}
+        BlockFamily block = blockManager.getBlockFamily(blockName);
+        if (block == null) {
+            return "";
+        }
 
-		BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
-		EntityRef blockItem = blockItemFactory.newInstance(block);
+        BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+        EntityRef blockItem = blockItemFactory.newInstance(block);
 
-		pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
-		return "Spawned block.";
-	}
+        pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
+        return "Spawned block.";
+    }
 
     @Command(shortDescription = "Sets the current world time in days")
     public String setWorldTime(@CommandParam("day") float day) {
@@ -335,50 +334,50 @@ public class CoreCommands extends BaseComponentSystem {
         return "World time changed";
     }
 
-	@Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
-	public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
-		if (commandName == null) {
-			StringBuilder msg = new StringBuilder();
-			Collection<ConsoleCommand> commands = console.getCommands();
+    @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
+    public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
+        if (commandName == null) {
+            StringBuilder msg = new StringBuilder();
+            Collection<ConsoleCommand> commands = console.getCommands();
 
-			for (ConsoleCommand cmd : commands) {
-				if (!msg.toString().isEmpty()) {
-					msg.append(Message.NEW_LINE);
-				}
+            for (ConsoleCommand cmd : commands) {
+                if (!msg.toString().isEmpty()) {
+                    msg.append(Message.NEW_LINE);
+                }
 
-				msg.append(FontColor.getColored(cmd.getUsage(), ConsoleColors.COMMAND));
-				msg.append(" - ");
-				msg.append(cmd.getDescription());
-			}
+                msg.append(FontColor.getColored(cmd.getUsage(), ConsoleColors.COMMAND));
+                msg.append(" - ");
+                msg.append(cmd.getDescription());
+            }
 
-			return msg.toString();
-		} else {
-			ConsoleCommand cmd = console.getCommand(commandName);
-			if (cmd == null) {
-				return "No help available for command '" + commandName + "'. Unknown command.";
-			} else {
-				StringBuilder msg = new StringBuilder();
+            return msg.toString();
+        } else {
+            ConsoleCommand cmd = console.getCommand(commandName);
+            if (cmd == null) {
+                return "No help available for command '" + commandName + "'. Unknown command.";
+            } else {
+                StringBuilder msg = new StringBuilder();
 
-				msg.append("=====================================================================================================================");
-				msg.append(Message.NEW_LINE);
-				msg.append(cmd.getUsage());
-				msg.append(Message.NEW_LINE);
-				msg.append("=====================================================================================================================");
-				msg.append(Message.NEW_LINE);
-				if (!cmd.getHelpText().isEmpty()) {
-					msg.append(cmd.getHelpText());
-					msg.append(Message.NEW_LINE);
-					msg.append("=====================================================================================================================");
-					msg.append(Message.NEW_LINE);
-				} else if (!cmd.getDescription().isEmpty()) {
-					msg.append(cmd.getDescription());
-					msg.append(Message.NEW_LINE);
-					msg.append("=====================================================================================================================");
-					msg.append(Message.NEW_LINE);
-				}
+                msg.append("=====================================================================================================================");
+                msg.append(Message.NEW_LINE);
+                msg.append(cmd.getUsage());
+                msg.append(Message.NEW_LINE);
+                msg.append("=====================================================================================================================");
+                msg.append(Message.NEW_LINE);
+                if (!cmd.getHelpText().isEmpty()) {
+                    msg.append(cmd.getHelpText());
+                    msg.append(Message.NEW_LINE);
+                    msg.append("=====================================================================================================================");
+                    msg.append(Message.NEW_LINE);
+                } else if (!cmd.getDescription().isEmpty()) {
+                    msg.append(cmd.getDescription());
+                    msg.append(Message.NEW_LINE);
+                    msg.append("=====================================================================================================================");
+                    msg.append(Message.NEW_LINE);
+                }
 
-				return msg.toString();
-			}
-		}
-	}
+                return msg.toString();
+            }
+        }
+    }
 }
