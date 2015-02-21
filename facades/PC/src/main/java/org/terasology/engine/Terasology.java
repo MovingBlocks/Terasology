@@ -18,6 +18,7 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -45,6 +46,7 @@ import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 
@@ -98,7 +100,8 @@ public final class Terasology {
     private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
-    private static int serverPort = TerasologyConstants.DEFAULT_PORT;
+
+    private static Config config = CoreRegistry.get(Config.class);
 
     private Terasology() {
     }
@@ -119,15 +122,8 @@ public final class Terasology {
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
 
-            Config config = CoreRegistry.get(Config.class);
-
             if (!writeSaveGamesEnabled) {
                 config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
-            }
-
-            config.getTransients().setServerPort(config.getNetwork().getServerPort());
-            if(serverPort != config.getNetwork().getServerPort()) {
-                config.getTransients().setServerPort(serverPort);
             }
 
             if (isHeadless) {
@@ -257,7 +253,12 @@ public final class Terasology {
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
             } else if(arg.startsWith(SERVER_PORT)) {
-                serverPort = Integer.parseInt(arg.substring(SERVER_PORT.length()));
+                try {
+                    config.getTransients().setServerPort(Integer.parseInt(arg.substring(SERVER_PORT.length())));
+                } catch (NumberFormatException e) {
+                    config.getTransients().setServerPort(TerasologyConstants.DEFAULT_PORT);
+                    System.out.println("Couldn't parse server port. Using default port.");
+                }
             } else {
                 recognized = false;
             }

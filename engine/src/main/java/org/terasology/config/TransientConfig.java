@@ -16,7 +16,7 @@
 
 package org.terasology.config;
 
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * Options that should <b>not</b> be stored in the config
@@ -27,7 +27,7 @@ public class TransientConfig {
 
     private boolean writeSaveGamesEnabled = true;
     //The port that is used for hosting
-    private int serverPort = TerasologyConstants.DEFAULT_PORT;
+    private int serverPort = -1;
 
     /**
      * Enables/disables write access for the storage manager.
@@ -45,7 +45,11 @@ public class TransientConfig {
     }
 
     public int getServerPort() {
-        return serverPort;
+        if(serverPort == -1) {
+            return CoreRegistry.get(Config.class).getNetwork().getServerPort();
+        } else {
+            return serverPort;
+        }
     }
 
     public void setServerPort(int serverPort) {
