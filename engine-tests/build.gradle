@@ -38,16 +38,3 @@ dependencies {
     // For reading logback.groovy when running unit tests. Excessive just for a config file?
     testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// General IDE customization                                                                                         //
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-idea {
-    module {
-        // Change around the output a bit
-        inheritOutputDirs = false
-        outputDir = file('build/classes')
-        testOutputDir = file('build/testClasses')
-    }
-}
