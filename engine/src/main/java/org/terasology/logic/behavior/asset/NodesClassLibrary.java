@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -39,7 +40,13 @@ public class NodesClassLibrary extends AbstractClassLibrary<Node> {
     public void scan(ModuleEnvironment environment) {
         for (Class<? extends Node> entry : environment.getSubtypesOf(Node.class)) {
             logger.debug("Found node class {}", entry);
-            register(new SimpleUri(environment.getModuleProviding(entry), entry.getSimpleName()), entry);
+            Name moduleName = environment.getModuleProviding(entry);
+
+            // can be null if the class was encountered in a
+            // unit test (which is not part of the module)
+            if (moduleName != null) {
+                register(new SimpleUri(moduleName, entry.getSimpleName()), entry);
+            }
         }
     }
 

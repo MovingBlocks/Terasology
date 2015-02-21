@@ -139,21 +139,30 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             public <T> TypeAdapter<T> create(final Gson gson, TypeToken<T> type) {
                 final TypeAdapter<T> delegate = gson.getDelegateAdapter(this, type);
                 return new TypeAdapter<T>() {
+                    private NodesClassLibrary nodesClassLibrary = CoreRegistry.get(NodesClassLibrary.class);
+
                     @Override
                     public void write(JsonWriter out, T value) throws IOException {
                         if (value instanceof Node) {
-                            out.beginObject();
-                            idNodes.put(currentId, (Node) value);
-                            nodeIds.put((Node) value, currentId);
+                            Node node = (Node) value;
+                            ClassMetadata<?, ?> metadata = nodesClassLibrary.getMetadata(node.getClass());
 
-                            TypeAdapter<T> delegateAdapter = getDelegateAdapter(value.getClass());
+                            if (metadata != null) {
+                                out.beginObject();
+                                idNodes.put(currentId, node);
+                                nodeIds.put(node, currentId);
 
-                            out.name("nodeType").value(CoreRegistry.get(NodesClassLibrary.class).getMetadata(((Node) value).getClass()).getUri().toString())
-                                    .name("nodeId").value(currentId);
-                            currentId++;
-                            out.name("node");
-                            delegateAdapter.write(out, value);
-                            out.endObject();
+                                TypeAdapter<T> delegateAdapter = getDelegateAdapter(value.getClass());
+
+                                String metadataVal = metadata.getUri().toString();
+                                out.name("nodeType").value(metadataVal).name("nodeId").value(currentId);
+                                currentId++;
+                                out.name("node");
+                                delegateAdapter.write(out, value);
+                                out.endObject();
+                            } else {
+                                delegate.write(out, null);
+                            }
                         } else {
                             delegate.write(out, value);
                         }
