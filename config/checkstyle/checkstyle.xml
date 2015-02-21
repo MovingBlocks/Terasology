@@ -15,6 +15,7 @@
     <!-- Checks that there are no tab characters ('\t') in the source code. -->
     <!-- See http://checkstyle.sourceforge.net/config_whitespace.html#FileTabCharacter -->
     <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
         <property name="fileExtensions" value="java"/>
     </module>
 
@@ -22,11 +23,11 @@
     <!-- See http://checkstyle.sourceforge.net/config_header.html --> 
     <!-- ***************** --> 
     <!-- Checks that a source file begins with a specified header. --> 
-	<module name="RegexpHeader">
-		<property name="severity" value="warning"/>
-		<property name="header" value="/*\n * Copyright 20\d\d MovingBlocks\n *\n * Licensed under the Apache License, Version 2.0"/>
-		<property name="fileExtensions" value="java"/>
-	</module>
+    <module name="RegexpHeader">
+        <property name="severity" value="warning"/>
+        <property name="header" value="/*\n * Copyright 20\d\d MovingBlocks\n *\n * Licensed under the Apache License, Version 2.0"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
   
     <module name="TreeWalker">
         <!-- Checks for Naming Conventions -->
