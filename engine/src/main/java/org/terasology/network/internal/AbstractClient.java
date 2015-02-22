@@ -23,6 +23,7 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Color;
 
 /**
@@ -41,37 +42,52 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public void disconnect() {
-        ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-        if (clientComp != null) {
-            clientComp.clientInfo.destroy();
-            /*
-             * The character does not get destroyed here. Instead it gets only deactivated when it gets stored,
-             * so that it's id lives on.
-             */
-        }
         clientEntity.destroy();
+    }
+
+    private EntityRef findClientEntityRef() {
+        for (EntityRef entityRef: CoreRegistry.get(EntityManager.class).getEntitiesWith(ClientInfoComponent.class)) {
+            ClientInfoComponent clientInfoComponent = entityRef.getComponent(ClientInfoComponent.class);
+            if (clientInfoComponent.playerId.equals(getId())) {
+                return entityRef;
+            }
+        }
+        return EntityRef.NULL;
     }
 
     protected void createEntity(String name, Color color, EntityManager entityManager) {
         // Create player entity
         clientEntity = entityManager.create("engine:client");
 
+
+
         // TODO: Send event for clientInfo creation, don't create here.
-        EntityRef clientInfo = entityManager.create("engine:clientInfo");
-        DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
-        displayInfo.name = name;
-        clientInfo.saveComponent(displayInfo);
-        
-        // mark clientInfo entities with a dedicated component
-        ClientInfoComponent cic = new ClientInfoComponent();
-        clientInfo.addComponent(cic);
-        
-        ColorComponent colorComp = new ColorComponent();
-        colorComp.color = color;
-        clientInfo.addComponent(colorComp);
+
+        EntityRef clientInfo = findClientEntityRef();
+        if (!clientInfo.exists()) {
+            clientInfo = createClientInfoEntity(name, color, entityManager);
+        }
 
         ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
         clientComponent.clientInfo = clientInfo;
         clientEntity.saveComponent(clientComponent);
+    }
+
+    private EntityRef createClientInfoEntity(String name, Color color, EntityManager entityManager) {
+        EntityRef clientInfo;
+        clientInfo = entityManager.create("engine:clientInfo");
+        DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
+        displayInfo.name = name;
+        clientInfo.saveComponent(displayInfo);
+
+        // mark clientInfo entities with a dedicated component
+        ClientInfoComponent cic = new ClientInfoComponent();
+        cic.playerId = getId();
+        clientInfo.addComponent(cic);
+
+        ColorComponent colorComp = new ColorComponent();
+        colorComp.color = color;
+        clientInfo.addComponent(colorComp);
+        return clientInfo;
     }
 }
