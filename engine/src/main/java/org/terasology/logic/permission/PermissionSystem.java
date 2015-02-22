@@ -81,7 +81,13 @@ public class PermissionSystem extends BaseComponentSystem implements PermissionM
         }
     }
 
+    /**
+     *
+     * @param player client info entity of the player
+     *
+     * @return true if it is the local player
+     */
     private boolean isLocal(EntityRef player) {
-        return localPlayer != null && localPlayer.getCharacterEntity() == player;
+        return localPlayer != null && localPlayer.getClientInfoEntity().equals(player);
     }
 }

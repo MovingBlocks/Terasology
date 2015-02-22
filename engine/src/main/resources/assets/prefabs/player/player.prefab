@@ -60,8 +60,5 @@
               0,0,0,0,0,0,0,0,0,0
             ]
     },
-    "Breather" : {},
-    "PermissionSet": {
-        "permissions": []
-    }
+    "Breather" : {}
 }

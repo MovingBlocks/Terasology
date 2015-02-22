@@ -6,5 +6,8 @@
     },
     "Network" : {
         "replicateMode" : "ALWAYS"
+    },
+    "PermissionSet": {
+        "permissions": []
     }
 }

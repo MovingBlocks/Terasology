@@ -46,7 +46,7 @@ public class PermissionCommands extends BaseComponentSystem {
         if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
             permissionConfig.setOneTimeAuthorizationKey("");
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
-            permissionManager.addPermission(clientComponent.character, PermissionManager.OPERATOR_PERMISSION);
+            permissionManager.addPermission(clientComponent.clientInfo, PermissionManager.OPERATOR_PERMISSION);
             return "Permission key used: You have now \"op\" rights";
         } else {
             return "Key invalid or used";
@@ -64,7 +64,7 @@ public class PermissionCommands extends BaseComponentSystem {
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
             if (clientHasName(clientComponent, player)) {
-                permissionManager.addPermission(clientComponent.character, permission);
+                permissionManager.addPermission(clientComponent.clientInfo, permission);
                 permissionGiven = true;
             }
         }
@@ -87,7 +87,7 @@ public class PermissionCommands extends BaseComponentSystem {
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
             if (clientHasName(clientComponent, player)) {
-                permissionManager.removePermission(clientComponent.character, permission);
+                permissionManager.removePermission(clientComponent.clientInfo, permission);
                 permissionGiven = true;
             }
         }

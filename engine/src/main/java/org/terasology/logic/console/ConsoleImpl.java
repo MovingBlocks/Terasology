@@ -267,7 +267,7 @@ public class ConsoleImpl implements Console {
             ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
             EntityRef character = clientComponent.character;
 
-            if (permissionManager.hasPermission(character, requiredPermission)) {
+            if (permissionManager.hasPermission(clientComponent.clientInfo, requiredPermission)) {
                 hasPermission = true;
             }
         }

@@ -76,6 +76,14 @@ public class LocalPlayer {
         return EntityRef.NULL;
     }
 
+    public EntityRef getClientInfoEntity() {
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+        if (client != null) {
+            return client.clientInfo;
+        }
+        return EntityRef.NULL;
+    }
+
     public boolean isValid() {
         EntityRef characterEntity = getCharacterEntity();
         return characterEntity.exists() && characterEntity.hasComponent(LocationComponent.class) && characterEntity.hasComponent(CharacterComponent.class)

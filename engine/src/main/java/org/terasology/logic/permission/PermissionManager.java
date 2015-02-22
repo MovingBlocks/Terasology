@@ -22,37 +22,37 @@ public interface PermissionManager {
     String OPERATOR_PERMISSION = "op";
 
     /**
-     * Adds specified permission to the player (character).
+     * Adds specified permission to the player (client info entity).
      *
-     * @param player     Player (character) to add permission to.
+     * @param player     Player (client info entity) to add permission to.
      * @param permission Permission to add.
      */
     void addPermission(EntityRef player, String permission);
 
     /**
-     * Checks if the specified player (character) has said permission.
+     * Checks if the specified player (client info entity) has said permission.
      * Note: Local player is considered to have all the permissions in all situations.
      *
-     * @param player     Player (character) to check.
+     * @param player     Player (client info entity) to check.
      * @param permission Permission to check.
-     * @return If player (character) has permission.
+     * @return If player (client info entity) has permission.
      */
     boolean hasPermission(EntityRef player, String permission);
 
     /**
-     * Checks if the specified player (character) has permission that is accepted by the specified predicate.
+     * Checks if the specified player (client info entity) has permission that is accepted by the specified predicate.
      * Note: Local player is considered to have all the permissions in all situations.
      *
-     * @param player              Player (character) to check.
+     * @param player              Player (client info entity) to check.
      * @param permissionPredicate Permission predicate to check against.
-     * @return If player (character) has permission matching the predicate.
+     * @return If player (client info entity) has permission matching the predicate.
      */
     boolean hasPermission(EntityRef player, Predicate<String> permissionPredicate);
 
     /**
-     * Removes specified permission from the player (character).
+     * Removes specified permission from the player (client info entity).
      *
-     * @param player     Player (character) to remove permission from.
+     * @param player     Player (client info entity) to remove permission from.
      * @param permission Permission to remove.
      */
     void removePermission(EntityRef player, String permission);
