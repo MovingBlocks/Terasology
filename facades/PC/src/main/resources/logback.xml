@@ -17,9 +17,14 @@
     </discriminator>
     <timeout>30 seconds</timeout>
     <sift>
-      <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${logFileFolder}/Terasology-${phase}.log</file>
-        <append>false</append>
+      <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <!-- daily rollover -->
+          <fileNamePattern>${logFileFolder}/Terasology-%d{yyyy-MM-dd}-${phase}.log</fileNamePattern>
+
+          <!-- keep 10 days' worth of history -->
+          <maxHistory>10</maxHistory>
+        </rollingPolicy>
         <encoder>
           <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
