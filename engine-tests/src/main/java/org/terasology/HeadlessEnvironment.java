@@ -19,7 +19,8 @@ package org.terasology;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.newdawn.slick.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -78,6 +79,8 @@ import static org.mockito.Mockito.mock;
  * @author Martin Steiger
  */
 public class HeadlessEnvironment extends Environment {
+
+    private static final Logger logger = LoggerFactory.getLogger(HeadlessEnvironment.class);
 
     /**
      * Setup a headless ( = no graphics ) environment
@@ -199,9 +202,9 @@ public class HeadlessEnvironment extends Environment {
 
         if (result.isSuccess()) {
             ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
-            Log.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
+            logger.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
         } else {
-            Log.error("Could not resolve module dependencies for " + moduleNames);
+            logger.error("Could not resolve module dependencies for " + moduleNames);
         }
 
         CoreRegistry.put(ModuleManager.class, moduleManager);

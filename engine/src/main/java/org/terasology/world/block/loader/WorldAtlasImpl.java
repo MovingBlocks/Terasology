@@ -23,7 +23,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectIntProcedure;
 
-import org.newdawn.slick.opengl.PNGDecoder;
+import de.matthiasmann.twl.utils.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -254,7 +254,7 @@ public class WorldAtlasImpl implements WorldAtlas {
                 ImageIO.write(image, "png", bos);
                 PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
                 ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
+                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
                 buf.flip();
                 data[i] = buf;
             } catch (IOException e) {

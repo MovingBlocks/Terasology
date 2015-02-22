@@ -15,6 +15,21 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+import javax.imageio.ImageIO;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
@@ -22,7 +37,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.KHRDebugCallback;
-import org.newdawn.slick.opengl.ImageIOImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -70,23 +84,11 @@ import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import static org.lwjgl.opengl.GL11.*;
-
 public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
     private GLBufferPool bufferPool = new GLBufferPool(false);
-
-    @Override
-    public void preInitialise() {
-        super.preInitialise();
-    }
 
     @Override
     public void postInitialise(Config config) {
@@ -151,11 +153,12 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
 
                 Display.setIcon(new ByteBuffer[]{
-                        new ImageIOImageData().imageToByteBuffer(icon16, false, false, null),
-                        new ImageIOImageData().imageToByteBuffer(icon32, false, false, null),
-                        new ImageIOImageData().imageToByteBuffer(icon64, false, false, null),
-                        new ImageIOImageData().imageToByteBuffer(icon128, false, false, null)
+                        imageToByteBuffer(icon16),
+                        imageToByteBuffer(icon32),
+                        imageToByteBuffer(icon64),
+                        imageToByteBuffer(icon128)
                 });
+
             } catch (IOException | IllegalArgumentException e) {
                 logger.warn("Could not set icon", e);
             }
@@ -179,6 +182,18 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         } catch (LWJGLException e) {
             throw new RuntimeException("Can not initialize graphics device.", e);
         }
+    }
+
+    public ByteBuffer imageToByteBuffer(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int[] data = image.getRGB(0, 0, width, height, null, 0, width);
+        ByteBuffer imageBuffer = ByteBuffer.allocateDirect(data.length * 4);
+        imageBuffer.order(ByteOrder.nativeOrder());
+        imageBuffer.asIntBuffer().put(data);
+
+        return imageBuffer;
     }
 
     private void initOpenGL() {
