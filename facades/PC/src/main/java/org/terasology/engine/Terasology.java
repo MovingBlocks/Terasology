@@ -126,7 +126,7 @@ public final class Terasology {
                 config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
 
-            if(serverPort != -1) {
+            if (serverPort != -1) {
                 config.getTransients().setServerPort(serverPort);
             }
 
@@ -256,12 +256,11 @@ public final class Terasology {
                 soundEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
-            } else if(arg.startsWith(SERVER_PORT)) {
+            } else if (arg.startsWith(SERVER_PORT)) {
                 try {
                     serverPort = Integer.parseInt(arg.substring(SERVER_PORT.length()));
                 } catch (NumberFormatException e) {
-                    serverPort = TerasologyConstants.DEFAULT_PORT;
-                    System.out.println("Couldn't parse server port. Using default port.");
+                    reportException(e);
                 }
             } else {
                 recognized = false;

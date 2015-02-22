@@ -45,7 +45,7 @@ public class TransientConfig {
     }
 
     public int getServerPort() {
-        if(serverPort == -1) {
+        if (serverPort == -1) {
             return CoreRegistry.get(Config.class).getNetwork().getServerPort();
         } else {
             return serverPort;
