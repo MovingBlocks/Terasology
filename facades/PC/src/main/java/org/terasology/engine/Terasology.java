@@ -16,14 +16,12 @@
 package org.terasology.engine;
 
 import java.awt.GraphicsEnvironment;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -46,13 +44,6 @@ import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.FileAppender;
-import ch.qos.logback.core.util.StatusPrinter;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -166,32 +157,7 @@ public final class Terasology {
             path = Paths.get("logs");
         }
 
-        File file = path.resolve("Terasology.log").toFile();
-        setupLogging(file);
-    }
-
-    private static void setupLogging(File file) {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-
-        FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
-        fileAppender.setContext(context);
-        fileAppender.setName("FILE");
-        fileAppender.setAppend(false);
-        fileAppender.setFile(file.getAbsolutePath());
-
-        PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-        encoder.setContext(context);
-        encoder.setPattern("%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n");
-        encoder.start();
-
-        fileAppender.setEncoder(encoder);
-        fileAppender.start();
-
-        // attach the rolling file appender to the logger of your choice
-        Logger logbackLogger = context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-        logbackLogger.addAppender(fileAppender);
-
-        StatusPrinter.print(context);
+        LoggingContext.initialize(path);
     }
 
     private static void handlePrintUsageRequest(String[] args) {
