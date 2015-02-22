@@ -181,7 +181,7 @@ public final class Terasology {
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
                 NO_SOUND,
-                SERVER_PORT);
+                SERVER_PORT + "<port>");
 
         StringBuilder optText = new StringBuilder();
 
