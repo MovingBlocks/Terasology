@@ -71,6 +71,7 @@ public class RenderingConfig {
     private boolean vSync;
     private boolean clampLighting;
     private int fboScale = 100;
+    private boolean dumpShaders;
     private int screenshotSize = 1;
     private String screenshotFormat = "png";
     private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
@@ -445,6 +446,14 @@ public class RenderingConfig {
 
     public void setScreenshotFormat(String screenshotFormat) {
         this.screenshotFormat = screenshotFormat;
+    }
+
+    public boolean isDumpShaders() {
+        return dumpShaders;
+    }
+
+    public void setDumpShaders(boolean dumpShaders) {
+        this.dumpShaders = dumpShaders;
     }
 
     @Override
