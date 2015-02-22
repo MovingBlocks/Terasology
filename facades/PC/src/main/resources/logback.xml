@@ -8,12 +8,23 @@
     <resetJUL>true</resetJUL>
   </contextListener>
 
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>${logFileFolder}/Terasology.log</file>
-    <append>false</append>
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>
+  <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <!-- in the absence of the class attribute, it is assumed that the
+         desired discriminator type is MDCBasedDiscriminator -->
+    <discriminator>
+      <key>phase</key>
+      <defaultValue>init</defaultValue>
+    </discriminator>
+    <timeout>30 seconds</timeout>
+    <sift>
+      <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${logFileFolder}/Terasology-${phase}.log</file>
+        <append>false</append>
+        <encoder>
+          <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+      </appender>
+    </sift>
   </appender>
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -24,7 +35,7 @@
   </appender>
 
   <root level="debug">
-    <appender-ref ref="FILE" />
+    <appender-ref ref="SIFT" />
     <appender-ref ref="CONSOLE" />
   </root>
 

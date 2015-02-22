@@ -24,6 +24,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.LoggingContext;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -148,6 +149,9 @@ public class StateIngame implements GameState {
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);
         GameThread.clearWaitingProcesses();
+
+        LoggingContext.endGamePhase();
+
         /*
          * Clear the binding as otherwise the complete ingame state would be
          * referenced.

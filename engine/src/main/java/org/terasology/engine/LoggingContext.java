@@ -16,7 +16,15 @@
 
 package org.terasology.engine;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
+import org.slf4j.MDC;
+import org.terasology.game.GameManifest;
 
 /**
  * Configures the underlying logback logging framework.
@@ -24,13 +32,29 @@ import java.nio.file.Path;
  */
 public final class LoggingContext {
 
+    /**
+     * The variable name for the log file root folder as defined in logback.xml
+     */
+    private static final String LOG_FILE_FOLDER = "logFileFolder";
+
+    /**
+     * The variable name for the discriminator in the sifting appender
+     */
+    private static final String PHASE_KEY = "phase";
+
     private LoggingContext() {
         // no instances
     }
 
     public static void initialize(Path logFileFolder) {
         String pathString = logFileFolder.normalize().toString();
-        System.setProperty("logFileFolder", pathString);
+        System.setProperty(LOG_FILE_FOLDER, pathString);
+
+        try {
+            deleteLogFiles(logFileFolder);
+        } catch (IOException e) {
+            System.err.println("Could not delete log files");
+        }
 
         // Unfortunately, setting context-based variables works only after initialization
         // has completed. Manual initialization will work but is overriden by the first
@@ -50,5 +74,27 @@ public final class LoggingContext {
 //        } catch (JoranException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    private static void deleteLogFiles(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+
+                if (file.toString().endsWith(".log")) {
+                    Files.delete(file);
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    public static void startGamePhase(GameManifest game) {
+        MDC.put(PHASE_KEY, game.getTitle());
+    }
+
+    public static void endGamePhase() {
+        MDC.put(PHASE_KEY, "init");
     }
 }

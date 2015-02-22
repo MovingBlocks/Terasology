@@ -130,7 +130,7 @@ dependencies {
     // TODO: These could be moved into facade
     compile group: 'org.terasology', name: 'CrashReporter', version: '2.0.0'
 
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.9'
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
