@@ -18,9 +18,7 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.terasology.config.Config;
-import org.terasology.config.TransientConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
@@ -44,11 +42,9 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
 import java.awt.GraphicsEnvironment;
-import java.beans.Transient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 
