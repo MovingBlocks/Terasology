@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
@@ -51,6 +52,7 @@ public class NetworkConfig implements Iterable<ServerInfo> {
 
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
+        CoreRegistry.get(Config.class).getTransients().setServerPort(serverPort);
     }
 
     @Override

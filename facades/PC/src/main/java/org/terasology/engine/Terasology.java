@@ -104,8 +104,6 @@ public final class Terasology {
     private static boolean loadLastGame;
     private static int serverPort = -1;
 
-    private static Config config = CoreRegistry.get(Config.class);
-
     private Terasology() {
     }
 
@@ -124,6 +122,8 @@ public final class Terasology {
         handleLaunchArguments(args);
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
+
+            Config config = CoreRegistry.get(Config.class);
 
             if (!writeSaveGamesEnabled) {
                 config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
@@ -263,7 +263,7 @@ public final class Terasology {
                 try {
                     serverPort = Integer.parseInt(arg.substring(SERVER_PORT.length()));
                 } catch (NumberFormatException e) {
-                    new TransientConfig().setServerPort(TerasologyConstants.DEFAULT_PORT);
+                    serverPort = TerasologyConstants.DEFAULT_PORT;
                     System.out.println("Couldn't parse server port. Using default port.");
                 }
             } else {
