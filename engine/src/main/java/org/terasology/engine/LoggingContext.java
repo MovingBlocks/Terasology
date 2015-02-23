@@ -53,7 +53,7 @@ public final class LoggingContext {
         try {
             deleteLogFiles(logFileFolder);
         } catch (IOException e) {
-            System.err.println("Could not delete log files");
+            e.printStackTrace();
         }
 
         // Unfortunately, setting context-based variables works only after initialization
@@ -82,7 +82,12 @@ public final class LoggingContext {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
                 if (file.toString().endsWith(".log")) {
-                    Files.delete(file);
+                    try {
+                        Files.delete(file);
+                    } catch (IOException e) {
+                        System.err.println(String.format("Could not delete log file \"%s\" - %s",
+                                path.relativize(file), e.getMessage()));
+                    }
                 }
 
                 return FileVisitResult.CONTINUE;
