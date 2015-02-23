@@ -29,6 +29,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -48,7 +49,7 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     @In
     private AudioManager audioManager;
 
-    @Command(shortDescription = "Toggle muting all sound")
+    @Command(shortDescription = "Toggle muting all sound", requiredPermission = PermissionManager.NO_PERMISSION)
     public String mute(@Sender EntityRef sender) {
         audioManager.setMute(!audioManager.isMute());
         return "All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.");

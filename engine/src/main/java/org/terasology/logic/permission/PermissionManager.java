@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 public interface PermissionManager {
     static final String OPERATOR_PERMISSION = "op";
     static final String CHAT_PERMISSION = "chat";
+    static final String NO_PERMISSION = "";
 
     /**
      * Adds specified permission to the player (client info entity).

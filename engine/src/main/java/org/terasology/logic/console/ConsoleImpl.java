@@ -262,10 +262,10 @@ public class ConsoleImpl implements Console {
         PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
         boolean hasPermission = true;
 
-        if (permissionManager != null && requiredPermission != null && !requiredPermission.isEmpty()) {
+        if (permissionManager != null && requiredPermission != null
+                && !requiredPermission.equals(PermissionManager.NO_PERMISSION)) {
             hasPermission = false;
             ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
-            EntityRef character = clientComponent.character;
 
             if (permissionManager.hasPermission(clientComponent.clientInfo, requiredPermission)) {
                 hasPermission = true;
