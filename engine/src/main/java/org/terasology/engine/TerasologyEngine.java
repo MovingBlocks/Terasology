@@ -381,6 +381,9 @@ public class TerasologyEngine implements GameEngine {
                 logger.error("Rethrowing original exception");
             }
             throw e;
+        } catch (Throwable t) {
+            logger.error("Uncaught throwable", t);
+            throw t;
         }
     }
 
