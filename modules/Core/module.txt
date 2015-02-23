@@ -1,8 +1,6 @@
 {
     "id" : "Core",
     "version" : "0.49.1",
-    "displayName" : "Core Gameplay",
-    "description" : "This mandatory module introduces the core Terasology mechanics",
-    "isGameplay" : "true",
-    "defaultWorldGenerator" : "Core:FacetedPerlin"
+    "displayName" : "Core Content",
+    "description" : "This module adds a set of base content for Terasology"
 }
