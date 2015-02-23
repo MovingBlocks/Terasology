@@ -17,12 +17,17 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import com.google.common.collect.Lists;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
@@ -34,6 +39,8 @@ import java.util.List;
  * @author Immortius
  */
 public class RegisterMods extends SingleStepLoadProcess {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegisterMods.class);
 
     private GameManifest gameManifest;
 
@@ -57,7 +64,12 @@ public class RegisterMods extends SingleStepLoadProcess {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(moduleIds);
         if (result.isSuccess()) {
-            moduleManager.loadEnvironment(result.getModules(), true);
+            ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
+
+            for (Module moduleInfo : env.getModulesOrderedByDependencies()) {
+                logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
+            }
+
             ApplyModulesUtil.applyModules();
         } else {
             CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
