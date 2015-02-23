@@ -38,6 +38,7 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.logic.console.ui.MiniChatOverlay;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
@@ -94,7 +95,9 @@ public class ChatSystem extends BaseComponentSystem {
         }
     }
 
-    @Command(runOnServer = true, shortDescription = "Sends a message to all other players")
+    @Command(runOnServer = true,
+            requiredPermission = PermissionManager.CHAT_PERMISSION,
+            shortDescription = "Sends a message to all other players")
     public String say(
             @Sender EntityRef sender,
             @CommandParam(value = "message") String message
@@ -108,7 +111,9 @@ public class ChatSystem extends BaseComponentSystem {
         return "Message sent.";
     }
 
-    @Command(runOnServer = true, shortDescription = "Sends a private message to a specified user")
+    @Command(runOnServer = true,
+            requiredPermission = PermissionManager.CHAT_PERMISSION,
+            shortDescription = "Sends a private message to a specified user")
     public String whisper(
             @Sender EntityRef sender,
             @CommandParam(value = "user", suggester = UsernameSuggester.class) String username,

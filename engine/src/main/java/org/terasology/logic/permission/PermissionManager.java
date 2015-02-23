@@ -19,7 +19,8 @@ import com.google.common.base.Predicate;
 import org.terasology.entitySystem.entity.EntityRef;
 
 public interface PermissionManager {
-    String OPERATOR_PERMISSION = "op";
+    static final String OPERATOR_PERMISSION = "op";
+    static final String CHAT_PERMISSION = "chat";
 
     /**
      * Adds specified permission to the player (client info entity).
