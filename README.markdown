@@ -43,7 +43,7 @@ This will launch the server and store game files in the "server" subdir at the p
 
 In this case *there is no default player with "op" rights*. You need to "op" yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`
 
-Join the server and run the console command `usePermissionKey <key>` where you replace `<key>` with the value from your config file. This only works once.
+Join the server and run the console command `usePermissionKey <key>` where you replace `<key>` with the value from the server's config file. This only works once.
 
 In either server situation you can "op" other players by executing `givePermission <player> op` in the console, replacing `<player>` with the desired player's name (case sensitive).
 
@@ -188,6 +188,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [CommonWorld](https://github.com/Terasology/CommonWorld) - general world generation utility module
 * [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
 * Core - mandatory content needed for normal game launch
+* CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
 * [CustomOreGen](https://github.com/Terasology/CustomOreGen) - library containing an ore distribution algorithm based on [JRoush's CustomOreGen](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1282294-1-4-6-v2-custom-ore-generation-updated-jan-5th)
 * [Durability](https://github.com/Terasology/Durability) - library module to support destructible items (wear and tear eventually breaks them)
