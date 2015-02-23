@@ -24,5 +24,14 @@ import org.terasology.entitySystem.Component;
  */
 @Replicate
 public final class ClientInfoComponent implements Component {
-    // just a marker
+
+    /**
+     * When a client connects, the game searches a client info component for the client id ({@link Client#getId()}).
+     * If it finds one it is gets reused, otherwise a new one will be created.
+     *
+     * The field does not get replicated as there is no need to tell the clients the player ids.
+     *
+     */
+    @NoReplicate
+    public String playerId;
 }

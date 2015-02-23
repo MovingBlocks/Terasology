@@ -1,6 +1,5 @@
 {
-    // TODO: This should be persisted, but the Network component is removed while the client is disconnected
-    "persisted" : false,
+    "persisted" : true,
     "DisplayName" : {
         "name" : "Unknown",
         "description" : "A player"
