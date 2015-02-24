@@ -24,7 +24,6 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
-import org.terasology.engine.LoggingContext;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -32,6 +31,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.game.GameManifest;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -77,9 +77,13 @@ public class StateIngame implements GameState {
 
     private StorageManager storageManager;
 
-    public StateIngame() {
+    private GameManifest gameManifest;
+
+    public StateIngame(GameManifest gameManifest) {
+        this.gameManifest = gameManifest;
     }
 
+    @Override
     public void init(GameEngine engine) {
         nuiManager = CoreRegistry.get(NUIManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
@@ -150,8 +154,6 @@ public class StateIngame implements GameState {
         BlockManager.getAir().setEntity(EntityRef.NULL);
         GameThread.clearWaitingProcesses();
 
-        LoggingContext.endGamePhase();
-
         /*
          * Clear the binding as otherwise the complete ingame state would be
          * referenced.
@@ -193,6 +195,7 @@ public class StateIngame implements GameState {
         return !pauseGame;
     }
 
+    @Override
     public void render() {
         DisplayDevice displayDevice = CoreRegistry.get(DisplayDevice.class);
         displayDevice.prepareToRender();
@@ -215,6 +218,11 @@ public class StateIngame implements GameState {
     @Override
     public boolean isHibernationAllowed() {
         return networkSystem.getMode() == NetworkMode.NONE;
+    }
+
+    @Override
+    public String getLoggingPhase() {
+        return gameManifest.getTitle();
     }
 
     public void renderUserInterface() {

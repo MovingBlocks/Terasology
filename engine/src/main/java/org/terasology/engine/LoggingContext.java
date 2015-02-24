@@ -24,7 +24,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.slf4j.MDC;
-import org.terasology.game.GameManifest;
+import org.terasology.engine.modes.GameState;
 
 /**
  * Configures the underlying logback logging framework.
@@ -33,14 +33,24 @@ import org.terasology.game.GameManifest;
 public final class LoggingContext {
 
     /**
-     * The variable name for the log file root folder as defined in logback.xml
+     * The identifier for the initialization phase
      */
-    private static final String LOG_FILE_FOLDER = "logFileFolder";
+    public static final String INIT_PHASE = "init";
+
+    /**
+     * The identifier for the menu phase
+     */
+    public static final String MENU = "menu";
 
     /**
      * The variable name for the discriminator in the sifting appender
      */
     private static final String PHASE_KEY = "phase";
+
+    /**
+     * The variable name for the log file root folder as defined in logback.xml
+     */
+    private static final String LOG_FILE_FOLDER = "logFileFolder";
 
     private LoggingContext() {
         // no instances
@@ -76,30 +86,33 @@ public final class LoggingContext {
 //        }
     }
 
-    private static void deleteLogFiles(Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+    private static void deleteLogFiles(Path rootPath) throws IOException {
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
                 if (file.toString().endsWith(".log")) {
-                    try {
-                        Files.delete(file);
-                    } catch (IOException e) {
-                        System.err.println(String.format("Could not delete log file \"%s\" - %s",
-                                path.relativize(file), e.getMessage()));
-                    }
+                    tryDelete(rootPath, file);
                 }
 
                 return FileVisitResult.CONTINUE;
             }
+
+            private void tryDelete(Path path, Path file) {
+                try {
+                    Files.delete(file);
+                } catch (IOException e) {
+                    System.err.println(String.format("Could not delete log file \"%s\" - %s",
+                            path.relativize(file), e.getMessage()));
+                }
+            }
         });
     }
 
-    public static void startGamePhase(GameManifest game) {
-        MDC.put(PHASE_KEY, game.getTitle());
-    }
-
-    public static void endGamePhase() {
-        MDC.put(PHASE_KEY, "init");
+    public static void setGameState(GameState state) {
+        String phase = state.getLoggingPhase();
+        phase = phase.replaceAll("\\s", "_");
+        MDC.put(PHASE_KEY, phase);
     }
 }

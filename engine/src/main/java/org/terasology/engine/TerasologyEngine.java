@@ -556,6 +556,7 @@ public class TerasologyEngine implements GameEngine {
             currentState.dispose();
         }
         currentState = newState;
+        LoggingContext.setGameState(newState);
         newState.init(this);
         for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
             subscriber.onStateChange();

@@ -44,4 +44,9 @@ public interface GameState {
      * @return Whether the game should hibernate when it loses focus
      */
     boolean isHibernationAllowed();
+
+    /**
+     * @return identifies the target for logging events
+     */
+    String getLoggingPhase();
 }

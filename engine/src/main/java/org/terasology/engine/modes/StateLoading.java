@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.LoggingContext;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.engine.modes.loadProcesses.CacheBlocks;
@@ -117,8 +116,6 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
-
-        LoggingContext.startGamePhase(gameManifest);
 
         CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
@@ -243,7 +240,7 @@ public class StateLoading implements GameState {
         if (current == null) {
             nuiManager.closeScreen(loadingScreen);
             nuiManager.setHUDVisible(true);
-            CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
+            CoreRegistry.get(GameEngine.class).changeState(new StateIngame(gameManifest));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);
@@ -261,4 +258,8 @@ public class StateLoading implements GameState {
         return false;
     }
 
+    @Override
+    public String getLoggingPhase() {
+        return gameManifest.getTitle();
+    }
 }
