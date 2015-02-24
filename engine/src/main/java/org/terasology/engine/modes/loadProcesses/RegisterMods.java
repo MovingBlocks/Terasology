@@ -72,6 +72,7 @@ public class RegisterMods extends SingleStepLoadProcess {
 
             ApplyModulesUtil.applyModules();
         } else {
+            logger.warn("Missing at least one required module or dependency: {}", moduleIds);
             CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
         }
         return true;
