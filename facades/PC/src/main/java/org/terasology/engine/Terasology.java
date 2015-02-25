@@ -297,8 +297,7 @@ public final class Terasology {
         }
 
         if (crashReportEnabled) {
-            Path logFile = logPath.resolve("Terasology.log");
-            CrashReporter.report(throwable, logFile);
+            CrashReporter.report(throwable, logPath);
         }
     }
 
