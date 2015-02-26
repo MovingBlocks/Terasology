@@ -19,7 +19,11 @@ import com.google.common.base.Predicate;
 import org.terasology.entitySystem.entity.EntityRef;
 
 public interface PermissionManager {
+    /**
+     * Allows the player to use chat commands.
+     */
     static final String CHAT_PERMISSION = "chat";
+    
     /**
      * Allows the player to use cheats that
      * <ul>
@@ -30,6 +34,10 @@ public interface PermissionManager {
      * not mining.
      */
     static final String CHEAT_PERMISSION = "cheat";
+
+    /**
+     * Used to indicate that something requires no permission.
+     */
     static final String NO_PERMISSION = "";
 
     /**
