@@ -124,9 +124,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                     }
 
                     // find the first gameplay module that is available
-                    for (Name moduleName : config.getDefaultModSelection().listModules()) {
-                        Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-
+                    for (Module module : moduleManager.getRegistry()) {
                         // module is null if it is no longer present
                         if (module != null && moduleManager.isGameplayModule(module)) {
                             set(module);
@@ -141,7 +139,7 @@ public class CreateGameScreen extends CoreScreenLayer {
 
             @Override
             public void set(Module value) {
-                setSelectedGameplayModule(selected, value);
+                setSelectedGameplayModule(value);
                 selected = value;
             }
         });
@@ -194,20 +192,6 @@ public class CreateGameScreen extends CoreScreenLayer {
                     WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
                     if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
                         return info;
-                    }
-
-                    // get the default generator from the selected gameplay module
-                    Module selectedGameplayModule = gameplay.getSelection();
-                    if (selectedGameplayModule != null) {
-                        String defaultWorldGenerator = selectedGameplayModule.getMetadata().getExtension(ModuleManager.DEFAULT_WORLD_GENERATOR_EXT, String.class);
-                        if (defaultWorldGenerator != null) {
-                            for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
-                                if (worldGenInfo.getUri().equals(new SimpleUri(defaultWorldGenerator))) {
-                                    set(worldGenInfo);
-                                    return worldGenInfo;
-                                }
-                            }
-                        }
                     }
 
                     // just use the first available generator
@@ -323,31 +307,43 @@ public class CreateGameScreen extends CoreScreenLayer {
     private Set<Name> getAllEnabledModuleNames() {
         Set<Name> enabledModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-            if (module != null) {
-                enabledModules.add(moduleName);
-                if (module != null) {
-                    for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-                        enabledModules.add(dependencyInfo.getId());
-                    }
-                }
-            }
+            enabledModules.add(moduleName);
+            recursivelyAddModuleDependencies(enabledModules, moduleName);
         }
 
         return enabledModules;
     }
 
-    private void setSelectedGameplayModule(Module previousModule, Module module) {
+    private void recursivelyAddModuleDependencies(Set<Name> modules, Name moduleName) {
+        Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
+        if (module != null) {
+            if (module != null) {
+                for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
+                    modules.add(dependencyInfo.getId());
+                    recursivelyAddModuleDependencies(modules, dependencyInfo.getId());
+                }
+            }
+        }
+    }
+
+    private void setSelectedGameplayModule(Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.setDefaultGameplayModuleName(module.getId().toString());
-        if (previousModule != null) {
-            moduleConfig.removeModule(previousModule.getId());
-        }
+        moduleConfig.clear();
         moduleConfig.addModule(module.getId());
 
-        if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
-            config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
+        // Set the default generator of the selected gameplay module
+        if (module != null) {
+            SimpleUri defaultWorldGenerator = moduleManager.getDefaultWorldGenerator(module);
+            if (defaultWorldGenerator != null) {
+                for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
+                    if (worldGenInfo.getUri().equals(defaultWorldGenerator)) {
+                        config.getWorldGeneration().setDefaultGenerator(worldGenInfo.getUri());
+                    }
+                }
+            }
         }
+
         config.save();
     }
 

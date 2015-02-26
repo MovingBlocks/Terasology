@@ -33,7 +33,7 @@ public final class TerasologyConstants {
     public static final String MAIN_WORLD = "main";
     public static final Charset CHARSET = Charsets.UTF_8;
     public static final Name ENGINE_MODULE = new Name("engine");
-    public static final Name CORE_MODULE = new Name("core");
+    public static final Name CORE_GAMEPLAY_MODULE = new Name("coresamplegameplay");
     public static final String ASSETS_SUBDIRECTORY = "assets";
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
     public static final String DELTAS_SUBDIRECTORY = "deltas";

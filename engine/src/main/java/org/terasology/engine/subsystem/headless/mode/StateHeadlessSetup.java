@@ -83,8 +83,8 @@ public class StateHeadlessSetup extends StateSetup {
             for (Name moduleName : config.getDefaultModSelection().listModules()) {
                 Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
                 if (moduleManager.isGameplayModule(module)) {
-                    String defaultWorldGenerator = module.getMetadata().getExtension(ModuleManager.DEFAULT_WORLD_GENERATOR_EXT, String.class);
-                    worldGenConfig.setDefaultGenerator(new SimpleUri(defaultWorldGenerator));
+                    SimpleUri defaultWorldGenerator = moduleManager.getDefaultWorldGenerator(module);
+                    worldGenConfig.setDefaultGenerator(defaultWorldGenerator);
                     break;
                 }
             }
