@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -239,7 +240,7 @@ public class StateLoading implements GameState {
         if (current == null) {
             nuiManager.closeScreen(loadingScreen);
             nuiManager.setHUDVisible(true);
-            CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
+            CoreRegistry.get(GameEngine.class).changeState(new StateIngame(gameManifest));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);
@@ -257,4 +258,8 @@ public class StateLoading implements GameState {
         return false;
     }
 
+    @Override
+    public String getLoggingPhase() {
+        return gameManifest.getTitle();
+    }
 }

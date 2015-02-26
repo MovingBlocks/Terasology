@@ -19,9 +19,11 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
+
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
@@ -42,7 +44,6 @@ import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.loader.WorldAtlas;
 
-import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +57,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
 
 /**
  * GLSL Shader Program Instance class.
@@ -329,14 +332,18 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
             debugShaderType = "VERTEX";
         }
 
-        // Dump all final shader sources to the log directory
-        final String strippedTitle = getURI().toString().replace(":", "-");
+        Config config = CoreRegistry.get(Config.class);
+        if (config.getRendering().isDumpShaders()) {
+            // Dump all final shader sources to the log directory
+            final String strippedTitle = getURI().toString().replace(":", "-");
 
-        Path path = PathManager.getInstance().getShaderLogPath().resolve(debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl");
-        try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
-            writer.write(shader.toString());
-        } catch (IOException e) {
-            logger.error("Failed to dump shader source.");
+            String fname = debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl";
+            Path path = PathManager.getInstance().getShaderLogPath().resolve(fname);
+            try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
+                writer.write(shader.toString());
+            } catch (IOException e) {
+                logger.error("Failed to dump shader source.");
+            }
         }
 
         GL20.glShaderSource(shaderId, shader.toString());

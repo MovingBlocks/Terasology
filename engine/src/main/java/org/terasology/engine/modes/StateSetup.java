@@ -43,7 +43,7 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @version 0.3
  */
-public class StateSetup implements GameState {
+public abstract class StateSetup implements GameState {
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;

@@ -101,7 +101,7 @@ public class JoinServer implements LoadProcess {
                     CoreRegistry.get(GameEngine.class).changeState(mainMenu);
                     return false;
                 } else {
-                    logger.debug("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
+                    logger.info("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
                     gameManifest.addModule(module.getId(), module.getVersion());
                     moduleSet.add(module);
                 }

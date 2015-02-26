@@ -15,9 +15,12 @@
  */
 package org.terasology.engine;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
 
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
@@ -42,12 +45,9 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.GraphicsEnvironment;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
@@ -116,6 +116,8 @@ public final class Terasology {
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
 
+        setupLogging();
+
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
             if (!writeSaveGamesEnabled) {
                 CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
@@ -147,6 +149,15 @@ public final class Terasology {
         } finally {
             SplashScreen.getInstance().close();
         }
+    }
+
+    private static void setupLogging() {
+        Path path = PathManager.getInstance().getLogPath();
+        if (path == null) {
+            path = Paths.get("logs");
+        }
+
+        LoggingContext.initialize(path);
     }
 
     private static void handlePrintUsageRequest(String[] args) {
@@ -286,8 +297,7 @@ public final class Terasology {
         }
 
         if (crashReportEnabled) {
-            Path logFile = logPath.resolve("Terasology.log");
-            CrashReporter.report(throwable, logFile);
+            CrashReporter.report(throwable, logPath);
         }
     }
 

@@ -19,6 +19,7 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.LoggingContext;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.engine.module.ModuleManager;
@@ -149,6 +150,11 @@ public class StateMainMenu implements GameState {
     @Override
     public void render() {
         nuiManager.render();
+    }
+
+    @Override
+    public String getLoggingPhase() {
+        return LoggingContext.MENU;
     }
 
     @Override

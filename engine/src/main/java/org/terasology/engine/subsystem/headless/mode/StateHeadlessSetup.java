@@ -18,6 +18,7 @@ package org.terasology.engine.subsystem.headless.mode;
 import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.LoggingContext;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
@@ -121,5 +122,10 @@ public class StateHeadlessSetup extends StateSetup {
     @Override
     public boolean isHibernationAllowed() {
         return true;
+    }
+
+    @Override
+    public String getLoggingPhase() {
+        return LoggingContext.INIT_PHASE;
     }
 }
