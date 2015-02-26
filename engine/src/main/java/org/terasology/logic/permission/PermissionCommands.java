@@ -25,9 +25,12 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+
+import java.util.Objects;
 
 @RegisterSystem
 public class PermissionCommands extends BaseComponentSystem {
@@ -74,6 +77,21 @@ public class PermissionCommands extends BaseComponentSystem {
         } else {
             return "Unable to find player " + player;
         }
+    }
+
+    @Command(shortDescription = "Lists all permission the specified player has",
+            helpText = "Lists all permission the specified player has",
+            runOnServer = true)
+    public String listPermissions(@CommandParam(value = "player", suggester = UsernameSuggester.class) String player) {
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            if (clientHasName(clientComponent, player)) {
+                EntityRef clientInfo = clientComponent.clientInfo;
+                PermissionSetComponent permissionSetComp = clientInfo.getComponent(PermissionSetComponent.class);
+                return Objects.toString(permissionSetComp.permissions);
+            }
+        }
+        return "Player not found";
     }
 
     @Command(shortDescription = "Removes specified permission from player",
