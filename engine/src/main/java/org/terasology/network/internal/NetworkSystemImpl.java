@@ -277,8 +277,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public Client joinLocal(String name, Color color) {
-        Client localClient = new LocalClient(name, color, entityManager);
+    public Client joinLocal(String preferredName, Color color) {
+        Client localClient = new LocalClient(preferredName, color, entityManager);
         clientList.add(localClient);
         clientPlayerLookup.put(localClient.getEntity(), localClient);
         connectClient(localClient);
@@ -764,8 +764,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void processNewClient(NetClient client) {
-        logger.info("New client connected: {}", client.getName());
         client.connected(entityManager, entitySerializer, eventSerializer, entitySystemLibrary);
+        // log after connect so that the name has been set:
+        logger.info("New client connected: {}", client.getName());
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
                 NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
         clientList.add(client);
