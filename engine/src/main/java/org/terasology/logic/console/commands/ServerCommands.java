@@ -61,7 +61,8 @@ public class ServerCommands extends BaseComponentSystem {
     @In
     private ChunkProvider chunkProvider;
 
-    @Command(shortDescription = "Shutdown the server", runOnServer = true)
+    @Command(shortDescription = "Shutdown the server", runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     public String shutdownServer(@Sender EntityRef sender) {
 
         // TODO: verify permissions of sender
@@ -150,7 +151,8 @@ public class ServerCommands extends BaseComponentSystem {
         return "Request declined";
     }
 
-    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
+    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     public void save() {
         storageManager.requestSaving();
     }

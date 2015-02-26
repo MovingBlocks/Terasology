@@ -19,7 +19,6 @@ import com.google.common.base.Predicate;
 import org.terasology.entitySystem.entity.EntityRef;
 
 public interface PermissionManager {
-    static final String OPERATOR_PERMISSION = "op";
     static final String CHAT_PERMISSION = "chat";
     /**
      * Allows the player to use cheats that
@@ -39,6 +38,16 @@ public interface PermissionManager {
      * e.g. adding permissions, renaming them etc.
      */
     static final String USER_MANAGEMENT_PERMISSION = "userManagement";
+
+    /**
+     * Allows the player to perform server maintenance tasks like stopping the server.
+     */
+    static final String SERVER_MANAGEMENT_PERMISSION = "serverManagement";
+
+    /**
+     * Allows the player to use debug commands which are not intended to be used on a real server.
+     */
+    static final String DEBUG_PERMISSION = "debug";
 
     /**
      * Adds specified permission to the player (client info entity).

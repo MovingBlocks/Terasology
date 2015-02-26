@@ -67,7 +67,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
         Preconditions.checkNotNull(helpText);
 
         this.name = name;
-        this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
+        this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.DEBUG_PERMISSION;
         this.runOnServer = runOnServer;
         this.description = description;
         this.helpText = helpText;
