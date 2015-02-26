@@ -36,7 +36,7 @@ public class PermissionSystem extends BaseComponentSystem implements PermissionM
     public void addPermission(EntityRef player, String permission) {
         PermissionSetComponent permissionSet = player.getComponent(PermissionSetComponent.class);
         if (permissionSet != null) {
-            permissionSet.permissions.add(permission.toLowerCase());
+            permissionSet.permissions.add(permission);
             player.saveComponent(permissionSet);
         }
     }
@@ -49,7 +49,7 @@ public class PermissionSystem extends BaseComponentSystem implements PermissionM
         }
 
         PermissionSetComponent permissionSet = player.getComponent(PermissionSetComponent.class);
-        return permissionSet != null && permissionSet.permissions.contains(permission.toLowerCase());
+        return permissionSet != null && permissionSet.permissions.contains(permission);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PermissionSystem extends BaseComponentSystem implements PermissionM
     public void removePermission(EntityRef player, String permission) {
         PermissionSetComponent permissionSet = player.getComponent(PermissionSetComponent.class);
         if (permissionSet != null) {
-            permissionSet.permissions.remove(permission.toLowerCase());
+            permissionSet.permissions.remove(permission);
             player.saveComponent(permissionSet);
         }
     }
