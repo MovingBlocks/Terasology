@@ -33,6 +33,7 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -211,20 +212,23 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Inflicted damage of " + amount;
     }
 
-    @Command(shortDescription = "Restores your health to max", runOnServer = true)
+    @Command(shortDescription = "Restores your health to max", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String health(@Sender EntityRef clientEntity) {
         ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(100000, clientComp.character));
         return "Health restored";
     }
 
-    @Command(shortDescription = "Restores your health by an amount", runOnServer = true)
+    @Command(shortDescription = "Restores your health by an amount", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void health(@Sender EntityRef client, @CommandParam("amount") int amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(amount, clientComp.character));
     }
 
-    @Command(shortDescription = "Set max health", runOnServer = true)
+    @Command(shortDescription = "Set max health", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setMaxHealth(@Sender EntityRef client, @CommandParam("max") int max) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -234,7 +238,8 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Max health set to " + max;
     }
 
-    @Command(shortDescription = "Set health regen rate", runOnServer = true)
+    @Command(shortDescription = "Set health regen rate", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setRegenRate(@Sender EntityRef client, @CommandParam("rate") float rate) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);

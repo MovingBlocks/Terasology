@@ -21,6 +21,16 @@ import org.terasology.entitySystem.entity.EntityRef;
 public interface PermissionManager {
     static final String OPERATOR_PERMISSION = "op";
     static final String CHAT_PERMISSION = "chat";
+    /**
+     * Allows the player to use cheats that
+     * <ul>
+     *     <li>1. have no global impact.</li>
+     *     <li>2. don't endanger the stability of the game</li>
+     * </ul>
+     * The intention is that the permission can be given to all players on a server where players focus on building and
+     * not mining.
+     */
+    static final String CHEAT_PERMISSION = "cheat";
     static final String NO_PERMISSION = "";
 
     /**

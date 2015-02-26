@@ -292,7 +292,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true)
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);

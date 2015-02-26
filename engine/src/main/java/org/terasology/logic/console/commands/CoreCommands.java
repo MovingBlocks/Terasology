@@ -200,7 +200,8 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Teleports you to a location", runOnServer = true)
+    @Command(shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);

@@ -21,6 +21,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -39,7 +40,8 @@ public class ClientCommands extends BaseComponentSystem {
         return cameraTarget.toFullDescription();
     }
 
-    @Command(shortDescription = "Sets the current world time in days")
+    @Command(shortDescription = "Sets the current world time of the in days for the local player",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setWorldTime(@CommandParam("day") float day) {
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         world.getTime().setDays(day);

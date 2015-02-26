@@ -29,6 +29,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.health.HealthComponent;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 
 /**
@@ -37,7 +38,8 @@ import org.terasology.network.ClientComponent;
 @RegisterSystem
 public class MovementDebugCommands extends BaseComponentSystem {
 
-    @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true)
+    @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String ghost(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new SetMovementModeEvent(MovementMode.GHOSTING));
@@ -45,7 +47,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Ghost mode toggled";
     }
 
-    @Command(shortDescription = "Grants flight", runOnServer = true)
+    @Command(shortDescription = "Grants flight", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String flight(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new SetMovementModeEvent(MovementMode.FLYING));
@@ -54,7 +57,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
 
-    @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true)
+    @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setSpeedMultiplier(@Sender EntityRef client, @CommandParam("amount") float amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -69,7 +73,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    @Command(shortDescription = "Set jump speed", runOnServer = true)
+    @Command(shortDescription = "Set jump speed", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setJumpSpeed(@Sender EntityRef client, @CommandParam("amount") float amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -84,7 +89,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    @Command(shortDescription = "Show your Movement stats")
+    @Command(shortDescription = "Show your Movement stats",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String showMovement(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -96,7 +102,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "You're dead I guess.";
     }
 
-    @Command(shortDescription = "Go really fast", runOnServer = true)
+    @Command(shortDescription = "Go really fast", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String hspeed(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -111,7 +118,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    @Command(shortDescription = "Jump really high", runOnServer = true)
+    @Command(shortDescription = "Jump really high", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String hjump(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -129,7 +137,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    @Command(shortDescription = "Restore normal speed values", runOnServer = true)
+    @Command(shortDescription = "Restore normal speed values", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String restoreSpeed(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
 
@@ -158,7 +167,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Normal speed values restored";
     }
 
-    @Command(shortDescription = "Toggles the maximum slope the player can walk up", runOnServer = true)
+    @Command(shortDescription = "Toggles the maximum slope the player can walk up", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String sleigh(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -175,7 +185,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    @Command(shortDescription = "Sets the height the player can step up", runOnServer = true)
+    @Command(shortDescription = "Sets the height the player can step up", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String stepHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
