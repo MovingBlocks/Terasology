@@ -22,6 +22,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
@@ -30,17 +32,23 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @RegisterSystem
 public class PermissionCommands extends BaseComponentSystem {
     @In
     private PermissionManager permissionManager;
+
     @In
     private EntityManager entityManager;
 
-    @Command(shortDescription = "Use an one time key to get op permission",
-            helpText = "The config file contains a one time key which can be used to get op permission",
+    @In
+    private Console console;
+
+    @Command(shortDescription = "Use an one time key to get all permissions",
+            helpText = "The config file contains a one time key which can be used to get all permissions.",
             runOnServer = true, requiredPermission = PermissionManager.NO_PERMISSION)
     public String usePermissionKey(@CommandParam("key") String key, @Sender EntityRef client) {
         PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
@@ -49,11 +57,26 @@ public class PermissionCommands extends BaseComponentSystem {
         if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
             permissionConfig.setOneTimeAuthorizationKey("");
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
-            permissionManager.addPermission(clientComponent.clientInfo, PermissionManager.OPERATOR_PERMISSION);
-            return "Permission key used: You have now \"op\" rights";
+            EntityRef clientInfo = clientComponent.clientInfo;
+            for (String permission: findAllPermissions()) {
+                permissionManager.addPermission(clientInfo, permission);
+            }
+            PermissionSetComponent permissionSetComp = clientInfo.getComponent(PermissionSetComponent.class);
+            return "Permission key used: You have now the following permissions: " + permissionSetComp.permissions;
         } else {
             return "Key invalid or used";
         }
+    }
+
+    private Set<String> findAllPermissions() {
+        Set<String> allPermissions = new HashSet<>();
+        for (ConsoleCommand command: console.getCommands()) {
+            String permission = command.getRequiredPermission();
+            if (!permission.equals(PermissionManager.NO_PERMISSION)) {
+                allPermissions.add(permission);
+            }
+        }
+        return allPermissions;
     }
 
     @Command(shortDescription = "Gives specified permission to player",
