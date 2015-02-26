@@ -41,7 +41,7 @@ public class PermissionCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Use an one time key to get op permission",
             helpText = "The config file contains a one time key which can be used to get op permission",
-            runOnServer = true, requiredPermission = "")
+            runOnServer = true, requiredPermission = PermissionManager.NO_PERMISSION)
     public String usePermissionKey(@CommandParam("key") String key, @Sender EntityRef client) {
         PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
         String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
