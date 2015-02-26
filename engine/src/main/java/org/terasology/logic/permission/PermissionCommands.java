@@ -94,8 +94,15 @@ public class PermissionCommands extends BaseComponentSystem {
             runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String givePermission(
             @CommandParam("player") String player,
-            @CommandParam("permission") String permission) {
+            @CommandParam("permission") String permission,
+            @Sender EntityRef requester) {
         boolean permissionGiven = false;
+
+        ClientComponent requesterClientComponent = requester.getComponent(ClientComponent.class);
+        EntityRef requesterClientInfo = requesterClientComponent.clientInfo;
+        if (!permissionManager.hasPermission(requesterClientInfo, permission)) {
+            return String.format("You can't give the permission %s because you don't have it yourself", permission);
+        }
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
@@ -132,8 +139,15 @@ public class PermissionCommands extends BaseComponentSystem {
             runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String removePermission(
             @CommandParam("player") String player,
-            @CommandParam("permission") String permission) {
+            @CommandParam("permission") String permission,
+            @Sender EntityRef requester) {
         boolean permissionGiven = false;
+
+        ClientComponent requesterClientComponent = requester.getComponent(ClientComponent.class);
+        EntityRef requesterClientInfo = requesterClientComponent.clientInfo;
+        if (!permissionManager.hasPermission(requesterClientInfo, permission)) {
+            return String.format("You can't remove the permission %s because you don't have it yourself", permission);
+        }
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
@@ -144,7 +158,7 @@ public class PermissionCommands extends BaseComponentSystem {
         }
 
         if (permissionGiven) {
-            return "Permission " + permission + " removed to player " + player;
+            return "Permission " + permission + " removed from player " + player;
         } else {
             return "Unable to find player " + player;
         }
