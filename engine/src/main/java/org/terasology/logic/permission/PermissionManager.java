@@ -34,6 +34,13 @@ public interface PermissionManager {
     static final String NO_PERMISSION = "";
 
     /**
+     * Allows the player to edit settings of other users.
+     *
+     * e.g. adding permissions, renaming them etc.
+     */
+    static final String USER_MANAGEMENT_PERMISSION = "userManagement";
+
+    /**
      * Adds specified permission to the player (client info entity).
      *
      * @param player     Player (client info entity) to add permission to.

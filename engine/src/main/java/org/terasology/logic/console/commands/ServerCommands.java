@@ -28,6 +28,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -75,10 +76,9 @@ public class ServerCommands extends BaseComponentSystem {
         return "Server shutdown triggered";
     }
 
-    @Command(shortDescription = "Kick user by name", runOnServer = true)
+    @Command(shortDescription = "Kick user by name", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String kickUser(@CommandParam("username") String username) {
-
-        // TODO: verify permissions of sender
 
         for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
@@ -93,7 +93,8 @@ public class ServerCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("No such user '" + username + "'");
     }
 
-    @Command(shortDescription = "Kick user by ID", runOnServer = true)
+    @Command(shortDescription = "Kick user by ID", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String kickUserByID(@CommandParam("userId") int userId) {
 
         // TODO: verify permissions of sender
@@ -110,7 +111,8 @@ public class ServerCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("No such user with ID " + userId);
     }
 
-    @Command(shortDescription = "List users")
+    @Command(shortDescription = "List users",
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String listUsers() {
 
         StringBuilder stringBuilder = new StringBuilder();

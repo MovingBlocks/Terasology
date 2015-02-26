@@ -58,7 +58,7 @@ public class PermissionCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Gives specified permission to player",
             helpText = "Gives specified permission to player",
-            runOnServer = true)
+            runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String givePermission(
             @CommandParam("player") String player,
             @CommandParam("permission") String permission) {
@@ -81,7 +81,7 @@ public class PermissionCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Lists all permission the specified player has",
             helpText = "Lists all permission the specified player has",
-            runOnServer = true)
+            runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String listPermissions(@CommandParam(value = "player", suggester = UsernameSuggester.class) String player) {
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
@@ -96,7 +96,7 @@ public class PermissionCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Removes specified permission from player",
             helpText = "Removes specified permission from player",
-            runOnServer = true)
+            runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String removePermission(
             @CommandParam("player") String player,
             @CommandParam("permission") String permission) {
