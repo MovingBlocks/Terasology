@@ -47,8 +47,12 @@ public class PermissionCommands extends BaseComponentSystem {
     @In
     private Console console;
 
-    @Command(shortDescription = "Use an one time key to get all permissions",
-            helpText = "The config file contains a one time key which can be used to get all permissions.",
+    @In
+    private Config config;
+
+    @Command(shortDescription = "Use an one time key to get all* permissions",
+            helpText = "The config file contains a one time key which can be used to get all* permissions."
+                    + "Please note that the debug permission will only be granted if the debug setting is on.",
             runOnServer = true, requiredPermission = PermissionManager.NO_PERMISSION)
     public String usePermissionKey(@CommandParam("key") String key, @Sender EntityRef client) {
         PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
@@ -59,7 +63,13 @@ public class PermissionCommands extends BaseComponentSystem {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
             EntityRef clientInfo = clientComponent.clientInfo;
             for (String permission: findAllPermissions()) {
-                permissionManager.addPermission(clientInfo, permission);
+                boolean add = true;
+                if (permission.equals(PermissionManager.DEBUG_PERMISSION)) {
+                    add = config.getSystem().isDebugEnabled();
+                }
+                if (add) {
+                    permissionManager.addPermission(clientInfo, permission);
+                }
             }
             PermissionSetComponent permissionSetComp = clientInfo.getComponent(PermissionSetComponent.class);
             return "Permission key used: You have now the following permissions: " + permissionSetComp.permissions;
