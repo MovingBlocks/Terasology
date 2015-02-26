@@ -93,7 +93,7 @@ public class PermissionCommands extends BaseComponentSystem {
             helpText = "Gives specified permission to player",
             runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String givePermission(
-            @CommandParam("player") String player,
+            @CommandParam(value = "player", suggester = UsernameSuggester.class) String player,
             @CommandParam("permission") String permission,
             @Sender EntityRef requester) {
         boolean permissionGiven = false;
@@ -138,7 +138,7 @@ public class PermissionCommands extends BaseComponentSystem {
             helpText = "Removes specified permission from player",
             runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String removePermission(
-            @CommandParam("player") String player,
+            @CommandParam(value = "player", suggester = UsernameSuggester.class) String player,
             @CommandParam("permission") String permission,
             @Sender EntityRef requester) {
         boolean permissionGiven = false;
