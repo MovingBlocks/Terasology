@@ -8,6 +8,6 @@
         "replicateMode" : "ALWAYS"
     },
     "PermissionSet": {
-        "permissions": []
+        "permissions": ["chat"]
     }
 }
