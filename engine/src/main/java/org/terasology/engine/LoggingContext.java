@@ -86,7 +86,7 @@ public final class LoggingContext {
 //        }
     }
 
-    private static void deleteLogFiles(Path rootPath) throws IOException {
+    private static void deleteLogFiles(final Path rootPath) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 
             @Override
