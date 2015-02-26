@@ -36,7 +36,7 @@ import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.console.suggesters.UsernameSuggester;
+import org.terasology.logic.console.suggesters.OnlineUsernameSuggester;
 import org.terasology.logic.console.ui.MiniChatOverlay;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
@@ -116,7 +116,7 @@ public class ChatSystem extends BaseComponentSystem {
             shortDescription = "Sends a private message to a specified user")
     public String whisper(
             @Sender EntityRef sender,
-            @CommandParam(value = "user", suggester = UsernameSuggester.class) String username,
+            @CommandParam(value = "user", suggester = OnlineUsernameSuggester.class) String username,
             @CommandParam("message") String message
     ) {
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
