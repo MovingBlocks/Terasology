@@ -1,4 +1,0 @@
-{
-    "filterMode" : "Nearest",
-    "wrapMode" : "Repeat"
-}

@@ -18,6 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
@@ -25,6 +26,7 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,7 +45,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     private Random rand = new FastRandom();
 
     @EditorRange(min = 0.0f, max = 1.0f)
-    private float filmGrainIntensity = 0.025f;
+    private float filmGrainIntensity = 0.05f;
 
     @Override
     public void applyParameters(Material program) {
@@ -81,7 +83,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
             sceneCombined.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
 
-            Texture filmGrainNoiseTexture = Assets.getTexture("engine:noise");
+            AssetUri noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
+            Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri.toSimpleString());
 
             if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
