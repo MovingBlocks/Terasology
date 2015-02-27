@@ -241,7 +241,7 @@ public class ConsoleImpl implements Console {
                 Throwable cause = e.getCause();
                 String causeMessage = cause.getLocalizedMessage();
 
-                logger.trace("An error occurred while executing a command: ", e);
+                logger.error("An error occurred while executing a command: ", e);
 
                 if (Strings.isNullOrEmpty(causeMessage)) {
                     causeMessage = cause.toString();
@@ -262,12 +262,12 @@ public class ConsoleImpl implements Console {
         PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
         boolean hasPermission = true;
 
-        if (permissionManager != null && requiredPermission != null && !requiredPermission.isEmpty()) {
+        if (permissionManager != null && requiredPermission != null
+                && !requiredPermission.equals(PermissionManager.NO_PERMISSION)) {
             hasPermission = false;
             ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
-            EntityRef character = clientComponent.character;
 
-            if (permissionManager.hasPermission(character, requiredPermission)) {
+            if (permissionManager.hasPermission(clientComponent.clientInfo, requiredPermission)) {
                 hasPermission = true;
             }
         }

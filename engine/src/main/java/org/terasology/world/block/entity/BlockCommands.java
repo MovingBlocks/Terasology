@@ -32,6 +32,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
@@ -123,7 +124,8 @@ public class BlockCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("Sorry, something went wrong!");
     }
 
-    @Command(shortDescription = "Lists all available items (prefabs)")
+    @Command(shortDescription = "Lists all available items (prefabs)",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listItems() {
 
         List<String> stringItems = Lists.newArrayList();
@@ -145,7 +147,7 @@ public class BlockCommands extends BaseComponentSystem {
         return items.toString();
     }
 
-    @Command(shortDescription = "List all available blocks")
+    @Command(shortDescription = "List all available blocks", requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
@@ -172,7 +174,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all blocks by category")
+    @Command(shortDescription = "Lists all blocks by category", requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocksByCategory() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
@@ -190,7 +192,8 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all available shapes")
+    @Command(shortDescription = "Lists all available shapes",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
@@ -206,7 +209,9 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
+    @Command(shortDescription = "Lists available free shape blocks",
+            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
@@ -224,7 +229,7 @@ public class BlockCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Adds a block to your inventory",
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
-            runOnServer = true)
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String giveBlock(
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,

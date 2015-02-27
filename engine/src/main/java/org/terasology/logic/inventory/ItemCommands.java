@@ -25,6 +25,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
@@ -47,7 +48,8 @@ public class ItemCommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
+    @Command(shortDescription = "Adds an item to your inventory", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String giveItem(
             @Sender EntityRef client,
             @CommandParam("prefabId or blockName") String itemPrefabName,

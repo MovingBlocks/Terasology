@@ -34,6 +34,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Region3i;
@@ -281,7 +282,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @Command(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true)
+    @Command(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true,
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public void killCommand(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -290,7 +292,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true)
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);

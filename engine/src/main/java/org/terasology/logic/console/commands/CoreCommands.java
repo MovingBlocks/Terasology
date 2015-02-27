@@ -46,6 +46,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -164,7 +165,7 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Toggles Fullscreen Mode")
+    @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
     public String fullscreen() {
         TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
 
@@ -199,7 +200,8 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Teleports you to a location", runOnServer = true)
+    @Command(shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
@@ -209,12 +211,12 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Exits the game")
+    @Command(shortDescription = "Exits the game", requiredPermission = PermissionManager.NO_PERMISSION)
     public void exit() {
         CoreRegistry.get(GameEngine.class).shutdown();
     }
 
-    @Command(shortDescription = "Join a game")
+    @Command(shortDescription = "Join a game", requiredPermission = PermissionManager.NO_PERMISSION)
     public void join(@CommandParam("address") final String address, @CommandParam(value = "port", required = false) Integer portParam) {
         final int port = portParam != null ? portParam : TerasologyConstants.DEFAULT_PORT;
 
@@ -249,7 +251,8 @@ public class CoreCommands extends BaseComponentSystem {
         popup.startOperation(operation, true);
     }
 
-    @Command(shortDescription = "Leaves the current game and returns to main menu")
+    @Command(shortDescription = "Leaves the current game and returns to main menu",
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public String leave() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
         if (networkSystem.getMode() != NetworkMode.NONE) {
@@ -334,7 +337,8 @@ public class CoreCommands extends BaseComponentSystem {
         return "World time changed";
     }
 
-    @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
+    @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
         if (commandName == null) {
             StringBuilder msg = new StringBuilder();

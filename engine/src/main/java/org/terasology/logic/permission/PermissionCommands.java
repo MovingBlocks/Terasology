@@ -22,23 +22,38 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @RegisterSystem
 public class PermissionCommands extends BaseComponentSystem {
     @In
     private PermissionManager permissionManager;
+
     @In
     private EntityManager entityManager;
 
-    @Command(shortDescription = "Use an one time key to get op permission",
-            helpText = "The config file contains a one time key which can be used to get op permission",
-            runOnServer = true, requiredPermission = "")
+    @In
+    private Console console;
+
+    @In
+    private Config config;
+
+    @Command(shortDescription = "Use an one time key to get all* permissions",
+            helpText = "The config file contains a one time key which can be used to get all* permissions."
+                    + "Please note that the debug permission will only be granted if the debug setting is on.",
+            runOnServer = true, requiredPermission = PermissionManager.NO_PERMISSION)
     public String usePermissionKey(@CommandParam("key") String key, @Sender EntityRef client) {
         PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
         String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
@@ -46,25 +61,53 @@ public class PermissionCommands extends BaseComponentSystem {
         if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
             permissionConfig.setOneTimeAuthorizationKey("");
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
-            permissionManager.addPermission(clientComponent.character, PermissionManager.OPERATOR_PERMISSION);
-            return "Permission key used: You have now \"op\" rights";
+            EntityRef clientInfo = clientComponent.clientInfo;
+            for (String permission: findAllPermissions()) {
+                boolean add = true;
+                if (permission.equals(PermissionManager.DEBUG_PERMISSION)) {
+                    add = config.getSystem().isDebugEnabled();
+                }
+                if (add) {
+                    permissionManager.addPermission(clientInfo, permission);
+                }
+            }
+            PermissionSetComponent permissionSetComp = clientInfo.getComponent(PermissionSetComponent.class);
+            return "Permission key used: You have now the following permissions: " + permissionSetComp.permissions;
         } else {
             return "Key invalid or used";
         }
     }
 
+    private Set<String> findAllPermissions() {
+        Set<String> allPermissions = new HashSet<>();
+        for (ConsoleCommand command: console.getCommands()) {
+            String permission = command.getRequiredPermission();
+            if (!permission.equals(PermissionManager.NO_PERMISSION)) {
+                allPermissions.add(permission);
+            }
+        }
+        return allPermissions;
+    }
+
     @Command(shortDescription = "Gives specified permission to player",
             helpText = "Gives specified permission to player",
-            runOnServer = true)
+            runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String givePermission(
-            @CommandParam("player") String player,
-            @CommandParam("permission") String permission) {
+            @CommandParam(value = "player", suggester = UsernameSuggester.class) String player,
+            @CommandParam("permission") String permission,
+            @Sender EntityRef requester) {
         boolean permissionGiven = false;
+
+        ClientComponent requesterClientComponent = requester.getComponent(ClientComponent.class);
+        EntityRef requesterClientInfo = requesterClientComponent.clientInfo;
+        if (!permissionManager.hasPermission(requesterClientInfo, permission)) {
+            return String.format("You can't give the permission %s because you don't have it yourself", permission);
+        }
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
             if (clientHasName(clientComponent, player)) {
-                permissionManager.addPermission(clientComponent.character, permission);
+                permissionManager.addPermission(clientComponent.clientInfo, permission);
                 permissionGiven = true;
             }
         }
@@ -76,24 +119,46 @@ public class PermissionCommands extends BaseComponentSystem {
         }
     }
 
+    @Command(shortDescription = "Lists all permission the specified player has",
+            helpText = "Lists all permission the specified player has",
+            runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
+    public String listPermissions(@CommandParam(value = "player", suggester = UsernameSuggester.class) String player) {
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            if (clientHasName(clientComponent, player)) {
+                EntityRef clientInfo = clientComponent.clientInfo;
+                PermissionSetComponent permissionSetComp = clientInfo.getComponent(PermissionSetComponent.class);
+                return Objects.toString(permissionSetComp.permissions);
+            }
+        }
+        return "Player not found";
+    }
+
     @Command(shortDescription = "Removes specified permission from player",
             helpText = "Removes specified permission from player",
-            runOnServer = true)
+            runOnServer = true, requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String removePermission(
-            @CommandParam("player") String player,
-            @CommandParam("permission") String permission) {
+            @CommandParam(value = "player", suggester = UsernameSuggester.class) String player,
+            @CommandParam("permission") String permission,
+            @Sender EntityRef requester) {
         boolean permissionGiven = false;
+
+        ClientComponent requesterClientComponent = requester.getComponent(ClientComponent.class);
+        EntityRef requesterClientInfo = requesterClientComponent.clientInfo;
+        if (!permissionManager.hasPermission(requesterClientInfo, permission)) {
+            return String.format("You can't remove the permission %s because you don't have it yourself", permission);
+        }
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComponent = client.getComponent(ClientComponent.class);
             if (clientHasName(clientComponent, player)) {
-                permissionManager.removePermission(clientComponent.character, permission);
+                permissionManager.removePermission(clientComponent.clientInfo, permission);
                 permissionGiven = true;
             }
         }
 
         if (permissionGiven) {
-            return "Permission " + permission + " removed to player " + player;
+            return "Permission " + permission + " removed from player " + player;
         } else {
             return "Unable to find player " + player;
         }

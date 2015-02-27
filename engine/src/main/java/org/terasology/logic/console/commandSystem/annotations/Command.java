@@ -78,5 +78,5 @@ public @interface Command {
     /**
      * @return The permission required to run the command
      */
-    String requiredPermission() default PermissionManager.OPERATOR_PERMISSION;
+    String requiredPermission() default PermissionManager.DEBUG_PERMISSION;
 }
