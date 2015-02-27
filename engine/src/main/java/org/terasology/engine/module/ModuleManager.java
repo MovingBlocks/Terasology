@@ -201,6 +201,7 @@ public class ModuleManager {
     }
 
     public SimpleUri getDefaultWorldGenerator(Module module) {
-        return new SimpleUri(module.getMetadata().getExtension(ModuleManager.DEFAULT_WORLD_GENERATOR_EXT, String.class));
+        String ext = module.getMetadata().getExtension(ModuleManager.DEFAULT_WORLD_GENERATOR_EXT, String.class);
+        return ext != null ? new SimpleUri(ext) : null;
     }
 }
