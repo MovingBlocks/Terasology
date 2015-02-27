@@ -31,7 +31,7 @@ To name yourself for a multiplayer game use Settings / Player. You can also pick
 
 You can host a local server using the game client and have friends connect to your IP. Game port is 25777 which needs to be open and forwarded to your PC.
 
-Unlike in single player in a multiplayer situation permissions are enforced for console commands. On a local server the player who started the game gets "op" rights.
+Unlike in single player in a multiplayer setting permissions are enforced for console commands. Several permission types are available, if a command is not allowed it will state which permission is missing.
 
 You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, for example with a downloaded version:
 
@@ -41,13 +41,13 @@ You can also run a headless server, but this is harder to configure at the momen
 
 This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system)
 
-In this case *there is no default player with "op" rights*. You need to "op" yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`
+In this case *there is no default player with rights beyond "chat"*. You need to gain admin powers yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`. This gives you all permission types except "debug"
 
 Join the server and run the console command `usePermissionKey <key>` where you replace `<key>` with the value from the server's config file. This only works once.
 
-In either server situation you can "op" other players by executing `givePermission <player> op` in the console, replacing `<player>` with the desired player's name (case sensitive).
+After you have rights to manage *user* permissions you can grant other players specific permissions by executing `givePermission <player> <permission>` in the console, replacing `<player>` with the desired player's name (case sensitive).
 
-With "op" rights you can terminate the server gracefully via `shutdownServer` in the console. Otherwise you can kill the server with `CTRL-C` in a terminal / command prompt. Running headless with the .exe on Windows is not recommended as it "detaches" from its command prompt so you get no handy logging there or any way to issue a break to the process. If you cannot connect or get "op" you may have to terminate the process manually via Task Manager or comparable.
+With *server* rights you can terminate the server gracefully via `shutdownServer` in the console. Otherwise you can kill a headless server with `CTRL-C` in a terminal / command prompt. Running headless with the .exe on Windows is not recommended as it "detaches" from its command prompt so you get no handy logging there or any way to issue a break to the process. If you cannot connect or get "op" you may have to terminate the process manually via Task Manager or comparable.
 
 Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
 
