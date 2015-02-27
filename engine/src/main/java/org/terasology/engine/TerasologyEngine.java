@@ -19,7 +19,6 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -216,8 +215,8 @@ public class TerasologyEngine implements GameEngine {
         } else {
             config = new Config();
         }
-        if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_MODULE)) {
-            config.getDefaultModSelection().addModule(TerasologyConstants.CORE_MODULE);
+        if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_GAMEPLAY_MODULE)) {
+            config.getDefaultModSelection().addModule(TerasologyConstants.CORE_GAMEPLAY_MODULE);
         }
 
         if (!validateServerIdentity()) {

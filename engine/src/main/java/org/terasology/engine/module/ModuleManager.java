@@ -16,9 +16,9 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
@@ -52,8 +52,8 @@ import java.util.Set;
 public class ModuleManager {
 
     public static final String SERVER_SIDE_ONLY_EXT = "serverSideOnly";
-    public static final String IS_GAMEPLAY_EXT = "isGameplay";
-    public static final String DEFAULT_WORLD_GENERATOR_EXT = "defaultWorldGenerator";
+    private static final String IS_GAMEPLAY_EXT = "isGameplay";
+    private static final String DEFAULT_WORLD_GENERATOR_EXT = "defaultWorldGenerator";
 
     private ModuleSecurityManager moduleSecurityManager;
 
@@ -198,5 +198,9 @@ public class ModuleManager {
     public boolean isGameplayModule(Module module) {
         Boolean isGameplay = module.getMetadata().getExtension(IS_GAMEPLAY_EXT, Boolean.class);
         return isGameplay != null && isGameplay;
+    }
+
+    public SimpleUri getDefaultWorldGenerator(Module module) {
+        return new SimpleUri(module.getMetadata().getExtension(ModuleManager.DEFAULT_WORLD_GENERATOR_EXT, String.class));
     }
 }
