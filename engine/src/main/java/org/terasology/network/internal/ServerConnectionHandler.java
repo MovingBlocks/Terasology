@@ -130,7 +130,7 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
     private void receivedConnect(NetData.JoinMessage message) {
         logger.info("Received Start Join");
         NetClient client = new NetClient(channelHandlerContext.getChannel(), networkSystem, identity);
-        client.setName(message.getName());
+        client.setPreferredName(message.getName());
         client.setColor(new Color(message.getColor().getRgba()));
         client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));
         channelHandlerContext.getPipeline().remove(this);

@@ -26,6 +26,9 @@ import org.terasology.network.ColorComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Color;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * The common behaviour of all clients - whether local or remote
  *
@@ -55,22 +58,43 @@ public abstract class AbstractClient implements Client {
         return EntityRef.NULL;
     }
 
-    protected void createEntity(String name, Color color, EntityManager entityManager) {
+    protected void createEntity(String preferredName, Color color, EntityManager entityManager) {
         // Create player entity
         clientEntity = entityManager.create("engine:client");
-
-
 
         // TODO: Send event for clientInfo creation, don't create here.
 
         EntityRef clientInfo = findClientEntityRef();
         if (!clientInfo.exists()) {
+            String name = findUniquePlayerName(preferredName, entityManager);
             clientInfo = createClientInfoEntity(name, color, entityManager);
         }
 
         ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
         clientComponent.clientInfo = clientInfo;
         clientEntity.saveComponent(clientComponent);
+    }
+
+    protected String findUniquePlayerName(String preferredName, EntityManager entityManager) {
+        Set<String> usedNames = findUsedNames(entityManager);
+
+        String name = preferredName;
+        int nextSuffix = 2;
+        while(usedNames.contains(name)) {
+            name = preferredName + nextSuffix;
+            nextSuffix++;
+        }
+        return name;
+    }
+
+    private Set<String> findUsedNames(EntityManager entityManager) {
+        Set<String> usedNames = new HashSet<String>();
+        for (EntityRef clientInfo: entityManager.getEntitiesWith(ClientInfoComponent.class)) {
+            DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
+            String usedName = displayInfo.name;
+            usedNames.add(usedName);
+        }
+        return usedNames;
     }
 
     private EntityRef createClientInfoEntity(String name, Color color, EntityManager entityManager) {

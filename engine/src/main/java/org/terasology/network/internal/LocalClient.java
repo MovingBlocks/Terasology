@@ -38,8 +38,8 @@ public class LocalClient extends AbstractClient {
 
     private Config config = CoreRegistry.get(Config.class);
 
-    public LocalClient(String name, Color color, EntityManager entityManager) {
-        createEntity(name, color, entityManager);
+    public LocalClient(String preferredName, Color color, EntityManager entityManager) {
+        createEntity(preferredName, color, entityManager);
     }
 
     @Override

@@ -23,11 +23,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +42,6 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -108,7 +105,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private SetMultimap<Integer, Class<? extends Component>> addedComponents = LinkedHashMultimap.create();
     private SetMultimap<Integer, Class<? extends Component>> removedComponents = LinkedHashMultimap.create();
 
-    private String name = "Unknown";
+    private String preferredName = "Player";
     private long lastReceivedTime;
     private ViewDistance viewDistance = ViewDistance.NEAR;
     private float chunkSendCounter = 1.0f;
@@ -159,7 +156,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 return displayInfo.name;
             }
         }
-        return name;
+        return "Unknown Player";
     }
 
     @Override
@@ -193,16 +190,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     }
 
-    public void setName(String name) {
-        this.name = name;
-        ClientComponent client = getEntity().getComponent(ClientComponent.class);
-        if (client != null) {
-            DisplayNameComponent displayInfo = client.clientInfo.getComponent(DisplayNameComponent.class);
-            if (displayInfo != null) {
-                displayInfo.name = name;
-                client.clientInfo.saveComponent(displayInfo);
-            }
-        }
+    /**
+     * @param preferredName the name the player would like to use.
+     */
+    public void setPreferredName(String preferredName) {
+        this.preferredName = preferredName;
     }
 
     @Override
@@ -337,7 +329,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         this.eventSerializer = newEventSerializer;
         this.entitySystemLibrary = newSystemLibrary;
 
-        createEntity(name, color, entityManager);
+        createEntity(preferredName, color, entityManager);
     }
 
     @Override

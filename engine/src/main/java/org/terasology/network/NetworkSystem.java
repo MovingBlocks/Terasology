@@ -39,7 +39,7 @@ public interface NetworkSystem extends BlockRegistrationListener {
 
     void shutdown();
 
-    Client joinLocal(String name, Color color);
+    Client joinLocal(String preferredName, Color color);
 
     void update();
 
