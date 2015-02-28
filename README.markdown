@@ -132,9 +132,9 @@ Press the `grave` key (usually the \` key immediately above `tab`) to show the i
 * listBlocks - Lists all actively used blocks (have been loaded for the world)
 * listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
 * listShapes - Lists the available shapes
-* health - Fully restores the player's health
+* healthMax - Fully restores the player's health
 * showHealth - Shows the player's health
-* ~~teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42~~
+* teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42
 
 Building and running from source
 --------
