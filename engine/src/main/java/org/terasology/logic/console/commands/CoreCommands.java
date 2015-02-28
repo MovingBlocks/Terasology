@@ -127,14 +127,23 @@ public class CoreCommands extends BaseComponentSystem {
         return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
     }
 
-    @Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
-    public String reloadUI(@CommandParam("ui") String ui) {
-        CoreRegistry.get(NUIManager.class).clear();
+    @Command(shortDescription = "Reloads a ui screen")
+    public String reloadScreen(@CommandParam("ui") String ui) {
 
         AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
         UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
         if (uiData != null) {
+            NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+            boolean wasOpen = nuiManager.isOpen(uri);
+            if (wasOpen) {
+                nuiManager.closeScreen(uri);
+            }
+
             CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
+
+            if (wasOpen) {
+                nuiManager.pushScreen(uri);
+            }
             return "Success";
         } else {
             return "Unable to resolve ui '" + ui + "'";
