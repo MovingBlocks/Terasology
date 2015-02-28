@@ -47,14 +47,14 @@ public final class TextureDataFactory {
      */
     public static TextureData newInstance(Color color) {
 
-        byte red = UnsignedBytes.checkedCast(color.r());
-        byte green = UnsignedBytes.checkedCast(color.g());
-        byte blue = UnsignedBytes.checkedCast(color.b());
-        byte alpha = UnsignedBytes.checkedCast(color.a());
+        byte red = (byte) color.r();
+        byte green = (byte) color.g();
+        byte blue = (byte) color.b();
+        byte alpha = (byte) color.a();
 
         ByteBuffer data = ByteBuffer.allocateDirect(4 * TEXTURE_WIDTH * TEXTURE_HEIGHT);
-        for (int width = 0; width < TEXTURE_WIDTH; width++) {
-            for (int height = 0; height < TEXTURE_HEIGHT; height++) {
+        for (int height = 0; height < TEXTURE_HEIGHT; height++) {
+            for (int width = 0; width < TEXTURE_WIDTH; width++) {
                 data.put(red).put(green).put(blue).put(alpha);
             }
         }
