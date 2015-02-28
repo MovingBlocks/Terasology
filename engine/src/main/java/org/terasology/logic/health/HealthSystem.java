@@ -214,7 +214,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
 
     @Command(shortDescription = "Restores your health to max", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String health(@Sender EntityRef clientEntity) {
+    public String healthMax(@Sender EntityRef clientEntity) {
         ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(100000, clientComp.character));
         return "Health restored";

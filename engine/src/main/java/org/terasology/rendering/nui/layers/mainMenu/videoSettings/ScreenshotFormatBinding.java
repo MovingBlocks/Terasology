@@ -28,11 +28,12 @@ public class ScreenshotFormatBinding implements Binding<ScreenshotFormat> {
 
     @Override
     public ScreenshotFormat get() {
-        if(config.getScreenshotFormat() == "png") {
+        switch (config.getScreenshotFormat()) {
+        case "png":
             return ScreenshotFormat.PNG;
-        } else if(config.getScreenshotFormat() == "jpeg") {
+        case "jpeg":
             return ScreenshotFormat.JPEG;
-        } else {
+        default:
             return ScreenshotFormat.PNG;
         }
     }

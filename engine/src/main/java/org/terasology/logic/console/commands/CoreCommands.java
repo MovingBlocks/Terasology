@@ -179,15 +179,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     }
 
-    @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)
-    public void kill(EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        if (health != null) {
-            clientComp.character.send(new DestroyEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
-        }
-    }
-
     @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
     public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
         Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
@@ -197,17 +188,6 @@ public class CoreCommands extends BaseComponentSystem {
                     entity.destroy();
                 }
             }
-        }
-    }
-
-    @Command(shortDescription = "Teleports you to a location", runOnServer = true,
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
-        if (location != null) {
-            location.setWorldPosition(new Vector3f(x, y, z));
-            clientComp.character.saveComponent(location);
         }
     }
 
@@ -261,12 +241,6 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "Not connected";
         }
-    }
-
-    @Command(shortDescription = "Displays debug information on the target entity")
-    public String debugTarget() {
-        EntityRef cameraTarget = cameraTargetSystem.getTarget();
-        return cameraTarget.toFullDescription();
     }
 
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
@@ -327,14 +301,6 @@ public class CoreCommands extends BaseComponentSystem {
 
         pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
         return "Spawned block.";
-    }
-
-    @Command(shortDescription = "Sets the current world time in days")
-    public String setWorldTime(@CommandParam("day") float day) {
-        WorldProvider world = CoreRegistry.get(WorldProvider.class);
-        world.getTime().setDays(day);
-
-        return "World time changed";
     }
 
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",

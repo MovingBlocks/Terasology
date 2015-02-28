@@ -55,11 +55,11 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     }
 
     private EntityRef createFakeEntityWith(LocationComponent locationComponent) {
-        EntityRef entity = mock(EntityRef.class);
-        when(entity.getComponent(LocationComponent.class)).thenReturn(locationComponent);
-        when(entity.exists()).thenReturn(true);
-        when(entity.getId()).thenReturn(nextFakeEntityId++);
-        return entity;
+        EntityRef entRef = mock(EntityRef.class);
+        when(entRef.getComponent(LocationComponent.class)).thenReturn(locationComponent);
+        when(entRef.exists()).thenReturn(true);
+        when(entRef.getId()).thenReturn(nextFakeEntityId++);
+        return entRef;
     }
 
     @Test
