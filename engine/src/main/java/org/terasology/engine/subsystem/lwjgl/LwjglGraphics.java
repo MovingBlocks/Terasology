@@ -69,6 +69,7 @@ import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
+import org.terasology.rendering.assets.texture.NoiseTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
@@ -257,6 +258,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         });
         assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
         assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
+        assetManager.addResolver(AssetType.TEXTURE, new NoiseTextureAssetResolver());
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerLwjgl());
         CoreRegistry.get(ShaderManager.class).initShaders();

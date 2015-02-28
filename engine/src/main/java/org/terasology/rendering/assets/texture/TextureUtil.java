@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 
 public final class TextureUtil {
     public static final String GENERATED_COLOR_NAME_PREFIX = "color";
+    public static final String GENERATED_NOISE_NAME_PREFIX = "noise";
 
     private TextureUtil() {
     }
@@ -45,6 +46,20 @@ public final class TextureUtil {
         appendColorName(sb, color);
 
         return new AssetUri(AssetType.TEXTURE, "engine", sb.toString());
+    }
+
+    /**
+     * Returns a AssetUri which represents a Texture of that color.
+     *
+     * @param color, including alpha, of the texture to represent.
+     * @return an asset Uri for the texture
+     */
+    public static AssetUri getTextureUriForWhiteNoise(int size, long seed, int min, int max) {
+
+        String name = String.format("%s.%s.%d.%d.%d.%d",
+                GENERATED_NOISE_NAME_PREFIX, "white", size, seed, min, max);
+
+        return new AssetUri(AssetType.TEXTURE, "engine", name);
     }
 
     /**

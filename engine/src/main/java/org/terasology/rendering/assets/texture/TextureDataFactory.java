@@ -18,15 +18,18 @@ package org.terasology.rendering.assets.texture;
 
 import java.nio.ByteBuffer;
 
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.texture.Texture.FilterMode;
 import org.terasology.rendering.assets.texture.Texture.WrapMode;
 import org.terasology.rendering.nui.Color;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 import com.google.common.primitives.UnsignedBytes;
 
 /**
  * Creates TextureData objects based on specific criteria
- * 
+ *
  * @author mkienenb
  */
 public final class TextureDataFactory {
@@ -60,5 +63,27 @@ public final class TextureDataFactory {
         data.rewind();
 
         return new TextureData(TEXTURE_WIDTH, TEXTURE_HEIGHT, new ByteBuffer[]{data}, WrapMode.REPEAT, FilterMode.NEAREST);
+    }
+
+    public static TextureData createWhiteNoiseTexture(int size, long seed, int min, int max) {
+        int width = size;
+        int height = size;
+        ByteBuffer data = ByteBuffer.allocateDirect(4 * width * height);
+
+        Random rng = new FastRandom(seed);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                data.put((byte) TeraMath.clamp(rng.nextInt(min, max), 0, 255));
+                data.put((byte) TeraMath.clamp(rng.nextInt(min, max), 0, 255));
+                data.put((byte) TeraMath.clamp(rng.nextInt(min, max), 0, 255));
+                data.put((byte) 255);
+            }
+        }
+
+        // The buffer must be reset back to the initial position before passing it onward.
+        data.rewind();
+
+        return new TextureData(width, height, new ByteBuffer[]{data}, WrapMode.REPEAT, FilterMode.NEAREST);
     }
 }
