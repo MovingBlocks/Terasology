@@ -72,6 +72,7 @@ import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
 import org.terasology.rendering.assets.texture.NoiseTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureFromAtlasResolver;
@@ -154,10 +155,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
 
                 Display.setIcon(new ByteBuffer[]{
-                        imageToByteBuffer(icon16),
-                        imageToByteBuffer(icon32),
-                        imageToByteBuffer(icon64),
-                        imageToByteBuffer(icon128)
+                        TextureUtil.convertToByteBuffer(icon16),
+                        TextureUtil.convertToByteBuffer(icon32),
+                        TextureUtil.convertToByteBuffer(icon64),
+                        TextureUtil.convertToByteBuffer(icon128)
                 });
 
             } catch (IOException | IllegalArgumentException e) {
@@ -183,18 +184,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         } catch (LWJGLException e) {
             throw new RuntimeException("Can not initialize graphics device.", e);
         }
-    }
-
-    public ByteBuffer imageToByteBuffer(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        int[] data = image.getRGB(0, 0, width, height, null, 0, width);
-        ByteBuffer imageBuffer = ByteBuffer.allocateDirect(data.length * 4);
-        imageBuffer.order(ByteOrder.nativeOrder());
-        imageBuffer.asIntBuffer().put(data);
-
-        return imageBuffer;
     }
 
     private void initOpenGL() {
