@@ -80,7 +80,7 @@ public final class Config {
     /**
      * Transient fields are not persisted in GSON's serialization process.
      */
-    private transient TransientConfig transients = new TransientConfig();
+    private transient TransientConfig transients = new TransientConfig(this);
 
     /**
      * Create a new, empty config
