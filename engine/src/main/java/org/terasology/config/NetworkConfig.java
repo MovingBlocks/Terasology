@@ -30,7 +30,8 @@ public class NetworkConfig implements Iterable<ServerInfo> {
     private List<ServerInfo> servers = Lists.newArrayList();
     // Available upstream bandwidth in kilobits per second
     private int upstreamBandwidth = 1024;
-    //The port that is used for hosting
+
+    // the port that is used for hosting
     private int serverPort = TerasologyConstants.DEFAULT_PORT;
 
     public void clear() {

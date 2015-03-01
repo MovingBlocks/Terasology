@@ -99,7 +99,7 @@ public final class Terasology {
     private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
-    private static int serverPort = -1;
+    private static String serverPort = null;
 
     private Terasology() {
     }
@@ -128,8 +128,8 @@ public final class Terasology {
                 config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
 
-            if (serverPort != -1) {
-                config.getTransients().setServerPort(serverPort);
+            if (serverPort != null) {
+                config.getTransients().setServerPort(Integer.parseInt(serverPort));
             }
 
             if (isHeadless) {
@@ -153,11 +153,8 @@ public final class Terasology {
             }
         } catch (Throwable e) {
             // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
-            if (!GraphicsEnvironment.isHeadless()) {
-                reportException(e);
-            }
-        } finally {
             SplashScreen.getInstance().close();
+            reportException(e);
         }
     }
 
@@ -232,8 +229,8 @@ public final class Terasology {
         System.out.println("    Use \"myPath\" as the home directory:");
         System.out.println("    terasology " + USE_SPECIFIED_DIR_AS_HOME + "myPath");
         System.out.println();
-        System.out.println("    Start terasology in headless mode (no graphics):");
-        System.out.println("    terasology " + START_HEADLESS);
+        System.out.println("    Start terasology in headless mode (no graphics) and enforce using the default port:");
+        System.out.println("    terasology " + START_HEADLESS + " " + SERVER_PORT + TerasologyConstants.DEFAULT_PORT);
         System.out.println();
         System.out.println("    Load the latest game on startup and disable crash reporting");
         System.out.println("    terasology " + LOAD_LAST_GAME + " " + NO_CRASH_REPORT);
@@ -268,11 +265,7 @@ public final class Terasology {
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
-                try {
-                    serverPort = Integer.parseInt(arg.substring(SERVER_PORT.length()));
-                } catch (NumberFormatException e) {
-                    reportException(e);
-                }
+                serverPort = arg.substring(SERVER_PORT.length());
             } else {
                 recognized = false;
             }
@@ -288,9 +281,7 @@ public final class Terasology {
             }
 
         } catch (IOException e) {
-            if (!isHeadless) {
-                reportException(e);
-            }
+            reportException(e);
             System.exit(0);
         }
     }
@@ -315,8 +306,11 @@ public final class Terasology {
             throwable.addSuppressed(pathManagerConstructorFailure);
         }
 
-        if (crashReportEnabled) {
+        if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
             CrashReporter.report(throwable, logPath);
+        } else {
+            throwable.printStackTrace();
+            System.err.println("For more details, see the log files in " + logPath.toAbsolutePath().normalize());
         }
     }
 
