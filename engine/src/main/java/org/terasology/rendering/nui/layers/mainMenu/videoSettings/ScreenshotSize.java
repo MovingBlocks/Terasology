@@ -15,48 +15,49 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.config.RenderingConfig;
 
 public enum ScreenshotSize {
 
-    SUPER("Super Size", 0) {
+    DOUBLE_SIZE("Super Size", 2.0F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(0);
+            config.setScreenshotSize(DOUBLE_SIZE);
         }
     },
-    NORMAL("Normal Size", 1) {
+    NORMAL_SIZE("Normal Size", 1.0F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(1);
+            config.setScreenshotSize(NORMAL_SIZE);
         }
     },
-    SMALL("Small Size", 2) {
+    HALF_SIZE("Small Size", 0.5F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(2);
+            config.setScreenshotSize(HALF_SIZE);
         }
     },
-    THUMBNAIL("Thumbnail", 3) {
+    QUARTER_SIZE("Thumbnail", 0.25F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(3);
+            config.setScreenshotSize(QUARTER_SIZE);
         }
     };
 
 
     private String displayName;
-    private int index;
+    private float multiplier;
 
-    private ScreenshotSize(String displayName, int index) {
+    private ScreenshotSize(String displayName, float multiplier) {
         this.displayName = displayName;
-        this.index = index;
+        this.multiplier = multiplier;
     }
 
     public abstract void apply(RenderingConfig config);
 
-    public int getIndex() {
-        return index;
+    public float getMultiplier() {
+        return multiplier;
     }
 
     @Override

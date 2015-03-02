@@ -1367,23 +1367,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if (config.getRendering().getScreenshotSize() == 0) {
-            overwriteRtWidth = Display.getWidth() * 2;
-            overwriteRtHeight = Display.getHeight() * 2;
-        } else if (config.getRendering().getScreenshotSize() == 1) {
-            overwriteRtWidth = Display.getWidth();
-            overwriteRtHeight = Display.getHeight();
-        } else if (config.getRendering().getScreenshotSize() == 2) {
-            overwriteRtWidth = Display.getWidth() / 2;
-            overwriteRtHeight = Display.getHeight() / 2;
-        } else if (config.getRendering().getScreenshotSize() == 3) {
-            overwriteRtWidth = Display.getWidth() / 4;
-            overwriteRtHeight = Display.getHeight() / 4;
-        } else {
-            //In case its another config value use default values
-            overwriteRtWidth = 1152;
-            overwriteRtHeight = 700;
-        }
+        overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
+        overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
 
         createOrUpdateFullscreenFbos();
     }
@@ -1410,7 +1395,7 @@ public class LwjglRenderingProcess {
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = config.getRendering().getScreenshotFormat();
+                final String format = config.getRendering().getScreenshotFormat().toString();
                 final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);

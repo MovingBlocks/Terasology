@@ -22,13 +22,13 @@ public enum ScreenshotFormat {
     PNG("PNG") {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotFormat("png");
+            config.setScreenshotFormat(PNG);
         }
     },
     JPEG("JPEG") {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotFormat("jpeg");
+            config.setScreenshotFormat(JPEG);
         }
     };
 
