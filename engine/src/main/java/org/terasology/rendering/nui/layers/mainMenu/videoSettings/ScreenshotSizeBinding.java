@@ -28,13 +28,13 @@ public class ScreenshotSizeBinding implements Binding<ScreenshotSize> {
 
     @Override
     public ScreenshotSize get() {
-        if (config.getScreenshotSize() == 0) {
+        if (config.getScreenshotSize() == ScreenshotSize.SUPER) {
             return ScreenshotSize.SUPER;
-        } else if (config.getScreenshotSize() == 1) {
+        } else if (config.getScreenshotSize() == ScreenshotSize.NORMAL) {
             return ScreenshotSize.NORMAL;
-        } else if (config.getScreenshotSize() == 2) {
+        } else if (config.getScreenshotSize() == ScreenshotSize.SMALL) {
             return ScreenshotSize.SMALL;
-        } else if (config.getScreenshotSize() == 3) {
+        } else if (config.getScreenshotSize() == ScreenshotSize.THUMBNAIL) {
             return ScreenshotSize.THUMBNAIL;
         } else {
             return ScreenshotSize.NORMAL;

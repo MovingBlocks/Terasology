@@ -40,6 +40,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 
@@ -1367,16 +1368,16 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if (config.getRendering().getScreenshotSize() == 0) {
+        if (config.getRendering().getScreenshotSize() == ScreenshotSize.SUPER) {
             overwriteRtWidth = Display.getWidth() * 2;
             overwriteRtHeight = Display.getHeight() * 2;
-        } else if (config.getRendering().getScreenshotSize() == 1) {
+        } else if (config.getRendering().getScreenshotSize() == ScreenshotSize.NORMAL) {
             overwriteRtWidth = Display.getWidth();
             overwriteRtHeight = Display.getHeight();
-        } else if (config.getRendering().getScreenshotSize() == 2) {
+        } else if (config.getRendering().getScreenshotSize() == ScreenshotSize.SMALL) {
             overwriteRtWidth = Display.getWidth() / 2;
             overwriteRtHeight = Display.getHeight() / 2;
-        } else if (config.getRendering().getScreenshotSize() == 3) {
+        } else if (config.getRendering().getScreenshotSize() == ScreenshotSize.THUMBNAIL) {
             overwriteRtWidth = Display.getWidth() / 4;
             overwriteRtHeight = Display.getHeight() / 4;
         } else {
@@ -1410,7 +1411,7 @@ public class LwjglRenderingProcess {
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = config.getRendering().getScreenshotFormat();
+                final String format = config.getRendering().getScreenshotFormat().toString();
                 final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);

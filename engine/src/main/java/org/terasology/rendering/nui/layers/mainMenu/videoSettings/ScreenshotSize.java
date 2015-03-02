@@ -22,25 +22,25 @@ public enum ScreenshotSize {
     SUPER("Super Size", 0) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(0);
+            config.setScreenshotSize(SUPER);
         }
     },
     NORMAL("Normal Size", 1) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(1);
+            config.setScreenshotSize(NORMAL);
         }
     },
     SMALL("Small Size", 2) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(2);
+            config.setScreenshotSize(SMALL);
         }
     },
     THUMBNAIL("Thumbnail", 3) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(3);
+            config.setScreenshotSize(THUMBNAIL);
         }
     };
 
