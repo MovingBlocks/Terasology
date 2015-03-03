@@ -40,7 +40,6 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 
@@ -1368,23 +1367,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if (config.getRendering().getScreenshotSize() == ScreenshotSize.SUPER) {
-            overwriteRtWidth = Display.getWidth() * 2;
-            overwriteRtHeight = Display.getHeight() * 2;
-        } else if (config.getRendering().getScreenshotSize() == ScreenshotSize.NORMAL) {
-            overwriteRtWidth = Display.getWidth();
-            overwriteRtHeight = Display.getHeight();
-        } else if (config.getRendering().getScreenshotSize() == ScreenshotSize.SMALL) {
-            overwriteRtWidth = Display.getWidth() / 2;
-            overwriteRtHeight = Display.getHeight() / 2;
-        } else if (config.getRendering().getScreenshotSize() == ScreenshotSize.THUMBNAIL) {
-            overwriteRtWidth = Display.getWidth() / 4;
-            overwriteRtHeight = Display.getHeight() / 4;
-        } else {
-            //In case its another config value use default values
-            overwriteRtWidth = 1152;
-            overwriteRtHeight = 700;
-        }
+        overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
+        overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
 
         createOrUpdateFullscreenFbos();
     }

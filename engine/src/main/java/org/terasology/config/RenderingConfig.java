@@ -74,7 +74,7 @@ public class RenderingConfig {
     private boolean clampLighting;
     private int fboScale = 100;
     private boolean dumpShaders;
-    private ScreenshotSize screenshotSize = ScreenshotSize.NORMAL;
+    private ScreenshotSize screenshotSize = ScreenshotSize.NORMAL_SIZE;
     private ScreenshotFormat screenshotFormat = ScreenshotFormat.PNG;
     private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
