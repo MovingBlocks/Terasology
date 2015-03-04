@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -203,7 +205,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 Vector3f spawnPosition = getSafeSpawnPosition().toVector3f();
                 loc.setWorldPosition(spawnPosition);
                 entity.saveComponent(loc);
-                
+
                 SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity,
                         spawnPosition);
                 clientsPreparingToSpawn.add(spawningClientInfo);
@@ -298,10 +300,16 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
         if (location != null) {
+            // deactivate the character to reset the CharacterPredictionSystem,
+            // which would overwrite the character location
+            clientComp.character.send(BeforeDeactivateComponent.newInstance());
+
             location.setWorldPosition(new Vector3f(x, y, z));
             clientComp.character.saveComponent(location);
-        }
 
+            // re-active the character
+            clientComp.character.send(OnActivatedComponent.newInstance());
+        }
         return "Teleported to " + x + " " + y + " " + z;
     }
 

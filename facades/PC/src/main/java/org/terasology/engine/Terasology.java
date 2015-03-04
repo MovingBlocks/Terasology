@@ -22,6 +22,9 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -45,10 +48,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 /**
  * Class providing the main() method for launching Terasology as a PC app.
  * <p/>
@@ -69,6 +68,7 @@ import com.google.common.collect.Lists;
  * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
  * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
  * <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
+ * <tr><td>-serverPort=xxxxx</td><td>Change the server port.</td></tr>
  * </tbody>
  * </table>
  * <p/>
@@ -92,12 +92,14 @@ public final class Terasology {
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
     private static final String NO_SOUND = "-noSound";
+    private static final String SERVER_PORT = "-serverPort=";
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
     private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
+    private static String serverPort = null;
 
     private Terasology() {
     }
@@ -119,9 +121,17 @@ public final class Terasology {
         setupLogging();
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
+
+            Config config = CoreRegistry.get(Config.class);
+
             if (!writeSaveGamesEnabled) {
-                CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
+                config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
+
+            if (serverPort != null) {
+                config.getTransients().setServerPort(Integer.parseInt(serverPort));
+            }
+
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
                 engine.run(new StateHeadlessSetup());
@@ -143,11 +153,8 @@ public final class Terasology {
             }
         } catch (Throwable e) {
             // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
-            if (!GraphicsEnvironment.isHeadless()) {
-                reportException(e);
-            }
-        } finally {
             SplashScreen.getInstance().close();
+            reportException(e);
         }
     }
 
@@ -181,7 +188,8 @@ public final class Terasology {
                 LOAD_LAST_GAME,
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
-                NO_SOUND);
+                NO_SOUND,
+                SERVER_PORT + "<port>");
 
         StringBuilder optText = new StringBuilder();
 
@@ -211,6 +219,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("To disable sound use the " + NO_SOUND + " launch argument (default in headless mode).");
         System.out.println();
+        System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
+        System.out.println();
         System.out.println("Examples:");
         System.out.println();
         System.out.println("    Use the current directory as the home directory:");
@@ -219,8 +229,8 @@ public final class Terasology {
         System.out.println("    Use \"myPath\" as the home directory:");
         System.out.println("    terasology " + USE_SPECIFIED_DIR_AS_HOME + "myPath");
         System.out.println();
-        System.out.println("    Start terasology in headless mode (no graphics):");
-        System.out.println("    terasology " + START_HEADLESS);
+        System.out.println("    Start terasology in headless mode (no graphics) and enforce using the default port:");
+        System.out.println("    terasology " + START_HEADLESS + " " + SERVER_PORT + TerasologyConstants.DEFAULT_PORT);
         System.out.println();
         System.out.println("    Load the latest game on startup and disable crash reporting");
         System.out.println("    terasology " + LOAD_LAST_GAME + " " + NO_CRASH_REPORT);
@@ -254,6 +264,8 @@ public final class Terasology {
                 soundEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else if (arg.startsWith(SERVER_PORT)) {
+                serverPort = arg.substring(SERVER_PORT.length());
             } else {
                 recognized = false;
             }
@@ -269,9 +281,7 @@ public final class Terasology {
             }
 
         } catch (IOException e) {
-            if (!isHeadless) {
-                reportException(e);
-            }
+            reportException(e);
             System.exit(0);
         }
     }
@@ -296,8 +306,11 @@ public final class Terasology {
             throwable.addSuppressed(pathManagerConstructorFailure);
         }
 
-        if (crashReportEnabled) {
+        if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
             CrashReporter.report(throwable, logPath);
+        } else {
+            throwable.printStackTrace();
+            System.err.println("For more details, see the log files in " + logPath.toAbsolutePath().normalize());
         }
     }
 

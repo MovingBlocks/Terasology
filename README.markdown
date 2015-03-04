@@ -39,7 +39,7 @@ You can also run a headless server, but this is harder to configure at the momen
 
 `java -jar libs/Terasology.jar -headless -homedir=server`
 
-This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system)
+This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system). You can add `-serverPort=#####` to run on a different port than default 25777.
 
 In this case *there is no default player with rights beyond "chat"*. You need to gain admin powers yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`. This gives you all permission types except "debug"
 
@@ -132,9 +132,9 @@ Press the `grave` key (usually the \` key immediately above `tab`) to show the i
 * listBlocks - Lists all actively used blocks (have been loaded for the world)
 * listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
 * listShapes - Lists the available shapes
-* health - Fully restores the player's health
+* healthMax - Fully restores the player's health
 * showHealth - Shows the player's health
-* ~~teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42~~
+* teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42
 
 Building and running from source
 --------

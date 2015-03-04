@@ -127,14 +127,23 @@ public class CoreCommands extends BaseComponentSystem {
         return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
     }
 
-    @Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
-    public String reloadUI(@CommandParam("ui") String ui) {
-        CoreRegistry.get(NUIManager.class).clear();
+    @Command(shortDescription = "Reloads a ui screen")
+    public String reloadScreen(@CommandParam("ui") String ui) {
 
         AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
         UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
         if (uiData != null) {
+            NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+            boolean wasOpen = nuiManager.isOpen(uri);
+            if (wasOpen) {
+                nuiManager.closeScreen(uri);
+            }
+
             CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
+
+            if (wasOpen) {
+                nuiManager.pushScreen(uri);
+            }
             return "Success";
         } else {
             return "Unable to resolve ui '" + ui + "'";
@@ -179,15 +188,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     }
 
-    @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)
-    public void kill(EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        if (health != null) {
-            clientComp.character.send(new DestroyEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
-        }
-    }
-
     @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
     public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
         Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
@@ -197,17 +197,6 @@ public class CoreCommands extends BaseComponentSystem {
                     entity.destroy();
                 }
             }
-        }
-    }
-
-    @Command(shortDescription = "Teleports you to a location", runOnServer = true,
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public void teleport(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z, EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
-        if (location != null) {
-            location.setWorldPosition(new Vector3f(x, y, z));
-            clientComp.character.saveComponent(location);
         }
     }
 
@@ -261,12 +250,6 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "Not connected";
         }
-    }
-
-    @Command(shortDescription = "Displays debug information on the target entity")
-    public String debugTarget() {
-        EntityRef cameraTarget = cameraTargetSystem.getTarget();
-        return cameraTarget.toFullDescription();
     }
 
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
@@ -327,14 +310,6 @@ public class CoreCommands extends BaseComponentSystem {
 
         pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
         return "Spawned block.";
-    }
-
-    @Command(shortDescription = "Sets the current world time in days")
-    public String setWorldTime(@CommandParam("day") float day) {
-        WorldProvider world = CoreRegistry.get(WorldProvider.class);
-        world.getTime().setDays(day);
-
-        return "World time changed";
     }
 
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",

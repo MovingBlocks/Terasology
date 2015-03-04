@@ -149,6 +149,12 @@ public final class TextureUtil {
         return image;
     }
 
+    /**
+     * Converts a BufferedImage into a ByteBuffer based on 32-bit values
+     * in RGBA byte order
+     * @param image any type of BufferedImage
+     * @return a ByteBuffer that contains the data in RGBA byte order
+     */
     public static ByteBuffer convertToByteBuffer(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
