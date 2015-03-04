@@ -127,6 +127,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
         prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("newParticle", new ShaderParametersDefault());
     }
 
     @Override

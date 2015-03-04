@@ -15,9 +15,17 @@
  */
 package org.terasology.logic.particles;
 
+import org.terasology.math.geom.Vector3f;
+
 /**
- * Created by Linus on 28-2-2015.
+ * Functor object for inspection/tweaking of the data of a particle.
+ * @author Linus van Elswijk
  */
-public interface EmitterFunction {
-    void onEmission();
+public interface ParticleSpawnFunction {
+
+    /**
+     * Function callback.
+     * @param inOutData Input and output parameter of the particle data
+     */
+    void call(final ParticleData inOutData);
 }

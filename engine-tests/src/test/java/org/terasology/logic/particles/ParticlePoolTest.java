@@ -35,7 +35,7 @@ public class ParticlePoolTest {
         final int index4 = index * 4;
 
         pool.size[index] = random.nextFloat();
-        pool.lifeRemaining[index] = random.nextFloat();
+        pool.energy[index] = random.nextFloat();
 
         for(int i = 0; i < 3; i++) {
             pool.position[index3 + i] = random.nextFloat();
@@ -53,7 +53,7 @@ public class ParticlePoolTest {
         final int index4 = index * 4;
 
         dest.size[index] = src.size[index];
-        dest.lifeRemaining[index] = src.lifeRemaining[index];
+        dest.energy[index] = src.energy[index];
 
         System.arraycopy(src.position, index3, dest.position, index3, 3);
         System.arraycopy(src.previousPosition, index3, dest.previousPosition, index3, 3);
@@ -85,7 +85,7 @@ public class ParticlePoolTest {
         final int actIndex4 = actIndex * 4;
 
         assertTrue(TeraMath.fastAbs(expected.size[expIndex] - actual.size[actIndex]) < epsilon);
-        assertTrue(TeraMath.fastAbs(expected.lifeRemaining[expIndex] - actual.lifeRemaining[actIndex]) < epsilon);
+        assertTrue(TeraMath.fastAbs(expected.energy[expIndex] - actual.energy[actIndex]) < epsilon);
 
         for(int i = 0; i < 3; i++) {
             assertTrue(TeraMath.fastAbs(expected.position[expIndex3 + i] - actual.position[actIndex3 + i]) < epsilon);
@@ -116,7 +116,7 @@ public class ParticlePoolTest {
             assertEquals(pool.size(), pool.deadParticles());
 
             assertEquals(size, pool.size.length);
-            assertEquals(size, pool.lifeRemaining.length);
+            assertEquals(size, pool.energy.length);
 
             assertEquals(size * 3, pool.position.length);
             assertEquals(size * 3, pool.previousPosition.length);

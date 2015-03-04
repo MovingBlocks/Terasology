@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2015 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles;
 
-/**
- * Created by Linus on 28-2-2015.
- */
-public interface AffectorFunction {
-
+void main() {
+    gl_FragData[0].rgba = gl_Color;
+    gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
+    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
 }

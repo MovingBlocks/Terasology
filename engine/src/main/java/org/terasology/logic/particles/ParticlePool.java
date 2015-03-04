@@ -29,7 +29,7 @@ public final class ParticlePool {
 
     // Per particle scalars
     final float[] size;
-    final float[] lifeRemaining;
+    final float[] energy;
 
     // Per particle 3d vectors
     final float[] position;
@@ -41,7 +41,7 @@ public final class ParticlePool {
 
     //== private attributes =============================
 
-    private final ParticleData temporaryParticleData = new ParticleData();
+    private final ParticleData temporaryParticleData = new ParticleData(this);
 
     private int firstDeadParticleIndex;
     private final int rawSize;
@@ -83,7 +83,7 @@ public final class ParticlePool {
 
         // Per particle scalars
         this.size = new float[size];
-        this.lifeRemaining = new float[size];
+        this.energy = new float[size];
 
         // Per particle 3d vectors
         position = new float[size * 3];
@@ -95,58 +95,6 @@ public final class ParticlePool {
     }
 
     //== private methods ================================
-
-    /**
-     * Data object to store the data of a single particle.
-     * Used internally for swapping operations.
-     */
-    private final class ParticleData {
-        // scalars
-        public float size;
-        public float lifeRemaining;
-
-        // 3d vectors
-        public float[] position = new float[3];
-        public float[] previousPosition = new float[3];
-        public float[] velocity = new float[3];
-
-        // 4d vectors
-        public float[] color = new float[4];
-
-        public void loadFrom(final int index) {
-            final int index3 = 3 * index;
-            final int index4 = 4 * index;
-
-            // scalars
-            size = ParticlePool.this.size[index];
-            lifeRemaining = ParticlePool.this.lifeRemaining[index];
-
-            // 3d vectors
-            System.arraycopy(ParticlePool.this.position, index3, position, 0, 3);
-            System.arraycopy(ParticlePool.this.previousPosition, index3, previousPosition, 0, 3);
-            System.arraycopy(ParticlePool.this.velocity, index3, velocity, 0, 3);
-
-            // 4d vectors
-            System.arraycopy(ParticlePool.this.color, index4, color, 0, 4);
-        }
-
-        public void storeAt(final int index) {
-            final int index3 = 3 * index;
-            final int index4 = 4 * index;
-
-            // scalars
-            ParticlePool.this.size[index] = size;
-            ParticlePool.this.lifeRemaining[index] = lifeRemaining;
-
-            // 3d vectors
-            System.arraycopy(position, 0, ParticlePool.this.position, index3, 3);
-            System.arraycopy(previousPosition, 0, ParticlePool.this.previousPosition, index3, 3);
-            System.arraycopy(velocity, 0, ParticlePool.this.velocity, index3, 3);
-
-            // 4d vectors
-            System.arraycopy(color, 0, ParticlePool.this.color, index4, 4);
-        }
-    }
 
     private ParticlePool() {
         throw new UnsupportedOperationException();
