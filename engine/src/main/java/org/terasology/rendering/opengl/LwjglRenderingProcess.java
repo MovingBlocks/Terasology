@@ -40,6 +40,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 
@@ -1367,8 +1368,18 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
-        overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
+        //TODO Only a temporary fix for a NullPointerException
+        if(config.getRendering().getScreenshotSize() == null) {
+            config.getRendering().setScreenshotSize(ScreenshotSize.NORMAL_SIZE);
+        }
+
+        if(config.getRendering().getScreenshotSize().isWithMultiplier()) {
+            overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
+            overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
+        } else {
+            overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth();
+            overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight();
+        }
 
         createOrUpdateFullscreenFbos();
     }

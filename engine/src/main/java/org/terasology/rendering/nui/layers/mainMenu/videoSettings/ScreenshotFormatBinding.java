@@ -18,8 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 import org.terasology.config.RenderingConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 
-import static org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotFormat.*;
-
 public class ScreenshotFormatBinding implements Binding<ScreenshotFormat> {
 
     private RenderingConfig config;
@@ -30,13 +28,10 @@ public class ScreenshotFormatBinding implements Binding<ScreenshotFormat> {
 
     @Override
     public ScreenshotFormat get() {
-        switch (config.getScreenshotFormat()) {
-        case PNG:
-            return PNG;
-        case JPEG:
-            return JPEG;
-        default:
-            return PNG;
+        if(config.getScreenshotFormat() != null) {
+            return config.getScreenshotFormat();
+        } else {
+            return ScreenshotFormat.PNG;
         }
     }
 
