@@ -1367,8 +1367,13 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
-        overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
+        if(config.getRendering().getScreenshotSize().isWithMultiplier()) {
+            overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
+            overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
+        } else {
+            overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth();
+            overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight();
+        }
 
         createOrUpdateFullscreenFbos();
     }

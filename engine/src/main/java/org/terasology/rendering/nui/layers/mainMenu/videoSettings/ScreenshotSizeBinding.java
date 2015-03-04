@@ -28,14 +28,8 @@ public class ScreenshotSizeBinding implements Binding<ScreenshotSize> {
 
     @Override
     public ScreenshotSize get() {
-        if (config.getScreenshotSize() == ScreenshotSize.DOUBLE_SIZE) {
-            return ScreenshotSize.DOUBLE_SIZE;
-        } else if (config.getScreenshotSize() == ScreenshotSize.NORMAL_SIZE) {
-            return ScreenshotSize.NORMAL_SIZE;
-        } else if (config.getScreenshotSize() == ScreenshotSize.HALF_SIZE) {
-            return ScreenshotSize.HALF_SIZE;
-        } else if (config.getScreenshotSize() == ScreenshotSize.QUARTER_SIZE) {
-            return ScreenshotSize.QUARTER_SIZE;
+        if(config.getScreenshotSize() != null) {
+            return config.getScreenshotSize();
         } else {
             return ScreenshotSize.NORMAL_SIZE;
         }

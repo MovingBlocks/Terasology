@@ -81,7 +81,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<ScreenshotSize> screenshotSize = find("screenshotSize", UIDropdown.class);
         if (screenshotSize != null) {
-            screenshotSize.setOptions(Lists.newArrayList(ScreenshotSize.QUARTER_SIZE, ScreenshotSize.HALF_SIZE, ScreenshotSize.NORMAL_SIZE, ScreenshotSize.DOUBLE_SIZE));
+            screenshotSize.setOptions(Lists.newArrayList(ScreenshotSize.QUARTER_SIZE, ScreenshotSize.HALF_SIZE, ScreenshotSize.NORMAL_SIZE, ScreenshotSize.DOUBLE_SIZE, ScreenshotSize.HD720));
             screenshotSize.bindSelection(new ScreenshotSizeBinding(config.getRendering()));
         }
 

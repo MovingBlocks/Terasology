@@ -43,21 +43,52 @@ public enum ScreenshotSize {
         public void apply(RenderingConfig config) {
             config.setScreenshotSize(QUARTER_SIZE);
         }
+    },
+    HD720("720p", 1280, 720) {
+        @Override
+        public void apply(RenderingConfig config) {
+            config.setScreenshotSize(HD720);
+        }
     };
 
 
     private String displayName;
     private float multiplier;
 
+    private int width;
+    private int height;
+
+    private boolean isWithMultiplier;
+
     private ScreenshotSize(String displayName, float multiplier) {
         this.displayName = displayName;
         this.multiplier = multiplier;
+        this.isWithMultiplier = true;
+    }
+
+    private ScreenshotSize(String displayName, int width, int height) {
+        this.displayName = displayName;
+        this.width = width;
+        this.height = height;
+        this.isWithMultiplier = false;
     }
 
     public abstract void apply(RenderingConfig config);
 
     public float getMultiplier() {
         return multiplier;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public boolean isWithMultiplier() {
+        return isWithMultiplier;
     }
 
     @Override
