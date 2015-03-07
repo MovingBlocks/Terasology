@@ -66,8 +66,15 @@ public abstract class AbstractClient implements Client {
 
         EntityRef clientInfo = findClientEntityRef();
         if (!clientInfo.exists()) {
-            String name = findUniquePlayerName(preferredName, entityManager);
-            clientInfo = createClientInfoEntity(name, color, entityManager);
+            clientInfo = createClientInfoEntity(entityManager);
+        }
+
+        addOrSetColorComponent(clientInfo, color);
+
+        DisplayNameComponent displayNameComponent = clientInfo.getComponent(DisplayNameComponent.class);
+        if (displayNameComponent == null || !displayNameComponent.name.equals(preferredName)) {
+            String bestAvailableName = findUniquePlayerName(preferredName, entityManager, clientInfo);
+            addOrSetDisplayNameComponent(clientInfo, bestAvailableName);
         }
 
         ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
@@ -75,8 +82,32 @@ public abstract class AbstractClient implements Client {
         clientEntity.saveComponent(clientComponent);
     }
 
-    protected String findUniquePlayerName(String preferredName, EntityManager entityManager) {
-        Set<String> usedNames = findUsedNames(entityManager);
+    private void addOrSetColorComponent(EntityRef clientInfo, Color color) {
+        ColorComponent colorComp = clientInfo.getComponent(ColorComponent.class);
+        if (colorComp != null) {
+            colorComp.color = color;
+            clientInfo.saveComponent(colorComp);
+        } else {
+            colorComp = new ColorComponent();
+            colorComp.color = color;
+            clientInfo.addComponent(colorComp);
+        }
+    }
+
+    private void addOrSetDisplayNameComponent(EntityRef clientInfo, String name) {
+        DisplayNameComponent component = clientInfo.getComponent(DisplayNameComponent.class);
+        if (component != null) {
+            component.name = name;
+            clientInfo.saveComponent(component);
+        } else {
+            component = new DisplayNameComponent();
+            component.name = name;
+            clientInfo.addComponent(component);
+        }
+    }
+
+    protected String findUniquePlayerName(String preferredName, EntityManager entityManager, EntityRef player) {
+        Set<String> usedNames = findNamesOfOtherPlayers(entityManager, player);
 
         String name = preferredName;
         int nextSuffix = 2;
@@ -87,31 +118,27 @@ public abstract class AbstractClient implements Client {
         return name;
     }
 
-    private Set<String> findUsedNames(EntityManager entityManager) {
-        Set<String> usedNames = new HashSet<String>();
+    private Set<String> findNamesOfOtherPlayers(EntityManager entityManager, EntityRef player) {
+        Set<String> otherNames = new HashSet<String>();
         for (EntityRef clientInfo: entityManager.getEntitiesWith(ClientInfoComponent.class)) {
-            DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
-            String usedName = displayInfo.name;
-            usedNames.add(usedName);
+            if (!clientInfo.equals(player)) {
+                DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
+                String usedName = displayInfo.name;
+                otherNames.add(usedName);
+            }
         }
-        return usedNames;
+        return otherNames;
     }
 
-    private EntityRef createClientInfoEntity(String name, Color color, EntityManager entityManager) {
+    private EntityRef createClientInfoEntity(EntityManager entityManager) {
         EntityRef clientInfo;
         clientInfo = entityManager.create("engine:clientInfo");
-        DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
-        displayInfo.name = name;
-        clientInfo.saveComponent(displayInfo);
 
         // mark clientInfo entities with a dedicated component
         ClientInfoComponent cic = new ClientInfoComponent();
         cic.playerId = getId();
         clientInfo.addComponent(cic);
 
-        ColorComponent colorComp = new ColorComponent();
-        colorComp.color = color;
-        clientInfo.addComponent(colorComp);
         return clientInfo;
     }
 }
