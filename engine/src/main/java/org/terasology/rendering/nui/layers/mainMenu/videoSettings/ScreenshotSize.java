@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.config.RenderingConfig;
 
 public enum ScreenshotSize {
@@ -48,6 +47,12 @@ public enum ScreenshotSize {
         @Override
         public void apply(RenderingConfig config) {
             config.setScreenshotSize(HD720);
+        }
+    },
+    HD1080("1080p", 1920, 1080) {
+        @Override
+        public void apply(RenderingConfig config) {
+            config.setScreenshotSize(HD1080);
         }
     };
 
