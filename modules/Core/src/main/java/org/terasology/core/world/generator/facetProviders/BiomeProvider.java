@@ -24,6 +24,8 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
+import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generation.facets.SurfaceHumidityFacet;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
@@ -31,7 +33,11 @@ import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
  * Determines the biome based on temperature and humidity
  */
 @Produces(BiomeFacet.class)
-@Requires({@Facet(SurfaceTemperatureFacet.class), @Facet(SurfaceHumidityFacet.class)})
+@Requires({
+    @Facet(SeaLevelFacet.class),
+    @Facet(SurfaceHeightFacet.class),
+    @Facet(SurfaceTemperatureFacet.class),
+    @Facet(SurfaceHumidityFacet.class)})
 public class BiomeProvider implements FacetProvider {
 
     @Override
@@ -40,15 +46,26 @@ public class BiomeProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        SurfaceTemperatureFacet temperature = region.getRegionFacet(SurfaceTemperatureFacet.class);
-        SurfaceHumidityFacet surfaceHumidityFacet = region.getRegionFacet(SurfaceHumidityFacet.class);
+        SeaLevelFacet seaLevelFacet = region.getRegionFacet(SeaLevelFacet.class);
+        SurfaceHeightFacet heightFacet = region.getRegionFacet(SurfaceHeightFacet.class);
+        SurfaceTemperatureFacet temperatureFacet = region.getRegionFacet(SurfaceTemperatureFacet.class);
+        SurfaceHumidityFacet humidityFacet = region.getRegionFacet(SurfaceHumidityFacet.class);
 
         Border3D border = region.getBorderForFacet(BiomeFacet.class);
         BiomeFacet biomeFacet = new BiomeFacet(region.getRegion(), border);
+
+        int seaLevel = seaLevelFacet.getSeaLevel();
+
         for (Vector2i pos : biomeFacet.getRelativeRegion()) {
-            float temp = temperature.get(pos);
-            float hum = temp * surfaceHumidityFacet.get(pos);
-            if (temp >= 0.5f && hum < 0.3f) {
+            float temp = temperatureFacet.get(pos);
+            float hum = temp * humidityFacet.get(pos);
+            float height = heightFacet.get(pos);
+
+            if (height <= seaLevel) {
+                 biomeFacet.set(pos, CoreBiome.OCEAN);
+            } else if (height <= seaLevel + 2) {
+                biomeFacet.set(pos, CoreBiome.BEACH);
+            } else if (temp >= 0.5f && hum < 0.3f) {
                 biomeFacet.set(pos, CoreBiome.DESERT);
             } else if (hum >= 0.3f && hum <= 0.6f && temp >= 0.5f) {
                 biomeFacet.set(pos, CoreBiome.PLAINS);

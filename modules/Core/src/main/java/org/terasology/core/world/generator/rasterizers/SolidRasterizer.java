@@ -28,6 +28,7 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.DensityFacet;
+import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -63,25 +64,29 @@ public class SolidRasterizer implements WorldRasterizer {
         DensityFacet solidityFacet = chunkRegion.getFacet(DensityFacet.class);
         SurfaceHeightFacet surfaceFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
         BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
+        SeaLevelFacet seaLevelFacet = chunkRegion.getFacet(SeaLevelFacet.class);
+        int seaLevel = seaLevelFacet.getSeaLevel();
+
         Vector2i pos2d = new Vector2i();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
             pos2d.set(pos.x, pos.z);
             CoreBiome biome = biomeFacet.get(pos2d);
             chunk.setBiome(pos.x, pos.y, pos.z, biome);
 
+            int posY = pos.y + chunk.getChunkWorldOffsetY();
             float density = solidityFacet.get(pos);
+
             if (density >= 32) {
                 chunk.setBlock(pos, stone);
             } else if (density >= 0) {
-                int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - pos.y - chunk.getChunkWorldOffsetY();
-                Block block = getSurfaceBlock(depth, pos.y + chunk.getChunkWorldOffsetY(), biome);
+                int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - posY;
+                Block block = getSurfaceBlock(depth, posY, biome);
                 chunk.setBlock(pos, block);
             } else {
-                int posY = pos.y + chunk.getChunkWorldOffsetY();
-
-                if (posY == 32 && CoreBiome.SNOW == biomeFacet.get(pos2d)) {
+                // fill up terrain up to sealevel height with water or ice
+                if (posY == seaLevel && CoreBiome.SNOW == biome) {
                     chunk.setBlock(pos, ice);
-                } else if (posY <= 32) {
+                } else if (posY <= seaLevel) {         // either OCEAN or SNOW
                     chunk.setBlock(pos, water);
                     chunk.setLiquid(pos, waterLiquid);
                 }
@@ -95,9 +100,7 @@ public class SolidRasterizer implements WorldRasterizer {
             case PLAINS:
             case MOUNTAINS:
                 // Beach
-                if (height >= 28 && height <= 34) {
-                    return sand;
-                } else if (depth == 0 && height > 32 && height < 128) {
+                if (depth == 0 && height > 32 && height < 128) {
                     return grass;
                 } else if (depth == 0 && height >= 128) {
                     return snow;
@@ -107,7 +110,7 @@ public class SolidRasterizer implements WorldRasterizer {
                     return dirt;
                 }
             case SNOW:
-                if (depth == 0.0 && height > 32) {
+                if (depth == 0 && height > 32) {
                     // Snow on top
                     return snow;
                 } else if (depth > 32) {
@@ -123,6 +126,18 @@ public class SolidRasterizer implements WorldRasterizer {
                     return stone;
                 } else {
                     return sand;
+                }
+            case OCEAN:
+                if (depth == 0) {
+                    return sand;
+                } else {
+                    return stone;
+                }
+            case BEACH:
+                if (depth < 3) {
+                    return sand;
+                } else {
+                    return stone;
                 }
         }
         return dirt;

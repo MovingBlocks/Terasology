@@ -61,12 +61,14 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
             FloraType.FLOWER, 0.1f,
             FloraType.MUSHROOM, 0.05f);
 
-    private Map<CoreBiome, Float> biomeProbs = ImmutableMap.of(
-            CoreBiome.FOREST, 0.3f,
-            CoreBiome.PLAINS, 0.2f,
-            CoreBiome.MOUNTAINS, 0.2f,
-            CoreBiome.SNOW, 0.001f,
-            CoreBiome.DESERT, 0.001f);
+    private Map<CoreBiome, Float> biomeProbs = ImmutableMap.<CoreBiome, Float>builder()
+            .put(CoreBiome.FOREST, 0.3f)
+            .put(CoreBiome.PLAINS, 0.2f)
+            .put(CoreBiome.MOUNTAINS, 0.2f)
+            .put(CoreBiome.SNOW, 0.001f)
+            .put(CoreBiome.BEACH, 0.001f)
+            .put(CoreBiome.OCEAN, 0f)
+            .put(CoreBiome.DESERT, 0.001f).build();
 
     public DefaultFloraProvider() {
 
@@ -79,6 +81,8 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
             }
         }
 
+        register(CoreBiome.BEACH, FloraType.MUSHROOM, 0);
+        register(CoreBiome.BEACH, FloraType.FLOWER, 0);
         register(CoreBiome.DESERT, FloraType.MUSHROOM, 0);
         register(CoreBiome.SNOW, FloraType.MUSHROOM, 0);
     }
