@@ -19,44 +19,81 @@ import org.terasology.config.RenderingConfig;
 
 public enum ScreenshotSize {
 
-    SUPER("Super Size", 0) {
+    DOUBLE_SIZE("Super Size", 2.0F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(0);
+            config.setScreenshotSize(DOUBLE_SIZE);
         }
     },
-    NORMAL("Normal Size", 1) {
+    NORMAL_SIZE("Normal Size", 1.0F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(1);
+            config.setScreenshotSize(NORMAL_SIZE);
         }
     },
-    SMALL("Small Size", 2) {
+    HALF_SIZE("Small Size", 0.5F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(2);
+            config.setScreenshotSize(HALF_SIZE);
         }
     },
-    THUMBNAIL("Thumbnail", 3) {
+    QUARTER_SIZE("Thumbnail", 0.25F) {
         @Override
         public void apply(RenderingConfig config) {
-            config.setScreenshotSize(3);
+            config.setScreenshotSize(QUARTER_SIZE);
+        }
+    },
+    HD720("720p", 1280, 720) {
+        @Override
+        public void apply(RenderingConfig config) {
+            config.setScreenshotSize(HD720);
+        }
+    },
+    HD1080("1080p", 1920, 1080) {
+        @Override
+        public void apply(RenderingConfig config) {
+            config.setScreenshotSize(HD1080);
         }
     };
 
 
     private String displayName;
-    private int index;
+    private float multiplier;
 
-    private ScreenshotSize(String displayName, int index) {
+    private int width;
+    private int height;
+
+    private boolean isWithMultiplier;
+
+    private ScreenshotSize(String displayName, float multiplier) {
         this.displayName = displayName;
-        this.index = index;
+        this.multiplier = multiplier;
+        this.isWithMultiplier = true;
+    }
+
+    private ScreenshotSize(String displayName, int width, int height) {
+        this.displayName = displayName;
+        this.width = width;
+        this.height = height;
+        this.isWithMultiplier = false;
     }
 
     public abstract void apply(RenderingConfig config);
 
-    public int getIndex() {
-        return index;
+    public float getMultiplier() {
+        return multiplier;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public boolean isWithMultiplier() {
+        return isWithMultiplier;
     }
 
     @Override
