@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -36,6 +37,8 @@ import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.util.Arrays;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author Immortius
@@ -81,14 +84,14 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<ScreenshotSize> screenshotSize = find("screenshotSize", UIDropdown.class);
         if (screenshotSize != null) {
-            screenshotSize.setOptions(Lists.newArrayList(ScreenshotSize.QUARTER_SIZE, ScreenshotSize.HALF_SIZE, ScreenshotSize.NORMAL_SIZE, ScreenshotSize.DOUBLE_SIZE, ScreenshotSize.HD720, ScreenshotSize.HD1080));
-            screenshotSize.bindSelection(new ScreenshotSizeBinding(config.getRendering()));
+            screenshotSize.setOptions(Arrays.asList(ScreenshotSize.values()));
+            screenshotSize.bindSelection(BindHelper.bindBeanProperty("screenshotSize", config.getRendering(), ScreenshotSize.class));
         }
 
-        UIDropdown<ScreenshotFormat> screenhotFormat = find("screenshotFormat", UIDropdown.class);
-        if(screenhotFormat != null) {
-            screenhotFormat.setOptions(Lists.newArrayList(ScreenshotFormat.JPEG, ScreenshotFormat.PNG));
-            screenhotFormat.bindSelection(new ScreenshotFormatBinding(config.getRendering()));
+        UIDropdown<String> screenshotFormat = find("screenshotFormat", UIDropdown.class);
+        if (screenshotFormat != null) {
+            screenshotFormat.setOptions(Arrays.asList(ImageIO.getWriterFileSuffixes()));
+            screenshotFormat.bindSelection(BindHelper.bindBeanProperty("screenshotFormat", config.getRendering(), String.class));
         }
 
         UIDropdown<Integer> blur = find("blur", UIDropdown.class);

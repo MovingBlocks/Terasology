@@ -1368,18 +1368,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        //TODO Only a temporary fix for a NullPointerException
-        if(config.getRendering().getScreenshotSize() == null) {
-            config.getRendering().setScreenshotSize(ScreenshotSize.NORMAL_SIZE);
-        }
-
-        if(config.getRendering().getScreenshotSize().isWithMultiplier()) {
-            overwriteRtWidth = (int) ((float) Display.getWidth() * config.getRendering().getScreenshotSize().getMultiplier());
-            overwriteRtHeight = (int) ((float) Display.getHeight() * config.getRendering().getScreenshotSize().getMultiplier());
-        } else {
-            overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth();
-            overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight();
-        }
+        overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth(Display.getWidth());
+        overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight(Display.getHeight());
 
         createOrUpdateFullscreenFbos();
     }
@@ -1401,7 +1391,7 @@ public class LwjglRenderingProcess {
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         fboSceneFinal.unbindTexture();
 
-        Runnable r = new Runnable() {
+        Runnable task = new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
@@ -1430,7 +1420,7 @@ public class LwjglRenderingProcess {
             }
         };
 
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", task);
 
         takeScreenshot = false;
         overwriteRtWidth = 0;

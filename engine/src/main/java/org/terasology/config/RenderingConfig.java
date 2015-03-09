@@ -23,7 +23,6 @@ import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotFormat;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
@@ -75,7 +74,7 @@ public class RenderingConfig {
     private int fboScale = 100;
     private boolean dumpShaders;
     private ScreenshotSize screenshotSize = ScreenshotSize.NORMAL_SIZE;
-    private ScreenshotFormat screenshotFormat = ScreenshotFormat.PNG;
+    private String screenshotFormat = "jpg";
     private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
@@ -442,11 +441,11 @@ public class RenderingConfig {
         this.screenshotSize = screenshotSize;
     }
 
-    public ScreenshotFormat getScreenshotFormat() {
+    public String getScreenshotFormat() {
         return screenshotFormat;
     }
 
-    public void setScreenshotFormat(ScreenshotFormat screenshotFormat) {
+    public void setScreenshotFormat(String screenshotFormat) {
         this.screenshotFormat = screenshotFormat;
     }
 
