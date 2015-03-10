@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles.components;
+package org.terasology.rendering.particles.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,23 +28,14 @@ import java.util.List;
  */
 public class ParticleSystemComponent implements Component {
 
-    public String systemType = "Simple";
-
-    public boolean oneTime = false;
+    public float maxLifeTime = Float.POSITIVE_INFINITY;
     public boolean destroyWhenFinished = true;
 
     public int nrOfParticles = 1000;
 
-    public ParticleSystemComponent(
-        final int nrOfParticles,
-        final boolean oneTime,
-        final boolean destroyWhenFinished
-    ) {
-        this.nrOfParticles = nrOfParticles;
-        this.oneTime = oneTime;
-        this.destroyWhenFinished = destroyWhenFinished;
-    }
+    @Owns
+    public EntityRef emitter = null;
 
     @Owns
-    public List<EntityRef> emitters = Lists.newArrayList();
+    public List<EntityRef> affectors = new ArrayList<>();
 }

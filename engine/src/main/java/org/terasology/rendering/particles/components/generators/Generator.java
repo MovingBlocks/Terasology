@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles;
+package org.terasology.rendering.particles.components.generators;
 
-import org.terasology.math.geom.Vector3f;
+import org.terasology.rendering.particles.ParticleData;
+import org.terasology.utilities.random.Random;
 
 /**
- * Functor object for inspection/tweaking of the data of a particle.
- * @author Linus van Elswijk
+ * Created by Linus on 7-3-2015.
  */
-public interface ParticleSpawnFunction {
-
-    /**
-     * Function callback.
-     * @param inOutData Input and output parameter of the particle data
-     */
-    void call(final ParticleData inOutData);
+public interface Generator {
+    void onEmission(ParticleData particleData, Random random);
 }

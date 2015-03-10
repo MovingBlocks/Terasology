@@ -13,29 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles.components;
+package org.terasology.rendering.particles.components;
 
+import com.google.api.client.util.Lists;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.entitySystem.Owns;
+import org.terasology.entitySystem.entity.EntityRef;
+
+import java.util.List;
 
 /**
  * Created by Linus on 1-3-2015.
  */
 public class ParticleEmitterComponent implements Component {
-    public float spawnRateMean = 10.0f;
-    public float spawnRateStdDev = 1.0f;
+    public static final int INFINITE_PARTICLE_SPAWNS = -1;
 
-    public Vector3f spawnPositionMin = new Vector3f();
-    public Vector3f spawnPositionMax = new Vector3f();
+    public float spawnRateMax = 11.0f;
+    public float spawnRateMin = 9.0f;
 
-    public float minVelocity = 0.0f;
-    public float maxVelocity = 0.0f;
+    public float maxLifeTime = Float.POSITIVE_INFINITY;
+    public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 
-    public Vector3f velocityDirection = new Vector3f();
-    public Vector3f velocityDirectionRandomness = new Vector3f();
-
-    public Vector4f color = new Vector4f(0.7f, 0.7f, 0.7f, 1.0f);
-    public Vector4f colorRandomness = new Vector4f();
+    public ParticleSystemComponent parentSystem;
 }

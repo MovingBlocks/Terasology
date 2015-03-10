@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles;
+package org.terasology.rendering.particles.components.affectors;
+
+import org.terasology.rendering.particles.ParticleData;
+import org.terasology.utilities.random.Random;
 
 /**
- * Created by Linus on 4-3-2015.
+ * Created by Linus on 7-3-2015.
  */
-public class ParticleEmitterType {
-
-
+public interface Affector {
+    void onUpdate(ParticleData data, Random random, float delta);
 }

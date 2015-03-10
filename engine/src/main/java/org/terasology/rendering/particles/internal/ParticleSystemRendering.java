@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles;
+package org.terasology.rendering.particles.internal;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.particles.components.ParticleSystemComponent;
-import org.terasology.logic.particles.internal.ParticleSystemStateData;
+import org.terasology.rendering.particles.internal.ParticlePool;
+import org.terasology.rendering.particles.internal.ParticleSystemStateData;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -103,10 +101,10 @@ public class ParticleSystemRendering {
 
             glColor4f(particlePool.color[i4 + 0], particlePool.color[i4 + 1], particlePool.color[i4 + 2], particlePool.color[i4 + 3]);
             glBegin(GL_QUADS);
-            GL11.glVertex3f(-0.05f, 0.05f, 0.0f);
-            GL11.glVertex3f(0.05f, 0.05f, 0.0f);
-            GL11.glVertex3f(0.05f, -0.05f, 0.0f);
-            GL11.glVertex3f(-0.05f, -0.05f, 0.0f);
+            GL11.glVertex3f(-0.05f, 0.07f, 0.0f);
+            GL11.glVertex3f(0.05f, 0.07f, 0.0f);
+            GL11.glVertex3f(0.05f, -0.07f, 0.0f);
+            GL11.glVertex3f(-0.05f, -0.07f, 0.0f);
             glEnd();
 
             glPopMatrix();

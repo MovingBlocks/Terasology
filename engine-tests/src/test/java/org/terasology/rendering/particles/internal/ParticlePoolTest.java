@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.particles;
+package org.terasology.rendering.particles.internal;
 
 import org.junit.Test;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.particles.internal.ParticlePool;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
@@ -37,13 +38,13 @@ public class ParticlePoolTest {
         pool.size[index] = random.nextFloat();
         pool.energy[index] = random.nextFloat();
 
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             pool.position[index3 + i] = random.nextFloat();
             pool.previousPosition[index3 + i] = random.nextFloat();
             pool.velocity[index3 + i] = random.nextFloat();
         }
 
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             pool.color[index4 + i] = random.nextFloat();
         }
     }
@@ -87,19 +88,19 @@ public class ParticlePoolTest {
         assertTrue(TeraMath.fastAbs(expected.size[expIndex] - actual.size[actIndex]) < epsilon);
         assertTrue(TeraMath.fastAbs(expected.energy[expIndex] - actual.energy[actIndex]) < epsilon);
 
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             assertTrue(TeraMath.fastAbs(expected.position[expIndex3 + i] - actual.position[actIndex3 + i]) < epsilon);
             assertTrue(TeraMath.fastAbs(expected.previousPosition[expIndex3 + i] - actual.previousPosition[actIndex3 + i]) < epsilon);
             assertTrue(TeraMath.fastAbs(expected.velocity[expIndex3 + i] - actual.velocity[actIndex3 + i]) < epsilon);
         }
 
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             assertTrue(TeraMath.fastAbs(expected.color[expIndex4 + i] - actual.color[actIndex4 + i]) < epsilon);
         }
     }
 
     private static void fillWithRandom(ParticlePool pool, int nr) {
-        for(int i = 0; i < nr; i++) {
+        for (int i = 0; i < nr; i++) {
             pool.reviveParticle();
             randomizeParticle(pool, i);
         }
