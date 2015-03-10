@@ -259,6 +259,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().OpenGL14,
                 GLContext.getCapabilities().OpenGL15,
                 GLContext.getCapabilities().OpenGL20,
+                GLContext.getCapabilities().OpenGL21,   // needed as we use GLSL 1.20
+
                 GLContext.getCapabilities().GL_ARB_framebuffer_object,  // Extensions eventually included in
                 GLContext.getCapabilities().GL_ARB_texture_float,       // OpenGl 3.0 according to
                 GLContext.getCapabilities().GL_ARB_half_float_pixel};   // http://en.wikipedia.org/wiki/OpenGL#OpenGL_3.0
@@ -267,6 +269,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                                     "OpenGL14",
                                     "OpenGL15",
                                     "OpenGL20",
+                                    "OpenGL21",
                                     "GL_ARB_framebuffer_object",
                                     "GL_ARB_texture_float",
                                     "GL_ARB_half_float_pixel"};
