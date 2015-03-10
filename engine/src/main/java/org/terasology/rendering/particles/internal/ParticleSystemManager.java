@@ -26,16 +26,14 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.physics.HitResult;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.particles.components.ParticleEmitterComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
-import org.terasology.rendering.particles.components.affectors.DragAffector;
-import org.terasology.rendering.particles.components.affectors.EnergyColorAffector;
-import org.terasology.rendering.particles.components.affectors.ForwardEulerAffector;
-import org.terasology.rendering.particles.components.affectors.StaticForceAffector;
+import org.terasology.rendering.particles.components.affectors.*;
 import org.terasology.rendering.particles.components.generators.*;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -161,7 +159,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         synchronized(particleSystems) {
             Camera camera = worldRenderer.getActiveCamera();
             Vector3f spawnPosition = new Vector3f(worldRenderer.getActiveCamera().getViewingDirection());
-            HitResult hit = physics.rayTrace(camera.getPosition(), camera.getViewingDirection(), 25);
+            HitResult hit = physics.rayTrace(camera.getPosition(), camera.getViewingDirection(), 25, StandardCollisionGroup.WORLD);
 
             if (hit.isHit()) {
                 spawnPosition.set(hit.getHitPoint());
@@ -201,21 +199,21 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
      * @return
      */
     @Command(shortDescription = "Spawns a particle system in front of you.")
-    public String spawnParticleSystem() {
+    public String spawnFire() {
 
         Camera camera = worldRenderer.getActiveCamera();
             Vector3f spawnPosition = new Vector3f(worldRenderer.getActiveCamera().getViewingDirection());
-            HitResult hit = physics.rayTrace(camera.getPosition(), camera.getViewingDirection(), 25);
+            HitResult hit = physics.rayTrace(camera.getPosition(), camera.getViewingDirection(), 25, StandardCollisionGroup.WORLD);
 
-            if(hit.isWorldHit()) {
+            if (hit.isHit()) {
                 spawnPosition.set(hit.getHitPoint());
-            }
-            else {
+            } else {
                 spawnPosition.scale(25);
                 spawnPosition.add(worldRenderer.getActiveCamera().getPosition());
             }
 
             EntityRef entityRef = spawnTestSystem(spawnPosition);
+            entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles = 5000;
 
             ParticleSystemStateData partsys = new ParticleSystemStateData(entityRef, new ParticlePool(entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles));
             partsys.emitter.spawnRateMax = 400.0f;
@@ -225,19 +223,30 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             partsys.affectors.add(new StaticForceAffector(new Vector3f(0, 0.25f, 0)));
             partsys.affectors.add(new DragAffector(0.6f));
             EnergyColorAffector energyColorAffector = new EnergyColorAffector();
-            energyColorAffector.gradientMap.put(4.5f, new Vector4f(0.9f, 0.9f, 0.9f, 0.8f));
-            energyColorAffector.gradientMap.put(4.2f, new Vector4f(1.0f, 1.0f, 0.3f, 1.0f));
-            energyColorAffector.gradientMap.put(3.5f, new Vector4f(1.0f, 0.2f, 0.1f, 0.7f));
-            energyColorAffector.gradientMap.put(3.0f, new Vector4f(1.0f, 0.2f, 0.1f, 0.0f));
+            energyColorAffector.gradientMap.put(6.5f, new Vector4f(0.9f, 0.9f, 0.9f, 0.8f));
+            energyColorAffector.gradientMap.put(6.4f, new Vector4f(1.0f, 1.0f, 0.3f, 1.0f));
+            energyColorAffector.gradientMap.put(5.6f, new Vector4f(1.0f, 0.2f, 0.1f, 0.0f));
+            energyColorAffector.gradientMap.put(5.0f, new Vector4f(1.0f, 0.2f, 0.1f, 0.7f));
             energyColorAffector.gradientMap.put(2.5f, new Vector4f(0.1f, 0.1f, 0.1f, 0.0f));
             energyColorAffector.gradientMap.put(1.0f, new Vector4f(0.1f, 0.1f, 0.1f, 1.0f));
             energyColorAffector.gradientMap.put(0.0f, new Vector4f(0.1f, 0.1f, 0.1f, 0.0f));
             partsys.affectors.add(energyColorAffector);
 
+
+            EnergySizeAffector energySizeAffector = new EnergySizeAffector();
+            energySizeAffector.gradientMap.put(6.5f, new Vector3f(0.01f, 0.01f, 0.01f));
+            energySizeAffector.gradientMap.put(6.2f, new Vector3f(0.1f, 0.1f, 0.1f));
+            energySizeAffector.gradientMap.put(5.0f, new Vector3f(0.0f, 0.0f, 0.0f));
+            energySizeAffector.gradientMap.put(2.5f, new Vector3f(0.01f, 0.01f, 0.01f));
+            energySizeAffector.gradientMap.put(0.0f, new Vector3f(0.7f, 0.7f, 0.7f));
+            partsys.affectors.add(energySizeAffector);
+
+            partsys.affectors.add(new TurbulenceAffector(2.5f));
+
             partsys.generators.add(new BoxPositionGenerator(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f)));
             partsys.generators.add(new BoxColorGenerator(new Vector4f(0.7f, 0.2f, 0.f, 1), new Vector4f(1, 0.4f, 0.3f, 1)));
             partsys.generators.add(new BoxVelocityGenerator(new Vector3f(-1f, 0.5f, -1f), new Vector3f(+1f, 2.0f, +1f)));
-            partsys.generators.add(new RandomEnergyGenerator(4, 5));
+            partsys.generators.add(new RandomEnergyGenerator(6, 7));
 
             this.particleSystems.put(entityRef, partsys);
 

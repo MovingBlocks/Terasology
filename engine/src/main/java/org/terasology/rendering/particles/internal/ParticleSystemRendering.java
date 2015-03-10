@@ -99,12 +99,15 @@ public class ParticleSystemRendering {
             glTranslatef(pos.x(), pos.y(), pos.z());
             applyOrientation();
 
+            final float halfWidth  = 0.5f * particlePool.scale[i3 + 0];
+            final float halfHeight = 0.5f * particlePool.scale[i3 + 1];
+
             glColor4f(particlePool.color[i4 + 0], particlePool.color[i4 + 1], particlePool.color[i4 + 2], particlePool.color[i4 + 3]);
             glBegin(GL_QUADS);
-            GL11.glVertex3f(-0.05f, 0.07f, 0.0f);
-            GL11.glVertex3f(0.05f, 0.07f, 0.0f);
-            GL11.glVertex3f(0.05f, -0.07f, 0.0f);
-            GL11.glVertex3f(-0.05f, -0.07f, 0.0f);
+            GL11.glVertex3f(-halfWidth, +halfHeight, 0.0f);
+            GL11.glVertex3f(+halfWidth, +halfHeight, 0.0f);
+            GL11.glVertex3f(+halfWidth, -halfHeight, 0.0f);
+            GL11.glVertex3f(-halfWidth, -halfHeight, 0.0f);
             glEnd();
 
             glPopMatrix();

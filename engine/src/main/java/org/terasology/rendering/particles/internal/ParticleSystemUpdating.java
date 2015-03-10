@@ -54,7 +54,7 @@ public class ParticleSystemUpdating {
             int i3 = i * 3;
             curr.set(pool.position[i3 + 0], pool.position[i3+1], pool.position[i3+2]);
             vel.set(pool.velocity[i3 + 0], pool.velocity[i3+1], pool.velocity[i3+2]);
-            float dist = vel.length() * delta * PHYSICS_SKIP_NR;
+            float dist = vel.length() * delta * PHYSICS_SKIP_NR * 1.5f;
             vel.normalize();
 
             HitResult hitResult = physics.rayTrace(curr, vel, dist, StandardCollisionGroup.WORLD);

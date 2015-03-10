@@ -15,8 +15,26 @@
  */
 package org.terasology.rendering.particles.components.generators;
 
+import org.terasology.math.geom.Vector3f;
+import org.terasology.rendering.particles.ParticleData;
+import org.terasology.utilities.random.Random;
+
 /**
  * Created by Linus on 10-3-2015.
  */
-public class BoxSizeGenerator {
+public class BoxSizeGenerator implements Generator {
+    public Vector3f minScale;
+    public Vector3f maxScale;
+
+    public BoxSizeGenerator(final Vector3f min, final Vector3f max) {
+        minScale = new Vector3f(min);
+        maxScale = new Vector3f(max);
+    }
+
+    @Override
+    public void onEmission(ParticleData particleData, Random random) {
+        particleData.scale.setX(random.nextFloat(minScale.x(), maxScale.x()));
+        particleData.scale.setY(random.nextFloat(minScale.y(), maxScale.y()));
+        particleData.scale.setZ(random.nextFloat(minScale.z(), maxScale.z()));
+    }
 }

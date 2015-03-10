@@ -43,6 +43,8 @@ public final class ParticlePool {
     final float[] previousPosition;
     final float[] velocity;
 
+    final float[] scale;
+
     // Per particle 4d vectors
     final float[] color;
 
@@ -69,6 +71,7 @@ public final class ParticlePool {
         this.position = new float[size * 3];
         this.previousPosition =  new float[size * 3];
         this.velocity = new float[size * 3];
+        this.scale = new  float[size * 3];
 
         // Per particle 4d vectors
         this.color =  new float[size * 4];
@@ -149,6 +152,14 @@ public final class ParticlePool {
             );
         }
 
+        if (DataMask.SCALE.isEnabled(rawMask)) {
+            temporaryParticleData.scale.set(
+                    scale[index3 + X_OFFSET],
+                    scale[index3 + Y_OFFSET],
+                    scale[index3 + Z_OFFSET]
+            );
+        }
+
         // 4d vectors
         if (DataMask.COLOR.isEnabled(rawMask)) {
             temporaryParticleData.color.set(
@@ -189,6 +200,12 @@ public final class ParticlePool {
             velocity[index3 + X_OFFSET] = temporaryParticleData.velocity.x();
             velocity[index3 + Y_OFFSET] = temporaryParticleData.velocity.y();
             velocity[index3 + Z_OFFSET] = temporaryParticleData.velocity.z();
+        }
+
+        if (DataMask.SCALE.isEnabled(rawMask)) {
+            scale[index3 + X_OFFSET] = temporaryParticleData.scale.x();
+            scale[index3 + Y_OFFSET] = temporaryParticleData.scale.y();
+            scale[index3 + Z_OFFSET] = temporaryParticleData.scale.z();
         }
 
         // 4d vectors

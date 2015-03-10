@@ -31,6 +31,8 @@ public class ParticleEmitterComponent implements Component {
     public float spawnRateMax = 11.0f;
     public float spawnRateMin = 9.0f;
 
+    public boolean isEmmiting = true;
+
     public float maxLifeTime = Float.POSITIVE_INFINITY;
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 

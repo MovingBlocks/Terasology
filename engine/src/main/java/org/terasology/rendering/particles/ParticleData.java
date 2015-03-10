@@ -33,6 +33,7 @@ public final class ParticleData {
     public final Vector3f position = new Vector3f();
     public final Vector3f previousPosition = new Vector3f();
     public final Vector3f velocity = new Vector3f();
+    public final Vector3f scale = new Vector3f();
 
     // 4d vectors
     public final Vector4f color = new Vector4f();

@@ -15,8 +15,23 @@
  */
 package org.terasology.rendering.particles.components.affectors;
 
+import org.terasology.rendering.particles.ParticleData;
+import org.terasology.utilities.random.Random;
+
 /**
  * Created by Linus on 10-3-2015.
  */
-public class TurbulenceAffector {
+public class TurbulenceAffector implements Affector {
+    public float magnitude;
+
+    public TurbulenceAffector(float magnitude) {
+        this.magnitude = magnitude;
+    }
+
+    @Override
+    public void onUpdate(ParticleData data, Random random, float delta) {
+        data.velocity.addX((random.nextFloat(-magnitude, magnitude) * delta));
+        data.velocity.addY((random.nextFloat(-magnitude, magnitude) * delta));
+        data.velocity.addZ((random.nextFloat(-magnitude, magnitude) * delta));
+    }
 }
