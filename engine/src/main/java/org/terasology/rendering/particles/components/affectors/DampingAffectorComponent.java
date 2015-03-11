@@ -15,21 +15,21 @@
  */
 package org.terasology.rendering.particles.components.affectors;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 7-3-2015.
  */
-public class ForwardEulerAffector implements Affector {
+public class DampingAffectorComponent implements Component {
+    public float dampingFactor;
 
-    @Override
-    public void onUpdate(final ParticleData data, final Random random, final float delta) {
-        data.position.add(
-                data.velocity.x() * delta,
-                data.velocity.y() * delta,
-                data.velocity.z() * delta
-        );
+    public DampingAffectorComponent() {
+        dampingFactor = 0.05f;
     }
 
+    public DampingAffectorComponent(final float dampingFactor) {
+        this.dampingFactor = dampingFactor;
+    }
 }

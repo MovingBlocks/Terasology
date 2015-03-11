@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.particles.components;
 
-import com.google.api.client.util.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,5 +36,6 @@ public class ParticleEmitterComponent implements Component {
     public float maxLifeTime = Float.POSITIVE_INFINITY;
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 
-    public ParticleSystemComponent parentSystem;
+    @Owns
+    public List<EntityRef> generators = new ArrayList<>();
 }

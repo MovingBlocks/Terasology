@@ -17,28 +17,18 @@ package org.terasology.rendering.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.particles.ParticleData;
-import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
- * Created by Linus on 7-3-2015.
+ * Created by Linus on 10-3-2015.
  */
-public class BoxPositionGenerator implements Generator {
+public class SizeRangeGeneratorComponent implements Component {
+    public Vector3f minScale;
+    public Vector3f maxScale;
 
-    public Vector3f minCoords;
-    public Vector3f maxCoords;
-
-    public BoxPositionGenerator(final Vector3f minCoords, final Vector3f maxCoords) {
-        this.minCoords = new Vector3f(minCoords);
-        this.maxCoords = new Vector3f(maxCoords);
-    }
-
-    @Override
-    public void onEmission(final ParticleData particleData, final Random random) {
-        particleData.position.setX(random.nextFloat(minCoords.x(), maxCoords.x()));
-        particleData.position.setY(random.nextFloat(minCoords.y(), maxCoords.y()));
-        particleData.position.setZ(random.nextFloat(minCoords.z(), maxCoords.z()));
+    public SizeRangeGeneratorComponent(final Vector3f min, final Vector3f max) {
+        minScale = new Vector3f(min);
+        maxScale = new Vector3f(max);
     }
 }

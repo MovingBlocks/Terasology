@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.components.generators;
+package org.terasology.rendering.particles.components.affectors;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
 
 /**
- * Created by Linus on 7-3-2015.
+ * Created by Linus on 10-3-2015.
  */
-public interface Generator {
-    void onEmission(ParticleData particleData, Random random);
+public class TurbulenceAffectorComponent implements Component {
+    public float magnitude;
+
+    public TurbulenceAffectorComponent() {
+        this.magnitude = 0.95f;
+    }
+
+    public TurbulenceAffectorComponent(float magnitude) {
+        this.magnitude = magnitude;
+    }
 }

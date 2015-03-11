@@ -13,25 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.components.generators;
+package org.terasology.rendering.particles.components.affectors;
 
-import org.terasology.rendering.particles.ParticleData;
-import org.terasology.utilities.random.Random;
+import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Created by Linus on 7-3-2015.
  */
-public class RandomEnergyGenerator implements Generator {
-    public float minEnergy = 100.0f;
-    public float maxEnergy = 100.0f;
+public class ForceAffectorComponent implements Component {
+    public Vector3f force;
 
-    public RandomEnergyGenerator(final float minEnergy, final float maxEnergy) {
-        this.minEnergy = minEnergy;
-        this.maxEnergy = maxEnergy;
+    public ForceAffectorComponent() {
+        force = new Vector3f();
     }
 
-    @Override
-    public void onEmission(ParticleData particleData, Random random) {
-        particleData.energy = random.nextFloat(minEnergy, maxEnergy);
+    public ForceAffectorComponent(final Vector3f force) {
+        this.force = new Vector3f(force);
     }
 }

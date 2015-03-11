@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.components.affectors;
+package org.terasology.rendering.particles;
 
-import org.terasology.rendering.particles.ParticleData;
-import org.terasology.utilities.random.Random;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.rendering.particles.functions.affectors.AffectorFunction;
 
 /**
- * Created by Linus on 7-3-2015.
+ * Created by Linus on 10-3-2015.
  */
-public class DragAffector implements Affector {
-    private float oneMinusDragAmmount;
+public interface ParticleManagerInterface {
+    public EntityRef createParticleSystem();
 
-    public DragAffector(final float dragAmmount) {
-        this.oneMinusDragAmmount = 1 - dragAmmount;
-    }
+    //public EntityRef createEmmiter(EntityRef particleSystem);
 
-    @Override
-    public void onUpdate(final ParticleData data, final Random random, final float delta) {
-        data.velocity.scale( 1 - (oneMinusDragAmmount * delta) );
-    }
+    public void registerAffectorFunction(AffectorFunction affectorFunction);
+
+    //public EntityRef createEmmiterParticleSystem(EntityRef particleSystem);
 }

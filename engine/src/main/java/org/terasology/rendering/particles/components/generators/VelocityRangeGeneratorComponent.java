@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.particles.components.generators;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
@@ -22,19 +23,12 @@ import org.terasology.utilities.random.Random;
 /**
  * Created by Linus on 7-3-2015.
  */
-public class BoxVelocityGenerator implements Generator {
+public class VelocityRangeGeneratorComponent implements Component {
     public Vector3f minCoords;
     public Vector3f maxCoords;
 
-    public BoxVelocityGenerator(final Vector3f minCoords, final Vector3f maxCoords) {
+    public VelocityRangeGeneratorComponent(final Vector3f minCoords, final Vector3f maxCoords) {
         this.minCoords = new Vector3f(minCoords);
         this.maxCoords = new Vector3f(maxCoords);
-    }
-
-    @Override
-    public void onEmission(final ParticleData particleData, final Random random) {
-        particleData.velocity.setX(random.nextFloat(minCoords.x(), maxCoords.x()));
-        particleData.velocity.setY(random.nextFloat(minCoords.y(), maxCoords.y()));
-        particleData.velocity.setZ(random.nextFloat(minCoords.z(), maxCoords.z()));
     }
 }

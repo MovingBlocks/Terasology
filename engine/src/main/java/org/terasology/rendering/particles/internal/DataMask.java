@@ -15,6 +15,13 @@
  */
 package org.terasology.rendering.particles.internal;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 /**
  * Created by Linus on 7-3-2015.
  */
@@ -35,11 +42,11 @@ public enum DataMask {
         this.rawMask = rawMask;
     }
 
-    boolean isEnabled(final int mask) {
+    public boolean isEnabled(final int mask) {
         return (this.rawMask & mask) != 0;
     }
 
-    int combine(DataMask dataMask, DataMask ... dataMasks) {
+    public static int toInt(DataMask dataMask, DataMask... dataMasks) {
         int combinedMask = dataMask.rawMask;
 
         for(DataMask dataMaskI: dataMasks) {

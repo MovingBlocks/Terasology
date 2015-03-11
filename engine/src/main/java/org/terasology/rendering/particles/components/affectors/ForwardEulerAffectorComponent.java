@@ -15,23 +15,13 @@
  */
 package org.terasology.rendering.particles.components.affectors;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
 
 /**
- * Created by Linus on 10-3-2015.
+ * Created by Linus on 7-3-2015.
  */
-public class TurbulenceAffector implements Affector {
-    public float magnitude;
+public class ForwardEulerAffectorComponent implements Component {
 
-    public TurbulenceAffector(float magnitude) {
-        this.magnitude = magnitude;
-    }
-
-    @Override
-    public void onUpdate(ParticleData data, Random random, float delta) {
-        data.velocity.addX((random.nextFloat(-magnitude, magnitude) * delta));
-        data.velocity.addY((random.nextFloat(-magnitude, magnitude) * delta));
-        data.velocity.addZ((random.nextFloat(-magnitude, magnitude) * delta));
-    }
 }

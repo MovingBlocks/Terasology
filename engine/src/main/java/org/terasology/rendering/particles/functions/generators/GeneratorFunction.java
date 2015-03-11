@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.components.generators;
+package org.terasology.rendering.particles.functions.generators;
 
-import org.terasology.math.geom.Vector3f;
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.particles.ParticleData;
+import org.terasology.rendering.particles.functions.ParticleSystemFunction;
+import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
- * Created by Linus on 9-3-2015.
+ * Created by Linus on 11-3-2015.
  */
-public class PointVelocityGenerator implements Generator {
-    public Vector3f point = new Vector3f();
-    public float magnitude = 1.0f;
-
-    public PointVelocityGenerator(Vector3f point, float magnitude) {
-        this.point.set(point);
-        this.magnitude = magnitude;
+public abstract class GeneratorFunction<T extends Component> extends ParticleSystemFunction<T> {
+    public GeneratorFunction(Class<T> component, DataMask dataMask, DataMask... dataMasks) {
+        super(component, dataMask, dataMasks);
     }
 
-    @Override
-    public void onEmission(ParticleData particleData, Random random) {
-        particleData.velocity.set((new Vector3f(particleData.position)).sub(point).normalize().scale(magnitude));
-    }
+    public abstract void onEmission(T component, ParticleData particleData, Random random);
 }

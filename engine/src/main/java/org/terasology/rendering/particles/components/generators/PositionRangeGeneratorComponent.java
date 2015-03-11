@@ -16,28 +16,22 @@
 package org.terasology.rendering.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.particles.ParticleData;
+import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 7-3-2015.
  */
-public class BoxColorGenerator implements Generator {
+public class PositionRangeGeneratorComponent implements Component {
 
-    public Vector4f minColorComponents;
-    public Vector4f maxColorComponents;
+    public Vector3f minCoords;
+    public Vector3f maxCoords;
 
-    public BoxColorGenerator(final Vector4f minColorComponents, final Vector4f maxColorComponents) {
-        this.minColorComponents = new Vector4f(minColorComponents);
-        this.maxColorComponents = new Vector4f(maxColorComponents);
-    }
-
-    @Override
-    public void onEmission(final ParticleData particleData, final Random random) {
-        particleData.color.setX(random.nextFloat(minColorComponents.x(), maxColorComponents.x()));
-        particleData.color.setY(random.nextFloat(minColorComponents.y(), maxColorComponents.y()));
-        particleData.color.setZ(random.nextFloat(minColorComponents.z(), maxColorComponents.z()));
-        particleData.color.setW(random.nextFloat(minColorComponents.w(), maxColorComponents.w()));
+    public PositionRangeGeneratorComponent(final Vector3f minCoords, final Vector3f maxCoords) {
+        this.minCoords = new Vector3f(minCoords);
+        this.maxCoords = new Vector3f(maxCoords);
     }
 }

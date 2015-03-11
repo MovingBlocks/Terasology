@@ -15,16 +15,13 @@
  */
 package org.terasology.rendering.particles.internal;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.particles.components.ParticleEmitterComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
-import org.terasology.rendering.particles.components.affectors.Affector;
-import org.terasology.rendering.particles.components.generators.Generator;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * Created by Linus on 4-3-2015.
@@ -40,8 +37,8 @@ public class ParticleSystemStateData {
     public final ParticlePool particlePool;
     public int collisionUpdateIteration;
 
-    public List<Affector> affectors;
-    public List<Generator> generators;
+    public List<Component> affectorComponents;
+    public List<EntityRef> generators;
 
     public ParticleSystemStateData(final EntityRef entityRef, final ParticlePool particlePool) {
         this.entityRef = entityRef;
@@ -51,7 +48,7 @@ public class ParticleSystemStateData {
 
         this.nextEmission = 0;
 
-        this.affectors = new ArrayList<>();
+        this.affectorComponents = new ArrayList<>();
         this.generators = new ArrayList<>();
     }
 }

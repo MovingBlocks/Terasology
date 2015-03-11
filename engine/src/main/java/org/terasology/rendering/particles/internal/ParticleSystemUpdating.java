@@ -16,13 +16,7 @@
 package org.terasology.rendering.particles.internal;
 
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.particles.components.ParticleEmitterComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
-import org.terasology.rendering.particles.components.affectors.Affector;
-import org.terasology.rendering.particles.components.generators.Generator;
-import org.terasology.rendering.particles.internal.ParticlePool;
-import org.terasology.rendering.particles.internal.ParticleSystemStateData;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.*;
 import org.terasology.utilities.random.FastRandom;
@@ -81,16 +75,18 @@ public class ParticleSystemUpdating {
 
         for(int i = 0; i < partSys.particlePool.livingParticles(); i++) {
             partSys.particlePool.loadTemporaryDataFrom(i, DataMask.ALL.rawMask);
-            for(Affector affector: partSys.affectors) {
+           /* for(Affector affector: partSys.affectors) {
                 affector.onUpdate(partSys.particlePool.temporaryParticleData, random, delta);
             }
             partSys.particlePool.storeTemporaryDataAt(i, DataMask.ALL.rawMask);
+            */
         }
     }
 
     //== emission ======================================================================================================
 
     public static void emitParticle(final ParticleSystemStateData particleSystem) {
+        /*
         int index = particleSystem.particlePool.reviveParticle();
 
         particleSystem.particlePool.loadTemporaryDataFrom(index, DataMask.ALL.rawMask);
@@ -101,10 +97,11 @@ public class ParticleSystemUpdating {
 
         particleSystem.particlePool.temporaryParticleData.position.add(particleSystem.entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(LocationComponent.class).getWorldPosition());
         particleSystem.particlePool.storeTemporaryDataAt(index, DataMask.ALL.rawMask);
+        */
     }
 
     public static void updateEmitter(final ParticleSystemStateData partSys, final float delta) {
-        float deltaLeft = delta;
+        /*float deltaLeft = delta;
         while (deltaLeft > 0 && partSys.particlePool.deadParticles() > 0 ) {
             if (partSys.nextEmission < deltaLeft) {
                 deltaLeft -= partSys.nextEmission;
@@ -124,6 +121,7 @@ public class ParticleSystemUpdating {
                 deltaLeft = 0;
             }
         }
+        */
     }
 
     //== general =======================================================================================================

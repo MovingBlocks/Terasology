@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.components.affectors;
+package org.terasology.rendering.particles.functions.generators;
 
 import org.terasology.rendering.particles.ParticleData;
+import org.terasology.rendering.particles.components.generators.EnergyRangeGeneratorComponent;
+import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
- * Created by Linus on 7-3-2015.
+ * Created by Linus on 11-3-2015.
  */
-public interface Affector {
-    void onUpdate(ParticleData data, Random random, float delta);
+public final class EnergyRangeGeneratorFunction extends GeneratorFunction<EnergyRangeGeneratorComponent> {
+
+    public EnergyRangeGeneratorFunction() {
+        super(EnergyRangeGeneratorComponent.class, DataMask.ENERGY);
+    }
+
+    @Override
+    public void onEmission(EnergyRangeGeneratorComponent component, ParticleData particleData, Random random) {
+        particleData.energy = random.nextFloat(component.minEnergy, component.maxEnergy);
+    }
 }
