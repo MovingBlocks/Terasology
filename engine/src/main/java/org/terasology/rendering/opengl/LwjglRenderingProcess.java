@@ -40,6 +40,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 
@@ -1367,23 +1368,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if (config.getRendering().getScreenshotSize() == 0) {
-            overwriteRtWidth = Display.getWidth() * 2;
-            overwriteRtHeight = Display.getHeight() * 2;
-        } else if (config.getRendering().getScreenshotSize() == 1) {
-            overwriteRtWidth = Display.getWidth();
-            overwriteRtHeight = Display.getHeight();
-        } else if (config.getRendering().getScreenshotSize() == 2) {
-            overwriteRtWidth = Display.getWidth() / 2;
-            overwriteRtHeight = Display.getHeight() / 2;
-        } else if (config.getRendering().getScreenshotSize() == 3) {
-            overwriteRtWidth = Display.getWidth() / 4;
-            overwriteRtHeight = Display.getHeight() / 4;
-        } else {
-            //In case its another config value use default values
-            overwriteRtWidth = 1152;
-            overwriteRtHeight = 700;
-        }
+        overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth(Display.getWidth());
+        overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight(Display.getHeight());
 
         createOrUpdateFullscreenFbos();
     }
@@ -1405,12 +1391,12 @@ public class LwjglRenderingProcess {
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         fboSceneFinal.unbindTexture();
 
-        Runnable r = new Runnable() {
+        Runnable task = new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = config.getRendering().getScreenshotFormat();
+                final String format = config.getRendering().getScreenshotFormat().toString();
                 final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
@@ -1434,7 +1420,7 @@ public class LwjglRenderingProcess {
             }
         };
 
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", task);
 
         takeScreenshot = false;
         overwriteRtWidth = 0;
