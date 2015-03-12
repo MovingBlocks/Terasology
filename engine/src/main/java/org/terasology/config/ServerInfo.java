@@ -16,6 +16,7 @@
 
 package org.terasology.config;
 
+
 /**
  * @author Immortius
  */
@@ -24,6 +25,10 @@ public class ServerInfo {
     private String address;
     private int port;
 
+    private ServerInfo() {
+        // for serialization purposes
+    }
+
     public ServerInfo(String name, String address, int port) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Server name must not be null or empty");
@@ -31,6 +36,10 @@ public class ServerInfo {
         if (address == null || address.isEmpty()) {
             throw new IllegalArgumentException("Server address must not be null or empty");
         }
+        if (port < 0 || port > 65535) {
+            throw new IllegalArgumentException("Server port must be in the range [0..65535]");
+        }
+
         this.name = name;
         this.address = address;
         this.port = port;
@@ -61,6 +70,13 @@ public class ServerInfo {
     }
 
     public void setPort(int port) {
-        this.port = port;
+        if (port >= 0 && port <= 65535) {
+            this.port = port;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ServerInfo [name=" + name + ", address=" + address + ", port=" + port + "]";
     }
 }

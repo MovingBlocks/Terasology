@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.terasology.config.Config;
@@ -56,12 +57,13 @@ public class JoinGameScreen extends CoreScreenLayer {
     private GameEngine engine;
 
     private UIList<ServerInfo> serverList;
-    
+
     @Override
     public void initialise() {
         serverList = find("serverList", UIList.class);
         if (serverList != null) {
-            serverList.bindList(BindHelper.bindBeanListProperty("servers", config.getNetwork(), ServerInfo.class));
+            List<ServerInfo> locals = config.getNetwork().getServers();
+            serverList.bindList(new OnlineServerListBinding(locals));
             serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
                 @Override
                 public String getString(ServerInfo value) {
@@ -92,13 +94,26 @@ public class JoinGameScreen extends CoreScreenLayer {
                     getManager().pushScreen(AddServerPopup.ASSET_URI);
                 }
             });
-            WidgetUtil.trySubscribe(this, "edit", new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-                    popup.setServerInfo(infoBinding.get());
-                }
-            });
+            UIButton edit = find("edit", UIButton.class);
+            if (edit != null) {
+                edit.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        if (infoBinding.get() == null) {
+                            return false;
+                        }
+
+                        return locals.contains(infoBinding.get());
+                    }
+                });
+                edit.subscribe(new ActivateEventListener() {
+                    @Override
+                    public void onActivated(UIWidget button) {
+                        AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                        popup.setServerInfo(infoBinding.get());
+                    }
+                });
+            }
             WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
@@ -131,7 +146,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             UIButton removeButton = find("remove", UIButton.class);
             UIButton joinButton = find("join", UIButton.class);
 
-            editButton.bindEnabled(hasSelection);
+//            editButton.bindEnabled(hasSelection);  --- has been set already
             removeButton.bindEnabled(hasSelection);
             joinButton.bindEnabled(hasSelection);
         }
@@ -167,7 +182,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             @Override
             public Void apply(JoinStatus result) {
                 if (result.getStatus() != JoinStatus.Status.FAILED) {
-                    engine.changeState(new StateLoading(result));               
+                    engine.changeState(new StateLoading(result));
                 } else {
                     MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
