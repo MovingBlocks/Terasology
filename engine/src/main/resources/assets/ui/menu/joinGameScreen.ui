@@ -71,36 +71,35 @@
                     },
                     "contents" : [
                         {
-                            "type" : "ScrollableArea",
-                            "content" : {
-                                "type" : "UIList",
-                                "id" : "serverList",
-                                "family" : "module-list"
-                            }
-                        },
-                        {
-                            "type" : "RelativeLayout",
-                            "family" : "description",
-                            "contents" : [
+                        	"type" : "RelativeLayout",
+                        	"contents" : [
                                 {
-                                    "type" : "UIButton",
-                                    "id" : "add",
-                                    "text" : "Add",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
+		                            "type" : "ScrollableArea",
+		                            "content" : {
+		                                "type" : "UIList",
+		                                "id" : "serverList",
+		                                "family" : "module-list"
+		                            },
+		                            "layoutInfo" : {
                                         "position-top" : {
                                             "target" : "TOP"
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "edit",
+                                            "offset" : 8
                                         }
                                     }
-                                },
+		                        },
                                 {
                                     "type" : "UIButton",
                                     "id" : "edit",
                                     "text" : "Edit",
                                     "layoutInfo" : {
                                         "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
+                                        "width" : 135,
+                                        "position-bottom" : {
+                                            "target" : "TOP",
                                             "widget" : "add",
                                             "offset" : 8
                                         }
@@ -112,13 +111,35 @@
                                     "text" : "Remove",
                                     "layoutInfo" : {
                                         "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
+                                        "position-left" : {
+                                            "target" : "RIGHT",
                                             "widget" : "edit",
+                                            "offset" : 8
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "add",
                                             "offset" : 8
                                         }
                                     }
                                 },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "add",
+                                    "text" : "Add New",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-bottom" : {
+                                            "target" : "BOTTOM"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type" : "RelativeLayout",
+                            "family" : "description",
+                            "contents" : [
                                 {
                                     "type" : "ColumnLayout",
                                     "id" : "simpleItems",
@@ -158,8 +179,7 @@
                                         "use-content-height" : true,
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "BOTTOM",
-                                            "widget" : "remove",
+                                            "target" : "TOP",
                                             "offset" : 8
                                         }
                                     }
