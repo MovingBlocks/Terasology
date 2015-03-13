@@ -88,6 +88,17 @@ public class JoinGameScreen extends CoreScreenLayer {
             UILabel port = find("port", UILabel.class);
             port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
 
+            ReadOnlyBinding<Boolean> localSelectedServerOnly = new ReadOnlyBinding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    if (infoBinding.get() == null) {
+                        return false;
+                    }
+
+                    return locals.contains(infoBinding.get());
+                }
+            };
+
             WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
@@ -96,16 +107,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             });
             UIButton edit = find("edit", UIButton.class);
             if (edit != null) {
-                edit.bindEnabled(new ReadOnlyBinding<Boolean>() {
-                    @Override
-                    public Boolean get() {
-                        if (infoBinding.get() == null) {
-                            return false;
-                        }
-
-                        return locals.contains(infoBinding.get());
-                    }
-                });
+                edit.bindEnabled(localSelectedServerOnly);
                 edit.subscribe(new ActivateEventListener() {
                     @Override
                     public void onActivated(UIWidget button) {
@@ -142,13 +144,15 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             };
 
-            UIButton editButton = find("edit", UIButton.class);
             UIButton removeButton = find("remove", UIButton.class);
-            UIButton joinButton = find("join", UIButton.class);
+            if (removeButton != null) {
+                removeButton.bindEnabled(localSelectedServerOnly);
+            }
 
-//            editButton.bindEnabled(hasSelection);  --- has been set already
-            removeButton.bindEnabled(hasSelection);
-            joinButton.bindEnabled(hasSelection);
+            UIButton joinButton = find("join", UIButton.class);
+            if (joinButton != null) {
+                joinButton.bindEnabled(hasSelection);
+            }
         }
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {

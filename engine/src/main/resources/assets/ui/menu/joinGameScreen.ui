@@ -52,6 +52,7 @@
                 {
                     "type" : "ColumnLayout",
                     "columns" : 2,
+                    "column-widths" : [0.4, 0.6],
                     "verticalSpacing" : 16,
                     "horizontalSpacing" : 8,
                     "layoutInfo" : {
@@ -122,7 +123,7 @@
                                     "type" : "ColumnLayout",
                                     "id" : "simpleItems",
                                     "columns" : 2,
-                                    "columnWidths" : [0.3, 0.7],
+                                    "column-widths" : [0.25, 0.75],
                                     "verticalSpacing" : 8,
                                     "contents" : [
                                         {
@@ -169,7 +170,7 @@
                                     "text" : "Join",
                                     "family" : "highlight",
                                     "layoutInfo" : {
-                                        "use-content-height" : true,
+                                        "height" : 40,
                                         "position-bottom" : {
                                             "target" : "BOTTOM"
                                         }
