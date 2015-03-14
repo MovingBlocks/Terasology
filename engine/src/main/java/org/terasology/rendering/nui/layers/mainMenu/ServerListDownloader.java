@@ -16,7 +16,6 @@
 
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -28,62 +27,78 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ServerInfo;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.org.apache.xerces.internal.util.URI;
 
-/**
- * TODO Type description
- * @author Martin Steiger
- */
-public class OnlineServerListBinding extends ReadOnlyBinding<List<ServerInfo>> {
+class ServerListDownloader {
 
-    private static final Logger logger = LoggerFactory.getLogger(OnlineServerListBinding.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServerListDownloader.class);
 
-    private final List<ServerInfo> servers;
+    private static final Gson GSON = new GsonBuilder().create();
+
+    private final Runnable downloadTask = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                status = "Starting to download ..";
+
+                @SuppressWarnings("serial")
+                Type entryListType = new TypeToken<List<ServerInfo>>() { /**/ }.getType();
+                URL url = new URL(serverAddress);
+
+                status = "Parsing content ..";
+
+                try (Reader reader = new InputStreamReader(url.openStream(), cs)) {
+                    List<ServerInfo> onlineServers = GSON.fromJson(reader, entryListType);
+                    for (ServerInfo entry : onlineServers) {
+                        logger.debug("Retrieved online game server {}", entry);
+                    }
+
+                    int count = onlineServers.size();
+                    status = String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries");
+
+                    servers.addAll(onlineServers);
+                }
+            } catch (Exception e) {
+                status = "Error: " + e.getLocalizedMessage();
+                // we catch Exception here to make sure that it's being logged
+                // alternative: re-throw as RuntimeException and use Thread.setUncaughtExceptionHandler()
+                logger.error("Error downloading online server list!", e);
+            }
+        }
+    };
+
+    private final List<ServerInfo> servers = Lists.newCopyOnWriteArrayList();
+
+    private final Charset cs = StandardCharsets.UTF_8;
+    private final String serverAddress;
 
     /**
-     * @param locals
+     * "volatile" ensures the visibility of updates across different threads
      */
-    public OnlineServerListBinding(List<ServerInfo> locals) {
-        this.servers = Lists.newCopyOnWriteArrayList(locals);
+    private volatile String status;
 
-        Thread dlThread = new Thread(new Downloader());
+    public ServerListDownloader(String serverAddress) {
+        this.serverAddress = serverAddress;
+        Thread dlThread = new Thread(downloadTask);
         dlThread.setName("ServerList Downloader");
         dlThread.start();
     }
 
-    @Override
-    public List<ServerInfo> get() {
+    /**
+     * @return a <b>thread-safe</b> list of servers
+     */
+    public List<ServerInfo> getServers() {
         return servers;
     }
 
-    private class Downloader implements Runnable {
-        @Override
-        public void run() {
-            try {
-                URL url = new URL("http://master-server.herokuapp.com/servers/list");
-                Charset cs = StandardCharsets.UTF_8;
-                Gson gson = new GsonBuilder().create();
-
-                @SuppressWarnings("serial")
-                Type entryListType = new TypeToken<List<ServerInfo>>() { /**/ }.getType();
-
-                try (Reader reader = new InputStreamReader(url.openStream(), cs)) {
-                    List<ServerInfo> onlineServers = gson.fromJson(reader, entryListType);
-                    for (ServerInfo entry : onlineServers) {
-                        logger.debug("Retrieved online game server {}", entry);
-                    }
-                    servers.addAll(onlineServers);
-                }
-            } catch (Exception e) {
-                // we catch Exception here to make sure that it's being logged
-                logger.error("Error downloading online server list!", e);
-            }
-        }
+    /**
+     * @return
+     */
+    public String getStatus() {
+        return status;
     }
 }

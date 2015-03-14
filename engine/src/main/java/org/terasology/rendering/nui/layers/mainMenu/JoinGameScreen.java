@@ -56,103 +56,11 @@ public class JoinGameScreen extends CoreScreenLayer {
     @In
     private GameEngine engine;
 
-    private UIList<ServerInfo> serverList;
-
     @Override
     public void initialise() {
-        serverList = find("serverList", UIList.class);
+        UIList<ServerInfo> serverList = find("serverList", UIList.class);
         if (serverList != null) {
-            List<ServerInfo> locals = config.getNetwork().getServers();
-            serverList.bindList(new OnlineServerListBinding(locals));
-            serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
-                @Override
-                public String getString(ServerInfo value) {
-                    return value.getName();
-                }
-            });
-            serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
-                @Override
-                public void onItemActivated(UIWidget widget, ServerInfo item) {
-                    join(item.getAddress(), item.getPort());
-                }
-            });
-
-            final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
-
-            UILabel name = find("name", UILabel.class);
-            name.bindText(BindHelper.bindBoundBeanProperty("name", infoBinding, ServerInfo.class, String.class));
-
-            UILabel address = find("address", UILabel.class);
-            address.bindText(BindHelper.bindBoundBeanProperty("address", infoBinding, ServerInfo.class, String.class));
-
-            UILabel port = find("port", UILabel.class);
-            port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
-
-            ReadOnlyBinding<Boolean> localSelectedServerOnly = new ReadOnlyBinding<Boolean>() {
-                @Override
-                public Boolean get() {
-                    if (infoBinding.get() == null) {
-                        return false;
-                    }
-
-                    return locals.contains(infoBinding.get());
-                }
-            };
-
-            WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    getManager().pushScreen(AddServerPopup.ASSET_URI);
-                }
-            });
-            UIButton edit = find("edit", UIButton.class);
-            if (edit != null) {
-                edit.bindEnabled(localSelectedServerOnly);
-                edit.subscribe(new ActivateEventListener() {
-                    @Override
-                    public void onActivated(UIWidget button) {
-                        AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-                        popup.setServerInfo(infoBinding.get());
-                    }
-                });
-            }
-            WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    if (serverList.getSelection() != null) {
-                        config.getNetwork().remove(serverList.getSelection());
-                        serverList.setSelection(null);
-                    }
-                }
-            });
-            WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    config.save();
-                    ServerInfo item = serverList.getSelection();
-                    if (item != null) {
-                        join(item.getAddress(), item.getPort());
-                    }
-                }
-            });
-
-            Binding<Boolean> hasSelection = new ReadOnlyBinding<Boolean>() {
-
-                @Override
-                public Boolean get() {
-                    return infoBinding.get() != null;
-                }
-            };
-
-            UIButton removeButton = find("remove", UIButton.class);
-            if (removeButton != null) {
-                removeButton.bindEnabled(localSelectedServerOnly);
-            }
-
-            UIButton joinButton = find("join", UIButton.class);
-            if (joinButton != null) {
-                joinButton.bindEnabled(hasSelection);
-            }
+            configureScreen(serverList);
         }
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
@@ -197,4 +105,122 @@ public class JoinGameScreen extends CoreScreenLayer {
         popup.startOperation(operation, true);
 
     }
+
+    private void configureScreen(UIList<ServerInfo> serverList) {
+        final List<ServerInfo> locals = config.getNetwork().getServers();
+        ServerListDownloader downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
+
+        serverList.bindList(new CombinedListBinding<ServerInfo>(locals, downloader.getServers()));
+        serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
+            @Override
+            public String getString(ServerInfo value) {
+                String name = value.getName();
+
+                if (locals.contains(value)) {
+                    name = "(custom) " + name;
+                }
+
+                return name;
+            }
+        });
+        serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
+            @Override
+            public void onItemActivated(UIWidget widget, ServerInfo item) {
+                join(item.getAddress(), item.getPort());
+            }
+        });
+
+        final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
+
+        UILabel name = find("name", UILabel.class);
+        if (name != null) {
+            name.bindText(BindHelper.bindBoundBeanProperty("name", infoBinding, ServerInfo.class, String.class));
+        }
+
+        UILabel address = find("address", UILabel.class);
+        if (address != null) {
+            address.bindText(BindHelper.bindBoundBeanProperty("address", infoBinding, ServerInfo.class, String.class));
+        }
+
+        UILabel port = find("port", UILabel.class);
+        if (port != null) {
+            port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
+        }
+
+        ReadOnlyBinding<Boolean> localSelectedServerOnly = new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                if (infoBinding.get() == null) {
+                    return false;
+                }
+
+                return locals.contains(infoBinding.get());
+            }
+        };
+
+        WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen(AddServerPopup.ASSET_URI);
+            }
+        });
+
+        UIButton edit = find("edit", UIButton.class);
+        if (edit != null) {
+            edit.bindEnabled(localSelectedServerOnly);
+            edit.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                    popup.setServerInfo(infoBinding.get());
+                }
+            });
+        }
+
+        UIButton removeButton = find("remove", UIButton.class);
+        if (removeButton != null) {
+            removeButton.bindEnabled(localSelectedServerOnly);
+            removeButton.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    if (serverList.getSelection() != null) {
+                        config.getNetwork().remove(serverList.getSelection());
+                        serverList.setSelection(null);
+                    }
+                }
+            });
+        }
+
+        UIButton joinButton = find("join", UIButton.class);
+        if (joinButton != null) {
+            joinButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    return infoBinding.get() != null;
+                }
+            });
+            joinButton.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    config.save();
+                    ServerInfo item = serverList.getSelection();
+                    if (item != null) {
+                        join(item.getAddress(), item.getPort());
+                    }
+                }
+            });
+        }
+
+        UILabel downloadLabel = find("download", UILabel.class);
+        if (downloadLabel != null) {
+            downloadLabel.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return downloader.getStatus();
+                }
+            });
+        }
+    }
+
 }

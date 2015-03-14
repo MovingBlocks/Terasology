@@ -16,23 +16,33 @@
 
 package org.terasology.config;
 
-import com.google.common.collect.Lists;
-
-import java.util.Iterator;
 import java.util.List;
 
 import org.terasology.engine.TerasologyConstants;
 
+import com.google.common.collect.Lists;
+
 /**
  * @author Immortius
  */
-public class NetworkConfig implements Iterable<ServerInfo> {
+public class NetworkConfig {
+
     private List<ServerInfo> servers = Lists.newArrayList();
-    // Available upstream bandwidth in kilobits per second
+
+    /**
+     * Available upstream bandwidth in kilobits per second
+     */
     private int upstreamBandwidth = 1024;
 
-    // the port that is used for hosting
+    /**
+     * The port that is used for hosting
+     */
     private int serverPort = TerasologyConstants.DEFAULT_PORT;
+
+    /**
+     * The master server URL
+     */
+    private String masterServer = "https://master-server.herokuapp.com/servers/list";
 
     public void clear() {
         servers.clear();
@@ -54,11 +64,6 @@ public class NetworkConfig implements Iterable<ServerInfo> {
         this.serverPort = serverPort;
     }
 
-    @Override
-    public Iterator<ServerInfo> iterator() {
-        return servers.iterator();
-    }
-
     public void add(ServerInfo serverInfo) {
         servers.add(serverInfo);
     }
@@ -73,5 +78,13 @@ public class NetworkConfig implements Iterable<ServerInfo> {
 
     public void setServers(List<ServerInfo> servers) {
         this.servers = servers;
+    }
+
+    public String getMasterServer() {
+        return masterServer;
+    }
+
+    public void setMasterServer(String masterServer) {
+        this.masterServer = masterServer;
     }
 }

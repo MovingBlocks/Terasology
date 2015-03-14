@@ -71,16 +71,16 @@
                     },
                     "contents" : [
                         {
-                        	"type" : "RelativeLayout",
-                        	"contents" : [
+                            "type" : "RelativeLayout",
+                            "contents" : [
                                 {
-		                            "type" : "ScrollableArea",
-		                            "content" : {
-		                                "type" : "UIList",
-		                                "id" : "serverList",
-		                                "family" : "module-list"
-		                            },
-		                            "layoutInfo" : {
+                                    "type" : "ScrollableArea",
+                                    "content" : {
+                                        "type" : "UIList",
+                                        "id" : "serverList",
+                                        "family" : "module-list"
+                                    },
+                                    "layoutInfo" : {
                                         "position-top" : {
                                             "target" : "TOP"
                                         },
@@ -90,7 +90,7 @@
                                             "offset" : 8
                                         }
                                     }
-		                        },
+                                },
                                 {
                                     "type" : "UIButton",
                                     "id" : "edit",
@@ -180,6 +180,19 @@
                                         "position-horizontal-center" : {},
                                         "position-top" : {
                                             "target" : "TOP",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "id" : "download",
+                                    "text" : "<download info text>",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "join",
                                             "offset" : 8
                                         }
                                     }
