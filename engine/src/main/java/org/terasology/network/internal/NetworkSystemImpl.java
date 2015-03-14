@@ -24,8 +24,10 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
+
 import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntLongHashMap;
+
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -61,9 +63,11 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.Server;
+import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
+import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
 import org.terasology.network.internal.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.internal.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
@@ -196,6 +200,24 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
         }
     }
+
+    @Override
+    public ServerInfoMessage requestInfo(String address, int port) throws InterruptedException {
+        NioClientSocketChannelFactory factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+        ClientBootstrap bootstrap = new ClientBootstrap(factory);
+        bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
+        bootstrap.setOption("tcpNoDelay", true);
+        bootstrap.setOption("keepAlive", true);
+        ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
+        connectCheck.await();
+        connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
+        factory.releaseExternalResources();
+        ClientConnectionHandler handler = connectCheck.getChannel().getPipeline().get(ClientConnectionHandler.class);
+        System.out.println(handler);
+
+        return null;
+    }
+
 
     @Override
     public JoinStatus join(String address, int port) throws InterruptedException {

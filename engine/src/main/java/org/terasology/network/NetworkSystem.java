@@ -66,4 +66,6 @@ public interface NetworkSystem extends BlockRegistrationListener {
     int getOutgoingBytesDelta();
 
     void forceDisconnect(Client client);
+
+    ServerInfoMessage requestInfo(String address, int port) throws InterruptedException;
 }
