@@ -32,6 +32,7 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.particles.ParticleManagerInterface;
 import org.terasology.rendering.particles.components.ParticleEmitterComponent;
@@ -247,6 +248,9 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         ParticleEmitterComponent emitterComponent = particleSystemComponent.emitter.getComponent(ParticleEmitterComponent.class);
         LocationComponent emitterLocationComponent = particleSystemComponent.emitter.getComponent(LocationComponent.class);
 
+        if(emitterComponent == null) throw new RuntimeException();
+        if(emitterComponent.generators == null) throw new RuntimeException();
+
         particleSystemComponent.nrOfParticles = 5000;
 
         emitterComponent.spawnRateMax = 400.0f;
@@ -308,16 +312,26 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         };
 
         particleSystemComponent.affectors.add(entityManager.create(new EnergyColorAffectorComponent(keyEnergies, colors)));
+        Component x = new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f));
+        Component y = new VelocityRangeGeneratorComponent(new Vector3f(-1f, 0.5f, -1f), new Vector3f(+1f, 2.0f, +1f));
+        Component z = new EnergyRangeGeneratorComponent(6, 7);
 
-        emitterComponent.generators.add(entityManager.create(
-                new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f))
-        ));
-        emitterComponent.generators.add(entityManager.create(
-                new VelocityRangeGeneratorComponent(new Vector3f(-1f, 0.5f, -1f), new Vector3f(+1f, 2.0f, +1f))
-        ));
-        emitterComponent.generators.add(entityManager.create(
-                new EnergyRangeGeneratorComponent(6, 7)
-        ));
+        EntityRef a = entityManager.create(
+                x
+        );
+
+        EntityRef b = entityManager.create(
+                y
+        );
+
+
+        EntityRef c = entityManager.create(
+                z
+        );
+
+        emitterComponent.generators.add(a);
+        emitterComponent.generators.add(b);
+        emitterComponent.generators.add(c);
 
         return String.format("Sparkly: %s", spawnPosition );
     }
@@ -344,10 +358,11 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
     public EntityRef createParticleSystem() {
         EntityBuilder psEntityBuilder = entityManager.newBuilder();
         psEntityBuilder.setPersistent(false);
-        psEntityBuilder.addComponent(new ParticleSystemComponent());
+        ParticleSystemComponent particleSystemComponent = new ParticleSystemComponent();
+        psEntityBuilder.addComponent(particleSystemComponent);
 
         EntityRef particleSystem = psEntityBuilder.build();
-        createEmmiter(particleSystem);
+        particleSystemComponent.emitter = createEmmiter(particleSystem);
 
         return particleSystem;
     }

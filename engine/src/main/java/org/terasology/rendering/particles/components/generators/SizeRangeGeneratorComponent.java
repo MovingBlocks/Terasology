@@ -31,4 +31,9 @@ public class SizeRangeGeneratorComponent implements Component {
         minScale = new Vector3f(min);
         maxScale = new Vector3f(max);
     }
+
+    public SizeRangeGeneratorComponent() {
+        minScale = new Vector3f();
+        maxScale = new Vector3f();
+    }
 }

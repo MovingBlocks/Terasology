@@ -31,4 +31,9 @@ public class VelocityRangeGeneratorComponent implements Component {
         this.minCoords = new Vector3f(minCoords);
         this.maxCoords = new Vector3f(maxCoords);
     }
+
+    public VelocityRangeGeneratorComponent() {
+        this.minCoords = new Vector3f();
+        this.maxCoords = new Vector3f();
+    }
 }

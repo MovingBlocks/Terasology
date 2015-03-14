@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class EnergyColorAffectorComponent implements Component {
 
-    public Map<Float, Vector4f> gradientMap = new TreeMap<>();
+    public Map<Float, Vector4f> gradientMap = new HashMap<>();
 
     public EnergyColorAffectorComponent() {
 

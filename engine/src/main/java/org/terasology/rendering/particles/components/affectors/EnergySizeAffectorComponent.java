@@ -22,17 +22,14 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by Linus on 10-3-2015.
  */
 public class EnergySizeAffectorComponent implements Component {
 
-    public NavigableMap<Float, Vector3f> sizeMap = new TreeMap<>();
+    public Map<Float, Vector3f> sizeMap = new HashMap<>();
 
     public EnergySizeAffectorComponent() {
 

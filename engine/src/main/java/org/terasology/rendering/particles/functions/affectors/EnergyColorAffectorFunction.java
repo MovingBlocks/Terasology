@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.particles.functions.affectors;
 
+import com.google.common.collect.Maps;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.particles.ParticleData;
@@ -34,24 +35,38 @@ public final class EnergyColorAffectorFunction extends AffectorFunction<EnergyCo
         super(EnergyColorAffectorComponent.class, DataMask.ENERGY, DataMask.COLOR);
     }
 
+    private NavigableMap<Float,Vector4f> navigableGradientMap = Maps.newTreeMap();
+
     @Override
     public void update(final EnergyColorAffectorComponent component,
                        final ParticleData particleData,
                        final Random random,
                        final float delta
     ) {
-        //TODO: make this actually work
-        NavigableMap<Float, Vector4f> sizeMap = (NavigableMap<Float, Vector4f>)component.gradientMap;
-        Map.Entry<Float, Vector4f> left = sizeMap.floorEntry(particleData.energy);
-        Map.Entry<Float, Vector4f> right = sizeMap.ceilingEntry(particleData.energy);
+        Map.Entry<Float, Vector4f> left = navigableGradientMap.floorEntry(particleData.energy);
+        Map.Entry<Float, Vector4f> right = navigableGradientMap.ceilingEntry(particleData.energy);
 
-        if(left == null && right != null) {
+        lerpAndSetColor(left, right, particleData);
+    }
+
+    @Override
+    public void beforeUpdates(final EnergyColorAffectorComponent component,
+                              final Random random,
+                              final float delta
+    ) {
+        navigableGradientMap.clear();
+        navigableGradientMap.putAll(component.gradientMap);
+    }
+
+    private static void lerpAndSetColor(final Map.Entry<Float, Vector4f> left,
+                                        final Map.Entry<Float, Vector4f> right,
+                                        final ParticleData particleData
+    ) {
+        if (left == null && right != null) {
             particleData.color.set(right.getValue());
-        }
-        else if(right == null && left != null) {
+        } else if (right == null && left != null) {
             particleData.color.set(left.getValue());
-        }
-        else if (left != null && right != null) {
+        } else if (left != null && right != null) {
             float rightAmount = (particleData.energy - left.getKey()) / (right.getKey() - left.getKey());
 
             final Vector4f leftValue = left.getValue();

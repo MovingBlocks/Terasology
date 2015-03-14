@@ -32,4 +32,9 @@ public class ColorRangeGeneratorComponent implements Component {
         this.minColorComponents = new Vector4f(minColorComponents);
         this.maxColorComponents = new Vector4f(maxColorComponents);
     }
+
+    public ColorRangeGeneratorComponent() {
+        minColorComponents = new Vector4f();
+        maxColorComponents = new Vector4f();
+    }
 }

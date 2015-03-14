@@ -15,9 +15,12 @@
  */
 package org.terasology.rendering.particles.functions.affectors;
 
+import com.google.common.collect.Maps;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.particles.ParticleData;
+import org.terasology.rendering.particles.components.affectors.EnergyColorAffectorComponent;
 import org.terasology.rendering.particles.components.affectors.EnergySizeAffectorComponent;
 import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
@@ -34,24 +37,55 @@ public final class EnergySizeAffectorFunction extends AffectorFunction<EnergySiz
         super(EnergySizeAffectorComponent.class, DataMask.ENERGY, DataMask.SCALE);
     }
 
+    private NavigableMap<Float,Vector3f> sizeMap = Maps.newTreeMap();
+
     @Override
     public void update(final EnergySizeAffectorComponent component,
                        final ParticleData particleData,
                        final Random random,
                        final float delta
     ) {
-        //TODO: make this actually work
-        NavigableMap<Float, Vector3f> sizeMap = (NavigableMap<Float, Vector3f>)component.sizeMap;
         Map.Entry<Float, Vector3f> left = sizeMap.floorEntry(particleData.energy);
         Map.Entry<Float, Vector3f> right = sizeMap.ceilingEntry(particleData.energy);
 
-        if(left == null && right != null) {
+        if (left == null && right != null) {
             particleData.scale.set(right.getValue());
         }
-        else if(right == null && left != null) {
+        else if (right == null && left != null) {
             particleData.scale.set(left.getValue());
         }
         else if (left != null && right != null) {
+            float rightAmount = (particleData.energy - left.getKey()) / (right.getKey() - left.getKey());
+
+            final Vector3f leftValue = left.getValue();
+            final Vector3f rightValue = right.getValue();
+
+            particleData.scale.set(
+                    TeraMath.lerp(leftValue.x(), rightValue.x(), rightAmount),
+                    TeraMath.lerp(leftValue.y(), rightValue.y(), rightAmount),
+                    TeraMath.lerp(leftValue.z(), rightValue.z(), rightAmount)
+            );
+        }
+    }
+
+    @Override
+    public void beforeUpdates(final EnergySizeAffectorComponent component,
+                              final Random random,
+                              final float delta
+    ) {
+        sizeMap.clear();
+        sizeMap.putAll(component.sizeMap);
+    }
+
+    private static void lerpAndSetSize(final Map.Entry<Float, Vector3f> left,
+                                        final Map.Entry<Float, Vector3f> right,
+                                        final ParticleData particleData
+    ) {
+        if (left == null && right != null) {
+            particleData.scale.set(right.getValue());
+        } else if (right == null && left != null) {
+            particleData.scale.set(left.getValue());
+        } else if (left != null && right != null) {
             float rightAmount = (particleData.energy - left.getKey()) / (right.getKey() - left.getKey());
 
             final Vector3f leftValue = left.getValue();

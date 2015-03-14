@@ -34,4 +34,9 @@ public class PositionRangeGeneratorComponent implements Component {
         this.minCoords = new Vector3f(minCoords);
         this.maxCoords = new Vector3f(maxCoords);
     }
+
+    public PositionRangeGeneratorComponent() {
+        minCoords = new Vector3f();
+        maxCoords = new Vector3f();
+    }
 }

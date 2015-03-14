@@ -30,4 +30,7 @@ public class EnergyRangeGeneratorComponent implements Component {
         this.minEnergy = minEnergy;
         this.maxEnergy = maxEnergy;
     }
+
+    public EnergyRangeGeneratorComponent() {
+    }
 }

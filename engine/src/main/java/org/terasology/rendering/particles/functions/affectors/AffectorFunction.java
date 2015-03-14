@@ -25,11 +25,20 @@ import org.terasology.utilities.random.Random;
 /**
  * Created by Linus on 10-3-2015.
  */
+// TODO: make cloneable so each PartSys has it's own set
 @API
-public abstract class AffectorFunction<T extends Component> extends ParticleSystemFunction<T> {
+public abstract class AffectorFunction<T extends Component> extends ParticleSystemFunction<T> implements Cloneable {
     public AffectorFunction(Class<T> affectorComponent, DataMask dataMask, DataMask... dataMasks) {
         super(affectorComponent, dataMask, dataMasks);
     }
 
     public abstract void update(T component, ParticleData particleData, Random random, float delta);
+
+    public void beforeUpdates(T component, Random random, float delta) {
+        // does nothing by default
+    }
+
+    public void afterUpdates(T component, Random random, float delta) {
+        // does nothing by default
+    }
 }
