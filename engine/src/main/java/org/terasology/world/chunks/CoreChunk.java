@@ -16,7 +16,7 @@
 package org.terasology.world.chunks;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;

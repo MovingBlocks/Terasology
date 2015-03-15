@@ -27,7 +27,8 @@ import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -105,7 +106,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
                     for (int i = 0; i < GATHERING_INVENTORY_SLOT_COUNT; i++) {
                         EntityRef item = inventoryManager.getItemInSlot(gatheringEntity, i);
                         if (item.exists()) {
-                            pickupBuilder.createPickupFor(item, event.getBlockPosition().toVector3f(), 60, true);
+                            pickupBuilder.createPickupFor(item, Vector3fUtil.newVector3f(event.getBlockPosition()), 60, true);
                         }
                     }
                 }

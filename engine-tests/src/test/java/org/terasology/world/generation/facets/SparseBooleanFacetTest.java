@@ -16,20 +16,20 @@
 
 package org.terasology.world.generation.facets;
 
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 import org.terasology.world.generation.facets.base.SparseBooleanFieldFacet3D;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 /**
  * Tests the {@link SparseBooleanFieldFacet3D} class.
+ *
  * @author Martin Steiger
  */
 public class SparseBooleanFacetTest extends BooleanFacetTest {
@@ -55,11 +55,11 @@ public class SparseBooleanFacetTest extends BooleanFacetTest {
         facet.setWorld(10, 21, 35, true);
 
         Map<Vector3i, Boolean> expected = ImmutableMap.of(
-            new Vector3i(0, 1, 2), true,
-            new Vector3i(0, 1, 3), true,
-            new Vector3i(3, 8, 4), true,
-            new Vector3i(0, 1, 5), true,
-            new Vector3i(9, 3, 1), true);
+                new Vector3i(0, 1, 2), true,
+                new Vector3i(0, 1, 3), true,
+                new Vector3i(3, 8, 4), true,
+                new Vector3i(0, 1, 5), true,
+                new Vector3i(9, 3, 1), true);
 
         Assert.assertEquals(expected, facet.getRelativeEntries());
     }
@@ -75,11 +75,11 @@ public class SparseBooleanFacetTest extends BooleanFacetTest {
         facet.setWorld(10, 21, 35, true);
 
         Map<Vector3i, Boolean> expected = ImmutableMap.of(
-            new Vector3i(10, 21, 32), true,
-            new Vector3i(10, 21, 33), true,
-            new Vector3i(13, 28, 34), true,
-            new Vector3i(10, 21, 35), true,
-            new Vector3i(19, 23, 31), true);
+                new Vector3i(10, 21, 32), true,
+                new Vector3i(10, 21, 33), true,
+                new Vector3i(13, 28, 34), true,
+                new Vector3i(10, 21, 35), true,
+                new Vector3i(19, 23, 31), true);
 
         Assert.assertEquals(expected, facet.getWorldEntries());
     }

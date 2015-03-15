@@ -16,20 +16,20 @@
 
 package org.terasology.world.generation.facets;
 
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.ObjectFacet3D;
 import org.terasology.world.generation.facets.base.SparseObjectFacet3D;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 /**
  * Tests the {@link SparseObjectFacet3D} class.
+ *
  * @author Martin Steiger
  */
 public class SparseObjectFacetTest extends ObjectFacetTest {
@@ -62,11 +62,11 @@ public class SparseObjectFacetTest extends ObjectFacetTest {
         facet.setWorld(10, 21, 35, 1);
 
         Map<Vector3i, Number> expected = ImmutableMap.<Vector3i, Number>of(
-            new Vector3i(0, 1, 2), 1,
-            new Vector3i(0, 1, 3), 2,
-            new Vector3i(3, 8, 4), 2,
-            new Vector3i(0, 1, 5), 1,
-            new Vector3i(9, 3, 1), 3);
+                new Vector3i(0, 1, 2), 1,
+                new Vector3i(0, 1, 3), 2,
+                new Vector3i(3, 8, 4), 2,
+                new Vector3i(0, 1, 5), 1,
+                new Vector3i(9, 3, 1), 3);
 
         Assert.assertEquals(expected, facet.getRelativeEntries());
     }
@@ -82,11 +82,11 @@ public class SparseObjectFacetTest extends ObjectFacetTest {
         facet.setWorld(10, 21, 35, 1);
 
         Map<Vector3i, Number> expected = ImmutableMap.<Vector3i, Number>of(
-            new Vector3i(10, 21, 32), 4,
-            new Vector3i(10, 21, 33), 3,
-            new Vector3i(13, 28, 34), 2,
-            new Vector3i(10, 21, 35), 1,
-            new Vector3i(19, 23, 31), 2);
+                new Vector3i(10, 21, 32), 4,
+                new Vector3i(10, 21, 33), 3,
+                new Vector3i(13, 28, 34), 2,
+                new Vector3i(10, 21, 35), 1,
+                new Vector3i(19, 23, 31), 2);
 
         Assert.assertEquals(expected, facet.getWorldEntries());
     }

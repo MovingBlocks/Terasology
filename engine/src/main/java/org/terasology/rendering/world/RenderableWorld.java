@@ -16,7 +16,7 @@
 package org.terasology.rendering.world;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
@@ -25,6 +25,7 @@ import org.terasology.world.chunks.ChunkProvider;
 public interface RenderableWorld {
 
     void onChunkLoaded(Vector3i chunkPosition);
+
     void onChunkUnloaded(Vector3i chunkPosition);
 
     boolean pregenerateChunks();
@@ -32,9 +33,11 @@ public interface RenderableWorld {
     void update();
 
     boolean updateChunksInProximity(Region3i renderableRegion);
+
     boolean updateChunksInProximity(ViewDistance viewDistance);
 
     void generateVBOs();
+
     int queueVisibleChunks(boolean isFirstRenderingStageForCurrentFrame);
 
     void dispose();
@@ -42,5 +45,6 @@ public interface RenderableWorld {
     RenderQueuesHelper getRenderQueues();
 
     String getMetrics();
+
     ChunkProvider getChunkProvider();
 }

@@ -17,6 +17,7 @@
 package org.terasology.math;
 
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
@@ -538,7 +539,7 @@ public final class TeraMath {
      */
     @Deprecated
     public static Vector3i calcChunkPos(Vector3f pos) {
-        return calcChunkPos(new Vector3i(pos, 0.5f));
+        return calcChunkPos(Vector3iUtil.newVector3i(pos, 0.5f));
     }
 
     /**
@@ -767,13 +768,14 @@ public final class TeraMath {
     }
 
     // TODO: This doesn't belong in this class, move it.
+
     /**
      * @deprecated use {@link ChunkMath#getSecondaryPlacementDirection(Vector3f, Vector3f)} instead
      */
     @Deprecated
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
+        Vector3f attachDir = Vector3fUtil.newVector3f(surfaceDir.reverse().getVector3i());
         Vector3f rawDirection = new Vector3f(direction);
         float dot = (float) rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));

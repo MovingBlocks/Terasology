@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
 import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;

@@ -22,7 +22,8 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -76,7 +77,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         Chunk chunk = new ChunkImpl(0, 0, 0);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z))) {
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3iUtil.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z))) {
             byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
             assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
         }
@@ -111,7 +112,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         }
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z))) {
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3iUtil.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z))) {
             byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y - 2, ChunkConstants.MAX_SUNLIGHT_REGEN);
             assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
         }
@@ -127,7 +128,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
             assertEquals(0, chunk.getSunlight(pos));
         }
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - ChunkConstants.MAX_SUNLIGHT_REGEN,
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3iUtil.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - ChunkConstants.MAX_SUNLIGHT_REGEN,
                 ChunkConstants.SIZE_Z))) {
             byte expectedSunlight = (byte) Math.min(ChunkConstants.SIZE_Y - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD - pos.y - 1, ChunkConstants.MAX_SUNLIGHT);
             assertEquals("Incorrect lighting at " + pos, expectedSunlight, chunk.getSunlight(pos));

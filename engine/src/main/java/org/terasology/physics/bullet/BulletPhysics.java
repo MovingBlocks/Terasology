@@ -15,51 +15,6 @@
  */
 package org.terasology.physics.bullet;
 
-import gnu.trove.iterator.TFloatIterator;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.VecMath;
-import org.terasology.math.Vector3i;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.components.RigidBodyComponent;
-import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.engine.CharacterCollider;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.physics.engine.PhysicsLiquidWrapper;
-import org.terasology.physics.engine.PhysicsSystem;
-import org.terasology.physics.engine.PhysicsWorldWrapper;
-import org.terasology.physics.engine.RigidBody;
-import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.physics.shapes.CapsuleShapeComponent;
-import org.terasology.physics.shapes.CylinderShapeComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
-import org.terasology.physics.shapes.SphereShapeComponent;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.BroadphasePair;
@@ -93,6 +48,48 @@ import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.iterator.TFloatIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.components.RigidBodyComponent;
+import org.terasology.physics.components.TriggerComponent;
+import org.terasology.physics.engine.CharacterCollider;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.physics.engine.PhysicsLiquidWrapper;
+import org.terasology.physics.engine.PhysicsSystem;
+import org.terasology.physics.engine.PhysicsWorldWrapper;
+import org.terasology.physics.engine.RigidBody;
+import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.shapes.CapsuleShapeComponent;
+import org.terasology.physics.shapes.CylinderShapeComponent;
+import org.terasology.physics.shapes.HullShapeComponent;
+import org.terasology.physics.shapes.SphereShapeComponent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet)

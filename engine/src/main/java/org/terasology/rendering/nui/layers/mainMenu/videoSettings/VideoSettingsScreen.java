@@ -36,6 +36,7 @@ import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.ViewDistance;
 
+import javax.imageio.ImageIO;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;

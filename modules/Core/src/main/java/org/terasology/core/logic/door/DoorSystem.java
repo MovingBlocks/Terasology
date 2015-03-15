@@ -32,8 +32,9 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -81,7 +82,7 @@ public class DoorSystem extends BaseComponentSystem {
         }
 
         Vector3f offset = new Vector3f(event.getHitPosition());
-        offset.sub(targetBlockComp.getPosition().toVector3f());
+        offset.sub(Vector3fUtil.newVector3f(targetBlockComp.getPosition()));
         Side offsetDir = Side.inDirection(offset);
 
         Vector3i primePos = new Vector3i(targetBlockComp.getPosition());
@@ -131,7 +132,7 @@ public class DoorSystem extends BaseComponentSystem {
         if (!blockEvent.isConsumed()) {
             EntityRef newDoor = entityManager.copy(entity);
             newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
-            Vector3f doorCenter = bottomBlockPos.toVector3f();
+            Vector3f doorCenter = Vector3fUtil.newVector3f(bottomBlockPos);
             doorCenter.y += 0.5f;
             newDoor.addComponent(new LocationComponent(doorCenter));
             DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);

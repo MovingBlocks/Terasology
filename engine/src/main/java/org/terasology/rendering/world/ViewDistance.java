@@ -17,7 +17,7 @@ package org.terasology.rendering.world;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 
 /**
  * @author Immortius

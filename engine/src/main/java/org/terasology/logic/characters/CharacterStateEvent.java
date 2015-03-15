@@ -16,18 +16,18 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.math.Vector3i;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
@@ -135,6 +135,7 @@ public class CharacterStateEvent extends NetworkEvent {
     public Vector3i getClimbDirection() {
         return climbDirection;
     }
+
     /**
      * Retrieve the pitch in degrees.
      *

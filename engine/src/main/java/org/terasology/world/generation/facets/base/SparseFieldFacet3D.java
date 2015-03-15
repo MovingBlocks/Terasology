@@ -16,19 +16,19 @@
 
 package org.terasology.world.generation.facets.base;
 
+import com.google.common.collect.Maps;
+import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.world.generation.Border3D;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
-import org.terasology.world.generation.Border3D;
-
-import com.google.common.collect.Maps;
-
 /**
  * A sparse (map-based) implementation
  * of {@link ObjectFacet3D}.
+ *
  * @author Martin Steiger
  */
 public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldFacet3D {
