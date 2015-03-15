@@ -40,7 +40,6 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 
@@ -82,15 +81,7 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
-import static org.lwjgl.opengl.EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT;
-import static org.lwjgl.opengl.EXTPixelBufferObject.GL_STREAM_READ_ARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glBindBufferARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glBufferDataARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glGenBuffersARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glMapBufferARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glUnmapBufferARB;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
@@ -194,11 +185,8 @@ public class LwjglRenderingProcess {
         createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
         createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
 
-        readBackPBOFront = new PBO();
-        readBackPBOBack = new PBO();
-        readBackPBOFront.init(1, 1);
-        readBackPBOBack.init(1, 1);
-
+        readBackPBOFront = new PBO(1, 1);
+        readBackPBOBack = new PBO(1, 1);
         readBackPBOCurrent = readBackPBOFront;
     }
 
@@ -991,7 +979,7 @@ public class LwjglRenderingProcess {
         Material program = Assets.getMaterial("engine:prog.lightBufferPass");
         program.enable();
 
-        LwjglRenderingProcess.FBO targetFbo = getFBO(target);
+        FBO targetFbo = getFBO(target);
 
         int texId = 0;
         if (targetFbo != null) {
@@ -1527,123 +1515,6 @@ public class LwjglRenderingProcess {
 
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
-    }
-
-    public static class PBO {
-        public int pboId;
-        public int bufferWidth;
-        public int bufferHeight;
-        ByteBuffer cachedBuffer;
-
-        public PBO() {
-            pboId = glGenBuffersARB();
-        }
-
-        public void bind() {
-            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, pboId);
-        }
-
-        public void unbind() {
-            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, 0);
-        }
-
-        public void init(int width, int height) {
-            this.bufferWidth = width;
-            this.bufferHeight = height;
-
-            int byteSize = width * height * 4;
-            cachedBuffer = BufferUtils.createByteBuffer(byteSize);
-
-            bind();
-            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, byteSize, GL_STREAM_READ_ARB);
-            unbind();
-        }
-
-        public void copyFromFBO(int fboId, int width, int height, int format, int type) {
-            bind();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-            glReadPixels(0, 0, width, height, format, type, 0);
-            unbind();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        }
-
-        public ByteBuffer readBackPixels() {
-            bind();
-
-            cachedBuffer = glMapBufferARB(GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
-
-            // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
-            ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
-            resultBuffer.put(cachedBuffer);
-            cachedBuffer.rewind();
-            resultBuffer.flip();
-
-            glUnmapBufferARB(GL_PIXEL_PACK_BUFFER_EXT);
-            unbind();
-
-            return resultBuffer;
-        }
-    }
-
-    public class FBO {
-        public int fboId;
-        public int textureId;
-        public int depthStencilTextureId;
-        public int depthStencilRboId;
-        public int normalsTextureId;
-        public int lightBufferTextureId;
-
-        public int width;
-        public int height;
-
-        public void bind() {
-            if (this != currentlyBoundFbo) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-                currentlyBoundFbo = this;
-            }
-        }
-
-        public void unbind() {
-            if (currentlyBoundFbo != null) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                currentlyBoundFbo = null;
-            }
-        }
-
-        public void bindDepthTexture() {
-            //if (currentlyBoundTextureId != depthStencilTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
-            //currentlyBoundTextureId = depthStencilTextureId;
-            //}
-        }
-
-        public void bindTexture() {
-            //if (currentlyBoundTextureId != textureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
-            //currentlyBoundTextureId = textureId;
-            //}
-        }
-
-        public void bindNormalsTexture() {
-            //if (currentlyBoundTextureId != normalsTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
-            //currentlyBoundTextureId = normalsTextureId;
-            //}
-        }
-
-        public void bindLightBufferTexture() {
-            //if (currentlyBoundTextureId != lightBufferTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
-            //currentlyBoundTextureId = lightBufferTextureId;
-            //}
-        }
-
-        public void unbindTexture() {
-            //if (currentlyBoundTextureId != 0) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-            //currentlyBoundTextureId = 0;
-            //}
-        }
     }
 
 }

@@ -22,6 +22,7 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -49,7 +50,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         int texId = 0;
 
-        LwjglRenderingProcess.FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -69,7 +70,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        LwjglRenderingProcess.FBO sceneReflectiveRefractive = LwjglRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
+        FBO sceneReflectiveRefractive = LwjglRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
