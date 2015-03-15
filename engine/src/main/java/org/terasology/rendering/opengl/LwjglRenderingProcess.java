@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.editor.EditorRange;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -154,7 +155,12 @@ public class LwjglRenderingProcess {
     /* VARIOUS */
     private boolean takeScreenshot;
     private int displayListQuad = -1;
+
+    // Note: this assumes that the settings in the configs might change at runtime,
+    // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
+    private RenderingConfig renderingConfig = config.getRendering();
+    private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
@@ -207,8 +213,6 @@ public class LwjglRenderingProcess {
             rtFullHeight = org.lwjgl.opengl.Display.getHeight();
         }
 
-        RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
-
         rtFullWidth *= renderingConfig.getFboScale() / 100f;
         rtFullHeight *= renderingConfig.getFboScale() / 100f;
 
@@ -258,7 +262,7 @@ public class LwjglRenderingProcess {
 
         createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true);
 
-        createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
+        createFBO("sceneShadowMap", renderingConfig.getShadowMapResolution(), renderingConfig.getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
         createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR);
         createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR);
@@ -506,7 +510,7 @@ public class LwjglRenderingProcess {
     }
 
     private void updateExposure() {
-        if (config.getRendering().isEyeAdaptation()) {
+        if (renderingConfig.isEyeAdaptation()) {
             FBO scene = getFBO("scene1");
 
             if (scene == null) {
@@ -783,7 +787,7 @@ public class LwjglRenderingProcess {
     public void endRenderSceneSky() {
         setRenderBufferMask(true, true, true);
 
-        if (config.getRendering().isInscattering()) {
+        if (renderingConfig.isInscattering()) {
             generateSkyBand(0);
             generateSkyBand(1);
         }
@@ -805,11 +809,11 @@ public class LwjglRenderingProcess {
     public void renderPreCombinedScene() {
         createOrUpdateFullscreenFbos();
 
-        if (config.getRendering().isOutline()) {
+        if (renderingConfig.isOutline()) {
             generateSobel();
         }
 
-        if (config.getRendering().isSsao()) {
+        if (renderingConfig.isSsao()) {
             generateSSAO();
             generateBlurredSSAO();
         }
@@ -818,7 +822,7 @@ public class LwjglRenderingProcess {
     }
 
     public void renderPost(WorldRenderingStage worldRenderingStage) {
-        if (config.getRendering().isLightShafts()) {
+        if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("Rendering light shafts");
             generateLightShafts();
             PerformanceMonitor.endActivity();
@@ -828,7 +832,7 @@ public class LwjglRenderingProcess {
         generatePrePost();
         PerformanceMonitor.endActivity();
 
-        if (config.getRendering().isEyeAdaptation()) {
+        if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("Rendering eye adaption");
             generateDownsampledScene();
             PerformanceMonitor.endActivity();
@@ -842,7 +846,7 @@ public class LwjglRenderingProcess {
         generateToneMappedScene();
         PerformanceMonitor.endActivity();
 
-        if (config.getRendering().isBloom()) {
+        if (renderingConfig.isBloom()) {
             PerformanceMonitor.startActivity("Applying bloom");
             generateHighPass();
             for (int i = 0; i < 3; i++) {
@@ -853,7 +857,7 @@ public class LwjglRenderingProcess {
 
         PerformanceMonitor.startActivity("Applying blur");
         for (int i = 0; i < 2; i++) {
-            if (config.getRendering().getBlurIntensity() != 0) {
+            if (renderingConfig.getBlurIntensity() != 0) {
                 generateBlur(i);
             }
         }
@@ -881,7 +885,7 @@ public class LwjglRenderingProcess {
     private void renderFinalSceneToRT(WorldRenderingStage renderingStage) {
         Material material;
 
-        if (config.getRendering().getDebug().isEnabled()) {
+        if (renderingDebugConfig.isEnabled()) {
             material = Assets.getMaterial("engine:prog.debug");
         } else {
             material = Assets.getMaterial("engine:prog.post");
@@ -936,13 +940,13 @@ public class LwjglRenderingProcess {
 
         Material material;
 
-        if (config.getRendering().isOculusVrSupport()) {
+        if (renderingConfig.isOculusVrSupport()) {
             material = Assets.getMaterial("engine:prog.ocDistortion");
             material.enable();
 
             updateOcShaderParametersForVP(material, 0, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.LEFT_EYE);
         } else {
-            if (config.getRendering().getDebug().isEnabled()) {
+            if (renderingDebugConfig.isEnabled()) {
                 material = Assets.getMaterial("engine:prog.debug");
             } else {
                 material = Assets.getMaterial("engine:prog.post");
@@ -953,7 +957,7 @@ public class LwjglRenderingProcess {
 
         renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), org.lwjgl.opengl.Display.getHeight());
 
-        if (config.getRendering().isOculusVrSupport()) {
+        if (renderingConfig.isOculusVrSupport()) {
             updateOcShaderParametersForVP(material, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.RIGHT_EYE);
 
             renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), Display.getHeight());
@@ -1197,7 +1201,7 @@ public class LwjglRenderingProcess {
         Material material = Assets.getMaterial("engine:prog.blur");
         material.enable();
 
-        material.setFloat("radius", overallBlurRadiusFactor * config.getRendering().getBlurRadius(), true);
+        material.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
 
         FBO blur = getFBO("sceneBlur" + id);
 
@@ -1356,8 +1360,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth(Display.getWidth());
-        overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight(Display.getHeight());
+        overwriteRtWidth = renderingConfig.getScreenshotSize().getWidth(Display.getWidth());
+        overwriteRtHeight = renderingConfig.getScreenshotSize().getHeight(Display.getHeight());
 
         createOrUpdateFullscreenFbos();
     }
@@ -1384,7 +1388,7 @@ public class LwjglRenderingProcess {
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = config.getRendering().getScreenshotFormat().toString();
+                final String format = renderingConfig.getScreenshotFormat().toString();
                 final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
