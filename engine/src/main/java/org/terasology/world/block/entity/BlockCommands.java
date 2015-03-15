@@ -34,12 +34,9 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Vector3i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
@@ -85,43 +82,6 @@ public class BlockCommands extends BaseComponentSystem {
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-    }
-
-    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera), also apply required permission
-    @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
-            "The block is set directly into the world and might override existing blocks. After placement the block can be destroyed like any regular placed block.")
-    public String placeBlock(@CommandParam("blockName") String blockName) {
-        Camera camera = renderer.getActiveCamera();
-        Vector3f spawnPos = camera.getPosition();
-        Vector3f offset = camera.getViewingDirection();
-        offset.scale(3);
-        spawnPos.add(offset);
-
-        BlockFamily blockFamily;
-
-        List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(blockName);
-        if (matchingUris.size() == 1) {
-            blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
-
-        } else if (matchingUris.isEmpty()) {
-            throw new IllegalArgumentException("No block found for '" + blockName + "'");
-        } else {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Non-unique block name, possible matches: ");
-            Joiner.on(", ").appendTo(builder, matchingUris);
-            return builder.toString();
-        }
-
-        if (world != null) {
-            world.setBlock(new Vector3i((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z), blockFamily.getArchetypeBlock());
-
-            StringBuilder builder = new StringBuilder();
-            builder.append(blockFamily.getArchetypeBlock());
-            builder.append(" block placed at position (");
-            builder.append((int) spawnPos.x).append((int) spawnPos.y).append((int) spawnPos.z).append(")");
-            return builder.toString();
-        }
-        throw new IllegalArgumentException("Sorry, something went wrong!");
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)",
