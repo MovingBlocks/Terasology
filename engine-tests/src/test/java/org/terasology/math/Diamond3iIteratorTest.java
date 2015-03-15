@@ -19,6 +19,7 @@ package org.terasology.math;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -33,14 +34,14 @@ public class Diamond3iIteratorTest {
 
     @Test
     public void zeroDistanceIteration() {
-        Iterator<Vector3i> iter = Diamond3iIterator.iterate(Vector3i.zero(), 0).iterator();
-        assertEquals(Lists.newArrayList(Vector3i.zero()), Lists.newArrayList(iter));
+        Iterator<Vector3i> iter = Diamond3iIterator.iterate(Vector3iUtil.zero(), 0).iterator();
+        assertEquals(Lists.newArrayList(Vector3iUtil.zero()), Lists.newArrayList(iter));
     }
 
     @Test
     public void oneDistanceIteration() {
-        Iterator<Vector3i> iter = Diamond3iIterator.iterate(Vector3i.zero(), 1).iterator();
-        Set<Vector3i> expected = Sets.newHashSet(Vector3i.zero(), new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 1, 0),
+        Iterator<Vector3i> iter = Diamond3iIterator.iterate(Vector3iUtil.zero(), 1).iterator();
+        Set<Vector3i> expected = Sets.newHashSet(Vector3iUtil.zero(), new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 1, 0),
                 new Vector3i(0, -1, 0), new Vector3i(0, 0, 1), new Vector3i(0, 0, -1));
         while (iter.hasNext()) {
             Vector3i next = iter.next();
@@ -51,7 +52,7 @@ public class Diamond3iIteratorTest {
 
     @Test
     public void twoDistanceIteration() {
-        Set<Vector3i> iter = Sets.newHashSet(Diamond3iIterator.iterate(Vector3i.zero(), 2));
+        Set<Vector3i> iter = Sets.newHashSet(Diamond3iIterator.iterate(Vector3iUtil.zero(), 2));
         assertEquals(25, iter.size());
         for (Vector3i pos : iter) {
             assertTrue(pos.gridDistance(new Vector3i()) <= 2);

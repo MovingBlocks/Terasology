@@ -16,15 +16,16 @@
 
 package org.terasology.world.internal;
 
-import java.util.Collection;
-
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
+
+import java.util.Collection;
 
 /**
  * @author Immortius
@@ -44,7 +45,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public boolean isBlockRelevant(Vector3f pos) {
-        return isBlockRelevant(new Vector3i(pos, 0.5f));
+        return isBlockRelevant(Vector3iUtil.newVector3i(pos, 0.5f));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public Block getBlock(Vector3f pos) {
-        return getBlock(new Vector3i(pos, 0.5f));
+        return getBlock(Vector3iUtil.newVector3i(pos, 0.5f));
     }
 
     @Override
@@ -79,17 +80,17 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public byte getLight(Vector3f pos) {
-        return getLight(new Vector3i(pos, 0.5f));
+        return getLight(Vector3iUtil.newVector3i(pos, 0.5f));
     }
 
     @Override
     public byte getSunlight(Vector3f pos) {
-        return getSunlight(new Vector3i(pos, 0.5f));
+        return getSunlight(Vector3iUtil.newVector3i(pos, 0.5f));
     }
 
     @Override
     public byte getTotalLight(Vector3f pos) {
-        return getTotalLight(new Vector3i(pos, 0.5f));
+        return getTotalLight(Vector3iUtil.newVector3i(pos, 0.5f));
     }
 
 

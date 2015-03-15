@@ -28,9 +28,10 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -140,10 +141,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initMaterials() {
-        chunkShader         = Assets.getMaterial("engine:prog.chunk");
+        chunkShader = Assets.getMaterial("engine:prog.chunk");
         lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass");
         //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
-        shadowMapShader     = Assets.getMaterial("engine:prog.shadowMap");
+        shadowMapShader = Assets.getMaterial("engine:prog.shadowMap");
     }
 
     @Override
@@ -541,11 +542,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void renderChunk(RenderableChunk chunk, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         if (chunk.hasMesh()) {
             final Vector3f cameraPosition = camera.getPosition();
-            final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+            final Vector3f chunkPosition = Vector3fUtil.newVector3f(chunk.getPosition());
             final Vector3f chunkPositionRelativeToCamera =
                     new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                                 chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                                 chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
+                            chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
+                            chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
@@ -555,8 +556,8 @@ public final class WorldRendererImpl implements WorldRenderer {
                 }
 
                 chunkShader.setFloat3("chunkPositionWorld", chunkPosition.x * ChunkConstants.SIZE_X,
-                                                            chunkPosition.y * ChunkConstants.SIZE_Y,
-                                                            chunkPosition.z * ChunkConstants.SIZE_Z);
+                        chunkPosition.y * ChunkConstants.SIZE_Y,
+                        chunkPosition.z * ChunkConstants.SIZE_Z);
                 chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f);
 
                 if (mode == ChunkRenderMode.REFLECTION) {

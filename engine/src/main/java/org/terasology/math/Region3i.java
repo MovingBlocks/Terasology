@@ -17,6 +17,7 @@
 package org.terasology.math;
 
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 
@@ -55,8 +56,8 @@ public final class Region3i implements Iterable<Vector3i> {
         max.x = max.x - Math.ulp(max.x);
         max.y = max.y - Math.ulp(max.y);
         max.z = max.z - Math.ulp(max.z);
-        return createFromMinMax(new Vector3i(min),
-                new Vector3i(max));
+        return createFromMinMax(Vector3iUtil.newVector3i(min),
+                Vector3iUtil.newVector3i(max));
     }
 
     public static Region3i createFromCenterExtents(Vector3i center, Vector3i extents) {
@@ -75,9 +76,9 @@ public final class Region3i implements Iterable<Vector3i> {
 
     public static Region3i createBounded(Vector3i a, Vector3i b) {
         Vector3i min = new Vector3i(a);
-        min.min(b);
+        Vector3iUtil.min(min, b);
         Vector3i max = new Vector3i(a);
-        max.max(b);
+        Vector3iUtil.max(max, b);
         return createFromMinMax(min, max);
     }
 
@@ -97,9 +98,9 @@ public final class Region3i implements Iterable<Vector3i> {
             return a;
         }
         Vector3i min = a.min();
-        min.min(b.min());
+        Vector3iUtil.min(min, b.min());
         Vector3i max = a.max();
-        max.max(b.max());
+        Vector3iUtil.max(max, b.max());
         return createFromMinMax(min, max);
     }
 
@@ -171,13 +172,13 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @param other
      * @return The region that is encompassed by both this and other. If they
-     *         do not overlap then the empty region is returned
+     * do not overlap then the empty region is returned
      */
     public Region3i intersect(Region3i other) {
         Vector3i intersectMin = min();
-        intersectMin.max(other.min());
+        Vector3iUtil.max(intersectMin, other.min());
         Vector3i intersectMax = max();
-        intersectMax.min(other.max());
+        Vector3iUtil.min(intersectMax, other.max());
 
         return createFromMinMax(intersectMin, intersectMax);
     }
@@ -214,9 +215,9 @@ public final class Region3i implements Iterable<Vector3i> {
 
     public Region3i expandToContain(Vector3i adjPos) {
         Vector3i expandedMin = min();
-        expandedMin.min(adjPos);
+        Vector3iUtil.min(expandedMin, adjPos);
         Vector3i expandedMax = max();
-        expandedMax.max(adjPos);
+        Vector3iUtil.max(expandedMax, adjPos);
         return createFromMinMax(expandedMin, expandedMax);
     }
 
@@ -224,8 +225,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return The position at the center of the region
      */
     public Vector3f center() {
-        Vector3f result = min.toVector3f();
-        Vector3f halfSize = size.toVector3f();
+        Vector3f result = Vector3fUtil.newVector3f(min);
+        Vector3f halfSize = Vector3fUtil.newVector3f(size);
         halfSize.scale(0.5f);
         result.add(halfSize);
         return result;
@@ -259,8 +260,8 @@ public final class Region3i implements Iterable<Vector3i> {
      */
     public Vector3i getNearestPointTo(Vector3i pos) {
         Vector3i result = new Vector3i(pos);
-        result.min(max());
-        result.max(min);
+        Vector3iUtil.min(result, max());
+        Vector3iUtil.max(result, min);
         return result;
     }
 

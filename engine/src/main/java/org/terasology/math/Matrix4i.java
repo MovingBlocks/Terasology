@@ -16,6 +16,8 @@
 
 package org.terasology.math;
 
+import org.terasology.math.geom.Vector3i;
+
 import java.util.Arrays;
 
 /**

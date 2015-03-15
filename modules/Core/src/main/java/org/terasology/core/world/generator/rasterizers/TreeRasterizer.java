@@ -15,12 +15,10 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
-import java.util.Map;
-
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -30,9 +28,12 @@ import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.base.SparseFacet3D;
 
+import java.util.Map;
+
 /**
  * Creates trees based on the {@link TreeGenerator} that is
  * defined by the {@link TreeFacet}.
+ *
  * @author Martin Steiger
  */
 public class TreeRasterizer implements WorldRasterizer {

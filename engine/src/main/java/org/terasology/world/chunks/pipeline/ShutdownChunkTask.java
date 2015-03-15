@@ -16,7 +16,8 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 
 /**
  * @author Immortius
@@ -39,7 +40,7 @@ public final class ShutdownChunkTask implements ChunkTask {
 
     @Override
     public Vector3i getPosition() {
-        return Vector3i.zero();
+        return Vector3iUtil.zero();
     }
 
 }

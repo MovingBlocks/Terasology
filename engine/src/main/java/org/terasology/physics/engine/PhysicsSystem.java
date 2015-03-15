@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -132,7 +133,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onBlockAltered(OnChangedBlock event, EntityRef entity) {
-        physics.awakenArea(event.getBlockPosition().toVector3f(), 0.6f);
+        physics.awakenArea(Vector3fUtil.newVector3f(event.getBlockPosition()), 0.6f);
     }
 
     @Override

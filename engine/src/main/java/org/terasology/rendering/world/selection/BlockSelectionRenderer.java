@@ -15,6 +15,22 @@
  */
 package org.terasology.rendering.world.selection;
 
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.Assets;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.Vector4f;
+import org.terasology.module.sandbox.API;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.world.WorldRenderer;
+
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -26,22 +42,6 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslated;
-
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.Assets;
-import org.terasology.module.sandbox.API;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.math.Vector3i;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * Renders a selection. Is used by the BlockSelectionSystem.

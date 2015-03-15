@@ -19,7 +19,7 @@ package org.terasology.persistence.typeHandling.mathTypes;
 import com.google.common.collect.Maps;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;

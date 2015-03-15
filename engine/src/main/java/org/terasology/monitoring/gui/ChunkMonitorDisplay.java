@@ -20,24 +20,27 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
-import org.terasology.monitoring.chunk.ChunkMonitor;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitorEntry;
 import org.terasology.monitoring.chunk.ChunkMonitorEvent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.Chunk;
 
-import javax.swing.*;
-
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -158,7 +161,7 @@ public class ChunkMonitorDisplay extends JPanel {
     private Vector3i calcPlayerChunkPos() {
         final LocalPlayer p = CoreRegistry.get(LocalPlayer.class);
         if (p != null) {
-            return ChunkMath.calcChunkPos(new Vector3i(p.getPosition()));
+            return ChunkMath.calcChunkPos(Vector3iUtil.newVector3i(p.getPosition()));
         }
         return null;
     }

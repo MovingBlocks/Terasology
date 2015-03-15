@@ -17,7 +17,6 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -41,9 +40,11 @@ import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.math.Vector3iUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -196,13 +197,13 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         } else {
-            Vector3i pos = Vector3i.zero();
+            Vector3i pos = Vector3iUtil.zero();
             if (worldProvider.isBlockRelevant(pos)) {
                 spawnPlayer(entity, getSafeSpawnPosition());
             } else {
                 // Move the player (before it's spawned) to the spawn-position to make sure the relevance
                 // loads the chunk at some point
-                Vector3f spawnPosition = getSafeSpawnPosition().toVector3f();
+                Vector3f spawnPosition = Vector3fUtil.newVector3f(getSafeSpawnPosition());
                 loc.setWorldPosition(spawnPosition);
                 entity.saveComponent(loc);
 
@@ -269,16 +270,16 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (!client.character.exists()) {
-            Vector3i pos = Vector3i.zero();
+            Vector3i pos = Vector3iUtil.zero();
             if (worldProvider.isBlockRelevant(pos)) {
                 spawnPlayer(entity, getSafeSpawnPosition());
             } else {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                loc.setWorldPosition(getSafeSpawnPosition().toVector3f());
+                loc.setWorldPosition(Vector3fUtil.newVector3f(getSafeSpawnPosition()));
                 entity.saveComponent(loc);
                 updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());
 
-                SpawningClientInfo info = new SpawningClientInfo(entity, getSafeSpawnPosition().toVector3f());
+                SpawningClientInfo info = new SpawningClientInfo(entity, Vector3fUtil.newVector3f(getSafeSpawnPosition()));
                 clientsPreparingToSpawn.add(info);
             }
         }

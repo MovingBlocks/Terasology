@@ -17,7 +17,6 @@ package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -25,8 +24,9 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
@@ -38,11 +38,11 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
-import java.util.List;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * Created by manu on 24.12.2014.
@@ -88,10 +88,10 @@ public class RenderableWorldImpl implements RenderableWorld {
         this.shadowMapCamera = shadowMapCamera;
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
-                                              new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
-                                              new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
-                                              new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
-                                              new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkBackToFrontComparator()));
+                new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
+                new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
+                new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
+                new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkBackToFrontComparator()));
     }
 
     @Override
@@ -242,8 +242,8 @@ public class RenderableWorldImpl implements RenderableWorld {
     private Vector3i calcCameraCoordinatesInChunkUnits() {
         Vector3f cameraCoordinates = playerCamera.getPosition();
         return new Vector3i((int) (cameraCoordinates.x / ChunkConstants.SIZE_X),
-                            (int) (cameraCoordinates.y / ChunkConstants.SIZE_Y),
-                            (int) (cameraCoordinates.z / ChunkConstants.SIZE_Z));
+                (int) (cameraCoordinates.y / ChunkConstants.SIZE_Y),
+                (int) (cameraCoordinates.z / ChunkConstants.SIZE_Z));
     }
 
     @Override
@@ -408,9 +408,9 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
-         // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
+        // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
-        Vector3f result = chunk.getPosition().toVector3f(); // chunk position in chunk coordinates
+        Vector3f result = Vector3fUtil.newVector3f(chunk.getPosition()); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
 
         result.x *= ChunkConstants.SIZE_X;    // chunk center in world coordinates

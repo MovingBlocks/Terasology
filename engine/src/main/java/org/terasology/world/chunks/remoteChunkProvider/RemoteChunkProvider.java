@@ -19,7 +19,6 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +27,10 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.math.Vector3iUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -203,7 +204,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, Vector3iUtil.one());
         }
         return null;
     }
@@ -322,7 +323,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private int score(Vector3i chunk) {
-            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), 0.5f));
+            Vector3i playerChunk = ChunkMath.calcChunkPos(Vector3iUtil.newVector3i(localPlayer.getPosition(), 0.5f));
             return playerChunk.distanceSquared(chunk);
         }
     }
@@ -337,7 +338,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private float score(Vector3i chunkPos) {
-            Vector3f vec = chunkPos.toVector3f();
+            Vector3f vec = Vector3fUtil.newVector3f(chunkPos);
             vec.sub(localPlayer.getPosition());
             return vec.lengthSquared();
         }

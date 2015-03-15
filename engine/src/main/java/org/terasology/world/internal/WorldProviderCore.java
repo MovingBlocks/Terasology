@@ -15,16 +15,16 @@
  */
 package org.terasology.world.internal;
 
-import java.util.Collection;
-
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
+
+import java.util.Collection;
 
 /**
  * Provides the basic interface for all world providers.
@@ -108,7 +108,7 @@ public interface WorldProviderCore {
     /**
      * Changes the biome at the given position.
      *
-     * @param pos  The world position to change
+     * @param pos   The world position to change
      * @param biome The biome to set
      * @return The previous biome type at the position. Null if the change failed (because the necessary chunk was not loaded)
      */
