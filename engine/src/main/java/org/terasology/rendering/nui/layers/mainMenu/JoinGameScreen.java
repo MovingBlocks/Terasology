@@ -16,15 +16,29 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.ModuleRegistry;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
+import org.terasology.naming.Version;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.ServerInfoMessage;
 import org.terasology.registry.In;
+import org.terasology.rendering.FontColor;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -38,8 +52,10 @@ import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.world.internal.WorldInfo;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 
 /**
  * @author Immortius
@@ -54,6 +70,11 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private GameEngine engine;
+
+    @In
+    private ModuleManager moduleManager;
+
+    private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
     @Override
     public void initialise() {
@@ -170,8 +191,13 @@ public class JoinGameScreen extends CoreScreenLayer {
             edit.subscribe(new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-                    popup.setServerInfo(infoBinding.get());
+//                  AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+//                  popup.setServerInfo(infoBinding.get());
+                  ServerInfo item = serverList.getSelection();
+                  if (!extInfo.containsKey(item)) {
+                      Future<ServerInfoMessage> futureInfo = networkSystem.requestInfo(item.getAddress(), item.getPort());
+                      extInfo.put(item, futureInfo);
+                  }
                 }
             });
         }
@@ -210,6 +236,60 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             });
         }
+
+        UILabel modules = find("modules", UILabel.class);
+        modules.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
+                if (info != null) {
+                    if (info.isDone()) {
+                        try {
+                            List<String> codedModInfo = new ArrayList<>();
+                            ModuleRegistry reg = moduleManager.getRegistry();
+                            for (NameVersion entry : info.get().getModuleList()) {
+                                boolean isInstalled = reg.getModule(entry.getName(), entry.getVersion()) != null;
+                                Color color = isInstalled ? Color.GREEN : Color.RED;
+                                codedModInfo.add(FontColor.getColored(entry.toString(), color));
+                            }
+                            return "aa";//Joiner.on('\n').join(codedModInfo);
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace(); // never!
+                        }
+                    } else {
+                        return "requested";
+                    }
+                }
+                return null;
+            }
+        });
+
+        UILabel worlds = find("worlds", UILabel.class);
+        worlds.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
+                if (info != null) {
+                    if (info.isDone()) {
+                        try {
+                            List<String> codedWorldInfo = new ArrayList<>();
+                            for (WorldInfo wi : info.get().getWorldInfoList()) {
+                                codedWorldInfo.add(wi.getTitle());
+                                codedWorldInfo.add("Time: " + wi.getTime() / 3600_000);
+                                codedWorldInfo.add(wi.getWorldGenerator() + "-" + wi.getSeed());
+                            }
+                            return Joiner.on('\n').join(codedWorldInfo);
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace(); // never!
+                        }
+                    } else {
+                        return "requested";
+                    }
+                }
+                return null;
+            }
+        });
+
 
         UILabel downloadLabel = find("download", UILabel.class);
         if (downloadLabel != null) {

@@ -173,6 +173,24 @@
                                             "type" : "UILabel",
                                             "id" : "port",
                                             "text" : "Server Port Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Modules: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "modules",
+                                            "text" : "Module Info Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Worlds: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "worlds",
+                                            "text" : "World Info Goes Here"
                                         }
                                     ],
                                     "layoutInfo" : {
