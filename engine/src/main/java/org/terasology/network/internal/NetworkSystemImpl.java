@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.protobuf.ByteString;
 
 import gnu.trove.map.TIntLongMap;
@@ -104,6 +105,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -202,22 +204,21 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public ServerInfoMessage requestInfo(String address, int port) throws InterruptedException {
-        NioClientSocketChannelFactory factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-        ClientBootstrap bootstrap = new ClientBootstrap(factory);
+    public ListenableFuture<ServerInfoMessage> requestInfo(String address, int port) {
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        NioClientSocketChannelFactory tmpFactory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
+        ClientBootstrap bootstrap = new ClientBootstrap(tmpFactory);
         bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
         bootstrap.setOption("tcpNoDelay", true);
         bootstrap.setOption("keepAlive", true);
         ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
-        connectCheck.await();
-        connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
-        factory.releaseExternalResources();
-        ClientConnectionHandler handler = connectCheck.getChannel().getPipeline().get(ClientConnectionHandler.class);
-        System.out.println(handler);
 
-        return null;
+        InfoRequestHandler handler = connectCheck.getChannel().getPipeline().get(InfoRequestHandler.class);
+
+        // TODO: find a way to shutdown the factory and the pool later
+
+        return handler.getServerInfoFuture();
     }
-
 
     @Override
     public JoinStatus join(String address, int port) throws InterruptedException {

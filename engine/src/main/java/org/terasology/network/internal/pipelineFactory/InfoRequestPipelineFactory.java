@@ -16,35 +16,33 @@
 
 package org.terasology.network.internal.pipelineFactory;
 
-import static org.jboss.netty.channel.Channels.pipeline;
-
-import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.compression.ZlibDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.network.internal.ClientConnectionHandler;
 import org.terasology.network.internal.ClientHandshakeHandler;
+import org.terasology.network.internal.InfoRequestHandler;
 import org.terasology.network.internal.JoinStatusImpl;
 import org.terasology.network.internal.MetricRecordingHandler;
 import org.terasology.protobuf.NetData;
-import org.terasology.protobuf.NetData.ServerInfoMessage;
 
+/**
+ * A pipeline that requests {@link org.terasology.network.ServerInfoMessage} before it auto-disconnects.
+ * This is similar to {@link TerasologyClientPipelineFactory}.
+ * @author Martin Steiger
+ */
 public class InfoRequestPipelineFactory implements ChannelPipelineFactory {
-
-    private static final Logger logger = LoggerFactory.getLogger(InfoRequestPipelineFactory.class);
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         JoinStatusImpl joinStatus = new JoinStatusImpl();
-        ChannelPipeline p = pipeline();
+        ChannelPipeline p = Channels.pipeline();
+
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
 
         p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
@@ -55,24 +53,8 @@ public class InfoRequestPipelineFactory implements ChannelPipelineFactory {
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
         p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
-        p.addLast("connectionHandler", new ClientConnectionHandler(joinStatus, null) {
+        p.addLast("connectionHandler", new InfoRequestHandler());
 
-            @Override
-            public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-                NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
-                if (message.hasServerInfo()) {
-                    receivedServerInfo2(message.getServerInfo());
-                } else {
-                    logger.error("Received unexpected message");
-                }
-                ctx.getChannel().close();
-            }
-
-            private void receivedServerInfo2(ServerInfoMessage serverInfo) {
-                System.out.println("RECEIVED INFO: " + serverInfo.toString());
-            }
-
-        });
         return p;
     }
 }
