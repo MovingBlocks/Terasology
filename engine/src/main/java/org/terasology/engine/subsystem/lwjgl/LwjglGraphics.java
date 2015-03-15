@@ -15,21 +15,6 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import javax.imageio.ImageIO;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
@@ -85,6 +70,19 @@ import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
 
@@ -259,6 +257,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().OpenGL14,
                 GLContext.getCapabilities().OpenGL15,
                 GLContext.getCapabilities().OpenGL20,
+                GLContext.getCapabilities().OpenGL21,   // needed as we use GLSL 1.20
+
                 GLContext.getCapabilities().GL_ARB_framebuffer_object,  // Extensions eventually included in
                 GLContext.getCapabilities().GL_ARB_texture_float,       // OpenGl 3.0 according to
                 GLContext.getCapabilities().GL_ARB_half_float_pixel};   // http://en.wikipedia.org/wiki/OpenGL#OpenGL_3.0
@@ -267,6 +267,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                                     "OpenGL14",
                                     "OpenGL15",
                                     "OpenGL20",
+                "OpenGL21",
                                     "GL_ARB_framebuffer_object",
                                     "GL_ARB_texture_float",
                                     "GL_ARB_half_float_pixel"};

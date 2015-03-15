@@ -44,8 +44,10 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.math.Vector3iUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -189,7 +191,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getBlockEntityAt(Vector3f position) {
-        Vector3i pos = new Vector3i(position, 0.5f);
+        Vector3i pos = Vector3iUtil.newVector3i(position, 0.5f);
         return getBlockEntityAt(pos);
     }
 
@@ -314,7 +316,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab());
-        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new LocationComponent(Vector3fUtil.newVector3f(blockPosition)));
         builder.addComponent(new BlockComponent(block, blockPosition));
         if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
             // Block regen should always take the same amount of time,  regardless of its hardness 

@@ -17,14 +17,13 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
@@ -102,8 +101,8 @@ public class ChunkImpl implements Chunk {
 
     public ChunkImpl(Vector3i chunkPos) {
         this(chunkPos, new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-            new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-            new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
+                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
+                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
     }
 
     public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid, TeraArray biome) {
@@ -348,8 +347,8 @@ public class ChunkImpl implements Chunk {
     @Override
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3f min = getChunkWorldOffset().toVector3f();
-            Vector3f max = ChunkConstants.CHUNK_SIZE.toVector3f();
+            Vector3f min = Vector3fUtil.newVector3f(getChunkWorldOffset());
+            Vector3f max = Vector3fUtil.newVector3f(ChunkConstants.CHUNK_SIZE);
             max.add(min);
             aabb = AABB.createMinMax(min, max);
         }
@@ -387,13 +386,13 @@ public class ChunkImpl implements Chunk {
             double totalPercent = 100d - (100d / totalSize * totalReduced);
 
             logger.debug("chunk {}: " +
-                    "size-before: {} " +
-                    "bytes, size-after: {} " +
-                    "bytes, total-deflated-by: {}%, " +
-                    "blocks-deflated-by={}%, " +
-                    "light-deflated-by={}%, " +
-                    "liquid-deflated-by={}%, " +
-                    "biome-deflated-by={}%",
+                            "size-before: {} " +
+                            "bytes, size-after: {} " +
+                            "bytes, total-deflated-by: {}%, " +
+                            "blocks-deflated-by={}%, " +
+                            "light-deflated-by={}%, " +
+                            "liquid-deflated-by={}%, " +
+                            "biome-deflated-by={}%",
                     chunkPos,
                     SIZE_FORMAT.format(totalSize),
                     SIZE_FORMAT.format(totalReduced),
@@ -436,12 +435,12 @@ public class ChunkImpl implements Chunk {
             double totalPercent = 100d - (100d / totalSize * totalReduced);
 
             logger.debug("chunk {}: " +
-                    "size-before: {} " +
-                    "bytes, size-after: {} " +
-                    "bytes, total-deflated-by: {}%, " +
-                    "sunlight-deflated-by={}%, " +
-                    "sunlight-regen-deflated-by={}%, " +
-                    chunkPos,
+                            "size-before: {} " +
+                            "bytes, size-after: {} " +
+                            "bytes, total-deflated-by: {}%, " +
+                            "sunlight-deflated-by={}%, " +
+                            "sunlight-regen-deflated-by={}%, " +
+                            chunkPos,
                     SIZE_FORMAT.format(totalSize),
                     SIZE_FORMAT.format(totalReduced),
                     PERCENT_FORMAT.format(totalPercent),

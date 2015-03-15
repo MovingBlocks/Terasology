@@ -42,7 +42,8 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
@@ -248,7 +249,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
+                    center.set(ChunkMath.calcChunkPos(Vector3iUtil.newVector3i(loc.getWorldPosition(), 0.5f)));
                 }
                 Vector3i pos = null;
                 int distance = Integer.MAX_VALUE;

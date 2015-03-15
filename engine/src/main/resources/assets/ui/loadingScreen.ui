@@ -1,6 +1,6 @@
 {
     "type" : "loadingScreen",
-    "skin" : "mainMenu",
+    "skin": "loadingScreen",
     "contents" : {
         "type" : "RelativeLayout",
         "contents" : [

@@ -17,7 +17,8 @@ package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
@@ -41,7 +42,7 @@ public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
     @Override
     public void process(GeneratingRegion region) {
         // will give funny results for regions that are not exactly chunk sized, but it is better than sinking in the water on spawn
-        Vector3i centerChunkPos = new Vector3i(ChunkConstants.CHUNK_REGION.center());
+        Vector3i centerChunkPos = Vector3iUtil.newVector3i(ChunkConstants.CHUNK_REGION.center());
         if (region.getRegion().encompasses(centerChunkPos)) {
             SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
             SeaLevelFacet seaLevelFacet = region.getRegionFacet(SeaLevelFacet.class);

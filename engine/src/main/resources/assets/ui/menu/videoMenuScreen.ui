@@ -76,6 +76,14 @@
                                 "id" : "screenshotSize"
                             },
                             {
+                                "type": "UILabel",
+                                "text": "Fullscreen: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "fullscreen"
+                            },
+                            {
                                 "type" : "UILabel",
                                 "text" : "Screenshot format: "
                             },
@@ -90,14 +98,6 @@
                             {
                                 "type": "UICheckbox",
                                 "id": "vsync"
-                            },
-                            {
-                                "type": "UILabel",
-                                "text": "Fullscreen: "
-                            },
-                            {
-                                "type": "UICheckbox",
-                                "id": "fullscreen"
                             },
                             {
                                 "type": "UISpace",

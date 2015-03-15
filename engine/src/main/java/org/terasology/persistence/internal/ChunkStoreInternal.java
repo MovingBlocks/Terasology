@@ -16,7 +16,7 @@
 package org.terasology.persistence.internal;
 
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;

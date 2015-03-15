@@ -20,13 +20,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -35,7 +33,8 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
@@ -89,7 +88,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
-    private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
+    private static final Vector3i UNLOAD_LEEWAY = Vector3iUtil.one();
 
     private StorageManager storageManager;
     private final EntityManager entityManager;
@@ -134,7 +133,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, Vector3iUtil.one());
         }
         return null;
     }

@@ -22,7 +22,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.utilities.procedural.Noise;
 import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.world.generation.Facet;
@@ -38,6 +38,7 @@ import java.util.Map;
 /**
  * Places objects on the surface based on population densities
  * for a environmental variable (e.g. biome).
+ *
  * @author Martin Steiger
  */
 @Requires(@Facet(SurfaceHeightFacet.class))
@@ -54,10 +55,11 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
     /**
      * Populates a given facet based on filters and population densities
-     * @param facet the facet to populate
+     *
+     * @param facet        the facet to populate
      * @param surfaceFacet the surface height facet
-     * @param typeFacet the facet that provides the environment
-     * @param filters a set of filters
+     * @param typeFacet    the facet that provides the environment
+     * @param filters      a set of filters
      */
     protected void populateFacet(ObjectFacet3D<T> facet, SurfaceHeightFacet surfaceFacet, ObjectFacet2D<? extends B> typeFacet, List<Predicate<Vector3i>> filters) {
 
@@ -104,8 +106,9 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
     /**
      * Registers an object type with a certain population density based on an environmental variable
-     * @param type the environment type (e.g. biome)
-     * @param tree the object type
+     *
+     * @param biome        the environment type (e.g. biome)
+     * @param tree        the object type
      * @param probability the population density in [0..1]
      * @throws IllegalArgumentException if probability is not in [0..1]
      */
@@ -118,6 +121,7 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
     /**
      * Clears all registered population densities
+     *
      * @see SurfaceObjectProvider#register(B, T, float)
      */
     protected void clearProbabilities() {
@@ -125,8 +129,8 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
     }
 
     /**
-     * @param x the x coordinate
-     * @param z the z coordinate
+     * @param x    the x coordinate
+     * @param z    the z coordinate
      * @param objs a map (objType -> probability)
      * @return a random pick from the map or <code>null</code>
      */

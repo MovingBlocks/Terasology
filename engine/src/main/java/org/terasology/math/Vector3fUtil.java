@@ -17,8 +17,8 @@
 package org.terasology.math;
 
 import com.bulletphysics.BulletGlobals;
-
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 /**
  * @author Immortius
@@ -26,6 +26,7 @@ import org.terasology.math.geom.Vector3f;
 public final class Vector3fUtil {
     private Vector3fUtil() {
     }
+
 
     /**
      * @return The reflection of direction against normal
@@ -77,5 +78,9 @@ public final class Vector3fUtil {
         out.y = Math.max(a.y, b.y);
         out.z = Math.max(a.z, b.z);
         return out;
+    }
+
+    public static Vector3f newVector3f(Vector3i other) {
+        return new Vector3f(other.x, other.y, other.z);
     }
 }

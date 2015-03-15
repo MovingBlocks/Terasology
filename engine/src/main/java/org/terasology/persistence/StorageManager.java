@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 

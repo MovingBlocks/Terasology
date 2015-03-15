@@ -29,7 +29,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
@@ -165,8 +165,8 @@ public class ServerCommands extends BaseComponentSystem {
         }
         boolean success = chunkProvider.reloadChunk(pos);
         return success
-            ? "Cleared chunk " + pos + " from cache and triggered reload"
-            : "Chunk " + pos + " did not exist in the cache";
+                ? "Cleared chunk " + pos + " from cache and triggered reload"
+                : "Chunk " + pos + " did not exist in the cache";
     }
 
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)

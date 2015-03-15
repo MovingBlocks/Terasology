@@ -34,8 +34,10 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.math.Vector3iUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -103,14 +105,14 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
     public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent, LocationComponent locationComp) {
-        Vector3i location = new Vector3i(locationComp.getWorldPosition(), 0.5f);
+        Vector3i location = Vector3iUtil.newVector3i(locationComp.getWorldPosition(), 0.5f);
         commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
     public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent, BlockRegionComponent blockRegion) {
         if (!entity.hasComponent(LocationComponent.class)) {
-            Vector3i location = new Vector3i(blockRegion.region.center(), 0.5f);
+            Vector3i location = Vector3iUtil.newVector3i(blockRegion.region.center(), 0.5f);
             commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
         }
     }
@@ -160,7 +162,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     private void processDropping(EntityRef item, Vector3i location) {
-        EntityRef pickup = pickupBuilder.createPickupFor(item, location.toVector3f(), 60);
+        EntityRef pickup = pickupBuilder.createPickupFor(item, Vector3fUtil.newVector3f(location), 60);
         pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 

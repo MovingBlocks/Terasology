@@ -30,10 +30,10 @@ import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
@@ -131,8 +131,8 @@ public class TypeSerializationLibrary {
     }
 
     public static TypeSerializationLibrary createDefaultLibrary(PojoEntityManager entityManager,
-                                                                                ReflectFactory factory,
-                                                                                CopyStrategyLibrary copyStrategies) {
+                                                                ReflectFactory factory,
+                                                                CopyStrategyLibrary copyStrategies) {
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
         serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
         serializationLibrary.add(Block.class, new BlockTypeHandler());

@@ -17,8 +17,6 @@ package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +26,9 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 import java.util.Set;
@@ -250,9 +249,9 @@ public class BindableButtonImpl implements BindableButton {
         }
         return false;
     }
-    
+
     @Override
     public String toString() {
-        return "BindableButtonEventImpl [" + id + ", \"" + displayName + "\", " + buttonEvent + "]"; 
+        return "BindableButtonEventImpl [" + id + ", \"" + displayName + "\", " + buttonEvent + "]";
     }
 }

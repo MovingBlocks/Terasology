@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
@@ -314,9 +315,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
         Vector3i blockMin = new Vector3i();
         blockMin.sub(offset);
-        blockMin.mult(chunkSize.x, chunkSize.y, chunkSize.z);
+        Vector3iUtil.mult(blockMin, chunkSize.x, chunkSize.y, chunkSize.z);
         Vector3i blockSize = chunkRegion.size();
-        blockSize.mult(chunkSize.x, chunkSize.y, chunkSize.z);
+        Vector3iUtil.mult(blockSize, chunkSize.x, chunkSize.y, chunkSize.z);
         this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);
     }
 

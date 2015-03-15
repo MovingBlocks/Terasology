@@ -18,7 +18,6 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -29,10 +28,10 @@ import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.VecMath;
-import org.terasology.math.Vector3i;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.math.Vector3iUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -583,11 +582,11 @@ public final class Block {
     }
 
     public AABB getBounds(Vector3i pos) {
-        return bounds.move(pos.toVector3f());
+        return bounds.move(Vector3fUtil.newVector3f(pos));
     }
 
     public AABB getBounds(Vector3f floatPos) {
-        return getBounds(new Vector3i(floatPos, 0.5f));
+        return getBounds(Vector3iUtil.newVector3i(floatPos, 0.5f));
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {

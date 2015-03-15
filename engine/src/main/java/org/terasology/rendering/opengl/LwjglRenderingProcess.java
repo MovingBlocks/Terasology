@@ -32,12 +32,12 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.editor.EditorRange;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
@@ -88,7 +88,53 @@ import static org.lwjgl.opengl.EXTPixelBufferObject.glBufferDataARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glGenBuffersARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glMapBufferARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glUnmapBufferARB;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ALWAYS;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DECR;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_INCR;
+import static org.lwjgl.opengl.GL11.GL_KEEP;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glReadPixels;
+import static org.lwjgl.opengl.GL11.glStencilFunc;
+import static org.lwjgl.opengl.GL11.glTexCoord2d;
+import static org.lwjgl.opengl.GL11.glVertex3i;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
@@ -1367,23 +1413,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if (config.getRendering().getScreenshotSize() == 0) {
-            overwriteRtWidth = Display.getWidth() * 2;
-            overwriteRtHeight = Display.getHeight() * 2;
-        } else if (config.getRendering().getScreenshotSize() == 1) {
-            overwriteRtWidth = Display.getWidth();
-            overwriteRtHeight = Display.getHeight();
-        } else if (config.getRendering().getScreenshotSize() == 2) {
-            overwriteRtWidth = Display.getWidth() / 2;
-            overwriteRtHeight = Display.getHeight() / 2;
-        } else if (config.getRendering().getScreenshotSize() == 3) {
-            overwriteRtWidth = Display.getWidth() / 4;
-            overwriteRtHeight = Display.getHeight() / 4;
-        } else {
-            //In case its another config value use default values
-            overwriteRtWidth = 1152;
-            overwriteRtHeight = 700;
-        }
+        overwriteRtWidth = config.getRendering().getScreenshotSize().getWidth(Display.getWidth());
+        overwriteRtHeight = config.getRendering().getScreenshotSize().getHeight(Display.getHeight());
 
         createOrUpdateFullscreenFbos();
     }
@@ -1405,12 +1436,12 @@ public class LwjglRenderingProcess {
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         fboSceneFinal.unbindTexture();
 
-        Runnable r = new Runnable() {
+        Runnable task = new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = config.getRendering().getScreenshotFormat();
+                final String format = config.getRendering().getScreenshotFormat().toString();
                 final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
@@ -1434,7 +1465,7 @@ public class LwjglRenderingProcess {
             }
         };
 
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", task);
 
         takeScreenshot = false;
         overwriteRtWidth = 0;

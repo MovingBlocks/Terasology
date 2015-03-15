@@ -17,11 +17,11 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Vector3iUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
@@ -241,7 +241,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3iUtil.zero(), ChunkConstants.CHUNK_SIZE), side);
 
         int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
         int[] depth = new int[edgeSize];
@@ -274,7 +274,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
                 adjPos.set(side.getVector3i());
-                adjPos.mult(i + 1);
+                Vector3iUtil.mult(adjPos, i + 1);
                 adjPos.add(pos);
                 adjPos.add(chunkEdgeDeltas.get(side));
                 byte value = rules.getValue(adjChunk, adjPos);

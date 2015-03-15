@@ -16,16 +16,14 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Border3D;
