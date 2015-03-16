@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.ChunkProvider;
@@ -43,4 +44,6 @@ public interface RenderableWorld {
 
     String getMetrics();
     ChunkProvider getChunkProvider();
+
+    void setRenderingConfig(RenderingConfig newRenderingConfig);
 }
