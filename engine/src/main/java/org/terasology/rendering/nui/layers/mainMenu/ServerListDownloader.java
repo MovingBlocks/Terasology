@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -43,16 +44,21 @@ class ServerListDownloader {
         @Override
         public void run() {
             try {
-                status = "Starting to download ..";
+                status = "Downloading server list ..";
 
                 @SuppressWarnings("serial")
                 Type entryListType = new TypeToken<List<ServerInfo>>() { /**/ }.getType();
                 URL url = new URL(serverAddress);
 
-                status = "Parsing content ..";
-
                 try (Reader reader = new InputStreamReader(url.openStream(), cs)) {
+
+                    status = "Parsing content ..";
+
                     List<ServerInfo> onlineServers = GSON.fromJson(reader, entryListType);
+                    if (onlineServers == null) {
+                        throw new IOException("Invalid server list file content!");
+                    }
+
                     for (ServerInfo entry : onlineServers) {
                         logger.debug("Retrieved online game server {}", entry);
                     }
