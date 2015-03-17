@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -106,9 +105,9 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     }
 
-    private void configureScreen(UIList<ServerInfo> serverList) {
+    private void configureScreen(final UIList<ServerInfo> serverList) {
         final List<ServerInfo> locals = config.getNetwork().getServers();
-        ServerListDownloader downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
+        final ServerListDownloader downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
 
         serverList.bindList(new CombinedListBinding<ServerInfo>(locals, downloader.getServers()));
         serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
