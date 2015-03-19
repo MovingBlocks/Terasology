@@ -86,6 +86,18 @@
                                         },
                                         "position-bottom" : {
                                             "target" : "TOP",
+                                            "widget" : "download"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "id" : "download",
+                                    "text" : "<download info text>",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-bottom" : {
+                                            "target" : "TOP",
                                             "widget" : "edit",
                                             "offset" : 8
                                         }
@@ -176,21 +188,21 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Modules: "
-                                        },
-                                        {
-                                            "type" : "UILabel",
-                                            "id" : "modules",
-                                            "text" : "Module Info Goes Here"
-                                        },
-                                        {
-                                            "type" : "UILabel",
                                             "text" : "Worlds: "
                                         },
                                         {
                                             "type" : "UILabel",
                                             "id" : "worlds",
                                             "text" : "World Info Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Modules: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "modules",
+                                            "text" : "Module Info Goes Here"
                                         }
                                     ],
                                     "layoutInfo" : {
@@ -198,19 +210,6 @@
                                         "position-horizontal-center" : {},
                                         "position-top" : {
                                             "target" : "TOP",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UILabel",
-                                    "id" : "download",
-                                    "text" : "<download info text>",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-bottom" : {
-                                            "target" : "TOP",
-                                            "widget" : "join",
                                             "offset" : 8
                                         }
                                     }

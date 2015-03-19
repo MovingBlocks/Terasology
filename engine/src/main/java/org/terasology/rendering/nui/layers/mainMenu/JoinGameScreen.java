@@ -53,6 +53,7 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.time.WorldTime;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -244,6 +245,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
                 if (info != null) {
                     if (info.isDone()) {
+                        int maxElements = 9;
                         try {
                             List<String> codedModInfo = new ArrayList<>();
                             ModuleRegistry reg = moduleManager.getRegistry();
@@ -252,7 +254,11 @@ public class JoinGameScreen extends CoreScreenLayer {
                                 Color color = isInstalled ? Color.GREEN : Color.RED;
                                 codedModInfo.add(FontColor.getColored(entry.toString(), color));
                             }
-                            return "aa";//Joiner.on('\n').join(codedModInfo);
+                            if (codedModInfo.size() > maxElements) {
+                                codedModInfo = codedModInfo.subList(0, maxElements - 1);
+                                codedModInfo.add("...");
+                            }
+                            return Joiner.on('\n').join(codedModInfo);
                         } catch (InterruptedException | ExecutionException e) {
                             e.printStackTrace(); // never!
                         }
@@ -274,9 +280,9 @@ public class JoinGameScreen extends CoreScreenLayer {
                         try {
                             List<String> codedWorldInfo = new ArrayList<>();
                             for (WorldInfo wi : info.get().getWorldInfoList()) {
-                                codedWorldInfo.add(wi.getTitle());
-                                codedWorldInfo.add("Time: " + wi.getTime() / 3600_000);
-                                codedWorldInfo.add(wi.getWorldGenerator() + "-" + wi.getSeed());
+                                float timeInDays = wi.getTime() / (float) WorldTime.DAY_LENGTH;
+                                codedWorldInfo.add("World: " + wi.getTitle());
+                                codedWorldInfo.add(String.format("World Time: %.2f days", timeInDays));
                             }
                             return Joiner.on('\n').join(codedWorldInfo);
                         } catch (InterruptedException | ExecutionException e) {
@@ -289,7 +295,6 @@ public class JoinGameScreen extends CoreScreenLayer {
                 return null;
             }
         });
-
 
         UILabel downloadLabel = find("download", UILabel.class);
         if (downloadLabel != null) {
