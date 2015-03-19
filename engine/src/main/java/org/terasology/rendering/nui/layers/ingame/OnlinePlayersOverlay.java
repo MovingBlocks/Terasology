@@ -19,11 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.ColorComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -54,7 +52,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
                 sb.append("\n");
             }
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-            sb.append(getColoredPlayerName(clientComp.clientInfo));
+            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
             first = false;
         }
         return sb.toString();
@@ -71,15 +69,4 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         }
     }
 
-    // TODO share code with NotificationMessageEvent
-    private static String getColoredPlayerName(EntityRef from) {
-        DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
-        ColorComponent colorInfo = from.getComponent(ColorComponent.class);
-        String playerName = (displayInfo != null) ? displayInfo.name : "Unknown";
-
-        if (colorInfo != null) {
-            playerName = FontColor.getColored(playerName, colorInfo.color);
-        }
-        return playerName;
-    }
 }
