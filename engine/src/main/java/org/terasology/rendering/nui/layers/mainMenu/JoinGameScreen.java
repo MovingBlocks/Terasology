@@ -36,6 +36,7 @@ import org.terasology.naming.Version;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.ServerInfoMessage;
+import org.terasology.network.ServerInfoService;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.Color;
@@ -77,6 +78,8 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
+    private ServerInfoService infoService = new ServerInfoService();
+
     @Override
     public void initialise() {
         UIList<ServerInfo> serverList = find("serverList", UIList.class);
@@ -91,6 +94,13 @@ public class JoinGameScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public void onClosed() {
+        infoService.close();
+
+        super.onClosed();
     }
 
     @Override
@@ -196,7 +206,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 //                  popup.setServerInfo(infoBinding.get());
                   ServerInfo item = serverList.getSelection();
                   if (!extInfo.containsKey(item)) {
-                      Future<ServerInfoMessage> futureInfo = networkSystem.requestInfo(item.getAddress(), item.getPort());
+                      Future<ServerInfoMessage> futureInfo = infoService.requestInfo(item.getAddress(), item.getPort());
                       extInfo.put(item, futureInfo);
                   }
                 }

@@ -204,23 +204,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public ListenableFuture<ServerInfoMessage> requestInfo(String address, int port) {
-        ExecutorService pool = Executors.newFixedThreadPool(2);
-        NioClientSocketChannelFactory tmpFactory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
-        ClientBootstrap bootstrap = new ClientBootstrap(tmpFactory);
-        bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
-        bootstrap.setOption("tcpNoDelay", true);
-        bootstrap.setOption("keepAlive", true);
-        ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
-
-        InfoRequestHandler handler = connectCheck.getChannel().getPipeline().get(InfoRequestHandler.class);
-
-        // TODO: find a way to shutdown the factory and the pool later
-
-        return handler.getServerInfoFuture();
-    }
-
-    @Override
     public JoinStatus join(String address, int port) throws InterruptedException {
         if (mode == NetworkMode.NONE) {
             factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());

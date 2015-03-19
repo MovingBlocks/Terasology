@@ -25,8 +25,6 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.internal.BlockRegistrationListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 /**
  * Interface for the network system
  *
@@ -68,6 +66,4 @@ public interface NetworkSystem extends BlockRegistrationListener {
     int getOutgoingBytesDelta();
 
     void forceDisconnect(Client client);
-
-    ListenableFuture<ServerInfoMessage> requestInfo(String address, int port);
 }
