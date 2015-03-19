@@ -4,6 +4,5 @@
     },
     "Client" : {},
     "Network" : {
-        "replicateMode" : "OWNER"
     }
 }
