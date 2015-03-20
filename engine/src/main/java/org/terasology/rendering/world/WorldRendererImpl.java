@@ -207,6 +207,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         statRenderedTriangles = 0;
     }
 
+    private void refreshConfigObjects() {
+        config = CoreRegistry.get(Config.class);
+        renderingConfig = config.getRendering();
+        renderingDebugConfig = renderingConfig.getDebug();
+    }
+
     private void preRenderUpdate(WorldRenderingStage renderingStage) {
 
         currentRenderingStage = renderingStage;
@@ -219,6 +225,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
+            refreshConfigObjects();
+            renderableWorld.setRenderingConfig(renderingConfig);
+            LwjglRenderingProcess.getInstance().setConfigObjects(renderingConfig, renderingDebugConfig);
+
             tick += secondsSinceLastFrame * 1000;  // Updates the tick variable that animation is based on.
             smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), secondsSinceLastFrame);
 

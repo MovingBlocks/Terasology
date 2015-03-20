@@ -250,7 +250,6 @@ public class RenderableWorldImpl implements RenderableWorld {
     public void generateVBOs() {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
         ChunkMesh pendingMesh;
-        ChunkMesh mesh;
         chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
         for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
 
@@ -407,6 +406,11 @@ public class RenderableWorldImpl implements RenderableWorld {
         return builder.toString();
     }
 
+    public void setRenderingConfig(RenderingConfig newRenderingConfig) {
+        renderingConfig = newRenderingConfig;
+    }
+
+
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
          // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
@@ -464,5 +468,4 @@ public class RenderableWorldImpl implements RenderableWorld {
             }
         }
     }
-
 }

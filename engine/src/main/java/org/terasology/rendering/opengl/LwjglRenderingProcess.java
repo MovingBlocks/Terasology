@@ -1521,4 +1521,9 @@ public class LwjglRenderingProcess {
         fboLookup.put(title + "PingPong", fbo1);
     }
 
+    public void setConfigObjects(RenderingConfig newRenderingConfig, RenderingDebugConfig newRenderingDebugConfig) {
+        this.renderingConfig = newRenderingConfig;
+        this.renderingDebugConfig = newRenderingDebugConfig;
+    }
+
 }
