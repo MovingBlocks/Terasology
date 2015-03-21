@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -44,6 +45,7 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -80,8 +82,15 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private ServerInfoService infoService = new ServerInfoService();
 
+    private ServerListDownloader downloader;
+
+    private List<ServerInfo> servers = new ArrayList<ServerInfo>();
+
     @Override
     public void initialise() {
+
+        downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
+
         UIList<ServerInfo> serverList = find("serverList", UIList.class);
         if (serverList != null) {
             configureScreen(serverList);
@@ -106,6 +115,20 @@ public class JoinGameScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        Queue<ServerInfo> newServers = downloader.getServers();
+
+        // make sure that the list of servers is updated only in the GUI thread
+        ServerInfo next = newServers.poll();
+        while (next != null) {
+            servers.add(next);
+            next = newServers.poll();
+        }
     }
 
     private void join(final String address, final int port) {
@@ -138,10 +161,11 @@ public class JoinGameScreen extends CoreScreenLayer {
     }
 
     private void configureScreen(final UIList<ServerInfo> serverList) {
-        final List<ServerInfo> locals = config.getNetwork().getServers();
-        final ServerListDownloader downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
 
-        serverList.bindList(new CombinedListBinding<ServerInfo>(locals, downloader.getServers()));
+        final List<ServerInfo> locals = config.getNetwork().getServers();
+        servers.addAll(locals);
+
+        serverList.bindList(new DefaultBinding<List<ServerInfo>>(servers));
         serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
             @Override
             public String getString(ServerInfo value) {

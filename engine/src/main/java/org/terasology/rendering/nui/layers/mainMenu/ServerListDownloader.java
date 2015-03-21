@@ -24,16 +24,21 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ServerInfo;
 
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * Downloads a list of servers from a given URL.
+ * @author Martin Steiger
+ */
 class ServerListDownloader {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerListDownloader.class);
@@ -77,7 +82,7 @@ class ServerListDownloader {
         }
     };
 
-    private final List<ServerInfo> servers = Lists.newCopyOnWriteArrayList();
+    private final Queue<ServerInfo> servers = new ConcurrentLinkedQueue<>();
 
     private final Charset cs = StandardCharsets.UTF_8;
     private final String serverAddress;
@@ -97,7 +102,7 @@ class ServerListDownloader {
     /**
      * @return a <b>thread-safe</b> list of servers
      */
-    public List<ServerInfo> getServers() {
+    public Queue<ServerInfo> getServers() {
         return servers;
     }
 
