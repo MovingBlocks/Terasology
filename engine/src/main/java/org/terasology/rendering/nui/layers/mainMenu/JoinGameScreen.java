@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +31,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleRegistry;
-import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
-import org.terasology.naming.Version;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.ServerInfoMessage;
@@ -327,8 +325,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             List<String> codedWorldInfo = new ArrayList<>();
             for (WorldInfo wi : info.get().getWorldInfoList()) {
                 float timeInDays = wi.getTime() / (float) WorldTime.DAY_LENGTH;
-                codedWorldInfo.add("World: " + wi.getTitle());
-                codedWorldInfo.add(String.format("World Time: %.2f days", timeInDays));
+                codedWorldInfo.add(String.format("%s (%.2f days)", wi.getTitle(), timeInDays));
             }
             return Joiner.on('\n').join(codedWorldInfo);
         } catch (InterruptedException e) {
@@ -354,6 +351,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 codedModInfo = codedModInfo.subList(0, maxElements - 1);
                 codedModInfo.add("...");
             }
+            Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
             return Joiner.on('\n').join(codedModInfo);
         } catch (InterruptedException e) {
             return "Timeout";

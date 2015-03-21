@@ -34,21 +34,23 @@ public class InfoRequestHandler extends SimpleChannelUpstreamHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(InfoRequestHandler.class);
 
-    private final SettableFuture<ServerInfoMessage> resultFuture = SettableFuture.create();
+    private volatile ServerInfoMessage serverInfo;
+    private volatile Exception exception;
 
     public InfoRequestHandler() {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        resultFuture.setException(e.getCause());
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+        exception = (Exception) e.getCause();
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
         if (message.hasServerInfo()) {
-            receivedServerInfo(message.getServerInfo());
+            logger.info("Received server info");
+            serverInfo = new ServerInfoMessageImpl(message.getServerInfo());
         } else {
             logger.error("Received unexpected message");
         }
@@ -57,13 +59,11 @@ public class InfoRequestHandler extends SimpleChannelUpstreamHandler {
         ctx.getChannel().close();
     }
 
-    public ListenableFuture<ServerInfoMessage> getServerInfoFuture() {
-        return resultFuture;
-    }
+    public ServerInfoMessage getServerInfo() throws Exception {
+        if (exception != null) {
+            throw exception;
+        }
 
-    private void receivedServerInfo(NetData.ServerInfoMessage message) {
-        logger.info("Received server info");
-
-        resultFuture.set(new ServerInfoMessageImpl(message));
+        return serverInfo;
     }
 }

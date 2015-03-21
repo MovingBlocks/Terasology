@@ -16,18 +16,18 @@
 
 package org.terasology.network;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.terasology.network.internal.InfoRequestHandler;
 import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
-
-import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * Performs temporary connections to one or more game servers.
@@ -35,12 +35,12 @@ import com.google.common.util.concurrent.ListenableFuture;
  */
 public class ServerInfoService implements AutoCloseable {
 
+    private final ClientBootstrap bootstrap;
+    private final NioClientSocketChannelFactory factory;
     private final ExecutorService pool;
-    private ClientBootstrap bootstrap;
-    private NioClientSocketChannelFactory factory;
 
     public ServerInfoService() {
-        pool = Executors.newFixedThreadPool(2);
+        pool = Executors.newCachedThreadPool();
         factory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
         bootstrap = new ClientBootstrap(factory);
         bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
@@ -48,11 +48,19 @@ public class ServerInfoService implements AutoCloseable {
         bootstrap.setOption("keepAlive", true);
     }
 
-    public ListenableFuture<ServerInfoMessage> requestInfo(String address, int port) {
-        ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
-        InfoRequestHandler handler = connectCheck.getChannel().getPipeline().get(InfoRequestHandler.class);
+    public Future<ServerInfoMessage> requestInfo(final String address, final int port) {
+        return pool.submit(new Callable<ServerInfoMessage>() {
 
-        return handler.getServerInfoFuture();
+            @Override
+            public ServerInfoMessage call() throws Exception {
+                InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
+                ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
+                connectCheck.getChannel().getCloseFuture().syncUninterruptibly();
+
+                InfoRequestHandler handler = connectCheck.getChannel().getPipeline().get(InfoRequestHandler.class);
+                return handler.getServerInfo();
+            }
+        });
     }
 
     @Override
