@@ -24,25 +24,20 @@ import org.slf4j.LoggerFactory;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.protobuf.NetData;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
-
 /**
+ * Checks if a {@link org.terasology.protobuf.NetData.ServerInfoMessage} was received
+ * and disconnects.
  * @author Martin Steiger
  */
-public class InfoRequestHandler extends SimpleChannelUpstreamHandler {
+public class ServerInfoRequestHandler extends SimpleChannelUpstreamHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(InfoRequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServerInfoRequestHandler.class);
 
     private volatile ServerInfoMessage serverInfo;
-    private volatile Exception exception;
-
-    public InfoRequestHandler() {
-    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        exception = (Exception) e.getCause();
+        logger.warn("Could not query server info: {}", e.getCause().toString());
     }
 
     @Override
@@ -60,10 +55,6 @@ public class InfoRequestHandler extends SimpleChannelUpstreamHandler {
     }
 
     public ServerInfoMessage getServerInfo() throws Exception {
-        if (exception != null) {
-            throw exception;
-        }
-
         return serverInfo;
     }
 }

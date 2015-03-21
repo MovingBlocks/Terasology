@@ -328,10 +328,8 @@ public class JoinGameScreen extends CoreScreenLayer {
                 codedWorldInfo.add(String.format("%s (%.2f days)", wi.getTitle(), timeInDays));
             }
             return Joiner.on('\n').join(codedWorldInfo);
-        } catch (InterruptedException e) {
-            return "Timeout";
-        } catch (ExecutionException e) {
-            return "Failed: " + e.getLocalizedMessage();
+        } catch (ExecutionException | InterruptedException e) {
+            return FontColor.getColored("Connection Failed!", Color.RED);
         }
     }
 
@@ -353,10 +351,8 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
             Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
             return Joiner.on('\n').join(codedModInfo);
-        } catch (InterruptedException e) {
-            return "Timeout";
-        } catch (ExecutionException e) {
-            return "Failed: " + e.getLocalizedMessage();
+        } catch (ExecutionException | InterruptedException e) {
+            return FontColor.getColored("Connection Failed!", Color.RED);
         }
     }
 
