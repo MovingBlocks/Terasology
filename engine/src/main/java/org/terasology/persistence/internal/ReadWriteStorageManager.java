@@ -33,8 +33,8 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -86,7 +86,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     /**
      * This lock should be hold during read and write operation in the world directory. Currently it is being hold
      * during reads of chunks or players as they are crruently the only data that needs to be loaded during the game.
-     *
+     * <p/>
      * This lock ensures that reading threads can properly finish reading even when for example the ZIP file with the
      * chunks got replaced with a newer version. Chunks that are getting saved get loaded from memory. It can however
      * still be that a thread tries to load another chunk from the same ZIP file that contains the chunk that needs to
@@ -186,11 +186,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     protected EntityData.PlayerStore loadPlayerStoreData(String playerId) {
-        EntityData.PlayerStore  disposedUnsavedPlayer = unloadedAndUnsavedPlayerMap.get(playerId);
+        EntityData.PlayerStore disposedUnsavedPlayer = unloadedAndUnsavedPlayerMap.get(playerId);
         if (disposedUnsavedPlayer != null) {
             return disposedUnsavedPlayer;
         }
-        EntityData.PlayerStore  disposedSavingPlayer = unloadedAndSavingPlayerMap.get(playerId);
+        EntityData.PlayerStore disposedSavingPlayer = unloadedAndSavingPlayerMap.get(playerId);
         if (disposedSavingPlayer != null) {
             return disposedSavingPlayer;
         }
@@ -227,7 +227,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             }
         }
 
-        for (Map.Entry<Vector3i, CompressedChunkBuilder> entry: unloadedAndSavingChunkMap.entrySet()) {
+        for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
             saveTransactionBuilder.addUnloadedChunk(entry.getKey(), entry.getValue());
         }
     }
@@ -267,7 +267,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
 
-
     private void addPlayersToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder,
                                              NetworkSystem networkSystem) {
         unloadedAndSavingPlayerMap.clear();
@@ -290,7 +289,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             saveTransactionBuilder.addLoadedPlayer(client.getId(), createPlayerStore(client, character));
         }
 
-        for (Map.Entry<String, EntityData.PlayerStore> entry: unloadedAndSavingPlayerMap.entrySet()) {
+        for (Map.Entry<String, EntityData.PlayerStore> entry : unloadedAndSavingPlayerMap.entrySet()) {
             saveTransactionBuilder.addUnloadedPlayer(entry.getKey(), entry.getValue());
         }
     }
@@ -319,7 +318,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         unloadedAndUnsavedChunkMap.put(chunk.getPosition(), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
                 entitiesOfChunk, true));
 
-        for (EntityRef entity: entitiesOfChunk) {
+        for (EntityRef entity : entitiesOfChunk) {
             deactivateOrDestroyEntityRecursive(entity);
         }
     }

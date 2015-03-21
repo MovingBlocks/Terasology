@@ -17,6 +17,7 @@ package org.terasology.math;
 
 import org.junit.Test;
 import org.terasology.config.Config;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertEquals;

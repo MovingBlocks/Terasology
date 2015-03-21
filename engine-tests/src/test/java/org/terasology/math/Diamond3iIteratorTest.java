@@ -19,6 +19,7 @@ package org.terasology.math;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 import java.util.Set;

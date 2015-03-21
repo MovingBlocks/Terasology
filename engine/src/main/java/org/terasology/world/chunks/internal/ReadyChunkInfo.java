@@ -17,7 +17,7 @@ package org.terasology.world.chunks.internal;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.map.TShortObjectMap;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.world.chunks.Chunk;
 

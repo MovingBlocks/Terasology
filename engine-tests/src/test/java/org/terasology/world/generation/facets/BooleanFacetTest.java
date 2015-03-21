@@ -20,12 +20,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 
 /**
  * Tests different implementations of {@link BooleanFieldFacet3D}.
+ *
  * @author Martin Steiger
  */
 public abstract class BooleanFacetTest {

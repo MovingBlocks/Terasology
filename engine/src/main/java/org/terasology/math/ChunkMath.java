@@ -17,6 +17,7 @@
 package org.terasology.math;
 
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
@@ -202,6 +203,7 @@ public final class ChunkMath {
     /**
      * Populates a target array with the minimum value adjacent to each location, including the location itself.
      * TODO: this is too specific for a general class like this. Move to a new class AbstractBatchPropagator
+     *
      * @param source
      * @param target
      * @param populateMargins Whether to populate the edges of the target array

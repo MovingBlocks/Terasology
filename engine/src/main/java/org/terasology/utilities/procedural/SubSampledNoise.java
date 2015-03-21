@@ -15,15 +15,14 @@
  */
 package org.terasology.utilities.procedural;
 
+import com.google.common.math.IntMath;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-
-import com.google.common.math.IntMath;
+import org.terasology.math.geom.Vector3i;
 
 /**
  * @author Immortius
@@ -35,8 +34,8 @@ public class SubSampledNoise extends AbstractNoise {
     private int sampleRate = 1;
 
     /**
-     * @param source the source noise generator
-     * @param zoom the zoom factor for x, y (z will be 1)
+     * @param source     the source noise generator
+     * @param zoom       the zoom factor for x, y (z will be 1)
      * @param sampleRate the sampling rate of the noise
      */
     public SubSampledNoise(Noise source, Vector2f zoom, int sampleRate) {

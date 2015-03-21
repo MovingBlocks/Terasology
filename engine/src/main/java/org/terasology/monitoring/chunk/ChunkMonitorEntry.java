@@ -18,7 +18,7 @@ package org.terasology.monitoring.chunk;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
 import java.lang.ref.WeakReference;
