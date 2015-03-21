@@ -50,6 +50,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.ItemSelectEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -183,12 +184,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
         });
 
-        // TODO: this is actually a selection listener
-        serverList.bindSelection(new DefaultBinding<ServerInfo>() {
+        serverList.subscribeSelection(new ItemSelectEventListener<ServerInfo>() {
             @Override
-            public void set(ServerInfo item) {
-                super.set(item);
-
+            public void onItemSelected(UIWidget widget, ServerInfo item) {
                 if (!extInfo.containsKey(item)) {
                     extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
                 }
