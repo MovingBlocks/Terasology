@@ -16,6 +16,7 @@
 package org.terasology.network.internal;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
@@ -36,6 +37,11 @@ public class InfoRequestHandler extends SimpleChannelUpstreamHandler {
     private final SettableFuture<ServerInfoMessage> resultFuture = SettableFuture.create();
 
     public InfoRequestHandler() {
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        resultFuture.setException(e.getCause());
     }
 
     @Override

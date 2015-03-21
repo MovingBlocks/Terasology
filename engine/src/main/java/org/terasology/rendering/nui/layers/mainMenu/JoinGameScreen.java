@@ -185,6 +185,18 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
         });
 
+        // TODO: this is actually a selection listener
+        serverList.bindSelection(new DefaultBinding<ServerInfo>() {
+            @Override
+            public void set(ServerInfo item) {
+                super.set(item);
+
+                if (!extInfo.containsKey(item)) {
+                    extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
+                }
+            }
+        });
+
         final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
 
         UILabel name = find("name", UILabel.class);
@@ -226,13 +238,8 @@ public class JoinGameScreen extends CoreScreenLayer {
             edit.subscribe(new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-//                  AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-//                  popup.setServerInfo(infoBinding.get());
-                  ServerInfo item = serverList.getSelection();
-                  if (!extInfo.containsKey(item)) {
-                      Future<ServerInfoMessage> futureInfo = infoService.requestInfo(item.getAddress(), item.getPort());
-                      extInfo.put(item, futureInfo);
-                  }
+                  AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                  popup.setServerInfo(infoBinding.get());
                 }
             });
         }
@@ -279,23 +286,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
                 if (info != null) {
                     if (info.isDone()) {
-                        int maxElements = 9;
-                        try {
-                            List<String> codedModInfo = new ArrayList<>();
-                            ModuleRegistry reg = moduleManager.getRegistry();
-                            for (NameVersion entry : info.get().getModuleList()) {
-                                boolean isInstalled = reg.getModule(entry.getName(), entry.getVersion()) != null;
-                                Color color = isInstalled ? Color.GREEN : Color.RED;
-                                codedModInfo.add(FontColor.getColored(entry.toString(), color));
-                            }
-                            if (codedModInfo.size() > maxElements) {
-                                codedModInfo = codedModInfo.subList(0, maxElements - 1);
-                                codedModInfo.add("...");
-                            }
-                            return Joiner.on('\n').join(codedModInfo);
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace(); // never!
-                        }
+                        return getModulesText(info);
                     } else {
                         return "requested";
                     }
@@ -311,17 +302,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
                 if (info != null) {
                     if (info.isDone()) {
-                        try {
-                            List<String> codedWorldInfo = new ArrayList<>();
-                            for (WorldInfo wi : info.get().getWorldInfoList()) {
-                                float timeInDays = wi.getTime() / (float) WorldTime.DAY_LENGTH;
-                                codedWorldInfo.add("World: " + wi.getTitle());
-                                codedWorldInfo.add(String.format("World Time: %.2f days", timeInDays));
-                            }
-                            return Joiner.on('\n').join(codedWorldInfo);
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace(); // never!
-                        }
+                        return getWorldText(info);
                     } else {
                         return "requested";
                     }
@@ -338,6 +319,46 @@ public class JoinGameScreen extends CoreScreenLayer {
                     return downloader.getStatus();
                 }
             });
+        }
+    }
+
+    private String getWorldText(Future<ServerInfoMessage> info) {
+        try {
+            List<String> codedWorldInfo = new ArrayList<>();
+            for (WorldInfo wi : info.get().getWorldInfoList()) {
+                float timeInDays = wi.getTime() / (float) WorldTime.DAY_LENGTH;
+                codedWorldInfo.add("World: " + wi.getTitle());
+                codedWorldInfo.add(String.format("World Time: %.2f days", timeInDays));
+            }
+            return Joiner.on('\n').join(codedWorldInfo);
+        } catch (InterruptedException e) {
+            return "Timeout";
+        } catch (ExecutionException e) {
+            return "Failed: " + e.getLocalizedMessage();
+        }
+    }
+
+    private String getModulesText(Future<ServerInfoMessage> info) {
+        int maxElements = 9;
+        try {
+            ServerInfoMessage serverInfoMessage = info.get();
+
+            List<String> codedModInfo = new ArrayList<>();
+            ModuleRegistry reg = moduleManager.getRegistry();
+            for (NameVersion entry : serverInfoMessage.getModuleList()) {
+                boolean isInstalled = reg.getModule(entry.getName(), entry.getVersion()) != null;
+                Color color = isInstalled ? Color.GREEN : Color.RED;
+                codedModInfo.add(FontColor.getColored(entry.toString(), color));
+            }
+            if (codedModInfo.size() > maxElements) {
+                codedModInfo = codedModInfo.subList(0, maxElements - 1);
+                codedModInfo.add("...");
+            }
+            return Joiner.on('\n').join(codedModInfo);
+        } catch (InterruptedException e) {
+            return "Timeout";
+        } catch (ExecutionException e) {
+            return "Failed: " + e.getLocalizedMessage();
         }
     }
 
