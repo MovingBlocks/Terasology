@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
  */
 public class NetworkConfig {
 
-    private List<ServerInfo> servers = Lists.newArrayList();
+    private List<ServerInfo> servers = Lists.newArrayList(new ServerInfo("localhost", "localhost", 25777));
 
     /**
      * Available upstream bandwidth in kilobits per second
