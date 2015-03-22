@@ -120,14 +120,12 @@ public class JoinGameScreen extends CoreScreenLayer {
     public void update(float delta) {
         super.update(delta);
 
-        Queue<ServerInfo> newServers = downloader.getServers();
+        List<ServerInfo> onlineServers = downloader.getServers();
+        List<ServerInfo> localServers = config.getNetwork().getServers();
 
-        // make sure that the list of servers is updated only in the GUI thread
-        ServerInfo next = newServers.poll();
-        while (next != null) {
-            servers.add(next);
-            next = newServers.poll();
-        }
+        servers.clear();
+        servers.addAll(localServers);
+        servers.addAll(onlineServers);
     }
 
     private void join(final String address, final int port) {
@@ -162,7 +160,6 @@ public class JoinGameScreen extends CoreScreenLayer {
     private void configureScreen(final UIList<ServerInfo> serverList) {
 
         final List<ServerInfo> locals = config.getNetwork().getServers();
-        servers.addAll(locals);
 
         serverList.bindList(new DefaultBinding<List<ServerInfo>>(servers));
         serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
@@ -187,7 +184,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         serverList.subscribeSelection(new ItemSelectEventListener<ServerInfo>() {
             @Override
             public void onItemSelected(UIWidget widget, ServerInfo item) {
-                if (!extInfo.containsKey(item)) {
+                if (item != null && !extInfo.containsKey(item)) {
                     extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
                 }
             }

@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ class ServerListDownloader {
         }
     };
 
-    private final Queue<ServerInfo> servers = new ConcurrentLinkedQueue<>();
+    private final List<ServerInfo> servers = new CopyOnWriteArrayList<>();
 
     private final Charset cs = StandardCharsets.UTF_8;
     private final String serverAddress;
@@ -102,7 +103,7 @@ class ServerListDownloader {
     /**
      * @return a <b>thread-safe</b> list of servers
      */
-    public Queue<ServerInfo> getServers() {
+    public List<ServerInfo> getServers() {
         return servers;
     }
 
