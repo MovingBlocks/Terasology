@@ -40,8 +40,10 @@ public class UIList<T> extends CoreWidget {
     private Binding<List<T>> list = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
 
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
-    private List<ItemInteractionListener> itemListeners = Lists.newArrayList();
-    private List<ItemActivateEventListener<T>> eventListeners = Lists.newArrayList();
+
+    private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
+    private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
+    private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
 
 
     public UIList() {
@@ -136,18 +138,29 @@ public class UIList<T> extends CoreWidget {
         return selection.get();
     }
 
-    public void setSelection(T val) {
+    public void setSelection(T item) {
         if (isSelectable()) {
-            selection.set(val);
+            selection.set(item);
+            for (ItemSelectEventListener<T> listener : selectionListeners) {
+                listener.onItemSelected(this, item);
+            }
         }
     }
 
     public void subscribe(ItemActivateEventListener<T> eventListener) {
-        eventListeners.add(eventListener);
+        activateListeners.add(eventListener);
     }
 
     public void unsubscribe(ItemActivateEventListener<T> eventListener) {
-        eventListeners.remove(eventListener);
+        activateListeners.remove(eventListener);
+    }
+
+    public void subscribeSelection(ItemSelectEventListener<T> eventListener) {
+        selectionListeners.add(eventListener);
+    }
+
+    public void unsubscribeSelection(ItemSelectEventListener<T> eventListener) {
+        selectionListeners.remove(eventListener);
     }
 
     public void select(int index) {
@@ -160,7 +173,7 @@ public class UIList<T> extends CoreWidget {
     private void activate(int index) {
         if (index < list.get().size()) {
             T item = list.get().get(index);
-            for (ItemActivateEventListener<T> listener : eventListeners) {
+            for (ItemActivateEventListener<T> listener : activateListeners) {
                 listener.onItemActivated(this, item);
             }
         }

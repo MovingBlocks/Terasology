@@ -51,7 +51,6 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     private static final String AUTHENTICATION_FAILURE = "Authentication failure";
 
     private Config config = CoreRegistry.get(Config.class);
-    private ClientConnectionHandler clientConnectionHandler;
     private JoinStatusImpl joinStatus;
 
     private byte[] serverRandom;
@@ -71,7 +70,6 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelOpen(ctx, e);
-        clientConnectionHandler = ctx.getPipeline().get(ClientConnectionHandler.class);
         joinStatus.setCurrentActivity("Authenticating with server");
     }
 
@@ -105,7 +103,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         // And we're authenticated.
         ctx.getPipeline().remove(this);
-        clientConnectionHandler.channelAuthenticated(ctx);
+        channelAuthenticated(ctx);
     }
 
     private void processNewIdentity(NetData.ProvisionIdentity provisionIdentity, ChannelHandlerContext ctx) {
@@ -153,12 +151,18 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
             // And we're authenticated.
             ctx.getPipeline().remove(this);
-            clientConnectionHandler.channelAuthenticated(ctx);
+            channelAuthenticated(ctx);
         } catch (InvalidProtocolBufferException e) {
             logger.error("Received invalid certificate data: cancelling authentication", e);
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.getChannel().close();
         }
+    }
+
+    private void channelAuthenticated(ChannelHandlerContext ctx) {
+        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+                .setServerInfoRequest(NetData.ServerInfoRequest.newBuilder()).build());
+        joinStatus.setCurrentActivity("Requesting server info");
     }
 
     private void processServerHello(NetData.HandshakeHello helloMessage, ChannelHandlerContext ctx) {
