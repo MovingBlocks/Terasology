@@ -15,47 +15,39 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import com.google.common.collect.Sets;
-import com.google.common.math.IntMath;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
+import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Border3D;
+import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
-import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import com.google.common.math.IntMath;
 
 @Produces(SurfaceHeightFacet.class)
 @Requires(@Facet(SeaLevelFacet.class))
-public class HeightMapSurfaceHeightProvider implements FacetProvider {
+public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(HeightMapSurfaceHeightProvider.class);
 
-    private static float[][] heightmap;
+    private float[][] heightmap;
 
     private int mapWidth;
     private int mapHeight;
 
-    private float heightOffset = 5;
-    private float heightScale = 80;
-
-    private int terrainScale = 4;
+    private HeightMapConfiguration configuration = new HeightMapConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -85,21 +77,23 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
         SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), border);
 
         for (Vector2i pos : facet.getWorldRegion()) {
-            int wrapX = IntMath.mod(pos.getX(), mapWidth * terrainScale);
-            int wrapZ = IntMath.mod(pos.getY(), mapHeight * terrainScale);
+            int xzScale = configuration.terrainScale;
 
-            int mapX = wrapX / terrainScale;
-            int mapZ = wrapZ / terrainScale;
+            int wrapX = IntMath.mod(pos.getX(), mapWidth * xzScale);
+            int wrapZ = IntMath.mod(pos.getY(), mapHeight * xzScale);
+
+            int mapX = wrapX / xzScale;
+            int mapZ = wrapZ / xzScale;
             double p00 = heightmap[mapX][mapZ];
             double p10 = heightmap[(mapX - 1 + 512) % 512][(mapZ) % 512];
             double p11 = heightmap[(mapX - 1 + 512) % 512][(mapZ + 1 + 512) % 512];
             double p01 = heightmap[(mapX) % 512][(mapZ + 1 + 512) % 512];
 
-            float relX = (wrapX % terrainScale) / (float) terrainScale;
-            float relZ = (wrapZ % terrainScale) / (float) terrainScale;
+            float relX = (wrapX % xzScale) / (float) xzScale;
+            float relZ = (wrapZ % xzScale) / (float) xzScale;
 
             float interpolatedHeight = (float) lerp(relX, lerp(relZ, p10, p11), lerp(relZ, p00, p01));
-            float height = heightOffset + heightScale * interpolatedHeight;
+            float height = configuration.heightOffset + configuration.heightScale * interpolatedHeight;
 
             facet.setWorld(pos, height);
         }
@@ -136,5 +130,32 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
 
     private static double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    @Override
+    public String getConfigurationName() {
+        return "Height Map";
+    }
+
+    @Override
+    public Component getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(Component configuration) {
+        this.configuration = (HeightMapConfiguration) configuration;
+    }
+
+    private static class HeightMapConfiguration implements Component {
+
+        @Range(min = 0, max = 50f, increment = 1f, precision = 0, description = "Height Offset")
+        private float heightOffset = 5;
+
+        @Range(min = 10, max = 200f, increment = 10f, precision = 0, description = "Height Scale Factor")
+        private float heightScale = 80;
+
+        @Range(min = 1, max = 32, increment = 1, precision = 0, description = "Terrain Scale Factor")
+        private int terrainScale = 4;
     }
 }
