@@ -23,7 +23,7 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -198,7 +198,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     private static class SelectChunkProvider implements ChunkProvider {
         private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
 
-        public SelectChunkProvider(Chunk ... chunks) {
+        public SelectChunkProvider(Chunk... chunks) {
             for (Chunk chunk : chunks) {
                 this.chunks.put(chunk.getPosition(), chunk);
             }

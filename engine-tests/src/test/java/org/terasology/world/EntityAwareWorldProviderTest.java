@@ -52,7 +52,7 @@ import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;

@@ -37,8 +37,8 @@ import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
@@ -134,7 +134,6 @@ public class StorageManagerTest {
         testBlock2 = new Block();
         testBlock2.setId((short) 2);
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
-
 
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();

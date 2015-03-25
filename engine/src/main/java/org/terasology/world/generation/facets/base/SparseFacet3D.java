@@ -17,13 +17,14 @@
 package org.terasology.world.generation.facets.base;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
 /**
  * A base class for sparse (map-based)
  * implementations of {@link WorldFacet3D}.
+ *
  * @author Martin Steiger
  */
 public abstract class SparseFacet3D implements WorldFacet3D {

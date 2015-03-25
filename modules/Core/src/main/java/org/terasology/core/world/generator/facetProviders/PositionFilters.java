@@ -18,13 +18,14 @@ package org.terasology.core.world.generator.facetProviders;
 
 import com.google.common.base.Predicate;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.utilities.procedural.Noise;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * A collection of filters that restrict the placement of objects
+ *
  * @author Martin Steiger
  */
 public final class PositionFilters {
@@ -35,6 +36,7 @@ public final class PositionFilters {
 
     /**
      * Filters based on the vector's y value
+     *
      * @return a predicate that returns true only if (y > height)
      */
     public static Predicate<Vector3i> minHeight(final int height) {
@@ -43,6 +45,7 @@ public final class PositionFilters {
 
     /**
      * Filters based on the vector's y value
+     *
      * @return a predicate that returns true only if (y < height)
      */
     public static Predicate<Vector3i> maxHeight(final int height) {
@@ -51,6 +54,7 @@ public final class PositionFilters {
 
     /**
      * Filters based on the vector's y value
+     *
      * @return a predicate that returns true only if (y > minHeight) and (y < maxHeight)
      */
     public static Predicate<Vector3i> heightRange(final int minHeight, final int maxHeight) {
@@ -63,8 +67,10 @@ public final class PositionFilters {
             }
         };
     }
+
     /**
      * Filters based on the density
+     *
      * @param density the density facet that contains all tested coords.
      * @return a predicate that returns true if (density >= 0) and (density < 0) for the block at (y - 1)
      */
@@ -83,6 +89,7 @@ public final class PositionFilters {
 
     /**
      * Filters based on surface flatness
+     *
      * @param surfaceFacet the surface height facet that contains all tested coords.
      * @return a predicate that returns true only if there is a level surface in adjacent directions
      */
@@ -92,9 +99,10 @@ public final class PositionFilters {
 
     /**
      * Filters based on surface flatness
+     *
      * @param surfaceFacet the surface height facet that contains all tested coords.
-     * @param divUp surface can be higher up to <code>divUp</code>.
-     * @param divDown surface can be lower up to <code>divDown</code>.
+     * @param divUp        surface can be higher up to <code>divUp</code>.
+     * @param divDown      surface can be lower up to <code>divDown</code>.
      * @return a predicate that returns true only if there is a level surface in adjacent directions
      */
     public static Predicate<Vector3i> flatness(final SurfaceHeightFacet surfaceFacet, final int divUp, final int divDown) {
@@ -110,9 +118,9 @@ public final class PositionFilters {
                 int max = level + divUp;
 
                 return inBounds(blockHeightAt(x - 1, z), min, max)
-                    && inBounds(blockHeightAt(x + 1, z), min, max)
-                    && inBounds(blockHeightAt(x, z - 1), min, max)
-                    && inBounds(blockHeightAt(x, z + 1), min, max);
+                        && inBounds(blockHeightAt(x + 1, z), min, max)
+                        && inBounds(blockHeightAt(x, z - 1), min, max)
+                        && inBounds(blockHeightAt(x, z + 1), min, max);
             }
 
             private boolean inBounds(int height, int min, int max) {
@@ -127,8 +135,9 @@ public final class PositionFilters {
 
     /**
      * Filters based on a random noise
+     *
      * @param noiseGen the noise generator that produces noise in [0..1]
-     * @param density the threshold in [0..1]
+     * @param density  the threshold in [0..1]
      * @return true if the noise value is <b>below</b> the threshold
      */
     public static Predicate<Vector3i> probability(final Noise noiseGen, final float density) {

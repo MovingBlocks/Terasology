@@ -17,8 +17,8 @@
 package org.terasology.physics;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 /**
  * A HitResult holds the result of a ray-trace.
@@ -91,7 +91,7 @@ public class HitResult {
      * Returns the point where the hit took place.
      *
      * @return null if isHit() == false, otherwise the point where the hit took
-     *         place.
+     * place.
      */
     public Vector3f getHitPoint() {
         return hitPoint;
@@ -101,7 +101,7 @@ public class HitResult {
      * Returns the normal of surface on which the hit took place.
      *
      * @return null if isHit() == false, otherwise the normal of surface on
-     *         which the hit took place.
+     * which the hit took place.
      */
     public Vector3f getHitNormal() {
         return hitNormal;
@@ -109,9 +109,9 @@ public class HitResult {
 
     /**
      * @return The block where the hit took place. If the world was hit, it will
-     *         return the location of the block that was hit. Otherwise it returns the
-     *         block location inside which the hit took place. This is different from
-     *         the block position of the entity that got hit!
+     * return the location of the block that was hit. Otherwise it returns the
+     * block location inside which the hit took place. This is different from
+     * the block position of the entity that got hit!
      */
     public Vector3i getBlockPosition() {
         return blockPosition;

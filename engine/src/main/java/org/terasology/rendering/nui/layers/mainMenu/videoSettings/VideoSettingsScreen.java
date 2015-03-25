@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -36,9 +35,8 @@ import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.ViewDistance;
 
-import java.util.Arrays;
-
 import javax.imageio.ImageIO;
+import java.util.Arrays;
 
 /**
  * @author Immortius
@@ -179,7 +177,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fboScaleSlider.setLabelFunction(new Function<Float, String>() {
                 @Override
                 public String apply(Float input) {
-                return String.valueOf(input.intValue()) + "%";
+                    return String.valueOf(input.intValue()) + "%";
                 }
             });
             fboScaleSlider.bindValue(new Binding<Float>() {
