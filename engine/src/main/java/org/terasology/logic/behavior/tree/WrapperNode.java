@@ -16,8 +16,8 @@
 package org.terasology.logic.behavior.tree;
 
 /**
- * Always finishes with <b>SUCCESS</b>.<br/>
- * <br/>
+ * Always finishes with <b>SUCCESS</b>.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class WrapperNode extends DecoratorNode {

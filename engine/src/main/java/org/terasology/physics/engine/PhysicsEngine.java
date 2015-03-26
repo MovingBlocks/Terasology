@@ -138,7 +138,7 @@ public interface PhysicsEngine extends Physics {
     boolean hasCharacterCollider(EntityRef entity);
 
     /**
-     * Warning: Do not remove physics entities while iterating with the returned iterator. <br/>
+     * Warning: Do not remove physics entities while iterating with the returned iterator. <br>
      * You may create a list of entities to remove and remove them afterwards)
      * <p/>
      * This method is more efficient than getPhysicsEntities().

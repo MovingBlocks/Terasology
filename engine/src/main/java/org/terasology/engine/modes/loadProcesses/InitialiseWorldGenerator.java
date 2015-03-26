@@ -22,7 +22,7 @@ import org.terasology.world.generator.WorldGenerator;
 
 /**
  * Initialize the world generator.
- * <br/><br/>
+ * <br><br>
  * This is done after the world entity has been created/loaded so that
  * world generation config. is available at the time of initialization.
  * @author Martin Steiger

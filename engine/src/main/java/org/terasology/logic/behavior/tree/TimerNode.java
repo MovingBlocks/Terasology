@@ -18,11 +18,11 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * Starts the decorated node.<br/>
- * <br/>
- * <b>SUCCESS</b>: as soon as decorated node finishes with <b>SUCCESS</b>.<br/>
- * <b>FAILURE</b>: after x seconds.<br/>
- * <br/>
+ * Starts the decorated node.<br>
+ * <br>
+ * <b>SUCCESS</b>: as soon as decorated node finishes with <b>SUCCESS</b>.<br>
+ * <b>FAILURE</b>: after x seconds.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class TimerNode extends DecoratorNode {

@@ -18,10 +18,10 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.module.sandbox.API;
 
 /**
- * <br/>
- * <b>SUCCESS</b>: as soon as one child node finishes SUCCESS<br/>
- * <b>FAILURE</b>: as soon as one child node finishes <b>FAILURE</b>.<br/>
- * <br/>
+ * <br>
+ * <b>SUCCESS</b>: as soon as one child node finishes SUCCESS<br>
+ * <b>FAILURE</b>: as soon as one child node finishes <b>FAILURE</b>.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

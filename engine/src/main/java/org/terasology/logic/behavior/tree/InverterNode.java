@@ -16,11 +16,11 @@
 package org.terasology.logic.behavior.tree;
 
 /**
- * Inverts the child.<br/>
- * <br/>
- * <b>SUCCESS</b>: when child finishes <b>FAILURE</b>.<br/>
- * <b>FAILURE</b>: when child finishes <b>SUCCESS</b>.<br/>
- * <br/>
+ * Inverts the child.<br>
+ * <br>
+ * <b>SUCCESS</b>: when child finishes <b>FAILURE</b>.<br>
+ * <b>FAILURE</b>: when child finishes <b>SUCCESS</b>.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class InverterNode extends DecoratorNode {
