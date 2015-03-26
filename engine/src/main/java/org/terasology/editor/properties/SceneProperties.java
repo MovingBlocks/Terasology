@@ -24,7 +24,7 @@ import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import java.util.List;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class SceneProperties implements PropertyProvider {
     @Override

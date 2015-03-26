@@ -24,7 +24,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class FilesUtil {
 

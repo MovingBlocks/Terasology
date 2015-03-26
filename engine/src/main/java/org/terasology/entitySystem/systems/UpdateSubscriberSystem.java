@@ -33,7 +33,7 @@ package org.terasology.entitySystem.systems;
  *     </li>
  *   </ul>
  * </p>
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface UpdateSubscriberSystem extends ComponentSystem {
 

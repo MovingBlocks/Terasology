@@ -29,7 +29,7 @@ import org.terasology.module.sandbox.API;
  * When event handler runs, the  predictedInteractionTarget field of the instigator's
  * CharacterComponent will already be updated to the new value.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 @API
 public class InteractionStartPredicted implements Event {

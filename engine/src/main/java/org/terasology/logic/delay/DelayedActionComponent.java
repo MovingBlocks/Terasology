@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * Not for public use. Use DelayManager instead.
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 @ForceBlockActive
 public final class DelayedActionComponent implements Component {

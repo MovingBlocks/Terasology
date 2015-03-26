@@ -30,7 +30,7 @@ import org.terasology.network.Replicate;
 /**
  * Information common to characters (the physical body of players and creatures)
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class CharacterComponent implements Component {
     public Vector3f spawnPosition = new Vector3f();

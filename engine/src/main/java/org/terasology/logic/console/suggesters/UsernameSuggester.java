@@ -29,7 +29,7 @@ import java.util.Set;
  * Suggests user names of all users even if they aren't online.
  *
  * @author Limeth
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class UsernameSuggester implements CommandParameterSuggester<String> {
     @Override

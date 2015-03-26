@@ -65,7 +65,7 @@ import javax.swing.JOptionPane;
  * <br><br>
  * Provides actual shader compilation and manipulation support.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 

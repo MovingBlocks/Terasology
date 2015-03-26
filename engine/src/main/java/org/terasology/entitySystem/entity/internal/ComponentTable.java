@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * A table for storing entities and components. Focused on allowing iteration across a components of a given type
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 class ComponentTable {
     private Map<Class, TLongObjectMap<Component>> store = Maps.newConcurrentMap();

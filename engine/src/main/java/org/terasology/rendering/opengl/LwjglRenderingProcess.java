@@ -142,7 +142,7 @@ import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 /**
  * The Default Rendering Process class.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class LwjglRenderingProcess {
 

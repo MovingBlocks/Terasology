@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Importer for Wavefront obj files. Supports core obj mesh data
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 
 public class ObjMeshLoader implements AssetLoader<MeshData> {

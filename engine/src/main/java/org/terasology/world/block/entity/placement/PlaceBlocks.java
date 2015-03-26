@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 public class PlaceBlocks extends AbstractConsumableEvent {
     private Map<Vector3i, Block> blocks;

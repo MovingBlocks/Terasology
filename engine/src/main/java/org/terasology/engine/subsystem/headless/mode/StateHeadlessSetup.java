@@ -39,10 +39,10 @@ import java.util.List;
 /**
  * The class is game selection menu replacement for the headless server.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Anton Kireev <adeon.k87@gmail.com>
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * @author Florian <florian@fkoeberle.de>
+ * @author Benjamin Glatzel
+ * @author Anton Kireev
+ * @author Marcel Lehwald
+ * @author Florian
  */
 public class StateHeadlessSetup extends StateSetup {
 

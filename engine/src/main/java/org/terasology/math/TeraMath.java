@@ -23,7 +23,7 @@ import org.terasology.world.chunks.ChunkConstants;
 /**
  * Collection of math functions.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public final class TeraMath {
 

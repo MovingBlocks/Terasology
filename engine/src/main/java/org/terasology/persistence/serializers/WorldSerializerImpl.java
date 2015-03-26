@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * Implementation of WorldSerializer for EngineEntityManager.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class WorldSerializerImpl implements WorldSerializer {
 

@@ -75,7 +75,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Immortius
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);

@@ -21,7 +21,7 @@ import org.terasology.TeraOVR;
 /**
  * Helper class for the Oculus Rift.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public final class OculusVrHelper {
 

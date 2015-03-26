@@ -31,7 +31,7 @@ import java.util.Set;
 
 /**
  * @author Immortius
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 final class GlobalStoreBuilder {
 

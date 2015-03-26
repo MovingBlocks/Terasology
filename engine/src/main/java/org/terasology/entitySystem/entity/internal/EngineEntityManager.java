@@ -23,7 +23,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface EngineEntityManager extends LowLevelEntityManager {
 

@@ -20,7 +20,7 @@ import org.terasology.rendering.assets.material.Material;
 /**
  * Shader parameters for the Shadow Map shader program.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ShaderParametersShadowMap extends ShaderParametersBase {
 

@@ -30,7 +30,7 @@ import org.terasology.monitoring.impl.PerformanceMonitorInternal;
  * Performance monitor is intended only for use by the main thread of Terasology, and does not handle
  * activities being started and ended on other threads at this time.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class PerformanceMonitor {
     private static PerformanceMonitorInternal instance;

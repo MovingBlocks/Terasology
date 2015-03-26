@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
  * BenchmarkError encapsulates an error that occurred during a benchmark.
  * It stores the type of the error and the exception object.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public class BenchmarkError {
 

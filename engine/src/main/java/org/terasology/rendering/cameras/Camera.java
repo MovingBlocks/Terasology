@@ -25,13 +25,13 @@ import org.terasology.math.geom.Vector3f;
 /**
  * Provides global access to fonts.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 
 /**
  * Camera base class.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public abstract class Camera {
 

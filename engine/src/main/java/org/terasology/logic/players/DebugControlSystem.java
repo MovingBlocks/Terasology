@@ -44,7 +44,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)

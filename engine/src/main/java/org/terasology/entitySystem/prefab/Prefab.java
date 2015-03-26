@@ -27,7 +27,7 @@ import java.util.List;
  * An entity prefab describes the recipe for creating an entity.
  * Like an entity it groups a collection of components.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public abstract class Prefab extends AbstractAsset<PrefabData> implements ComponentContainer, Asset<PrefabData> {
 

@@ -31,8 +31,8 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 /**
- * @author Immortius <immortius@gmail.com>
- * @author Florian <florian@fkoeberle.de>
+ * @author Immortius
+ * @author Florian
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction extends BaseComponentSystem {

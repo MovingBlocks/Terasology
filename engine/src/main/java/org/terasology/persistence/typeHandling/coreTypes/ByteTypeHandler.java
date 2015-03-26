@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class ByteTypeHandler implements TypeHandler<Byte> {
 

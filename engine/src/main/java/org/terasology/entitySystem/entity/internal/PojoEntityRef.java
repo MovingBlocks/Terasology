@@ -21,7 +21,7 @@ import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.network.NetworkComponent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class PojoEntityRef extends BaseEntityRef {
     private long id;

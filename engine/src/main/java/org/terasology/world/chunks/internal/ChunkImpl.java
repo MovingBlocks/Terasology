@@ -52,9 +52,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
  * which are then used for the actual rendering process.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Manuel Brotz <manu.brotz@gmx.ch>
- * @author Florian <florian@fkoeberle.de>
+ * @author Benjamin Glatzel
+ * @author Manuel Brotz
+ * @author Florian
  */
 public class ChunkImpl implements Chunk {
 

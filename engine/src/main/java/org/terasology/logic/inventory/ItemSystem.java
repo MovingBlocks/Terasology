@@ -25,7 +25,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemSystem extends BaseComponentSystem {

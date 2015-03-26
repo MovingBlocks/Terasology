@@ -47,7 +47,7 @@ import org.terasology.world.block.Block;
 import java.util.List;
 
 /**
- * @author Immortius <immortius@gmail.com>, Limeth
+ * @author Immortius, Limeth
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {

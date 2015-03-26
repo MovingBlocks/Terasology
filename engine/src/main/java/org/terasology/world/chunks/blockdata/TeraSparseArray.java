@@ -20,7 +20,7 @@ package org.terasology.world.chunks.blockdata;
 /**
  * TeraSparseArray is the base class used to implement sparse arrays.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public abstract class TeraSparseArray extends TeraArray {
 

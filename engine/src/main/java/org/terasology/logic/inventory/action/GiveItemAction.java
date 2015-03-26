@@ -26,7 +26,7 @@ import java.util.List;
  * This action adds the item into the inventory of the entity it was sent to. The item is either completely consumed
  * or not modified at all. If it was consumed, the isConsumed() will return <code>true</code>.
  *
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  * @deprecated Use InventoryManager method instead.
  */
 @API

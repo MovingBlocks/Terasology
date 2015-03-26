@@ -23,7 +23,7 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.ForceBlockActive;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @ForceBlockActive
 public final class MeshComponent implements Component {

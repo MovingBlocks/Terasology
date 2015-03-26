@@ -30,7 +30,7 @@ import org.terasology.math.geom.Quat4f;
  * <br><br>
  * Uses the fly weight pattern to cache the 64 combinations of rotation.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class Rotation {
 

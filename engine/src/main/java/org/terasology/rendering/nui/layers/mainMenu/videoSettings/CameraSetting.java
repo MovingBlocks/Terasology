@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 public enum CameraSetting {
     NORMAL("Normal", 1),

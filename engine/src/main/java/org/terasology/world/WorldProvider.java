@@ -24,7 +24,7 @@ import org.terasology.world.liquid.LiquidData;
 /**
  * Provides the basic interface for all world providers.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public interface WorldProvider extends WorldProviderCore {
 

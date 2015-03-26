@@ -22,7 +22,7 @@ package org.terasology.entitySystem;
  *     <li> can be inspected and/or edited by one or more {@link org.terasology.entitySystem.systems.ComponentSystem}s.</li>
  * </ul>
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface Component {
 
