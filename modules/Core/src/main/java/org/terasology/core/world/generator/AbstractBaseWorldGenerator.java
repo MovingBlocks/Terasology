@@ -61,6 +61,11 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     }
 
     @Override
+    public String getWorldSeed() {
+        return worldSeed;
+    }
+
+    @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
         for (final ChunkGenerationPass generator : generationPasses) {

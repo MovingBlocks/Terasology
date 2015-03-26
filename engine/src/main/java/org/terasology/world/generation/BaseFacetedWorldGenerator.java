@@ -48,6 +48,11 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     }
 
     @Override
+    public String getWorldSeed() {
+        return worldSeed;
+    }
+
+    @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
         worldBuilder = createWorld(worldSeed.hashCode());

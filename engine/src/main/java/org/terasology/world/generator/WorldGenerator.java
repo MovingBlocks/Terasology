@@ -26,6 +26,8 @@ import org.terasology.world.generation.World;
 public interface WorldGenerator {
     SimpleUri getUri();
 
+    String getWorldSeed();
+
     void setWorldSeed(String seed);
 
     void createChunk(CoreChunk chunk);
