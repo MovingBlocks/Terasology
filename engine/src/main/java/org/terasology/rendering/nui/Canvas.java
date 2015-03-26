@@ -134,7 +134,7 @@ public interface Canvas {
 
     /**
      * Draws a widget to the given region of the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false.
-     * <p/>
+     * <br><br>
      * This method will update the skin settings for the given element and its current mode.  Min/max and fixed size settings will be applied, along with horizontal
      * and vertical alignment as necessary. If element.isSkinAppliedByCanvas() returns true, any background will be drawn and margin applied to remaining region to
      * determine the region provided to the element for drawing content.
@@ -208,11 +208,11 @@ public interface Canvas {
      * becomes the new offset (0,0), and the value size() is the width/height of the SubRegion. All canvas state is specific
      * to a region, so a new sub-region will have offset/text color and other options returned to default. When a sub-region
      * ends the previous canvas settings are restored.
-     * <p/>
+     * <br><br>
      * SubRegions allow UI elements to be draw in isolation without having to know about their location on the screen.
      * SubRegions can be marked as cropped, in which case any drawing that falls outside of the region
      * will not appear.
-     * <p/>
+     * <br><br>
      * SubRegions are an AutoClosable, so ideally are used as a resource in a try-block, to ensure they are closed
      * when no longer needed.
      * <pre>
@@ -230,7 +230,7 @@ public interface Canvas {
 
     /**
      * Allocates a sub region for drawing to a target texture, until that SubRegion is closed.
-     * <p/>
+     * <br><br>
      * For each (texture) uri a FrameBufferObject and a target texture is created.
      * Notice, the resulting texture is flipped. To draw it in the right order use:
      * <pre>
@@ -240,7 +240,7 @@ public interface Canvas {
      * Texture texture = Assets.get(uri, Texture.class);
      * canvas.drawTextureRaw(texture, screenRegion, ScaleMode.SCALE_FIT, 0, 1f, 1f, -1f);
      * </pre>
-     * <p/>
+     * <br><br>
      *
      * @param uri    The URI to access the texture
      * @param size   the size of the texture.
@@ -427,7 +427,7 @@ public interface Canvas {
 
     /**
      * Draws a material to a given area.
-     * <p/>
+     * <br><br>
      * Other than cropping and positioning the material relative to the current region of the canvas, it is up to the material as to how it behaves.
      * The "alpha" parameter of the material, if any, will be set to the current alpha of the canvas.
      *

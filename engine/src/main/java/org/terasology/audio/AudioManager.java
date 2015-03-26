@@ -59,7 +59,7 @@ public interface AudioManager {
 
     /**
      * Update AudioManager sound sources
-     * <p/>
+     * <br><br>
      * Should be called in main game loop
      */
     void update(float delta);

@@ -44,7 +44,7 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  * The class implements the main game menu.
- * <p/>
+ * <br><br>
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>

@@ -59,7 +59,7 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
- * <p/>
+ * <br><br>
  * The result of this task can be obtained via {@link #getResult()}.
  *
  * @author Florian <florian@fkoeberle.de>

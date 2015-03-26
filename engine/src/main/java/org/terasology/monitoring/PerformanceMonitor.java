@@ -23,10 +23,10 @@ import org.terasology.monitoring.impl.PerformanceMonitorInternal;
 /**
  * Maintains a running average of time taken by different activities. Activities call to denote when they
  * start and stop.
- * <p/>
+ * <br><br>
  * Activities may be nested, and while a nested activity is running the out activities are paused and time passing
  * is not assigned to them.
- * <p/>
+ * <br><br>
  * Performance monitor is intended only for use by the main thread of Terasology, and does not handle
  * activities being started and ended on other threads at this time.
  *

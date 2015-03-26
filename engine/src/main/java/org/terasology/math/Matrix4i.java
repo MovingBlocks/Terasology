@@ -85,7 +85,7 @@ public class Matrix4i {
 
     /**
      * Sets the matrix to the given matrix as an int array.
-     * <p/>
+     * <br><br>
      * The given array must have at least 16 values.
      *
      * @param values The matrix

@@ -49,7 +49,7 @@ import org.terasology.world.block.Block;
  * <li>If an slope is hit, slide up it</li>
  * <li>Finally sweep downwards to undo any stepping, and for falling</li>
  * </ol>
- * <p/>
+ * <br><br>
  * TODO: Refactor to allow additional movement modes.
  * TODO: Detect entry and exit from water while ghosting.
  *
@@ -157,7 +157,7 @@ public class KinematicCharacterMover implements CharacterMover {
     /**
      * Checks whether a character should change movement mode (from being underwater or in a ladder). A higher and lower point of the
      * character is tested for being in water, only if both points are in water does the character count as swimming.
-     * <p/>
+     * <br><br>
      * Sends the OnEnterLiquidEvent and OnLeaveLiquidEvent events.
      *
      * @param movementComp The movement component of the character.

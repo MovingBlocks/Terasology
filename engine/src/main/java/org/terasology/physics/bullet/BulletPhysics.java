@@ -600,7 +600,7 @@ public class BulletPhysics implements PhysicsEngine {
      * The shape is determined based on the shape component of the given entity.
      * If the entity has somehow got multiple shapes, only one is picked. The
      * order of priority is: Sphere, Capsule, Cylinder, arbitrary.
-     * <p/>
+     * <br><br>
      * TODO: Flyweight this (take scale as parameter)
      *
      * @param entity the entity to get the shape of.

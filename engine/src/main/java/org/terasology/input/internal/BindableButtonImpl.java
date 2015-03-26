@@ -36,7 +36,7 @@ import java.util.Set;
 /**
  * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the
  * mouse wheel).
- * <p/>
+ * <br><br>
  * When the BindableButton changes state it sends out events like an actual key or button does. It also allows direct
  * subscription via the {@link org.terasology.input.BindButtonSubscriber} interface.
  */

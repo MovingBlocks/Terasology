@@ -31,7 +31,7 @@ public interface EngineEntityManager extends LowLevelEntityManager {
 
     /**
      * Creates an entity but doesn't send any lifecycle events.
-     * <p/>
+     * <br><br>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
      *
      * @param components
@@ -41,7 +41,7 @@ public interface EngineEntityManager extends LowLevelEntityManager {
 
     /**
      * Creates an entity but doesn't send any lifecycle events.
-     * <p/>
+     * <br><br>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
      *
      * @param prefab
@@ -53,7 +53,7 @@ public interface EngineEntityManager extends LowLevelEntityManager {
 
     /**
      * Destroys an entity without sending lifecycle events.
-     * <p/>
+     * <br><br>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
      *
      * @param entity

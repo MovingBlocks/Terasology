@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.Color;
  * Resolves references to engine:color.RRGGBBAA texture assets,
  * where RR is the red hex value in lowercase,
  * and GG, BB, and AA are green, blue, and alpha, respectively.
- * <p/>
+ * <br><br>
  * The color is parsed from the name of the asset, then TextureDataFactory is used to create
  * a TextureData object which is used to build the Texture.
  *

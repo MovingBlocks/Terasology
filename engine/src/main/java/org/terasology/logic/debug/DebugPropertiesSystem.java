@@ -30,11 +30,11 @@ import java.security.PrivilegedAction;
 
 /**
  * @author synopia
- *         <p/>
+ *         <br><br>
  *         Debug property editor. Usage:
- *         <p/>
+ *         <br><br>
  *         CoreRegistry.get(DebugPropertiesSystem.class).addProperty("Model 1", model);
- *         <p/>
+ *         <br><br>
  *         Ingame press F1 to see the property editor. Only annotated fields will show up.
  */
 @API

@@ -62,7 +62,7 @@ import javax.swing.JOptionPane;
 
 /**
  * GLSL Shader Program Instance class.
- * <p/>
+ * <br><br>
  * Provides actual shader compilation and manipulation support.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

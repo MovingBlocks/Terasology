@@ -63,7 +63,7 @@ public class SaveTransactionHelper {
     /**
      * Merges all outstanding changes into the save game. If this operation gets interrupted it can be started again
      * without any file corruption when the file system supports atomic moves.
-     * <p/>
+     * <br><br>
      * The write lock for the save directory should be acquired before this method gets called.
      */
     public void mergeChanges() throws IOException {

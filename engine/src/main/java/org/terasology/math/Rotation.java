@@ -27,7 +27,7 @@ import org.terasology.math.geom.Quat4f;
 
 /**
  * Rotation provides easy access to 90 degree increments of rotations - intended for block-related rotations.
- * <p/>
+ * <br><br>
  * Uses the fly weight pattern to cache the 64 combinations of rotation.
  *
  * @author Immortius <immortius@gmail.com>

@@ -86,7 +86,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     /**
      * This lock should be hold during read and write operation in the world directory. Currently it is being hold
      * during reads of chunks or players as they are crruently the only data that needs to be loaded during the game.
-     * <p/>
+     * <br><br>
      * This lock ensures that reading threads can properly finish reading even when for example the ZIP file with the
      * chunks got replaced with a newer version. Chunks that are getting saved get loaded from memory. It can however
      * still be that a thread tries to load another chunk from the same ZIP file that contains the chunk that needs to

@@ -43,7 +43,7 @@ import java.util.Map;
 
 /**
  * Converts between the EntityData types and JSON.
- * <p/>
+ * <br><br>
  * This means that serialization between JSON and Entities/Prefabs is a two step process, with EntityData as an
  * intermediate step - it was done this way because it is much simpler to write gson handlers for the small number of
  * EntityData types than to dynamically build handlers for every component type (and have gson properly handle missing

@@ -40,7 +40,7 @@ public interface Physics {
     /**
      * Scans the given area for physics objects of the given groups and returns
      * a list of the entities of the physics objects in the given area.
-     * <p/>
+     * <br><br>
      * If an Entity has multiple physics objects with the right collision group
      * in this area, this entity will be found multiple times in the returned
      * list.
@@ -57,7 +57,7 @@ public interface Physics {
     /**
      * Scans the given area for physics objects of the given groups and returns
      * a list of the entities of the physics objects in the given area.
-     * <p/>
+     * <br><br>
      * If an Entity has multiple physics objects with the right collision group
      * in this area, this entity will be found multiple times in the returned
      * list.

@@ -29,7 +29,7 @@ public final class OrdinalIndicator {
 
     /**
      * Returns the ordinal indicator of an integer.
-     * <p/>
+     * <br><br>
      * Most readable when called with class name:
      * OrdinalIndicator.of(22) -> "nd"
      *
@@ -63,7 +63,7 @@ public final class OrdinalIndicator {
 
     /**
      * Returns the integer combined with it's ordinal indicator as String.
-     * <p/>
+     * <br><br>
      * Most readable when called with class name:
      * OrdinalIndicator.addedTo(22) -> "22nd"
      *

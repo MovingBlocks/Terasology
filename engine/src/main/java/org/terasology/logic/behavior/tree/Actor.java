@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * The actor is a decorated entity, which can act on a behavior tree using an Interpreter.
- * <p/>
+ * <br><br>
  * Besides the actual entity, a blackboard is stored for each actor. Every node may read or write to this blackboard,
  * to communicate their states or exchange variables with other nodes.
  *

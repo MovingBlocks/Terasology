@@ -27,7 +27,7 @@ import java.util.Set;
 
 /**
  * The physics engine provides access to physics functionality like ray tracing.
- * <p/>
+ * <br><br>
  * TODO: Move physics methods that should only be used by the engine/physics implementing system into another interface that inherits this.
  *
  * @author Xanhou
@@ -140,7 +140,7 @@ public interface PhysicsEngine extends Physics {
     /**
      * Warning: Do not remove physics entities while iterating with the returned iterator. <br>
      * You may create a list of entities to remove and remove them afterwards)
-     * <p/>
+     * <br><br>
      * This method is more efficient than getPhysicsEntities().
      *
      * @return An iterator that iterates over all entities that have a rigidBody
@@ -152,10 +152,10 @@ public interface PhysicsEngine extends Physics {
      * Removes the CharacterCollider associated with the given entity from the
      * physics engine. The collider object of this entity will no longer be
      * valid.
-     * <p/>
+     * <br><br>
      * If no CharacterCollider was attached to the entity, a warning is logged
      * and this method return false.
-     * <p/>
+     * <br><br>
      * Make sure not to make another call to getCharacterCollider() if you are
      * destroying the entity, as this will create a new CharacterCollider for
      * the entity.
@@ -171,10 +171,10 @@ public interface PhysicsEngine extends Physics {
      * engine. The RigidBody object returned by the newRigidBody(EntityRef) or
      * getRigidBody(EntityRef) method will no longer be valid for this entity un
      * till newRigidBody is called again, so be careful!
-     * <p/>
+     * <br><br>
      * If no rigid body was attached to the entity, a warning is logged and this
      * method return false.
-     * <p/>
+     * <br><br>
      * Make sure not to make another call to getRigidBody() if you are
      * destroying the entity, as this will create a new RigidBody for
      * the entity.
@@ -188,10 +188,10 @@ public interface PhysicsEngine extends Physics {
     /**
      * Removes the trigger associated with the given entity from the physics
      * engine.
-     * <p/>
+     * <br><br>
      * If no trigger was attached to the entity, a warning is logged and this
      * method return false.
-     * <p/>
+     * <br><br>
      * Make sure not to make another call to updateTrigger() if you are
      * destroying the entity, as this will create a new trigger for
      * the entity.
@@ -216,7 +216,7 @@ public interface PhysicsEngine extends Physics {
      * entity. If the given entity had no rigidBody in the physics engine, it
      * will be created. Updating an entity without RigidBody is seen as bad
      * practise and hence a warning is logged.
-     * <p/>
+     * <br><br>
      * This method also updates the position of the rigid body in line with
      * the location of the entity. If this method is not called, then the
      * position of the rigid body would be overwritten by the next physics
@@ -233,7 +233,7 @@ public interface PhysicsEngine extends Physics {
      * a TriggerComponent, LocationComponent and ShapeComponent to have a
      * trigger. When updating an existing trigger the location and scale are
      * updated.
-     * <p/>
+     * <br><br>
      * An entity with a trigger attached to it will generate collision pairs
      * when it collides or intersects with other objects. A good example of its
      * usage is picking up items. By creating a trigger for a player, a

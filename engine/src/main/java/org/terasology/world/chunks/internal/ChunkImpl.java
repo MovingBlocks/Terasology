@@ -48,7 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
  * determined by its dimensions. They are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
- * <p/>
+ * <br><br>
  * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
  * which are then used for the actual rendering process.
  *

@@ -34,13 +34,13 @@ import java.nio.ByteOrder;
 
 /**
  * Decompresses an Ogg file.
- * <p/>
+ * <br><br>
  * How to use:<br>
  * 1. Create OggInputStream passing in the input stream of the packed ogg file<br>
  * 2. Fetch format and sampling rate using getFormat() and getRate(). Use it to
  * initialize the sound player.<br>
  * 3. Read the PCM data using one of the read functions, and feed it to your player.
- * <p/>
+ * <br><br>
  * OggInputStream provides a read(ByteBuffer, int, int) that can be used to read
  * data directly into a native buffer.
  */
@@ -222,7 +222,7 @@ public class OggReader extends FilterInputStream {
 
     /**
      * Returns 0 after EOF is reached, otherwise always return 1.
-     * <p/>
+     * <br><br>
      * Programs should not count on this method to return the actual number of
      * bytes that could be read without blocking.
      *

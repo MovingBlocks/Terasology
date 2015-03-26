@@ -37,7 +37,7 @@ import java.util.Set;
 
 /**
  * A library of copy strategies.
- * <p/>
+ * <br><br>
  * This library is should be initialised by registering strategies for a number of core types.  Then as strategies are requested for unknown types,
  * new strategies are generated for those types.
  * The library knows how to generate strategies for Lists, Sets, Maps and types marked with the MappedContainer annotation.

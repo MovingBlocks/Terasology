@@ -129,7 +129,7 @@ class ComponentTable {
 
     /**
      * Produces an iterator for iterating over all entities
-     * <p/>
+     * <br><br>
      * This is not designed to be performant, and in general usage entities should not be iterated over.
      *
      * @return An iterator over all entity ids.

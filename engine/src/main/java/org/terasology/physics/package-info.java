@@ -17,12 +17,12 @@
 /**
  * This package provides physics support for Terasology -
  * ray tracing, character movement, collision detection and rigid bodies.
- * <p/>
+ * <br><br>
  * The core of the physics support is the PhysicsEngine class. This
  * interface should be available from the CoreRegistry, using
  * CoreRegistry.get(PhysicsEngine.class). From there most of the physics
  * behaviour can be accessed.
- * <p/>
+ * <br><br>
  * Besides the PhysicsEngine and the interfaces and classes returned by it or
  * required by it, there are three other groups of classes.
  * <ul>

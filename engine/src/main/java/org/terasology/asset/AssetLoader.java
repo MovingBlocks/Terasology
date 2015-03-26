@@ -35,7 +35,7 @@ public interface AssetLoader<T extends AssetData> {
      * Loads an asset. The module containing the asset is provided, along with an stream, and the urls relating to the
      * asset. In simple cases there is just one url, but in some cases an asset is composed of multiple files so the
      * urls for each file is provided. In these cases the stream is for the first url.
-     * <p/>
+     * <br><br>
      * The provided stream is cleaned up by the caller, and doesn't have to be closed by this method.
      *
      * @param module The module providing the asset

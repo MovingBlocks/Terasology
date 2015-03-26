@@ -21,7 +21,7 @@ import org.terasology.entitySystem.event.Event;
 /**
  * When a component is about to leave the active state, either due to being removed, the entity it is attached to being destroyed,
  * or the entity being stored, this event is sent.
- * <p/>
+ * <br><br>
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  *

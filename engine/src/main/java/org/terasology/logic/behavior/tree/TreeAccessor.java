@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * Interface to access a tree structure.
- * <p/>
+ * <br><br>
  * Using a ChainedTreeAccessor the modification made to a tree is reflected to all trees in the chain.
  *
  * @author synopia
