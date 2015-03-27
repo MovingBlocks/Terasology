@@ -27,6 +27,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
+import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.events.KeyDownEvent;
@@ -38,6 +39,7 @@ import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.nui.layers.ingame.inventory.TransferItemCursor;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
@@ -91,6 +93,19 @@ public class MenuControlSystem extends BaseComponentSystem {
         if (entity.getComponent(ClientComponent.class).local) {
             nuiManager.pushScreen("engine:deathScreen");
         }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onShowOnlinePlayers(OnlinePlayersButton event, EntityRef entity) {
+        boolean show = event.isDown();
+        String onlinePlayersOverlay = "engine:onlinePlayersOverlay";
+
+        if (show) {
+            nuiManager.addOverlay(onlinePlayersOverlay, OnlinePlayersOverlay.class);
+        } else {
+            nuiManager.removeOverlay(onlinePlayersOverlay);
+        }
+        event.consume();
     }
 
 }

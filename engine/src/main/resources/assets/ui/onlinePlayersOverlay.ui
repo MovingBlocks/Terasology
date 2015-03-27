@@ -1,0 +1,38 @@
+{
+    "type" : "OnlinePlayersOverlay",
+    "skin" : "onlinePlayersOverlay",
+    "contents" : {
+        "type" : "relativeLayout",
+            "contents" : [
+                {
+                    "type" : "UIBox",
+                    "layoutInfo" : {
+                        "width" : 200,
+                        "use-content-height" : true,
+                        "position-horizontal-center" : {},
+                        "position-vertical-center" : {}
+                    },
+                    "content" : {
+                        "type" : "ColumnLayout",
+                        "columns" : 1,
+                        "verticalSpacing" : 8,
+                        "contents" : [
+                            {
+                                "type" : "UILabel",
+                                "text" : "Online Players",
+                                "id" : "title",
+                                "family" : "title"
+                            },
+                            {
+                                "type": "UIText",
+                                "readOnly": true,
+                                "multiline": true,
+                                "id": "playerList",
+                                "family": "history"
+                            }
+                        ]
+                    }
+                }
+            ]
+    }
+}

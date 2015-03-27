@@ -1,0 +1,15 @@
+{
+    "inherit" : "default",
+    "elements" : {
+        "UIScreenLayer" : {
+            "background" : ""
+        },
+        "UIText" : {
+            "background": "",
+            "text-align-horizontal": "center"
+        },
+        "UILabel" : {
+            "font" : "title"
+        }
+    }
+}

@@ -17,13 +17,11 @@
 package org.terasology.logic.chat;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
-import org.terasology.network.ColorComponent;
+import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.OwnerEvent;
-import org.terasology.rendering.FontColor;
 
 /**
  * A chat message
@@ -49,14 +47,8 @@ public class ChatMessageEvent implements MessageEvent {
 
     @Override
     public Message getFormattedMessage() {
-        DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
-        ColorComponent colorInfo = from.getComponent(ColorComponent.class);
-        String playerName = (displayInfo != null) ? displayInfo.name : "Unknown";
-        
-        if (colorInfo != null) {
-            playerName = FontColor.getColored(playerName, colorInfo.color);
-        }
-        
+        String playerName = PlayerUtil.getColoredPlayerName(from);
+
         return new Message(String.format("%s: %s", playerName, message), CoreMessageType.CHAT);
     }
 
