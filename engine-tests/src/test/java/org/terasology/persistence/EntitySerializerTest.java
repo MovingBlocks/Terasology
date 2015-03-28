@@ -51,7 +51,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class EntitySerializerTest {
 

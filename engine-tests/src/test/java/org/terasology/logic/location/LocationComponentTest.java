@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class LocationComponentTest extends TerasologyTestingEnvironment {
 

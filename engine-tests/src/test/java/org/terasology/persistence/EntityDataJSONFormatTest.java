@@ -36,7 +36,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class EntityDataJSONFormatTest {
 

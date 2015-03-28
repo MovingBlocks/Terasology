@@ -19,7 +19,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class GetterSetterComponent implements Component {
     public transient boolean getterUsed;

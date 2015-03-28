@@ -37,7 +37,7 @@ public final class PositionFilters {
     /**
      * Filters based on the vector's y value
      *
-     * @return a predicate that returns true only if (y > height)
+     * @return a predicate that returns true only if (y &gt; height)
      */
     public static Predicate<Vector3i> minHeight(final int height) {
         return heightRange(height, Integer.MAX_VALUE);
@@ -46,7 +46,7 @@ public final class PositionFilters {
     /**
      * Filters based on the vector's y value
      *
-     * @return a predicate that returns true only if (y < height)
+     * @return a predicate that returns true only if (y &lt; height)
      */
     public static Predicate<Vector3i> maxHeight(final int height) {
         return heightRange(Integer.MIN_VALUE, height);
@@ -55,7 +55,7 @@ public final class PositionFilters {
     /**
      * Filters based on the vector's y value
      *
-     * @return a predicate that returns true only if (y > minHeight) and (y < maxHeight)
+     * @return a predicate that returns true only if (y &gt; minHeight) and (y &lt; maxHeight)
      */
     public static Predicate<Vector3i> heightRange(final int minHeight, final int maxHeight) {
         return new Predicate<Vector3i>() {
@@ -72,7 +72,7 @@ public final class PositionFilters {
      * Filters based on the density
      *
      * @param density the density facet that contains all tested coords.
-     * @return a predicate that returns true if (density >= 0) and (density < 0) for the block at (y - 1)
+     * @return a predicate that returns true if (density &ge; 0) and (density &lt; 0) for the block at (y - 1)
      */
     public static Predicate<Vector3i> density(final DensityFacet density) {
         return new Predicate<Vector3i>() {
