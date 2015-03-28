@@ -22,7 +22,7 @@ import java.util.Objects;
 
 /**
  * A URI to identify a field of a component in terasology.
- * These URIs are always in the form: <module-name>:<object-name>.<fieldName>. They are case-insensitive (using
+ * These URIs are always in the form: {@literal <module-name>:<object-name>.<fieldName>}. They are case-insensitive (using
  * English casing), and have a "normalized" form that is lower case.
  *
  * @author Florian

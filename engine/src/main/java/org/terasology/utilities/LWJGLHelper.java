@@ -46,7 +46,7 @@ public final class LWJGLHelper {
             logger.warn("Could not load optional TeraOVR native libraries - Oculus support disabled");
         }
     }
-    
+
     private static void initLibraryPaths() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:

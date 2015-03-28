@@ -31,7 +31,7 @@ public final class OrdinalIndicator {
      * Returns the ordinal indicator of an integer.
      * <br><br>
      * Most readable when called with class name:
-     * OrdinalIndicator.of(22) -> "nd"
+     * OrdinalIndicator.of(22) returns "nd"
      *
      * @param number the integer
      * @return The ordinal indicator ("st", "nd", "rd" or "th").
@@ -65,7 +65,7 @@ public final class OrdinalIndicator {
      * Returns the integer combined with it's ordinal indicator as String.
      * <br><br>
      * Most readable when called with class name:
-     * OrdinalIndicator.addedTo(22) -> "22nd"
+     * OrdinalIndicator.addedTo(22) returns "22nd"
      *
      * @param x the integer
      * @return The integer with it's ordinal indicator attached.

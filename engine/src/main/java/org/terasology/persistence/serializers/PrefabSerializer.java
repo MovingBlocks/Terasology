@@ -121,7 +121,7 @@ public class PrefabSerializer {
      * Deserializes a prefab
      *
      * @param prefabData
-     * @param
+     * @param deltas
      * @return The deserialized prefab
      */
     public PrefabData deserialize(EntityData.Prefab prefabData, List<EntityData.Prefab> deltas) {

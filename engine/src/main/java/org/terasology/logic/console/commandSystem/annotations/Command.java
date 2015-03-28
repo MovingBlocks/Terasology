@@ -39,16 +39,15 @@ import java.lang.annotation.Target;
  * {@code arrayDelimiter} to {@code Command.ARRAY_DELIMITER_VARARGS}.
  * <br><br>
  * An example varargs command:
- * <pre>{@code
- * @literal@CommandDefinition(value = "tell", shortDescription = "Sends a private message to a user")
+ * <pre>
+ * {@literal @}Command(value = "tell", shortDescription = "Sends a private message to a user")
  * public String tellCommand(
- *      @literal@Sender EntityRef sender,
- *      @literal@CommandParameter("user") String user,
- *      @literal@CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray
- * ) {
- *     return "You -> " + user + ": " + Joiner.on(' ').join(messageArray);
+ *        {@literal @}Sender EntityRef sender,
+ *        {@literal @}CommandParam("user") String user,
+ *        {@literal @}CommandParam(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray) {
+ *     return "You: " + user + ": " + Joiner.on(' ').join(messageArray);
  * }
- * }</pre>
+ * </pre>
  *
  * @author Immortius, Limeth
  */

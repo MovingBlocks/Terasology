@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * A data structure that allows to add, remove and find nearest nodes in an N-dimensional space.
  * This can be used to locate entities (or block entities) nearest to player of a specific type, provided that system
- * using it keeps track of all loaded & active entities of this specific type.
+ * using it keeps track of all loaded &amp; active entities of this specific type.
  * <br><br>
  * For three dimensions this is an octree and for two dimensions this is quadtree implementations.
  * <br><br>

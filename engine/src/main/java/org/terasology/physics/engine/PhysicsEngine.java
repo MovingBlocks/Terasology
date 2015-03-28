@@ -101,7 +101,7 @@ public interface PhysicsEngine extends Physics {
     /**
      * Returns the rigid body associated with the given entity. If no such
      * RigidBody exists, a new one is created and returned.
-     * </p>
+     * <br><br>
      * Note that you should not wait with calling this method until using the
      * rigid body. As soon as the rigid body should exist in the physics engine,
      * this method should be called to create the rigid body.

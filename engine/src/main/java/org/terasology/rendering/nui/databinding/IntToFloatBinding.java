@@ -28,15 +28,15 @@ public final class IntToFloatBinding implements Binding<Float> {
 
     private final Binding<Integer> intBinding;
     private final RoundingMode roundingMode;
-    
+
     /**
      * Uses {@link RoundingMode#HALF_UP}.
-     * @param ip
+     * @param intBinding the original binding that is wrapped
      */
     public IntToFloatBinding(Binding<Integer> intBinding) {
         this(intBinding, RoundingMode.HALF_UP);
     }
-    
+
     public IntToFloatBinding(Binding<Integer> intBinding, RoundingMode rm) {
         this.intBinding = intBinding;
         this.roundingMode = rm;

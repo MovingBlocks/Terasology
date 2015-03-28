@@ -21,8 +21,9 @@ import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 
 /**
- * A URI to identify standard objects in Terasology - components, events, etc. These URIs are always in the form: <module-name>:<object-name>. They are case-insensitive (using
- * English casing), and have a "normalized" form that is lower case.
+ * A URI to identify standard objects in Terasology - components, events, etc.
+ * These URIs are always in the form: {@literal <module-name>:<object-name>}.
+ * They are case-insensitive (using English casing), and have a "normalized" form that is lower case.
  *
  * @author synopia
  */

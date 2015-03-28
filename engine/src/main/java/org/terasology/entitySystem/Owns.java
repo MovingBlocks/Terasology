@@ -22,8 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * When used in a Component on a EntityRef, List&lt;EntityRef> or Set&lt;EntityRef> field, denotes that the Entity
- * will assume ownership of the entity or entities contained in that field.
+ * When used in a Component on a EntityRef, {@literal List<EntityRef>} or {@literal Set<EntityRef> field},
+ * denotes that the Entity will assume ownership of the entity or entities contained in that field.
  * <br><br>
  * This means:
  * <ul>
