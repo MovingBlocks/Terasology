@@ -1470,7 +1470,7 @@ public class LwjglRenderingProcess {
 
         takeScreenshot = false;
         overwriteRtWidth = 0;
-        overwriteRtWidth = 0;
+        overwriteRtHeight = 0;
 
         createOrUpdateFullscreenFbos();
     }
@@ -1574,5 +1574,5 @@ public class LwjglRenderingProcess {
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
     }
-
 }
+
