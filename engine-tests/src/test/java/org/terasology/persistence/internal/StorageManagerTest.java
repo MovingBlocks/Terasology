@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Matchers;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -113,7 +114,7 @@ public class StorageManagerTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         CoreRegistry.put(ModuleManager.class, moduleManager);
         CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        CoreRegistry.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
         CoreRegistry.put(NetworkSystem.class, networkSystem);
 
         entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem,

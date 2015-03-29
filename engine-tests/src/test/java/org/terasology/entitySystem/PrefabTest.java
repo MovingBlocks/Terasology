@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -63,7 +64,7 @@ public class PrefabTest {
     public void setup() throws Exception {
         ModuleManager moduleManager = ModuleManagerFactory.create();
 
-        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
+        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         CoreRegistry.put(ModuleManager.class, moduleManager);
         CoreRegistry.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);

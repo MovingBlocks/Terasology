@@ -19,10 +19,12 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
@@ -290,7 +292,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
 
         SplashScreen.getInstance().post("Loading assets ...");
-        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
         assetManager.setEnvironment(moduleManager.getEnvironment());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());

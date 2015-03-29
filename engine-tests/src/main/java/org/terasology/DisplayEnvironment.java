@@ -21,6 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
@@ -94,7 +95,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
 
     @Override
     protected void setupAssetManager() {
-        AssetManager assetManager = new AssetManager(CoreRegistry.get(ModuleManager.class).getEnvironment());
+        AssetManager assetManager = new AssetManagerImpl(CoreRegistry.get(ModuleManager.class).getEnvironment());
         CoreRegistry.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);
 
