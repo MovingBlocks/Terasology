@@ -16,13 +16,11 @@
 package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -358,7 +356,7 @@ public final class InventoryUtils {
         EntityRef itemTo = getItemAt(to, slotTo);
 
         if (!itemTo.exists()) {
-            EntityRef fromCopy = CoreRegistry.get(EntityManager.class).copy(itemFrom);
+            EntityRef fromCopy = itemFrom.copy();
 
             ItemComponent copyItem = fromCopy.getComponent(ItemComponent.class);
             copyItem.stackCount = (byte) amount;
