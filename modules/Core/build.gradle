@@ -79,10 +79,6 @@ configurations.all {
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-
-    // For reading logback.groovy when running unit tests. Excessive just for a config file?
-    testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
-
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
     if (project.name != project(':').name) {
         println "\nProcessing module '$project.name' in a multi-project workspace"
@@ -150,7 +146,6 @@ dependencies {
         println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
 
         // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
-        // Tricky scenario: Building a module with a transitive dependency on engine-tests - that seems to be ignored
         // TODO: Look for a provided engine jar in the workspace and use that if present
         // TODO: Only use engine, engine-tests, and maybe core for compilation, but remove when publishing?
         compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
@@ -165,7 +160,6 @@ dependencies {
         }
 
         // TODO: parse and apply external lib dependencies if any are present
-
         // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any trouble (is only for logging)
         // This step resolves artifacts (both compile & testCompile) and prints out some interesting versions
         configurations.testCompile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->

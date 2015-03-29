@@ -23,7 +23,7 @@ buildscript {
 }
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance. It is primarily for local use.
-// In Jenkins the Artifactory plugin is supposed to supply these values, which works for publishing, not for resolving.
+// In Jenkins the Artifactory plugin can supply overrides for the following values
 artifactory {
     contextUrl = 'http://artifactory.terasology.org/artifactory'
 
@@ -55,6 +55,7 @@ artifactory {
 
     // This is the source where we get dependencies. Or it would be but it does not appear to work
     // Only the main repositories {} seems to matter, and if commented out this still doesn't help
+    // After a Jenkins upgrade in March 2015 the setting in Jenkins started working. Needs retesting here
     resolve {
         repository {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing

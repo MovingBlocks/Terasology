@@ -4,8 +4,17 @@
 // Find the true name of the project - probably available within Jenkins but this way can test easier outside
 def settingsGradleFile = new File('settings.gradle')
 def gradlePropertiesFile = new File('gradle.properties')
+
+// Check on the project name. This defaults to the parent directory name, which can be wrong in some cases
+def moduleName = settingsGradleFile.getAbsoluteFile().parentFile.name
+if (moduleName.equals("workspace")) {
+    // At one point Jenkins put a "workspace" dir inside the job dir, with the job dir == the module name. Fix that
+    moduleName = settingsGradleFile.getAbsoluteFile().parentFile.parentFile.name
+    println "Found parent dir to be 'workspace' - assuming Jenkins and going up one additional level: " + moduleName
+}
+
 // The "Nano" only relates to test jobs prefixed as such - otherwise it is ignored. Well, unless somebody makes a Nano* module
-def moduleName = settingsGradleFile.getAbsoluteFile().parentFile.parentFile.name - "Nano"
+moduleName = moduleName - "Nano"
 println "Preparing settings.gradle for module '$moduleName'"
 
 // Make sure no existing files exists, no sneaking in stealthy Gradle stuff (would have to be in Git, Jenkins cleans thoroughly)
