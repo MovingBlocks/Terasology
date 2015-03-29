@@ -19,11 +19,13 @@ package org.terasology.world;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -110,7 +112,7 @@ public class EntityAwareWorldProviderTest {
     @Before
     public void setup() {
         GameThread.setToCurrentThread();
-        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
             @Override

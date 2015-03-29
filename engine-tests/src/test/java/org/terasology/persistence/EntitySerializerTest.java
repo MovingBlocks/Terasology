@@ -16,11 +16,13 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -64,7 +66,7 @@ public class EntitySerializerTest {
     @BeforeClass
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
-        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
+        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {

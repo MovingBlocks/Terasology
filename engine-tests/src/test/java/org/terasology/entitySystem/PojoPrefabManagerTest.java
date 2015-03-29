@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -67,7 +68,7 @@ public class PojoPrefabManagerTest {
         entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
-        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
+        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {

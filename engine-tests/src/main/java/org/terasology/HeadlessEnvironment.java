@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.AudioManager;
@@ -136,7 +137,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupEmptyAssetManager() {
-        AssetManager assetManager = new AssetManager(CoreRegistry.get(ModuleManager.class).getEnvironment());
+        AssetManager assetManager = new AssetManagerImpl(CoreRegistry.get(ModuleManager.class).getEnvironment());
 
         // mock an empy asset factory for all asset types
         for (AssetType type : AssetType.values()) {
