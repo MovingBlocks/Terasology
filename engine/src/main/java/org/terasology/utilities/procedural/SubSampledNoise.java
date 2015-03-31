@@ -74,11 +74,11 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] getSubset(float[] fullData, Rect2i fullRegion, Rect2i subRegion) {
-        if (subRegion.size().x != fullRegion.size().x || subRegion.size().y != fullRegion.size().y) {
-            float[] result = new float[subRegion.size().x * subRegion.size().y];
+        if (subRegion.sizeX() != fullRegion.sizeX() || subRegion.sizeY() != fullRegion.sizeY()) {
+            float[] result = new float[subRegion.sizeX() * subRegion.sizeY()];
             Vector2i offset = new Vector2i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY());
-            for (int y = 0; y < subRegion.size().y; ++y) {
-                System.arraycopy(fullData, offset.getX() + fullRegion.size().x * (y + offset.getY()), result, subRegion.size().x * y, subRegion.size().x);
+            for (int y = 0; y < subRegion.sizeY(); ++y) {
+                System.arraycopy(fullData, offset.getX() + fullRegion.sizeX() * (y + offset.getY()), result, subRegion.sizeX() * y, subRegion.sizeX());
             }
             return result;
         } else {
@@ -87,9 +87,9 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] mapExpand(float[] keyData, Rect2i fullRegion) {
-        float[] fullData = new float[fullRegion.size().x * fullRegion.size().y];
-        int samplesX = fullRegion.size().x / sampleRate + 1;
-        int samplesY = fullRegion.size().y / sampleRate + 1;
+        float[] fullData = new float[fullRegion.sizeX() * fullRegion.sizeY()];
+        int samplesX = fullRegion.sizeX() / sampleRate + 1;
+        int samplesY = fullRegion.sizeY() / sampleRate + 1;
         for (int y = 0; y < samplesY - 1; y++) {
             for (int x = 0; x < samplesX - 1; x++) {
                 float q11 = keyData[x + y * samplesX];
@@ -98,7 +98,7 @@ public class SubSampledNoise extends AbstractNoise {
                 float q22 = keyData[(x + 1) + (y + 1) * samplesX];
                 for (int innerY = 0; innerY < sampleRate; ++innerY) {
                     for (int innerX = 0; innerX < sampleRate; ++innerX) {
-                        fullData[x * sampleRate + innerX + fullRegion.size().x * (y * sampleRate + innerY)] =
+                        fullData[x * sampleRate + innerX + fullRegion.sizeX() * (y * sampleRate + innerY)] =
                                 TeraMath.biLerp(q11, q21, q12, q22, (float) innerX / sampleRate, (float) innerY / sampleRate);
                     }
                 }
@@ -108,8 +108,8 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] getKeyValues(Rect2i fullRegion) {
-        int xDim = fullRegion.size().x / sampleRate + 1;
-        int yDim = fullRegion.size().y / sampleRate + 1;
+        int xDim = fullRegion.sizeX() / sampleRate + 1;
+        int yDim = fullRegion.sizeY() / sampleRate + 1;
         float[] fullData = new float[xDim * yDim];
         for (int y = 0; y < yDim; y++) {
             for (int x = 0; x < xDim; x++) {
@@ -118,6 +118,7 @@ public class SubSampledNoise extends AbstractNoise {
                 fullData[x + y * xDim] = source.noise(zoom.x * actualX, zoom.y * actualY);
             }
         }
+
         return fullData;
     }
 
@@ -151,7 +152,6 @@ public class SubSampledNoise extends AbstractNoise {
         float q101 = source.noise(x1 * zoom.x, y0 * zoom.y, z1 * zoom.z);
         float q011 = source.noise(x0 * zoom.x, y1 * zoom.y, z1 * zoom.z);
         float q111 = source.noise(x1 * zoom.x, y1 * zoom.y, z1 * zoom.z);
-
         return TeraMath.triLerp(q000, q100, q010, q110, q001, q101, q011, q111, xMod / sampleRate, yMod / sampleRate, zMod / sampleRate);
     }
 
@@ -163,13 +163,13 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] getSubset(float[] fullData, Region3i fullRegion, Region3i subRegion) {
-        if (subRegion.size().x != fullRegion.size().x || subRegion.size().y != fullRegion.size().y || subRegion.size().z != fullRegion.size().z) {
-            float[] result = new float[subRegion.size().x * subRegion.size().y * subRegion.size().z];
+        if (subRegion.sizeX() != fullRegion.sizeX() || subRegion.sizeY() != fullRegion.sizeY() || subRegion.sizeZ() != fullRegion.sizeZ()) {
+            float[] result = new float[subRegion.sizeX() * subRegion.sizeY() * subRegion.sizeZ()];
             Vector3i offset = new Vector3i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY(), subRegion.minZ() - fullRegion.minZ());
-            for (int z = 0; z < subRegion.size().z; ++z) {
-                for (int y = 0; y < subRegion.size().y; ++y) {
+            for (int z = 0; z < subRegion.sizeZ(); ++z) {
+                for (int y = 0; y < subRegion.sizeY(); ++y) {
                     System.arraycopy(fullData, offset.x + fullRegion.sizeX() * (y + offset.y + fullRegion.sizeY() * (z + offset.z)),
-                            result, subRegion.sizeX() * (y + subRegion.sizeY() * z), subRegion.size().x);
+                            result, subRegion.sizeX() * (y + subRegion.sizeY() * z), subRegion.sizeX());
                 }
             }
             return result;
@@ -179,10 +179,10 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] mapExpand(float[] keyData, Region3i fullRegion) {
-        float[] fullData = new float[fullRegion.size().x * fullRegion.size().y * fullRegion.size().z];
-        int samplesX = fullRegion.size().x / sampleRate + 1;
-        int samplesY = fullRegion.size().y / sampleRate + 1;
-        int samplesZ = fullRegion.size().z / sampleRate + 1;
+        float[] fullData = new float[fullRegion.sizeX() * fullRegion.sizeY() * fullRegion.sizeZ()];
+        int samplesX = fullRegion.sizeX() / sampleRate + 1;
+        int samplesY = fullRegion.sizeY() / sampleRate + 1;
+        int samplesZ = fullRegion.sizeZ() / sampleRate + 1;
         for (int z = 0; z < samplesZ - 1; z++) {
             for (int y = 0; y < samplesY - 1; y++) {
                 for (int x = 0; x < samplesX - 1; x++) {
@@ -210,9 +210,9 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] getKeyValues(Region3i fullRegion) {
-        int xDim = fullRegion.size().x / sampleRate + 1;
-        int yDim = fullRegion.size().y / sampleRate + 1;
-        int zDim = fullRegion.size().z / sampleRate + 1;
+        int xDim = fullRegion.sizeX() / sampleRate + 1;
+        int yDim = fullRegion.sizeY() / sampleRate + 1;
+        int zDim = fullRegion.sizeZ() / sampleRate + 1;
         float[] fullData = new float[xDim * yDim * zDim];
         for (int z = 0; z < zDim; z++) {
             for (int y = 0; y < yDim; y++) {
