@@ -26,12 +26,12 @@ import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * <b>Properties</b>: <b>sound</b>, <b>volume</b><br/>
- * <br/>
- * <b>RUNNING</b>: while sound is playing<br/>
- * <b>SUCCESS</b>: once sound ends playing<br/>
- * <b>FAILURE</b>: otherwise<br/>
- * <br/>
+ * <b>Properties</b>: <b>sound</b>, <b>volume</b><br>
+ * <br>
+ * <b>RUNNING</b>: while sound is playing<br>
+ * <b>SUCCESS</b>: once sound ends playing<br>
+ * <b>FAILURE</b>: otherwise<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class PlaySoundNode extends Node {

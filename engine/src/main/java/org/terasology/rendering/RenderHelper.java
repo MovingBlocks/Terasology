@@ -22,7 +22,7 @@ import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.shader.ShaderParametersChunk;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public final class RenderHelper {
 

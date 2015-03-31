@@ -21,8 +21,8 @@ import ec.util.MersenneTwisterFast;
 
 /**
  * Random number generator based on the Mersenne Primer Twister implementation of Sean Luke.
- * The MersenneTwister code is based on standard MT19937 C/C++ code by Takuji Nishimura.<br/><br/>
- * Reference: Makato Matsumoto and Takuji Nishimura: <br/>
+ * The MersenneTwister code is based on standard MT19937 C/C++ code by Takuji Nishimura.<br><br>
+ * Reference: Makato Matsumoto and Takuji Nishimura: <br>
  * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator"
  *
  * @author Martin Steiger

@@ -46,8 +46,8 @@ import java.util.Map;
 /**
  * Stores all information for a specific block type.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @author Benjamin Glatzel
+ * @author Rasmus 'Cervator' Praestholm
  */
 // TODO: Make this immutable, add a block builder class?
 public final class Block {

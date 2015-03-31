@@ -35,7 +35,7 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.CoreRegistry;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class LocalPlayer {
 
@@ -144,8 +144,8 @@ public class LocalPlayer {
      * Can be used by modules to trigger the activation of a player owned entity like an item.
      *
      * The method has been made for the usage on the client. It triggers a {@link ActivationPredicted} event
-     * on the client and a {@link ActivationRequest} event on the server which will lead to a {@link ActivateEvent}
-     * on the server.
+     * on the client and a {@link ActivationRequest} event on the server which will lead
+     * to a {@link org.terasology.logic.common.ActivateEvent} on the server.
      *
      * @param usedOwnedEntity an entity owned by the player like an item.
      *

@@ -20,11 +20,11 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * This event occurs whenever a component is changed and saved.
- * <p/>
+ * <br><br>
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class OnChangedComponent implements Event {
 

@@ -38,7 +38,7 @@ import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
 import java.util.Set;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

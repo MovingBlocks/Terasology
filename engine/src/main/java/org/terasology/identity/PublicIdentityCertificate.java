@@ -89,7 +89,7 @@ public class PublicIdentityCertificate {
 
     /**
      * Encrypts data such that it can only be decrypted by the paired private certificate, which is held by the certificate owner.
-     * <p/>
+     * <br><br>
      * Note that only a limited amount of data can be encrypted in this fashion - for large exchanges this should be used
      * to establish shared symmetric key which can then be used for the main exchange.
      *

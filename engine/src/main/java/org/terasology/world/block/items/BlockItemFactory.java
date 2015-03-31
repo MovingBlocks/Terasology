@@ -27,7 +27,7 @@ import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class BlockItemFactory {
     private EntityManager entityManager;

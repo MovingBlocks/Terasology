@@ -35,7 +35,7 @@ import java.util.Map;
  * the point of the last auto save. By doing so the auto save can access a snapshot of all entities on
  * off the main thread.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 class EntitySetDeltaRecorder {
     private final ComponentLibrary componentLibrary;

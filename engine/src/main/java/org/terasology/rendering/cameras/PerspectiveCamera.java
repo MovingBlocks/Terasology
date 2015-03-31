@@ -32,7 +32,7 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 /**
  * Simple default camera.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class PerspectiveCamera extends Camera {
     // Values used for smoothing

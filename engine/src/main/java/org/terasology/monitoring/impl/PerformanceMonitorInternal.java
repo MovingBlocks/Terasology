@@ -21,7 +21,7 @@ import org.terasology.monitoring.Activity;
 /**
  * Base interface for performance monitor implementations.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface PerformanceMonitorInternal {
     void rollCycle();

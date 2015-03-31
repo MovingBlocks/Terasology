@@ -16,7 +16,7 @@
 
 /**
  * This package provides a system for loading and managing Assets - these are resources used by Terasology that are loaded from modules.
- * <p/>
+ * <br><br>
  * The asset system features support for:
  * <ul>
  *      <li>Multiple file formats for an asset (with an AssetLoader per format)</li>

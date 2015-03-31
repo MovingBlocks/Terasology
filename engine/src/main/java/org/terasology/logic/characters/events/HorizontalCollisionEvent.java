@@ -18,8 +18,8 @@ package org.terasology.logic.characters.events;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
- * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * @author Immortius
+ * @author Esa-Petri Tirkkonen
  */
 public class HorizontalCollisionEvent extends CollisionEvent {
 

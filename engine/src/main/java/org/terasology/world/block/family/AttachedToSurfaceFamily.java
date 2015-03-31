@@ -26,7 +26,7 @@ import org.terasology.world.block.BlockUri;
 import java.util.Map;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);

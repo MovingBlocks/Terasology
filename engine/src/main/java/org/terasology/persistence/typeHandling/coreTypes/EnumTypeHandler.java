@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
 

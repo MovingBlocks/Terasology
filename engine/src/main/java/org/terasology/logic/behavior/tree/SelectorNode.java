@@ -20,12 +20,12 @@ import org.terasology.module.sandbox.API;
 import java.util.Iterator;
 
 /**
- * Evaluates the children one by one.<br/>
- * Starts next child, if previous child finishes with <b>FAILURE</b>.<br/>
- * <br/>
- * <b>SUCCESS</b>: as soon as a child finishes <b>SUCCESS</b>.<br/>
- * <b>FAILURE</b>: when all children finished with <b>FAILURE</b>.<br/>
- * <br/>
+ * Evaluates the children one by one.<br>
+ * Starts next child, if previous child finishes with <b>FAILURE</b>.<br>
+ * <br>
+ * <b>SUCCESS</b>: as soon as a child finishes <b>SUCCESS</b>.<br>
+ * <b>FAILURE</b>: when all children finished with <b>FAILURE</b>.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

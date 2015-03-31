@@ -53,7 +53,7 @@ import java.util.Set;
 
 /**
  * @author Immortius
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class GLSLMaterial extends BaseMaterial {
 

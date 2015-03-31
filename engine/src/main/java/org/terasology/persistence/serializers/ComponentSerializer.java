@@ -43,10 +43,10 @@ import java.util.Map;
 /**
  * ComponentSerializer provides the ability to serialize and deserialize between Components and the protobuf
  * EntityData.Component
- * <p/>
+ * <br><br>
  * If provided with a idTable, then the components will be serialized and deserialized using those ids rather
  * than the names of each component, saving some space.
- * <p/>
+ * <br><br>
  * When serializing, a FieldSerializeCheck can be provided to determine whether each field should be serialized or not
  *
  * @author Immortius

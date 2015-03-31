@@ -52,7 +52,7 @@ public class Voronoi {
 
     /**
      * @param at
-     * @param numPoints Should be <= 5. The number of points to return
+     * @param numPoints Should be &le; 5. The number of points to return
      * @return
      */
     public VoronoiResult[] getClosestPoints(Vector2f at, int numPoints) {

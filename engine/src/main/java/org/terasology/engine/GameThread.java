@@ -49,7 +49,7 @@ public final class GameThread {
 
     /**
      * Runs a process on the game thread, not waiting for it to run.
-     * <p/>
+     * <br><br>
      * If the current thread is the game thread, then the process runs immediately
      *
      * @param process
@@ -64,7 +64,7 @@ public final class GameThread {
 
     /**
      * Runs a process on the game thread, waiting for it to run (the current thread is blocked).
-     * <p/>
+     * <br><br>
      * If the current thread is the game thread, then the process runs immediately
      *
      * @param process

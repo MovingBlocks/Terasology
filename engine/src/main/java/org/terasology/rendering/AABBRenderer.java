@@ -83,7 +83,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
 
     /**
      * Renders this AABB.
-     * <p/>
+     * <br><br>
      *
      * @param lineThickness The thickness of the line
      */

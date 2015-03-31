@@ -147,7 +147,7 @@ public class MeshBuilder {
 
     /**
      * Add vertices, texture coordinate and indices for a box specified by offset and size.
-     * <p/>
+     * <br><br>
      * Use the texture mapper to change how texture coordinates (u and v) are applied to each vertex.
      */
     public MeshBuilder addBox(Vector3f offset, Vector3f size, float u, float v) {

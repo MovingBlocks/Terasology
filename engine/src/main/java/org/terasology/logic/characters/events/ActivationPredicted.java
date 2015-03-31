@@ -21,8 +21,8 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Florian <florian@fkoeberle.de>
- * @author Immortius <immortius@gmail.com>
+ * @author Florian
+ * @author Immortius
  */
 public class ActivationPredicted implements Event {
 

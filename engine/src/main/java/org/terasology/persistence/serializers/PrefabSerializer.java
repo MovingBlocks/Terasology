@@ -36,10 +36,10 @@ import java.util.Map;
 
 /**
  * Provides the ability to serialize and deserialize prefabs to the EntityData.Prefab proto buffer format.
- * <p/>
+ * <br><br>
  * As with the component serializer, a component id mapping can be provided to have components serialized against
  * ids rather than name strings.
- * <p/>
+ * <br><br>
  * It is also possible to set whether entity ids will be handled or ignored - if ignored then deserialized entities will
  * be given new ids.
  *
@@ -121,7 +121,7 @@ public class PrefabSerializer {
      * Deserializes a prefab
      *
      * @param prefabData
-     * @param
+     * @param deltas
      * @return The deserialized prefab
      */
     public PrefabData deserialize(EntityData.Prefab prefabData, List<EntityData.Prefab> deltas) {

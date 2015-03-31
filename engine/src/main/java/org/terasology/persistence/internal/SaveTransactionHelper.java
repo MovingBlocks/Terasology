@@ -30,7 +30,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * Helper class for methods around {@link SaveTransaction}s that are also needed outside of the save transaction.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class SaveTransactionHelper {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransactionHelper.class);
@@ -63,7 +63,7 @@ public class SaveTransactionHelper {
     /**
      * Merges all outstanding changes into the save game. If this operation gets interrupted it can be started again
      * without any file corruption when the file system supports atomic moves.
-     * <p/>
+     * <br><br>
      * The write lock for the save directory should be acquired before this method gets called.
      */
     public void mergeChanges() throws IOException {

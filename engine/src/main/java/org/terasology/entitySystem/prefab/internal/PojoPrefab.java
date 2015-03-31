@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class PojoPrefab extends Prefab {
 

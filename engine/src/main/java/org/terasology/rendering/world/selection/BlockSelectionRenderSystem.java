@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * System to render registered BlockSelections.
- * <p/>
+ * <br><br>
  * This system is not currently thread-safe.
  *
  * @author synopia mkienenb@gmail.com

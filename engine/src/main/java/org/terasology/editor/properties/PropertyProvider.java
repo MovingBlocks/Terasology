@@ -18,7 +18,7 @@ package org.terasology.editor.properties;
 import java.util.List;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public interface PropertyProvider<T> {
     /**

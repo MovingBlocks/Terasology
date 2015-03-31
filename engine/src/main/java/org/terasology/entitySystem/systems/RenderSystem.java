@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.systems;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface RenderSystem extends ComponentSystem {
 

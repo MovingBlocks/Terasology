@@ -21,9 +21,9 @@ import org.terasology.math.geom.Vector3f;
 
 /**
  * A rigid body is a physics object whose movement and location is controlled by the physics engine. Rigid bodies move under gravity and bounce off each other and the world.
- * <p/>
+ * <br><br>
  * After being removed from the physics engine this object is no longer valid and should not be used anymore.
- * <p/>
+ * <br><br>
  * TODO: add the methods to apply forces
  *
  * @author Xanhou

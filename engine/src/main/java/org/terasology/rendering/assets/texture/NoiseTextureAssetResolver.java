@@ -27,7 +27,7 @@ import org.terasology.naming.Name;
 
 /**
  * Resolves references to <code>engine:noise</code> texture assets,
- * <br/><br/>
+ * <br><br>
  * The noise parameters are parsed from the name of the asset, then TextureDataFactory is used to create
  * a TextureData object which is used to build the Texture.
  *

@@ -36,7 +36,7 @@ public final class TextureUtil {
     /**
      * Returns a AssetUri which represents a Texture of that color.
      *
-     * @param color, including alpha, of the texture to represent.
+     * @param color including alpha, of the texture to represent.
      * @return an asset Uri for the texture
      */
     public static AssetUri getTextureUriForColor(Color color) {
@@ -49,9 +49,12 @@ public final class TextureUtil {
     }
 
     /**
-     * Returns a AssetUri which represents a Texture of that color.
+     * Returns a AssetUri which represents a Texture that contains white noise
      *
-     * @param color, including alpha, of the texture to represent.
+     * @param size the size of the texture (both width and height)
+     * @param seed the seed value for the noise generator
+     * @param min the minimum noise value (can be lower than 0 and will be clamped then)
+     * @param max the minimum noise value (can be larger than 255 and will be clamped then)
      * @return an asset Uri for the texture
      */
     public static AssetUri getTextureUriForWhiteNoise(int size, long seed, int min, int max) {
@@ -63,13 +66,12 @@ public final class TextureUtil {
     }
 
     /**
-     * Method to convert the color string hex representation back to a color.
+     * Method to append the color string hex representation back to a string buffer.
      * Package-only access as it is for internal use in ColorTextureAssetResolver,
      * but should be here for maintenance with the color-to-color-string code.
      *
      * @param sb    StringBuilder into which to append name
      * @param color represented by hexColorName
-     * @return hexColorName RRGGBBAA in lower-case hex notation
      */
     private static void appendColorName(StringBuilder sb, Color color) {
         int red = color.r();

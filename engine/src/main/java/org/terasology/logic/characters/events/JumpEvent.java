@@ -18,7 +18,7 @@ package org.terasology.logic.characters.events;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class JumpEvent implements Event {
 }

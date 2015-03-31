@@ -47,8 +47,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * @author Immortius <immortius@gmail.com>
- * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @author Immortius
+ * @author Rasmus 'Cervator' Praestholm
  */
 public class PojoPrefabManagerTest {
 

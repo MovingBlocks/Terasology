@@ -27,7 +27,7 @@ public interface WorldConfigurator  {
 
     /**
      * The values are supposed to be annotated with {@link org.terasology.rendering.nui.properties.Property}
-     * @return a map (label->object)
+     * @return a map (label to object)
      */
     Map<String, Component> getProperties();
 }

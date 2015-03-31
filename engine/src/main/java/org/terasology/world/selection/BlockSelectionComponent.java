@@ -23,15 +23,15 @@ import org.terasology.rendering.assets.texture.Texture;
 
 /**
  * @author mkienenb
- *         <p/>
+ *         <br><br>
  *         Use this component to track and draw a region of selected blocks.
  * @author synopia
- *         <p/>
+ *         <br><br>
  *         One example use is with the LocalPlayerBlockSelectionByItemSystem.
  *         Add this component to any item entity, to make the item to a selection item. When using such items, a temporary
  *         selection is placed in the world. First use sets the starting point, second use finishes the selection and
  *         a ApplyBlockSelectionEvent is fired to the player using the selection item.
- *         <p/>
+ *         <br><br>
  */
 @API
 public class BlockSelectionComponent implements Component {

@@ -66,7 +66,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?

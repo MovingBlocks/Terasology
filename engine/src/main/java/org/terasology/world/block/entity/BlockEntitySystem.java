@@ -56,7 +56,7 @@ import org.terasology.world.block.regions.BlockRegionComponent;
 /**
  * Event handler for events affecting block entities
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @RegisterSystem
 public class BlockEntitySystem extends BaseComponentSystem {

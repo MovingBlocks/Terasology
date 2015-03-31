@@ -21,7 +21,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 
 /**
  * This event is sent to allow damage to be modified or cancelled, before it is processed.
- * <p/>
+ * <br><br>
  * Damage modifications are accumulated as additions/subtractions (modifiers) and multipliers.
  *
  * @author Immortius

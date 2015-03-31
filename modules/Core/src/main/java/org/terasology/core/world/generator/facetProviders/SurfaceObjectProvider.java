@@ -121,8 +121,6 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
 
     /**
      * Clears all registered population densities
-     *
-     * @see SurfaceObjectProvider#register(B, T, float)
      */
     protected void clearProbabilities() {
         probsTable.clear();
@@ -131,7 +129,7 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
     /**
      * @param x    the x coordinate
      * @param z    the z coordinate
-     * @param objs a map (objType -> probability)
+     * @param objs a map (objType to probability)
      * @return a random pick from the map or <code>null</code>
      */
     protected T getType(int x, int z, Map<T, Float> objs) {

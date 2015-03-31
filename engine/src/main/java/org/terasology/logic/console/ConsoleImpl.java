@@ -47,7 +47,7 @@ import java.util.Set;
 /**
  * The console handles commands and messages.
  *
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @author Marcel Lehwald
  */
 public class ConsoleImpl implements Console {
     private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";

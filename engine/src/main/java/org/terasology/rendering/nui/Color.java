@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Color is a representation of a RGBA color. Color components can be set and accessed via floats ranging from 0-1, or ints ranging from 0-255.
  * Color is immutable and thread safe.
- * <p/>
+ * <br><br>
  * There are a plethora of Color classes, but none that are quite suitable IMO:
  * <ul>
  * <li>vecmaths - doesn't access with r/g/b/a, separation by representation is awkward, feature bland.</li>

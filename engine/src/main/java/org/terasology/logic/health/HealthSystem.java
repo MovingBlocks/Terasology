@@ -40,7 +40,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HealthSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

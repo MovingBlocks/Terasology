@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  * The size of a border, supporting independent widths on each side.
- * <p/>
+ * <br><br>
  * Immutable
  *
  * @author Immortius

@@ -22,7 +22,7 @@ import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
 /**
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 @ServerEvent(lagCompensate = true)
 public class ActivationRequest extends NetworkEvent {

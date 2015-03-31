@@ -55,8 +55,8 @@ import java.util.Collections;
 /**
  * Play mode.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Anton Kireev <adeon.k87@gmail.com>
+ * @author Benjamin Glatzel
+ * @author Anton Kireev
  * @version 0.1
  */
 public class StateIngame implements GameState {

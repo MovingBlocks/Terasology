@@ -254,7 +254,7 @@ public class BlockManagerImpl extends BlockManager {
 
     /**
      * Retrieve all {@code BlockUri}s that match the given string.
-     * <p/>
+     * <br><br>
      * In order to resolve the {@code BlockUri}s, every package is searched for the given uri pattern.
      *
      * @param uri the uri pattern to match

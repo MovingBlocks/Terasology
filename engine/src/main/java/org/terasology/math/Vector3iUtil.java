@@ -20,7 +20,7 @@ import org.terasology.math.geom.Vector3i;
 /**
  * Vector3i - integer vector class in the style of VecMath.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class Vector3iUtil {
     private Vector3iUtil() {

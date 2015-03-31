@@ -24,7 +24,7 @@ import org.terasology.entitySystem.Component;
  * If the supporting block is removed or changed to one that does not support attachment, the block
  * (attachment) will be destroyed. The check for which side this block entity is attached to is done via BlockMeshPart.
  *
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 public class AttachSupportRequiredComponent implements Component {
 }

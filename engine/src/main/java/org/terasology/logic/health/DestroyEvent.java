@@ -22,7 +22,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 /**
  * Sent to request the destruction of an entity.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class DestroyEvent implements Event {
     private EntityRef instigator;

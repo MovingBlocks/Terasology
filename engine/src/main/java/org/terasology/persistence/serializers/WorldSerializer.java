@@ -20,7 +20,7 @@ import org.terasology.protobuf.EntityData;
 /**
  * Serializes an entity system, with all prefabs and entities.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface WorldSerializer {
 

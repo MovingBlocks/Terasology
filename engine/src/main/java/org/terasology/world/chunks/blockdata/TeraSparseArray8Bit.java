@@ -27,7 +27,7 @@ import java.util.Arrays;
  * Its elements are in the range -128 through +127 and it stores one element per byte.
  * It can reduce memory consumption through sparse memory allocation.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 

@@ -37,8 +37,8 @@ import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 
 /**
  *
- * @author Immortius <immortius@gmail.com>
- * @author Florian <florian@fkoeberle.de>
+ * @author Immortius
+ * @author Florian
  *
  */
 @RegisterSystem(RegisterMode.ALWAYS)

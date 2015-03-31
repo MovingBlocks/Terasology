@@ -56,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Provides support for loading and applying shaders.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ShaderManagerLwjgl implements ShaderManager {
 

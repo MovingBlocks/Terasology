@@ -49,7 +49,7 @@ public interface PlayerStore {
 
     /**
      * Sets the location which should be loaded for the player when they rejoin the game.
-     * <p/>
+     * <br><br>
      * This is set automatically to the character's location if a character is stored.
      *
      * @param location

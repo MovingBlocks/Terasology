@@ -36,7 +36,7 @@ public class Environment {
 
     /**
      * Default setup order
-     * @param modules
+     * @param moduleNames a list of module names
      */
     public Environment(Name ... moduleNames) {
 

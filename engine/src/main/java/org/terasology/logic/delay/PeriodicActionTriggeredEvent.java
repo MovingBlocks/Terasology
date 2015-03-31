@@ -18,7 +18,7 @@ package org.terasology.logic.delay;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 public class PeriodicActionTriggeredEvent implements Event {
     private String actionId;

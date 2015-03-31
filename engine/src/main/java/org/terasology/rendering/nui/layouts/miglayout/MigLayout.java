@@ -43,9 +43,9 @@ import java.util.Map;
 
 /**
  * MigLayout Binding
- * <p/>
+ * <br><br>
  * see: http://www.miglayout.com/
- * <p/>
+ * <br><br>
  * Created by synopia on 06.01.14.
  */
 public class MigLayout extends CoreLayout<MigLayout.CCHint> implements ContainerWrapper {

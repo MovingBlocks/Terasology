@@ -38,9 +38,9 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
 /**
  * The class provides the basics for the setup stage for the game, where the game parameters are defined
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Anton Kireev <adeon.k87@gmail.com>
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @author Benjamin Glatzel
+ * @author Anton Kireev
+ * @author Marcel Lehwald
  * @version 0.3
  */
 public abstract class StateSetup implements GameState {

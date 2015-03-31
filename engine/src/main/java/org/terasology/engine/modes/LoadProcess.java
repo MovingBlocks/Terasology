@@ -35,8 +35,6 @@ public interface LoadProcess {
 
     /**
      * Begins the loading
-     *
-     * @return The total number of expected steps for this LoadProcess, 0 if nothing to do
      */
     void begin();
 

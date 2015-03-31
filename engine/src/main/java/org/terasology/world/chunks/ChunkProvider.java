@@ -76,7 +76,6 @@ public interface ChunkProvider {
      * Retrieves the ChunkRelevanceRegion object for the given entity
      *
      * @param entity
-     * @return The chunk relevance region, or null
      */
     void updateRelevanceEntity(EntityRef entity, Vector3i distance);
 

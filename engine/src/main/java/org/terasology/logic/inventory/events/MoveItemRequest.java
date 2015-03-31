@@ -22,7 +22,7 @@ import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 @ServerEvent
 public class MoveItemRequest extends AbstractMoveItemRequest implements Event {

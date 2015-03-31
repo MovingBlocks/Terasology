@@ -36,7 +36,7 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscriberSystem {

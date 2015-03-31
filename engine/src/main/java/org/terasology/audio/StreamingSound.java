@@ -23,8 +23,6 @@ public interface StreamingSound extends Sound<StreamingSoundData> {
 
     /**
      * Reset sound state (clears buffers, reset cached info)
-     *
-     * @return
      */
     void reset();
 

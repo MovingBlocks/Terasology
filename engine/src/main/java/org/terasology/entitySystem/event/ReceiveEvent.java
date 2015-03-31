@@ -25,11 +25,11 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to mark up methods that can be registered to receive events through the EventSystem
- * <p/>
+ * <br><br>
  * These methods should have the form
  * <code>public void handlerMethod(EventType event, EntityRef entity)</code>
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

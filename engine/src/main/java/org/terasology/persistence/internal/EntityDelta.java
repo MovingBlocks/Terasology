@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class EntityDelta {
     private Set<Class<? extends Component>> removedComponents = Sets.newHashSet();

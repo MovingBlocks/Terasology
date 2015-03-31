@@ -32,7 +32,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the Post-processing shader program.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 

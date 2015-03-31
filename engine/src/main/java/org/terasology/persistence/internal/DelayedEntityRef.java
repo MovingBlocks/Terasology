@@ -28,7 +28,7 @@ import org.terasology.entitySystem.prefab.Prefab;
  * Currently it gets used by the StorageManager to create entity refs on the main thread for storage off the main
  * thread. During the storage the entities will be bound to the entity manager that is private the the saving thread.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class DelayedEntityRef extends EntityRef {
     private final long id;

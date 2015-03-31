@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Allows the generation of complex trees based on L-Systems.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class TreeGeneratorLSystem extends AbstractTreeGenerator {
 

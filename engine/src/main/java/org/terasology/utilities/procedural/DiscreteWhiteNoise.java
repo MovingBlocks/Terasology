@@ -21,7 +21,7 @@ import org.terasology.math.TeraMath;
 /**
  * This implementation is based on Robert Jenkins' 96 bit mix function as described in
  * in "Integer Hash Function" by Thomas Wang, Jan 1997. The original code is public domain.
- * <br/><br/>
+ * <br><br>
  * This implementation rounds float parameters to the closest integer value. Use it in combination
  * with BrownianNoise at lacunarity = 2.0.
  * @author Martin Steiger

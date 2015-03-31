@@ -41,10 +41,10 @@ import java.util.Map;
 
 /**
  * Class Metadata provides information on a class and its fields, and the ability to create, copy or manipulate an instance of the class.
- * <p/>
+ * <br><br>
  * Subclasses can be created to hold additional information for specific types of objects.  These may override createField()
  * to change how fields are processed and possibly switch to a subtype of FieldMetadata that holds additional information.
- * <p/>
+ * <br><br>
  * Consumed classes are required to have a default constructor (this may be private)
  *
  * @author Immortius

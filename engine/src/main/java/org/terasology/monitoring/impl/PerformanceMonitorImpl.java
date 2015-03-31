@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Active implementation of Performance Monitor
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  *         TODO: Check to ensure activities are being started and stopped correctly
  *         TODO: Remove activities with 0 time
  */

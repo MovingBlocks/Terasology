@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 @RegisterSystem
 @Share(BlockStructuralSupportRegistry.class)

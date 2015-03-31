@@ -22,7 +22,7 @@ import org.terasology.rendering.assets.material.Material;
  * be used to automatically set shader parameters when the
  * corresponding shader program gets activated.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public interface ShaderParameters {
 

@@ -20,7 +20,7 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 /**
  * BenchmarkTeraArrayRead implements a simple read performance benchmark for tera arrays.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public class BenchmarkTeraArrayRead extends BenchmarkTeraArray {
 

@@ -55,7 +55,7 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public final class WorldRendererImpl implements WorldRenderer {
 

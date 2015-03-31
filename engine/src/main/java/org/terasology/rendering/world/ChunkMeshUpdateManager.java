@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Provides the mechanism for updating and generating chunk meshes.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public final class ChunkMeshUpdateManager {
     private static final int NUM_TASK_THREADS = 8;

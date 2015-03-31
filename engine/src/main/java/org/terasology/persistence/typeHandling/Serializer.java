@@ -71,7 +71,7 @@ public class Serializer {
 
     /**
      * Serializes the given value, that was originally obtained from the given field.
-     * <p/>
+     * <br><br>
      * This is provided for performance, to avoid obtaining the same value twice.
      *
      * @param rawValue The value to serialize

@@ -22,41 +22,41 @@ import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
 /**
- * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.
+ * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.<br>
+ * <b>NOTE:</b> Currently it is optimized for chunks of size 16x256x16 blocks.<br>
+ * TODO: Implement deflation for sparse arrays.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
- * @note Currently it is optimized for chunks of size 16x256x16 blocks.
- * @todo Implement deflation for sparse arrays.
+ * @author Manuel Brotz
  */
 public class TeraStandardDeflator extends TeraVisitingDeflator {
-    
+
     /*
      *  16-bit variant
      *  ==============
-     *  
+     *
      *  dense chunk  : 4 + 12 + (65536 * 2)                                                   = 131088
      *  sparse chunk : (4 + 12 + (256 * 2)) + (4 + 12 + (256 × 4)) + ((12 + (256 * 2)) × 256) = 135712
      *  difference   : 135712 - 131088                                                        =   4624
      *  min. deflate : 4624 / (12 + (256 * 2))                                                =      8.8
-     *  
-     *  
+     *
+     *
      *  8-bit variant
      *  =============
-     *  
+     *
      *  dense chunk  : 4 + 12 + 65536                                                   = 65552
      *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + 256) × 256)       = 69920
      *  difference   : 69920 - 65552                                                    =  4368
      *  min. deflate : 4368 / (12 + 256)                                                =    16.3
-     *  
-     *  
+     *
+     *
      *  4-bit variant
      *  =============
-     *  
+     *
      *  dense chunk  : 4 + 12 + (65536 / 2)                                             = 32784
      *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + (256 / 2)) × 256) = 37152
      *  difference   : 37152 - 32784                                                    =  4368
      *  min. deflate : 4368 / (12 + (256 / 2))                                          =    31.2
-     *  
+     *
      */
 
     // TODO dynamically calculate DEFLATE_MINIMUM_*, they only work for chunks with dimension 16x256x16

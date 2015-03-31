@@ -20,7 +20,7 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 /**
  * BenchmarkTeraArrayWrite implements a simple write performance benchmark for tera arrays.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public class BenchmarkTeraArrayWrite extends BenchmarkTeraArray {
 

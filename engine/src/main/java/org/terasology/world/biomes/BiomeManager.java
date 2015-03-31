@@ -198,7 +198,7 @@ public class BiomeManager implements BiomeRegistry {
     /**
      * @return A biome that can be used to avoid a null pointer in cases where the real biome is unknown, i.e.
      * when the chunk has not yet been loaded.
-     * <p/>
+     * <br><br>
      * TODO: Decide how a caller can determine that he got the unknown biome and not the real one.
      */
     public static Biome getUnknownBiome() {

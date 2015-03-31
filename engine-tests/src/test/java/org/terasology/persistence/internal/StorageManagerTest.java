@@ -81,7 +81,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class StorageManagerTest {
 

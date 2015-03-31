@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Repairs the save game when it is in an inconsistent state after a crash.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class EnsureSaveGameConsistency implements LoadProcess {
 

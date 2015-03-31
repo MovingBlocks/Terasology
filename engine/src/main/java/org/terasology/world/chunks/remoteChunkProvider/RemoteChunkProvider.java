@@ -55,7 +55,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Immortius
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 

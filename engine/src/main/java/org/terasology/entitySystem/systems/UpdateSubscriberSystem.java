@@ -16,9 +16,8 @@
 package org.terasology.entitySystem.systems;
 
 /**
- * <p>
  * Interface for component systems that needs to be updated every time the engine is updated.
- * </p>
+ * <br><br>
  * <p><b>Note:</b> Usage of the UpdateSubscriberSystem interface is discouraged unless truly needed.
  * For most systems receiving the update call on every engine frame is overkill.
  * In most cases it will be sufficient to:
@@ -32,8 +31,7 @@ package org.terasology.entitySystem.systems;
  *       system update function at a specific times.
  *     </li>
  *   </ul>
- * </p>
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface UpdateSubscriberSystem extends ComponentSystem {
 

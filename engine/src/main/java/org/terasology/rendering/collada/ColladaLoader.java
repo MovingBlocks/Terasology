@@ -50,12 +50,12 @@ import org.terasology.math.geom.Vector3f;
 
 /**
  * Importer for Collada data exchange model files.
- * <p/>
+ * <br><br>
  * The development of this loader was greatly influenced by
  * http://www.wazim.com/Collada_Tutorial_1.htm
- * <p/>
+ * <br><br>
  * TODO: Consider documenting this class similar to what has been done at this web page:
- * <p/>
+ * <br><br>
  * http://docs.garagegames.com/torque-3d/official/content/documentation/Artist%20Guide/Formats/ColladaLoader.html
  *
  * @author mkienenb@gmail.com

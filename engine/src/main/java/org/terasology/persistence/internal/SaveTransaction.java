@@ -59,10 +59,10 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
- * <p/>
+ * <br><br>
  * The result of this task can be obtained via {@link #getResult()}.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class SaveTransaction extends AbstractTask {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransaction.class);
