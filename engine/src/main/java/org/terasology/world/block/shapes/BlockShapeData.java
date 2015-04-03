@@ -29,7 +29,7 @@ import java.util.EnumMap;
 /**
  * @author Immortius
  */
-public class BlockShapeData implements AssetData {
+public class BlockShapeData {
     private String displayName = "";
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);

@@ -24,7 +24,7 @@ import java.util.Arrays;
 /**
  * @author Immortius
  */
-public class TextureData implements AssetData {
+public class TextureData {
     private static final int BYTES_PER_PIXEL = 4;
 
     private int width;

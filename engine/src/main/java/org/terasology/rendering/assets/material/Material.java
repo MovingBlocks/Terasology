@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.assets.material;
 
-import org.terasology.asset.Asset;
+import org.terasology.assets.Asset;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector2f;

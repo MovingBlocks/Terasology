@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class UISkinData implements AssetData {
+public class UISkinData {
     Map<String, UIStyleFamily> skinFamilies;
 
     public UISkinData(Map<String, UIStyleFamily> families) {

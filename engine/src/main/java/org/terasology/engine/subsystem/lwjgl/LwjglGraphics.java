@@ -26,7 +26,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import javax.imageio.ImageIO;
 

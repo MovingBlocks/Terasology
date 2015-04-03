@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class MeshAnimationData implements AssetData {
+public class MeshAnimationData {
 
     public static final int NO_PARENT = -1;
 

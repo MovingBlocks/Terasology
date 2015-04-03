@@ -16,15 +16,28 @@
 
 package org.terasology.audio;
 
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
+
 /**
  * Interface for a non-streamed sound - these sounds are loaded entirely into memory.
  */
-public interface StaticSound extends Sound<StaticSoundData> {
+public abstract class StaticSound extends Sound<StaticSoundData> {
+
+    /**
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     *
+     * @param urn       The urn identifying the asset.
+     * @param assetType The asset type this asset belongs to.
+     */
+    protected StaticSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType) {
+        super(urn, assetType);
+    }
 
     /**
      * Returns sound sample length in seconds
      *
      * @return
      */
-    float getLength();
+    public abstract float getLength();
 }

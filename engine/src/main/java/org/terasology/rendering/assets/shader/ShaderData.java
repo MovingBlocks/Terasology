@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ShaderData implements AssetData {
+public class ShaderData {
 
     private String vertexProgram;
     private String fragmentProgram;

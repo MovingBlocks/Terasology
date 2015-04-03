@@ -21,5 +21,5 @@ import org.terasology.asset.AssetData;
 /**
  * @author Immortius
  */
-public interface TextureRegionAsset<T extends AssetData> extends TextureRegion, Asset<T> {
+public interface TextureRegionAsset<T> extends TextureRegion, Asset<T> {
 }

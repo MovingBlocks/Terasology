@@ -15,23 +15,32 @@
  */
 package org.terasology.audio.nullAudio;
 
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 
 /**
  * @author Immortius
  */
-public class NullSound extends AbstractAsset<StaticSoundData> implements StaticSound {
+public class NullSound extends StaticSound {
 
     private int channels;
     private int sampleRate;
     private float length;
 
-    public NullSound(AssetUri uri, StaticSoundData data) {
-        super(uri);
-        onReload(data);
+
+    public NullSound(ResourceUrn urn, StaticSoundData data, AssetType<?, StaticSoundData> assetType) {
+        super(urn, assetType);
+        reload(data);
+    }
+
+    public NullSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, int channels, int sampleRate, float length) {
+        super(urn, assetType);
+        this.channels = channels;
+        this.sampleRate = sampleRate;
+        this.length = length;
     }
 
     @Override
@@ -63,14 +72,18 @@ public class NullSound extends AbstractAsset<StaticSoundData> implements StaticS
     }
 
     @Override
-    protected void onReload(StaticSoundData data) {
+    protected void doReload(StaticSoundData data) {
         this.channels = data.getChannels();
         this.sampleRate = data.getSampleRate();
         this.length = data.getData().limit() / getChannels() / (data.getBufferBits() / 8) / getSamplingRate();
     }
 
     @Override
-    protected void onDispose() {
+    protected Asset<StaticSoundData> doCreateInstance(ResourceUrn instanceUrn, AssetType<?, StaticSoundData> parentAssetType) {
+        return new NullSound(instanceUrn, parentAssetType, channels, sampleRate, length);
     }
 
+    @Override
+    protected void doDispose() {
+    }
 }

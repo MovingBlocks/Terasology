@@ -14,23 +14,29 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.loaders;
+package org.terasology.audio.formats;
 
-import org.terasology.asset.AssetLoader;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.format.AbstractAssetFileFormat;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.audio.StreamingSoundData;
-import org.terasology.module.Module;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class OggStreamingSoundLoader implements AssetLoader<StreamingSoundData> {
+@RegisterAssetFileFormat
+public class OggStreamingSoundFormat extends AbstractAssetFileFormat<StreamingSoundData> {
+
+    public OggStreamingSoundFormat() {
+        super("ogg");
+    }
+
     @Override
-    public StreamingSoundData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
-        return new OggStreamingSoundData(urls.get(0));
+    public StreamingSoundData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
+        return new OggStreamingSoundData(inputs.get(0));
     }
 }

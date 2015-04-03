@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * @author synopia
  */
-public class BehaviorTreeData implements AssetData {
+public class BehaviorTreeData {
     private Map<Node, RenderableNode> renderableNodes = Maps.newHashMap();
     private Node root;
     private RenderableNode renderableRoot;

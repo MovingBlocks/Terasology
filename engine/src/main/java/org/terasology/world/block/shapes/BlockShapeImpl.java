@@ -35,7 +35,6 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.VecMath;
 import org.terasology.math.Yaw;
-import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;

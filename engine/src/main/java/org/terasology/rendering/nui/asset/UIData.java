@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.UIWidget;
  * @author Immortius
  */
 @API
-public class UIData implements AssetData {
+public class UIData {
     private UIWidget rootWidget;
 
     public UIData(UIWidget rootWidget) {

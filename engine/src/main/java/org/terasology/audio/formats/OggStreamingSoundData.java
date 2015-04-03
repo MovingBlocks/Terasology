@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.loaders;
+package org.terasology.audio.formats;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.PrivilegedOpenStream;
+import org.terasology.assets.format.AssetDataFile;
 import org.terasology.audio.StreamingSoundData;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.ByteBuffer;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
 
 /**
  *
@@ -34,17 +31,12 @@ public class OggStreamingSoundData implements StreamingSoundData {
 
     private static Logger logger = LoggerFactory.getLogger(OggStreamingSoundData.class);
 
-    private final URL url;
+    private final AssetDataFile stream;
     private OggReader reader;
 
-    public OggStreamingSoundData(URL url) throws IOException {
-        this.url = url;
-        try {
-            PrivilegedOpenStream action = new PrivilegedOpenStream(url);
-            reader = new OggReader(AccessController.doPrivileged(action));
-        } catch (PrivilegedActionException e) {
-            throw new IOException("Could not open stream at " + url, e);
-        }
+    public OggStreamingSoundData(AssetDataFile stream) throws IOException {
+        this.stream = stream;
+        reader = new OggReader(stream.openStream());
     }
 
     @Override
@@ -54,7 +46,7 @@ public class OggStreamingSoundData implements StreamingSoundData {
             dataBuffer.flip();
             return dataBuffer;
         } catch (IOException e) {
-            throw new RuntimeException("Error reading from sound stream at " + url, e);
+            throw new RuntimeException("Error reading from sound stream", e);
         }
     }
 
@@ -79,10 +71,9 @@ public class OggStreamingSoundData implements StreamingSoundData {
             dispose();
         }
         try {
-            PrivilegedOpenStream action = new PrivilegedOpenStream(url);
-            reader = new OggReader(AccessController.doPrivileged(action));
-        } catch (PrivilegedActionException e) {
-            throw new RuntimeException("Failed to reset ogg stream from " + url, e);
+            reader = new OggReader(stream.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to reset ogg stream", e);
         }
     }
 
@@ -92,7 +83,7 @@ public class OggStreamingSoundData implements StreamingSoundData {
             try {
                 reader.close();
             } catch (IOException e) {
-                logger.error("Failed to close ogg streaming from {}", url, e);
+                logger.error("Failed to close ogg streaming", e);
             }
             reader = null;
         }

@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class PrefabData implements AssetData, MutableComponentContainer {
+public class PrefabData implements MutableComponentContainer {
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
     private boolean persisted = true;

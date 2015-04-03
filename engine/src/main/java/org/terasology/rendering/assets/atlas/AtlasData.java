@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class AtlasData implements AssetData {
+public class AtlasData {
 
     private Map<Name, SubtextureData> subtextures;
 

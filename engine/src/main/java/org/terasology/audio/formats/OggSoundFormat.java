@@ -14,29 +14,34 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.loaders;
+package org.terasology.audio.formats;
 
 import com.google.common.io.ByteStreams;
 import org.lwjgl.BufferUtils;
-import org.terasology.asset.AssetLoader;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.format.AbstractAssetFileFormat;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.audio.StaticSoundData;
-import org.terasology.module.Module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class OggSoundLoader implements AssetLoader<StaticSoundData> {
+@RegisterAssetFileFormat
+public class OggSoundFormat extends AbstractAssetFileFormat<StaticSoundData> {
+
+    public OggSoundFormat() {
+        super("ogg");
+    }
 
     @Override
-    public StaticSoundData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
-        try (OggReader reader = new OggReader(stream)) {
+    public StaticSoundData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
+        try (OggReader reader = new OggReader(inputs.get(0).openStream())) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ByteStreams.copy(reader, bos);
 

@@ -22,7 +22,7 @@ import org.terasology.rendering.assets.texture.Texture;
 /**
  * @author Immortius
  */
-public class SubtextureData implements AssetData {
+public class SubtextureData {
     private Texture texture;
     private Rect2f region;
 

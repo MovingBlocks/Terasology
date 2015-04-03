@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Immortius
  */
-public class MaterialData implements AssetData {
+public class MaterialData {
     private Shader shader;
     private Map<String, Texture> textures = Maps.newHashMap();
     private Map<String, Float> floatParams = Maps.newHashMap();

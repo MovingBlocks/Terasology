@@ -20,8 +20,8 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-import org.terasology.audio.loaders.OggSoundLoader;
-import org.terasology.audio.loaders.OggStreamingSoundLoader;
+import org.terasology.audio.formats.OggSoundFormat;
+import org.terasology.audio.formats.OggStreamingSoundFormat;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.naming.Name;
@@ -53,8 +53,8 @@ import java.util.Map;
  */
 public enum AssetType {
     PREFAB("prefab", "prefabs", "prefab", new PrefabLoader(), true),
-    SOUND("sound", "sounds", "ogg", new OggSoundLoader(), false),
-    MUSIC("music", "music", "ogg", new OggStreamingSoundLoader(), false),
+    SOUND("sound", "sounds", "ogg", new OggSoundFormat(), false),
+    MUSIC("music", "music", "ogg", new OggStreamingSoundFormat(), false),
     SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader(), false),
     MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaMeshLoader()}, false),
     TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader(), false),

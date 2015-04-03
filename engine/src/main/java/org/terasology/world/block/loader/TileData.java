@@ -22,7 +22,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Immortius
  */
-public class TileData implements AssetData {
+public class TileData {
     private BufferedImage image;
 
     public TileData(BufferedImage image) {

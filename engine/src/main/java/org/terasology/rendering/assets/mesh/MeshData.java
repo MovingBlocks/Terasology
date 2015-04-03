@@ -24,7 +24,7 @@ import org.terasology.asset.AssetData;
 /**
  * @author Immortius
  */
-public class MeshData implements AssetData {
+public class MeshData {
 
     private TFloatList vertices = new TFloatArrayList();
     private TFloatList texCoord0 = new TFloatArrayList();

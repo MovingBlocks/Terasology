@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class SkeletalMeshData implements AssetData {
+public class SkeletalMeshData {
 
     private Bone rootBone;
     private Map<String, Bone> boneLookup = Maps.newHashMap();

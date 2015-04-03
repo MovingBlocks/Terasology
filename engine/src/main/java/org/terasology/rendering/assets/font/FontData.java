@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class FontData implements AssetData {
+public class FontData {
     private int lineHeight;
     private Map<Integer, FontCharacter> characters;
 
