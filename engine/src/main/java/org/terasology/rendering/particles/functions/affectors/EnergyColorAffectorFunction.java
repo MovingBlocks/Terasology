@@ -57,6 +57,7 @@ public final class EnergyColorAffectorFunction extends AffectorFunction<EnergyCo
         navigableGradientMap.clear();
         for(EnergyColorAffectorComponent.EnergyAndColor energyAndColor: component.gradientMap)
         navigableGradientMap.put(energyAndColor.energy, energyAndColor.color);
+        System.out.println(navigableGradientMap.size() + "preup grademap");
     }
 
     private static void lerpAndSetColor(final Map.Entry<Float, Vector4f> left,

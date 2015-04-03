@@ -23,16 +23,16 @@ import org.terasology.utilities.random.Random;
 /**
  * Created by Linus on 10-3-2015.
  */
-public class SizeRangeGeneratorComponent implements Component {
+public class ScaleRangeGeneratorComponent implements Component {
     public Vector3f minScale;
     public Vector3f maxScale;
 
-    public SizeRangeGeneratorComponent(final Vector3f min, final Vector3f max) {
+    public ScaleRangeGeneratorComponent(final Vector3f min, final Vector3f max) {
         minScale = new Vector3f(min);
         maxScale = new Vector3f(max);
     }
 
-    public SizeRangeGeneratorComponent() {
+    public ScaleRangeGeneratorComponent() {
         minScale = new Vector3f();
         maxScale = new Vector3f();
     }

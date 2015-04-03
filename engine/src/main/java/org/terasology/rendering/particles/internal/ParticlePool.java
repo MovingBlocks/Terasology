@@ -35,7 +35,6 @@ public final class ParticlePool {
     private static final int W_OFFSET = 3;
 
     // Per particle scalars
-    final float[] size;
     final float[] energy;
 
     // Per particle 3d vectors
@@ -64,7 +63,6 @@ public final class ParticlePool {
         this.firstDeadParticleIndex = 0;
 
         // Per particle scalars
-        this.size = new float[size];
         this.energy = new float[size];
 
         // Per particle 3d vectors
@@ -118,11 +116,6 @@ public final class ParticlePool {
         final int index4 = 4 * index;
 
         // scalars
-
-        if (DataMask.SIZE.isEnabled(rawMask)) {
-            temporaryParticleData.size = size[index];
-        }
-
         if (DataMask.ENERGY.isEnabled(rawMask)) {
             temporaryParticleData.energy = energy[index];
         }
@@ -174,10 +167,6 @@ public final class ParticlePool {
     void storeTemporaryDataAt(final int index, final int rawMask) {
         final int index3 = 3 * index;
         final int index4 = 4 * index;
-
-        if (DataMask.SIZE.isEnabled(rawMask)) {
-            size[index] = temporaryParticleData.size;
-        }
 
         if (DataMask.ENERGY.isEnabled(rawMask)) {
             energy[index] = temporaryParticleData.energy;

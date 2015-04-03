@@ -18,8 +18,8 @@ package org.terasology.rendering.particles.internal;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
-import org.terasology.rendering.particles.internal.ParticlePool;
-import org.terasology.rendering.particles.internal.ParticleSystemStateData;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -40,17 +40,16 @@ public class ParticleSystemRendering {
 
         glDisable(GL11.GL_CULL_FACE);
         for (ParticleSystemStateData particleSystem: particleSystems) {
-
-
-            //drawEmmiter(particleSystemComponent, camPos);
+            drawEmmiter(particleSystem, camPos);
             drawParticles(particleSystem, camPos);
         }
 
         glEnable(GL11.GL_CULL_FACE);
     }
-    /*
-    private static void drawEmmiter(ParticleSystemComponent particleSystem, Vector3f camera) {
-        Vector3f position = new Vector3f(particleSystem.emmiter.getComponent(LocationComponent.class).getWorldPosition());
+
+    private static void drawEmmiter(ParticleSystemStateData particleSystem, Vector3f camera) {
+        Vector3f position = particleSystem.entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(LocationComponent.class).getWorldPosition();
+
         position.sub(camera);
         glPushMatrix();
         glTranslatef(position.x(), position.y(), position.z());
@@ -62,10 +61,6 @@ public class ParticleSystemRendering {
         GL11.glVertex3f(-0.2f, 0.0f, -0.2f);
         glEnd();
         glPopMatrix();
-    }
-    */
-    private static void pushParticleDataToGPU() {
-
     }
 
     private static void drawParticles(ParticleSystemStateData particleSystem, Vector3f camera) {
@@ -108,6 +103,13 @@ public class ParticleSystemRendering {
             GL11.glVertex3f(+halfWidth, +halfHeight, 0.0f);
             GL11.glVertex3f(+halfWidth, -halfHeight, 0.0f);
             GL11.glVertex3f(-halfWidth, -halfHeight, 0.0f);
+            glEnd();
+
+            glBegin(GL_QUADS);
+            GL11.glVertex3f(-halfWidth, +halfHeight, 0.0f);
+            GL11.glVertex3f(-halfWidth, -halfHeight, 0.0f);
+            GL11.glVertex3f(+halfWidth, -halfHeight, 0.0f);
+            GL11.glVertex3f(+halfWidth, +halfHeight, 0.0f);
             glEnd();
 
             glPopMatrix();

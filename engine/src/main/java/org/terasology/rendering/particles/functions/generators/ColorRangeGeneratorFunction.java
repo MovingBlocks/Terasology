@@ -35,8 +35,8 @@ public final class ColorRangeGeneratorFunction extends GeneratorFunction<ColorRa
                            final Random random
     ) {
         particleData.color.setX(random.nextFloat(component.minColorComponents.x(), component.maxColorComponents.x()));
-        particleData.color.setX(random.nextFloat(component.minColorComponents.y(), component.maxColorComponents.y()));
-        particleData.color.setX(random.nextFloat(component.minColorComponents.z(), component.maxColorComponents.z()));
-        particleData.color.setX(random.nextFloat(component.minColorComponents.w(), component.maxColorComponents.w()));
+        particleData.color.setY(random.nextFloat(component.minColorComponents.y(), component.maxColorComponents.y()));
+        particleData.color.setZ(random.nextFloat(component.minColorComponents.z(), component.maxColorComponents.z()));
+        particleData.color.setW(random.nextFloat(component.minColorComponents.w(), component.maxColorComponents.w()));
     }
 }

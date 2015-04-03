@@ -18,49 +18,46 @@ package org.terasology.rendering.particles.components.affectors;
 import com.google.common.base.Preconditions;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.reflection.MappedContainer;
-import org.terasology.rendering.particles.ParticleData;
-import org.terasology.utilities.random.Random;
 
 import java.util.*;
 
 /**
  * Created by Linus on 10-3-2015.
  */
-public class EnergySizeAffectorComponent implements Component {
+public class EnergyScaleAffectorComponent implements Component {
 
-    public List<EnergyAndSize> sizeMap = new ArrayList<>();
+    public List<EnergyAndScale> sizeMap = new ArrayList<>();
 
     @MappedContainer
-    public static class EnergyAndSize {
+    public static class EnergyAndScale {
         public float energy;
-        public Vector3f size;
+        public Vector3f scale;
 
-        public EnergyAndSize() {
+        public EnergyAndScale() {
             energy = 0.0f;
-            size = new Vector3f();
+            scale = new Vector3f();
         }
 
-        public EnergyAndSize(float energy, Vector3f size) {
+        public EnergyAndScale(float energy, Vector3f scale) {
             this.energy = energy;
-            this.size = new Vector3f(size);
+            this.scale = new Vector3f(scale);
         }
     }
 
-    public EnergySizeAffectorComponent() {
+    public EnergyScaleAffectorComponent() {
 
     }
 
-    public EnergySizeAffectorComponent(float[] keys, Vector3f[] values) {
+    public EnergyScaleAffectorComponent(float[] keys, Vector3f[] values) {
         Preconditions.checkArgument(keys.length == values.length);
 
         for (int i = 0; i < keys.length; i++) {
-            sizeMap.add(new EnergyAndSize(keys[i], values[i]));
+            sizeMap.add(new EnergyAndScale(keys[i], values[i]));
         }
     }
 
-    public EnergySizeAffectorComponent(Iterable<Float> keys, Iterable<Vector3f> values) {
+    public EnergyScaleAffectorComponent(Iterable<Float> keys, Iterable<Vector3f> values) {
         final Iterator<Float> keyIterator = keys.iterator();
         final Iterator<Vector3f> valueIterator = values.iterator();
 
@@ -70,7 +67,7 @@ public class EnergySizeAffectorComponent implements Component {
                     "Received more keys than values"
             );
 
-            sizeMap.add(new EnergyAndSize(keyIterator.next(), valueIterator.next()));
+            sizeMap.add(new EnergyAndScale(keyIterator.next(), valueIterator.next()));
         }
 
         Preconditions.checkArgument(!valueIterator.hasNext(),

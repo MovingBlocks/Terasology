@@ -30,7 +30,7 @@ public class ParticleSystemStateData {
 
     public final EntityRef entityRef;
 
-    public final ParticleEmitterComponent emitter;
+    public final ParticleEmitterComponent emitterComponent;
 
     public float nextEmission;
 
@@ -38,17 +38,15 @@ public class ParticleSystemStateData {
     public int collisionUpdateIteration;
 
     public List<Component> affectorComponents;
-    public List<EntityRef> generators;
 
     public ParticleSystemStateData(final EntityRef entityRef, final ParticlePool particlePool) {
         this.entityRef = entityRef;
         this.particlePool = particlePool;
-        this.emitter = entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(ParticleEmitterComponent.class);
+        this.emitterComponent = entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(ParticleEmitterComponent.class);
         this.collisionUpdateIteration = 0;
 
         this.nextEmission = 0;
 
         this.affectorComponents = new ArrayList<>();
-        this.generators = new ArrayList<>();
     }
 }

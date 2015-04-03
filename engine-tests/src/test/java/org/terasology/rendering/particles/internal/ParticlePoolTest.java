@@ -35,13 +35,13 @@ public class ParticlePoolTest {
         final int index3 = index * 3;
         final int index4 = index * 4;
 
-        pool.size[index] = random.nextFloat();
         pool.energy[index] = random.nextFloat();
 
         for (int i = 0; i < 3; i++) {
             pool.position[index3 + i] = random.nextFloat();
             pool.previousPosition[index3 + i] = random.nextFloat();
             pool.velocity[index3 + i] = random.nextFloat();
+            pool.scale[index3 + i] = random.nextFloat();
         }
 
         for (int i = 0; i < 4; i++) {
@@ -53,12 +53,12 @@ public class ParticlePoolTest {
         final int index3 = index * 3;
         final int index4 = index * 4;
 
-        dest.size[index] = src.size[index];
         dest.energy[index] = src.energy[index];
 
         System.arraycopy(src.position, index3, dest.position, index3, 3);
         System.arraycopy(src.previousPosition, index3, dest.previousPosition, index3, 3);
         System.arraycopy(src.velocity, index3, dest.velocity, index3, 3);
+        System.arraycopy(src.scale, index3, dest.scale, index3, 3);
 
         System.arraycopy(src.color, index4, dest.color, index4, 4);
     }
@@ -85,13 +85,13 @@ public class ParticlePoolTest {
         final int actIndex3 = actIndex * 3;
         final int actIndex4 = actIndex * 4;
 
-        assertTrue(TeraMath.fastAbs(expected.size[expIndex] - actual.size[actIndex]) < epsilon);
         assertTrue(TeraMath.fastAbs(expected.energy[expIndex] - actual.energy[actIndex]) < epsilon);
 
         for (int i = 0; i < 3; i++) {
             assertTrue(TeraMath.fastAbs(expected.position[expIndex3 + i] - actual.position[actIndex3 + i]) < epsilon);
             assertTrue(TeraMath.fastAbs(expected.previousPosition[expIndex3 + i] - actual.previousPosition[actIndex3 + i]) < epsilon);
             assertTrue(TeraMath.fastAbs(expected.velocity[expIndex3 + i] - actual.velocity[actIndex3 + i]) < epsilon);
+            assertTrue(TeraMath.fastAbs(expected.scale[expIndex3 + i] - actual.scale[actIndex3 + i]) < epsilon);
         }
 
         for (int i = 0; i < 4; i++) {
@@ -116,12 +116,12 @@ public class ParticlePoolTest {
             assertEquals(0, pool.livingParticles());
             assertEquals(pool.size(), pool.deadParticles());
 
-            assertEquals(size, pool.size.length);
             assertEquals(size, pool.energy.length);
 
             assertEquals(size * 3, pool.position.length);
             assertEquals(size * 3, pool.previousPosition.length);
             assertEquals(size * 3, pool.velocity.length);
+            assertEquals(size * 3, pool.scale.length);
 
             assertEquals(size * 4, pool.color.length);
         }

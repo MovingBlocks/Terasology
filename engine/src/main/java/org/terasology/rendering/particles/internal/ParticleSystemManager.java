@@ -25,9 +25,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.*;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.LocationComponent;
@@ -35,7 +32,6 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.particles.ParticleManagerInterface;
 import org.terasology.rendering.particles.components.ParticleEmitterComponent;
@@ -130,12 +126,12 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         registerGeneratorFunction(new ColorRangeGeneratorFunction());
         registerGeneratorFunction(new EnergyRangeGeneratorFunction());
         registerGeneratorFunction(new PositionRangeGeneratorFunction());
-        registerGeneratorFunction(new SizeRangeGeneratorFunction());
+        registerGeneratorFunction(new ScaleRangeGeneratorFunction());
         registerGeneratorFunction(new VelocityRangeGeneratorFunction());
 
         registerAffectorFunction(new DampingAffectorFunction());
         registerAffectorFunction(new EnergyColorAffectorFunction());
-        registerAffectorFunction(new EnergySizeAffectorFunction());
+        registerAffectorFunction(new EnergyScaleAffectorFunction());
         registerAffectorFunction(new ForceAffectorFunction());
         registerAffectorFunction(new ForwardEulerAffectorFunction());
         registerAffectorFunction(new TurbulenceAffectorFunction());
@@ -157,7 +153,6 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             for (ParticleSystemStateData system : particleSystems.values()) {
                 ParticleSystemUpdating.update(system, physics, registeredGeneratorFunctions, registeredAffectorFunctions, delta);
             }
-            cumDelta += delta;
 
             Iterator<Map.Entry<EntityRef,ParticleSystemStateData>> iter = particleSystems.entrySet().iterator();
             while (iter.hasNext()) {
@@ -258,9 +253,6 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         ParticleEmitterComponent emitterComponent = particleSystemComponent.emitter.getComponent(ParticleEmitterComponent.class);
         LocationComponent emitterLocationComponent = particleSystemComponent.emitter.getComponent(LocationComponent.class);
 
-        if(emitterComponent == null) throw new RuntimeException();
-        if(emitterComponent.generators == null) throw new RuntimeException();
-
         particleSystemComponent.nrOfParticles = 5000;
 
         emitterComponent.spawnRateMax = 400.0f;
@@ -291,12 +283,12 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         final float keyFullOpacity = 1.0f;
         final float keySmokeEnd    = 0.0f;
 
-        EnergySizeAffectorComponent energySizeAffector = new EnergySizeAffectorComponent();
-            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keyFireStart, new Vector3f(0.01f, 0.01f, 0.01f)));
-            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keyFireRed, new Vector3f(0.1f, 0.1f, 0.1f)));
-            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keyFireEnd, new Vector3f(0.00f, 0.00f, 0.00f)));
-            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keySmokeStart, new Vector3f(0.02f, 0.02f, 0.02f)));
-            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keySmokeEnd, new Vector3f(0.5f, 0.5f, 0.5f)));
+        EnergyScaleAffectorComponent energySizeAffector = new EnergyScaleAffectorComponent();
+            energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keyFireStart, new Vector3f(0.01f, 0.01f, 0.01f)));
+            energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keyFireRed, new Vector3f(0.1f, 0.1f, 0.1f)));
+            energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keyFireEnd, new Vector3f(0.00f, 0.00f, 0.00f)));
+            energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keySmokeStart, new Vector3f(0.02f, 0.02f, 0.02f)));
+            energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keySmokeEnd, new Vector3f(0.5f, 0.5f, 0.5f)));
         particleSystemComponent.affectors.add(entityManager.create(energySizeAffector));
 
 
@@ -321,12 +313,21 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             new Vector4f(0.1f, 0.1f, 0.1f, 0.0f),   // end
         };
 
+        EnergyColorAffectorComponent energyColorAffector = new EnergyColorAffectorComponent(keyEnergies, colors);
+        particleSystemComponent.affectors.add(entityManager.create(energyColorAffector));
+
         emitterComponent.generators.add(entityManager.create(
                 new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f))
         ));
+
         emitterComponent.generators.add(entityManager.create(
-                new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f))
+                new ScaleRangeGeneratorComponent(new Vector3f(0.1f, 0.1f, 0.1f), new Vector3f(0.2f, 0.2f, 0.2f))
         ));
+
+        emitterComponent.generators.add(entityManager.create(
+                new ColorRangeGeneratorComponent(new Vector4f(0.2f, 0.2f, 0.2f, 1.0f), new Vector4f(0.8f, 0.8f, 0.8f, 1.0f))
+        ));
+
         emitterComponent.generators.add(entityManager.create(
                 new EnergyRangeGeneratorComponent(6, 7)
         ));

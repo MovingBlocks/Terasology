@@ -26,7 +26,6 @@ import org.terasology.rendering.particles.internal.ParticlePool;
  */
 public final class ParticleData {
     // scalars
-    public float size;
     public float energy;
 
     // 3d vectors

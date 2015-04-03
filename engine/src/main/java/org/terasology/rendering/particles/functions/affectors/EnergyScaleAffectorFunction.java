@@ -18,10 +18,8 @@ package org.terasology.rendering.particles.functions.affectors;
 import com.google.common.collect.Maps;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.particles.ParticleData;
-import org.terasology.rendering.particles.components.affectors.EnergyColorAffectorComponent;
-import org.terasology.rendering.particles.components.affectors.EnergySizeAffectorComponent;
+import org.terasology.rendering.particles.components.affectors.EnergyScaleAffectorComponent;
 import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
 
@@ -31,22 +29,22 @@ import java.util.NavigableMap;
 /**
  * Created by Linus on 11-3-2015.
  */
-public final class EnergySizeAffectorFunction extends AffectorFunction<EnergySizeAffectorComponent> {
+public final class EnergyScaleAffectorFunction extends AffectorFunction<EnergyScaleAffectorComponent> {
 
-    public EnergySizeAffectorFunction() {
-        super(EnergySizeAffectorComponent.class, DataMask.ENERGY, DataMask.SCALE);
+    public EnergyScaleAffectorFunction() {
+        super(EnergyScaleAffectorComponent.class, DataMask.ENERGY, DataMask.SCALE);
     }
 
-    private NavigableMap<Float,Vector3f> sizeMap = Maps.newTreeMap();
+    private NavigableMap<Float,Vector3f> scaleMap = Maps.newTreeMap();
 
     @Override
-    public void update(final EnergySizeAffectorComponent component,
+    public void update(final EnergyScaleAffectorComponent component,
                        final ParticleData particleData,
                        final Random random,
                        final float delta
     ) {
-        Map.Entry<Float, Vector3f> left = sizeMap.floorEntry(particleData.energy);
-        Map.Entry<Float, Vector3f> right = sizeMap.ceilingEntry(particleData.energy);
+        Map.Entry<Float, Vector3f> left = scaleMap.floorEntry(particleData.energy);
+        Map.Entry<Float, Vector3f> right = scaleMap.ceilingEntry(particleData.energy);
 
         if (left == null && right != null) {
             particleData.scale.set(right.getValue());
@@ -67,14 +65,14 @@ public final class EnergySizeAffectorFunction extends AffectorFunction<EnergySiz
     }
 
     @Override
-    public void beforeUpdates(final EnergySizeAffectorComponent component,
+    public void beforeUpdates(final EnergyScaleAffectorComponent component,
                               final Random random,
                               final float delta
     ) {
-        sizeMap.clear();
+        scaleMap.clear();
 
-        for(EnergySizeAffectorComponent.EnergyAndSize energyAndSize: component.sizeMap) {
-            sizeMap.put(energyAndSize.energy, energyAndSize.size);
+        for(EnergyScaleAffectorComponent.EnergyAndScale energyAndScale : component.sizeMap) {
+            scaleMap.put(energyAndScale.energy, energyAndScale.scale);
         }
     }
 

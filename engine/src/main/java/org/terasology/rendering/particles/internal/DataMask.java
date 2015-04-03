@@ -27,14 +27,13 @@ import java.util.stream.Stream;
  */
 public enum DataMask {
 
-    SIZE              (0b0000001),
-    ENERGY            (0b0000010),
-    POSITION          (0b0000100),
-    PREVIOUS_POSITION (0b0001000),
-    VELOCITY          (0b0010000),
-    SCALE             (0b0100000),
-    COLOR             (0b1000000),
-    ALL               (0b1111111);
+    ENERGY            (0b000001),
+    POSITION          (0b000010),
+    PREVIOUS_POSITION (0b000100),
+    VELOCITY          (0b001000),
+    SCALE             (0b010000),
+    COLOR             (0b100000),
+    ALL               (0b111111);
 
 
     //Package private stuff

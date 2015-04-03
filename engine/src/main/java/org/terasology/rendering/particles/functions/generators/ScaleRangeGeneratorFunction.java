@@ -16,20 +16,20 @@
 package org.terasology.rendering.particles.functions.generators;
 
 import org.terasology.rendering.particles.ParticleData;
-import org.terasology.rendering.particles.components.generators.SizeRangeGeneratorComponent;
+import org.terasology.rendering.particles.components.generators.ScaleRangeGeneratorComponent;
 import org.terasology.rendering.particles.internal.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 11-3-2015.
  */
-public final class SizeRangeGeneratorFunction extends GeneratorFunction<SizeRangeGeneratorComponent> {
-    public SizeRangeGeneratorFunction() {
-        super(SizeRangeGeneratorComponent.class, DataMask.SIZE);
+public final class ScaleRangeGeneratorFunction extends GeneratorFunction<ScaleRangeGeneratorComponent> {
+    public ScaleRangeGeneratorFunction() {
+        super(ScaleRangeGeneratorComponent.class, DataMask.SCALE);
     }
 
     @Override
-    public void onEmission(final SizeRangeGeneratorComponent component,
+    public void onEmission(final ScaleRangeGeneratorComponent component,
                            final ParticleData particleData,
                            final Random random
     ) {

@@ -18,15 +18,18 @@ package org.terasology.rendering.particles.internal;
 import com.google.common.collect.BiMap;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.*;
+import org.terasology.rendering.particles.components.affectors.EnergyColorAffectorComponent;
 import org.terasology.rendering.particles.events.ParticleSystemUpdateEvent;
 import org.terasology.rendering.particles.functions.affectors.AffectorFunction;
+import org.terasology.rendering.particles.functions.affectors.EnergyColorAffectorFunction;
+import org.terasology.rendering.particles.functions.generators.ColorRangeGeneratorFunction;
 import org.terasology.rendering.particles.functions.generators.GeneratorFunction;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 28-2-2015.
@@ -88,8 +91,23 @@ public class ParticleSystemUpdating {
 
         ParticleSystemComponent partComp = partSys.entityRef.getComponent(ParticleSystemComponent.class);
 
+        for (EntityRef generator: partComp.affectors) {
+            for (Component component: generator.iterateComponents()) {
+                AffectorFunction<Component> function = registeredAffectorFunctions.get(component.getClass());
+
+                if (function != null) {
+                    function.beforeUpdates(
+                            component,
+                            random,
+                            delta
+                    );
+                }
+            }
+        }
+
         for(int i = 0; i < partSys.particlePool.livingParticles(); i++) {
             partSys.particlePool.loadTemporaryDataFrom(i, DataMask.ALL.rawMask);
+
 
             for (EntityRef generator: partComp.affectors) {
                 for (Component component: generator.iterateComponents()) {
@@ -120,7 +138,8 @@ public class ParticleSystemUpdating {
 
         particleSystem.particlePool.loadTemporaryDataFrom(index, DataMask.ALL.rawMask);
 
-        for (EntityRef generator: particleSystem.generators) {
+
+        for (EntityRef generator: particleSystem.emitterComponent.generators) {
             for (Component component: generator.iterateComponents()) {
                 GeneratorFunction<Component> function = registeredGeneratorFunctions.get(component.getClass());
 
@@ -135,6 +154,9 @@ public class ParticleSystemUpdating {
         }
 
         particleSystem.particlePool.temporaryParticleData.position.add(particleSystem.entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(LocationComponent.class).getWorldPosition());
+
+
+
         particleSystem.particlePool.storeTemporaryDataAt(index, DataMask.ALL.rawMask);
     }
 
@@ -145,17 +167,12 @@ public class ParticleSystemUpdating {
         while (deltaLeft > 0 && partSys.particlePool.deadParticles() > 0 ) {
             if (partSys.nextEmission < deltaLeft) {
                 deltaLeft -= partSys.nextEmission;
-                float freq1 = 1 / partSys.emitter.spawnRateMax;
-                float freq2 = 1 / partSys.emitter.spawnRateMin;
+                float freq1 = 1.0f / partSys.emitterComponent.spawnRateMax;
+                float freq2 = 1.0f / partSys.emitterComponent.spawnRateMin;
                 partSys.nextEmission = random.nextFloat(freq1 , freq2);
 
-                if (partSys.entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles > 0) {
-                    emitParticle(partSys, registeredGeneratorFunctions);
-                    if (partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime < Float.POSITIVE_INFINITY) {
-                        partSys.entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles--;
-                    }
-                }
-            }else {
+                emitParticle(partSys, registeredGeneratorFunctions);
+            } else {
                 partSys.nextEmission -= deltaLeft;
                 deltaLeft = 0;
             }
