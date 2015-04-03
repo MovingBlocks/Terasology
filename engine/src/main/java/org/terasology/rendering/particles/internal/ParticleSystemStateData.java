@@ -15,13 +15,16 @@
  */
 package org.terasology.rendering.particles.internal;
 
+import com.google.api.client.util.Maps;
+import com.google.common.collect.BiMap;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.particles.components.ParticleEmitterComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
+import org.terasology.rendering.particles.functions.affectors.AffectorFunction;
+import org.terasology.rendering.particles.functions.generators.GeneratorFunction;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Linus on 4-3-2015.
@@ -37,7 +40,8 @@ public class ParticleSystemStateData {
     public final ParticlePool particlePool;
     public int collisionUpdateIteration;
 
-    public List<Component> affectorComponents;
+    public final Map<Component, AffectorFunction> affectors;
+    public final Map<Component, GeneratorFunction> generators;
 
     public ParticleSystemStateData(final EntityRef entityRef, final ParticlePool particlePool) {
         this.entityRef = entityRef;
@@ -47,6 +51,29 @@ public class ParticleSystemStateData {
 
         this.nextEmission = 0;
 
-        this.affectorComponents = new ArrayList<>();
+        this.affectors = new LinkedHashMap<>();
+        this.generators = new LinkedHashMap<>();
     }
+
+    public void updateFunctionMaps(final BiMap<Class<Component>, AffectorFunction> affectorFunctions, final BiMap<Class<Component>, GeneratorFunction> generatorFunctions) {
+        fetchFunctions(affectors, affectorFunctions);
+        fetchFunctions(generators, generatorFunctions);
+    }
+
+    private <T> void fetchFunctions(final Map<Component, T> fetchedFunctions, final BiMap<Class<Component>, T> registeredFunctions) {
+        fetchedFunctions.clear();
+
+        Set<Class<Component>> relevantClasses = registeredFunctions.keySet();
+
+        Iterator<Component> components = emitterComponent.generators.stream()
+                .map((entity) -> entity.iterateComponents(). iterator() )
+                .filter((component) -> relevantClasses.contains(component.getClass()))
+                .findAny().get();
+
+        components.forEachRemaining(
+                (component) -> fetchedFunctions.put(component, registeredFunctions.get(component))
+        );
+    }
+
+
 }
