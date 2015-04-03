@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.reflection.MappedContainer;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
 
@@ -29,7 +30,23 @@ import java.util.*;
  */
 public class EnergySizeAffectorComponent implements Component {
 
-    public Map<Float, Vector3f> sizeMap = new HashMap<>();
+    public List<EnergyAndSize> sizeMap = new ArrayList<>();
+
+    @MappedContainer
+    public static class EnergyAndSize {
+        public float energy;
+        public Vector3f size;
+
+        public EnergyAndSize() {
+            energy = 0.0f;
+            size = new Vector3f();
+        }
+
+        public EnergyAndSize(float energy, Vector3f size) {
+            this.energy = energy;
+            this.size = new Vector3f(size);
+        }
+    }
 
     public EnergySizeAffectorComponent() {
 
@@ -39,7 +56,7 @@ public class EnergySizeAffectorComponent implements Component {
         Preconditions.checkArgument(keys.length == values.length);
 
         for (int i = 0; i < keys.length; i++) {
-            sizeMap.put(keys[i], values[i]);
+            sizeMap.add(new EnergyAndSize(keys[i], values[i]));
         }
     }
 
@@ -52,7 +69,8 @@ public class EnergySizeAffectorComponent implements Component {
             Preconditions.checkArgument(valueIterator.hasNext(),
                     "Received more keys than values"
             );
-            sizeMap.put(keyIterator.next(), valueIterator.next());
+
+            sizeMap.add(new EnergyAndSize(keyIterator.next(), valueIterator.next()));
         }
 
         Preconditions.checkArgument(!valueIterator.hasNext(),

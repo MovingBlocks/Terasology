@@ -17,6 +17,7 @@ package org.terasology.rendering.particles;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.particles.functions.affectors.AffectorFunction;
+import org.terasology.rendering.particles.functions.generators.GeneratorFunction;
 
 /**
  * Created by Linus on 10-3-2015.
@@ -27,6 +28,8 @@ public interface ParticleManagerInterface {
     //public EntityRef createEmmiter(EntityRef particleSystem);
 
     public void registerAffectorFunction(AffectorFunction affectorFunction);
+
+    public void registerGeneratorFunction(GeneratorFunction generatorFunction);
 
     //public EntityRef createEmmiterParticleSystem(EntityRef particleSystem);
 }

@@ -15,17 +15,28 @@
  */
 package org.terasology.rendering.particles.internal;
 
+import com.google.common.collect.BiMap;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.*;
+import org.terasology.rendering.particles.events.ParticleSystemUpdateEvent;
+import org.terasology.rendering.particles.functions.affectors.AffectorFunction;
+import org.terasology.rendering.particles.functions.generators.GeneratorFunction;
 import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 28-2-2015.
  */
 public class ParticleSystemUpdating {
     private static final int PHYSICS_SKIP_NR = 10;
+
+    private static void broadCastBeforeUpdateEvent(EntityRef particleSystem) {
+        ParticleSystemUpdateEvent event = new ParticleSystemUpdateEvent();
+    }
 
     private static FastRandom random = new FastRandom();
     /*
@@ -52,7 +63,7 @@ public class ParticleSystemUpdating {
             vel.normalize();
 
             HitResult hitResult = physics.rayTrace(curr, vel, dist, StandardCollisionGroup.WORLD);
-            if(hitResult.isHit()) {
+            if (hitResult.isHit()) {
                 pool.energy[i] = 0;
             }
         }
@@ -70,38 +81,67 @@ public class ParticleSystemUpdating {
         }
     }
 
-    public static void updateParticles(ParticleSystemStateData partSys, float delta) {
+    public static void updateParticles(ParticleSystemStateData partSys,
+                                       final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
+                                       float delta) {
         updateLifeRemaining(partSys.particlePool, delta);
+
+        ParticleSystemComponent partComp = partSys.entityRef.getComponent(ParticleSystemComponent.class);
 
         for(int i = 0; i < partSys.particlePool.livingParticles(); i++) {
             partSys.particlePool.loadTemporaryDataFrom(i, DataMask.ALL.rawMask);
-           /* for(Affector affector: partSys.affectors) {
-                affector.onUpdate(partSys.particlePool.temporaryParticleData, random, delta);
+
+            for (EntityRef generator: partComp.affectors) {
+                for (Component component: generator.iterateComponents()) {
+                    AffectorFunction<Component> function = registeredAffectorFunctions.get(component.getClass());
+
+                    if (function != null) {
+                        function.update(
+                                component,
+                                partSys.particlePool.temporaryParticleData,
+                                random,
+                                delta
+                        );
+                    }
+                }
             }
+
             partSys.particlePool.storeTemporaryDataAt(i, DataMask.ALL.rawMask);
-            */
+
         }
     }
 
     //== emission ======================================================================================================
 
-    public static void emitParticle(final ParticleSystemStateData particleSystem) {
-        /*
+    public static void emitParticle(final ParticleSystemStateData particleSystem,
+                                    final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions
+    ) {
         int index = particleSystem.particlePool.reviveParticle();
 
         particleSystem.particlePool.loadTemporaryDataFrom(index, DataMask.ALL.rawMask);
 
-        for(Generator generator: particleSystem.generators ) {
-            generator.onEmission(particleSystem.particlePool.temporaryParticleData, random);
+        for (EntityRef generator: particleSystem.generators) {
+            for (Component component: generator.iterateComponents()) {
+                GeneratorFunction<Component> function = registeredGeneratorFunctions.get(component.getClass());
+
+                if (function != null) {
+                    function.onEmission(
+                            component,
+                            particleSystem.particlePool.temporaryParticleData,
+                            random
+                    );
+                }
+            }
         }
 
         particleSystem.particlePool.temporaryParticleData.position.add(particleSystem.entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(LocationComponent.class).getWorldPosition());
         particleSystem.particlePool.storeTemporaryDataAt(index, DataMask.ALL.rawMask);
-        */
     }
 
-    public static void updateEmitter(final ParticleSystemStateData partSys, final float delta) {
-        /*float deltaLeft = delta;
+    public static void updateEmitter(final ParticleSystemStateData partSys,
+                                     final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions,
+                                     final float delta) {
+        float deltaLeft = delta;
         while (deltaLeft > 0 && partSys.particlePool.deadParticles() > 0 ) {
             if (partSys.nextEmission < deltaLeft) {
                 deltaLeft -= partSys.nextEmission;
@@ -109,28 +149,31 @@ public class ParticleSystemUpdating {
                 float freq2 = 1 / partSys.emitter.spawnRateMin;
                 partSys.nextEmission = random.nextFloat(freq1 , freq2);
 
-                if(partSys.entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles > 0) {
-                    emitParticle(partSys);
-                    if(partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime < Float.POSITIVE_INFINITY) {
+                if (partSys.entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles > 0) {
+                    emitParticle(partSys, registeredGeneratorFunctions);
+                    if (partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime < Float.POSITIVE_INFINITY) {
                         partSys.entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles--;
                     }
                 }
-            }
-            else {
+            }else {
                 partSys.nextEmission -= deltaLeft;
                 deltaLeft = 0;
             }
         }
-        */
     }
 
     //== general =======================================================================================================
 
-    public static void update(final ParticleSystemStateData partSys, final Physics physics, final float delta) {
-        updateEmitter(partSys, delta);
+    public static void update(final ParticleSystemStateData partSys,
+                              final Physics physics,
+                              final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions,
+                              final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
+                              final float delta
+    ) {
+        updateEmitter(partSys, registeredGeneratorFunctions, delta);
         checkCollision(partSys.particlePool, physics, partSys.collisionUpdateIteration, delta);
         partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
-        updateParticles(partSys, delta);
+        updateParticles(partSys, registeredAffectorFunctions, delta);
 
         partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime -= delta;
     }

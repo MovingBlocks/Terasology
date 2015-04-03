@@ -25,6 +25,9 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.*;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.LocationComponent;
@@ -43,6 +46,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.particles.components.affectors.*;
 import org.terasology.rendering.particles.components.generators.*;
 import org.terasology.rendering.particles.functions.affectors.*;
+import org.terasology.rendering.particles.functions.generators.*;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -74,22 +78,21 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
     @In
     private Physics physics;
 
+    private BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions = HashBiMap.create();
     private BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions = HashBiMap.create();
 
     // Internal state of all particle systems
     private Map<EntityRef, ParticleSystemStateData> particleSystems = new HashMap<>();
+
     /*
     @ReceiveEvent(components = {ParticleSystemComponent.class})
     public void onActivated(OnActivatedComponent event, EntityRef entity) {
         ParticleSystemComponent component = entity.getComponent(ParticleSystemComponent.class);
-        /*
+
         particleSystems.put(entity, new ParticleSystemStateData(
                 entity,
-              //  registeredParticleSimulators.get(component.systemType),
                 new ParticlePool(component.nrOfParticles)
         ));
-        *
-
     }
 
     @ReceiveEvent(components = {ParticleSystemComponent.class})
@@ -124,6 +127,12 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
     }
 
     public void initialise() {
+        registerGeneratorFunction(new ColorRangeGeneratorFunction());
+        registerGeneratorFunction(new EnergyRangeGeneratorFunction());
+        registerGeneratorFunction(new PositionRangeGeneratorFunction());
+        registerGeneratorFunction(new SizeRangeGeneratorFunction());
+        registerGeneratorFunction(new VelocityRangeGeneratorFunction());
+
         registerAffectorFunction(new DampingAffectorFunction());
         registerAffectorFunction(new EnergyColorAffectorFunction());
         registerAffectorFunction(new EnergySizeAffectorFunction());
@@ -134,9 +143,9 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
     @Override
     public void shutdown() {
-
         particleSystems.clear();
         registeredAffectorFunctions.clear();
+        registeredGeneratorFunctions.clear();
     }
 
     float cumDelta = 0.0f;
@@ -146,14 +155,14 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         synchronized(particleSystems) {
             cumDelta += delta;
             for (ParticleSystemStateData system : particleSystems.values()) {
-                ParticleSystemUpdating.update(system, physics, delta);
+                ParticleSystemUpdating.update(system, physics, registeredGeneratorFunctions, registeredAffectorFunctions, delta);
             }
             cumDelta += delta;
 
             Iterator<Map.Entry<EntityRef,ParticleSystemStateData>> iter = particleSystems.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<EntityRef,ParticleSystemStateData> entry = iter.next();
-                if(entry.getKey().getComponent(ParticleSystemComponent.class).maxLifeTime < 0){
+                if (entry.getKey().getComponent(ParticleSystemComponent.class).maxLifeTime < 0){
                     entry.getKey().destroy();
                     iter.remove();
                 }
@@ -168,7 +177,6 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             }
         }
     }
-
 
     public void renderAlphaBlend() {
         ParticleSystemRendering.render(worldRenderer, particleSystems.values());
@@ -236,6 +244,8 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         return spawnPosition;
     }
 
+
+
     /**
      * @return
      */
@@ -282,11 +292,11 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         final float keySmokeEnd    = 0.0f;
 
         EnergySizeAffectorComponent energySizeAffector = new EnergySizeAffectorComponent();
-            energySizeAffector.sizeMap.put(keyFireStart,  new Vector3f(0.01f, 0.01f, 0.01f));
-            energySizeAffector.sizeMap.put(keyFireRed,    new Vector3f(0.1f,  0.1f,  0.1f ));
-            energySizeAffector.sizeMap.put(keyFireEnd,    new Vector3f(0.00f, 0.00f, 0.00f));
-            energySizeAffector.sizeMap.put(keySmokeStart, new Vector3f(0.02f, 0.02f, 0.02f));
-            energySizeAffector.sizeMap.put(keySmokeEnd,    new Vector3f(0.5f,  0.5f,  0.5f ));
+            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keyFireStart, new Vector3f(0.01f, 0.01f, 0.01f)));
+            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keyFireRed, new Vector3f(0.1f, 0.1f, 0.1f)));
+            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keyFireEnd, new Vector3f(0.00f, 0.00f, 0.00f)));
+            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keySmokeStart, new Vector3f(0.02f, 0.02f, 0.02f)));
+            energySizeAffector.sizeMap.add(new EnergySizeAffectorComponent.EnergyAndSize(keySmokeEnd, new Vector3f(0.5f, 0.5f, 0.5f)));
         particleSystemComponent.affectors.add(entityManager.create(energySizeAffector));
 
 
@@ -311,27 +321,17 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             new Vector4f(0.1f, 0.1f, 0.1f, 0.0f),   // end
         };
 
-        particleSystemComponent.affectors.add(entityManager.create(new EnergyColorAffectorComponent(keyEnergies, colors)));
-        Component x = new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f));
-        Component y = new VelocityRangeGeneratorComponent(new Vector3f(-1f, 0.5f, -1f), new Vector3f(+1f, 2.0f, +1f));
-        Component z = new EnergyRangeGeneratorComponent(6, 7);
+        emitterComponent.generators.add(entityManager.create(
+                new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f))
+        ));
+        emitterComponent.generators.add(entityManager.create(
+                new PositionRangeGeneratorComponent(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f))
+        ));
+        emitterComponent.generators.add(entityManager.create(
+                new EnergyRangeGeneratorComponent(6, 7)
+        ));
 
-        EntityRef a = entityManager.create(
-                x
-        );
-
-        EntityRef b = entityManager.create(
-                y
-        );
-
-
-        EntityRef c = entityManager.create(
-                z
-        );
-
-        emitterComponent.generators.add(a);
-        emitterComponent.generators.add(b);
-        emitterComponent.generators.add(c);
+        particleSystems.put(entityRef, new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles)));
 
         return String.format("Sparkly: %s", spawnPosition );
     }
@@ -379,6 +379,16 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         particleSystem.getComponent(ParticleSystemComponent.class).emitter = emitter;
 
         return emitter;
+    }
+
+    @Override
+    public void registerGeneratorFunction(GeneratorFunction generatorFunction) {
+        Preconditions.checkArgument(!registeredGeneratorFunctions.containsKey(generatorFunction.getComponentClass()),
+                "Tried to register an GeneratorFunction for %s twice", generatorFunction
+        );
+
+        logger.info("Registering GeneratorFunction for Component class {}", generatorFunction.getComponentClass());
+        registeredGeneratorFunctions.put(generatorFunction.getComponentClass(), generatorFunction);
     }
 
     @Override

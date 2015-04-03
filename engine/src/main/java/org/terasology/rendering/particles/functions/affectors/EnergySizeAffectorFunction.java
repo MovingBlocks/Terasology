@@ -50,11 +50,9 @@ public final class EnergySizeAffectorFunction extends AffectorFunction<EnergySiz
 
         if (left == null && right != null) {
             particleData.scale.set(right.getValue());
-        }
-        else if (right == null && left != null) {
+        } else if (right == null && left != null) {
             particleData.scale.set(left.getValue());
-        }
-        else if (left != null && right != null) {
+        } else if (left != null && right != null) {
             float rightAmount = (particleData.energy - left.getKey()) / (right.getKey() - left.getKey());
 
             final Vector3f leftValue = left.getValue();
@@ -74,7 +72,10 @@ public final class EnergySizeAffectorFunction extends AffectorFunction<EnergySiz
                               final float delta
     ) {
         sizeMap.clear();
-        sizeMap.putAll(component.sizeMap);
+
+        for(EnergySizeAffectorComponent.EnergyAndSize energyAndSize: component.sizeMap) {
+            sizeMap.put(energyAndSize.energy, energyAndSize.size);
+        }
     }
 
     private static void lerpAndSetSize(final Map.Entry<Float, Vector3f> left,

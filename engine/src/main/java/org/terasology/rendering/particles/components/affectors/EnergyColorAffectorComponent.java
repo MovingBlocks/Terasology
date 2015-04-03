@@ -16,9 +16,11 @@
 package org.terasology.rendering.particles.components.affectors;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.reflection.MappedContainer;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.utilities.random.Random;
 
@@ -29,7 +31,23 @@ import java.util.*;
  */
 public class EnergyColorAffectorComponent implements Component {
 
-    public Map<Float, Vector4f> gradientMap = new HashMap<>();
+    public List<EnergyAndColor> gradientMap = new ArrayList<>();
+
+    @MappedContainer
+    public static class EnergyAndColor {
+        public float energy;
+        public Vector4f color;
+
+        public EnergyAndColor() {
+            energy = 0.0f;
+            color = new Vector4f();
+        }
+
+        public EnergyAndColor(float energy, Vector4f color) {
+            this.energy = energy;
+            this.color = new Vector4f(color);
+        }
+    }
 
     public EnergyColorAffectorComponent() {
 
@@ -41,7 +59,7 @@ public class EnergyColorAffectorComponent implements Component {
         );
 
         for (int i = 0; i < keys.length; i++) {
-            gradientMap.put(keys[i], values[i]);
+            gradientMap.add(new EnergyAndColor(keys[i], values[i]));
         }
     }
 
@@ -54,7 +72,8 @@ public class EnergyColorAffectorComponent implements Component {
             Preconditions.checkArgument(valueIterator.hasNext(),
                     "Received more keys than values."
             );
-            gradientMap.put(keyIterator.next(), valueIterator.next());
+
+            gradientMap.add(new EnergyAndColor(keyIterator.next(), valueIterator.next()));
         }
 
         Preconditions.checkArgument(!valueIterator.hasNext(),
