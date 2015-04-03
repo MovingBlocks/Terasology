@@ -26,7 +26,7 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * Shader parameters for the Debug shader program.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ShaderParametersDebug extends ShaderParametersBase {
 

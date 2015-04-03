@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Allows an entity to store items.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @ForceBlockActive
 public final class InventoryComponent implements Component, ReplicationCheck {

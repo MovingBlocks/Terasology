@@ -15,39 +15,39 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import com.google.common.collect.Sets;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
+import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Border3D;
+import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
-import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Set;
+import com.google.common.math.IntMath;
 
 @Produces(SurfaceHeightFacet.class)
 @Requires(@Facet(SeaLevelFacet.class))
-public class HeightMapSurfaceHeightProvider implements FacetProvider {
-    private static final Logger logger = LoggerFactory.getLogger(HeightMapSurfaceHeightProvider.class);
-    private static final int MAX_HEIGHT = 256;
+public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider {
 
-    private static float[][] heightmap;
+    private static final Logger logger = LoggerFactory.getLogger(HeightMapSurfaceHeightProvider.class);
+
+    private float[][] heightmap;
+
+    private int mapWidth;
+    private int mapHeight;
+
+    private HeightMapConfiguration configuration = new HeightMapConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -57,14 +57,14 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
         ByteBuffer[] bb = texture.getData().getBuffers();
         IntBuffer intBuf = bb[0].asIntBuffer();
 
-        int width = texture.getWidth();
-        int height = texture.getHeight();
+        mapWidth = texture.getWidth();
+        mapHeight = texture.getHeight();
 
-        heightmap = new float[width][height];
+        heightmap = new float[mapWidth][mapHeight];
         while (intBuf.position() < intBuf.limit()) {
             int pos = intBuf.position();
-            int val = intBuf.get();
-            heightmap[pos % width][pos / width] = val / (256 * 256 * 256 * 12.8f);
+            long val = intBuf.get() & 0xFFFFFFFFL;
+            heightmap[pos % mapWidth][pos / mapWidth] = val / (256 * 256 * 256 * 256f);
         }
 
         heightmap = shiftArray(rotateArray(heightmap), -50, -100);
@@ -76,44 +76,26 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
         Border3D border = region.getBorderForFacet(SurfaceHeightFacet.class);
         SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), border);
 
-        Set<Vector3i> chunkCoordinates = Sets.newHashSet();
-        for (Vector3i pos : border.expandTo3D(region.getRegion())) {
-            chunkCoordinates.add(ChunkMath.calcChunkPos(pos));
-        }
+        for (Vector2i pos : facet.getWorldRegion()) {
+            int xzScale = configuration.terrainScale;
 
-        for (Vector3i chunkCoordinate : chunkCoordinates) {
-            Vector3i minWorldPosForChunk = new Vector3i(ChunkConstants.SIZE_X * chunkCoordinate.x,
-                    ChunkConstants.SIZE_Y * chunkCoordinate.y,
-                    ChunkConstants.SIZE_Z * chunkCoordinate.z);
-            Region3i chunkWorldRegion = Region3i.createFromMinAndSize(minWorldPosForChunk, ChunkConstants.CHUNK_SIZE);
+            int wrapX = IntMath.mod(pos.getX(), mapWidth * xzScale);
+            int wrapZ = IntMath.mod(pos.getY(), mapHeight * xzScale);
 
-            int hmX = (((chunkWorldRegion.minX() / chunkWorldRegion.sizeX()) % 512) + 512) % 512;
-            int hmZ = (((chunkWorldRegion.minZ() / chunkWorldRegion.sizeZ()) % 512) + 512) % 512;
+            int mapX = wrapX / xzScale;
+            int mapZ = wrapZ / xzScale;
+            double p00 = heightmap[mapX][mapZ];
+            double p10 = heightmap[(mapX - 1 + 512) % 512][(mapZ) % 512];
+            double p11 = heightmap[(mapX - 1 + 512) % 512][(mapZ + 1 + 512) % 512];
+            double p01 = heightmap[(mapX) % 512][(mapZ + 1 + 512) % 512];
 
-            double scaleFactor = 0.05 * MAX_HEIGHT;
+            float relX = (wrapX % xzScale) / (float) xzScale;
+            float relZ = (wrapZ % xzScale) / (float) xzScale;
 
-            double p00 = heightmap[hmX][hmZ] * scaleFactor;
-            double p10 = heightmap[(hmX - 1 + 512) % 512][(hmZ) % 512] * scaleFactor;
-            double p11 = heightmap[(hmX - 1 + 512) % 512][(hmZ + 1 + 512) % 512] * scaleFactor;
-            double p01 = heightmap[(hmX) % 512][(hmZ + 1 + 512) % 512] * scaleFactor;
+            float interpolatedHeight = (float) lerp(relX, lerp(relZ, p10, p11), lerp(relZ, p00, p01));
+            float height = configuration.heightOffset + configuration.heightScale * interpolatedHeight;
 
-            Rect2i worldRegion = Rect2i.createFromMinAndSize(chunkWorldRegion.minX(),
-                    chunkWorldRegion.minZ(),
-                    chunkWorldRegion.sizeX(),
-                    chunkWorldRegion.sizeZ());
-
-            for (Vector2i pos : worldRegion) {
-                Vector3i localPos = ChunkMath.calcBlockPos(new Vector3i(pos.x, 0, pos.y));
-                int x = localPos.x;
-                int z = localPos.z;
-                //calculate avg height
-                float interpolatedHeight = (float) lerp(x / (double) ChunkConstants.CHUNK_REGION.sizeX(), lerp(z / (double) ChunkConstants.CHUNK_REGION.sizeZ(), p10, p11),
-                        lerp(z / (double) ChunkConstants.CHUNK_REGION.sizeZ(), p00, p01));
-
-                if (facet.getWorldRegion().contains(pos)) {
-                    facet.setWorld(pos, interpolatedHeight);
-                }
-            }
+            facet.setWorld(pos, height);
         }
 
         region.setRegionFacet(SurfaceHeightFacet.class, facet);
@@ -148,5 +130,32 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
 
     private static double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    @Override
+    public String getConfigurationName() {
+        return "Height Map";
+    }
+
+    @Override
+    public Component getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(Component configuration) {
+        this.configuration = (HeightMapConfiguration) configuration;
+    }
+
+    private static class HeightMapConfiguration implements Component {
+
+        @Range(min = 0, max = 50f, increment = 1f, precision = 0, description = "Height Offset")
+        private float heightOffset = 5;
+
+        @Range(min = 10, max = 200f, increment = 10f, precision = 0, description = "Height Scale Factor")
+        private float heightScale = 80;
+
+        @Range(min = 1, max = 32, increment = 1, precision = 0, description = "Terrain Scale Factor")
+        private int terrainScale = 4;
     }
 }

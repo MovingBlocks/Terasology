@@ -25,7 +25,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.util.Map;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
 

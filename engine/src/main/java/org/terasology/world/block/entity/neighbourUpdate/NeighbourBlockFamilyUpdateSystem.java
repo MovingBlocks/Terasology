@@ -21,12 +21,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
@@ -38,7 +38,7 @@ import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
 import java.util.Set;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -69,7 +69,6 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             notifyNeighboursOfChangedBlocks();
         }
     }
-
 
 
     private void notifyNeighboursOfChangedBlocks() {

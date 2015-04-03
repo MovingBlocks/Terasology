@@ -18,10 +18,8 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import gnu.trove.procedure.TLongObjectProcedure;
 import gnu.trove.procedure.TLongProcedure;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -30,9 +28,8 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.concurrency.AbstractTask;
@@ -62,10 +59,10 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
- * <p/>
+ * <br><br>
  * The result of this task can be obtained via {@link #getResult()}.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class SaveTransaction extends AbstractTask {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransaction.class);
@@ -153,7 +150,7 @@ public class SaveTransaction extends AbstractTask {
          * Currently loaded persistent entities without owner that have not been saved yet.
          */
         Set<EntityRef> unsavedEntities = new HashSet<>();
-        for (EntityRef entity: privateEntityManager.getAllEntities()) {
+        for (EntityRef entity : privateEntityManager.getAllEntities()) {
             if (entity.isPersistent()) {
                 unsavedEntities.add(entity);
             }
@@ -165,7 +162,6 @@ public class SaveTransaction extends AbstractTask {
 
 
     /**
-     *
      * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
      *                        This method removes entities it saves.
      */
@@ -174,7 +170,7 @@ public class SaveTransaction extends AbstractTask {
 
         allChunks = Maps.newHashMap();
         allChunks.putAll(unloadedChunks);
-        for (Map.Entry<Vector3i,ChunkImpl> chunkEntry: loadedChunks.entrySet()) {
+        for (Map.Entry<Vector3i, ChunkImpl> chunkEntry : loadedChunks.entrySet()) {
             Collection<EntityRef> entitiesToStore = chunkPosToEntitiesMap.get(chunkEntry.getKey());
             if (entitiesToStore == null) {
                 entitiesToStore = Collections.emptySet();
@@ -189,14 +185,13 @@ public class SaveTransaction extends AbstractTask {
     }
 
     /**
-     *
      * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
      *                        This method removes entities it saves.
      */
     private void preparePlayerStores(Set<EntityRef> unsavedEntities) {
         allPlayers = Maps.newHashMap();
         allPlayers.putAll(unloadedPlayers);
-        for (Map.Entry<String,PlayerStoreBuilder> playerEntry: loadedPlayers.entrySet()) {
+        for (Map.Entry<String, PlayerStoreBuilder> playerEntry : loadedPlayers.entrySet()) {
             PlayerStoreBuilder playerStoreBuilder = playerEntry.getValue();
             EntityData.PlayerStore playerStore = playerStoreBuilder.build(privateEntityManager);
             unsavedEntities.removeAll(playerStoreBuilder.getStoredEntities());
@@ -259,11 +254,11 @@ public class SaveTransaction extends AbstractTask {
             public boolean execute(long entityId, EntityDelta delta) {
                 if (privateEntityManager.isActiveEntity(entityId)) {
                     EntityRef entity = privateEntityManager.getEntity(entityId);
-                    for (Component changedComponent: delta.getChangedComponents().values()) {
+                    for (Component changedComponent : delta.getChangedComponents().values()) {
                         entity.removeComponent(changedComponent.getClass());
                         entity.addComponent(changedComponent);
                     }
-                    for (Class<? extends Component> c: delta.getRemovedComponents()) {
+                    for (Class<? extends Component> c : delta.getRemovedComponents()) {
                         entity.removeComponent(c);
                     }
                 } else {
@@ -304,7 +299,7 @@ public class SaveTransaction extends AbstractTask {
          */
         deltaToSave.bindAllDelayedEntityRefsTo(privateEntityManager);
 
-        for (EntityRef entityRef: entitiesToDestroy) {
+        for (EntityRef entityRef : entitiesToDestroy) {
             entityRef.destroy();
         }
 

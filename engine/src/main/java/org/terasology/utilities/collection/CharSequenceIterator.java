@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * @author Marcos Vives Del Sol <socram8888@gmail.com>
+ * @author Marcos Vives Del Sol
  */
 public class CharSequenceIterator implements Iterator<Character> {
 

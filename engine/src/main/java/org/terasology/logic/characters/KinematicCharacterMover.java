@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.characters;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,11 +25,12 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
@@ -50,7 +49,7 @@ import org.terasology.world.block.Block;
  * <li>If an slope is hit, slide up it</li>
  * <li>Finally sweep downwards to undo any stepping, and for falling</li>
  * </ol>
- * <p/>
+ * <br><br>
  * TODO: Refactor to allow additional movement modes.
  * TODO: Detect entry and exit from water while ghosting.
  *
@@ -158,7 +157,7 @@ public class KinematicCharacterMover implements CharacterMover {
     /**
      * Checks whether a character should change movement mode (from being underwater or in a ladder). A higher and lower point of the
      * character is tested for being in water, only if both points are in water does the character count as swimming.
-     * <p/>
+     * <br><br>
      * Sends the OnEnterLiquidEvent and OnLeaveLiquidEvent events.
      *
      * @param movementComp The movement component of the character.
@@ -681,7 +680,7 @@ public class KinematicCharacterMover implements CharacterMover {
             rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
-        // looking sidewards from ladder
+            // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
@@ -689,11 +688,11 @@ public class KinematicCharacterMover implements CharacterMover {
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
-                TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
+                    TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
             );
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
-        // facing away from ladder
+            // facing away from ladder
         } else {
             rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);

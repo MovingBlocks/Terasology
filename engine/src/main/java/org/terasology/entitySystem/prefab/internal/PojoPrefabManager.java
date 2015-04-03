@@ -29,8 +29,8 @@ import java.util.Collection;
 /**
  * Basic implementation of PrefabManager.
  *
- * @author Immortius <immortius@gmail.com>
- * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @author Immortius
+ * @author Rasmus 'Cervator' Praestholm
  * @see PrefabManager
  */
 public class PojoPrefabManager implements PrefabManager {

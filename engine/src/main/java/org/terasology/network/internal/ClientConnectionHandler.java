@@ -52,7 +52,6 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private final JoinStatusImpl joinStatus;
     private NetworkSystemImpl networkSystem;
     private ServerImpl server;
-    private ChannelHandlerContext channelHandlerContext;
     private ModuleManager moduleManager;
 
     private Set<String> missingModules = Sets.newHashSet();
@@ -71,19 +70,19 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
         if (message.hasServerInfo()) {
-            receivedServerInfo(message.getServerInfo());
+            receivedServerInfo(ctx, message.getServerInfo());
         } else if (message.hasModuleDataHeader()) {
-            receiveModuleStart(message.getModuleDataHeader());
+            receiveModuleStart(ctx, message.getModuleDataHeader());
         } else if (message.hasModuleData()) {
-            receiveModule(message.getModuleData());
+            receiveModule(ctx, message.getModuleData());
         } else if (message.hasJoinComplete()) {
-            completeJoin(message.getJoinComplete());
+            completeJoin(ctx, message.getJoinComplete());
         } else {
             logger.error("Received unexpected message");
         }
     }
 
-    private void receiveModuleStart(NetData.ModuleDataHeader moduleDataHeader) {
+    private void receiveModuleStart(ChannelHandlerContext channelHandlerContext, NetData.ModuleDataHeader moduleDataHeader) {
         if (receivingModule != null) {
             joinStatus.setErrorMessage("Module download error");
             channelHandlerContext.getChannel().close();
@@ -126,7 +125,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
-    private void receiveModule(NetData.ModuleData moduleData) {
+    private void receiveModule(ChannelHandlerContext channelHandlerContext, NetData.ModuleData moduleData) {
         if (receivingModule == null) {
             joinStatus.setErrorMessage("Module download error");
             channelHandlerContext.getChannel().close();
@@ -158,7 +157,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                     receivingModule = null;
 
                     if (missingModules.isEmpty()) {
-                        sendJoin();
+                        sendJoin(channelHandlerContext);
                     }
                 } else {
                     logger.error("Module rejected");
@@ -173,7 +172,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
-    private void completeJoin(NetData.JoinCompleteMessage joinComplete) {
+    private void completeJoin(ChannelHandlerContext channelHandlerContext, NetData.JoinCompleteMessage joinComplete) {
         logger.info("Join complete received");
         server.setClientId(joinComplete.getClientId());
 
@@ -182,7 +181,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         joinStatus.setComplete();
     }
 
-    private void receivedServerInfo(NetData.ServerInfoMessage message) {
+    private void receivedServerInfo(ChannelHandlerContext channelHandlerContext, NetData.ServerInfoMessage message) {
         logger.info("Received server info");
         ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
         this.server = new ServerImpl(networkSystem, channelHandlerContext.getChannel());
@@ -197,7 +196,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
         if (missingModules.isEmpty()) {
             joinStatus.setCurrentActivity("Finalizing join");
-            sendJoin();
+            sendJoin(channelHandlerContext);
         } else {
             joinStatus.setCurrentActivity("Requesting missing modules");
             NetData.NetMessage.Builder builder = NetData.NetMessage.newBuilder();
@@ -208,7 +207,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
-    private void sendJoin() {
+    private void sendJoin(ChannelHandlerContext channelHandlerContext) {
         Config config = CoreRegistry.get(Config.class);
         NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
         NetData.Color.Builder clrbldr = NetData.Color.newBuilder();
@@ -218,13 +217,6 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
 
         channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
-    }
-
-    public void channelAuthenticated(ChannelHandlerContext ctx) {
-        channelHandlerContext = ctx;
-        ctx.getChannel().write(NetData.NetMessage.newBuilder()
-                .setServerInfoRequest(NetData.ServerInfoRequest.newBuilder()).build());
-        joinStatus.setCurrentActivity("Requesting server info");
     }
 
     public JoinStatus getJoinStatus() {

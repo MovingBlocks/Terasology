@@ -59,7 +59,7 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonRenderer extends BaseComponentSystem implements RenderSystem {

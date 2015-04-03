@@ -26,7 +26,7 @@ import java.nio.FloatBuffer;
 /**
  * View frustum usable for frustum culling.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ViewFrustum {
 

@@ -20,12 +20,12 @@ import org.terasology.network.OwnerEvent;
 
 /**
  * Represents the end of an interaction between for example a character and a container.
- * <p/>
+ * <br><br>
  * The event is sent via the character.
- * <p/>
+ * <br><br>
  * The event is sent by the server to the owner of the character..
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 @OwnerEvent
 public class InteractionEndEvent implements Event {

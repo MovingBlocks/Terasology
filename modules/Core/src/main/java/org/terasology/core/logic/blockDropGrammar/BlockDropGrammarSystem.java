@@ -40,7 +40,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 import java.util.List;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Marcin Sciesinski
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockDropGrammarSystem extends BaseComponentSystem {

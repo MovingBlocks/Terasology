@@ -24,8 +24,8 @@ import java.util.Objects;
 
 /**
  * Base class for all Assets that ensures that they
- * @author Immortius <immortius@gmail.com>
- * @author Florian <florian@fkoeberle.de>
+ * @author Immortius
+ * @author Florian
  */
 public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     private static final Logger logger = LoggerFactory.getLogger(AbstractAsset.class);

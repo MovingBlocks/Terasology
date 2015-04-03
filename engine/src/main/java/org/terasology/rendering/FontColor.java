@@ -23,7 +23,7 @@ import org.terasology.rendering.nui.Color;
  * Defines a set of special characters that manipulate the font color of a rendered text string.
  * Use {@link #toChar(int, int, int)}# to get such a char and append it to the text string at the desired position.
  * Use {@link #getReset()} to reset the color back to the default.
- * <br/> 
+ * <br> 
  * <b>Note:</b> The resolution is only 4 bit per channel (not 8 as usual). 
  * @author Martin Steiger
  */

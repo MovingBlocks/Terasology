@@ -19,7 +19,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * @author Esa-Petri Tirkkonen
  */
 public final class HierarchicalAIComponent implements Component {
 

@@ -38,7 +38,8 @@
             "text-color": "FF4444FF"
         },
         "highlight": {
-            "text-color": "FFFF00FF"
+            "text-color": "FFFF00FF",
+            "font" : "NotoSans-Bold"
         },
         "heading-input": {
             "font": "title",

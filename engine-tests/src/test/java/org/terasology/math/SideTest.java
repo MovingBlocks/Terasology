@@ -20,7 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class SideTest {
 

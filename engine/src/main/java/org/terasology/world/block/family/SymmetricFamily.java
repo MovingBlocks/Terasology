@@ -16,7 +16,7 @@
 package org.terasology.world.block.family;
 
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -28,7 +28,7 @@ import java.util.Collections;
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class SymmetricFamily extends AbstractBlockFamily {
 

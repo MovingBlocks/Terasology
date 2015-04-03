@@ -50,17 +50,17 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
- * <p/>
+ * <br><br>
  * Through the following launch arguments default locations to store logs and
  * game saves can be overridden, by using the current directory or a specified
  * one as the home directory. Furthermore, Terasology can be launched headless,
  * to save resources while acting as a server or to run in an environment with
  * no graphics, audio or input support. Additional arguments are available to
  * reload the latest game on startup and to disable crash reporting.
- * <p/>
+ * <br><br>
  * Available launch arguments:
- * <p/>
- * <table>
+ * <br><br>
+ * <table summary="Launch arguments">
  * <tbody>
  * <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
  * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
@@ -71,15 +71,15 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
  * <tr><td>-serverPort=xxxxx</td><td>Change the server port.</td></tr>
  * </tbody>
  * </table>
- * <p/>
+ * <br><br>
  * When used via command line an usage help and some examples can be obtained via:
- * <p/>
+ * <br><br>
  * terasology -help    or    terasology /?
- * <p/>
- * In case of crashes Terasology logs available information in <logpath>/Terasology.log
+ * <br><br>
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Kireev   Anton   <adeon.k87@gmail.com>
+ * @author Benjamin Glatzel
+ * @author Anton Kireev
+ * @author and many others
  */
 
 public final class Terasology {

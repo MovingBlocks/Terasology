@@ -25,7 +25,7 @@ import org.terasology.persistence.StorageManager;
 /**
  * Component for storing entity system information on an entity
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class EntityInfoComponent implements Component {
     public Prefab parentPrefab = new NullPrefab();

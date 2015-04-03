@@ -18,7 +18,7 @@ package org.terasology.benchmark;
 /**
  * Benchmark is an abstract class which is used to implement one particular benchmark.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public interface Benchmark {
 

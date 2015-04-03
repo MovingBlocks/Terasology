@@ -61,7 +61,7 @@ import java.util.Set;
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class PojoEntityManager implements LowLevelEntityManager, EngineEntityManager {
     public static final long NULL_ID = 0;

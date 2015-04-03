@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * Benchmarks contains methods to execute one or many benchmarks with support for a progress callback as well as
  * a simple pretty printer for benchmark results.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public final class Benchmarks {
 

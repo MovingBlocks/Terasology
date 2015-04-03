@@ -25,7 +25,7 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 /**
  * Helper class to have LWJGL loading logic in a central spot
  *
- * @author Rasmus 'Cervator' Praestholm - cervator@gmail.com
+ * @author Rasmus 'Cervator' Praestholm
  */
 public final class LWJGLHelper {
 
@@ -46,7 +46,7 @@ public final class LWJGLHelper {
             logger.warn("Could not load optional TeraOVR native libraries - Oculus support disabled");
         }
     }
-    
+
     private static void initLibraryPaths() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:

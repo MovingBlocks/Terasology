@@ -33,13 +33,13 @@ import java.util.TimerTask;
 /**
  * This data structure takes Entities with a location in the world and sorts
  * them based on their distance to an other entity.
- * <p/>
+ * <br><br>
  * The sorting is done in a background thread.
- * <p/>
+ * <br><br>
  * When retrieving Entities from this container, no guarantees are given on the
  * sorting of the entities. This class only tries to keep the elements sorted,
  * but does not guarantee it.
- * <p/>
+ * <br><br>
  * It it therefor use full for graphics purposes, to keep track of the nearest
  * entities to draw.
  *
@@ -184,7 +184,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      * Fills the given array with Entities from this container. Attempts are
      * made to put the Entities nearest to the player in this array and nearer
      * entities are expected, but not guaranteed to be at a lower index.
-     * <p/>
+     * <br><br>
      * This is the most memory friendly way to obtain elements from this
      * container.
      *
@@ -281,12 +281,12 @@ public class NearestSortingList implements Iterable<EntityRef> {
     /**
      * Stops the background sorting without deleting clearing this container.
      * This is required for proper clean-up.
-     * <p/>
+     * <br><br>
      * Note that if a sorting process is running while this method is called,
      * the sorting process finishes sorting this method will wait for it to
      * finish. Afterwards the sorting is not scheduled again until the
      * initialize method is called again.
-     * <p/>
+     * <br><br>
      * Note that calling stop() and clear() can be done in any order and the
      * specified behaviour will be exactly the same. If there is a difference it
      * is an insignificant performance loss or win if.

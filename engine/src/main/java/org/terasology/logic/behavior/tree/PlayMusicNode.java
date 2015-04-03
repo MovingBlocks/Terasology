@@ -24,12 +24,12 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 
 /**
- * <b>Properties</b>: <b>music</b><br/>
- * <br/>
- * <b>RUNNING</b>: while music is playing<br/>
- * <b>SUCCESS</b>: once music ends playing<br/>
- * <b>FAILURE</b>: otherwise<br/>
- * <br/>
+ * <b>Properties</b>: <b>music</b><br>
+ * <br>
+ * <b>RUNNING</b>: while music is playing<br>
+ * <b>SUCCESS</b>: once music ends playing<br>
+ * <b>FAILURE</b>: otherwise<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class PlayMusicNode extends Node {

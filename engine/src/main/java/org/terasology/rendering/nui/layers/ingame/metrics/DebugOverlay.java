@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
@@ -25,9 +24,8 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;

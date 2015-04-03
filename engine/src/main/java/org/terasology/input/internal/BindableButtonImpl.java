@@ -17,8 +17,6 @@ package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +26,9 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 import java.util.Set;
@@ -37,7 +36,7 @@ import java.util.Set;
 /**
  * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the
  * mouse wheel).
- * <p/>
+ * <br><br>
  * When the BindableButton changes state it sends out events like an actual key or button does. It also allows direct
  * subscription via the {@link org.terasology.input.BindButtonSubscriber} interface.
  */
@@ -250,9 +249,9 @@ public class BindableButtonImpl implements BindableButton {
         }
         return false;
     }
-    
+
     @Override
     public String toString() {
-        return "BindableButtonEventImpl [" + id + ", \"" + displayName + "\", " + buttonEvent + "]"; 
+        return "BindableButtonEventImpl [" + id + ", \"" + displayName + "\", " + buttonEvent + "]";
     }
 }

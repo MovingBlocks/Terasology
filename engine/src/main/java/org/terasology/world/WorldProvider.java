@@ -15,8 +15,8 @@
  */
 package org.terasology.world;
 
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
@@ -24,7 +24,7 @@ import org.terasology.world.liquid.LiquidData;
 /**
  * Provides the basic interface for all world providers.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public interface WorldProvider extends WorldProviderCore {
 

@@ -29,17 +29,16 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.math.Vector3i;
+import org.terasology.logic.players.PlayerUtil;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
-import org.terasology.network.ColorComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
@@ -121,10 +120,10 @@ public class ServerCommands extends BaseComponentSystem {
         for (EntityRef clientInfo : entityManager.getEntitiesWith(ClientInfoComponent.class)) {
 
             DisplayNameComponent dnc = clientInfo.getComponent(DisplayNameComponent.class);
-            ColorComponent cc = clientInfo.getComponent(ColorComponent.class);
             NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
 
-            String playerText = FontColor.getColored(dnc.name, cc.color);
+            String playerText = PlayerUtil.getColoredPlayerName(clientInfo);
+
             String line = String.format("%s - %s (%d)", playerText, dnc.description, nc.getNetworkId());
 
             stringBuilder.append(line);
@@ -165,8 +164,8 @@ public class ServerCommands extends BaseComponentSystem {
         }
         boolean success = chunkProvider.reloadChunk(pos);
         return success
-            ? "Cleared chunk " + pos + " from cache and triggered reload"
-            : "Chunk " + pos + " did not exist in the cache";
+                ? "Cleared chunk " + pos + " from cache and triggered reload"
+                : "Chunk " + pos + " did not exist in the cache";
     }
 
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)

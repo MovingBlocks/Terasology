@@ -16,7 +16,7 @@
 package org.terasology.editor.properties;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public interface Property<T> {
 

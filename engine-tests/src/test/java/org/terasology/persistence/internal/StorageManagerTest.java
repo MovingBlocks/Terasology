@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Matchers;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetManagerImpl;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -37,8 +38,8 @@ import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
@@ -80,7 +81,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class StorageManagerTest {
 
@@ -113,7 +114,7 @@ public class StorageManagerTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         CoreRegistry.put(ModuleManager.class, moduleManager);
         CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        CoreRegistry.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
         CoreRegistry.put(NetworkSystem.class, networkSystem);
 
         entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem,
@@ -134,7 +135,6 @@ public class StorageManagerTest {
         testBlock2 = new Block();
         testBlock2.setId((short) 2);
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
-
 
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();

@@ -52,6 +52,7 @@
                 {
                     "type" : "ColumnLayout",
                     "columns" : 2,
+                    "column-widths" : [0.4, 0.6],
                     "verticalSpacing" : 16,
                     "horizontalSpacing" : 8,
                     "layoutInfo" : {
@@ -70,25 +71,35 @@
                     },
                     "contents" : [
                         {
-                            "type" : "ScrollableArea",
-                            "content" : {
-                                "type" : "UIList",
-                                "id" : "serverList",
-                                "family" : "module-list"
-                            }
-                        },
-                        {
                             "type" : "RelativeLayout",
-                            "family" : "description",
                             "contents" : [
                                 {
-                                    "type" : "UIButton",
-                                    "id" : "add",
-                                    "text" : "Add",
+                                    "type" : "ScrollableArea",
+                                    "content" : {
+                                        "type" : "UIList",
+                                        "id" : "serverList",
+                                        "family" : "module-list"
+                                    },
                                     "layoutInfo" : {
-                                        "use-content-height" : true,
                                         "position-top" : {
                                             "target" : "TOP"
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "download"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "id" : "download",
+                                    "text" : "<download info text>",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "edit",
+                                            "offset" : 8
                                         }
                                     }
                                 },
@@ -98,8 +109,9 @@
                                     "text" : "Edit",
                                     "layoutInfo" : {
                                         "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
+                                        "width" : 135,
+                                        "position-bottom" : {
+                                            "target" : "TOP",
                                             "widget" : "add",
                                             "offset" : 8
                                         }
@@ -111,18 +123,40 @@
                                     "text" : "Remove",
                                     "layoutInfo" : {
                                         "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
+                                        "position-left" : {
+                                            "target" : "RIGHT",
                                             "widget" : "edit",
+                                            "offset" : 8
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "add",
                                             "offset" : 8
                                         }
                                     }
                                 },
                                 {
+                                    "type" : "UIButton",
+                                    "id" : "add",
+                                    "text" : "Add New",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-bottom" : {
+                                            "target" : "BOTTOM"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type" : "RelativeLayout",
+                            "family" : "description",
+                            "contents" : [
+                                {
                                     "type" : "ColumnLayout",
                                     "id" : "simpleItems",
                                     "columns" : 2,
-                                    "columnWidths" : [0.3, 0.7],
+                                    "column-widths" : [0.25, 0.75],
                                     "verticalSpacing" : 8,
                                     "contents" : [
                                         {
@@ -151,14 +185,31 @@
                                             "type" : "UILabel",
                                             "id" : "port",
                                             "text" : "Server Port Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Worlds: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "worlds",
+                                            "text" : "World Info Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Modules: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "modules",
+                                            "text" : "Module Info Goes Here"
                                         }
                                     ],
                                     "layoutInfo" : {
                                         "use-content-height" : true,
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "BOTTOM",
-                                            "widget" : "remove",
+                                            "target" : "TOP",
                                             "offset" : 8
                                         }
                                     }
@@ -169,7 +220,7 @@
                                     "text" : "Join",
                                     "family" : "highlight",
                                     "layoutInfo" : {
-                                        "use-content-height" : true,
+                                        "height" : 40,
                                         "position-bottom" : {
                                             "target" : "BOTTOM"
                                         }

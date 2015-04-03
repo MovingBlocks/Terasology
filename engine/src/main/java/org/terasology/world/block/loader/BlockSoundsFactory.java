@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Creates block sounds objects from data driven block sounds definitions.
- * <p/>
+ * <br><br>
  * Responsible for resolving the actual sound assets referenced by the block sounds definition.
  */
 public class BlockSoundsFactory {

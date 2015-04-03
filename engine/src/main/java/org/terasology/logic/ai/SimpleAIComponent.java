@@ -19,7 +19,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class SimpleAIComponent implements Component {
 

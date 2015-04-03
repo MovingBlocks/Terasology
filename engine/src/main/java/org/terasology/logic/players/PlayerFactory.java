@@ -28,7 +28,7 @@ import org.terasology.network.ColorComponent;
 import org.terasology.rendering.logic.MeshComponent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class PlayerFactory {
 

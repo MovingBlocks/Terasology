@@ -16,7 +16,7 @@
 package org.terasology.world.block.family;
 
 import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -27,7 +27,7 @@ import org.terasology.world.block.BlockUri;
  * This will enable such effects as players picking up a block with one orientation and it grouping
  * with the same block with different orientations, and placing it in different directions.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface BlockFamily {
 

@@ -23,7 +23,7 @@ import java.awt.*;
 /**
  * TeraEd main class.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 @SuppressWarnings("serial")
 public final class Viewport extends Canvas {

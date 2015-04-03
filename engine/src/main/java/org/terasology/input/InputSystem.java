@@ -56,7 +56,7 @@ import java.util.Map;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
- * <p/>
+ * <br><br>
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
  * to one or more inputs.
  */

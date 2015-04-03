@@ -20,7 +20,7 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public interface AudioManager {
     float MAX_DISTANCE = 100.0f;
@@ -59,7 +59,7 @@ public interface AudioManager {
 
     /**
      * Update AudioManager sound sources
-     * <p/>
+     * <br><br>
      * Should be called in main game loop
      */
     void update(float delta);

@@ -24,6 +24,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -32,7 +33,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the LightBufferPass shader program.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
 
@@ -40,7 +41,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        LwjglRenderingProcess.FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         int texId = 0;
         if (sceneOpaque != null) {

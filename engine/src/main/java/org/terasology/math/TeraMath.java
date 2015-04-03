@@ -17,12 +17,13 @@
 package org.terasology.math;
 
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
  * Collection of math functions.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public final class TeraMath {
 
@@ -359,7 +360,7 @@ public final class TeraMath {
 
     /**
      * Modulus operation, where the result has the same sign as the divisor.
-     * <p/>
+     * <br><br>
      * Modulus(a, b) differs from a % b in that the result of the first has the
      * same sign as a, while the latter has the same sign as b.
      *
@@ -374,7 +375,7 @@ public final class TeraMath {
 
     /**
      * Modulus operation, where the result has the same sign as the divisor.
-     * <p/>
+     * <br><br>
      * Modulus(a, b) differs from a % b in that the result of the first has the
      * same sign as a, while the latter has the same sign as b.
      *
@@ -389,7 +390,7 @@ public final class TeraMath {
 
     /**
      * Modulus operation, where the result has the same sign as the dividend.
-     * <p/>
+     * <br><br>
      * Modulus(a, b) equals a % b.
      * This function (alias) exists primarily to be used in places where both modulus and % are used,
      * to make a clearer distinction between the two operations.
@@ -405,7 +406,7 @@ public final class TeraMath {
 
     /**
      * Modulus operation, where the result has the same sign as the dividend.
-     * <p/>
+     * <br><br>
      * Modulus(a, b) equals a % b.
      * This function (alias) exists primarily to be used in places where both modulus and % are used,
      * to make a clearer distinction between the two operations.
@@ -674,7 +675,7 @@ public final class TeraMath {
 
     /**
      * Lowest power of two greater or equal to val
-     * <p/>
+     * <br><br>
      * For values &lt;= 0 returns 0
      * For values &gt;= 2 ^ 30 returns 0. (2^30 is the largest power of 2 that fits within a int).
      *
@@ -767,6 +768,7 @@ public final class TeraMath {
     }
 
     // TODO: This doesn't belong in this class, move it.
+
     /**
      * @deprecated use {@link ChunkMath#getSecondaryPlacementDirection(Vector3f, Vector3f)} instead
      */

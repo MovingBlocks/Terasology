@@ -18,7 +18,7 @@ package org.terasology.entitySystem.stubs;
 import org.terasology.entitySystem.Component;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class IntegerComponent implements Component {
     public int value;

@@ -17,6 +17,7 @@
 package org.terasology.math;
 
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 
@@ -171,7 +172,7 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @param other
      * @return The region that is encompassed by both this and other. If they
-     *         do not overlap then the empty region is returned
+     * do not overlap then the empty region is returned
      */
     public Region3i intersect(Region3i other) {
         Vector3i intersectMin = min();

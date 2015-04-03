@@ -21,7 +21,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class BlockTypeHandler extends StringRepresentationTypeHandler<Block> {
 

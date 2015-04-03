@@ -24,7 +24,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class PropertySlider extends JPanel implements ChangeListener {
 

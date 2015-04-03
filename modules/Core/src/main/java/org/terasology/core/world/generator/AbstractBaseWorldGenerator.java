@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
@@ -58,6 +58,11 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     @Override
     public final SimpleUri getUri() {
         return uri;
+    }
+
+    @Override
+    public String getWorldSeed() {
+        return worldSeed;
     }
 
     @Override

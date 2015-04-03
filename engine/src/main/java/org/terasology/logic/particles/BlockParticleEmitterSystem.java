@@ -32,9 +32,9 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -76,7 +76,7 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 // TODO: Generalise for non-block particles
 // TODO: Dispose display lists

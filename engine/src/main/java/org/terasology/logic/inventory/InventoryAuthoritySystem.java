@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- * @author Florian <florian@fkoeberle.de>
+ * @author Marcin Sciesinski
+ * @author Florian
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(value = InventoryManager.class)

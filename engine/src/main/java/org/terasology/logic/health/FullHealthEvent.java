@@ -21,7 +21,7 @@ import org.terasology.entitySystem.event.Event;
 /**
  * Event sent upon an entity reaching full health if previously on less than full health.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class FullHealthEvent implements Event {
     private EntityRef instigator;

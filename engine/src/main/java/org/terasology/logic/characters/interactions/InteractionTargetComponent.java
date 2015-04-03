@@ -18,7 +18,7 @@ package org.terasology.logic.characters.interactions;
 import org.terasology.entitySystem.Component;
 
 /**
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class InteractionTargetComponent implements Component {
 }

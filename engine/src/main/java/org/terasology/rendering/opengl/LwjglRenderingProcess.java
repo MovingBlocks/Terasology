@@ -31,13 +31,14 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.editor.EditorRange;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
@@ -88,14 +89,60 @@ import static org.lwjgl.opengl.EXTPixelBufferObject.glBufferDataARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glGenBuffersARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glMapBufferARB;
 import static org.lwjgl.opengl.EXTPixelBufferObject.glUnmapBufferARB;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ALWAYS;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DECR;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_INCR;
+import static org.lwjgl.opengl.GL11.GL_KEEP;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glReadPixels;
+import static org.lwjgl.opengl.GL11.glStencilFunc;
+import static org.lwjgl.opengl.GL11.glTexCoord2d;
+import static org.lwjgl.opengl.GL11.glVertex3i;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
  * The Default Rendering Process class.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class LwjglRenderingProcess {
 
@@ -162,7 +209,12 @@ public class LwjglRenderingProcess {
     /* VARIOUS */
     private boolean takeScreenshot;
     private int displayListQuad = -1;
+
+    // Note: this assumes that the settings in the configs might change at runtime,
+    // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
+    private RenderingConfig renderingConfig = config.getRendering();
+    private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
@@ -193,11 +245,8 @@ public class LwjglRenderingProcess {
         createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
         createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
 
-        readBackPBOFront = new PBO();
-        readBackPBOBack = new PBO();
-        readBackPBOFront.init(1, 1);
-        readBackPBOBack.init(1, 1);
-
+        readBackPBOFront = new PBO(1, 1);
+        readBackPBOBack = new PBO(1, 1);
         readBackPBOCurrent = readBackPBOFront;
     }
 
@@ -217,8 +266,6 @@ public class LwjglRenderingProcess {
         if (overwriteRtHeight == 0) {
             rtFullHeight = org.lwjgl.opengl.Display.getHeight();
         }
-
-        RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
 
         rtFullWidth *= renderingConfig.getFboScale() / 100f;
         rtFullHeight *= renderingConfig.getFboScale() / 100f;
@@ -269,7 +316,7 @@ public class LwjglRenderingProcess {
 
         createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true);
 
-        createFBO("sceneShadowMap", config.getRendering().getShadowMapResolution(), config.getRendering().getShadowMapResolution(), FBOType.NO_COLOR, true, false);
+        createFBO("sceneShadowMap", renderingConfig.getShadowMapResolution(), renderingConfig.getShadowMapResolution(), FBOType.NO_COLOR, true, false);
 
         createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR);
         createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR);
@@ -517,7 +564,7 @@ public class LwjglRenderingProcess {
     }
 
     private void updateExposure() {
-        if (config.getRendering().isEyeAdaptation()) {
+        if (renderingConfig.isEyeAdaptation()) {
             FBO scene = getFBO("scene1");
 
             if (scene == null) {
@@ -794,7 +841,7 @@ public class LwjglRenderingProcess {
     public void endRenderSceneSky() {
         setRenderBufferMask(true, true, true);
 
-        if (config.getRendering().isInscattering()) {
+        if (renderingConfig.isInscattering()) {
             generateSkyBand(0);
             generateSkyBand(1);
         }
@@ -816,11 +863,11 @@ public class LwjglRenderingProcess {
     public void renderPreCombinedScene() {
         createOrUpdateFullscreenFbos();
 
-        if (config.getRendering().isOutline()) {
+        if (renderingConfig.isOutline()) {
             generateSobel();
         }
 
-        if (config.getRendering().isSsao()) {
+        if (renderingConfig.isSsao()) {
             generateSSAO();
             generateBlurredSSAO();
         }
@@ -829,7 +876,7 @@ public class LwjglRenderingProcess {
     }
 
     public void renderPost(WorldRenderingStage worldRenderingStage) {
-        if (config.getRendering().isLightShafts()) {
+        if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("Rendering light shafts");
             generateLightShafts();
             PerformanceMonitor.endActivity();
@@ -839,7 +886,7 @@ public class LwjglRenderingProcess {
         generatePrePost();
         PerformanceMonitor.endActivity();
 
-        if (config.getRendering().isEyeAdaptation()) {
+        if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("Rendering eye adaption");
             generateDownsampledScene();
             PerformanceMonitor.endActivity();
@@ -853,7 +900,7 @@ public class LwjglRenderingProcess {
         generateToneMappedScene();
         PerformanceMonitor.endActivity();
 
-        if (config.getRendering().isBloom()) {
+        if (renderingConfig.isBloom()) {
             PerformanceMonitor.startActivity("Applying bloom");
             generateHighPass();
             for (int i = 0; i < 3; i++) {
@@ -864,7 +911,7 @@ public class LwjglRenderingProcess {
 
         PerformanceMonitor.startActivity("Applying blur");
         for (int i = 0; i < 2; i++) {
-            if (config.getRendering().getBlurIntensity() != 0) {
+            if (renderingConfig.getBlurIntensity() != 0) {
                 generateBlur(i);
             }
         }
@@ -892,7 +939,7 @@ public class LwjglRenderingProcess {
     private void renderFinalSceneToRT(WorldRenderingStage renderingStage) {
         Material material;
 
-        if (config.getRendering().getDebug().isEnabled()) {
+        if (renderingDebugConfig.isEnabled()) {
             material = Assets.getMaterial("engine:prog.debug");
         } else {
             material = Assets.getMaterial("engine:prog.post");
@@ -947,13 +994,13 @@ public class LwjglRenderingProcess {
 
         Material material;
 
-        if (config.getRendering().isOculusVrSupport()) {
+        if (renderingConfig.isOculusVrSupport()) {
             material = Assets.getMaterial("engine:prog.ocDistortion");
             material.enable();
 
             updateOcShaderParametersForVP(material, 0, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.LEFT_EYE);
         } else {
-            if (config.getRendering().getDebug().isEnabled()) {
+            if (renderingDebugConfig.isEnabled()) {
                 material = Assets.getMaterial("engine:prog.debug");
             } else {
                 material = Assets.getMaterial("engine:prog.post");
@@ -964,7 +1011,7 @@ public class LwjglRenderingProcess {
 
         renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), org.lwjgl.opengl.Display.getHeight());
 
-        if (config.getRendering().isOculusVrSupport()) {
+        if (renderingConfig.isOculusVrSupport()) {
             updateOcShaderParametersForVP(material, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.RIGHT_EYE);
 
             renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), Display.getHeight());
@@ -990,7 +1037,7 @@ public class LwjglRenderingProcess {
         Material program = Assets.getMaterial("engine:prog.lightBufferPass");
         program.enable();
 
-        LwjglRenderingProcess.FBO targetFbo = getFBO(target);
+        FBO targetFbo = getFBO(target);
 
         int texId = 0;
         if (targetFbo != null) {
@@ -1208,7 +1255,7 @@ public class LwjglRenderingProcess {
         Material material = Assets.getMaterial("engine:prog.blur");
         material.enable();
 
-        material.setFloat("radius", overallBlurRadiusFactor * config.getRendering().getBlurRadius(), true);
+        material.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
 
         FBO blur = getFBO("sceneBlur" + id);
 
@@ -1367,23 +1414,8 @@ public class LwjglRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        if (config.getRendering().getScreenshotSize() == 0) {
-            overwriteRtWidth = Display.getWidth() * 2;
-            overwriteRtHeight = Display.getHeight() * 2;
-        } else if (config.getRendering().getScreenshotSize() == 1) {
-            overwriteRtWidth = Display.getWidth();
-            overwriteRtHeight = Display.getHeight();
-        } else if (config.getRendering().getScreenshotSize() == 2) {
-            overwriteRtWidth = Display.getWidth() / 2;
-            overwriteRtHeight = Display.getHeight() / 2;
-        } else if (config.getRendering().getScreenshotSize() == 3) {
-            overwriteRtWidth = Display.getWidth() / 4;
-            overwriteRtHeight = Display.getHeight() / 4;
-        } else {
-            //In case its another config value use default values
-            overwriteRtWidth = 1152;
-            overwriteRtHeight = 700;
-        }
+        overwriteRtWidth = renderingConfig.getScreenshotSize().getWidth(Display.getWidth());
+        overwriteRtHeight = renderingConfig.getScreenshotSize().getHeight(Display.getHeight());
 
         createOrUpdateFullscreenFbos();
     }
@@ -1405,12 +1437,12 @@ public class LwjglRenderingProcess {
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         fboSceneFinal.unbindTexture();
 
-        Runnable r = new Runnable() {
+        Runnable task = new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = config.getRendering().getScreenshotFormat();
+                final String format = renderingConfig.getScreenshotFormat().toString();
                 final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
@@ -1434,11 +1466,11 @@ public class LwjglRenderingProcess {
             }
         };
 
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", task);
 
         takeScreenshot = false;
         overwriteRtWidth = 0;
-        overwriteRtWidth = 0;
+        overwriteRtHeight = 0;
 
         createOrUpdateFullscreenFbos();
     }
@@ -1542,122 +1574,5 @@ public class LwjglRenderingProcess {
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
     }
-
-    public static class PBO {
-        public int pboId;
-        public int bufferWidth;
-        public int bufferHeight;
-        ByteBuffer cachedBuffer;
-
-        public PBO() {
-            pboId = glGenBuffersARB();
-        }
-
-        public void bind() {
-            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, pboId);
-        }
-
-        public void unbind() {
-            glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, 0);
-        }
-
-        public void init(int width, int height) {
-            this.bufferWidth = width;
-            this.bufferHeight = height;
-
-            int byteSize = width * height * 4;
-            cachedBuffer = BufferUtils.createByteBuffer(byteSize);
-
-            bind();
-            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, byteSize, GL_STREAM_READ_ARB);
-            unbind();
-        }
-
-        public void copyFromFBO(int fboId, int width, int height, int format, int type) {
-            bind();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-            glReadPixels(0, 0, width, height, format, type, 0);
-            unbind();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        }
-
-        public ByteBuffer readBackPixels() {
-            bind();
-
-            cachedBuffer = glMapBufferARB(GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
-
-            // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
-            ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
-            resultBuffer.put(cachedBuffer);
-            cachedBuffer.rewind();
-            resultBuffer.flip();
-
-            glUnmapBufferARB(GL_PIXEL_PACK_BUFFER_EXT);
-            unbind();
-
-            return resultBuffer;
-        }
-    }
-
-    public class FBO {
-        public int fboId;
-        public int textureId;
-        public int depthStencilTextureId;
-        public int depthStencilRboId;
-        public int normalsTextureId;
-        public int lightBufferTextureId;
-
-        public int width;
-        public int height;
-
-        public void bind() {
-            if (this != currentlyBoundFbo) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-                currentlyBoundFbo = this;
-            }
-        }
-
-        public void unbind() {
-            if (currentlyBoundFbo != null) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                currentlyBoundFbo = null;
-            }
-        }
-
-        public void bindDepthTexture() {
-            //if (currentlyBoundTextureId != depthStencilTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
-            //currentlyBoundTextureId = depthStencilTextureId;
-            //}
-        }
-
-        public void bindTexture() {
-            //if (currentlyBoundTextureId != textureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
-            //currentlyBoundTextureId = textureId;
-            //}
-        }
-
-        public void bindNormalsTexture() {
-            //if (currentlyBoundTextureId != normalsTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
-            //currentlyBoundTextureId = normalsTextureId;
-            //}
-        }
-
-        public void bindLightBufferTexture() {
-            //if (currentlyBoundTextureId != lightBufferTextureId) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
-            //currentlyBoundTextureId = lightBufferTextureId;
-            //}
-        }
-
-        public void unbindTexture() {
-            //if (currentlyBoundTextureId != 0) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-            //currentlyBoundTextureId = 0;
-            //}
-        }
-    }
-
 }
+

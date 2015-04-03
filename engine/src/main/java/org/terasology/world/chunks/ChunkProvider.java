@@ -17,7 +17,7 @@
 package org.terasology.world.chunks;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.internal.ChunkViewCore;
 
 import java.util.Collection;
@@ -76,7 +76,6 @@ public interface ChunkProvider {
      * Retrieves the ChunkRelevanceRegion object for the given entity
      *
      * @param entity
-     * @return The chunk relevance region, or null
      */
     void updateRelevanceEntity(EntityRef entity, Vector3i distance);
 

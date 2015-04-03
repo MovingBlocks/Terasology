@@ -16,13 +16,13 @@
 package org.terasology.world.block;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Replicate;
 
 /**
  * Used for entities representing a block in the world
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class BlockComponent implements Component {
     @Replicate

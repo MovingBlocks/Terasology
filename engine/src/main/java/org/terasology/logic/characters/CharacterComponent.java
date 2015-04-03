@@ -30,7 +30,7 @@ import org.terasology.network.Replicate;
 /**
  * Information common to characters (the physical body of players and creatures)
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public final class CharacterComponent implements Component {
     public Vector3f spawnPosition = new Vector3f();
@@ -42,15 +42,15 @@ public final class CharacterComponent implements Component {
     public float interactionRange = 5f;
     /**
      * The current interaction target of a character which has been authorized by the authority (e.g. the server).
-     * <p/>
+     * <br><br>
      * Modules should not modify this field directly.
      */
     public EntityRef authorizedInteractionTarget = EntityRef.NULL;
     /**
      * This field is only set for clients (including clients that are servers).
-     * <p/>
+     * <br><br>
      * It contains the number of the activationId that caused the interaction start.
-     * <p/>
+     * <br><br>
      * The field is used to tell the client which interaction got canceled. Thus if the client has started another
      * interaction when it receives the old cancel, it won't wrongly cancel the new interaction.
      */
@@ -59,7 +59,7 @@ public final class CharacterComponent implements Component {
     /**
      * This field is only set for clients (including clients that are servers). The clients set it
      * best to their knowledge.
-     * <p/>
+     * <br><br>
      * The events {@link org.terasology.logic.characters.interactions.InteractionStartPredicted} and
      * {@link org.terasology.logic.characters.interactions.InteractionEndPredicted} inform about changes of this
      * field.
@@ -68,9 +68,9 @@ public final class CharacterComponent implements Component {
 
     /**
      * This field is only set for clients (including clients that are servers).
-     * <p/>
+     * <br><br>
      * It contains the number of the activationId that caused the interaction start.
-     * <p/>
+     * <br><br>
      * The field is used to determine if a incoming interaction cancel is for the current interaction or not.
      */
     public int predictedInteractionId;

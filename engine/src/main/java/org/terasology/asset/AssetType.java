@@ -49,7 +49,7 @@ import java.util.Map;
  * An AssetType defines a type of resource accessible through the AssetManager.
  *
  * @author Immortius
- * @author Lucas Jenss <public@x3ro.de>
+ * @author Lucas Jenss
  */
 public enum AssetType {
     PREFAB("prefab", "prefabs", "prefab", new PrefabLoader(), true),

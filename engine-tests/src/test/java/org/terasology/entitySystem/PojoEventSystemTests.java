@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class PojoEventSystemTests {
 

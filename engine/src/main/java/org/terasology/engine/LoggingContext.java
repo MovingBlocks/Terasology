@@ -22,6 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.slf4j.MDC;
 import org.terasology.engine.modes.GameState;
@@ -52,6 +55,11 @@ public final class LoggingContext {
      */
     private static final String LOG_FILE_FOLDER = "logFileFolder";
 
+    /**
+     * The format of the log folder timestamps
+     */
+    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+
     private LoggingContext() {
         // no instances
     }
@@ -61,7 +69,7 @@ public final class LoggingContext {
         System.setProperty(LOG_FILE_FOLDER, pathString);
 
         try {
-            deleteLogFiles(logFileFolder);
+            deleteLogFiles(logFileFolder, 5 * 24 * 60 * 60); // JAVA8: Duration.ofDays(5).getSeconds();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -86,26 +94,60 @@ public final class LoggingContext {
 //        }
     }
 
-    private static void deleteLogFiles(final Path rootPath) throws IOException {
+    private static void deleteLogFiles(final Path rootPath, final int maxAgeInSecs) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs) {
+                if (path.equals(rootPath)) {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                // compare only the first subfolder
+                String relPath = rootPath.relativize(path).getName(0).toString();
+
+                SimpleDateFormat sdf = new SimpleDateFormat(TIMESTAMP_FORMAT);
+                try {
+                    Date folderDate = sdf.parse(relPath);
+                    // JAVA8: long ageInSecs = folderDate.toInstant().until(Instant.now(), ChronoUnit.SECONDS);
+                    long ageInSecs = (new Date().getTime() - folderDate.getTime()) / 1000;
+
+                    return ageInSecs > maxAgeInSecs ? FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+                } catch (ParseException e) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 
                 if (file.toString().endsWith(".log")) {
-                    tryDelete(rootPath, file);
+                    try {
+                        Files.delete(file);
+                    } catch (IOException e) {
+                        // we explicitly catch the exception so that other files
+                        // will be removed even if this one fails
+                        System.err.println("Could not delete log file: " + file);
+                    }
                 }
 
                 return FileVisitResult.CONTINUE;
             }
 
-            private void tryDelete(Path path, Path file) {
-                try {
-                    Files.delete(file);
-                } catch (IOException e) {
-                    System.err.println(String.format("Could not delete log file \"%s\" - %s",
-                            path.relativize(file), e.getMessage()));
+            @Override
+            public FileVisitResult postVisitDirectory(Path path, IOException exc) {
+
+                if (path.toFile().list().length == 0) {
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        // we explicitly catch the exception so that other folders
+                        // will be removed even if this one fails
+                        System.err.println("Could not delete empty folder: " + path);
+                    }
                 }
+
+                return FileVisitResult.CONTINUE;
             }
         });
     }

@@ -21,15 +21,15 @@ import org.terasology.module.sandbox.API;
 
 /**
  * Sent to the client by itself at the start of an interaction between a character and a target.
- * <p/>
+ * <br><br>
  * THe event is sent to the target entity.
- * <p/>
+ * <br><br>
  * This event is not intended to be sent by modules.
- * <p/>
+ * <br><br>
  * When event handler runs, the  predictedInteractionTarget field of the instigator's
  * CharacterComponent will already be updated to the new value.
  *
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 @API
 public class InteractionStartPredicted implements Event {

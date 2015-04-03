@@ -17,7 +17,7 @@ package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;

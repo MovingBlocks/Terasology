@@ -18,7 +18,6 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -29,10 +28,8 @@ import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.VecMath;
-import org.terasology.math.Vector3i;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -49,8 +46,8 @@ import java.util.Map;
 /**
  * Stores all information for a specific block type.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @author Benjamin Glatzel
+ * @author Rasmus 'Cervator' Praestholm
  */
 // TODO: Make this immutable, add a block builder class?
 public final class Block {

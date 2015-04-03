@@ -19,11 +19,11 @@ import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * Starts child a limit number of times.<br/>
- * <br/>
- * <b>SUCCESS</b>: when child finished with <b>SUCCESS</b>n times.<br/>
- * <b>FAILURE</b>: as soon as child finishes with <b>FAILURE</b>.<br/>
- * <br/>
+ * Starts child a limit number of times.<br>
+ * <br>
+ * <b>SUCCESS</b>: when child finished with <b>SUCCESS</b>n times.<br>
+ * <b>FAILURE</b>: as soon as child finishes with <b>FAILURE</b>.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

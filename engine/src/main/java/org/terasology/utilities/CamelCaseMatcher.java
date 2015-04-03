@@ -37,7 +37,7 @@ public final class CamelCaseMatcher {
     }
 
     /**
-     * @param commandName
+     * @param queryStr
      * @param commands
      * @return
      */
@@ -59,9 +59,9 @@ public final class CamelCaseMatcher {
 
             if (m.find()) {
                 matches.add(m.group());
-            } 
+            }
         }
-        
+
         return matches;
     }
 }

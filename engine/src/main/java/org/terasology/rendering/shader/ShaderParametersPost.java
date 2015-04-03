@@ -28,6 +28,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
@@ -38,7 +39,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the Post-processing shader program.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel
  */
 public class ShaderParametersPost extends ShaderParametersBase {
 
@@ -76,7 +77,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        LwjglRenderingProcess.FBO sceneCombined = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        FBO sceneCombined = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         if (sceneCombined != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

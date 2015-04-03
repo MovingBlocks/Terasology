@@ -18,7 +18,7 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -27,7 +27,8 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * Utility class for creating {@link SaveTransaction} instances.
- * @author Florian <florian@fkoeberle.de>
+ *
+ * @author Florian
  */
 class SaveTransactionBuilder {
     private final Lock worldDirectoryWriteLock;
@@ -74,8 +75,8 @@ class SaveTransactionBuilder {
     }
 
     public SaveTransaction build() {
-        return new SaveTransaction(privateEntityManager, deltaToSave, unloadedPlayers, loadedPlayers,globalStoreBuilder,
-                unloadedChunks, loadedChunks,  gameManifest, storeChunksInZips, storagePathProvider,
+        return new SaveTransaction(privateEntityManager, deltaToSave, unloadedPlayers, loadedPlayers, globalStoreBuilder,
+                unloadedChunks, loadedChunks, gameManifest, storeChunksInZips, storagePathProvider,
                 worldDirectoryWriteLock);
 
     }

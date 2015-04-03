@@ -20,21 +20,21 @@ import org.terasology.utilities.random.FastRandom;
 
 /**
  * A speed-improved simplex noise algorithm for Simplex noise in 2D, 3D and 4D.
- * <p/>
+ * <br><br>
  * Based on example code by Stefan Gustavson (stegu@itn.liu.se).
  * Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
  * Better rank ordering method by Stefan Gustavson in 2012.
- * <p/>
+ * <br><br>
  * This could be speeded up even further, but it's useful as it is.
- * <p/>
+ * <br><br>
  * Version 2012-03-09
- * <p/>
+ * <br><br>
  * This code was placed in the public domain by its original author,
  * Stefan Gustavson. You may use it as you see fit, but
  * attribution is appreciated.
- * <p/>
+ * <br><br>
  * See http://staffwww.itn.liu.se/~stegu/
- * <p/>
+ * <br><br>
  * msteiger: Introduced seed value
  */
 public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {

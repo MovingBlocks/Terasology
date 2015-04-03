@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Florian <florian@fkoeberle.de>
+ * @author Florian
  */
 public class PermissionConfig {
     /**

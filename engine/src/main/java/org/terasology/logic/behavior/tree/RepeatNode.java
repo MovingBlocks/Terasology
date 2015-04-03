@@ -18,11 +18,11 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.module.sandbox.API;
 
 /**
- * Repeats the child node forever.<br/>
- * <br/>
- * <b>SUCCESS</b>: Never.<br/>
- * <b>FAILURE</b>: as soon as decorated node finishes with <b>FAILURE</b>.<br/>
- * <br/>
+ * Repeats the child node forever.<br>
+ * <br>
+ * <b>SUCCESS</b>: Never.<br>
+ * <b>FAILURE</b>: as soon as decorated node finishes with <b>FAILURE</b>.<br>
+ * <br>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

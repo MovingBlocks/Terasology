@@ -50,7 +50,7 @@ import java.util.Map;
  * </ul>
  * It becomes active when initialise() is called, and inactive when shutdown() is called.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class ComponentSystemManager {
 

@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.players;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
@@ -48,10 +46,11 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -67,7 +66,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?

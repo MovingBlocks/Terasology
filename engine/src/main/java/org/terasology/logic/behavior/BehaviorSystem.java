@@ -53,10 +53,10 @@ import java.util.Map;
 
 /**
  * Behavior tree system
- * <p/>
+ * <br><br>
  * Each entity with BehaviorComponent is kept under control by this system. For each such entity a behavior tree
  * is loaded and an interpreter is started.
- * <p/>
+ * <br><br>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  *
  * @author synopia

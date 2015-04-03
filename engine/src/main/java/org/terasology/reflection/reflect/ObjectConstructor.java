@@ -17,7 +17,7 @@ package org.terasology.reflection.reflect;
 
 /**
  * Providers the ability to construct an instance of a type.
- * <p/>
+ * <br><br>
  * These types must provide a default constructor, which will be invoked.
  *
  * @param <T> The type of the class to construct instances of

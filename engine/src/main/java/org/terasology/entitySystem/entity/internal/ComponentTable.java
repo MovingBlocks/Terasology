@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * A table for storing entities and components. Focused on allowing iteration across a components of a given type
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 class ComponentTable {
     private Map<Class, TLongObjectMap<Component>> store = Maps.newConcurrentMap();
@@ -129,7 +129,7 @@ class ComponentTable {
 
     /**
      * Produces an iterator for iterating over all entities
-     * <p/>
+     * <br><br>
      * This is not designed to be performant, and in general usage entities should not be iterated over.
      *
      * @return An iterator over all entity ids.

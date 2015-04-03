@@ -17,7 +17,6 @@
 package org.terasology.math;
 
 import com.bulletphysics.BulletGlobals;
-
 import org.terasology.math.geom.Vector3f;
 
 /**
@@ -26,6 +25,7 @@ import org.terasology.math.geom.Vector3f;
 public final class Vector3fUtil {
     private Vector3fUtil() {
     }
+
 
     /**
      * @return The reflection of direction against normal

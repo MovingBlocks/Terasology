@@ -15,15 +15,15 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.Noise;
 import org.terasology.utilities.procedural.WhiteNoise;
@@ -36,18 +36,17 @@ import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Determines where plants can be placed.  Will put plants one block above the surface if it is in the correct biome.
  */
 @Produces(FloraFacet.class)
 @Requires({
-    @Facet(SeaLevelFacet.class),
-    @Facet(SurfaceHeightFacet.class),
-    @Facet(BiomeFacet.class)
+        @Facet(SeaLevelFacet.class),
+        @Facet(SurfaceHeightFacet.class),
+        @Facet(BiomeFacet.class)
 //    @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))
 })
 public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType> implements ConfigurableFacetProvider {
@@ -61,12 +60,14 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
             FloraType.FLOWER, 0.1f,
             FloraType.MUSHROOM, 0.05f);
 
-    private Map<CoreBiome, Float> biomeProbs = ImmutableMap.of(
-            CoreBiome.FOREST, 0.3f,
-            CoreBiome.PLAINS, 0.2f,
-            CoreBiome.MOUNTAINS, 0.2f,
-            CoreBiome.SNOW, 0.001f,
-            CoreBiome.DESERT, 0.001f);
+    private Map<CoreBiome, Float> biomeProbs = ImmutableMap.<CoreBiome, Float>builder()
+            .put(CoreBiome.FOREST, 0.3f)
+            .put(CoreBiome.PLAINS, 0.2f)
+            .put(CoreBiome.MOUNTAINS, 0.2f)
+            .put(CoreBiome.SNOW, 0.001f)
+            .put(CoreBiome.BEACH, 0.001f)
+            .put(CoreBiome.OCEAN, 0f)
+            .put(CoreBiome.DESERT, 0.001f).build();
 
     public DefaultFloraProvider() {
 
@@ -79,6 +80,8 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
             }
         }
 
+        register(CoreBiome.BEACH, FloraType.MUSHROOM, 0);
+        register(CoreBiome.BEACH, FloraType.FLOWER, 0);
         register(CoreBiome.DESERT, FloraType.MUSHROOM, 0);
         register(CoreBiome.SNOW, FloraType.MUSHROOM, 0);
     }

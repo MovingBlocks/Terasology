@@ -21,7 +21,7 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 /**
  * TeraDeflator is the abstract base class used to implement chunk deflation.
  *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Manuel Brotz
  */
 public abstract class TeraDeflator {
 

@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -154,34 +155,34 @@ public class Vector3iTest {
 
     @Test
     public void testIsUnitVector() {
-        assertFalse(Vector3i.zero().isUnitVector());
-        assertTrue(Vector3i.unitX().isUnitVector());
-        assertTrue(Vector3i.unitY().isUnitVector());
-        assertTrue(Vector3i.unitZ().isUnitVector());
-        Vector3i v = Vector3i.unitX();
+        assertFalse(Vector3iUtil.isUnitVector(Vector3i.zero()));
+        assertTrue(Vector3iUtil.isUnitVector(Vector3iUtil.unitX()));
+        assertTrue(Vector3iUtil.isUnitVector(Vector3iUtil.unitY()));
+        assertTrue(Vector3iUtil.isUnitVector(Vector3iUtil.unitZ()));
+        Vector3i v = Vector3iUtil.unitX();
         v.scale(-1);
-        assertTrue(v.isUnitVector());
-        assertFalse(Vector3i.one().isUnitVector());
+        assertTrue(Vector3iUtil.isUnitVector(v));
+        assertFalse(Vector3iUtil.isUnitVector(Vector3i.one()));
     }
 
     @Test
     public void testManhattanDistance() {
         assertEquals(0, Vector3i.zero().gridDistance(Vector3i.zero()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.unitX()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.unitY()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.unitZ()));
+        assertEquals(1, Vector3i.zero().gridDistance(Vector3iUtil.unitX()));
+        assertEquals(1, Vector3i.zero().gridDistance(Vector3iUtil.unitY()));
+        assertEquals(1, Vector3i.zero().gridDistance(Vector3iUtil.unitZ()));
         assertEquals(3, Vector3i.zero().gridDistance(Vector3i.one()));
         assertEquals(3, Vector3i.zero().gridDistance(new Vector3i(1, -1, 1)));
     }
 
     @Test
     public void testManhattanMagnitude() {
-        assertEquals(0, Vector3i.zero().gridMagnitude());
-        assertEquals(1, Vector3i.unitX().gridMagnitude());
-        assertEquals(1, Vector3i.unitY().gridMagnitude());
-        assertEquals(1, Vector3i.unitZ().gridMagnitude());
-        assertEquals(3, Vector3i.one().gridMagnitude());
-        assertEquals(3, new Vector3i(1, -1, 1).gridMagnitude());
+        assertEquals(0, Vector3iUtil.gridMagnitude(Vector3i.zero()));
+        assertEquals(1, Vector3iUtil.gridMagnitude(Vector3iUtil.unitX()));
+        assertEquals(1, Vector3iUtil.gridMagnitude(Vector3iUtil.unitY()));
+        assertEquals(1, Vector3iUtil.gridMagnitude(Vector3iUtil.unitZ()));
+        assertEquals(3, Vector3iUtil.gridMagnitude(Vector3i.one()));
+        assertEquals(3, Vector3iUtil.gridMagnitude(new Vector3i(1, -1, 1)));
     }
 
     @Test

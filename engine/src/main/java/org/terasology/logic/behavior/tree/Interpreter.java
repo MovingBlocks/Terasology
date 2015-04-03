@@ -37,7 +37,7 @@ import java.util.Set;
  * An interpreter evaluates a behavior tree. This is done by creating tasks for an actor for the nodes of the BT.
  * If a task returns RUNNING, the task is placed to the active list and asked next tick again.
  * Finished nodes may create new tasks, which are placed to the active list.
- * <p/>
+ * <br><br>
  *
  * @author synopia
  */

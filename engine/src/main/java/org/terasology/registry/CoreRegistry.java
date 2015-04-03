@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 @API
 public final class CoreRegistry {

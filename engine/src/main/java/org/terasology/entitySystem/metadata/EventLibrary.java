@@ -27,7 +27,7 @@ import org.terasology.entitySystem.event.Event;
 /**
  * The library for metadata about events (and their fields).
  *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
 public class EventLibrary extends AbstractClassLibrary<Event> {
 
