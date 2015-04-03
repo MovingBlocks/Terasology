@@ -100,8 +100,9 @@ dependencies {
     // Java magic
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
-    compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
-    compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.09'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.9'
+    compile group: 'org.javassist', name: 'javassist', version: '3.19.0-GA'
+    compile group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.0'
 
     // Graphics, 3D, UI, etc
     compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
@@ -120,7 +121,8 @@ dependencies {
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // Our developed libs
-    compile group: 'org.terasology', name: 'gestalt-module', version: '2.2.3'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '2.3.0-RC1'
+    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '2.3.0-RC1'
     compile group: 'org.terasology', name: 'TeraMath', version: '+', changing: true
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
 

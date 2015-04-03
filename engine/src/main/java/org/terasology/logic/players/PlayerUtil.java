@@ -22,8 +22,6 @@ import org.terasology.rendering.FontColor;
 
 /**
  * Utility class. Currently only used as container for getColoredPlayerName.
- *
- * @author Florian <florian@fkoeberle.de>
  */
 public class PlayerUtil {
 
