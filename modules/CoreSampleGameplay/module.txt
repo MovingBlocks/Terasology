@@ -5,7 +5,7 @@
     "description" : "This module introduces the core Terasology content",
     "dependencies" :
     [
-        {"id": "Core", "minVersion": "0.48.1"}
+        {"id": "Core", "minVersion": "0.51.0"}
     ],
     "isGameplay" : "true",
     "defaultWorldGenerator" : "Core:FacetedPerlin"
