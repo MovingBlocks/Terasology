@@ -21,9 +21,6 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
-/**
- * @author Florian <florian@fkoeberle.de>
- */
 @RegisterBindButton(id = "showOnlinePlayers", description = "Show online players", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.TAB)
 public class OnlinePlayersButton extends BindButtonEvent {
