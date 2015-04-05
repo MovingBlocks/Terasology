@@ -332,7 +332,9 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
                 new EnergyRangeGeneratorComponent(6, 7)
         ));
 
-        particleSystems.put(entityRef, new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles)));
+        ParticleSystemStateData stateData = new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles));
+        stateData.updateFunctionMaps(registeredGeneratorFunctions, registeredAffectorFunctions);
+        particleSystems.put(entityRef, stateData);
 
         return String.format("Sparkly: %s", spawnPosition );
     }

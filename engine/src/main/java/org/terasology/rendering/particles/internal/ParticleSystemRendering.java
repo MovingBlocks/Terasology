@@ -105,13 +105,6 @@ public class ParticleSystemRendering {
             GL11.glVertex3f(-halfWidth, -halfHeight, 0.0f);
             glEnd();
 
-            glBegin(GL_QUADS);
-            GL11.glVertex3f(-halfWidth, +halfHeight, 0.0f);
-            GL11.glVertex3f(-halfWidth, -halfHeight, 0.0f);
-            GL11.glVertex3f(+halfWidth, -halfHeight, 0.0f);
-            GL11.glVertex3f(+halfWidth, +halfHeight, 0.0f);
-            glEnd();
-
             glPopMatrix();
         }
 

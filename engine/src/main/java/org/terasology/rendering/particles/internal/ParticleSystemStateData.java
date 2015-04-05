@@ -15,16 +15,18 @@
  */
 package org.terasology.rendering.particles.internal;
 
-import com.google.api.client.util.Maps;
 import com.google.common.collect.BiMap;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.particles.components.ParticleEmitterComponent;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.rendering.particles.functions.affectors.AffectorFunction;
 import org.terasology.rendering.particles.functions.generators.GeneratorFunction;
 
-import java.util.*;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by Linus on 4-3-2015.
@@ -55,25 +57,44 @@ public class ParticleSystemStateData {
         this.generators = new LinkedHashMap<>();
     }
 
-    public void updateFunctionMaps(final BiMap<Class<Component>, AffectorFunction> affectorFunctions, final BiMap<Class<Component>, GeneratorFunction> generatorFunctions) {
-        fetchFunctions(affectors, affectorFunctions);
-        fetchFunctions(generators, generatorFunctions);
+    public void updateFunctionMaps(final BiMap<Class<Component>, GeneratorFunction> generatorFunctions,
+                                   final BiMap<Class<Component>, AffectorFunction> affectorFunctions) {
+        fetchGeneratorFunctions(generatorFunctions);
+        fetchAffectorFunctions(affectorFunctions);
     }
 
-    private <T> void fetchFunctions(final Map<Component, T> fetchedFunctions, final BiMap<Class<Component>, T> registeredFunctions) {
-        fetchedFunctions.clear();
+    private void fetchGeneratorFunctions(final BiMap<Class<Component>, GeneratorFunction> generatorFunctions) {
+        generators.clear();
 
-        Set<Class<Component>> relevantClasses = registeredFunctions.keySet();
+        for (EntityRef generator: emitterComponent.generators) {
+            for (Component component: generator.iterateComponents()) {
+                GeneratorFunction<Component> function = generatorFunctions.get(component.getClass());
 
-        Iterator<Component> components = emitterComponent.generators.stream()
-                .map((entity) -> entity.iterateComponents(). iterator() )
-                .filter((component) -> relevantClasses.contains(component.getClass()))
-                .findAny().get();
-
-        components.forEachRemaining(
-                (component) -> fetchedFunctions.put(component, registeredFunctions.get(component))
-        );
+                if (function != null) {
+                    generators.put(component, function);
+                }
+            }
+        }
     }
 
+    private void fetchAffectorFunctions(final BiMap<Class<Component>, AffectorFunction> affectorFunctions) {
+        affectors.clear();
 
+        for (EntityRef affector: entityRef.getComponent(ParticleSystemComponent.class).affectors) {
+            for (Component component: affector.iterateComponents()) {
+                AffectorFunction<Component> function = affectorFunctions.get(component.getClass());
+
+                if (function != null) {
+                    affectors.put(component, function);
+                }
+            }
+        }
+    }
+
+    public LocationComponent getEmitterLocation() {
+        return entityRef
+                .getComponent(ParticleSystemComponent.class)
+                .emitter
+                .getComponent(LocationComponent.class);
+    }
 }

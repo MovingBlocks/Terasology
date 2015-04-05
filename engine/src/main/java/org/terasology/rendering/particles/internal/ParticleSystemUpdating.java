@@ -31,29 +31,17 @@ import org.terasology.rendering.particles.functions.generators.ColorRangeGenerat
 import org.terasology.rendering.particles.functions.generators.GeneratorFunction;
 import org.terasology.utilities.random.FastRandom;
 
+import java.util.Map;
+import java.util.function.Function;
+
 /**
  * Created by Linus on 28-2-2015.
  */
 public class ParticleSystemUpdating {
     private static final int PHYSICS_SKIP_NR = 10;
 
-    private static void broadCastBeforeUpdateEvent(EntityRef particleSystem) {
-        ParticleSystemUpdateEvent event = new ParticleSystemUpdateEvent();
-    }
-
     private static FastRandom random = new FastRandom();
-    /*
-    public static void updatePositions(final ParticlePool pool, float delta) {
-        for (int i = 0; i < pool.livingParticles() * 3; i++) {
-            pool.position[i] += pool.velocity[i] * delta;
-        }
 
-        for(int i = 0; i < pool.livingParticles(); i++) {
-            pool.velocity[i*3+1] -= 9.81 * delta;
-            pool.velocity[i*3+1] *= 0.98;
-        }
-    }
-*/
     public static void checkCollision(final ParticlePool pool, final Physics physics, final int offset, float delta) {
         Vector3f vel = new Vector3f();
         Vector3f curr = new Vector3f();
@@ -91,41 +79,19 @@ public class ParticleSystemUpdating {
 
         ParticleSystemComponent partComp = partSys.entityRef.getComponent(ParticleSystemComponent.class);
 
-        for (EntityRef generator: partComp.affectors) {
-            for (Component component: generator.iterateComponents()) {
-                AffectorFunction<Component> function = registeredAffectorFunctions.get(component.getClass());
-
-                if (function != null) {
-                    function.beforeUpdates(
-                            component,
-                            random,
-                            delta
-                    );
-                }
-            }
-        }
+        partSys.affectors.forEach(
+                (component, affector) -> affector.beforeUpdates(component, random, delta)
+        );
 
         for(int i = 0; i < partSys.particlePool.livingParticles(); i++) {
             partSys.particlePool.loadTemporaryDataFrom(i, DataMask.ALL.rawMask);
 
 
-            for (EntityRef generator: partComp.affectors) {
-                for (Component component: generator.iterateComponents()) {
-                    AffectorFunction<Component> function = registeredAffectorFunctions.get(component.getClass());
-
-                    if (function != null) {
-                        function.update(
-                                component,
-                                partSys.particlePool.temporaryParticleData,
-                                random,
-                                delta
-                        );
-                    }
-                }
-            }
+            partSys.affectors.forEach(
+                    (component, affector) -> affector.update(component, partSys.particlePool.temporaryParticleData, random, delta)
+            );
 
             partSys.particlePool.storeTemporaryDataAt(i, DataMask.ALL.rawMask);
-
         }
     }
 
@@ -138,24 +104,11 @@ public class ParticleSystemUpdating {
 
         particleSystem.particlePool.loadTemporaryDataFrom(index, DataMask.ALL.rawMask);
 
-
-        for (EntityRef generator: particleSystem.emitterComponent.generators) {
-            for (Component component: generator.iterateComponents()) {
-                GeneratorFunction<Component> function = registeredGeneratorFunctions.get(component.getClass());
-
-                if (function != null) {
-                    function.onEmission(
-                            component,
-                            particleSystem.particlePool.temporaryParticleData,
-                            random
-                    );
-                }
-            }
-        }
+        particleSystem.generators.forEach( (component, generator) ->
+            generator.onEmission(component, particleSystem.particlePool.temporaryParticleData, random)
+        );
 
         particleSystem.particlePool.temporaryParticleData.position.add(particleSystem.entityRef.getComponent(ParticleSystemComponent.class).emitter.getComponent(LocationComponent.class).getWorldPosition());
-
-
 
         particleSystem.particlePool.storeTemporaryDataAt(index, DataMask.ALL.rawMask);
     }
@@ -188,9 +141,10 @@ public class ParticleSystemUpdating {
                               final float delta
     ) {
         updateEmitter(partSys, registeredGeneratorFunctions, delta);
-        checkCollision(partSys.particlePool, physics, partSys.collisionUpdateIteration, delta);
-        partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
         updateParticles(partSys, registeredAffectorFunctions, delta);
+
+        //checkCollision(partSys.particlePool, physics, partSys.collisionUpdateIteration, delta);
+        //partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
 
         partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime -= delta;
     }
