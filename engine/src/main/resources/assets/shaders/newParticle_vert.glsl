@@ -14,10 +14,23 @@
  * limitations under the License.
  */
 
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projMatrix;
-uniform mat4 viewProjMatrix;
+//uniform int particleIndex;
+
+/*
+#define INDEX3_X ((particleIndex * 3) + 0)
+#define INDEX3_Y ((particleIndex * 3) + 1)
+#define INDEX3_Z ((particleIndex * 3) + 2)
+
+#define INDEX4_X ((particleIndex * 4) + 0)
+#define INDEX4_Y ((particleIndex * 4) + 1)
+#define INDEX4_Z ((particleIndex * 4) + 2)
+#define INDEX4_W ((particleIndex * 4) + 3)
+*/
+
+uniform vec3 scale;
+uniform vec3 position;
+
+uniform vec4 color;
 
 mat4 undoRotation(in mat4 matrix) {
 	mat4 noRotation = mat4(matrix);
@@ -31,8 +44,20 @@ mat4 undoRotation(in mat4 matrix) {
 	return noRotation;
 }
 
+vec4 applyScale(in vec4 vertex) {
+    return vec4(
+        vertex.x * scale.x,
+        vertex.y * scale.y,
+        vertex.z * scale.z,
+        vertex.w
+    );
+}
+
 void main()
 {
-	gl_Position = ftransform();
-    gl_FrontColor = gl_Color;
+    gl_Position = applyScale(gl_Vertex);
+    gl_Position.xyz += position;
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Position;
+
+    gl_FrontColor = color;
 }

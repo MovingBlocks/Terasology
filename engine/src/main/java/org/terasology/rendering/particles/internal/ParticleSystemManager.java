@@ -123,6 +123,8 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
     }
 
     public void initialise() {
+        ParticleSystemRendering.initialise();
+
         registerGeneratorFunction(new ColorRangeGeneratorFunction());
         registerGeneratorFunction(new EnergyRangeGeneratorFunction());
         registerGeneratorFunction(new PositionRangeGeneratorFunction());
@@ -139,6 +141,8 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
     @Override
     public void shutdown() {
+        ParticleSystemRendering.shutdown();
+
         particleSystems.clear();
         registeredAffectorFunctions.clear();
         registeredGeneratorFunctions.clear();

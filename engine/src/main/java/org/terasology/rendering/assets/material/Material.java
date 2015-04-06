@@ -224,6 +224,18 @@ public interface Material extends Asset<MaterialData> {
      */
     void setTexture(String name, Texture texture);
 
+    void setVertexAttribPointer(String desc,
+                                int size,
+                                boolean normalized,
+                                int stride,
+                                long offset,
+                                boolean currentOnly
+    );
+
+    void enableVertexAttributeArray(String desc, boolean currentOnly);
+
+    void disableVertexAttributeArray(String desc, boolean currentOnly);
+
     /**
      * Sets up this matertial for the given camera
      *

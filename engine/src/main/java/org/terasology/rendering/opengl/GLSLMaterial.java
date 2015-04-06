@@ -27,6 +27,8 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
+import org.lwjgl.opengl.ARBDrawInstanced;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
@@ -571,6 +573,79 @@ public class GLSLMaterial extends BaseMaterial {
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
                 GL20.glUniformMatrix4(id, false, value);
+            }
+
+            restoreStateAfterUniformsSet();
+        }
+    }
+
+    @Override
+    public void setVertexAttribPointer(String desc,
+                                       int size,
+                                       boolean normalized,
+                                       int stride,
+                                       long offset,
+                                       boolean currentOnly
+    ) {
+        if (isDisposed()) {
+            return;
+        }
+        if (currentOnly) {
+            enable();
+            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+            GL20.glVertexAttribPointer(id, size, GL11.GL_FLOAT, normalized, stride, 0L);
+        } else {
+            TIntIntIterator it = shaderPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+
+                GL20.glUseProgram(it.value());
+                int id = getUniformLocation(it.value(), desc);
+                GL20.glVertexAttribPointer(id, size, GL11.GL_FLOAT, normalized, stride, 0L);
+            }
+
+            restoreStateAfterUniformsSet();
+        }
+    }
+
+    public void enableVertexAttributeArray(String desc, boolean currentOnly) {
+        if (isDisposed()) {
+            return;
+        }
+        if (currentOnly) {
+            enable();
+            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+            GL20.glEnableVertexAttribArray(id);
+        } else {
+            TIntIntIterator it = shaderPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+
+                GL20.glUseProgram(it.value());
+                int id = getUniformLocation(it.value(), desc);
+                GL20.glEnableVertexAttribArray(id);
+            }
+
+            restoreStateAfterUniformsSet();
+        }
+    }
+
+    public void disableVertexAttributeArray(String desc, boolean currentOnly) {
+        if (isDisposed()) {
+            return;
+        }
+        if (currentOnly) {
+            enable();
+            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+            GL20.glDisableVertexAttribArray(id);
+        } else {
+            TIntIntIterator it = shaderPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+
+                GL20.glUseProgram(it.value());
+                int id = getUniformLocation(it.value(), desc);
+                GL20.glDisableVertexAttribArray(id);
             }
 
             restoreStateAfterUniformsSet();
