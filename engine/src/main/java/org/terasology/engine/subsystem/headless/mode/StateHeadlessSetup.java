@@ -24,6 +24,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateSetup;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
@@ -83,8 +84,8 @@ public class StateHeadlessSetup extends StateSetup {
             // find the first gameplay module that is available, it should have a preferred world gen
             for (Name moduleName : config.getDefaultModSelection().listModules()) {
                 Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-                if (moduleManager.isGameplayModule(module)) {
-                    SimpleUri defaultWorldGenerator = moduleManager.getDefaultWorldGenerator(module);
+                if (StandardModuleExtension.isGameplayModule(module)) {
+                    SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
                     worldGenConfig.setDefaultGenerator(defaultWorldGenerator);
                     break;
                 }

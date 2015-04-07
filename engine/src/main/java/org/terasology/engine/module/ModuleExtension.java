@@ -16,24 +16,10 @@
 
 package org.terasology.engine.module;
 
-import java.util.Set;
+public interface ModuleExtension {
 
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleMetadataReader;
-import org.terasology.module.ModuleRegistry;
+    String getKey();
 
-/**
- * TODO Type description
- * @author Martin Steiger
- */
-public interface ModuleManager {
-
-    ModuleRegistry getRegistry();
-
-    ModuleEnvironment getEnvironment();
-
-    ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary);
-
-    ModuleMetadataReader getModuleMetadataReader();
+    Class<?> getValueType();
 }
+

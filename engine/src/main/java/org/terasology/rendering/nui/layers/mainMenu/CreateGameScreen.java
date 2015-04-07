@@ -26,6 +26,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
@@ -126,7 +127,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                     // find the first gameplay module that is available
                     for (Module module : moduleManager.getRegistry()) {
                         // module is null if it is no longer present
-                        if (module != null && moduleManager.isGameplayModule(module)) {
+                        if (module != null && StandardModuleExtension.isGameplayModule(module)) {
                             set(module);
                             return selected;
                         }
@@ -334,7 +335,7 @@ public class CreateGameScreen extends CoreScreenLayer {
 
         // Set the default generator of the selected gameplay module
         if (module != null) {
-            SimpleUri defaultWorldGenerator = moduleManager.getDefaultWorldGenerator(module);
+            SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
             if (defaultWorldGenerator != null) {
                 for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
                     if (worldGenInfo.getUri().equals(defaultWorldGenerator)) {
@@ -352,7 +353,7 @@ public class CreateGameScreen extends CoreScreenLayer {
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (!latestVersion.isOnClasspath()) {
-                if (moduleManager.isGameplayModule(latestVersion)) {
+                if (StandardModuleExtension.isGameplayModule(latestVersion)) {
                     gameplayModules.add(latestVersion);
                 }
             }
