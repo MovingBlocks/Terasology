@@ -75,6 +75,8 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * @author Immortius
  */
@@ -347,10 +349,10 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     protected void renderParticle(Particle particle, float light) {
         Material mat = Assets.getMaterial("engine:prog.particle");
 
-        mat.setFloat4("colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w, true);
-        mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
-        mat.setFloat2("texScale", particle.texSize.x, particle.texSize.y, true);
-        mat.setFloat("light", light, true);
+        mat.setFloat4(UNIFORM, "colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w, true);
+        mat.setFloat2(UNIFORM, "texOffset", particle.texOffset.x, particle.texOffset.y, true);
+        mat.setFloat2(UNIFORM, "texScale", particle.texSize.x, particle.texSize.y, true);
+        mat.setFloat(UNIFORM, "light", light, true);
 
         glCallList(displayList);
     }
@@ -359,11 +361,11 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         Material mat = Assets.getMaterial("engine:prog.particle");
 
         Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, biome);
-        mat.setFloat4("colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);
+        mat.setFloat4(UNIFORM, "colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);
 
-        mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
-        mat.setFloat2("texScale", particle.texSize.x, particle.texSize.y, true);
-        mat.setFloat("light", light, true);
+        mat.setFloat2(UNIFORM, "texOffset", particle.texOffset.x, particle.texOffset.y, true);
+        mat.setFloat2(UNIFORM, "texScale", particle.texSize.x, particle.texSize.y, true);
+        mat.setFloat(UNIFORM, "light", light, true);
 
         glCallList(displayList);
     }

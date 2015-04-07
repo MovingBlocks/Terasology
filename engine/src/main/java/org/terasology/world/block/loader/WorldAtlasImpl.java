@@ -58,6 +58,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * @author Immortius
  */
@@ -205,8 +207,8 @@ public class WorldAtlasImpl implements WorldAtlas {
 
         MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));
         terrainMatData.setParam("textureAtlas", terrainTex);
-        terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
-        terrainMatData.setParam("textured", true);
+        terrainMatData.setParam(UNIFORM, "colorOffset", new float[]{1, 1, 1});
+        terrainMatData.setParam(UNIFORM, "textured", true);
         Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
 
         createTextureAtlas(terrainTex);

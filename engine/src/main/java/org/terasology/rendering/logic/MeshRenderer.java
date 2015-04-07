@@ -62,6 +62,8 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslated;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
  *
@@ -205,14 +207,14 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                 MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-                meshComp.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-                meshComp.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                meshComp.material.setMatrix4(UNIFORM, "projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                meshComp.material.setMatrix4(UNIFORM, "worldViewMatrix", tempMatrixBuffer44, true);
 
                 MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-                meshComp.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
-                meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
-                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
-                meshComp.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
+                meshComp.material.setMatrix3(UNIFORM, "normalMatrix", tempMatrixBuffer33, true);
+                meshComp.material.setFloat4(UNIFORM, "colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
+                meshComp.material.setFloat(UNIFORM, "light", worldRenderer.getRenderingLightValueAt(worldPos), true);
+                meshComp.material.setFloat(UNIFORM, "sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
 
                 OpenGLMesh mesh = (OpenGLMesh) meshComp.mesh;
                 meshComp.material.bindTextures();
@@ -250,9 +252,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         for (Material material : meshByMaterial.keySet()) {
             OpenGLMesh lastMesh = null;
             material.enable();
-            material.setFloat("sunlight", 1.0f);
-            material.setFloat("blockLight", 1.0f);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            material.setFloat(UNIFORM, "sunlight", 1.0f);
+            material.setFloat(UNIFORM, "blockLight", 1.0f);
+            material.setMatrix4(UNIFORM, "projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.bindTextures();
 
             Set<EntityRef> entities = meshByMaterial.get(material);
@@ -293,14 +295,14 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                     MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-                    material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                    material.setMatrix4(UNIFORM, "worldViewMatrix", tempMatrixBuffer44, true);
 
                     MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-                    material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+                    material.setMatrix3(UNIFORM, "normalMatrix", tempMatrixBuffer33, true);
 
-                    material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
-                    material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
-                    material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
+                    material.setFloat3(UNIFORM, "colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
+                    material.setFloat(UNIFORM, "sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
+                    material.setFloat(UNIFORM, "blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
                     lastMesh.doRender();
                 }

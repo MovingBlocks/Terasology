@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * @author Immortius
  */
@@ -604,7 +606,7 @@ public class CanvasImpl implements CanvasControl {
         if (!state.cropRegion.overlaps(drawRegion)) {
             return;
         }
-        material.setFloat("alpha", state.getAlpha());
+        material.setFloat(UNIFORM, "alpha", state.getAlpha());
         material.bindTextures();
         renderer.drawMaterialAt(material, drawRegion);
     }

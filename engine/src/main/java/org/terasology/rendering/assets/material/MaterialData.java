@@ -23,16 +23,21 @@ import org.terasology.rendering.assets.texture.Texture;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * @author Immortius
  */
 public class MaterialData implements AssetData {
+
     private Shader shader;
     private Map<String, Texture> textures = Maps.newHashMap();
-    private Map<String, Float> floatParams = Maps.newHashMap();
-    private Map<String, float[]> floatArrayParams = Maps.newHashMap();
-    private Map<String, Integer> intParams = Maps.newHashMap();
+
+    private Map<String, Float> floatUniforms = Maps.newHashMap();
+    private Map<String, float[]> floatArrayUniforms = Maps.newHashMap();
+    private Map<String, Integer> intUniforms = Maps.newHashMap();
+
+    private Map<String, Float> floatAttributes = Maps.newHashMap();
+    private Map<String, float[]> floatArrayAttributes = Maps.newHashMap();
+
 
     public MaterialData(Shader shader) {
         checkNotNull(shader);
@@ -51,52 +56,111 @@ public class MaterialData implements AssetData {
         this.textures.put(parmName, value);
     }
 
-    public Map<String, Float> getFloatParams() {
-        return floatParams;
+    public Map<String, Float> getFloatUniforms() {
+        return floatUniforms;
     }
 
-    public void setParam(String parmName, float value) {
-        this.floatParams.put(parmName, value);
+    public Map<String, Float> getFloatAttributes() {
+        return floatAttributes;
     }
 
-    public Map<String, float[]> getFloatArrayParams() {
-        return floatArrayParams;
+    public void setParam(Material.StorageQualifier qualifier, String parmName, float value) {
+        switch (qualifier) {
+            case UNIFORM:
+                this.floatUniforms.put(parmName, value);
+                break;
+            case ATTRIBUTE:
+                this.floatAttributes.put(parmName, value);
+                break;
+            default:
+                throw noSwitchCaseImplemented(qualifier);
+        }
     }
 
-    public void setParam(String parmName, float[] value) {
-        this.floatArrayParams.put(parmName, value);
+    public Map<String, float[]> getFloatArrayUniforms() {
+        return floatArrayUniforms;
     }
 
-    public Map<String, Integer> getIntegerParams() {
-        return intParams;
+    public Map<String, float[]> getFloatArrayAttributes() {
+        return floatArrayAttributes;
     }
 
-    public void setParam(String parmName, int value) {
-        this.intParams.put(parmName, value);
+    public void setParam(Material.StorageQualifier qualifier, String parmName, float[] value) {
+        switch (qualifier) {
+            case UNIFORM:
+                this.floatArrayUniforms.put(parmName, value);
+                break;
+            case ATTRIBUTE:
+                this.floatArrayAttributes.put(parmName, value);
+                break;
+            default:
+                throw noSwitchCaseImplemented(qualifier);
+        }
     }
 
-    public void setParam(String parmName, boolean value) {
-        this.intParams.put(parmName, (value) ? 1 : 0);
+    public Map<String, Integer> getIntegerUniforms() {
+        return intUniforms;
     }
 
+    public void setParam(Material.StorageQualifier qualifier, String parmName, int value) {
+        switch (qualifier) {
+            case UNIFORM:
+                this.intUniforms.put(parmName, value);
+                break;
+            case ATTRIBUTE:
+                throw new UnsupportedOperationException("Int attributes are not supported in GLSL 1.2");
+            default:
+                throw noSwitchCaseImplemented(qualifier);
+        }
+    }
+
+    public void setParam(Material.StorageQualifier qualifier, String parmName, boolean value) {
+        final int intValue = (value) ? 1 : 0;
+
+        switch (qualifier) {
+            case UNIFORM:
+                this.intUniforms.put(parmName, intValue);
+                break;
+            case ATTRIBUTE:
+                throw new UnsupportedOperationException("Int attributes are not supported in GLSL 1.2");
+            default:
+                throw noSwitchCaseImplemented(qualifier);
+        }
+    }
 
     public void setTextureParams(Map<String, Texture> newTextureParmas) {
         this.textures.clear();
         this.textures.putAll(newTextureParmas);
     }
 
-    public void setFloatParams(Map<String, Float> floatParams) {
-        this.floatParams.clear();
-        this.floatParams.putAll(floatParams);
+    public void setFloatUniforms(Map<String, Float> floatParams) {
+        this.floatUniforms.clear();
+        this.floatUniforms.putAll(floatParams);
     }
 
-    public void setFloatArrayParams(Map<String, float[]> floatArrayParams) {
-        this.floatArrayParams.clear();
-        this.floatArrayParams.putAll(floatArrayParams);
+    public void setFloatArrayUniforms(Map<String, float[]> floatArrayParams) {
+        this.floatArrayUniforms.clear();
+        this.floatArrayUniforms.putAll(floatArrayParams);
     }
 
-    public void setIntParams(Map<String, Integer> intParams) {
-        this.intParams.clear();
-        this.intParams.putAll(intParams);
+    public void setIntUniforms(Map<String, Integer> intParams) {
+        this.intUniforms.clear();
+        this.intUniforms.putAll(intParams);
+    }
+
+    public void setFloatAttributes(Map<String, Float> floatParams) {
+        this.floatAttributes.clear();
+        this.floatAttributes.putAll(floatParams);
+    }
+
+    public void setFloatArrayAttributes(Map<String, float[]> floatArrayParams) {
+        this.floatArrayAttributes.clear();
+        this.floatArrayAttributes.putAll(floatArrayParams);
+    }
+
+    private static UnsupportedOperationException noSwitchCaseImplemented(Material.StorageQualifier qualifier) {
+        return new UnsupportedOperationException(
+                "Switch statement does not have a case in for " + qualifier
+        );
     }
 }

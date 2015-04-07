@@ -40,6 +40,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -85,7 +86,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
             ssaoSamples.flip();
         }
-        material.setFloat3("ssaoSamples", ssaoSamples);
+        material.setFloat3(UNIFORM, "ssaoSamples", ssaoSamples);
     }
 
     @Override
@@ -99,25 +100,25 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             scene.bindDepthTexture();
-            program.setInt("texDepth", texId++, true);
+            program.setInt(UNIFORM, "texDepth", texId++, true);
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
             scene.bindNormalsTexture();
-            program.setInt("texNormals", texId++, true);
+            program.setInt(UNIFORM, "texNormals", texId++, true);
         }
 
         Texture ssaoNoiseTexture = updateNoiseTexture();
 
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
         glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
-        program.setInt("texNoise", texId++, true);
+        program.setInt(UNIFORM, "texNoise", texId++, true);
 
-        program.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
+        program.setFloat4(UNIFORM, "ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
 
         if (CoreRegistry.get(WorldRenderer.class) != null) {
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
             if (activeCamera != null) {
-                program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
-                program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+                program.setMatrix4(UNIFORM, "invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+                program.setMatrix4(UNIFORM, "projMatrix", activeCamera.getProjectionMatrix(), true);
             }
         }
     }

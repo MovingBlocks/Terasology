@@ -26,6 +26,8 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * Shader parameters for the Combine shader program.
  *
@@ -55,19 +57,19 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindTexture();
-            program.setInt("texSceneOpaque", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaque", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindDepthTexture();
-            program.setInt("texSceneOpaqueDepth", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueDepth", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindNormalsTexture();
-            program.setInt("texSceneOpaqueNormals", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueNormals", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindLightBufferTexture();
-            program.setInt("texSceneOpaqueLightBuffer", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueLightBuffer", texId++, true);
         }
 
         FBO sceneReflectiveRefractive = LwjglRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
@@ -75,48 +77,48 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneReflectiveRefractive.bindTexture();
-            program.setInt("texSceneReflectiveRefractive", texId++, true);
+            program.setInt(UNIFORM, "texSceneReflectiveRefractive", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isLocalReflections()) {
             if (sceneReflectiveRefractive != null) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 sceneReflectiveRefractive.bindNormalsTexture();
-                program.setInt("texSceneReflectiveRefractiveNormals", texId++, true);
+                program.setInt(UNIFORM, "texSceneReflectiveRefractiveNormals", texId++, true);
             }
 
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
             if (activeCamera != null) {
-                program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
-                program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+                program.setMatrix4(UNIFORM, "invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+                program.setMatrix4(UNIFORM, "projMatrix", activeCamera.getProjectionMatrix(), true);
             }
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().bindFboTexture("ssaoBlurred");
-            program.setInt("texSsao", texId++, true);
+            program.setInt(UNIFORM, "texSsao", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().bindFboTexture("sobel");
-            program.setInt("texEdges", texId++, true);
+            program.setInt(UNIFORM, "texEdges", texId++, true);
 
-            program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
-            program.setFloat("outlineThickness", outlineThickness, true);
+            program.setFloat(UNIFORM, "outlineDepthThreshold", outlineDepthThreshold, true);
+            program.setFloat(UNIFORM, "outlineThickness", outlineThickness, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
-            program.setInt("texSceneSkyBand", texId++, true);
+            program.setInt(UNIFORM, "texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();
             skyInscatteringSettingsFrag.y = skyInscatteringStrength;
             skyInscatteringSettingsFrag.z = skyInscatteringLength;
             skyInscatteringSettingsFrag.w = skyInscatteringThreshold;
-            program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag, true);
+            program.setFloat4(UNIFORM, "skyInscatteringSettingsFrag", skyInscatteringSettingsFrag, true);
         }
     }
 }

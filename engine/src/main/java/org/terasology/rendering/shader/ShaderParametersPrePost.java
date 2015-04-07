@@ -28,6 +28,7 @@ import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -49,27 +50,27 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         super.applyParameters(program);
 
         Vector3f tint = CoreRegistry.get(WorldRenderer.class).getTint();
-        program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
+        program.setFloat3(UNIFORM, "inLiquidTint", tint.x, tint.y, tint.z, true);
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         LwjglRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
-        program.setInt("texScene", texId++, true);
+        program.setInt(UNIFORM, "texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().bindFboTexture("sceneBloom2");
-            program.setInt("texBloom", texId++, true);
+            program.setInt(UNIFORM, "texBloom", texId++, true);
 
-            program.setFloat("bloomFactor", bloomFactor, true);
+            program.setFloat(UNIFORM, "bloomFactor", bloomFactor, true);
         }
 
-        program.setFloat2("aberrationOffset", aberrationOffsetX, aberrationOffsetY, true);
+        program.setFloat2(UNIFORM, "aberrationOffset", aberrationOffsetX, aberrationOffsetY, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().bindFboTexture("lightShafts");
-            program.setInt("texLightShafts", texId++, true);
+            program.setInt(UNIFORM, "texLightShafts", texId++, true);
         }
 
         Texture vignetteTexture = Assets.getTexture("engine:vignette");
@@ -77,7 +78,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         if (vignetteTexture != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
-            program.setInt("texVignette", texId++, true);
+            program.setInt(UNIFORM, "texVignette", texId++, true);
         }
     }
 }

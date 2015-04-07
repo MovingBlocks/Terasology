@@ -17,6 +17,17 @@
 package org.terasology.rendering.assets.shader;
 
 /**
+ *
+ * <p>
+ *     <strong>Note:</strong> The {@link  org.terasology.rendering.assets.material.MaterialLoader#load(
+ *          org.terasology.module.Module,
+ *          java.io.InputStream,
+ *          java.util.List,
+ *          java.util.List)
+ *     } method  works under the assumption that the asset data only specifies uniform parameter values.
+ *     This should be reconsidered whenever the ParamType enum is extended.
+ * </p>
+ *
  * @author Immortius
  */
 public enum ParamType {
