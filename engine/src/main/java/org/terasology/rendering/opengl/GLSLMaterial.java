@@ -580,76 +580,28 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public void setVertexAttribPointer(String desc,
-                                       int size,
-                                       boolean normalized,
-                                       int stride,
-                                       long offset,
-                                       boolean currentOnly
+    public void vertexAttribPointer(String desc,
+                                    int size,
+                                    int type,
+                                    boolean normalized,
+                                    int stride,
+                                    long offset
     ) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glVertexAttribPointer(id, size, GL11.GL_FLOAT, normalized, stride, 0L);
-        } else {
-            TIntIntIterator it = shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glVertexAttribPointer(id, size, GL11.GL_FLOAT, normalized, stride, 0L);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+        enable();
+        int id = getUniformLocation(getActiveShaderProgramId(), desc);
+        GL20.glVertexAttribPointer(id, size, type, normalized, stride, offset);
     }
 
-    public void enableVertexAttributeArray(String desc, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glEnableVertexAttribArray(id);
-        } else {
-            TIntIntIterator it = shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glEnableVertexAttribArray(id);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+    public void enableVertexAttributeArray(String desc) {
+        enable();
+        int id = getUniformLocation(getActiveShaderProgramId(), desc);
+        GL20.glEnableVertexAttribArray(id);
     }
 
-    public void disableVertexAttributeArray(String desc, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glDisableVertexAttribArray(id);
-        } else {
-            TIntIntIterator it = shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glDisableVertexAttribArray(id);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
+    public void disableVertexAttributeArray(String desc) {
+        enable();
+        int id = getUniformLocation(getActiveShaderProgramId(), desc);
+        GL20.glDisableVertexAttribArray(id);
     }
 
     private int getActiveShaderProgramId() {

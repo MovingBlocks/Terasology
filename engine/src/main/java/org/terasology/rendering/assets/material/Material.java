@@ -224,17 +224,37 @@ public interface Material extends Asset<MaterialData> {
      */
     void setTexture(String name, Texture texture);
 
-    void setVertexAttribPointer(String desc,
-                                int size,
-                                boolean normalized,
-                                int stride,
-                                long offset,
-                                boolean currentOnly
+    /**
+     * Calls glVertexAttribPointer, with the id of the attribute that matches the string.
+     *
+     * @param desc The exact name of the attribute in the shader
+     * @param size
+     * @param type
+     * @param normalized
+     * @param stride
+     * @param offset
+     */
+    void vertexAttribPointer(String desc,
+                             int size,
+                             int type,
+                             boolean normalized,
+                             int stride,
+                             long offset
     );
 
-    void enableVertexAttributeArray(String desc, boolean currentOnly);
+    /**
+     * Calls glEnableVertexAttributeArray with the index of attribute passed as argument.
+     *
+     * @param desc the name of the attribute, as it appears in the shader.
+     */
+    void enableVertexAttributeArray(String desc);
 
-    void disableVertexAttributeArray(String desc, boolean currentOnly);
+    /**
+     * Calls glDisableVertexAttributeArray with the index of attribute passed as argument.
+     *
+     * @param desc the name of the attribute, as it appears in the shader.
+     */
+    void disableVertexAttributeArray(String desc);
 
     /**
      * Sets up this matertial for the given camera

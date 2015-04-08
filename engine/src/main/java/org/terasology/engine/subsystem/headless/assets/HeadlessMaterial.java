@@ -130,23 +130,23 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    public void setVertexAttribPointer(String desc,
-                                       int size,
-                                       boolean normalized,
-                                       int stride,
-                                       long offset,
-                                       boolean currentOnly
+    public void vertexAttribPointer(String desc,
+                                    int size,
+                                    int type,
+                                    boolean normalized,
+                                    int stride,
+                                    long offset
     ) {
         // Do nothing
     }
 
     @Override
-    public void enableVertexAttributeArray(String desc, boolean currentOnly) {
+    public void enableVertexAttributeArray(String desc) {
         // Do nothing
     }
 
     @Override
-    public void disableVertexAttributeArray(String desc, boolean currentOnly) {
+    public void disableVertexAttributeArray(String desc) {
         // Do nothing
     }
 

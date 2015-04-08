@@ -35,28 +35,28 @@ public final class ParticlePool {
     private static final int W_OFFSET = 3;
 
     // Per particle scalars
-    final float[] energy;
+    public final float[] energy;
 
     // Per particle 3d vectors
-    final float[] position;
-    final float[] previousPosition;
-    final float[] velocity;
+    public final float[] position;
+    public final float[] previousPosition;
+    public final float[] velocity;
 
-    final float[] scale;
+    public final float[] scale;
 
     // Per particle 4d vectors
-    final float[] color;
+    public final float[] color;
 
     //== private attributes =============================
 
-    final ParticleData temporaryParticleData = new ParticleData();
+    public final ParticleData temporaryParticleData = new ParticleData();
 
     private int firstDeadParticleIndex;
     private final int rawSize;
 
     //== Constructors ===================================
 
-    ParticlePool(final int size) {
+    public ParticlePool(final int size) {
         Preconditions.checkArgument(size > 0, "Size must be >0, but was %s", size);
 
         this.rawSize = size;
@@ -93,15 +93,13 @@ public final class ParticlePool {
         return rawSize - firstDeadParticleIndex;
     }
 
-    //== package private methods ========================
-
-    int reviveParticle() {
+    public int reviveParticle() {
         firstDeadParticleIndex++;
 
         return firstDeadParticleIndex - 1;
     }
 
-    void moveDeceasedParticle(final int index) {
+    public void moveDeceasedParticle(final int index) {
         firstDeadParticleIndex--;
         // First dead particle now points to the last living particle and there is a dead particle in the living pool.
         // Moving the last living particle to the location of the deceased particle fixes both issues.
@@ -111,7 +109,7 @@ public final class ParticlePool {
 
     //== moving particle data ===========================
 
-    void loadTemporaryDataFrom(final int index, int rawMask) {
+    public void loadTemporaryDataFrom(final int index, int rawMask) {
         final int index3 = 3 * index;
         final int index4 = 4 * index;
 
@@ -164,7 +162,7 @@ public final class ParticlePool {
         }
     }
 
-    void storeTemporaryDataAt(final int index, final int rawMask) {
+    public void storeTemporaryDataAt(final int index, final int rawMask) {
         final int index3 = 3 * index;
         final int index4 = 4 * index;
 

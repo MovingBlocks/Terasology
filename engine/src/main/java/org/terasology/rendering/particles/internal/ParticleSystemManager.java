@@ -43,6 +43,7 @@ import org.terasology.rendering.particles.components.affectors.*;
 import org.terasology.rendering.particles.components.generators.*;
 import org.terasology.rendering.particles.functions.affectors.*;
 import org.terasology.rendering.particles.functions.generators.*;
+import org.terasology.rendering.particles.internal.rendering.ParticleRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -73,6 +74,8 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
     @In
     private Physics physics;
+
+    private ParticleRenderer particleRenderer;
 
     private BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions = HashBiMap.create();
     private BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions = HashBiMap.create();
@@ -123,7 +126,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
     }
 
     public void initialise() {
-        ParticleSystemRendering.initialise();
+        particleRenderer = ParticleRenderer.create(logger);
 
         registerGeneratorFunction(new ColorRangeGeneratorFunction());
         registerGeneratorFunction(new EnergyRangeGeneratorFunction());
@@ -141,11 +144,12 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
     @Override
     public void shutdown() {
-        ParticleSystemRendering.shutdown();
-
         particleSystems.clear();
         registeredAffectorFunctions.clear();
         registeredGeneratorFunctions.clear();
+
+        particleRenderer.dispose();
+        particleRenderer = null;
     }
 
     float cumDelta = 0.0f;
@@ -177,9 +181,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         }
     }
 
-    public void renderAlphaBlend() {
-        ParticleSystemRendering.render(worldRenderer, particleSystems.values());
-    }
+
 
     /**
      * @return
@@ -341,6 +343,12 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         particleSystems.put(entityRef, stateData);
 
         return String.format("Sparkly: %s", spawnPosition );
+    }
+
+    public void renderAlphaBlend() {
+        if (particleRenderer != null) {
+            particleRenderer.render(worldRenderer, particleSystems.values());
+        }
     }
 
     public void renderOpaque() {

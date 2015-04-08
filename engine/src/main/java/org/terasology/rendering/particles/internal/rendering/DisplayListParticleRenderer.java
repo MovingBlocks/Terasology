@@ -1,0 +1,117 @@
+/*
+ * Copyright 2015 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.terasology.rendering.particles.internal.rendering;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.particles.internal.ParticlePool;
+import org.terasology.rendering.particles.internal.ParticleSystemStateData;
+import org.terasology.rendering.particles.internal.rendering.ParticleRenderer;
+
+import static org.lwjgl.opengl.GL11.*;
+
+/**
+ * Created by Linus on 7-4-2015.
+ */
+class DisplayListParticleRenderer extends ParticleRenderer {
+
+    private final DisplayList drawUnitQuad;
+
+    public DisplayListParticleRenderer() {
+        drawUnitQuad =  new DisplayList(() -> {
+            glBegin(GL_TRIANGLE_FAN);
+            GL11.glVertex3f(UNIT_QUAD_VERTICES[0], UNIT_QUAD_VERTICES[1], UNIT_QUAD_VERTICES[2]);
+            GL11.glVertex3f(UNIT_QUAD_VERTICES[3], UNIT_QUAD_VERTICES[4], UNIT_QUAD_VERTICES[5]);
+            GL11.glVertex3f(UNIT_QUAD_VERTICES[6], UNIT_QUAD_VERTICES[7], UNIT_QUAD_VERTICES[8]);
+            GL11.glVertex3f(UNIT_QUAD_VERTICES[9], UNIT_QUAD_VERTICES[10], UNIT_QUAD_VERTICES[11]);
+            glEnd();
+        });
+    }
+
+    public void finalize() throws Throwable {
+        super.finalize();
+        drawUnitQuad.dispose();
+    }
+
+    @Override
+    public void dispose() {
+        drawUnitQuad.dispose();
+    }
+
+    public void drawParticles(Material material, ParticleSystemStateData particleSystem, Vector3f camera) {
+        ParticlePool particlePool = particleSystem.particlePool;
+        glPushMatrix();
+        glTranslatef(-camera.x(), -camera.y(), -camera.z());
+
+        for (int i = 0; i < particlePool.livingParticles(); i++) {
+            final int i3 = i * 3;
+            final int i4 = i * 4;
+
+            material.setFloat3("position",
+                    particlePool.position[i3],
+                    particlePool.position[i3 + 1],
+                    particlePool.position[i3 + 2]
+            );
+
+            material.setFloat3("scale",
+                    particlePool.scale[i3],
+                    particlePool.scale[i3 + 1],
+                    particlePool.scale[i3 + 2]
+            );
+
+            material.setFloat4("color",
+                    particlePool.color[i4],
+                    particlePool.color[i4 + 1],
+                    particlePool.color[i4 + 2],
+                    particlePool.color[i4 + 3]
+            );
+
+            drawUnitQuad.call();
+        }
+
+        glPopMatrix();
+    }
+
+    private static class DisplayList {
+        private static final int DISPOSED = 0;
+        private int id;
+
+        public DisplayList(Runnable commands) {
+            id = glGenLists(1);
+            glNewList(id, GL11.GL_COMPILE);
+            commands.run();
+            glEndList();
+        }
+
+        public void call() {
+            glCallList(id);
+        }
+
+        public void dispose() {
+            if (id != DISPOSED) {
+                glDeleteLists(id, 1);
+                id = DISPOSED;
+            }
+        }
+
+        @Override
+        public void finalize() throws Throwable {
+            super.finalize();
+            dispose();
+        }
+    }
+}
