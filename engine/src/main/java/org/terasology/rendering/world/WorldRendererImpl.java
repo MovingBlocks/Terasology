@@ -54,6 +54,8 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * @author Benjamin Glatzel
  */
@@ -462,25 +464,25 @@ public final class WorldRendererImpl implements WorldRenderer {
         Vector3f lightViewPosition = new Vector3f(worldPosition);
         playerCamera.getViewMatrix().transformPoint(lightViewPosition);
 
-        program.setFloat3("lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z, true);
+        program.setFloat3(UNIFORM, "lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z, true);
 
         Matrix4f modelMatrix = new Matrix4f();
         modelMatrix.set(lightComponent.lightAttenuationRange);
 
         modelMatrix.setTranslation(worldPosition);
-        program.setMatrix4("modelMatrix", modelMatrix, true);
+        program.setMatrix4(UNIFORM, "modelMatrix", modelMatrix, true);
 
         if (!geometryOnly) {
-            program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
-            program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
+            program.setFloat3(UNIFORM, "lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
+            program.setFloat3(UNIFORM, "lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
 
-            program.setFloat4("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity,
+            program.setFloat4(UNIFORM, "lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity,
                     lightComponent.lightSpecularIntensity, lightComponent.lightSpecularPower, true);
         }
 
         if (lightComponent.lightType == LightComponent.LightType.POINT) {
             if (!geometryOnly) {
-                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange * 0.975f, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
+                program.setFloat4(UNIFORM, "lightExtendedProperties", lightComponent.lightAttenuationRange * 0.975f, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
             }
 
             LightGeometryHelper.renderSphereGeometry();
@@ -554,15 +556,15 @@ public final class WorldRendererImpl implements WorldRenderer {
                     chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
 
-                chunkShader.setFloat3("chunkPositionWorld", chunkPosition.x * ChunkConstants.SIZE_X,
+                chunkShader.setFloat3(UNIFORM, "chunkPositionWorld", chunkPosition.x * ChunkConstants.SIZE_X,
                         chunkPosition.y * ChunkConstants.SIZE_Y,
                         chunkPosition.z * ChunkConstants.SIZE_Z);
-                chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f);
+                chunkShader.setFloat(UNIFORM, "animated", chunk.isAnimated() ? 1.0f : 0.0f);
 
                 if (mode == ChunkRenderMode.REFLECTION) {
-                    chunkShader.setFloat("clip", camera.getClipHeight());
+                    chunkShader.setFloat(UNIFORM, "clip", camera.getClipHeight());
                 } else {
-                    chunkShader.setFloat("clip", 0.0f);
+                    chunkShader.setFloat(UNIFORM, "clip", 0.0f);
                 }
 
                 chunkShader.enable();

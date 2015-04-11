@@ -43,6 +43,8 @@ import org.terasology.world.chunks.ChunkConstants;
 
 import java.util.Map;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * Stores all information for a specific block type.
  *
@@ -596,8 +598,8 @@ public final class Block {
         mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         mat.enable();
-        mat.setFloat("sunlight", sunlight);
-        mat.setFloat("blockLight", blockLight);
+        mat.setFloat(UNIFORM, "sunlight", sunlight);
+        mat.setFloat(UNIFORM, "blockLight", blockLight);
 
         if (mesh == null || mesh.isDisposed()) {
             generateMesh();

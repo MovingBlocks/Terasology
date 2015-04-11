@@ -55,72 +55,72 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    public void setFloat(String name, float f, boolean currentOnly) {
+    public void setFloat(StorageQualifier qualifier, String name, float f, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat1(String name, FloatBuffer buffer, boolean currentOnly) {
+    public void setFloat1(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat2(String name, float f1, float f2, boolean currentOnly) {
+    public void setFloat2(StorageQualifier qualifier, String name, float f1, float f2, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat2(String name, FloatBuffer buffer, boolean currentOnly) {
+    public void setFloat2(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat3(String name, float f1, float f2, float f3, boolean currentOnly) {
+    public void setFloat3(StorageQualifier qualifier, String name, float f1, float f2, float f3, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat3(String name, FloatBuffer buffer, boolean currentOnly) {
+    public void setFloat3(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat4(String name, float f1, float f2, float f3, float f4, boolean currentOnly) {
+    public void setFloat4(StorageQualifier qualifier, String name, float f1, float f2, float f3, float f4, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setFloat4(String name, FloatBuffer buffer, boolean currentOnly) {
+    public void setFloat4(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setInt(String name, int i, boolean currentOnly) {
+    public void setInt(StorageQualifier qualifier, String name, int i, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setBoolean(String name, boolean value, boolean currentOnly) {
+    public void setBoolean(StorageQualifier qualifier, String name, boolean value, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setMatrix3(String name, Matrix3f matrix, boolean currentOnly) {
+    public void setMatrix3(StorageQualifier qualifier, String name, Matrix3f matrix, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setMatrix3(String name, FloatBuffer buffer, boolean currentOnly) {
+    public void setMatrix3(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setMatrix4(String name, Matrix4f matrix, boolean currentOnly) {
+    public void setMatrix4(StorageQualifier qualifier, String name, Matrix4f matrix, boolean currentOnly) {
         // Do nothing
     }
 
     @Override
-    public void setMatrix4(String name, FloatBuffer buffer, boolean currentOnly) {
+    public void setMatrix4(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly) {
         // Do nothing
     }
 

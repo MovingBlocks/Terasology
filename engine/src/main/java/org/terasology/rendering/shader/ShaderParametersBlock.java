@@ -22,6 +22,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * Shader parameters for the Block shader program.
@@ -47,9 +48,9 @@ public class ShaderParametersBlock extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
-        program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f, true);
-        program.setBoolean("textured", true, true);
-        program.setFloat("alpha", 1.0f, true);
+        program.setFloat3(UNIFORM, "colorOffset", 1.0f, 1.0f, 1.0f, true);
+        program.setBoolean(UNIFORM, "textured", true, true);
+        program.setFloat(UNIFORM, "alpha", 1.0f, true);
     }
 
 }

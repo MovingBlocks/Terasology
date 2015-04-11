@@ -21,6 +21,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * Shader parameters for the Post-processing shader program.
  *
@@ -42,14 +44,14 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             scene.bindDepthTexture();
-            program.setInt("texDepth", 0);
+            program.setInt(UNIFORM, "texDepth", 0);
 
-            program.setFloat("texelWidth", 1.0f / scene.width);
-            program.setFloat("texelHeight", 1.0f / scene.height);
+            program.setFloat(UNIFORM, "texelWidth", 1.0f / scene.width);
+            program.setFloat(UNIFORM, "texelHeight", 1.0f / scene.height);
         }
 
-        program.setFloat("pixelOffsetX", pixelOffsetX);
-        program.setFloat("pixelOffsetY", pixelOffsetY);
+        program.setFloat(UNIFORM, "pixelOffsetX", pixelOffsetX);
+        program.setFloat(UNIFORM, "pixelOffsetY", pixelOffsetY);
     }
 
 }

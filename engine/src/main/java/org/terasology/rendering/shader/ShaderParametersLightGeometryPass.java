@@ -29,6 +29,7 @@ import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * Shader parameters for the LightBufferPass shader program.
@@ -47,32 +48,32 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindDepthTexture();
-            program.setInt("texSceneOpaqueDepth", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueDepth", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindNormalsTexture();
-            program.setInt("texSceneOpaqueNormals", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueNormals", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindLightBufferTexture();
-            program.setInt("texSceneOpaqueLightBuffer", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueLightBuffer", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
-            program.setInt("texSceneShadowMap", texId++, true);
+            program.setInt(UNIFORM, "texSceneShadowMap", texId++, true);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
             if (lightCamera != null && activeCamera != null) {
-                program.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
-                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+                program.setMatrix4(UNIFORM, "lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
+                program.setMatrix4(UNIFORM, "invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
 
                 Vector3f activeCameraToLightSpace = new Vector3f();
                 activeCameraToLightSpace.sub(activeCamera.getPosition(), lightCamera.getPosition());
-                program.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
+                program.setFloat3(UNIFORM, "activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
             }
 
             if (CoreRegistry.get(Config.class).getRendering().isCloudShadows()) {
@@ -80,7 +81,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 glBindTexture(GL11.GL_TEXTURE_2D, clouds.getId());
-                program.setInt("texSceneClouds", texId++, true);
+                program.setInt(UNIFORM, "texSceneClouds", texId++, true);
             }
         }
     }

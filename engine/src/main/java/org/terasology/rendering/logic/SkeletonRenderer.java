@@ -65,6 +65,8 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * @author Immortius
  */
@@ -227,10 +229,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 continue;
             }
             skeletalMesh.material.enable();
-            skeletalMesh.material.setFloat("sunlight", 1.0f, true);
-            skeletalMesh.material.setFloat("blockLight", 1.0f, true);
+            skeletalMesh.material.setFloat(UNIFORM, "sunlight", 1.0f, true);
+            skeletalMesh.material.setFloat(UNIFORM, "blockLight", 1.0f, true);
 
-            skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            skeletalMesh.material.setMatrix4(UNIFORM, "projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
 
             LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -250,13 +252,13 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
             MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-            skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+            skeletalMesh.material.setMatrix4(UNIFORM, "worldViewMatrix", tempMatrixBuffer44, true);
 
             MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-            skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+            skeletalMesh.material.setMatrix3(UNIFORM, "normalMatrix", tempMatrixBuffer33, true);
 
-            skeletalMesh.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
-            skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
+            skeletalMesh.material.setFloat(UNIFORM, "sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
+            skeletalMesh.material.setFloat(UNIFORM, "blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
             // TODO: Add frustum culling here
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
@@ -296,9 +298,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             glDisable(GL_DEPTH_TEST);
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
             Material material = Assets.getMaterial("engine:white");
-            material.setFloat("sunlight", 1.0f, true);
-            material.setFloat("blockLight", 1.0f, true);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            material.setFloat(UNIFORM, "sunlight", 1.0f, true);
+            material.setFloat(UNIFORM, "blockLight", 1.0f, true);
+            material.setMatrix4(UNIFORM, "projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             glLineWidth(2);
             Vector3f worldPos = new Vector3f();
 
@@ -320,10 +322,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                 MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-                material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                material.setMatrix4(UNIFORM, "worldViewMatrix", tempMatrixBuffer44, true);
 
                 MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-                material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+                material.setMatrix3(UNIFORM, "normalMatrix", tempMatrixBuffer33, true);
 
                 SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
                 renderBone(skeletalMesh.rootBone, worldPos);

@@ -27,6 +27,8 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * Shader parameters for the Light Shaft shader program.
  *
@@ -54,16 +56,16 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             scene.bindTexture();
-            program.setInt("texScene", texId++, true);
+            program.setInt(UNIFORM, "texScene", texId++, true);
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             scene.bindDepthTexture();
-            program.setInt("texDepth", texId++, true);
+            program.setInt(UNIFORM, "texDepth", texId++, true);
         }
 
-        program.setFloat("density", density, true);
-        program.setFloat("exposure", exposure, true);
-        program.setFloat("weight", weight, true);
-        program.setFloat("decay", decay, true);
+        program.setFloat(UNIFORM, "density", density, true);
+        program.setFloat(UNIFORM, "exposure", exposure, true);
+        program.setFloat(UNIFORM, "weight", weight, true);
+        program.setFloat(UNIFORM, "decay", decay, true);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
@@ -82,8 +84,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
             sunPositionScreenSpace.z /= sunPositionScreenSpace.w;
             sunPositionScreenSpace.w = 1.0f;
 
-            program.setFloat("lightDirDotViewDir", activeCamera.getViewingDirection().dot(sunDirection), true);
-            program.setFloat2("lightScreenPos", (sunPositionScreenSpace.x + 1.0f) / 2.0f, (sunPositionScreenSpace.y + 1.0f) / 2.0f, true);
+            program.setFloat(UNIFORM, "lightDirDotViewDir", activeCamera.getViewingDirection().dot(sunDirection), true);
+            program.setFloat2(UNIFORM, "lightScreenPos", (sunPositionScreenSpace.x + 1.0f) / 2.0f, (sunPositionScreenSpace.y + 1.0f) / 2.0f, true);
         }
     }
 }

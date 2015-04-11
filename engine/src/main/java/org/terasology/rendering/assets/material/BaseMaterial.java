@@ -28,6 +28,8 @@ import org.terasology.rendering.cameras.Camera;
 
 import java.nio.FloatBuffer;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {
 
     public BaseMaterial(AssetUri uri) {
@@ -42,33 +44,33 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
 
     public abstract void enable();
 
-    public abstract void setFloat(String name, float f, boolean currentOnly);
+    public abstract void setFloat(StorageQualifier qualifier, String name, float f, boolean currentOnly);
 
-    public abstract void setFloat1(String name, FloatBuffer buffer, boolean currentOnly);
+    public abstract void setFloat1(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
-    public abstract void setFloat2(String name, float f1, float f2, boolean currentOnly);
+    public abstract void setFloat2(StorageQualifier qualifier, String name, float f1, float f2, boolean currentOnly);
 
-    public abstract void setFloat2(String name, FloatBuffer buffer, boolean currentOnly);
+    public abstract void setFloat2(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
-    public abstract void setFloat3(String name, float f1, float f2, float f3, boolean currentOnly);
+    public abstract void setFloat3(StorageQualifier qualifier, String name, float f1, float f2, float f3, boolean currentOnly);
 
-    public abstract void setFloat3(String name, FloatBuffer buffer, boolean currentOnly);
+    public abstract void setFloat3(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
-    public abstract void setFloat4(String name, float f1, float f2, float f3, float f4, boolean currentOnly);
+    public abstract void setFloat4(StorageQualifier qualifier, String name, float f1, float f2, float f3, float f4, boolean currentOnly);
 
-    public abstract void setFloat4(String name, FloatBuffer buffer, boolean currentOnly);
+    public abstract void setFloat4(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
-    public abstract void setInt(String name, int i, boolean currentOnly);
+    public abstract void setInt(StorageQualifier qualifier, String name, int i, boolean currentOnly);
 
-    public abstract void setBoolean(String name, boolean value, boolean currentOnly);
+    public abstract void setBoolean(StorageQualifier qualifier, String name, boolean value, boolean currentOnly);
 
-    public abstract void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
+    public abstract void setMatrix3(StorageQualifier qualifier, String name, Matrix3f matrix, boolean currentOnly);
 
-    public abstract void setMatrix3(String name, FloatBuffer buffer, boolean currentOnly);
+    public abstract void setMatrix3(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
-    public abstract void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
+    public abstract void setMatrix4(StorageQualifier qualifier, String name, Matrix4f matrix, boolean currentOnly);
 
-    public abstract void setMatrix4(String name, FloatBuffer buffer, boolean currentOnly);
+    public abstract void setMatrix4(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     public abstract void setTexture(String name, Texture texture);
 
@@ -83,109 +85,109 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     public abstract void bindTextures();
 
     @Override
-    public void setFloat(String name, float f) {
-        setFloat(name, f, false);
+    public void setFloat(StorageQualifier qualifier, String name, float f) {
+        setFloat(qualifier, name, f, false);
     }
 
     @Override
-    public void setFloat1(String name, FloatBuffer buffer) {
-        setFloat1(name, buffer, false);
+    public void setFloat1(StorageQualifier qualifier, String name, FloatBuffer buffer) {
+        setFloat1(qualifier, name, buffer, false);
     }
 
     @Override
-    public void setFloat2(String name, float f1, float f2) {
-        setFloat2(name, f1, f2, false);
+    public void setFloat2(StorageQualifier qualifier, String name, float f1, float f2) {
+        setFloat2(qualifier, name, f1, f2, false);
     }
 
     @Override
-    public void setFloat2(String name, Vector2f value) {
-        setFloat2(name, value.x, value.y);
+    public void setFloat2(StorageQualifier qualifier, String name, Vector2f value) {
+        setFloat2(qualifier, name, value.x, value.y);
     }
 
     @Override
-    public void setFloat2(String name, Vector2f value, boolean currentOnly) {
-        setFloat2(name, value.x, value.y, currentOnly);
+    public void setFloat2(StorageQualifier qualifier, String name, Vector2f value, boolean currentOnly) {
+        setFloat2(qualifier, name, value.x, value.y, currentOnly);
     }
 
     @Override
-    public void setFloat2(String name, FloatBuffer buffer) {
-        setFloat2(name, buffer, false);
+    public void setFloat2(StorageQualifier qualifier, String name, FloatBuffer buffer) {
+        setFloat2(qualifier, name, buffer, false);
     }
 
     @Override
-    public void setFloat3(String name, float f1, float f2, float f3) {
-        setFloat3(name, f1, f2, f3, false);
+    public void setFloat3(StorageQualifier qualifier, String name, float f1, float f2, float f3) {
+        setFloat3(qualifier, name, f1, f2, f3, false);
     }
 
     @Override
-    public void setFloat3(String name, Vector3f value) {
-        setFloat3(name, value.x, value.y, value.z);
+    public void setFloat3(StorageQualifier qualifier, String name, Vector3f value) {
+        setFloat3(qualifier, name, value.x, value.y, value.z);
     }
 
-    public void setFloat3(String name, Vector3f value, boolean currentOnly) {
-        setFloat3(name, value.x, value.y, value.z, currentOnly);
-    }
-
-    @Override
-    public void setFloat3(String name, FloatBuffer buffer) {
-        setFloat3(name, buffer, false);
+    public void setFloat3(StorageQualifier qualifier, String name, Vector3f value, boolean currentOnly) {
+        setFloat3(qualifier, name, value.x, value.y, value.z, currentOnly);
     }
 
     @Override
-    public void setFloat4(String name, float f1, float f2, float f3, float f4) {
-        setFloat4(name, f1, f2, f3, f4, false);
+    public void setFloat3(StorageQualifier qualifier, String name, FloatBuffer buffer) {
+        setFloat3(qualifier, name, buffer, false);
     }
 
     @Override
-    public void setFloat4(String name, Vector4f value) {
-        setFloat4(name, value.x, value.y, value.z, value.w);
+    public void setFloat4(StorageQualifier qualifier, String name, float f1, float f2, float f3, float f4) {
+        setFloat4(qualifier, name, f1, f2, f3, f4, false);
     }
 
     @Override
-    public void setFloat4(String name, Vector4f value, boolean currentOnly) {
-        setFloat4(name, value.x, value.y, value.z, value.w, currentOnly);
+    public void setFloat4(StorageQualifier qualifier, String name, Vector4f value) {
+        setFloat4(qualifier, name, value.x, value.y, value.z, value.w);
     }
 
     @Override
-    public void setFloat4(String name, FloatBuffer buffer) {
-        setFloat4(name, buffer, false);
+    public void setFloat4(StorageQualifier qualifier, String name, Vector4f value, boolean currentOnly) {
+        setFloat4(qualifier, name, value.x, value.y, value.z, value.w, currentOnly);
     }
 
     @Override
-    public void setInt(String name, int i) {
-        setInt(name, i, false);
+    public void setFloat4(StorageQualifier qualifier, String name, FloatBuffer buffer) {
+        setFloat4(qualifier, name, buffer, false);
     }
 
     @Override
-    public void setBoolean(String name, boolean value) {
-        setBoolean(name, value, false);
+    public void setInt(StorageQualifier qualifier, String name, int i) {
+        setInt(qualifier, name, i, false);
     }
 
     @Override
-    public void setMatrix3(String name, Matrix3f matrix) {
-        setMatrix3(name, matrix, false);
+    public void setBoolean(StorageQualifier qualifier, String name, boolean value) {
+        setBoolean(qualifier, name, value, false);
     }
 
     @Override
-    public void setMatrix3(String name, FloatBuffer buffer) {
-        setMatrix3(name, buffer, false);
+    public void setMatrix3(StorageQualifier qualifier, String name, Matrix3f matrix) {
+        setMatrix3(qualifier, name, matrix, false);
     }
 
     @Override
-    public void setMatrix4(String name, Matrix4f matrix) {
-        setMatrix4(name, matrix, false);
+    public void setMatrix3(StorageQualifier qualifier, String name, FloatBuffer buffer) {
+        setMatrix3(qualifier, name, buffer, false);
     }
 
     @Override
-    public void setMatrix4(String name, FloatBuffer buffer) {
-        setMatrix3(name, buffer, false);
+    public void setMatrix4(StorageQualifier qualifier, String name, Matrix4f matrix) {
+        setMatrix4(qualifier, name, matrix, false);
+    }
+
+    @Override
+    public void setMatrix4(StorageQualifier qualifier, String name, FloatBuffer buffer) {
+        setMatrix3(qualifier, name, buffer, false);
     }
 
     @Override
     public void setCamera(Camera camera) {
-        setMatrix4("viewMatrix", camera.getViewMatrix());
-        setMatrix4("projMatrix", camera.getProjectionMatrix());
-        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix());
-        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
+        setMatrix4(UNIFORM, "viewMatrix", camera.getViewMatrix());
+        setMatrix4(UNIFORM, "projMatrix", camera.getProjectionMatrix());
+        setMatrix4(UNIFORM, "viewProjMatrix", camera.getViewProjectionMatrix());
+        setMatrix4(UNIFORM, "invProjMatrix", camera.getInverseProjectionMatrix());
     }
 }

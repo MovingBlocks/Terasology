@@ -35,6 +35,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -57,15 +58,15 @@ public class ShaderParametersPost extends ShaderParametersBase {
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         LwjglRenderingProcess.getInstance().bindFboTexture("sceneToneMapped");
-        program.setInt("texScene", texId++, true);
+        program.setInt(UNIFORM, "texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             LwjglRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
-            program.setInt("texBlur", texId++, true);
+            program.setInt(UNIFORM, "texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
-                program.setFloat("focalDistance", cameraTargetSystem.getFocalDistance(), true); //for use in DOF effect
+                program.setFloat(UNIFORM, "focalDistance", cameraTargetSystem.getFocalDistance(), true); //for use in DOF effect
             }
         }
 
@@ -74,7 +75,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         if (colorGradingLut != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             glBindTexture(GL12.GL_TEXTURE_3D, colorGradingLut.getId());
-            program.setInt("texColorGradingLut", texId++, true);
+            program.setInt(UNIFORM, "texColorGradingLut", texId++, true);
         }
 
         FBO sceneCombined = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
@@ -82,7 +83,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         if (sceneCombined != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneCombined.bindDepthTexture();
-            program.setInt("texDepth", texId++, true);
+            program.setInt(UNIFORM, "texDepth", texId++, true);
 
             AssetUri noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
             Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri.toSimpleString());
@@ -90,19 +91,19 @@ public class ShaderParametersPost extends ShaderParametersBase {
             if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
-                program.setInt("texNoise", texId++, true);
-                program.setFloat("grainIntensity", filmGrainIntensity, true);
-                program.setFloat("noiseOffset", rand.nextFloat(), true);
+                program.setInt(UNIFORM, "texNoise", texId++, true);
+                program.setFloat(UNIFORM, "grainIntensity", filmGrainIntensity, true);
+                program.setFloat(UNIFORM, "noiseOffset", rand.nextFloat(), true);
 
-                program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
-                program.setFloat2("renderTargetSize", sceneCombined.width, sceneCombined.height, true);
+                program.setFloat2(UNIFORM, "noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
+                program.setFloat2(UNIFORM, "renderTargetSize", sceneCombined.width, sceneCombined.height, true);
             }
         }
 
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         if (activeCamera != null && CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
-            program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-            program.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix(), true);
+            program.setMatrix4(UNIFORM, "invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+            program.setMatrix4(UNIFORM, "prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix(), true);
         }
     }
 

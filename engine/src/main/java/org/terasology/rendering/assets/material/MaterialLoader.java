@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *
  * @author Immortius
  */
 public class MaterialLoader implements AssetLoader<MaterialData> {
@@ -53,6 +54,22 @@ public class MaterialLoader implements AssetLoader<MaterialData> {
         gson = new GsonBuilder().registerTypeAdapter(MaterialMetadata.class, new MaterialMetadataHandler()).create();
     }
 
+    /**
+     *
+     * <p>
+     *     <strong>Note:</strong> This method works under the assumption that
+     *     the asset data only specifies uniform parameter values.
+     *     This should be reconsidered whenever the {@link  org.terasology.rendering.assets.shader.ParamType}
+     *     enum is extended.
+     * </p>
+     *
+     * @param module The module providing the asset
+     * @param stream A stream containing the assets data.
+     * @param urls   The urls related to the asset. The first url is the url providing the stream
+     * @param deltas
+     * @return
+     * @throws IOException
+     */
     @Override
     public MaterialData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), MaterialMetadata.class);
@@ -64,14 +81,17 @@ public class MaterialLoader implements AssetLoader<MaterialData> {
 
         MaterialData data = new MaterialData(shader);
         data.setTextureParams(metadata.textures);
-        data.setFloatParams(metadata.floatParams);
-        data.setFloatArrayParams(metadata.floatArrayParams);
-        data.setIntParams(metadata.intParams);
+
+        data.setFloatUniforms(metadata.floatParams);
+        data.setFloatArrayUniforms(metadata.floatArrayParams);
+        data.setIntUniforms(metadata.intParams);
+
         return data;
     }
 
     private static class MaterialMetadata {
         String shader;
+
         Map<String, Texture> textures = Maps.newHashMap();
         Map<String, Float> floatParams = Maps.newHashMap();
         Map<String, float[]> floatArrayParams = Maps.newHashMap();

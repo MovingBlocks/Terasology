@@ -138,6 +138,7 @@ import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * The Default Rendering Process class.
@@ -976,18 +977,18 @@ public class LwjglRenderingProcess {
 
         float as = (float) vpWidth / vpHeight;
 
-        program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
+        program.setFloat4(UNIFORM, "ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
                 OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3], true);
 
         float ocLensCenter = (renderingStage == WorldRenderingStage.RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 
-        program.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f, true);
-        program.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f, true);
+        program.setFloat2(UNIFORM, "ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f, true);
+        program.setFloat2(UNIFORM, "ocScreenCenter", x + w * 0.5f, y + h * 0.5f, true);
 
         float scaleFactor = 1.0f / OculusVrHelper.getScaleFactor();
 
-        program.setFloat2("ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
-        program.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
+        program.setFloat2(UNIFORM, "ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
+        program.setFloat2(UNIFORM, "ocScaleIn", (2 / w), (2 / h) / as, true);
     }
 
     private void renderFinalScene() {
@@ -1043,19 +1044,19 @@ public class LwjglRenderingProcess {
         if (targetFbo != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindTexture();
-            program.setInt("texSceneOpaque", texId++);
+            program.setInt(UNIFORM, "texSceneOpaque", texId++);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindDepthTexture();
-            program.setInt("texSceneOpaqueDepth", texId++);
+            program.setInt(UNIFORM, "texSceneOpaqueDepth", texId++);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindNormalsTexture();
-            program.setInt("texSceneOpaqueNormals", texId++);
+            program.setInt(UNIFORM, "texSceneOpaqueNormals", texId++);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindLightBufferTexture();
-            program.setInt("texSceneOpaqueLightBuffer", texId++, true);
+            program.setInt(UNIFORM, "texSceneOpaqueLightBuffer", texId++, true);
         }
 
         bindFbo(target + "PingPong");
@@ -1087,8 +1088,8 @@ public class LwjglRenderingProcess {
         Material material = Assets.getMaterial("engine:prog.blur");
 
         material.enable();
-        material.setFloat("radius", 8.0f, true);
-        material.setFloat2("texelSize", 1.0f / skyBand.width, 1.0f / skyBand.height, true);
+        material.setFloat(UNIFORM, "radius", 8.0f, true);
+        material.setFloat2(UNIFORM, "texelSize", 1.0f / skyBand.width, 1.0f / skyBand.height, true);
 
         if (id == 0) {
             bindFboTexture("sceneOpaque");
@@ -1147,8 +1148,8 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        ssaoShader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
-        ssaoShader.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
+        ssaoShader.setFloat2(UNIFORM, "texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
+        ssaoShader.setFloat2(UNIFORM, "noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
 
         ssao.bind();
 
@@ -1191,7 +1192,7 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        shader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
+        shader.setFloat2(UNIFORM, "texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
         ssao.bind();
 
         glViewport(0, 0, ssao.width, ssao.height);
@@ -1218,7 +1219,7 @@ public class LwjglRenderingProcess {
 
     private void generateHighPass() {
         Material program = Assets.getMaterial("engine:prog.highp");
-        program.setFloat("highPassThreshold", bloomHighPassThreshold, true);
+        program.setFloat(UNIFORM, "highPassThreshold", bloomHighPassThreshold, true);
         program.enable();
 
         FBO highPass = getFBO("sceneHighPass");
@@ -1234,7 +1235,7 @@ public class LwjglRenderingProcess {
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         sceneOpaque.bindTexture();
-        program.setInt("tex", texId++);
+        program.setInt(UNIFORM, "tex", texId++);
 
 //        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
 //        sceneOpaque.bindDepthTexture();
@@ -1255,7 +1256,7 @@ public class LwjglRenderingProcess {
         Material material = Assets.getMaterial("engine:prog.blur");
         material.enable();
 
-        material.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
+        material.setFloat(UNIFORM, "radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
 
         FBO blur = getFBO("sceneBlur" + id);
 
@@ -1263,7 +1264,7 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        material.setFloat2("texelSize", 1.0f / blur.width, 1.0f / blur.height, true);
+        material.setFloat2(UNIFORM, "texelSize", 1.0f / blur.width, 1.0f / blur.height, true);
 
         blur.bind();
 
@@ -1288,7 +1289,7 @@ public class LwjglRenderingProcess {
         Material shader = Assets.getMaterial("engine:prog.blur");
 
         shader.enable();
-        shader.setFloat("radius", bloomBlurRadius, true);
+        shader.setFloat(UNIFORM, "radius", bloomBlurRadius, true);
 
         FBO bloom = getFBO("sceneBloom" + id);
 
@@ -1296,7 +1297,7 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        shader.setFloat2("texelSize", 1.0f / bloom.width, 1.0f / bloom.height, true);
+        shader.setFloat2(UNIFORM, "texelSize", 1.0f / bloom.width, 1.0f / bloom.height, true);
 
         bloom.bind();
 
@@ -1325,7 +1326,7 @@ public class LwjglRenderingProcess {
             int sizePrev = TeraMath.pow(2, i + 1);
 
             int size = TeraMath.pow(2, i);
-            shader.setFloat("size", size, true);
+            shader.setFloat(UNIFORM, "size", size, true);
 
             bindFbo("scene" + size);
             glViewport(0, 0, size, size);

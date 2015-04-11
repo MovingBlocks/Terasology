@@ -27,6 +27,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.world.WorldProvider;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * Parameters for the sky shader program.
  *
@@ -71,25 +73,25 @@ public class ShaderParametersSky extends ShaderParametersBase {
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky90").getId());
-        program.setInt("texSky90", texId++, true);
+        program.setInt(UNIFORM, "texSky90", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky180").getId());
-        program.setInt("texSky180", texId++, true);
+        program.setInt(UNIFORM, "texSky180", texId++, true);
 
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
         if (worldProvider != null && backdropProvider != null) {
-            program.setFloat("colorExp", backdropProvider.getColorExp(), true);
+            program.setFloat(UNIFORM, "colorExp", backdropProvider.getColorExp(), true);
 
             Vector3f sunDirection = backdropProvider.getSunDirection(false);
             Vector3d zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
 
-            program.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
-            program.setFloat("turbidity", backdropProvider.getTurbidity(), true);
-            program.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
+            program.setFloat(UNIFORM, "sunAngle", backdropProvider.getSunPositionAngle(), true);
+            program.setFloat(UNIFORM, "turbidity", backdropProvider.getTurbidity(), true);
+            program.setFloat3(UNIFORM, "zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
         }
 
-        program.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
+        program.setFloat4(UNIFORM, "skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
     }
 }

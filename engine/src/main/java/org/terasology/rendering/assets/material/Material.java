@@ -33,6 +33,14 @@ import java.nio.FloatBuffer;
  */
 public interface Material extends Asset<MaterialData> {
 
+    /**
+     * Storage qualifier of GLSL (input) parameters.
+     */
+    public static enum StorageQualifier {
+        UNIFORM,
+        ATTRIBUTE
+    }
+
     void recompile();
 
     /**
@@ -41,180 +49,197 @@ public interface Material extends Asset<MaterialData> {
     void enable();
 
     /**
-     * Sets a float uniform parameter (for all feature permutations)
+     * Sets a float uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param f
      */
-    void setFloat(String name, float f);
+    void setFloat(StorageQualifier qualifier, String name, float f);
 
-    void setFloat(String name, float f, boolean currentOnly);
+    void setFloat(StorageQualifier qualifier, String name, float f, boolean currentOnly);
 
     /**
-     * Sets a float1 uniform parameter (for all feature permutations)
+     * Sets a float1 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param buffer
      */
-    void setFloat1(String name, FloatBuffer buffer);
+    void setFloat1(StorageQualifier qualifier, String name, FloatBuffer buffer);
 
-    void setFloat1(String name, FloatBuffer buffer, boolean currentOnly);
+    void setFloat1(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     /**
-     * Sets a float2 uniform parameter (for all feature permutations)
+     * Sets a float2 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param f1
      * @param f2
      */
-    void setFloat2(String name, float f1, float f2);
+    void setFloat2(StorageQualifier qualifier, String name, float f1, float f2);
 
-    void setFloat2(String name, float f1, float f2, boolean currentOnly);
+    void setFloat2(StorageQualifier qualifier, String name, float f1, float f2, boolean currentOnly);
 
     /**
-     * Sets a float2 uniform parameter (for all feature permutations)
+     * Sets a float2 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param value
      */
-    void setFloat2(String name, Vector2f value);
+    void setFloat2(StorageQualifier qualifier, String name, Vector2f value);
 
-    void setFloat2(String name, Vector2f value, boolean currentOnly);
+    void setFloat2(StorageQualifier qualifier, String name, Vector2f value, boolean currentOnly);
 
     /**
-     * Sets a float2 uniform parameter (for all feature permutations)
+     * Sets a float2 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param buffer
      */
-    void setFloat2(String name, FloatBuffer buffer);
+    void setFloat2(StorageQualifier qualifier, String name, FloatBuffer buffer);
 
-    void setFloat2(String name, FloatBuffer buffer, boolean currentOnly);
+    void setFloat2(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     /**
-     * Sets a float3 uniform parameter (for all feature permutations)
+     * Sets a float3 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param f1
      * @param f2
      * @param f3
      */
-    void setFloat3(String name, float f1, float f2, float f3);
+    void setFloat3(StorageQualifier qualifier, String name, float f1, float f2, float f3);
 
-    void setFloat3(String name, float f1, float f2, float f3, boolean currentOnly);
+    void setFloat3(StorageQualifier qualifier, String name, float f1, float f2, float f3, boolean currentOnly);
 
     /**
-     * Sets a float3 uniform parameter (for all feature permutations)
+     * Sets a float3 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param value
      */
-    void setFloat3(String name, Vector3f value);
+    void setFloat3(StorageQualifier qualifier, String name, Vector3f value);
 
-    void setFloat3(String name, Vector3f value, boolean currentOnly);
+    void setFloat3(StorageQualifier qualifier, String name, Vector3f value, boolean currentOnly);
 
     /**
-     * Sets a float3 uniform parameter (for all feature permutations)
+     * Sets a float3 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param buffer
      */
-    void setFloat3(String name, FloatBuffer buffer);
+    void setFloat3(StorageQualifier qualifier, String name, FloatBuffer buffer);
 
-    void setFloat3(String name, FloatBuffer buffer, boolean currentOnly);
+    void setFloat3(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     /**
-     * Sets a float4 uniform parameter (for all feature permutations)
+     * Sets a float4 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param f1
      * @param f2
      * @param f3
      * @param f4
      */
-    void setFloat4(String name, float f1, float f2, float f3, float f4);
+    void setFloat4(StorageQualifier qualifier, String name, float f1, float f2, float f3, float f4);
 
-    void setFloat4(String name, float f1, float f2, float f3, float f4, boolean currentOnly);
+    void setFloat4(StorageQualifier qualifier, String name, float f1, float f2, float f3, float f4, boolean currentOnly);
 
     /**
-     * Sets a float4 uniform parameter (for all feature permutations)
+     * Sets a float4 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param value
      */
-    void setFloat4(String name, Vector4f value);
+    void setFloat4(StorageQualifier qualifier, String name, Vector4f value);
 
-    void setFloat4(String name, Vector4f value, boolean currentOnly);
+    void setFloat4(StorageQualifier qualifier, String name, Vector4f value, boolean currentOnly);
 
     /**
-     * Sets a float4 uniform parameter (for all feature permutations)
+     * Sets a float4 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param buffer
      */
-    void setFloat4(String name, FloatBuffer buffer);
+    void setFloat4(StorageQualifier qualifier, String name, FloatBuffer buffer);
 
-    void setFloat4(String name, FloatBuffer buffer, boolean currentOnly);
+    void setFloat4(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     /**
-     * Sets an int uniform parameter (for all feature permutations)
+     * Sets an int uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param i
      */
-    void setInt(String name, int i);
+    void setInt(StorageQualifier qualifier, String name, int i);
 
-    void setInt(String name, int i, boolean currentOnly);
+    void setInt(StorageQualifier qualifier, String name, int i, boolean currentOnly);
 
     /**
-     * Sets a boolean (int 1 or 0) uniform parameter (for all feature permutations}
+     * Sets a boolean (int 1 or 0) uniform/attribute parameter (for all feature permutations}
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param value
      */
-    void setBoolean(String name, boolean value);
+    void setBoolean(StorageQualifier qualifier, String name, boolean value);
 
-    void setBoolean(String name, boolean value, boolean currentOnly);
+    void setBoolean(StorageQualifier qualifier, String name, boolean value, boolean currentOnly);
 
     /**
-     * Sets a matrix3 uniform parameter (for all feature permutations)
+     * Sets a matrix3 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param matrix
      */
-    void setMatrix3(String name, Matrix3f matrix);
+    void setMatrix3(StorageQualifier qualifier, String name, Matrix3f matrix);
 
-    void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
+    void setMatrix3(StorageQualifier qualifier, String name, Matrix3f matrix, boolean currentOnly);
 
     /**
-     * Sets a matrix3 uniform parameter (for all feature permutations)
+     * Sets a matrix3 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param buffer
      */
-    void setMatrix3(String name, FloatBuffer buffer);
+    void setMatrix3(StorageQualifier qualifier, String name, FloatBuffer buffer);
 
-    void setMatrix3(String name, FloatBuffer buffer, boolean currentOnly);
+    void setMatrix3(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     /**
-     * Sets a matrix4 uniform parameter (for all feature permutations)
+     * Sets a matrix4 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param matrix
      */
-    void setMatrix4(String name, Matrix4f matrix);
+    void setMatrix4(StorageQualifier qualifier, String name, Matrix4f matrix);
 
-    void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
+    void setMatrix4(StorageQualifier qualifier, String name, Matrix4f matrix, boolean currentOnly);
 
     /**
-     * Sets a matrix3 uniform parameter (for all feature permutations)
+     * Sets a matrix4 uniform/attribute parameter (for all feature permutations)
      *
+     * @param qualifier The storage qualifier of the parameter, UNIFORM or ATTRIBUTE.
      * @param name
      * @param buffer
      */
-    void setMatrix4(String name, FloatBuffer buffer);
+    void setMatrix4(StorageQualifier qualifier, String name, FloatBuffer buffer);
 
-    void setMatrix4(String name, FloatBuffer buffer, boolean currentOnly);
+    void setMatrix4(StorageQualifier qualifier, String name, FloatBuffer buffer, boolean currentOnly);
 
     /**
      * Sets a texture parameter

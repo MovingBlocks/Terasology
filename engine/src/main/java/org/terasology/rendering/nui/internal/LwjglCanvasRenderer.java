@@ -74,6 +74,7 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
 
 /**
  * @author Immortius
@@ -125,7 +126,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
         currentTextureCropRegion = requestedCropRegion;
-        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1
+        textureMat.setFloat4(UNIFORM, CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1
                 , requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
     }
 
@@ -183,8 +184,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         finalMat.mul(translateTransform);
         MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
 
-        material.setFloat4(CROPPING_BOUNDARIES_PARAM, cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
-        material.setMatrix4("posMatrix", translateTransform);
+        material.setFloat4(UNIFORM, CROPPING_BOUNDARIES_PARAM, cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+        material.setMatrix4(UNIFORM, "posMatrix", translateTransform);
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL11.GL_MODELVIEW);
@@ -196,7 +197,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         if (matrixStackSupported) {
             material.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
         }
-        material.setFloat("alpha", alpha);
+        material.setFloat(UNIFORM, "alpha", alpha);
         material.bindTextures();
         mesh.render();
         if (matrixStackSupported) {
@@ -245,7 +246,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                             float ux, float uy, float uw, float uh, float alpha) {
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
-            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+            textureMat.setFloat4(UNIFORM, CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
                     requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
             currentTextureCropRegion = requestedCropRegion;
         }
@@ -264,41 +265,41 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                     mesh = builder.build();
                     cachedTextures.put(key, mesh);
                 }
-                textureMat.setFloat2("scale", scale);
-                textureMat.setFloat2("offset",
+                textureMat.setFloat2(UNIFORM, "scale", scale);
+                textureMat.setFloat2(UNIFORM, "offset",
                         absoluteRegion.minX(),
                         absoluteRegion.minY());
 
-                textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-                textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+                textureMat.setFloat2(UNIFORM, "texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+                textureMat.setFloat2(UNIFORM, "texSize", uw * textureArea.width(), uh * textureArea.height());
                 break;
             }
             case SCALE_FILL: {
-                textureMat.setFloat2("offset", absoluteRegion.minX(), absoluteRegion.minY());
-                textureMat.setFloat2("scale", absoluteRegion.width(), absoluteRegion.height());
+                textureMat.setFloat2(UNIFORM, "offset", absoluteRegion.minX(), absoluteRegion.minY());
+                textureMat.setFloat2(UNIFORM, "scale", absoluteRegion.width(), absoluteRegion.height());
 
                 float texBorderX = (scale.x - absoluteRegion.width()) / scale.x * uw;
                 float texBorderY = (scale.y - absoluteRegion.height()) / scale.y * uh;
 
-                textureMat.setFloat2("texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width()
+                textureMat.setFloat2(UNIFORM, "texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width()
                         , textureArea.minY() + (uy + 0.5f * texBorderY) * textureArea.height());
-                textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.width(), (uh - texBorderY) * textureArea.height());
+                textureMat.setFloat2(UNIFORM, "texSize", (uw - texBorderX) * textureArea.width(), (uh - texBorderY) * textureArea.height());
                 break;
             }
             default: {
-                textureMat.setFloat2("scale", scale);
-                textureMat.setFloat2("offset",
+                textureMat.setFloat2(UNIFORM, "scale", scale);
+                textureMat.setFloat2(UNIFORM, "offset",
                         absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
                         absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
 
-                textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-                textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+                textureMat.setFloat2(UNIFORM, "texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+                textureMat.setFloat2(UNIFORM, "texSize", uw * textureArea.width(), uh * textureArea.height());
                 break;
             }
         }
 
         textureMat.setTexture("texture", texture.getTexture());
-        textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
+        textureMat.setFloat4(UNIFORM, "color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
         textureMat.bindTextures();
         mesh.render();
     }
@@ -328,10 +329,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
-            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+            entry.getKey().setFloat4(UNIFORM, CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
                     requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
-            entry.getKey().setFloat2("offset", offset.x, offset.y);
-            entry.getKey().setFloat("alpha", alpha);
+            entry.getKey().setFloat2(UNIFORM, "offset", offset.x, offset.y);
+            entry.getKey().setFloat(UNIFORM, "alpha", alpha);
             entry.getValue().render();
         }
     }
@@ -340,7 +341,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     public void drawTextureBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.encompasses(region) && requestedCropRegion.encompasses(region))) {
-            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+            textureMat.setFloat4(UNIFORM, CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
                     requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
             currentTextureCropRegion = requestedCropRegion;
         }
@@ -432,15 +433,15 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             mesh = builder.build();
             cachedTextures.put(key, mesh);
         }
-        textureMat.setFloat2("scale", region.width(), region.height());
-        textureMat.setFloat2("offset", region.minX(), region.minY());
+        textureMat.setFloat2(UNIFORM, "scale", region.width(), region.height());
+        textureMat.setFloat2(UNIFORM, "offset", region.minX(), region.minY());
 
         Rect2f textureArea = texture.getRegion();
-        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+        textureMat.setFloat2(UNIFORM, "texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+        textureMat.setFloat2(UNIFORM, "texSize", uw * textureArea.width(), uh * textureArea.height());
 
         textureMat.setTexture("texture", texture.getTexture());
-        textureMat.setFloat4("color", 1, 1, 1, alpha);
+        textureMat.setFloat4(UNIFORM, "color", 1, 1, 1, alpha);
         textureMat.bindTextures();
         mesh.render();
     }

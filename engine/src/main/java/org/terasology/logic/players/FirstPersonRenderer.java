@@ -58,6 +58,8 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * @author Immortius
  */
@@ -139,8 +141,8 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
-        shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
-        shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
+        shader.setFloat(UNIFORM, "sunlight", worldRenderer.getSunlightValue(), true);
+        shader.setFloat(UNIFORM, "blockLight", worldRenderer.getBlockLightValue(), true);
         glBindTexture(GL11.GL_TEXTURE_2D, handTex.getId());
 
         glPushMatrix();
@@ -164,10 +166,10 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
 
             shader.enable();
 
-            shader.setBoolean("textured", false, true);
+            shader.setBoolean(UNIFORM, "textured", false, true);
 
-            shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
-            shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
+            shader.setFloat(UNIFORM, "sunlight", worldRenderer.getSunlightValue(), true);
+            shader.setFloat(UNIFORM, "blockLight", worldRenderer.getBlockLightValue(), true);
 
             glPushMatrix();
 

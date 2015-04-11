@@ -24,6 +24,8 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
+import static org.terasology.rendering.assets.material.Material.StorageQualifier.UNIFORM;
+
 /**
  * Basic shader parameters for all shader program.
  *
@@ -42,34 +44,34 @@ public class ShaderParametersBase implements ShaderParameters {
     @Override
     public void applyParameters(Material program) {
 
-        program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f);
+        program.setFloat(UNIFORM, "viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
         if (worldRenderer != null && backdropProvider != null) {
-            program.setFloat("daylight", backdropProvider.getDaylight(), true);
-            program.setFloat("swimming", worldRenderer.isHeadUnderWater() ? 1.0f : 0.0f, true);
-            program.setFloat("tick", worldRenderer.getTick(), true);
-            program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getSmoothedPlayerSunlightValue(), true);
+            program.setFloat(UNIFORM, "daylight", backdropProvider.getDaylight(), true);
+            program.setFloat(UNIFORM, "swimming", worldRenderer.isHeadUnderWater() ? 1.0f : 0.0f, true);
+            program.setFloat(UNIFORM, "tick", worldRenderer.getTick(), true);
+            program.setFloat(UNIFORM, "sunlightValueAtPlayerPos", worldRenderer.getSmoothedPlayerSunlightValue(), true);
 
             Camera activeCamera = worldRenderer.getActiveCamera();
             if (activeCamera != null) {
                 final Vector3f cameraDir = activeCamera.getViewingDirection();
                 final Vector3f cameraPosition = activeCamera.getPosition();
 
-                program.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-                program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-                program.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
+                program.setFloat3(UNIFORM, "cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
+                program.setFloat3(UNIFORM, "cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
+                program.setFloat3(UNIFORM, "cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
             }
 
             Vector3f sunDirection = backdropProvider.getSunDirection(false);
-            program.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
+            program.setFloat3(UNIFORM, "sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
         }
 
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
-            program.setFloat("time", worldProvider.getTime().getDays());
+            program.setFloat(UNIFORM, "time", worldProvider.getTime().getDays());
         }
     }
 }
