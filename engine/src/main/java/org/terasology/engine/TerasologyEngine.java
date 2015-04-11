@@ -32,6 +32,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -283,7 +284,7 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         SplashScreen.getInstance().post("Loading modules ...");
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl());
 
         SplashScreen.getInstance().post("Loading reflections ...");
         ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());

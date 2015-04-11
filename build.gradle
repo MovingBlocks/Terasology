@@ -214,7 +214,7 @@ idea {
 
     project {
         // Set JDK
-        jdkName = '1.7'
+        jdkName = '1.8'
         wildcards -= '!?*.groovy'
 
         ipr {
@@ -231,7 +231,7 @@ idea {
 
             // Sets sourceCompatibility within IntelliJ (without this root build having the Java plugin applied)
             whenMerged {project ->
-                project.jdk.languageLevel = 'JDK_1_7'
+                project.jdk.languageLevel = 'JDK_1_8'
             }
         }
     }

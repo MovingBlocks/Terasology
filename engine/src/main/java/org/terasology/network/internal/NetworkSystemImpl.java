@@ -47,6 +47,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -820,8 +821,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel());
         }
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
-            Boolean serverSideOnly = module.getMetadata().getExtension(ModuleManager.SERVER_SIDE_ONLY_EXT, Boolean.class);
-            if (serverSideOnly == null || !serverSideOnly) {
+            if (!StandardModuleExtension.isServerSideOnly(module)) {
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder()
                         .setModuleId(module.getId().toString())
                         .setModuleVersion(module.getVersion().toString()).build());

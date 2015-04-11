@@ -27,8 +27,6 @@ import org.terasology.rendering.nui.widgets.UIText;
 
 /**
  * Overlay that lists all players that are currently online.
- *
- * @author Florian <florian@fkoeberle.de>
  */
 public class OnlinePlayersOverlay extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(OnlinePlayersOverlay.class);
