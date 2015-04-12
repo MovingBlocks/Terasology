@@ -16,9 +16,11 @@
 package org.terasology.rendering.particles.components;
 
 import com.google.common.collect.Lists;
+import org.lwjgl.util.vector.Vector2f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,4 +40,8 @@ public class ParticleSystemComponent implements Component {
 
     @Owns
     public List<EntityRef> affectors = new ArrayList<>();
+
+    public Texture texture = null;
+    public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
+    public Vector2f textureOffset = new Vector2f(0.0f, 0.0f);
 }

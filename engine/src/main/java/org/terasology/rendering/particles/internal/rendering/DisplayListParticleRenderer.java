@@ -16,8 +16,11 @@
 package org.terasology.rendering.particles.internal.rendering;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.rendering.particles.internal.ParticlePool;
 import org.terasology.rendering.particles.internal.ParticleSystemStateData;
 import org.terasology.rendering.particles.internal.rendering.ParticleRenderer;
@@ -34,9 +37,16 @@ class DisplayListParticleRenderer extends ParticleRenderer {
     public DisplayListParticleRenderer() {
         drawUnitQuad =  new DisplayList(() -> {
             glBegin(GL_TRIANGLE_FAN);
+            GL11.glTexCoord2f(UNIT_QUAD_VERTICES[0] + 0.5f, -UNIT_QUAD_VERTICES[1] + 0.5f);
             GL11.glVertex3f(UNIT_QUAD_VERTICES[0], UNIT_QUAD_VERTICES[1], UNIT_QUAD_VERTICES[2]);
+
+            GL11.glTexCoord2f(UNIT_QUAD_VERTICES[3] + 0.5f, -UNIT_QUAD_VERTICES[4] + 0.5f);
             GL11.glVertex3f(UNIT_QUAD_VERTICES[3], UNIT_QUAD_VERTICES[4], UNIT_QUAD_VERTICES[5]);
+
+            GL11.glTexCoord2f(UNIT_QUAD_VERTICES[6] + 0.5f, -UNIT_QUAD_VERTICES[7] + 0.5f);
             GL11.glVertex3f(UNIT_QUAD_VERTICES[6], UNIT_QUAD_VERTICES[7], UNIT_QUAD_VERTICES[8]);
+
+            GL11.glTexCoord2f(UNIT_QUAD_VERTICES[9] + 0.5f, -UNIT_QUAD_VERTICES[10] + 0.5f);
             GL11.glVertex3f(UNIT_QUAD_VERTICES[9], UNIT_QUAD_VERTICES[10], UNIT_QUAD_VERTICES[11]);
             glEnd();
         });
@@ -54,6 +64,18 @@ class DisplayListParticleRenderer extends ParticleRenderer {
 
     public void drawParticles(Material material, ParticleSystemStateData particleSystem, Vector3f camera) {
         ParticlePool particlePool = particleSystem.particlePool;
+        ParticleSystemComponent component = particleSystem.entityRef.getComponent(ParticleSystemComponent.class);
+
+
+        material.setBoolean("useTexture", component.texture != null);
+        if (component.texture != null) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            glBindTexture(GL11.GL_TEXTURE_2D, component.texture.getId());
+
+            material.setFloat2("texSize", component.textureSize.getX(), component.textureSize.getY());
+            material.setFloat2("texOffset", component.textureOffset.getX(), component.textureOffset.getY());
+        }
+
         glPushMatrix();
         glTranslatef(-camera.x(), -camera.y(), -camera.z());
 

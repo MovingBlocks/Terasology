@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
+
+uniform sampler2D texAtlas;
+
+uniform bool useTexture;
+
+uniform vec2 texOffset = vec2(0.0, 0.0);
+uniform vec2 texSize = vec2(1.0, 1.0);
+
 void main() {
-    gl_FragData[0].rgba = gl_Color;
+    vec4 color = useTexture
+        ? texture2D(texAtlas, gl_TexCoord[0].xy)// * texSize.xy + texOffset.xy)
+        : vec4(1.0);
+
+    color *= gl_Color;
+
+    gl_FragData[0].rgba = color;
     gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
     gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
 }
