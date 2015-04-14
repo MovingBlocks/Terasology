@@ -37,6 +37,9 @@ public final class ParticlePool {
     // Per particle scalars
     public final float[] energy;
 
+    // Per particle 2d vectors
+    public final float[] textureOffset;
+
     // Per particle 3d vectors
     public final float[] position;
     public final float[] previousPosition;
@@ -64,6 +67,9 @@ public final class ParticlePool {
 
         // Per particle scalars
         this.energy = new float[size];
+
+        // Per particle 2d vectors
+        this.textureOffset = new float[size * 2];
 
         // Per particle 3d vectors
         this.position = new float[size * 3];
@@ -94,6 +100,7 @@ public final class ParticlePool {
     }
 
     public int reviveParticle() {
+        resetParticleData(firstDeadParticleIndex);
         firstDeadParticleIndex++;
 
         return firstDeadParticleIndex - 1;
@@ -110,12 +117,21 @@ public final class ParticlePool {
     //== moving particle data ===========================
 
     public void loadTemporaryDataFrom(final int index, int rawMask) {
+        final int index2 = 2 * index;
         final int index3 = 3 * index;
         final int index4 = 4 * index;
 
         // scalars
         if (DataMask.ENERGY.isEnabled(rawMask)) {
             temporaryParticleData.energy = energy[index];
+        }
+
+        // 2d vectors
+        if (DataMask.TEXTURE_OFFSET.isEnabled(rawMask)) {
+            temporaryParticleData.textureOffset.set(
+                    textureOffset[index2 + X_OFFSET],
+                    textureOffset[index2 + Y_OFFSET]
+            );
         }
 
         // 3d vectors
@@ -163,11 +179,19 @@ public final class ParticlePool {
     }
 
     public void storeTemporaryDataAt(final int index, final int rawMask) {
+        final int index2 = 2 * index;
         final int index3 = 3 * index;
         final int index4 = 4 * index;
 
+        // scalars
         if (DataMask.ENERGY.isEnabled(rawMask)) {
             energy[index] = temporaryParticleData.energy;
+        }
+
+        // 2d vectors
+        if (DataMask.TEXTURE_OFFSET.isEnabled(rawMask)) {
+            textureOffset[index2 + X_OFFSET] = temporaryParticleData.textureOffset.x();
+            textureOffset[index2 + Y_OFFSET] = temporaryParticleData.textureOffset.y();
         }
 
         // 3d vectors
@@ -202,5 +226,26 @@ public final class ParticlePool {
             color[index4 + Z_OFFSET] = temporaryParticleData.color.z();
             color[index4 + W_OFFSET] = temporaryParticleData.color.w();
         }
+    }
+
+    private void resetParticleData(final int i) {
+        final int i2 = i * 2;
+        final int i3 = i * 3;
+        final int i4 = i * 4;
+
+        // scalars
+        energy[i] = 1.0f;
+
+        // 2D vectors
+        textureOffset[i2 + X_OFFSET] = 0.0f;
+
+        // 3D vectors
+        position[i3 + X_OFFSET] = position[i3 + Y_OFFSET] = position[i3 + Z_OFFSET] = 0.0f;
+        previousPosition[i3 + X_OFFSET] = previousPosition[i3 + Y_OFFSET] = previousPosition[i3 + Z_OFFSET] = 0.0f;
+        velocity[i3 + X_OFFSET] = velocity[i3 + Y_OFFSET] = velocity[i3 + Z_OFFSET] = 0.0f;
+        scale[i3 + X_OFFSET] = scale[i3 + Y_OFFSET] = scale[i3 + Z_OFFSET] = 1.0f;
+
+        // 4D vectors
+        color[i4 + X_OFFSET] = color[i4 + Y_OFFSET] = color[i4 + Z_OFFSET] = color[i4 + W_OFFSET ] = 1.0f;
     }
 }

@@ -66,20 +66,19 @@ class DisplayListParticleRenderer extends ParticleRenderer {
         ParticlePool particlePool = particleSystem.particlePool;
         ParticleSystemComponent component = particleSystem.entityRef.getComponent(ParticleSystemComponent.class);
 
-
         material.setBoolean("useTexture", component.texture != null);
         if (component.texture != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             glBindTexture(GL11.GL_TEXTURE_2D, component.texture.getId());
 
             material.setFloat2("texSize", component.textureSize.getX(), component.textureSize.getY());
-            material.setFloat2("texOffset", component.textureOffset.getX(), component.textureOffset.getY());
         }
 
         glPushMatrix();
         glTranslatef(-camera.x(), -camera.y(), -camera.z());
 
         for (int i = 0; i < particlePool.livingParticles(); i++) {
+            final int i2 = i * 2;
             final int i3 = i * 3;
             final int i4 = i * 4;
 
@@ -100,6 +99,12 @@ class DisplayListParticleRenderer extends ParticleRenderer {
                     particlePool.color[i4 + 1],
                     particlePool.color[i4 + 2],
                     particlePool.color[i4 + 3]
+            );
+
+
+            material.setFloat2("texOffset",
+                    particlePool.textureOffset[i2],
+                    particlePool.textureOffset[i2 + 1]
             );
 
             drawUnitQuad.call();

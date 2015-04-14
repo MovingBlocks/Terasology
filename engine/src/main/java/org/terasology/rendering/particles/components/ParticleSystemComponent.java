@@ -43,5 +43,4 @@ public class ParticleSystemComponent implements Component {
 
     public Texture texture = null;
     public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
-    public Vector2f textureOffset = new Vector2f(0.0f, 0.0f);
 }

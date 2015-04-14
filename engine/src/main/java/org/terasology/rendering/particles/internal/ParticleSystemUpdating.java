@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.*;
@@ -38,19 +39,23 @@ import java.util.function.Function;
  * Created by Linus on 28-2-2015.
  */
 public class ParticleSystemUpdating {
-    private static final int PHYSICS_SKIP_NR = 10;
+    private static final int PHYSICS_SKIP_NR = 100;
 
+    private static float movingAvgDelta = 1.0f / 60.0f; //just a guess, doesn't matter much
     private static FastRandom random = new FastRandom();
 
     public static void checkCollision(final ParticlePool pool, final Physics physics, final int offset, float delta) {
         Vector3f vel = new Vector3f();
+        Vector3f halfVelDir = new Vector3f();
         Vector3f curr = new Vector3f();
 
         for (int i = offset; i < pool.livingParticles(); i+= PHYSICS_SKIP_NR ) {
             int i3 = i * 3;
             curr.set(pool.position[i3 + 0], pool.position[i3+1], pool.position[i3+2]);
-            vel.set(pool.velocity[i3 + 0], pool.velocity[i3+1], pool.velocity[i3+2]);
-            float dist = vel.length() * delta * PHYSICS_SKIP_NR * 1.5f;
+            vel.set(pool.velocity[i3 + 0], pool.velocity[i3 + 1], pool.velocity[i3 + 2]);
+            halfVelDir.scale(0).add(vel).normalize().scale(0.5f);
+            curr.sub(halfVelDir);
+            float dist = (vel.length() + 0.5f) * movingAvgDelta * PHYSICS_SKIP_NR * 1.5f;
             vel.normalize();
 
             HitResult hitResult = physics.rayTrace(curr, vel, dist, StandardCollisionGroup.WORLD);
@@ -140,11 +145,12 @@ public class ParticleSystemUpdating {
                               final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
                               final float delta
     ) {
+        movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
         updateEmitter(partSys, registeredGeneratorFunctions, delta);
         updateParticles(partSys, registeredAffectorFunctions, delta);
 
-        //checkCollision(partSys.particlePool, physics, partSys.collisionUpdateIteration, delta);
-        //partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
+        checkCollision(partSys.particlePool, physics, partSys.collisionUpdateIteration, delta);
+        partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
 
         partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime -= delta;
     }

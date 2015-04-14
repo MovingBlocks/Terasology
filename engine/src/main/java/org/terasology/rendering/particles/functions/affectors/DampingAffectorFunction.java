@@ -34,6 +34,6 @@ public final class DampingAffectorFunction extends AffectorFunction<DampingAffec
                        final Random random,
                        final float delta
     ) {
-        particleData.velocity.scale( 1 - (delta * (1 - component.dampingFactor)) );
+        particleData.velocity.scale( 1 - delta * component.dampingFactor );
     }
 }

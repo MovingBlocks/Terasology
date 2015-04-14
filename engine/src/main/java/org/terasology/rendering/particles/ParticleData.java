@@ -15,10 +15,9 @@
  */
 package org.terasology.rendering.particles;
 
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.rendering.particles.internal.DataMask;
-import org.terasology.rendering.particles.internal.ParticlePool;
 
 /**
  * Data object to store the data of a single particle.
@@ -27,6 +26,9 @@ import org.terasology.rendering.particles.internal.ParticlePool;
 public final class ParticleData {
     // scalars
     public float energy;
+
+    // 2d vectors
+    public final Vector2f textureOffset = new Vector2f();
 
     // 3d vectors
     public final Vector3f position = new Vector3f();

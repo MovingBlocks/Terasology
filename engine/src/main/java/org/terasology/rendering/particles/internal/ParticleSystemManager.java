@@ -29,6 +29,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.*;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.physics.HitResult;
@@ -134,11 +136,13 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         registerGeneratorFunction(new PositionRangeGeneratorFunction());
         registerGeneratorFunction(new ScaleRangeGeneratorFunction());
         registerGeneratorFunction(new VelocityRangeGeneratorFunction());
+        registerGeneratorFunction(new TextureOffsetGeneratorFunction());
 
         registerAffectorFunction(new DampingAffectorFunction());
         registerAffectorFunction(new EnergyColorAffectorFunction());
         registerAffectorFunction(new EnergyScaleAffectorFunction());
         registerAffectorFunction(new ForceAffectorFunction());
+        registerAffectorFunction(new PointForceAffectorFunction());
         registerAffectorFunction(new ForwardEulerAffectorFunction());
         registerAffectorFunction(new TurbulenceAffectorFunction());
     }
@@ -177,7 +181,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             Iterator<Map.Entry<EntityRef,ParticleSystemStateData>> iter = particleSystems.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<EntityRef,ParticleSystemStateData> entry = iter.next();
-                if (entry.getKey().getComponent(ParticleSystemComponent.class).maxLifeTime < 0){
+                if (entry.getKey().getComponent(ParticleSystemComponent.class).maxLifeTime < 0) {
                     entry.getKey().destroy();
                     iter.remove();
                 }
@@ -199,7 +203,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
      * @return
      */
     @Command(shortDescription = "Spawns a particle system in front of you.")
-    public String spawnExplosion() {
+    public String sxplosion() {
         synchronized(particleSystems) {
             /*
             Camera camera = worldRenderer.getActiveCamera();
@@ -280,10 +284,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         emitterLocationComponent.setWorldPosition(spawnPosition);
 
 
-        particleSystemComponent.texture = Assets.getTexture("engine:simpleParticle");
-        particleSystemComponent.textureSize.setX(particleSystemComponent.texture.getWidth());
-        particleSystemComponent.textureSize.setY(particleSystemComponent.texture.getHeight());
-        particleSystemComponent.textureOffset.setY(14);
+        particleSystemComponent.texture = null;
 
         //==============================================================================================================
         // adding simple affectors
@@ -294,15 +295,15 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
 
         emitterComponent.generators.add(entityManager.create(
-                new PositionRangeGeneratorComponent(new Vector3f(-50f, -50f, -50f), new Vector3f(50f, 50f, 50f))
+                new PositionRangeGeneratorComponent(new Vector3f(-15f, -15f, -15f), new Vector3f(15f, 15f, 15f))
         ));
 
         emitterComponent.generators.add(entityManager.create(
-            new VelocityRangeGeneratorComponent(new Vector3f(0.2f, -16.0f, 0.2f), new Vector3f(-0.2f, -20.0f, -0.2f))
+            new VelocityRangeGeneratorComponent(new Vector3f(0.2f, -10.0f, 0.2f), new Vector3f(-0.2f, -12.0f, -0.2f))
         ));
 
         emitterComponent.generators.add(entityManager.create(
-                new ScaleRangeGeneratorComponent(new Vector3f(0.1f, 0.8f, 0.1f), new Vector3f(0.2f, 1.1f, 0.2f))
+                new ScaleRangeGeneratorComponent(new Vector3f(0.01f, 0.8f, 0.01f), new Vector3f(0.02f, 1.1f, 0.02f))
         ));
 
         emitterComponent.generators.add(entityManager.create(
@@ -324,9 +325,44 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
     }
 
+    public static enum FireStyle {
+        SQUARE,
+        DEFAULT,
+        SMOKEY,
+        TOON1,
+        TOON2
+    }
 
     @Command(shortDescription = "Spawns a particle system in front of you.")
-    public String spawnFire() {
+    public void spawnFireSquare() {
+        spawnFire(FireStyle.SQUARE);
+    }
+
+    @Command(shortDescription = "Spawns a particle system in front of you.")
+    public void spawnFireDefualt() {
+        spawnFire(FireStyle.DEFAULT);
+
+    }
+
+    @Command(shortDescription = "Spawns a particle system in front of you.")
+    public void spawnFireSmokey() {
+
+        spawnFire(FireStyle.SMOKEY);
+    }
+
+
+    @Command(shortDescription = "Spawns a particle system in front of you.")
+    public void spawnFireToon1() {
+        spawnFire(FireStyle.TOON1);
+
+    }
+
+    @Command(shortDescription = "Spawns a particle system in front of you.")
+    public void spawnFireToon2() {
+        spawnFire(FireStyle.TOON2);
+    }
+
+    private String spawnFire(FireStyle style) {
         EntityRef entityRef = createParticleSystem();
         Vector3f spawnPosition = getSpawnPosition();
 
@@ -334,23 +370,44 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         ParticleEmitterComponent emitterComponent = particleSystemComponent.emitter.getComponent(ParticleEmitterComponent.class);
         LocationComponent emitterLocationComponent = particleSystemComponent.emitter.getComponent(LocationComponent.class);
 
-        particleSystemComponent.nrOfParticles = 5000;
+        particleSystemComponent.nrOfParticles = 250;
 
-        emitterComponent.spawnRateMax = 400.0f;
-        emitterComponent.spawnRateMin = 300.0f;
+        emitterComponent.spawnRateMax = 50.0f;
+        emitterComponent.spawnRateMin = 20.0f;
 
         emitterLocationComponent.setWorldPosition(spawnPosition);
+
+        switch (style) {
+            case SQUARE:
+                break;
+            case DEFAULT:
+                particleSystemComponent.texture = Assets.getTexture("engine:simpleParticle");
+                particleSystemComponent.textureSize.setX(1.0f);
+                particleSystemComponent.textureSize.setY(1.0f);
+                break;
+            case SMOKEY:
+                particleSystemComponent.texture = Assets.getTexture("engine:smokeParticle");
+                particleSystemComponent.textureSize.setX(1.0f);
+                particleSystemComponent.textureSize.setY(1.0f);
+                break;
+            case TOON1:
+                particleSystemComponent.texture = Assets.getTexture("engine:toonSmokeParticle");
+                particleSystemComponent.textureSize.setX(1.0f);
+                particleSystemComponent.textureSize.setY(1.0f);
+                break;
+            case TOON2:
+                particleSystemComponent.texture = Assets.getTexture("engine:smokeAtlas");
+                particleSystemComponent.textureSize.setX(0.5f);
+                particleSystemComponent.textureSize.setY(1.0f);
+                break;
+        }
 
         //==============================================================================================================
         // adding simple affectors
         //==============================================================================================================
 
-        particleSystemComponent.texture = Assets.getTexture("engine:simpleParticle");
-        particleSystemComponent.textureSize.setX(particleSystemComponent.texture.getWidth());
-        particleSystemComponent.textureSize.setY(particleSystemComponent.texture.getHeight());
-
         particleSystemComponent.affectors.add(entityManager.create(new ForwardEulerAffectorComponent()));
-        particleSystemComponent.affectors.add(entityManager.create(new ForceAffectorComponent(new Vector3f(0, 0.25f, 0))));
+        particleSystemComponent.affectors.add(entityManager.create(new ForceAffectorComponent(new Vector3f(0, 0.12f, 0))));
         particleSystemComponent.affectors.add(entityManager.create(new DampingAffectorComponent(0.6f)));
         particleSystemComponent.affectors.add(entityManager.create(new TurbulenceAffectorComponent(0.25f)));
 
@@ -402,7 +459,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         particleSystemComponent.affectors.add(entityManager.create(energyColorAffector));
 
         emitterComponent.generators.add(entityManager.create(
-                new PositionRangeGeneratorComponent(new Vector3f(-0.05f, -0.05f, -0.05f), new Vector3f(0.05f, 0.05f, 0.05f))
+                new PositionRangeGeneratorComponent(new Vector3f(-0.01f, -0.01f, -0.01f), new Vector3f(0.01f, 0.01f, 0.01f))
         ));
 
         emitterComponent.generators.add(entityManager.create(
@@ -417,9 +474,128 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
                 new EnergyRangeGeneratorComponent(6, 7)
         ));
 
+        if(style == FireStyle.TOON2) {
+            emitterComponent.generators.add(entityManager.create(
+                    new TextureOffsetGeneratorComponent(
+                            new Vector2f[]{
+                                    new Vector2f(0, 0),
+                                    new Vector2f(0.5f, 0)
+                            }
+                    )
+            ));
+        }
+
+
         ParticleSystemStateData stateData = new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles));
         stateData.updateFunctionMaps(registeredGeneratorFunctions, registeredAffectorFunctions);
         particleSystems.put(entityRef, stateData);
+
+        return String.format("Sparkly: %s", spawnPosition );
+    }
+
+
+    @Command(shortDescription = "Spawns a particle system in front of you.")
+    public String spawnExplosion() {
+        EntityRef entityRef = createParticleSystem();
+        Vector3f spawnPosition = getSpawnPosition();
+
+        ParticleSystemComponent particleSystemComponent = entityRef.getComponent(ParticleSystemComponent.class);
+        ParticleEmitterComponent emitterComponent = particleSystemComponent.emitter.getComponent(ParticleEmitterComponent.class);
+        LocationComponent emitterLocationComponent = particleSystemComponent.emitter.getComponent(LocationComponent.class);
+
+        particleSystemComponent.nrOfParticles = 500;
+
+        emitterComponent.spawnRateMax = 1e5f;
+        emitterComponent.spawnRateMin = 1e5f;
+
+        emitterLocationComponent.setWorldPosition(spawnPosition);
+
+        particleSystemComponent.texture = Assets.getTexture("engine:smokeAtlas");
+        particleSystemComponent.textureSize.setX(0.5f);
+        particleSystemComponent.textureSize.setY(1.0f);
+
+        //==============================================================================================================
+        // adding simple affectors
+        //==============================================================================================================
+
+        particleSystemComponent.affectors.add(entityManager.create(new ForwardEulerAffectorComponent()));
+        particleSystemComponent.affectors.add(entityManager.create(new PointForceAffectorComponent(spawnPosition, 25.0f, 0.5f)));
+        particleSystemComponent.affectors.add(entityManager.create(new ForceAffectorComponent(new Vector3f(0.0f, 0.25f, 0.0f))));
+        particleSystemComponent.affectors.add(entityManager.create(new DampingAffectorComponent(0.8f)));
+
+        //==============================================================================================================
+        // adding gradient affectors
+        //==============================================================================================================
+
+        // Example of using named variables and map.put calls to define keyframes
+        final float keyFireStart   = 6.5f;
+        final float keyFireYellow  = 6.4f;
+        final float keyFireRed     = 5.6f;
+        final float keyFireEnd     = 5.0f;
+        final float keySmokeStart  = 2.5f;
+        final float keyFullOpacity = 1.0f;
+        final float keySmokeEnd    = 0.0f;
+
+        EnergyScaleAffectorComponent energySizeAffector = new EnergyScaleAffectorComponent();
+        energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keyFireStart, new Vector3f(0.1f, 0.1f, 0.1f)));
+        energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keyFireYellow, new Vector3f(1.4f, 1.4f, 1.4f)));
+        energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keyFireEnd, new Vector3f(0.4f, 0.4f, 0.4f)));
+        energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keySmokeStart, new Vector3f(0.2f, 0.2f, 0.2f)));
+        energySizeAffector.sizeMap.add(new EnergyScaleAffectorComponent.EnergyAndScale(keySmokeEnd, new Vector3f(0.2f, 0.2f, 0.2f)));
+        particleSystemComponent.affectors.add(entityManager.create(energySizeAffector));
+
+
+        // Example of using arrays to define keyframes (
+        float[] keyEnergies = {
+                keyFireStart,
+                keyFireYellow,
+                keyFireRed,
+                keyFireEnd,
+                keySmokeStart,
+                keyFullOpacity,
+                keySmokeEnd
+        };
+
+        Vector4f[]  colors = {
+                new Vector4f(0.9f, 0.9f, 0.9f, 0.8f),   // fire start
+                new Vector4f(1.0f, 1.0f, 0.3f, 1.0f),   //   yellow
+                new Vector4f(1.0f, 0.2f, 0.1f, 0.0f),   //   red
+                new Vector4f(1.0f, 0.2f, 0.1f, 0.7f),   // fire end
+                new Vector4f(0.1f, 0.1f, 0.1f, 0.0f),   // smoke start
+                new Vector4f(0.1f, 0.1f, 0.1f, 1.0f),   //   smoke full opacity
+                new Vector4f(0.1f, 0.1f, 0.1f, 0.0f),   // end
+        };
+
+        EnergyColorAffectorComponent energyColorAffector = new EnergyColorAffectorComponent(keyEnergies, colors);
+        particleSystemComponent.affectors.add(entityManager.create(energyColorAffector));
+
+        emitterComponent.generators.add(entityManager.create(
+                new PositionRangeGeneratorComponent(new Vector3f(-0.01f, -0.01f, -0.01f), new Vector3f(0.01f, 0.01f, 0.01f))
+        ));
+
+        emitterComponent.generators.add(entityManager.create(
+                new ColorRangeGeneratorComponent(new Vector4f(0.2f, 0.2f, 0.2f, 1.0f), new Vector4f(0.8f, 0.8f, 0.8f, 1.0f))
+        ));
+
+        emitterComponent.generators.add(entityManager.create(
+                new EnergyRangeGeneratorComponent(6.0f, 6.5f)
+        ));
+
+        emitterComponent.generators.add(entityManager.create(
+                new TextureOffsetGeneratorComponent(
+                        new Vector2f[]{
+                                new Vector2f(0, 0),
+                                new Vector2f(0.5f, 0)
+                        }
+                )
+        ));
+
+
+        ParticleSystemStateData stateData = new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles));
+        stateData.updateFunctionMaps(registeredGeneratorFunctions, registeredAffectorFunctions);
+        particleSystems.put(entityRef, stateData);
+
+
 
         return String.format("Sparkly: %s", spawnPosition );
     }

@@ -24,7 +24,7 @@ uniform vec2 texSize = vec2(1.0, 1.0);
 
 void main() {
     vec4 color = useTexture
-        ? texture2D(texAtlas, gl_TexCoord[0].xy)// * texSize.xy + texOffset.xy)
+        ? texture2D(texAtlas, gl_TexCoord[0].xy * texSize.xy + texOffset.xy)
         : vec4(1.0);
 
     color *= gl_Color;
