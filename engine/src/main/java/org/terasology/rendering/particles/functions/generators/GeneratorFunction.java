@@ -18,7 +18,7 @@ package org.terasology.rendering.particles.functions.generators;
 import org.terasology.entitySystem.Component;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.rendering.particles.functions.ParticleSystemFunction;
-import org.terasology.rendering.particles.internal.DataMask;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**

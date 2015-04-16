@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.particles.functions;
 
-import org.terasology.rendering.particles.internal.DataMask;
+import org.terasology.rendering.particles.DataMask;
 
 /**
  * Created by Linus on 11-3-2015.

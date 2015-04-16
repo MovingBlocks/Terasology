@@ -26,10 +26,12 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.*;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
@@ -47,10 +49,9 @@ import org.terasology.rendering.particles.components.generators.*;
 import org.terasology.rendering.particles.functions.affectors.*;
 import org.terasology.rendering.particles.functions.generators.*;
 import org.terasology.rendering.particles.internal.rendering.ParticleRenderer;
+import org.terasology.rendering.particles.internal.updating.ParticleUpdater;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-
-import java.util.*;
 
 /**
  * Component system responsible for all ParticleSystem components.
@@ -79,57 +80,48 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
     private Physics physics;
 
     private ParticleRenderer particleRenderer;
+    private ParticleUpdater particleUpdater;
 
     private BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions = HashBiMap.create();
     private BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions = HashBiMap.create();
 
-    // Internal state of all particle systems
-    private Map<EntityRef, ParticleSystemStateData> particleSystems = new HashMap<>();
 
-    /*
     @ReceiveEvent(components = {ParticleSystemComponent.class})
     public void onActivated(OnActivatedComponent event, EntityRef entity) {
-        ParticleSystemComponent component = entity.getComponent(ParticleSystemComponent.class);
-
-        particleSystems.put(entity, new ParticleSystemStateData(
-                entity,
-                new ParticlePool(component.nrOfParticles)
-        ));
+        particleUpdater.register(entity);
     }
 
     @ReceiveEvent(components = {ParticleSystemComponent.class})
     public void onDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
-        particleSystems.remove(entity);
+        particleUpdater.dispose(entity);
     }
-    */
 
     public EntityRef spawnTestSystem(Vector3f location) {
-        synchronized(particleSystems) {
-            LocationComponent locationComponent = new LocationComponent(location);
+        LocationComponent locationComponent = new LocationComponent(location);
 
-            ParticleEmitterComponent emitterComponent = new ParticleEmitterComponent();
+        ParticleEmitterComponent emitterComponent = new ParticleEmitterComponent();
 
-            EntityBuilder emitterBuilder = entityManager.newBuilder();
-            emitterBuilder.setPersistent(false);
-            emitterBuilder.addComponent(emitterComponent);
-            emitterBuilder.addComponent(locationComponent);
-            EntityRef emitter = emitterBuilder.build();
+        EntityBuilder emitterBuilder = entityManager.newBuilder();
+        emitterBuilder.setPersistent(false);
+        emitterBuilder.addComponent(emitterComponent);
+        emitterBuilder.addComponent(locationComponent);
+        EntityRef emitter = emitterBuilder.build();
 
-            EntityBuilder particleSystemBuilder = entityManager.newBuilder();
+        EntityBuilder particleSystemBuilder = entityManager.newBuilder();
 
-            ParticleSystemComponent particleSystemComponent = new ParticleSystemComponent();
-            particleSystemComponent.emitter = emitter;
+        ParticleSystemComponent particleSystemComponent = new ParticleSystemComponent();
+        particleSystemComponent.emitter = emitter;
 
 
-            particleSystemBuilder.setPersistent(false);
-            particleSystemBuilder.addComponent(particleSystemComponent);
-            EntityRef particleSystem = particleSystemBuilder.build();
-            return particleSystem;
-        }
+        particleSystemBuilder.setPersistent(false);
+        particleSystemBuilder.addComponent(particleSystemComponent);
+        EntityRef particleSystem = particleSystemBuilder.build();
+        return particleSystem;
     }
 
     public void initialise() {
         particleRenderer = ParticleRenderer.create(logger);
+        particleUpdater = ParticleUpdater.create(physics, logger);
 
         registerGeneratorFunction(new ColorRangeGeneratorFunction());
         registerGeneratorFunction(new EnergyRangeGeneratorFunction());
@@ -149,15 +141,14 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
     @Override
     public void shutdown() {
-        particleSystems.clear();
         registeredAffectorFunctions.clear();
         registeredGeneratorFunctions.clear();
 
         particleRenderer.dispose();
         particleRenderer = null;
-    }
 
-    float cumDelta = 0.0f;
+        particleUpdater = null;
+    }
 
     public void update(float delta) {
 
@@ -171,79 +162,7 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
                     );
                 }
         );
-
-        synchronized(particleSystems) {
-            cumDelta += delta;
-            for (ParticleSystemStateData system : particleSystems.values()) {
-                ParticleSystemUpdating.update(system, physics, registeredGeneratorFunctions, registeredAffectorFunctions, delta);
-            }
-
-            Iterator<Map.Entry<EntityRef,ParticleSystemStateData>> iter = particleSystems.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<EntityRef,ParticleSystemStateData> entry = iter.next();
-                if (entry.getKey().getComponent(ParticleSystemComponent.class).maxLifeTime < 0) {
-                    entry.getKey().destroy();
-                    iter.remove();
-                }
-            }
-
-            if (cumDelta > 1.0f) {
-                cumDelta = 0;
-                System.out.println(particleSystems.size() + " particle systems active.");
-                if (particleSystems.size() > 0) {
-                    System.out.println(particleSystems.values().toArray(new ParticleSystemStateData[0])[0].particlePool.livingParticles() + " parts");
-                }
-            }
-        }
-    }
-
-
-
-    /**
-     * @return
-     */
-    @Command(shortDescription = "Spawns a particle system in front of you.")
-    public String sxplosion() {
-        synchronized(particleSystems) {
-            /*
-            Camera camera = worldRenderer.getActiveCamera();
-            Vector3f spawnPosition = new Vector3f(worldRenderer.getActiveCamera().getViewingDirection());
-            HitResult hit = physics.rayTrace(camera.getPosition(), camera.getViewingDirection(), 25, StandardCollisionGroup.WORLD);
-
-            if (hit.isHit()) {
-                spawnPosition.set(hit.getHitPoint());
-            } else {
-                spawnPosition.scale(25);
-                spawnPosition.add(worldRenderer.getActiveCamera().getPosition());
-            }
-
-            EntityRef entityRef = spawnTestSystem(spawnPosition);
-
-            ParticleSystemStateData partsys = new ParticleSystemStateData(entityRef, new ParticlePool(entityRef.getComponent(ParticleSystemComponent.class).nrOfParticles));
-            partsys.emitter.spawnRateMax = 10000.0f;
-            partsys.emitter.spawnRateMin = 10000.0f;
-
-            partsys.affectors.add(new ForwardEulerAffectorComponent());
-            partsys.affectors.add(new ForceAffectorComponent(new Vector3f(0, -1.0f, 0)));
-            partsys.affectors.add(new DampingAffectorComponent(0.35f));
-            EnergyColorAffectorComponent energyColorAffector = new EnergyColorAffectorComponent();
-            energyColorAffector.gradientMap.put(4.5f, new Vector4f(0.9f, 0.9f, 0.9f, 0.8f));
-            energyColorAffector.gradientMap.put(4.2f, new Vector4f(0.0f, 0.0f, 0.9f, 1.0f));
-            energyColorAffector.gradientMap.put(3.5f, new Vector4f(0.0f, 0.0f, 0.6f, 0.7f));
-            energyColorAffector.gradientMap.put(0.0f, new Vector4f(0.0f, 0.0f, 0.6f, 0.0f));
-            partsys.affectors.add(energyColorAffector);
-
-            partsys.generators.add(new BoxPositionGenerator(new Vector3f(-0.2f, -0.2f, -0.2f), new Vector3f(0.2f, 0.2f, 0.2f)));
-            partsys.generators.add(new PointVelocityGenerator(new Vector3f(0, 0, 0), 8));
-            partsys.generators.add(new RandomEnergyGenerator(4.5f, 5f));
-
-            this.particleSystems.put(entityRef, partsys);
-            entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime = 6.0f;
-
-            */
-            Vector3f spawnPosition = new Vector3f();
-            return String.format("Sparkly: %s", spawnPosition );
-        }
+        particleUpdater.update(registeredAffectorFunctions, registeredGeneratorFunctions, delta);
     }
 
     private Vector3f getSpawnPosition() {
@@ -260,8 +179,6 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
 
         return spawnPosition;
     }
-
-
 
     /**
      * @return
@@ -313,10 +230,6 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
         emitterComponent.generators.add(entityManager.create(
                 new EnergyRangeGeneratorComponent(2, 3)
         ));
-
-        ParticleSystemStateData stateData = new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles));
-        stateData.updateFunctionMaps(registeredGeneratorFunctions, registeredAffectorFunctions);
-        particleSystems.put(entityRef, stateData);
 
         return String.format("Sparkly: %s", spawnPosition );
     }
@@ -485,11 +398,6 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
             ));
         }
 
-
-        ParticleSystemStateData stateData = new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles));
-        stateData.updateFunctionMaps(registeredGeneratorFunctions, registeredAffectorFunctions);
-        particleSystems.put(entityRef, stateData);
-
         return String.format("Sparkly: %s", spawnPosition );
     }
 
@@ -590,19 +498,12 @@ public class ParticleSystemManager extends BaseComponentSystem implements Update
                 )
         ));
 
-
-        ParticleSystemStateData stateData = new ParticleSystemStateData(entityRef, new ParticlePool(particleSystemComponent.nrOfParticles));
-        stateData.updateFunctionMaps(registeredGeneratorFunctions, registeredAffectorFunctions);
-        particleSystems.put(entityRef, stateData);
-
-
-
         return String.format("Sparkly: %s", spawnPosition );
     }
 
     public void renderAlphaBlend() {
         if (particleRenderer != null) {
-            particleRenderer.render(worldRenderer, particleSystems.values());
+            particleRenderer.render(worldRenderer, particleUpdater.getStateData());
         }
     }
 

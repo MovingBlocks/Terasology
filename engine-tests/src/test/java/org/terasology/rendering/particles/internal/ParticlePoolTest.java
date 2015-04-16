@@ -17,7 +17,7 @@ package org.terasology.rendering.particles.internal;
 
 import org.junit.Test;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.particles.internal.ParticlePool;
+import org.terasology.rendering.particles.internal.data.ParticlePool;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 

@@ -19,11 +19,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.particles.components.ParticleSystemComponent;
-import org.terasology.rendering.particles.internal.ParticlePool;
-import org.terasology.rendering.particles.internal.ParticleSystemStateData;
-import org.terasology.rendering.particles.internal.rendering.ParticleRenderer;
+import org.terasology.rendering.particles.internal.data.ParticlePool;
+import org.terasology.rendering.particles.internal.data.ParticleSystemStateData;
 
 import static org.lwjgl.opengl.GL11.*;
 

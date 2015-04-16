@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.internal;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+package org.terasology.rendering.particles;
 
 /**
  * Created by Linus on 7-3-2015.
@@ -36,9 +29,9 @@ public enum DataMask {
     COLOR             (0b1000000),
     ALL               (0b1111111);
 
+    private final int rawMask;
 
-    //Package private stuff
-    DataMask(final int rawMask) {
+    private DataMask(final int rawMask) {
         this.rawMask = rawMask;
     }
 
@@ -46,15 +39,17 @@ public enum DataMask {
         return (this.rawMask & mask) != 0;
     }
 
+    public int toInt() {
+        return DataMask.toInt(this);
+    }
+
     public static int toInt(DataMask dataMask, DataMask... dataMasks) {
         int combinedMask = dataMask.rawMask;
 
-        for(DataMask dataMaskI: dataMasks) {
+        for (DataMask dataMaskI: dataMasks) {
             combinedMask |= dataMaskI.rawMask;
         }
 
         return combinedMask;
     }
-
-    final int rawMask;
 }

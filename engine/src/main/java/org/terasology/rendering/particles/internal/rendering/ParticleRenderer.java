@@ -15,16 +15,13 @@
  */
 package org.terasology.rendering.particles.internal.rendering;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.terasology.asset.Assets;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.particles.internal.ParticleSystemStateData;
+import org.terasology.rendering.particles.internal.data.ParticleSystemStateData;
 import org.terasology.rendering.world.WorldRenderer;
-
-import java.nio.FloatBuffer;
 
 /**
  * Created by Linus on 7-4-2015.
@@ -44,24 +41,6 @@ public abstract class ParticleRenderer {
                 +0.5f, +0.5f, 0.0f,
                 +0.5f, -0.5f, 0.0f
     };
-
-    protected void removeModelViewMatrixRotation() {
-        final FloatBuffer model = BufferUtils.createFloatBuffer(16);
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
-
-        // And undo all rotations and scaling
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (i == j) {
-                    model.put(i * 4 + j, 1.0f);
-                } else {
-                    model.put(i * 4 + j, 0.0f);
-                }
-            }
-        }
-
-        GL11.glLoadMatrix(model);
-    }
 
     public static ParticleRenderer create(Logger logger) {
         //TODO: fix and enable instanced rendering

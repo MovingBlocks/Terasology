@@ -19,10 +19,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.particles.internal.ParticlePool;
-import org.terasology.rendering.particles.internal.ParticleSystemStateData;
+import org.terasology.rendering.particles.internal.data.ParticlePool;
+import org.terasology.rendering.particles.internal.data.ParticleSystemStateData;
 
-import java.nio.BufferOverflowException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.particles.internal;
+package org.terasology.rendering.particles.internal.data;
 
 import com.google.common.base.Preconditions;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.rendering.particles.ParticleData;
 
 /**
@@ -110,8 +111,8 @@ public final class ParticlePool {
         firstDeadParticleIndex--;
         // First dead particle now points to the last living particle and there is a dead particle in the living pool.
         // Moving the last living particle to the location of the deceased particle fixes both issues.
-        loadTemporaryDataFrom(firstDeadParticleIndex, DataMask.ALL.rawMask);
-        storeTemporaryDataAt(index, DataMask.ALL.rawMask);
+        loadTemporaryDataFrom(firstDeadParticleIndex, DataMask.toInt(DataMask.ALL));
+        storeTemporaryDataAt(index, DataMask.toInt(DataMask.ALL));
     }
 
     //== moving particle data ===========================

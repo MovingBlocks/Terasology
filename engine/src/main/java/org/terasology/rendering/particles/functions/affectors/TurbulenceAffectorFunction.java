@@ -17,7 +17,7 @@ package org.terasology.rendering.particles.functions.affectors;
 
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.rendering.particles.components.affectors.TurbulenceAffectorComponent;
-import org.terasology.rendering.particles.internal.DataMask;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
