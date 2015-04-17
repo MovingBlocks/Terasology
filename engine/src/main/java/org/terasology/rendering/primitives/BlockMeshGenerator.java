@@ -27,8 +27,7 @@ import org.terasology.world.block.Block;
 public interface BlockMeshGenerator {
 
     /**
-     * Calculates the color offset for a given block type and a specific
-     * side of the block.
+     * Generates a block mesh at the defined location in the ChunkMesh.
      *
      * @param view  The input hunk area to acquire the Block data from.
      * @param mesh  The output mesh that is being generated.
