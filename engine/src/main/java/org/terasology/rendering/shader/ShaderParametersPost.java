@@ -95,7 +95,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
                 program.setFloat("noiseOffset", rand.nextFloat(), true);
 
                 program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
-                program.setFloat2("renderTargetSize", sceneCombined.width, sceneCombined.height, true);
+                program.setFloat2("renderTargetSize", sceneCombined.width(), sceneCombined.height(), true);
             }
         }
 
