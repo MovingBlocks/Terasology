@@ -17,14 +17,10 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBHalfFloatPixel;
-import org.lwjgl.opengl.ARBTextureFloat;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.EXTPackedDepthStencil;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,37 +54,14 @@ import java.util.Date;
 import java.util.Map;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_STENCIL_ATTACHMENT_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindRenderbufferEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glCheckFramebufferStatusEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
-import static org.lwjgl.opengl.EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT;
-import static org.lwjgl.opengl.EXTPixelBufferObject.GL_STREAM_READ_ARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glBindBufferARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glBufferDataARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glGenBuffersARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glMapBufferARB;
-import static org.lwjgl.opengl.EXTPixelBufferObject.glUnmapBufferARB;
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -125,18 +98,15 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glNewList;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glReadPixels;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.lwjgl.opengl.GL11.glTexCoord2d;
 import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
@@ -200,12 +170,6 @@ public class LwjglRenderingProcess {
     private FBO currentlyBoundFbo;
     //private int currentlyBoundTextureId = -1;
 
-    public enum FBOType {
-        DEFAULT,
-        HDR,
-        NO_COLOR
-    }
-
     /* VARIOUS */
     private boolean takeScreenshot;
     private int displayListQuad = -1;
@@ -239,11 +203,12 @@ public class LwjglRenderingProcess {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
-        createFBO("scene16", 16, 16, FBOType.DEFAULT, false, false);
-        createFBO("scene8", 8, 8, FBOType.DEFAULT, false, false);
-        createFBO("scene4", 4, 4, FBOType.DEFAULT, false, false);
-        createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
-        createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
+        // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
+        new FBObuilder("scene16", 16, 16, FBO.Type.DEFAULT).build();
+        new FBObuilder("scene8",   8,  8, FBO.Type.DEFAULT).build();
+        new FBObuilder("scene4",   4,  4, FBO.Type.DEFAULT).build();
+        new FBObuilder("scene2",   2,  2, FBO.Type.DEFAULT).build();
+        new FBObuilder("scene1",   1,  1, FBO.Type.DEFAULT).build();
 
         readBackPBOFront = new PBO(1, 1);
         readBackPBOBack = new PBO(1, 1);
@@ -291,54 +256,50 @@ public class LwjglRenderingProcess {
         rtHeight32 = rtWidth16 / 2;
 
         FBO scene = fboLookup.get("sceneOpaque");
-        final boolean recreate = scene == null || (scene.width != rtFullWidth || scene.height != rtFullHeight);
+        final boolean recreate = scene == null || (scene.width() != rtFullWidth || scene.height() != rtFullHeight);
 
         if (!recreate) {
             return;
         }
 
-        /*
-         TODO: switch from createFBO() calls to
+        // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
+        int shadowMapResolution = renderingConfig.getShadowMapResolution();
+        new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
 
-         new FBOBuilder("title", width, height, FBOType.HDR)
-            .useDepthBuffer()
-            .useNormalBuffer()
-            .useLightBuffer()
-            .create()
+        // buffers for the initial renderings
+        FBO sceneOpaque =
+                new FBObuilder("sceneOpaque", rtFullWidth, rtFullHeight, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+        new FBObuilder("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
 
-         to improve readability
-        */
-        createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
-        createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
+        new FBObuilder("sceneSkyBand0",   rtWidth16, rtHeight16, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand1",   rtWidth32, rtHeight32, FBO.Type.DEFAULT).build();
 
-        createFBO("sceneReflectiveRefractive", rtFullWidth, rtFullHeight, FBOType.HDR, false, true);
-        attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
+        FBO sceneReflectiveRefractive = new FBObuilder("sceneReflectiveRefractive", rtFullWidth, rtFullHeight, FBO.Type.HDR).useNormalBuffer().build();
+        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
 
-        createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true);
+        new FBObuilder("sceneReflected",  rtWidth2, rtHeight2, FBO.Type.DEFAULT).useDepthBuffer().build();
 
-        createFBO("sceneShadowMap", renderingConfig.getShadowMapResolution(), renderingConfig.getShadowMapResolution(), FBOType.NO_COLOR, true, false);
+        // buffers for the prePost-Processing composite
+        new FBObuilder("sobel",           rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
+        new FBObuilder("ssao",            rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
+        new FBObuilder("ssaoBlurred",     rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
+        new FBObuilder("scenePrePost",    rtFullWidth, rtFullHeight, FBO.Type.HDR).build();
 
-        createFBO("scenePrePost", rtFullWidth, rtFullHeight, FBOType.HDR);
-        createFBO("sceneToneMapped", rtFullWidth, rtFullHeight, FBOType.HDR);
-        createFBO("sceneFinal", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
+        // buffers for the Initial Post-Processing
+        new FBObuilder("lightShafts",     rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneToneMapped", rtFullWidth, rtFullHeight, FBO.Type.HDR).build();
 
-        createFBO("sobel", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
+        new FBObuilder("sceneHighPass",   rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBloom0",     rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBloom1",     rtWidth4,    rtHeight4,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBloom2",     rtWidth8,    rtHeight8,    FBO.Type.DEFAULT).build();
 
-        createFBO("ssao", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
-        createFBO("ssaoBlurred", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
+        new FBObuilder("sceneBlur0",      rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBlur1",      rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
 
-        createFBO("lightShafts", rtWidth2, rtHeight2, FBOType.DEFAULT);
-
-        createFBO("sceneHighPass", rtFullWidth, rtFullHeight, FBOType.DEFAULT);
-        createFBO("sceneBloom0", rtWidth2, rtHeight2, FBOType.DEFAULT);
-        createFBO("sceneBloom1", rtWidth4, rtHeight4, FBOType.DEFAULT);
-        createFBO("sceneBloom2", rtWidth8, rtHeight8, FBOType.DEFAULT);
-
-        createFBO("sceneBlur0", rtWidth2, rtHeight2, FBOType.DEFAULT);
-        createFBO("sceneBlur1", rtWidth2, rtHeight2, FBOType.DEFAULT);
-
-        createFBO("sceneSkyBand0", rtWidth16, rtHeight16, FBOType.DEFAULT);
-        createFBO("sceneSkyBand1", rtWidth32, rtHeight32, FBOType.DEFAULT);
+        // buffers for the Final Post-Processing
+        new FBObuilder("ocUndistorted",   rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneFinal",      rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
     }
 
     public void deleteFBO(String title) {
@@ -347,9 +308,9 @@ public class LwjglRenderingProcess {
 
             glDeleteFramebuffersEXT(fbo.fboId);
             glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
-            GL11.glDeleteTextures(fbo.normalsTextureId);
+            GL11.glDeleteTextures(fbo.normalsBufferTextureId);
             GL11.glDeleteTextures(fbo.depthStencilTextureId);
-            GL11.glDeleteTextures(fbo.textureId);
+            GL11.glDeleteTextures(fbo.colorBufferTextureId);
         }
     }
 
@@ -369,198 +330,6 @@ public class LwjglRenderingProcess {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
         return true;
-    }
-
-    public FBO createFBO(String title, int width, int height, FBOType type) {
-        return createFBO(title, width, height, type, false, false, false);
-    }
-
-    public FBO createFBO(String title, int width, int height, FBOType type, boolean depth) {
-        return createFBO(title, width, height, type, depth, false, false);
-    }
-
-    public FBO createFBO(String title, int width, int height, FBOType type, boolean depth, boolean normals) {
-        return createFBO(title, width, height, type, depth, normals, false);
-    }
-
-    public FBO createFBO(String title, int width, int height, FBOType type, boolean depth, boolean normals, boolean lightBuffer) {
-        return createFBO(title, width, height, type, depth, normals, lightBuffer, false);
-    }
-
-    public FBO createFBO(String title, int width, int height, FBOType type, boolean depthBuffer, boolean normalBuffer, boolean lightBuffer, boolean stencilBuffer) {
-        // Make sure to delete the existing FBO before creating a new one
-        deleteFBO(title);
-
-        // Create a new FBO object
-        FBO fbo = new FBO();
-        fbo.width = width;
-        fbo.height = height;
-
-        // Create the FBO
-        fbo.fboId = glGenFramebuffersEXT();
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo.fboId);
-
-        if (type != FBOType.NO_COLOR) {
-            fbo.textureId = glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.textureId);
-
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-            if (type == FBOType.HDR) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA,
-                        ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (ByteBuffer) null);
-            } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
-            }
-
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
-        }
-
-        if (normalBuffer) {
-            fbo.normalsTextureId = glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsTextureId);
-
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
-
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsTextureId, 0);
-        }
-
-        if (lightBuffer) {
-            fbo.lightBufferTextureId = glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId);
-
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-            if (type == FBOType.HDR) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0,
-                        GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (ByteBuffer) null);
-            } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
-            }
-
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
-        }
-
-        if (depthBuffer) {
-            fbo.depthStencilTextureId = glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId);
-
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-            if (!stencilBuffer) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_UNSIGNED_INT, (ByteBuffer) null);
-            } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height, 0,
-                        EXTPackedDepthStencil.GL_DEPTH_STENCIL_EXT, EXTPackedDepthStencil.GL_UNSIGNED_INT_24_8_EXT, (ByteBuffer) null);
-            }
-
-            fbo.depthStencilRboId = glGenRenderbuffersEXT();
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
-
-            if (!stencilBuffer) {
-                glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
-            } else {
-                glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, width, height);
-            }
-
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-
-            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
-
-            if (stencilBuffer) {
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
-            }
-        }
-
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-        if (type != FBOType.NO_COLOR) {
-            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT);
-        }
-        if (normalBuffer) {
-            bufferIds.put(GL_COLOR_ATTACHMENT1_EXT);
-        }
-        if (lightBuffer) {
-            bufferIds.put(GL_COLOR_ATTACHMENT2_EXT);
-        }
-        bufferIds.flip();
-
-        if (bufferIds.limit() == 0) {
-            GL11.glReadBuffer(GL11.GL_NONE);
-            GL20.glDrawBuffers(GL11.GL_NONE);
-        } else {
-            GL20.glDrawBuffers(bufferIds);
-        }
-
-        int checkFB = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        switch (checkFB) {
-            case GL_FRAMEBUFFER_COMPLETE_EXT:
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
-                break;
-            case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-                logger.error("FrameBuffer: " + title
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
-
-                /*
-                 * On some graphics cards, FBOType.NO_COLOR can cause a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT.
-                 * Attempt to continue without this FBO.
-                 */
-                if (type == FBOType.NO_COLOR) {
-                    logger.error("FrameBuffer: " + title
-                            + ", ...but the FBOType was NO_COLOR, ignoring this error and continuing without this FBO.");
-
-                    return null;
-                }
-
-                break;
-            default:
-                logger.error("Unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
-                break;
-        }
-
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-        fboLookup.put(title, fbo);
-        return fbo;
     }
 
     private void updateExposure() {
@@ -750,14 +519,14 @@ public class LwjglRenderingProcess {
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
 
-        if (fbo.textureId != 0) {
+        if (fbo.colorBufferTextureId != 0) {
             if (color) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
 
             attachmentId++;
         }
-        if (fbo.normalsTextureId != 0) {
+        if (fbo.normalsBufferTextureId != 0) {
             if (normal) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
@@ -803,7 +572,7 @@ public class LwjglRenderingProcess {
 
         reflected.bind();
 
-        glViewport(0, 0, reflected.width, reflected.height);
+        glViewport(0, 0, reflected.width(), reflected.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glCullFace(GL11.GL_FRONT);
     }
@@ -823,7 +592,7 @@ public class LwjglRenderingProcess {
 
         shadowMap.bind();
 
-        glViewport(0, 0, shadowMap.width, shadowMap.height);
+        glViewport(0, 0, shadowMap.width(), shadowMap.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glDisable(GL_CULL_FACE);
     }
@@ -1088,7 +857,7 @@ public class LwjglRenderingProcess {
 
         material.enable();
         material.setFloat("radius", 8.0f, true);
-        material.setFloat2("texelSize", 1.0f / skyBand.width, 1.0f / skyBand.height, true);
+        material.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
 
         if (id == 0) {
             bindFboTexture("sceneOpaque");
@@ -1096,7 +865,7 @@ public class LwjglRenderingProcess {
             bindFboTexture("sceneSkyBand" + (id - 1));
         }
 
-        glViewport(0, 0, skyBand.width, skyBand.height);
+        glViewport(0, 0, skyBand.width(), skyBand.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -1128,7 +897,7 @@ public class LwjglRenderingProcess {
 
         lightshaft.bind();
 
-        glViewport(0, 0, lightshaft.width, lightshaft.height);
+        glViewport(0, 0, lightshaft.width(), lightshaft.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -1147,12 +916,12 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        ssaoShader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
+        ssaoShader.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
         ssaoShader.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
 
         ssao.bind();
 
-        glViewport(0, 0, ssao.width, ssao.height);
+        glViewport(0, 0, ssao.width(), ssao.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -1172,7 +941,7 @@ public class LwjglRenderingProcess {
 
         sobel.bind();
 
-        glViewport(0, 0, sobel.width, sobel.height);
+        glViewport(0, 0, sobel.width(), sobel.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -1191,10 +960,10 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        shader.setFloat2("texelSize", 1.0f / ssao.width, 1.0f / ssao.height, true);
+        shader.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
         ssao.bind();
 
-        glViewport(0, 0, ssao.width, ssao.height);
+        glViewport(0, 0, ssao.width(), ssao.height());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         bindFboTexture("ssao");
 
@@ -1240,7 +1009,7 @@ public class LwjglRenderingProcess {
 //        sceneOpaque.bindDepthTexture();
 //        program.setInt("texDepth", texId++);
 
-        glViewport(0, 0, highPass.width, highPass.height);
+        glViewport(0, 0, highPass.width(), highPass.height());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -1263,11 +1032,11 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        material.setFloat2("texelSize", 1.0f / blur.width, 1.0f / blur.height, true);
+        material.setFloat2("texelSize", 1.0f / blur.width(), 1.0f / blur.height(), true);
 
         blur.bind();
 
-        glViewport(0, 0, blur.width, blur.height);
+        glViewport(0, 0, blur.width(), blur.height());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -1296,11 +1065,11 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        shader.setFloat2("texelSize", 1.0f / bloom.width, 1.0f / bloom.height, true);
+        shader.setFloat2("texelSize", 1.0f / bloom.width(), 1.0f / bloom.height(), true);
 
         bloom.bind();
 
-        glViewport(0, 0, bloom.width, bloom.height);
+        glViewport(0, 0, bloom.width(), bloom.height());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -1431,7 +1200,7 @@ public class LwjglRenderingProcess {
             return;
         }
 
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width * fboSceneFinal.height * 4);
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width() * fboSceneFinal.height() * 4);
 
         fboSceneFinal.bindTexture();
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
@@ -1443,17 +1212,17 @@ public class LwjglRenderingProcess {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
                 final String format = renderingConfig.getScreenshotFormat().toString();
-                final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
+                final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width() + "x" + fboSceneFinal.height() + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
-                BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
+                BufferedImage image = new BufferedImage(fboSceneFinal.width(), fboSceneFinal.height(), BufferedImage.TYPE_INT_RGB);
 
-                for (int x = 0; x < fboSceneFinal.width; x++) {
-                    for (int y = 0; y < fboSceneFinal.height; y++) {
-                        int i = (x + fboSceneFinal.width * y) * 4;
+                for (int x = 0; x < fboSceneFinal.width(); x++) {
+                    for (int y = 0; y < fboSceneFinal.height(); y++) {
+                        int i = (x + fboSceneFinal.width() * y) * 4;
                         int r = buffer.get(i) & 0xFF;
                         int g = buffer.get(i + 1) & 0xFF;
                         int b = buffer.get(i + 2) & 0xFF;
-                        image.setRGB(x, fboSceneFinal.height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+                        image.setRGB(x, fboSceneFinal.height() - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
                     }
                 }
 
@@ -1573,6 +1342,160 @@ public class LwjglRenderingProcess {
 
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
+    }
+
+    /**
+     * Builder class to simplify the syntax creating an FBO.
+     * <p>
+     * Once the desired characteristics of the FBO are set via the Builder's constructor and its
+     * use*Buffer() methods, the build() method can be called for the actual FBO to be generated,
+     * alongside the underlying FrameBuffer and its attachments on the GPU.
+     * <p>
+     * The new FBO is automatically registered with the LwjglRenderingProcess, overwriting any
+     * existing FBO with the same title.
+     */
+    public class FBObuilder {
+
+        private FBO generatedFBO;
+
+        private String title;
+        private FBO.Dimensions dimensions;
+        private FBO.Type type;
+
+        private boolean useDepthBuffer;
+        private boolean useNormalBuffer;
+        private boolean useLightBuffer;
+        private boolean useStencilBuffer;
+
+        /**
+         * Constructs an FBO builder capable of building the two most basic FBOs:
+         * an FBO with no attachments or one with a single color buffer attached to it.
+         * <p>
+         * To attach additional buffers, see the use*Buffer() methods.
+         * <p>
+         * Example: FBO basicFBO = new FBObuilder("basic", new Dimensions(1920, 1080), Type.DEFAULT).build();
+         *
+         * @param title A string identifier, the title is used to later manipulate the FBO through
+         *              methods such as LwjglRenderingProcess.getFBO(title) and LwjglRenderingProcess.bindFBO(title).
+         * @param dimensions A Dimensions object providing width and height information.
+         * @param type Type.DEFAULT will result in a 32 bit color buffer attached to the FBO. (GL_RGBA, GL11.GL_UNSIGNED_BYTE, GL_LINEAR)
+         *             Type.HDR will result in a 64 bit color buffer attached to the FBO. (GL_RGBA, GL_HALF_FLOAT_ARB, GL_LINEAR)
+         *             Type.NO_COLOR will result in -no- color buffer attached to the FBO
+         *             (WARNING: this could result in an FBO with Status.DISPOSED - see FBO.getStatus()).
+         */
+        public FBObuilder(String title, FBO.Dimensions dimensions, FBO.Type type) {
+            this.title = title;
+            this.dimensions = dimensions;
+            this.type = type;
+        }
+
+        /**
+         * Same as the previous FBObuilder constructor, but taking in input
+         * explicit, integer width and height instead of a Dimensions object.
+         */
+        public FBObuilder(String title, int width, int height, FBO.Type type) {
+            this(title,  new FBO.Dimensions(width, height), type);
+        }
+
+/*
+ *  * @param useDepthBuffer If true the FBO will have a 24 bit depth buffer attached to it. (GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, GL_NEAREST)
+    * @param useNormalBuffer If true the FBO will have a 32 bit normals buffer attached to it. (GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR)
+    * @param useLightBuffer If true the FBO will have 32/64 bit light buffer attached to it, depending if Type is DEFAULT/HDR.
+*                       (GL_RGBA/GL_RGBA16F_ARB, GL_UNSIGNED_BYTE/GL_HALF_FLOAT_ARB, GL_LINEAR)
+    * @param useStencilBuffer If true the depth buffer will also have an 8 bit Stencil buffer associated with it.
+    *                         (GL_DEPTH24_STENCIL8_EXT, GL_UNSIGNED_INT_24_8_EXT, GL_NEAREST)
+                *                         */
+
+        /**
+         * Sets the builder to generate, allocate and attach a 24 bit depth buffer to the FrameBuffer to be built.
+         * If useStencilBuffer() is also used, an 8 bit stencil buffer will also be associated with the depth buffer.
+         * For details on the specific characteristics of the buffers, see the FBO.create() method.
+         *
+         * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useDepthBuffer().build();
+         */
+        public FBObuilder useDepthBuffer() {
+            useDepthBuffer = true;
+            return this;
+        }
+
+        /**
+         * Sets the builder to generate, allocate and attach a normals buffer to the FrameBuffer to be built.
+         * For details on the specific characteristics of the buffer, see the FBO.create() method.
+         *
+         * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useNormalsBuffer().build();
+         */
+        public FBObuilder useNormalBuffer() {
+            useNormalBuffer = true;
+            return this;
+        }
+
+        /**
+         * Sets the builder to generate, allocate and attach a light buffer to the FrameBuffer to be built.
+         * Be aware that the number of bits per channel for this buffer changes with the set FBO.Type.
+         * For details see the FBO.create() method.
+         *
+         * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useLightBuffer().build();
+         */
+        public FBObuilder useLightBuffer() {
+            useLightBuffer = true;
+            return this;
+        }
+
+        /**
+         * -IF- the builder has been set to generate a depth buffer, using this method sets the builder to
+         * generate a depth buffer inclusive of stencil buffer, with the following characteristics:
+         * internal format GL_DEPTH24_STENCIL8_EXT, data type GL_UNSIGNED_INT_24_8_EXT and filtering GL_NEAREST.
+         *
+         * @return The calling instance of FBObuilder, to chain calls,
+         *         i.e.: new FBObuilder(...).useDepthBuffer().useStencilBuffer().build();
+         */
+        public FBObuilder useStencilBuffer() {
+            useStencilBuffer = true;
+            return this;
+        }
+
+        /**
+         * Given information set through the constructor and the use*Buffer() methods, builds and returns
+         * an FBO instance, inclusive the underlying OpenGL FrameBuffer and any requested attachments.
+         * <p>
+         * The FBO is also automatically registered with the LwjglRenderingProcess through its title string.
+         * This allows its retrieval and binding through methods such as getFBO(String title) and
+         * bindFBO(String title). If another FBO is registered with the same title, it is disposed and
+         * the new FBO registered in its place.
+         * <p>
+         * This method is effectively mono-use: calling it more than once will return the exact same FBO
+         * returned the first time. To build a new FBO with identical or different characteristics it's
+         * necessary to instantiate a new builder.
+         *
+         * @return An FBO. Make sure to check it with FBO.getStatus() before using it.
+         */
+        public FBO build() {
+            if (generatedFBO != null) {
+                return generatedFBO;
+            }
+
+            FBO oldFBO = fboLookup.get(title);
+            if (oldFBO != null) {
+                oldFBO.dispose();
+                fboLookup.remove(title);
+                logger.warn("FBO " + title + " has been overwritten. Ideally it would have been deleted first.");
+            }
+
+            generatedFBO = FBO.create(title, dimensions, type, useDepthBuffer, useNormalBuffer, useLightBuffer, useStencilBuffer);
+            handleIncompleteAndUnexpectedStatus(generatedFBO);
+            fboLookup.put(title, generatedFBO);
+            return generatedFBO;
+        }
+
+        private void handleIncompleteAndUnexpectedStatus(FBO fbo) {
+            // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
+            // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
+            if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
+                logger.error("FBO " + title + " is incomplete. Look earlier in the log for details.");
+            } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
+                logger.error("FBO " + title + " has generated an unexpected status code. Look earlier in the log for details.");
+            }
+        }
     }
 }
 

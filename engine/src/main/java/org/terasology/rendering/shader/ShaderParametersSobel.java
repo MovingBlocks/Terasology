@@ -44,8 +44,8 @@ public class ShaderParametersSobel extends ShaderParametersBase {
             scene.bindDepthTexture();
             program.setInt("texDepth", 0);
 
-            program.setFloat("texelWidth", 1.0f / scene.width);
-            program.setFloat("texelHeight", 1.0f / scene.height);
+            program.setFloat("texelWidth", 1.0f / scene.width());
+            program.setFloat("texelHeight", 1.0f / scene.height());
         }
 
         program.setFloat("pixelOffsetX", pixelOffsetX);
