@@ -72,18 +72,6 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
 
     public abstract void setTexture(String name, Texture texture);
 
-    public abstract void vertexAttribPointer(String desc,
-                                             int size,
-                                             int type,
-                                             boolean normalized,
-                                             int stride,
-                                             long offset
-    );
-
-    public abstract void enableVertexAttributeArray(String desc);
-
-    public abstract void disableVertexAttributeArray(String desc);
-
     public abstract boolean supportsFeature(ShaderProgramFeature feature);
 
     public abstract void activateFeature(ShaderProgramFeature feature);

@@ -43,13 +43,7 @@ public abstract class ParticleRenderer {
     };
 
     public static ParticleRenderer create(Logger logger) {
-        //TODO: fix and enable instanced rendering
-        if (false && InstancedParticleRenderer.hardwareIsCapable()) {
-            return new InstancedParticleRenderer(Assets.getMaterial(PARTICLE_MATERIAL_URI));
-        } else {
-            logger.info("Hardware not capable of instancing: reverting to display list mode.");
-            return new DisplayListParticleRenderer();
-        }
+        return new DisplayListParticleRenderer();
     }
 
     protected abstract void drawParticles(Material material, ParticleSystemStateData particleSystem, Vector3f camera);

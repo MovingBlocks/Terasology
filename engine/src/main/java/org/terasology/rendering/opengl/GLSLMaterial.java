@@ -27,8 +27,6 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import org.lwjgl.opengl.ARBDrawInstanced;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
@@ -577,31 +575,6 @@ public class GLSLMaterial extends BaseMaterial {
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void vertexAttribPointer(String desc,
-                                    int size,
-                                    int type,
-                                    boolean normalized,
-                                    int stride,
-                                    long offset
-    ) {
-        enable();
-        int id = getUniformLocation(getActiveShaderProgramId(), desc);
-        GL20.glVertexAttribPointer(id, size, type, normalized, stride, offset);
-    }
-
-    public void enableVertexAttributeArray(String desc) {
-        enable();
-        int id = getUniformLocation(getActiveShaderProgramId(), desc);
-        GL20.glEnableVertexAttribArray(id);
-    }
-
-    public void disableVertexAttributeArray(String desc) {
-        enable();
-        int id = getUniformLocation(getActiveShaderProgramId(), desc);
-        GL20.glDisableVertexAttribArray(id);
     }
 
     private int getActiveShaderProgramId() {
