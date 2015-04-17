@@ -39,6 +39,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
+import org.terasology.rendering.opengl.FBO.Dimensions;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -149,19 +150,16 @@ public class LwjglRenderingProcess {
     private PBO readBackPBOBack;
     private PBO readBackPBOCurrent;
 
-    /* RTs */
-    private int rtFullWidth;
-    private int rtFullHeight;
-    private int rtWidth2;
-    private int rtHeight2;
-    private int rtWidth4;
-    private int rtHeight4;
-    private int rtWidth8;
-    private int rtHeight8;
-    private int rtWidth16;
-    private int rtHeight16;
-    private int rtWidth32;
-    private int rtHeight32;
+    // I could have named them fullResolution, halfResolution and so on. But halfScale is actually
+    // -both- fullScale's dimension halved, leading to -a quarter- of its resolution. Following
+    // this logic one32thScale would have to be named one1024thResolution and the otherwise
+    // straightforward connection between variable names and dimensions would have been lost. -- manu3d
+    private Dimensions fullScale;
+    private Dimensions halfScale;
+    private Dimensions quarterScale;
+    private Dimensions one8thScale;
+    private Dimensions one16thScale;
+    private Dimensions one32thScale;
 
     private int overwriteRtWidth;
     private int overwriteRtHeight;
@@ -221,42 +219,26 @@ public class LwjglRenderingProcess {
      * to zero.
      */
     private void createOrUpdateFullscreenFbos() {
-        rtFullWidth = overwriteRtWidth;
-        rtFullHeight = overwriteRtHeight;
 
-        if (overwriteRtWidth == 0) {
-            rtFullWidth = org.lwjgl.opengl.Display.getWidth();
-        }
-
-        if (overwriteRtHeight == 0) {
-            rtFullHeight = org.lwjgl.opengl.Display.getHeight();
-        }
-
-        rtFullWidth *= renderingConfig.getFboScale() / 100f;
-        rtFullHeight *= renderingConfig.getFboScale() / 100f;
-
-        if (renderingConfig.isOculusVrSupport()) {
-            if (overwriteRtWidth == 0) {
-                rtFullWidth *= OculusVrHelper.getScaleFactor();
-            }
-            if (overwriteRtHeight == 0) {
-                rtFullHeight *= OculusVrHelper.getScaleFactor();
+        if(overwriteRtWidth == 0) {
+            fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
+        } else {
+            fullScale = new Dimensions(overwriteRtWidth, overwriteRtHeight);
+            if (renderingConfig.isOculusVrSupport()) {
+                fullScale.multiplySelfBy(OculusVrHelper.getScaleFactor());
             }
         }
 
-        rtWidth2 = rtFullWidth / 2;
-        rtHeight2 = rtFullHeight / 2;
-        rtWidth4 = rtWidth2 / 2;
-        rtHeight4 = rtHeight2 / 2;
-        rtWidth8 = rtWidth4 / 2;
-        rtHeight8 = rtHeight4 / 2;
-        rtWidth16 = rtHeight8 / 2;
-        rtHeight16 = rtWidth8 / 2;
-        rtWidth32 = rtHeight16 / 2;
-        rtHeight32 = rtWidth16 / 2;
+        fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
+
+        halfScale    = fullScale.dividedBy(2);   // quarter resolution
+        quarterScale = fullScale.dividedBy(4);   // one 16th resolution
+        one8thScale  = fullScale.dividedBy(8);   // one 64th resolution
+        one16thScale = fullScale.dividedBy(16);  // one 256th resolution
+        one32thScale = fullScale.dividedBy(32);  // one 1024th resolution
 
         FBO scene = fboLookup.get("sceneOpaque");
-        final boolean recreate = scene == null || (scene.width() != rtFullWidth || scene.height() != rtFullHeight);
+        final boolean recreate = scene == null || (scene.dimensions().areDifferentFrom(fullScale));
 
         if (!recreate) {
             return;
@@ -268,38 +250,38 @@ public class LwjglRenderingProcess {
 
         // buffers for the initial renderings
         FBO sceneOpaque =
-                new FBObuilder("sceneOpaque", rtFullWidth, rtFullHeight, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
-        new FBObuilder("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+                new FBObuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+        new FBObuilder("sceneOpaquePingPong", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
 
-        new FBObuilder("sceneSkyBand0",   rtWidth16, rtHeight16, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneSkyBand1",   rtWidth32, rtHeight32, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand0", one16thScale, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand1", one32thScale, FBO.Type.DEFAULT).build();
 
-        FBO sceneReflectiveRefractive = new FBObuilder("sceneReflectiveRefractive", rtFullWidth, rtFullHeight, FBO.Type.HDR).useNormalBuffer().build();
+        FBO sceneReflectiveRefractive = new FBObuilder("sceneReflectiveRefractive", fullScale, FBO.Type.HDR).useNormalBuffer().build();
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
 
-        new FBObuilder("sceneReflected",  rtWidth2, rtHeight2, FBO.Type.DEFAULT).useDepthBuffer().build();
+        new FBObuilder("sceneReflected",  halfScale,    FBO.Type.DEFAULT).useDepthBuffer().build();
 
         // buffers for the prePost-Processing composite
-        new FBObuilder("sobel",           rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
-        new FBObuilder("ssao",            rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
-        new FBObuilder("ssaoBlurred",     rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
-        new FBObuilder("scenePrePost",    rtFullWidth, rtFullHeight, FBO.Type.HDR).build();
+        new FBObuilder("sobel",           fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("ssao",            fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("ssaoBlurred",     fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("scenePrePost",    fullScale,    FBO.Type.HDR).build();
 
         // buffers for the Initial Post-Processing
-        new FBObuilder("lightShafts",     rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneToneMapped", rtFullWidth, rtFullHeight, FBO.Type.HDR).build();
+        new FBObuilder("lightShafts",     halfScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneToneMapped", fullScale,    FBO.Type.HDR).build();
 
-        new FBObuilder("sceneHighPass",   rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBloom0",     rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBloom1",     rtWidth4,    rtHeight4,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBloom2",     rtWidth8,    rtHeight8,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneHighPass",   fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBloom0",     halfScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBloom1",     quarterScale, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBloom2",     one8thScale,  FBO.Type.DEFAULT).build();
 
-        new FBObuilder("sceneBlur0",      rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBlur1",      rtWidth2,    rtHeight2,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBlur0",      halfScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneBlur1",      halfScale,    FBO.Type.DEFAULT).build();
 
         // buffers for the Final Post-Processing
-        new FBObuilder("ocUndistorted",   rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneFinal",      rtFullWidth, rtFullHeight, FBO.Type.DEFAULT).build();
+        new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
     }
 
     public void deleteFBO(String title) {
@@ -572,7 +554,7 @@ public class LwjglRenderingProcess {
 
         reflected.bind();
 
-        glViewport(0, 0, reflected.width(), reflected.height());
+        setViewportTo(reflected.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glCullFace(GL11.GL_FRONT);
     }
@@ -580,7 +562,7 @@ public class LwjglRenderingProcess {
     public void endRenderReflectedScene() {
         GL11.glCullFace(GL11.GL_BACK);
         unbindFbo("sceneReflected");
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     public void beginRenderSceneShadowMap() {
@@ -592,7 +574,7 @@ public class LwjglRenderingProcess {
 
         shadowMap.bind();
 
-        glViewport(0, 0, shadowMap.width(), shadowMap.height());
+        setViewportTo(shadowMap.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glDisable(GL_CULL_FACE);
     }
@@ -600,7 +582,7 @@ public class LwjglRenderingProcess {
     public void endRenderSceneShadowMap() {
         GL11.glEnable(GL_CULL_FACE);
         unbindFbo("sceneShadowMap");
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     public void beginRenderSceneSky() {
@@ -724,13 +706,13 @@ public class LwjglRenderingProcess {
 
         switch (renderingStage) {
             case MONO:
-                renderFullscreenQuad(0, 0, rtFullWidth, rtFullHeight);
+                renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
                 break;
             case LEFT_EYE:
-                renderFullscreenQuad(0, 0, rtFullWidth / 2, rtFullHeight);
+                renderFullscreenQuad(0, 0, fullScale.width() / 2, fullScale.height());
                 break;
             case RIGHT_EYE:
-                renderFullscreenQuad(rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight);
+                renderFullscreenQuad(fullScale.width() / 2, 0, fullScale.width() / 2, fullScale.height());
                 break;
         }
 
@@ -738,10 +720,10 @@ public class LwjglRenderingProcess {
     }
 
     private void updateOcShaderParametersForVP(Material program, int vpX, int vpY, int vpWidth, int vpHeight, WorldRenderingStage renderingStage) {
-        float w = (float) vpWidth / rtFullWidth;
-        float h = (float) vpHeight / rtFullHeight;
-        float x = (float) vpX / rtFullWidth;
-        float y = (float) vpY / rtFullHeight;
+        float w = (float) vpWidth / fullScale.width();
+        float h = (float) vpHeight / fullScale.height();
+        float x = (float) vpX / fullScale.width();
+        float y = (float) vpY / fullScale.height();
 
         float as = (float) vpWidth / vpHeight;
 
@@ -767,7 +749,7 @@ public class LwjglRenderingProcess {
             material = Assets.getMaterial("engine:prog.ocDistortion");
             material.enable();
 
-            updateOcShaderParametersForVP(material, 0, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.LEFT_EYE);
+            updateOcShaderParametersForVP(material, 0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderingStage.LEFT_EYE);
         } else {
             if (renderingDebugConfig.isEnabled()) {
                 material = Assets.getMaterial("engine:prog.debug");
@@ -781,7 +763,7 @@ public class LwjglRenderingProcess {
         renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), org.lwjgl.opengl.Display.getHeight());
 
         if (renderingConfig.isOculusVrSupport()) {
-            updateOcShaderParametersForVP(material, rtFullWidth / 2, 0, rtFullWidth / 2, rtFullHeight, WorldRenderingStage.RIGHT_EYE);
+            updateOcShaderParametersForVP(material, fullScale.width() / 2, 0, fullScale.width() / 2, fullScale.height(), WorldRenderingStage.RIGHT_EYE);
 
             renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), Display.getHeight());
         }
@@ -865,13 +847,13 @@ public class LwjglRenderingProcess {
             bindFboTexture("sceneSkyBand" + (id - 1));
         }
 
-        glViewport(0, 0, skyBand.width(), skyBand.height());
+        setViewportTo(skyBand.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
         skyBand.unbind();
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateToneMappedScene() {
@@ -897,13 +879,13 @@ public class LwjglRenderingProcess {
 
         lightshaft.bind();
 
-        glViewport(0, 0, lightshaft.width(), lightshaft.height());
+        setViewportTo(lightshaft.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
         lightshaft.unbind();
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateSSAO() {
@@ -921,13 +903,13 @@ public class LwjglRenderingProcess {
 
         ssao.bind();
 
-        glViewport(0, 0, ssao.width(), ssao.height());
+        setViewportTo(ssao.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
         ssao.unbind();
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateSobel() {
@@ -941,13 +923,13 @@ public class LwjglRenderingProcess {
 
         sobel.bind();
 
-        glViewport(0, 0, sobel.width(), sobel.height());
+        setViewportTo(sobel.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
         sobel.unbind();
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateBlurredSSAO() {
@@ -963,14 +945,14 @@ public class LwjglRenderingProcess {
         shader.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
         ssao.bind();
 
-        glViewport(0, 0, ssao.width(), ssao.height());
+        setViewportTo(ssao.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         bindFboTexture("ssao");
 
         renderFullscreenQuad();
 
         ssao.unbind();
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generatePrePost() {
@@ -1009,15 +991,13 @@ public class LwjglRenderingProcess {
 //        sceneOpaque.bindDepthTexture();
 //        program.setInt("texDepth", texId++);
 
-        glViewport(0, 0, highPass.width(), highPass.height());
-
+        setViewportTo(highPass.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
         highPass.unbind();
-
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateBlur(int id) {
@@ -1036,8 +1016,7 @@ public class LwjglRenderingProcess {
 
         blur.bind();
 
-        glViewport(0, 0, blur.width(), blur.height());
-
+        setViewportTo(blur.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
@@ -1050,7 +1029,7 @@ public class LwjglRenderingProcess {
 
         blur.unbind();
 
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateBloom(int id) {
@@ -1069,8 +1048,7 @@ public class LwjglRenderingProcess {
 
         bloom.bind();
 
-        glViewport(0, 0, bloom.width(), bloom.height());
-
+        setViewportTo(bloom.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
@@ -1082,8 +1060,7 @@ public class LwjglRenderingProcess {
         renderFullscreenQuad();
 
         bloom.unbind();
-
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     private void generateDownsampledScene() {
@@ -1112,7 +1089,7 @@ public class LwjglRenderingProcess {
             unbindFbo("scene" + size);
         }
 
-        glViewport(0, 0, rtFullWidth, rtFullHeight);
+        setViewportToFullSize();
     }
 
     public void renderFullscreenQuad() {
@@ -1342,6 +1319,15 @@ public class LwjglRenderingProcess {
 
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
+    }
+
+
+    private void setViewportToFullSize() {
+        glViewport(0, 0, fullScale.width(), fullScale.height());
+    }
+
+    private void setViewportTo(Dimensions dimensions) {
+        glViewport(0, 0, dimensions.width(), dimensions.height());
     }
 
     /**

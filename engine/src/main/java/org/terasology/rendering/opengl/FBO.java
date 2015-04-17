@@ -188,7 +188,7 @@ public class FBO {
     /**
      * @return Returns the width and height of the FrameBuffer, as a Dimensions object.
      */
-    public Dimensions getDimensions() {
+    public Dimensions dimensions() {
         return dimensions;
     }
 
