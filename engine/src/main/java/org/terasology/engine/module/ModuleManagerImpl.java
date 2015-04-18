@@ -16,7 +16,6 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
@@ -36,9 +35,11 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
@@ -144,6 +145,10 @@ public class ModuleManagerImpl implements ModuleManager {
         moduleSecurityManager.getBasePermissionSet().addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(LoggerFactory.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(Logger.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(Reader.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(StringReader.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(BufferedReader.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(java.awt.datatransfer.UnsupportedFlavorException.class);
 
         APIScanner apiScanner = new APIScanner(moduleSecurityManager);
         for (Module module : registry) {
