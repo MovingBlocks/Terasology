@@ -250,7 +250,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.addResolver(AssetType.TEXTURE, new NoiseTextureAssetResolver());
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerLwjgl());
-        CoreRegistry.get(ShaderManager.class).initShaders();
     }
 
     private void checkOpenGL() {

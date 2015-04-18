@@ -119,8 +119,6 @@ public class LwjglRenderingProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglRenderingProcess.class);
 
-    private static LwjglRenderingProcess instance;
-
     /* PROPERTIES */
     @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
@@ -151,7 +149,7 @@ public class LwjglRenderingProcess {
     private PBO readBackPBOCurrent;
 
     // I could have named them fullResolution, halfResolution and so on. But halfScale is actually
-    // -both- fullScale's dimension halved, leading to -a quarter- of its resolution. Following
+    // -both- fullScale's dimensions halved, leading to -a quarter- of its resolution. Following
     // this logic one32thScale would have to be named one1024thResolution and the otherwise
     // straightforward connection between variable names and dimensions would have been lost. -- manu3d
     private Dimensions fullScale;
@@ -182,20 +180,6 @@ public class LwjglRenderingProcess {
 
     public LwjglRenderingProcess() {
         initialize();
-    }
-
-    /**
-     * Returns (and creates – if necessary) the static instance
-     * of this helper class.
-     *
-     * @return The instance
-     */
-    public static LwjglRenderingProcess getInstance() {
-        if (instance == null) {
-            instance = new LwjglRenderingProcess();
-        }
-
-        return instance;
     }
 
     public void initialize() {

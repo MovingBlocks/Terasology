@@ -37,8 +37,6 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        CoreRegistry.get(ShaderManager.class).initShaders();
-
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 

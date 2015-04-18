@@ -41,7 +41,8 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        FBO sceneOpaque = renderingProcess.getFBO("sceneOpaque");
 
         int texId = 0;
         if (sceneOpaque != null) {
@@ -60,7 +61,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            LwjglRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
+            renderingProcess.bindFboDepthTexture("sceneShadowMap");
             program.setInt("texSceneShadowMap", texId++, true);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();

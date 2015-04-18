@@ -155,9 +155,6 @@ public class DisplayEnvironment extends HeadlessEnvironment {
                 return new UISkin(uri, data);
             }
         });
-
-        // TODO: move somewhere else
-        CoreRegistry.put(ShaderManager.class, new ShaderManagerLwjgl()).initShaders();
     }
 
     @Override

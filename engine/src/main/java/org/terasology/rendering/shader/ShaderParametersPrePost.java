@@ -48,17 +48,19 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+
         Vector3f tint = CoreRegistry.get(WorldRenderer.class).getTint();
         program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        LwjglRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
+        renderingProcess.bindFboTexture("sceneOpaque");
         program.setInt("texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            LwjglRenderingProcess.getInstance().bindFboTexture("sceneBloom2");
+            renderingProcess.bindFboTexture("sceneBloom2");
             program.setInt("texBloom", texId++, true);
 
             program.setFloat("bloomFactor", bloomFactor, true);
@@ -68,7 +70,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            LwjglRenderingProcess.getInstance().bindFboTexture("lightShafts");
+            renderingProcess.bindFboTexture("lightShafts");
             program.setInt("texLightShafts", texId++, true);
         }
 

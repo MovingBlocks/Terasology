@@ -80,7 +80,7 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F12:
-                LwjglRenderingProcess.getInstance().takeScreenshot();
+                CoreRegistry.get(LwjglRenderingProcess.class).takeScreenshot();
                 CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera"));
                 break;
             default:
