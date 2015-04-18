@@ -35,7 +35,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.BlockMeshGenerator;
-import org.terasology.rendering.primitives.BlockMeshGenerator_SingleShape;
+import org.terasology.rendering.primitives.BlockMeshGeneratorSingleShape;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.biomes.Biome;
@@ -95,7 +95,7 @@ public final class Block {
     private boolean ice;
 
     // Rendering related
-    private BlockMeshGenerator meshGenerator = new BlockMeshGenerator_SingleShape(this);
+    private BlockMeshGenerator meshGenerator = new BlockMeshGeneratorSingleShape(this);
     private boolean translucent;
     private boolean doubleSided;
     private boolean shadowCasting = true;
@@ -291,7 +291,7 @@ public final class Block {
      */
     @Deprecated
     public void setInvisible(boolean invisible) {
-        if(invisible) {
+        if (invisible) {
             this.meshGenerator = null;
         }
     }
@@ -630,7 +630,7 @@ public final class Block {
 
         if (meshGenerator != null) {
             Mesh mesh = meshGenerator.getStandaloneMesh();
-            if(mesh != null) {
+            if (mesh != null) {
                 mesh.render();
             }
         }

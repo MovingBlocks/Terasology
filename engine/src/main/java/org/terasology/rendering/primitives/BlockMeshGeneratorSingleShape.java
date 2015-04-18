@@ -36,34 +36,34 @@ import java.util.Map;
 /**
  * Created by overminddl1 on 4/15/15.
  */
-public class BlockMeshGenerator_SingleShape implements BlockMeshGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(BlockMeshGenerator_SingleShape.class);
+public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(BlockMeshGeneratorSingleShape.class);
 
     private Block block;
     private Mesh mesh;
 
-    public BlockMeshGenerator_SingleShape(Block block) {
+    public BlockMeshGeneratorSingleShape(Block block) {
         this.block = block;
     }
 
     @Override
-    public void generateChunkMesh(ChunkView view, ChunkMesh mesh, int x, int y, int z) {
-        Biome biome = view.getBiome(x, y, z);
-        Block block = view.getBlock(x, y, z);
+    public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
+        Biome selfBiome = view.getBiome(x, y, z);
+        Block selfBlock = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
         ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
-        if (block.isWater()) {
+        if (selfBlock.isWater()) {
             if (view.getBlock(x, y + 1, z).isWater()) {
                 vertexFlag = ChunkVertexFlag.WATER;
             } else {
                 vertexFlag = ChunkVertexFlag.WATER_SURFACE;
             }
-        } else if (block.isLava()) {
+        } else if (selfBlock.isLava()) {
             vertexFlag = ChunkVertexFlag.LAVA;
-        } else if (block.isWaving() && block.isDoubleSided()) {
+        } else if (selfBlock.isWaving() && selfBlock.isDoubleSided()) {
             vertexFlag = ChunkVertexFlag.WAVING;
-        } else if (block.isWaving()) {
+        } else if (selfBlock.isWaving()) {
             vertexFlag = ChunkVertexFlag.WAVING_BLOCK;
         }
 
@@ -75,37 +75,37 @@ public class BlockMeshGenerator_SingleShape implements BlockMeshGenerator {
             adjacentBlocks.put(side, blockToCheck);
         }
 
-        BlockAppearance blockAppearance = block.getAppearance(adjacentBlocks);
+        BlockAppearance blockAppearance = selfBlock.getAppearance(adjacentBlocks);
 
         /*
          * Determine the render process.
          */
         ChunkMesh.RenderType renderType = ChunkMesh.RenderType.TRANSLUCENT;
 
-        if (!block.isTranslucent()) {
+        if (!selfBlock.isTranslucent()) {
             renderType = ChunkMesh.RenderType.OPAQUE;
         }
         // TODO: Review special case, or alternatively compare uris.
-        if (block.isWater() || block.isIce()) {
+        if (selfBlock.isWater() || selfBlock.isIce()) {
             renderType = ChunkMesh.RenderType.WATER_AND_ICE;
         }
-        if (block.isDoubleSided()) {
+        if (selfBlock.isDoubleSided()) {
             renderType = ChunkMesh.RenderType.BILLBOARD;
         }
 
         if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-            Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, biome);
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
+            Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
         }
 
         boolean[] drawDir = new boolean[6];
 
         for (Side side : Side.values()) {
-            drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), block, side);
+            drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side);
         }
 
-        // If the block is lowered, some more faces may have to be drawn
-        if (block.isLiquid()) {
+        // If the selfBlock is lowered, some more faces may have to be drawn
+        if (selfBlock.isLiquid()) {
             Block bottomBlock = adjacentBlocks.get(Side.BOTTOM);
             // Draw horizontal sides if visible from below
             for (Side side : Side.horizontalSides()) {
@@ -114,20 +114,20 @@ public class BlockMeshGenerator_SingleShape implements BlockMeshGenerator {
                 Block adjacent = adjacentBlocks.get(side);
 
                 boolean visible = (blockAppearance.getPart(BlockPart.fromSide(side)) != null
-                        && isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
+                        && isSideVisibleForBlockTypes(adjacentBelow, selfBlock, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
                 drawDir[side.ordinal()] |= visible;
             }
 
-            // Draw the top if below a non-lowered block
-            // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
+            // Draw the top if below a non-lowered selfBlock
+            // TODO: Don't need to render the top if each side and the selfBlock above each side are either liquid or opaque solids.
             Block blockToCheck = adjacentBlocks.get(Side.TOP);
             drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
             if (bottomBlock.isLiquid() || bottomBlock.isInvisible()) {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
-                        Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), biome);
-                        block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
+                        Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
+                        selfBlock.getLoweredLiquidMesh(dir).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
                     }
                 }
                 return;
@@ -136,13 +136,13 @@ public class BlockMeshGenerator_SingleShape implements BlockMeshGenerator {
 
         for (Side dir : Side.values()) {
             if (drawDir[dir.ordinal()]) {
-                Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), biome);
+                Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
-                if (block.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
+                if (selfBlock.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
+                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
                 } else {
                     //if(dir == Side.TOP) logger.info("Generating: " + (new Vector3i(x, y, z)).toString() + " " + view.getChunkRegion().toString() + " " + dir.toString());
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
+                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
                 }
             }
         }
