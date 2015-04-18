@@ -34,6 +34,8 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.primitives.BlockMeshGenerator;
+import org.terasology.rendering.primitives.BlockMeshGeneratorSingleShape;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.biomes.Biome;
@@ -93,7 +95,7 @@ public final class Block {
     private boolean ice;
 
     // Rendering related
-    private boolean invisible;
+    private BlockMeshGenerator meshGenerator = new BlockMeshGeneratorSingleShape(this);
     private boolean translucent;
     private boolean doubleSided;
     private boolean shadowCasting = true;
@@ -122,8 +124,6 @@ public final class Block {
     private boolean directPickup;
     private boolean stackable = true;
 
-    /* Mesh */
-    private Mesh mesh;
     private BlockAppearance primaryAppearance = new BlockAppearance();
     // TODO: Remove once liquids have nicer generation
     private Map<Side, BlockMeshPart> loweredLiquidMesh = Maps.newEnumMap(Side.class);
@@ -262,14 +262,38 @@ public final class Block {
     }
 
     /**
-     * @return Whether this block needs to be rendered at all
+     * @return The BlockMeshGenerator that is used in rendering, null if invisible.
      */
-    public boolean isInvisible() {
-        return invisible;
+    public BlockMeshGenerator getMeshGenerator() {
+        return meshGenerator;
     }
 
+    /**
+     * @param meshGenerator The new BlockMeshGenerator to use in rendering this block.
+     *                      If meshGenerator is null then this block is invisible.
+     */
+    public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
+        this.meshGenerator = meshGenerator;
+    }
+
+    /**
+     * @return Whether this block needs to be rendered at all
+     * @deprecated Use getMeshGenerator()==null instead.
+     */
+    @Deprecated()
+    public boolean isInvisible() {
+        return meshGenerator == null;
+    }
+
+    /**
+     * @param invisible Set if invisible
+     * @deprecated Use setMeshGenerator() instead.
+     */
+    @Deprecated
     public void setInvisible(boolean invisible) {
-        this.invisible = invisible;
+        if (invisible) {
+            this.meshGenerator = null;
+        }
     }
 
     /**
@@ -512,11 +536,16 @@ public final class Block {
     }
 
 
+    /**
+     * @return Standalone mesh
+     * @deprecated Use getMeshGenerator() instead.
+     */
+    @Deprecated
     public Mesh getMesh() {
-        if (mesh == null || mesh.isDisposed()) {
-            generateMesh();
+        if (meshGenerator != null) {
+            return meshGenerator.getStandaloneMesh();
         }
-        return mesh;
+        return new Tessellator().generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
     }
 
     public BlockMeshPart getLoweredLiquidMesh(Side side) {
@@ -599,31 +628,14 @@ public final class Block {
         mat.setFloat("sunlight", sunlight);
         mat.setFloat("blockLight", blockLight);
 
-        if (mesh == null || mesh.isDisposed()) {
-            generateMesh();
-        } else if (mesh.isDisposed()) {
-            logger.error("Cannot render disposed mesh");
-            return;
-        }
-
-        mesh.render();
-
-        mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-    }
-
-    private void generateMesh() {
-        Tessellator tessellator = new Tessellator();
-        for (BlockPart dir : BlockPart.values()) {
-            BlockMeshPart part = primaryAppearance.getPart(dir);
-            if (part != null) {
-                if (doubleSided) {
-                    tessellator.addMeshPartDoubleSided(part);
-                } else {
-                    tessellator.addMeshPart(part);
-                }
+        if (meshGenerator != null) {
+            Mesh mesh = meshGenerator.getStandaloneMesh();
+            if (mesh != null) {
+                mesh.render();
             }
         }
-        mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
+
+        mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     @Override
