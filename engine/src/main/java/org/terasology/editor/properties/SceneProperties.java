@@ -38,9 +38,9 @@ public class SceneProperties implements PropertyProvider {
         if (backdropRenderer != null) {
             result.addAll(new ReflectionProvider(backdropRenderer).getProperties());
         }
-        LwjglRenderingProcess postRenderer = LwjglRenderingProcess.getInstance();
-        if (postRenderer != null) {
-            result.addAll(new ReflectionProvider(postRenderer).getProperties());
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        if (renderingProcess != null) {
+            result.addAll(new ReflectionProvider(renderingProcess).getProperties());
         }
         return result;
     }

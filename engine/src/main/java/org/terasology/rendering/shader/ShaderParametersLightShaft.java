@@ -47,7 +47,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO scene = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        FBO scene = renderingProcess.getFBO("sceneOpaque");
 
         int texId = 0;
 

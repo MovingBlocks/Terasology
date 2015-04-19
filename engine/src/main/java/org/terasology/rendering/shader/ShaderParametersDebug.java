@@ -37,51 +37,53 @@ public class ShaderParametersDebug extends ShaderParametersBase {
 
         int texId = 0;
 
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+
         switch (config.getRendering().getDebug().getStage()) {
             case SHADOW_MAP:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboDepthTexture("sceneShadowMap");
+                renderingProcess.bindFboDepthTexture("sceneShadowMap");
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
+                renderingProcess.bindFboTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_NORMALS:
             case OPAQUE_SUNLIGHT:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboNormalsTexture("sceneOpaque");
+                renderingProcess.bindFboNormalsTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_DEPTH:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboDepthTexture("sceneOpaque");
+                renderingProcess.bindFboDepthTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_LIGHT_BUFFER:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboLightBufferTexture("sceneOpaque");
+                renderingProcess.bindFboLightBufferTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
             case TRANSPARENT_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sceneReflectiveRefractive");
+                renderingProcess.bindFboTexture("sceneReflectiveRefractive");
                 program.setInt("texDebug", texId++, true);
                 break;
             case SSAO:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("ssaoBlurred");
+                renderingProcess.bindFboTexture("ssaoBlurred");
                 program.setInt("texDebug", texId++, true);
                 break;
             case SOBEL:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sobel");
+                renderingProcess.bindFboTexture("sobel");
                 program.setInt("texDebug", texId++, true);
                 break;
             case BAKED_OCCLUSION:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
+                renderingProcess.bindFboTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
             case RECONSTRUCTED_POSITION:
@@ -91,27 +93,27 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 }
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboDepthTexture("sceneOpaque");
+                renderingProcess.bindFboDepthTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
             case BLOOM:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sceneBloom2");
+                renderingProcess.bindFboTexture("sceneBloom2");
                 program.setInt("texDebug", texId++, true);
                 break;
             case HIGH_PASS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sceneHighPass");
+                renderingProcess.bindFboTexture("sceneHighPass");
                 program.setInt("texDebug", texId++, true);
                 break;
             case SKY_BAND:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
+                renderingProcess.bindFboTexture("sceneSkyBand1");
                 program.setInt("texDebug", texId++, true);
                 break;
             case LIGHT_SHAFTS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                LwjglRenderingProcess.getInstance().bindFboTexture("lightShafts");
+                renderingProcess.bindFboTexture("lightShafts");
                 program.setInt("texDebug", texId++, true);
                 break;
             default:

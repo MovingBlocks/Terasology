@@ -158,8 +158,9 @@ public class HeadlessGraphics implements EngineSubsystem {
         assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
         assetManager.addResolver(AssetType.TEXTURE, new NoiseTextureAssetResolver());
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
+
+        // TODO: why headless cares about shaders?
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerHeadless());
-        CoreRegistry.get(ShaderManager.class).initShaders();
     }
 
     @Override

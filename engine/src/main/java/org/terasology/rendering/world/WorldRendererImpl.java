@@ -104,7 +104,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private RenderingConfig renderingConfig = config.getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
-    // TODO: rendering process as constructor input and setRenderingProcess method
+    private LwjglRenderingProcess renderingProcess;
 
     public WorldRendererImpl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
                              WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
@@ -124,10 +124,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         localPlayerSystem.setPlayerCamera(playerCamera);
 
         initMainDirectionalLight();
-        initMaterials();
 
         renderableWorld = new RenderableWorldImpl(worldProvider, chunkProvider, bufferPool, playerCamera, shadowMapCamera);
         renderQueues = renderableWorld.getRenderQueues();
+
+        initRenderingSupport();
     }
 
     private void initMainDirectionalLight() {
@@ -137,6 +138,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         mainDirectionalLight.lightAmbientIntensity = 1.0f;
         mainDirectionalLight.lightDiffuseIntensity = 2.0f;
         mainDirectionalLight.lightSpecularIntensity = 0.0f;
+    }
+
+    private void initRenderingSupport() {
+        renderingProcess = new LwjglRenderingProcess();
+        CoreRegistry.put(LwjglRenderingProcess.class, renderingProcess);
+
+        CoreRegistry.get(ShaderManager.class).initShaders();
+        initMaterials();
     }
 
     private void initMaterials() {
@@ -250,10 +259,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderShadowMap();
         renderWorldReflection();
 
-        LwjglRenderingProcess.getInstance().enableWireframeIf(renderingDebugConfig.isWireframe());
-        LwjglRenderingProcess.getInstance().clear();
+        renderingProcess.enableWireframeIf(renderingDebugConfig.isWireframe());
+        renderingProcess.clear();
 
-        LwjglRenderingProcess.getInstance().beginRenderSceneOpaque();
+        renderingProcess.beginRenderSceneOpaque();
         renderSky();
 
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
@@ -263,13 +272,13 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderOverlays();
             renderFirstPersonView();
 
-            LwjglRenderingProcess.getInstance().endRenderSceneOpaque();
+            renderingProcess.endRenderSceneOpaque();
 
             renderLightGeometry();
             renderChunksRefractiveReflective();
         }
 
-        LwjglRenderingProcess.getInstance().disableWireframeIf(renderingDebugConfig.isWireframe());
+        renderingProcess.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         combineRefractiveReflectiveAndOpaquePasses();
         renderSimpleBlendMaterialsIntoCombinedPass();
@@ -283,7 +292,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
             PerformanceMonitor.startActivity("Render World (Shadow Map)");
 
-            LwjglRenderingProcess.getInstance().beginRenderSceneShadowMap();
+            renderingProcess.beginRenderSceneShadowMap();
             shadowMapCamera.lookThrough();
 
             while (renderQueues.chunksOpaqueShadow.size() > 0) {
@@ -295,7 +304,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             }
 
             playerCamera.lookThrough(); // not strictly needed: just defensive programming here.
-            LwjglRenderingProcess.getInstance().endRenderSceneShadowMap();
+            renderingProcess.endRenderSceneShadowMap();
 
             PerformanceMonitor.endActivity();
         }
@@ -304,7 +313,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void renderWorldReflection() {
         PerformanceMonitor.startActivity("Render World (Reflection)");
 
-        LwjglRenderingProcess.getInstance().beginRenderReflectedScene();
+        renderingProcess.beginRenderReflectedScene();
         playerCamera.setReflected(true);
 
         playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
@@ -322,7 +331,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         playerCamera.setReflected(false);
-        LwjglRenderingProcess.getInstance().endRenderReflectedScene();
+        renderingProcess.endRenderReflectedScene();
 
         PerformanceMonitor.endActivity();
     }
@@ -330,9 +339,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void renderSky() {
         PerformanceMonitor.startActivity("Render Sky");
         playerCamera.lookThroughNormalized();
-        LwjglRenderingProcess.getInstance().beginRenderSceneSky();
+        renderingProcess.beginRenderSceneSky();
         backdropRenderer.render(playerCamera);
-        LwjglRenderingProcess.getInstance().endRenderSceneSky();
+        renderingProcess.endRenderSceneSky();
         playerCamera.lookThrough();
         PerformanceMonitor.endActivity();
     }
@@ -372,7 +381,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void renderFirstPersonView() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
-            LwjglRenderingProcess.getInstance().beginRenderFirstPerson();
+            renderingProcess.beginRenderFirstPerson();
 
             playerCamera.updateMatrices(90f);
             playerCamera.loadProjectionMatrix();
@@ -384,7 +393,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             playerCamera.updateMatrices();
             playerCamera.loadProjectionMatrix();
 
-            LwjglRenderingProcess.getInstance().endRenderFirstPerson();
+            renderingProcess.endRenderFirstPerson();
             PerformanceMonitor.endActivity();
         }
     }
@@ -393,7 +402,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Light Geometry");
         // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
         /*
-        LwjglRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
+        renderingProcess.beginRenderLightGeometryStencilPass();
 
         simple.enable();
         simple.setCamera(playerCamera);
@@ -406,10 +415,10 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderLightComponent(lightComponent, worldPosition, simple, true);
         }
 
-        LwjglRenderingProcess.getInstance().endRenderLightGeometryStencilPass();
+        renderingProcess.endRenderLightGeometryStencilPass();
         */
 
-        LwjglRenderingProcess.getInstance().beginRenderLightGeometry();
+        renderingProcess.beginRenderLightGeometry();
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
@@ -418,17 +427,17 @@ public final class WorldRendererImpl implements WorldRenderer {
             final Vector3f worldPosition = locationComponent.getWorldPosition();
             renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
-        LwjglRenderingProcess.getInstance().endRenderLightGeometry();
+        renderingProcess.endRenderLightGeometry();
 
         // Sunlight
-        LwjglRenderingProcess.getInstance().beginRenderDirectionalLights();
+        renderingProcess.beginRenderDirectionalLights();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
         sunlightWorldPosition.add(playerCamera.getPosition());
         renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
 
-        LwjglRenderingProcess.getInstance().endRenderDirectionalLights();
+        renderingProcess.endRenderDirectionalLights();
         PerformanceMonitor.endActivity();
     }
 
@@ -486,7 +495,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             LightGeometryHelper.renderSphereGeometry();
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
             // Directional lights cover all pixels on the screen
-            LwjglRenderingProcess.getInstance().renderFullscreenQuad();
+            renderingProcess.renderFullscreenQuad();
         }
 
         if (!geometryOnly) {
@@ -504,37 +513,37 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Chunks (Refractive/Reflective)");
 
         boolean isHeadUnderWater = isHeadUnderWater();
-        LwjglRenderingProcess.getInstance().beginRenderSceneReflectiveRefractive(isHeadUnderWater);
+        renderingProcess.beginRenderSceneReflectiveRefractive(isHeadUnderWater);
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             renderChunk(renderQueues.chunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
         }
 
-        LwjglRenderingProcess.getInstance().endRenderSceneReflectiveRefractive(isHeadUnderWater);
+        renderingProcess.endRenderSceneReflectiveRefractive(isHeadUnderWater);
         PerformanceMonitor.endActivity();
     }
 
     private void combineRefractiveReflectiveAndOpaquePasses() {
         PerformanceMonitor.startActivity("Render Combined Scene");
-        LwjglRenderingProcess.getInstance().renderPreCombinedScene();
+        renderingProcess.renderPreCombinedScene();
         PerformanceMonitor.endActivity();
     }
 
     private void renderSimpleBlendMaterialsIntoCombinedPass() {
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
-        LwjglRenderingProcess.getInstance().beginRenderSimpleBlendMaterialsIntoCombinedPass();
+        renderingProcess.beginRenderSimpleBlendMaterialsIntoCombinedPass();
 
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderAlphaBlend();
         }
 
-        LwjglRenderingProcess.getInstance().endRenderSimpleBlendMaterialsIntoCombinedPass();
+        renderingProcess.endRenderSimpleBlendMaterialsIntoCombinedPass();
         PerformanceMonitor.endActivity();
     }
 
     private void renderFinalPostProcessedScene() {
         PerformanceMonitor.startActivity("Render Post-Processing");
-        LwjglRenderingProcess.getInstance().renderPost(currentRenderingStage);
+        renderingProcess.renderPost(currentRenderingStage);
         PerformanceMonitor.endActivity();
     }
 
@@ -574,7 +583,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 CoreRegistry.get(ShaderManager.class).disableShader();
             }
 
-            LwjglRenderingProcess.getInstance().preChunkRenderSetup(chunkPositionRelativeToCamera);
+            renderingProcess.preChunkRenderSetup(chunkPositionRelativeToCamera);
 
             if (chunk.hasMesh()) {
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
@@ -587,7 +596,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 statRenderedTriangles += chunk.getMesh().triangleCount();
             }
 
-            LwjglRenderingProcess.getInstance().postChunkRenderCleanup();
+            renderingProcess.postChunkRenderCleanup();
 
             // TODO: review - moving the deactivateFeature commands to the analog codeblock above doesn't work. Why?
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {

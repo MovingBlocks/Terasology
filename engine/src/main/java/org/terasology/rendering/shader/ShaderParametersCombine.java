@@ -50,7 +50,8 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         int texId = 0;
 
-        FBO sceneOpaque = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        FBO sceneOpaque = renderingProcess.getFBO("sceneOpaque");
 
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -70,7 +71,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        FBO sceneReflectiveRefractive = LwjglRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
+        FBO sceneReflectiveRefractive = renderingProcess.getFBO("sceneReflectiveRefractive");
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -94,13 +95,13 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            LwjglRenderingProcess.getInstance().bindFboTexture("ssaoBlurred");
+            renderingProcess.bindFboTexture("ssaoBlurred");
             program.setInt("texSsao", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            LwjglRenderingProcess.getInstance().bindFboTexture("sobel");
+            renderingProcess.bindFboTexture("sobel");
             program.setInt("texEdges", texId++, true);
 
             program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
@@ -109,7 +110,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            LwjglRenderingProcess.getInstance().bindFboTexture("sceneSkyBand1");
+            renderingProcess.bindFboTexture("sceneSkyBand1");
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();

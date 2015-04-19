@@ -92,7 +92,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO scene = LwjglRenderingProcess.getInstance().getFBO("sceneOpaque");
+        FBO scene = CoreRegistry.get(LwjglRenderingProcess.class).getFBO("sceneOpaque");
 
         int texId = 0;
 

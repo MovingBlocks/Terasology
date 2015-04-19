@@ -88,6 +88,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             return;
         }
 
+        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
@@ -108,10 +110,10 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         program.setInt("textureEffects", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        LwjglRenderingProcess.getInstance().bindFboTexture("sceneReflected");
+        renderingProcess.bindFboTexture("sceneReflected");
         program.setInt("textureWaterReflection", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        LwjglRenderingProcess.getInstance().bindFboTexture("sceneOpaque");
+        renderingProcess.bindFboTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
