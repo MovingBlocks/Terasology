@@ -124,7 +124,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            EntityRef item = blockItemFactory.newInstance(block.getBlockFamily(), 1);
+            EntityRef item = blockItemFactory.newInstance(block.getBlockFamily(), entity);
             entity.send(new OnBlockToItem(item));
 
             if (shouldDropToWorld(event, block, blockDamageModifierComponent, item)) {

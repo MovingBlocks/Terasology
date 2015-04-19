@@ -85,4 +85,32 @@ public class BlockItemFactory {
         return builder.build();
     }
 
+    public EntityRef newInstance(BlockFamily blockFamily, EntityRef blockEntity) {
+        if (blockFamily == null) {
+            return EntityRef.NULL;
+        }
+
+        EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
+        if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
+            builder.addComponent(new LightComponent());
+        }
+
+        // Copy the components from block prefab into the block item
+        for (Component component : blockEntity.iterateComponents()) {
+            if (component.getClass().getAnnotation(AddToBlockBasedItem.class) != null) {
+                builder.addComponent(entityManager.getComponentLibrary().copy(component));
+            }
+        }
+
+        ItemComponent item = builder.getComponent(ItemComponent.class);
+        if (blockFamily.getArchetypeBlock().isStackable()) {
+            item.stackId = "block:" + blockFamily.getURI().toString();
+            item.stackCount = (byte) 1;
+        }
+
+        BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
+        blockItem.blockFamily = blockFamily;
+
+        return builder.build();
+    }
 }
