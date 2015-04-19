@@ -41,7 +41,7 @@ public class IntegerRangeHandlerTest {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 3);
         String rangeStr = handler.getAsString(range);
-        assertEquals("1.3", rangeStr);
+        assertEquals("1..3", rangeStr);
         validateRange(handler.getFromString(rangeStr), 1, 2, 3);
     }
 
@@ -60,7 +60,7 @@ public class IntegerRangeHandlerTest {
         range.addNumbers(1, 3);
         range.addNumbers(5, 6);
         String rangeStr = handler.getAsString(range);
-        assertEquals("1.3,5.6", rangeStr);
+        assertEquals("1..3,5..6", rangeStr);
         validateRange(handler.getFromString(rangeStr), 1, 2, 3, 5, 6);
     }
 
@@ -70,7 +70,7 @@ public class IntegerRangeHandlerTest {
         range.addNumbers(1, 5);
         range.addNumbers(3, 6);
         String rangeStr = handler.getAsString(range);
-        assertEquals("1.6", rangeStr);
+        assertEquals("1..6", rangeStr);
         validateRange(handler.getFromString(rangeStr), 1, 2, 3, 4, 5, 6);
     }
 

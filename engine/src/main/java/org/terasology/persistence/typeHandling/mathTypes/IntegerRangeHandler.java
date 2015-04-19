@@ -53,7 +53,7 @@ public class IntegerRangeHandler extends StringRepresentationTypeHandler<Integer
             sb.append(',');
         }
         if (rangeStart != rangeEnd) {
-            sb.append(rangeStart).append('.').append(rangeEnd);
+            sb.append(rangeStart).append("..").append(rangeEnd);
         } else {
             sb.append(rangeStart);
         }
@@ -65,7 +65,7 @@ public class IntegerRangeHandler extends StringRepresentationTypeHandler<Integer
         IntegerRange range = new IntegerRange();
         for (String rangePart : rangeParts) {
             if (!rangePart.isEmpty()) {
-                String[] parts = rangePart.split("\\.");
+                String[] parts = rangePart.split("\\.\\.");
                 if (parts.length == 2) {
                     range.addNumbers(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
                 } else if (parts.length == 1) {
