@@ -16,12 +16,13 @@
 package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.math.IntegerRange;
 import org.terasology.math.Side;
 
 import java.util.List;
 import java.util.Map;
 
 public class InventoryAccessComponent implements Component {
-    public Map<Side, List<Integer>> input;
-    public Map<Side, List<Integer>> output;
+    public Map<String, IntegerRange> input;
+    public Map<String, IntegerRange> output;
 }
