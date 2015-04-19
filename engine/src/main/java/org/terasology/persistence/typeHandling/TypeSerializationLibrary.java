@@ -29,6 +29,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.math.IntegerRange;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -58,6 +59,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandl
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
@@ -158,6 +160,7 @@ public class TypeSerializationLibrary {
         serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(AssetType.BEHAVIOR, BehaviorTree.class));
+        serializationLibrary.add(IntegerRange.class, new IntegerRangeHandler());
         return serializationLibrary;
     }
 
