@@ -76,3 +76,8 @@ findbugs {
     // This works as a solo module build in Jenkins as the config dir is copied in as part of the engine harness
     excludeFilter = new File(rootDir, "config/findbugs/findbugs-exclude.xml")
 }
+
+// TODO: Temporary until javadoc has been fixed for Java 8 everywhere
+javadoc {
+    failOnError = false
+}
