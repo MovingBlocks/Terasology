@@ -108,7 +108,7 @@ May vary by version and based on what modules are enabled
 * Axe / Pickaxe / Shovel - Faster right-click removal of some blocks
 * Torch - Shiny! Place with left click. Try throwing these in water at night
 * Explosion tool - Big bada boom!
-* Railgun  - Bigger bada boom, in a straight line!
+* Railgun  - Bigger bada boom, in a straight line! *Use with caution! May causes severe lag*
 * Goodie chest - place it and open with 'e' for assorted goodies
 
 More or completely alternative line-ups with certain modules / world types selected
