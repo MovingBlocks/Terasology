@@ -46,6 +46,7 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
@@ -105,6 +106,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
     private LwjglRenderingProcess renderingProcess;
+    private GraphicState graphicState;
 
     public WorldRendererImpl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
                              WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
@@ -143,6 +145,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void initRenderingSupport() {
         renderingProcess = new LwjglRenderingProcess();
         CoreRegistry.put(LwjglRenderingProcess.class, renderingProcess);
+
+        graphicState = new GraphicState(renderingProcess);
+
+        renderingProcess.setGraphicState(graphicState);
+        renderingProcess.initialize();
 
         CoreRegistry.get(ShaderManager.class).initShaders();
         initMaterials();
@@ -259,10 +266,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderShadowMap();
         renderWorldReflection();
 
-        renderingProcess.enableWireframeIf(renderingDebugConfig.isWireframe());
-        renderingProcess.clear();
+        graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
+        graphicState.clear();
 
-        renderingProcess.beginRenderSceneOpaque();
+        graphicState.beginRenderSceneOpaque();
         renderSky();
 
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
@@ -272,13 +279,13 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderOverlays();
             renderFirstPersonView();
 
-            renderingProcess.endRenderSceneOpaque();
+            graphicState.endRenderSceneOpaque();
 
             renderLightGeometry();
             renderChunksRefractiveReflective();
         }
 
-        renderingProcess.disableWireframeIf(renderingDebugConfig.isWireframe());
+        graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         combineRefractiveReflectiveAndOpaquePasses();
         renderSimpleBlendMaterialsIntoCombinedPass();
@@ -292,7 +299,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
             PerformanceMonitor.startActivity("Render World (Shadow Map)");
 
-            renderingProcess.beginRenderSceneShadowMap();
+            graphicState.beginRenderSceneShadowMap();
             shadowMapCamera.lookThrough();
 
             while (renderQueues.chunksOpaqueShadow.size() > 0) {
@@ -304,7 +311,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             }
 
             playerCamera.lookThrough(); // not strictly needed: just defensive programming here.
-            renderingProcess.endRenderSceneShadowMap();
+            graphicState.endRenderSceneShadowMap();
 
             PerformanceMonitor.endActivity();
         }
@@ -313,7 +320,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void renderWorldReflection() {
         PerformanceMonitor.startActivity("Render World (Reflection)");
 
-        renderingProcess.beginRenderReflectedScene();
+        graphicState.beginRenderReflectedScene();
         playerCamera.setReflected(true);
 
         playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
@@ -331,7 +338,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         playerCamera.setReflected(false);
-        renderingProcess.endRenderReflectedScene();
+        graphicState.endRenderReflectedScene();
 
         PerformanceMonitor.endActivity();
     }
@@ -339,9 +346,18 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void renderSky() {
         PerformanceMonitor.startActivity("Render Sky");
         playerCamera.lookThroughNormalized();
-        renderingProcess.beginRenderSceneSky();
+        graphicState.beginRenderSceneSky();
+
         backdropRenderer.render(playerCamera);
-        renderingProcess.endRenderSceneSky();
+        graphicState.endRenderSceneSky();
+
+        if (renderingConfig.isInscattering()) {
+            renderingProcess.generateSkyBand(0);
+            renderingProcess.generateSkyBand(1);
+        }
+
+        graphicState.endRenderSkyBands();
+
         playerCamera.lookThrough();
         PerformanceMonitor.endActivity();
     }
@@ -381,7 +397,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void renderFirstPersonView() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
-            renderingProcess.beginRenderFirstPerson();
+            graphicState.beginRenderFirstPerson();
 
             playerCamera.updateMatrices(90f);
             playerCamera.loadProjectionMatrix();
@@ -393,7 +409,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             playerCamera.updateMatrices();
             playerCamera.loadProjectionMatrix();
 
-            renderingProcess.endRenderFirstPerson();
+            graphicState.endRenderFirstPerson();
             PerformanceMonitor.endActivity();
         }
     }
@@ -402,7 +418,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Light Geometry");
         // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
         /*
-        renderingProcess.beginRenderLightGeometryStencilPass();
+        graphicState.beginRenderLightGeometryStencilPass();
 
         simple.enable();
         simple.setCamera(playerCamera);
@@ -415,10 +431,10 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderLightComponent(lightComponent, worldPosition, simple, true);
         }
 
-        renderingProcess.endRenderLightGeometryStencilPass();
+        graphicState.endRenderLightGeometryStencilPass();
         */
 
-        renderingProcess.beginRenderLightGeometry();
+        graphicState.beginRenderLightGeometry();
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
@@ -427,17 +443,17 @@ public final class WorldRendererImpl implements WorldRenderer {
             final Vector3f worldPosition = locationComponent.getWorldPosition();
             renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
-        renderingProcess.endRenderLightGeometry();
+        graphicState.endRenderLightGeometry();
 
         // Sunlight
-        renderingProcess.beginRenderDirectionalLights();
+        graphicState.beginRenderDirectionalLights();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
         sunlightWorldPosition.add(playerCamera.getPosition());
         renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
 
-        renderingProcess.endRenderDirectionalLights();
+        graphicState.endRenderDirectionalLights();
         PerformanceMonitor.endActivity();
     }
 
@@ -513,13 +529,13 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Chunks (Refractive/Reflective)");
 
         boolean isHeadUnderWater = isHeadUnderWater();
-        renderingProcess.beginRenderSceneReflectiveRefractive(isHeadUnderWater);
+        graphicState.beginRenderSceneReflectiveRefractive(isHeadUnderWater);
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             renderChunk(renderQueues.chunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
         }
 
-        renderingProcess.endRenderSceneReflectiveRefractive(isHeadUnderWater);
+        graphicState.endRenderSceneReflectiveRefractive(isHeadUnderWater);
         PerformanceMonitor.endActivity();
     }
 
@@ -531,13 +547,13 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void renderSimpleBlendMaterialsIntoCombinedPass() {
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
-        renderingProcess.beginRenderSimpleBlendMaterialsIntoCombinedPass();
+        graphicState.beginRenderSimpleBlendMaterialsIntoCombinedPass();
 
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderAlphaBlend();
         }
 
-        renderingProcess.endRenderSimpleBlendMaterialsIntoCombinedPass();
+        graphicState.endRenderSimpleBlendMaterialsIntoCombinedPass();
         PerformanceMonitor.endActivity();
     }
 
@@ -583,7 +599,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 CoreRegistry.get(ShaderManager.class).disableShader();
             }
 
-            renderingProcess.preChunkRenderSetup(chunkPositionRelativeToCamera);
+            graphicState.preChunkRenderSetup(chunkPositionRelativeToCamera);
 
             if (chunk.hasMesh()) {
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
@@ -596,7 +612,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 statRenderedTriangles += chunk.getMesh().triangleCount();
             }
 
-            renderingProcess.postChunkRenderCleanup();
+            graphicState.postChunkRenderCleanup();
 
             // TODO: review - moving the deactivateFeature commands to the analog codeblock above doesn't work. Why?
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
@@ -618,6 +634,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
+        graphicState.dispose();
     }
 
     /**
