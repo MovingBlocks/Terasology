@@ -24,6 +24,8 @@ import org.terasology.rendering.opengl.FBO.Dimensions;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
@@ -36,114 +38,118 @@ public class GraphicState {
 
     private LwjglRenderingProcess renderingProcess;
     private Dimensions fullScale;
+    private Buffers buffers  = new Buffers();
 
     public GraphicState(LwjglRenderingProcess renderingProcess) {
+        // a reference to the renderingProcess is not strictly necessary, as it is used only
+        // in refreshDynamicFBOs() and it could be passed as argument to it. We do it this
+        // way however to maintain similarity with the way the PostProcessor will work.
+        // TODO: update the comment above when the PostProcessor is in place.
         this.renderingProcess = renderingProcess;
     }
 
     public void dispose() {
         renderingProcess = null;
         fullScale = null;
+        buffers = null;
     }
 
-    public void clear() {
-        renderingProcess.bindFbo("sceneOpaque");
+    public void refreshDynamicFBOs() {
+        buffers.sceneOpaque               = renderingProcess.getFBO("sceneOpaque");
+        buffers.sceneReflectiveRefractive = renderingProcess.getFBO("sceneReflectiveRefractive");
+        buffers.sceneReflected            = renderingProcess.getFBO("sceneReflected");
+        fullScale = buffers.sceneOpaque.dimensions();
+    }
+
+    public void setSceneShadowMap(FBO newShadowMap) {
+        buffers.sceneShadowMap = newShadowMap;
+    }
+
+    public void initialClearing() {
+        buffers.sceneOpaque.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderingProcess.unbindFbo("sceneOpaque");
-        renderingProcess.bindFbo("sceneReflectiveRefractive");
+        buffers.sceneReflectiveRefractive.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderingProcess.unbindFbo("sceneReflectiveRefractive");
+        bindDisplay();
     }
 
-    public void beginRenderSceneOpaque() {
-        renderingProcess.bindFbo("sceneOpaque");
-        setRenderBufferMask("sceneOpaque", true, true, true);
+    public void preRenderSetupSceneOpaque() {
+        buffers.sceneOpaque.bind();
+        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
     }
 
-    public void endRenderSceneOpaque() {
-        setRenderBufferMask("sceneOpaque", true, true, true);
-        renderingProcess.unbindFbo("sceneOpaque");
+    public void postRenderCleanupSceneOpaque() {
+        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
+        bindDisplay();
     }
 
-    public void enableWireframeIf(boolean isWireframeEnabledInRenderingDebugConfig) {
-        if (isWireframeEnabledInRenderingDebugConfig) {
+    public void enableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
+        if (wireframeIsEnabledInRenderingDebugConfig) {
             GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
     }
 
-    public void disableWireframeIf(boolean isWireframeEnabledInRenderingDebugConfig) {
-        if (isWireframeEnabledInRenderingDebugConfig) {
+    public void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
+        if (wireframeIsEnabledInRenderingDebugConfig) {
             GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
     }
 
-    public void beginRenderSceneShadowMap() {
-        FBO shadowMap = renderingProcess.getFBO("sceneShadowMap");
+    public void preRenderSetupSceneShadowMap() {
+        buffers.sceneShadowMap.bind();
 
-        if (shadowMap == null) {
-            return;
-        }
-
-        shadowMap.bind();
-
-        setViewportTo(shadowMap.dimensions());
+        setViewportToSizeOf(buffers.sceneShadowMap);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glDisable(GL_CULL_FACE);
     }
 
-    public void endRenderSceneShadowMap() {
+    public void postRenderCleanupSceneShadowMap() {
         GL11.glEnable(GL_CULL_FACE);
-        renderingProcess.unbindFbo("sceneShadowMap");
-        setViewportToFullSize();
+        bindDisplay();
+        setViewportToWholeDisplay();
     }
 
-    public void beginRenderReflectedScene() {
-        FBO reflected = renderingProcess.getFBO("sceneReflected");
+    public void preRenderSetupReflectedScene() {
+        buffers.sceneReflected.bind();
 
-        if (reflected == null) {
-            return;
-        }
-
-        reflected.bind();
-
-        setViewportTo(reflected.dimensions());
+        setViewportToSizeOf(buffers.sceneReflected);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glCullFace(GL11.GL_FRONT);
     }
 
-    public void endRenderReflectedScene() {
+    public void postRenderCleanupReflectedScene() {
         GL11.glCullFace(GL11.GL_BACK);
-        renderingProcess.unbindFbo("sceneReflected");
-        setViewportToFullSize();
+        bindDisplay();
+        setViewportToWholeDisplay();
     }
 
-    public void beginRenderSceneSky() {
-        setRenderBufferMask("sceneOpaque", true, false, false);
+    public void preRenderSetupBackdrop() {
+        setRenderBufferMask(buffers.sceneOpaque, true, false, false);
     }
 
-    public void endRenderSceneSky() {
-        setRenderBufferMask("sceneOpaque", true, true, true);
+    public void midRenderChangesBackdrop() {
+        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
     }
 
-    public void endRenderSkyBands() {
-        renderingProcess.bindFbo("sceneOpaque");
+    public void postRenderCleanupBackdrop() {
+        buffers.sceneOpaque.bind();
     }
 
-    public void beginRenderFirstPerson() {
+    public void preRenderSetupFirstPerson() {
         GL11.glPushMatrix();
         GL11.glLoadIdentity();
         GL11.glDepthFunc(GL11.GL_ALWAYS);
     }
 
-    public void endRenderFirstPerson() {
+    public void postRenderClenaupFirstPerson() {
         GL11.glDepthFunc(GL_LEQUAL);
         GL11.glPopMatrix();
     }
 
     // TODO: figure how lighting works and what this does
-    public void beginRenderLightGeometryStencilPass() {
-        renderingProcess.bindFbo("sceneOpaque");
-        setRenderBufferMask("sceneOpaque", false, false, false);
+    public void preRenderSetupLightGeometryStencil() {
+        buffers.sceneOpaque.bind();
+        setRenderBufferMask(buffers.sceneOpaque, false, false, false);
         glDepthMask(false);
 
         glClear(GL_STENCIL_BUFFER_BIT);
@@ -159,16 +165,16 @@ public class GraphicState {
     }
 
     // TODO: figure how lighting works and what this does
-    public void endRenderLightGeometryStencilPass() {
-        setRenderBufferMask("sceneOpaque", true, true, true);
-        renderingProcess.unbindFbo("sceneOpaque");
+    public void postRenderCleanupLightGeometryStencil() {
+        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
+        bindDisplay();
     }
 
-    public void beginRenderLightGeometry() {
-        renderingProcess.bindFbo("sceneOpaque");
+    public void preRenderSetupLightGeometry() {
+        buffers.sceneOpaque.bind();
 
         // Only write to the light buffer
-        setRenderBufferMask("sceneOpaque", false, false, true);
+        setRenderBufferMask(buffers.sceneOpaque, false, false, true);
 
         glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 
@@ -182,38 +188,29 @@ public class GraphicState {
         glCullFace(GL_FRONT);
     }
 
-    public void endRenderLightGeometry() {
+    public void postRenderCleanupLightGeometry() {
         glDisable(GL_STENCIL_TEST);
         glCullFace(GL_BACK);
 
-        renderingProcess.unbindFbo("sceneOpaque");
+        bindDisplay();
     }
 
-    public void beginRenderDirectionalLights() {
-        renderingProcess.bindFbo("sceneOpaque");
+    public void preRenderSetupDirectionalLights() {
+        buffers.sceneOpaque.bind();
     }
 
-    public void endRenderDirectionalLights() {
+    public void postRenderCleanupDirectionalLights() {
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glEnable(GL_DEPTH_TEST);
 
-        setRenderBufferMask("sceneOpaque", true, true, true);
-        renderingProcess.unbindFbo("sceneOpaque");
-
-        renderingProcess.applyLightBufferPass("sceneOpaque");
+        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
+        bindDisplay();
     }
 
-    public void beginRenderSimpleBlendMaterialsIntoCombinedPass() {
-        beginRenderSceneOpaque();
-        GL11.glEnable(GL_BLEND);
-        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDepthMask(false);
-    }
-
-    public void beginRenderSceneReflectiveRefractive(boolean isHeadUnderWater) {
-        renderingProcess.bindFbo("sceneReflectiveRefractive");
+    public void preRenderSetupSceneReflectiveRefractive(boolean isHeadUnderWater) {
+        buffers.sceneReflectiveRefractive.bind();
 
         // Make sure the water surface is rendered if the player is underwater.
         if (isHeadUnderWater) {
@@ -221,32 +218,34 @@ public class GraphicState {
         }
     }
 
-    public void endRenderSceneReflectiveRefractive(boolean isHeadUnderWater) {
+    public void postRenderCleanupSceneReflectiveRefractive(boolean isHeadUnderWater) {
         if (isHeadUnderWater) {
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
 
-        renderingProcess.unbindFbo("sceneReflectiveRefractive");
+        bindDisplay();
     }
 
-    public void endRenderSimpleBlendMaterialsIntoCombinedPass() {
+    public void preRenderSetupSimpleBlendMaterials() {
+        preRenderSetupSceneOpaque();
+        GL11.glEnable(GL_BLEND);
+        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDepthMask(false);
+    }
+
+    public void postRenderCleanupSimpleBlendMaterials() {
         GL11.glDisable(GL_BLEND);
         GL11.glDepthMask(true);
-        endRenderSceneOpaque();
+        postRenderCleanupSceneOpaque();
     }
 
-    public void preChunkRenderSetup(Vector3f chunkPositionRelativeToCamera) {
+    public void preRenderSetupChunk(Vector3f chunkPositionRelativeToCamera) {
         GL11.glPushMatrix();
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
     }
 
-    public void postChunkRenderCleanup() {
+    public void postRenderCleanupChunk() {
         GL11.glPopMatrix();
-    }
-
-    public void setRenderBufferMask(String fboName, boolean color, boolean normal, boolean lightBuffer) {
-        FBO fbo = renderingProcess.getFBO(fboName);
-        setRenderBufferMask(fbo, color, normal, lightBuffer);
     }
 
     public void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
@@ -260,24 +259,18 @@ public class GraphicState {
 
         if (fbo.colorBufferTextureId != 0) {
             if (color) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId++);
             }
-
-            attachmentId++;
         }
         if (fbo.normalsBufferTextureId != 0) {
             if (normal) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId++);
             }
-
-            attachmentId++;
         }
         if (fbo.lightBufferTextureId != 0) {
             if (lightBuffer) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
-
-            attachmentId++;
         }
 
         bufferIds.flip();
@@ -285,15 +278,22 @@ public class GraphicState {
         GL20.glDrawBuffers(bufferIds);
     }
 
-    public void setViewportToFullSize() {
+    public void setViewportToWholeDisplay() {
         glViewport(0, 0, fullScale.width(), fullScale.height());
     }
 
-    public void setViewportTo(Dimensions dimensions) {
-        glViewport(0, 0, dimensions.width(), dimensions.height());
+    public void setViewportToSizeOf(FBO fbo) {
+        glViewport(0, 0, fbo.width(), fbo.height());
     }
 
-    public void setFullScale(Dimensions newDimensions) {
-        fullScale = newDimensions;
+    public void bindDisplay() {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    }
+
+    private class Buffers {
+        public FBO sceneOpaque;
+        public FBO sceneReflectiveRefractive;
+        public FBO sceneReflected;
+        public FBO sceneShadowMap;
     }
 }

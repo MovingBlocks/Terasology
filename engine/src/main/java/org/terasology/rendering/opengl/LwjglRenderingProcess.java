@@ -206,7 +206,9 @@ public class LwjglRenderingProcess {
 
         // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
         int shadowMapResolution = renderingConfig.getShadowMapResolution();
-        new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        FBO sceneShadowMap =
+                new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        graphicState.setSceneShadowMap(sceneShadowMap);
 
         // buffers for the initial renderings
         FBO sceneOpaque =
@@ -243,7 +245,7 @@ public class LwjglRenderingProcess {
         new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
 
-        graphicState.setFullScale(fullScale);
+        graphicState.refreshDynamicFBOs();
     }
 
     public void deleteFBO(String title) {
@@ -528,9 +530,9 @@ public class LwjglRenderingProcess {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        String fboName = target + "PingPong";
-        bindFbo(fboName);
-        graphicState.setRenderBufferMask(fboName, true, true, true);
+        FBO targetPingPong = getFBO(target + "PingPong");
+        targetPingPong.bind();
+        graphicState.setRenderBufferMask(targetPingPong, true, true, true);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -546,15 +548,14 @@ public class LwjglRenderingProcess {
     }
 
     public void generateSkyBand(int id) {
-        String fboName = "sceneSkyBand" + id;
-        FBO skyBand = getFBO(fboName);
+        FBO skyBand = getFBO("sceneSkyBand" + id);
 
         if (skyBand == null) {
             return;
         }
 
         skyBand.bind();
-        graphicState.setRenderBufferMask(fboName, true, false, false);
+        graphicState.setRenderBufferMask(skyBand, true, false, false);
 
         Material material = Assets.getMaterial("engine:prog.blur");
 
