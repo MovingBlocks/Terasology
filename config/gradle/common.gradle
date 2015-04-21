@@ -25,6 +25,19 @@ repositories {
     }
 }
 
+configurations {
+    codeMetrics
+}
+
+dependencies {
+    codeMetrics(group: 'org.terasology.config', name: 'codemetrics', version: '1.0.0', ext: 'zip')
+
+    checkstyle ('com.puppycrawl.tools:checkstyle:6.5')
+    pmd ('net.sourceforge.pmd:pmd-core:5.3.0')
+    pmd ('net.sourceforge.pmd:pmd-java:5.3.0')
+    // the FindBugs version is set in the configuration
+}
+
 task sourceJar(type: Jar) {
     description = "Create a JAR with all sources"
     from sourceSets.main.allSource
@@ -55,17 +68,25 @@ test {
     }
 }
 
-// The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds
-// Solo module builds in Jenkins get a copy of the config dir from the engine harness so it still lives at root/config
 checkstyle {
     ignoreFailures = true
-    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
+    config = resources.text.fromArchiveEntry(configurations.codeMetrics, "checkstyle/checkstyle.xml")
+    // this assigns the property variable ${samedir} in checkstyle.xml
+    configProperties.samedir = config.asFile().parent
+}
+
+configure([checkstyleMain, checkstyleTest]) { 
+    doFirst {
+        def suppressions = resources.text.fromArchiveEntry(configurations.codeMetrics, "checkstyle/suppressions.xml")
+        // the asFile() method extracts the file from the zip archive and puts it next to checkstyle.xml
+        // this procedure should not be done in the config phase, since the clean task would erase the file before it can be used
+        suppressions.asFile()
+    }
 }
 
 pmd {
     ignoreFailures = true
-    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+    ruleSetConfig = resources.text.fromArchiveEntry(configurations.codeMetrics, "pmd/pmd.xml")
     // by default, gradle uses both ruleset file AND the rulesets. 
     // We override the ruleSets to use only those from the file 
     ruleSets = []
@@ -73,8 +94,8 @@ pmd {
 
 findbugs {
     ignoreFailures = true
-    // This works as a solo module build in Jenkins as the config dir is copied in as part of the engine harness
-    excludeFilter = new File(rootDir, "config/findbugs/findbugs-exclude.xml")
+    toolVersion = '3.0.1'
+    excludeFilterConfig = resources.text.fromArchiveEntry(configurations.codeMetrics, "findbugs/findbugs-exclude.xml")
 }
 
 // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
