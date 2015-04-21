@@ -1,12 +1,12 @@
 # Ignore general
 /.*
+!.gitattributes
 !.gitignore
 *~
 ._*
 *.bak
 
 # Ignore Gradle, including local override properties (template file available under /templates)
-/.gradle/
 build/
 gradle.properties
 
