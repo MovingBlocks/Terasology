@@ -39,7 +39,7 @@ import org.terasology.world.block.Block;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TunnelAction extends BaseComponentSystem {
 
-    /** The most blocks that can be destroyed before the action ends (counts duplicates, so actually way lower */
+    /** The most blocks that can be destroyed before the action ends (counts duplicates, so actually way lower) */
     private static final int MAX_DESTROYED_BLOCKS = 5000;
 
     /** How many effects to display at the most */
