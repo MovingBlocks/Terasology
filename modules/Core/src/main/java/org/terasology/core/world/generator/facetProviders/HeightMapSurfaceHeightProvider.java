@@ -22,8 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Component;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.properties.OneOf.List;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
@@ -33,12 +35,18 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.rendering.nui.properties.OneOf.Enum;
 
 import com.google.common.math.IntMath;
 
 @Produces(SurfaceHeightFacet.class)
 @Requires(@Facet(SeaLevelFacet.class))
 public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider {
+
+    public enum WrapMode {
+        CLAMP,
+        REPEAT
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(HeightMapSurfaceHeightProvider.class);
 
@@ -53,7 +61,7 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
     public void setSeed(long seed) {
         logger.info("Reading height map..");
 
-        Texture texture = Assets.getTexture("core:platec_heightmap");
+        Texture texture = Assets.getTexture("core", configuration.heightMap);
         ByteBuffer[] bb = texture.getData().getBuffers();
         IntBuffer intBuf = bb[0].asIntBuffer();
 
@@ -66,9 +74,6 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
             long val = intBuf.get() & 0xFFFFFFFFL;
             heightmap[pos % mapWidth][pos / mapWidth] = val / (256 * 256 * 256 * 256f);
         }
-
-        heightmap = shiftArray(rotateArray(heightmap), -50, -100);
-
     }
 
     @Override
@@ -79,20 +84,36 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
         for (Vector2i pos : facet.getWorldRegion()) {
             int xzScale = configuration.terrainScale;
 
-            int wrapX = IntMath.mod(pos.getX(), mapWidth * xzScale);
-            int wrapZ = IntMath.mod(pos.getY(), mapHeight * xzScale);
+            int mapX0;
+            int mapZ0;
+            int mapX1;
+            int mapZ1;
+            switch (configuration.wrapMode) {
+                case CLAMP:
+                    mapX0 = TeraMath.clamp(pos.getX(), 0, mapWidth * xzScale - 1) / xzScale;
+                    mapZ0 = TeraMath.clamp(pos.getY(), 0, mapHeight * xzScale - 1) / xzScale;
+                    mapX1 = TeraMath.clamp(mapX0 + 1, 0, mapWidth - 1);
+                    mapZ1 = TeraMath.clamp(mapZ0 + 1, 0, mapHeight - 1);
+                    break;
+                case REPEAT:
+                    mapX0 = IntMath.mod(pos.getX(), mapWidth * xzScale) / xzScale;
+                    mapZ0 = IntMath.mod(pos.getY(), mapHeight * xzScale) / xzScale;
+                    mapX1 = IntMath.mod(mapX0 + 1, mapWidth);
+                    mapZ1 = IntMath.mod(mapZ0 + 1, mapHeight);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not supported: " + configuration.wrapMode);
+            }
 
-            int mapX = wrapX / xzScale;
-            int mapZ = wrapZ / xzScale;
-            double p00 = heightmap[mapX][mapZ];
-            double p10 = heightmap[(mapX - 1 + 512) % 512][(mapZ) % 512];
-            double p11 = heightmap[(mapX - 1 + 512) % 512][(mapZ + 1 + 512) % 512];
-            double p01 = heightmap[(mapX) % 512][(mapZ + 1 + 512) % 512];
+            double p00 = heightmap[mapX0][mapZ0];
+            double p10 = heightmap[mapX1][mapZ0];
+            double p11 = heightmap[mapX1][mapZ1];
+            double p01 = heightmap[mapX0][mapZ1];
 
-            float relX = (wrapX % xzScale) / (float) xzScale;
-            float relZ = (wrapZ % xzScale) / (float) xzScale;
+            float relX = IntMath.mod(pos.getX(), xzScale) / (float) xzScale;
+            float relZ = IntMath.mod(pos.getY(), xzScale) / (float) xzScale;
 
-            float interpolatedHeight = (float) lerp(relX, lerp(relZ, p10, p11), lerp(relZ, p00, p01));
+            float interpolatedHeight = (float) lerp(relX, lerp(relZ, p00, p01), lerp(relZ, p10, p11));
             float height = configuration.heightOffset + configuration.heightScale * interpolatedHeight;
 
             facet.setWorld(pos, height);
@@ -102,34 +123,16 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
 
     }
 
-    //helper functions for the Mapdesign until real mapGen is in
-    public static float[][] rotateArray(float[][] array) {
-        float[][] newArray = new float[array[0].length][array.length];
-        for (int i = 0; i < newArray.length; i++) {
-            for (int j = 0; j < newArray[0].length; j++) {
-                newArray[i][j] = array[j][array[j].length - i - 1];
-            }
-        }
-        return newArray;
-    }
-
-    public static float[][] shiftArray(float[][] array, int x, int y) {
-        int size = array.length;
-        float[][] newArray = new float[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                newArray[i][j] = array[(i + x + size) % size][(j + y + size) % size];
-            }
-        }
-        return newArray;
-    }
-
     private static double lerp(double t, double a, double b) {
         return a + fade(t) * (b - a);  //not sure if i should fade t, needs a bit longer to generate chunks but is definately nicer
     }
 
     private static double fade(double t) {
-        return t * t * t * (t * (t * 6 - 15) + 10);
+        // This is Perlin
+//        return t * t * t * (t * (t * 6 - 15) + 10);
+
+        // This is Hermite
+        return t * t * (3 - 2 * t);
     }
 
     @Override
@@ -149,13 +152,19 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
 
     private static class HeightMapConfiguration implements Component {
 
-        @Range(min = 0, max = 50f, increment = 1f, precision = 0, description = "Height Offset")
-        private float heightOffset = 5;
+        @Enum(description = "Wrap Mode")
+        private WrapMode wrapMode = WrapMode.REPEAT;
 
-        @Range(min = 10, max = 200f, increment = 10f, precision = 0, description = "Height Scale Factor")
-        private float heightScale = 80;
+        @List(items = { "platec_heightmap", "opposing_islands" }, description = "Height Map")
+        private String heightMap = "platec_heightmap";
+
+        @Range(min = 0, max = 50f, increment = 1f, precision = 0, description = "Height Offset")
+        private float heightOffset = 12;
+
+        @Range(min = 10, max = 200f, increment = 1f, precision = 0, description = "Height Scale Factor")
+        private float heightScale = 70;
 
         @Range(min = 1, max = 32, increment = 1, precision = 0, description = "Terrain Scale Factor")
-        private int terrainScale = 4;
+        private int terrainScale = 8;
     }
 }
