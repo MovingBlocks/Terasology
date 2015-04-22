@@ -26,18 +26,51 @@ import java.util.List;
  *
  */
 public abstract class StringTextRenderer<T> extends AbstractItemRenderer<T> {
+    private final boolean wrap;
+
+    protected StringTextRenderer() {
+        this(true);
+    }
+
+    protected StringTextRenderer(boolean wrap) {
+        this.wrap = wrap;
+    }
 
     @Override
     public void draw(T value, Canvas canvas) {
-        canvas.drawText(getString(value));
-
+        if (wrap) {
+            canvas.drawText(getString(value));
+        } else {
+            int width = canvas.size().x;
+            Font font = canvas.getCurrentStyle().getFont();
+            String text = getString(value);
+            if (font.getWidth(text) <= width) {
+                canvas.drawText(text);
+            } else {
+                String shortText = "...";
+                StringBuilder sb = new StringBuilder(text);
+                while (sb.length() > 0) {
+                    shortText = sb.toString() + "...";
+                    if (font.getWidth(shortText) <= width) {
+                        break;
+                    }
+                    sb.setLength(sb.length() - 1);
+                }
+                canvas.drawText(shortText);
+            }
+        }
     }
 
     @Override
     public Vector2i getPreferredSize(T value, Canvas canvas) {
         Font font = canvas.getCurrentStyle().getFont();
-        List<String> lines = TextLineBuilder.getLines(font, getString(value), canvas.size().x);
-        return font.getSize(lines);
+        String text = getString(value);
+        if (wrap) {
+            List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x);
+            return font.getSize(lines);
+        } else {
+            return new Vector2i(font.getWidth(text), font.getLineHeight());
+        }
     }
 
     public abstract String getString(T value);
