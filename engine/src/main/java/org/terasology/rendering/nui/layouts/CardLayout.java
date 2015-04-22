@@ -62,7 +62,7 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         if (defaultCard != null) {
             UIWidget widget = widgets.get(defaultCard);
             if (widget != null) {
-                widget.onDraw(canvas);
+                canvas.drawWidget(widget);
             }
         }
     }
