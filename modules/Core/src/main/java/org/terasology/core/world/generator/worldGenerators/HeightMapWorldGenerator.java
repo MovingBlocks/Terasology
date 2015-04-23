@@ -43,6 +43,7 @@ public class HeightMapWorldGenerator extends BaseFacetedWorldGenerator {
     @Override
     protected WorldBuilder createWorld(long seed) {
         return new WorldBuilder(seed)
+                .setSeaLevel(16)
                 .addProvider(new SeaLevelProvider(16))
                 .addProvider(new HeightMapSurfaceHeightProvider())
                 .addProvider(new PerlinHumidityProvider())

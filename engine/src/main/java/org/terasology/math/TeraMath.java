@@ -767,6 +767,40 @@ public final class TeraMath {
         return (val >= 0 && val != i) ? i + 1 : i;
     }
 
+    /**
+     * Rotates a given 2D array by 90 degrees
+     * @param array an array with equal size in both dimensions
+     * @return a new, rotated array
+     */
+    public static float[][] rotateArray(float[][] array) {
+        int size = array.length;
+        float[][] newArray = new float[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                newArray[i][j] = array[j][size - i - 1];
+            }
+        }
+        return newArray;
+    }
+
+    /**
+     * Shifts all elements given 2D array by given offsets (wraps around)
+     * @param array an array with equal size in both dimensions
+     * @param x the offset in x direction
+     * @param y the offset in y direction
+     * @return a new, shifted array
+     */
+    public static float[][] shiftArray(float[][] array, int x, int y) {
+        int size = array.length;
+        float[][] newArray = new float[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                newArray[i][j] = array[(i + x + size) % size][(j + y + size) % size];
+            }
+        }
+        return newArray;
+    }
+
     // TODO: This doesn't belong in this class, move it.
 
     /**
