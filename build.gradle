@@ -75,7 +75,7 @@ repositories {
     mavenCentral()
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
-        url "http://artifactory.terasology.org:8081/artifactory/repo"
+        url "http://artifactory.terasology.org:8081/artifactory/virtual-repo-live"
     }
 }
 
@@ -83,14 +83,18 @@ repositories {
 // Natives - Handles pulling in and extracting native libraries for LWJGL                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Define a custom configuration named "natives"
+// Define configurations for natives and config
 configurations {
     natives
+    codeMetrics
 }
 
-// For the "natives" configuration make it depend on the native files from LWJGL
 dependencies {
+    // For the "natives" configuration make it depend on the native files from LWJGL
     natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
+
+    // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
+    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.0.0', ext: 'zip'
 }
 
 task extractWindowsNatives(type:Sync) {
@@ -133,12 +137,24 @@ task extractNatives {
 // Helper tasks                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+task extractConfig (type: Copy) {
+    description = "Extracts our configuration files from the zip we fetched as a dependency"
+    configurations.codeMetrics.each { File file ->
+        println file.name
+        // Doing it this way doesn't feel quite right ... probably a better way to source the zip we want directly
+        from (zipTree(file))
+    }
+
+    into "$rootDir/config"
+}
+
 // Helper that returns a list of all local Terasology module projects
 def terasologyModules() {
     subprojects.findAll {it.parent.name == 'modules'}
 }
 
 // Helper that replaces the build.gradle under every module with a fresh copy from the Core module
+// TODO: Fix, not working well if at all :(
 task refreshModuleGradle << {
     File replacementGradle = new File(rootDir, 'modules/Core/build.gradle')
     terasologyModules().each {
