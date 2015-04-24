@@ -219,6 +219,10 @@
                 "down" : {
                     "background" : "buttonDown",
                     "text-color" : "FFFF00FF"
+                },
+                "disabled" : {
+                    "background" : "button",
+                    "text-color" : "BBBBBBFF"
                 }
             }
         },
