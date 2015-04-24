@@ -139,12 +139,11 @@ task extractNatives {
 
 task extractConfig (type: Copy) {
     description = "Extracts our configuration files from the zip we fetched as a dependency"
-    configurations.codeMetrics.each { File file ->
-        println file.name
-        // Doing it this way doesn't feel quite right ... probably a better way to source the zip we want directly
-        from (zipTree(file))
+    from {
+        configurations.codeMetrics.collect {
+            zipTree(it)
+        }
     }
-
     into "$rootDir/config"
 }
 

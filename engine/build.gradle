@@ -82,15 +82,6 @@ configurations {
     devCompile.extendsFrom compile
 }
 
-configure([checkstyleDev]) { 
-    doFirst {
-        def suppressions = resources.text.fromArchiveEntry(configurations.codeMetrics, "checkstyle/suppressions.xml")
-        // the asFile() method extracts the file from the zip archive and puts it next to checkstyle.xml
-        // this procedure should not be done in the config phase, since the clean task would erase the file before it can be used
-        suppressions.asFile()
-    }
-}
-
 // TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
@@ -253,3 +244,8 @@ idea {
         downloadSources = true
     }
 }
+
+// Make sure our config file for code analytics get extracted (vulnerability: non-IDE execution of single analytic)
+ideaModule.dependsOn rootProject.extractConfig
+tasks.eclipse.dependsOn rootProject.extractConfig
+check.dependsOn rootProject.extractConfig

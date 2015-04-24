@@ -25,13 +25,7 @@ repositories {
     }
 }
 
-configurations {
-    codeMetrics
-}
-
 dependencies {
-    codeMetrics(group: 'org.terasology.config', name: 'codemetrics', version: '1.0.0', ext: 'zip')
-
     checkstyle ('com.puppycrawl.tools:checkstyle:6.5')
     pmd ('net.sourceforge.pmd:pmd-core:5.3.0')
     pmd ('net.sourceforge.pmd:pmd-java:5.3.0')
@@ -68,34 +62,26 @@ test {
     }
 }
 
+// The config files here work in both a multi-project workspace (IDEs, running from source) and for solo module builds
+// Solo module builds in Jenkins get a copy of the config dir from the engine harness so it still lives at root/config
+// TODO: Maybe update other projects like modules to pull the zipped dependency so fewer quirks are needed in Jenkins
 checkstyle {
     ignoreFailures = true
-    config = resources.text.fromArchiveEntry(configurations.codeMetrics, "checkstyle/checkstyle.xml")
-    // this assigns the property variable ${samedir} in checkstyle.xml
-    configProperties.samedir = config.asFile().parent
-}
-
-configure([checkstyleMain, checkstyleTest]) { 
-    doFirst {
-        def suppressions = resources.text.fromArchiveEntry(configurations.codeMetrics, "checkstyle/suppressions.xml")
-        // the asFile() method extracts the file from the zip archive and puts it next to checkstyle.xml
-        // this procedure should not be done in the config phase, since the clean task would erase the file before it can be used
-        suppressions.asFile()
-    }
+    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+    configProperties.samedir = checkstyle.configFile.parentFile
 }
 
 pmd {
     ignoreFailures = true
-    ruleSetConfig = resources.text.fromArchiveEntry(configurations.codeMetrics, "pmd/pmd.xml")
-    // by default, gradle uses both ruleset file AND the rulesets. 
-    // We override the ruleSets to use only those from the file 
+    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+    // By default, gradle uses both ruleset file AND the rulesets. Override the ruleSets to use only those from the file
     ruleSets = []
 }
 
 findbugs {
     ignoreFailures = true
     toolVersion = '3.0.1'
-    excludeFilterConfig = resources.text.fromArchiveEntry(configurations.codeMetrics, "findbugs/findbugs-exclude.xml")
+    excludeFilter = new File(rootDir, "config/findbugs/findbugs-exclude.xml")
 }
 
 // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
