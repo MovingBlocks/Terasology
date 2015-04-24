@@ -15,15 +15,16 @@
  */
 package org.terasology.rendering.primitives;
 
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
-import org.terasology.world.block.Block;
 
 /**
  * This is used to generate Mesh data from a block in a chunk to a ChunkMesh output.
  *
  * Created by overminddl1 on 4/15/15.
  */
+@API
 public interface BlockMeshGenerator {
 
     /**
