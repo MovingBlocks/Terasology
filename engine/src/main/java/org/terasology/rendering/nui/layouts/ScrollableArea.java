@@ -42,9 +42,13 @@ public class ScrollableArea extends CoreLayout {
 
     @LayoutConfig
     private boolean stickToBottom;
+    @LayoutConfig
+    private boolean verticalScrollbar = true;
+    @LayoutConfig
+    private boolean horizontalScrollbar;
 
-    private UIScrollbar scrollbar = new UIScrollbar();
-
+    private UIScrollbar verticalBar = new UIScrollbar(true);
+    private UIScrollbar horizontalBar = new UIScrollbar(false);
 
     private boolean moveToBottomPending;
     private boolean moveToTopPending;
@@ -52,41 +56,118 @@ public class ScrollableArea extends CoreLayout {
     private InteractionListener scrollListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
-            scrollbar.setValue(scrollbar.getValue() + wheelTurns * SCROLL_MULTIPLIER);
+            // If there are two scrollbars, we assume vertical has priority
+            if (verticalScrollbar) {
+                verticalBar.setValue(verticalBar.getValue() + wheelTurns * SCROLL_MULTIPLIER);
+            } else if (horizontalScrollbar) {
+                horizontalBar.setValue(horizontalBar.getValue() + wheelTurns * SCROLL_MULTIPLIER);
+            }
             return true;
         }
     };
 
     @Override
     public void onDraw(Canvas canvas) {
-        int contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x, Integer.MAX_VALUE)).y;
-        if (canvas.size().y < contentHeight) {
-            int scrollbarWidth = canvas.calculateRestrictedSize(scrollbar, canvas.size()).x;
-            contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x - scrollbarWidth, Integer.MAX_VALUE)).y;
+        int availableWidth = canvas.size().x;
+        int availableHeight = canvas.size().y;
 
-            boolean atBottom = scrollbar.getRange() == scrollbar.getValue();
+        // First, try to layout it without any scroll bars
+        Vector2i contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth, availableHeight));
+        if (contentSize.x <= availableWidth && contentSize.y <= availableHeight) {
+            canvas.drawWidget(content, Rect2i.createFromMinAndSize(new Vector2i(0, 0), new Vector2i(availableWidth, availableHeight)));
+            return;
+        }
 
-            Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y);
-            scrollbar.setRange(contentHeight - contentRegion.height());
-            if ((stickToBottom && atBottom) || moveToBottomPending) {
-                scrollbar.setValue(scrollbar.getRange());
-                moveToBottomPending = false;
+        // Second, try to layout it just with vertical bar (if supported)
+        if (verticalScrollbar) {
+            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).x;
+            int scrollbarHeight = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).y;
+
+            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth - scrollbarWidth, availableHeight));
+            if (horizontalScrollbar && contentSize.x > availableWidth - scrollbarWidth) {
+                if (contentSize.y > availableHeight - scrollbarHeight) {
+                    layoutWithBothScrollbars(canvas, contentSize, availableWidth, availableHeight, scrollbarWidth, scrollbarHeight);
+                } else {
+                    contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth, availableHeight - scrollbarHeight));
+                    layoutWithJustHorizontal(canvas, contentSize, availableWidth, availableHeight, scrollbarHeight);
+                }
+            } else {
+                layoutWithJustVertical(canvas, contentSize, availableWidth, availableHeight, scrollbarWidth);
             }
-            if (moveToTopPending) {
-                scrollbar.setValue(0);
-                moveToTopPending = false;
-            }
+        } else if (horizontalScrollbar) {
+            // Well we know that just horizontal is allowed
+            int scrollbarHeight = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).y;
+            availableHeight -= scrollbarHeight;
 
-            canvas.addInteractionRegion(scrollListener);
-            canvas.drawWidget(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
-                    scrollbarWidth, canvas.size().y));
-
-            // Draw content
-            try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
-                canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));
-            }
+            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth, availableHeight - scrollbarHeight));
+            layoutWithJustHorizontal(canvas, contentSize, availableWidth, availableHeight, scrollbarHeight);
         } else {
-            canvas.drawWidget(content);
+            throw new IllegalStateException("ScrollableArea without any scrollbar allowed, what's the point of that?!");
+        }
+    }
+
+    private void layoutWithBothScrollbars(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarWidth, int scrollbarHeight) {
+        availableWidth -= scrollbarWidth;
+        availableHeight -= scrollbarHeight;
+
+        boolean atBottom = verticalBar.getRange() == verticalBar.getValue();
+
+        Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, availableWidth, availableHeight);
+        verticalBar.setRange(contentSize.y - contentRegion.height());
+        horizontalBar.setRange(contentSize.x - contentRegion.width());
+        if ((stickToBottom && atBottom) || moveToBottomPending) {
+            verticalBar.setValue(verticalBar.getRange());
+            moveToBottomPending = false;
+        }
+        if (moveToTopPending) {
+            verticalBar.setValue(0);
+            moveToTopPending = false;
+        }
+
+        canvas.addInteractionRegion(scrollListener);
+        canvas.drawWidget(verticalBar, Rect2i.createFromMinAndSize(availableWidth, 0, scrollbarWidth, availableHeight));
+        canvas.drawWidget(horizontalBar, Rect2i.createFromMinAndSize(0, availableHeight, availableWidth, scrollbarHeight));
+
+        try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
+            canvas.drawWidget(content, Rect2i.createFromMinAndSize(-horizontalBar.getValue(), -verticalBar.getValue(), contentSize.x, contentSize.y));
+        }
+    }
+
+    private void layoutWithJustVertical(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarWidth) {
+        availableWidth -= scrollbarWidth;
+
+        boolean atBottom = verticalBar.getRange() == verticalBar.getValue();
+
+        Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, availableWidth, availableHeight);
+        verticalBar.setRange(contentSize.y - contentRegion.height());
+        if ((stickToBottom && atBottom) || moveToBottomPending) {
+            verticalBar.setValue(verticalBar.getRange());
+            moveToBottomPending = false;
+        }
+        if (moveToTopPending) {
+            verticalBar.setValue(0);
+            moveToTopPending = false;
+        }
+
+        canvas.addInteractionRegion(scrollListener);
+        canvas.drawWidget(verticalBar, Rect2i.createFromMinAndSize(availableWidth, 0, scrollbarWidth, availableHeight));
+
+        try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
+            canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, -verticalBar.getValue(), availableWidth, contentSize.y));
+        }
+    }
+
+    private void layoutWithJustHorizontal(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarHeight) {
+        availableHeight -= scrollbarHeight;
+
+        Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, availableWidth, availableHeight);
+        horizontalBar.setRange(contentSize.x - contentRegion.width());
+
+        canvas.addInteractionRegion(scrollListener);
+        canvas.drawWidget(horizontalBar, Rect2i.createFromMinAndSize(0, availableHeight, availableWidth, scrollbarHeight));
+
+        try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
+            canvas.drawWidget(content, Rect2i.createFromMinAndSize(-horizontalBar.getValue(), 0, contentSize.x, availableHeight));
         }
     }
 
