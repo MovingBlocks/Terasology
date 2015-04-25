@@ -63,7 +63,7 @@ public class KinematicCharacterMover implements CharacterMover {
     /**
      * The amount of horizontal penetration to allow.
      */
-    private static final float HORIZONTAL_PENETRATION = 0.03f;
+    public static final float HORIZONTAL_PENETRATION = 0.03f;
 
     /**
      * The amount of extra distance added to horizontal movement to allow for penetration.
@@ -73,7 +73,7 @@ public class KinematicCharacterMover implements CharacterMover {
     /**
      * The amount of vertical penetration to allow.
      */
-    private static final float VERTICAL_PENETRATION = 0.04f;
+    public static final float VERTICAL_PENETRATION = 0.04f;
 
     /**
      * The amount of extra distance added to vertical movement to allow for penetration.
