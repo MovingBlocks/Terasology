@@ -16,7 +16,11 @@
 package org.terasology.world.generator;
 
 import com.google.common.base.Optional;
+
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.players.Spawner;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.World;
 
@@ -39,4 +43,9 @@ public interface WorldGenerator {
     World getWorld();
 
     void setConfigurator(WorldConfigurator newConfigurator);
+
+    /**
+     * @return
+     */
+    Spawner getSpawner();
 }

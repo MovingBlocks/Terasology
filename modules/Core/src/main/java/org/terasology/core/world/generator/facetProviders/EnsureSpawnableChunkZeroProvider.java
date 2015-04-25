@@ -45,7 +45,8 @@ public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
         if (region.getRegion().encompasses(centerChunkPos)) {
             SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
             SeaLevelFacet seaLevelFacet = region.getRegionFacet(SeaLevelFacet.class);
-            float seaLevel = (float) seaLevelFacet.getSeaLevel();
+            float seaLevel = seaLevelFacet.getSeaLevel();
+            float targetHeight = seaLevel + 1; // one block above the seaLevel
 
             // update the surface height so that it spikes up to sea level
             Vector2i middlePos = new Vector2i(centerChunkPos.x, centerChunkPos.z);
@@ -55,7 +56,7 @@ public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
                     // the surface is below sea level
                     float scaleTowardsSeaLevel = (float) pos.gridDistance(middlePos) / (float) (ChunkConstants.SIZE_X / 2);
                     if (scaleTowardsSeaLevel < 1f) {
-                        facet.setWorld(pos, TeraMath.lerp(originalValue, seaLevel, 1f - scaleTowardsSeaLevel));
+                        facet.setWorld(pos, TeraMath.lerp(originalValue, targetHeight, 1f - scaleTowardsSeaLevel));
                     }
                 }
             }

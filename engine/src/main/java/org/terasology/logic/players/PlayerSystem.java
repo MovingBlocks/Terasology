@@ -96,10 +96,10 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             SpawningClientInfo spawning = i.next();
             if (worldProvider.isBlockRelevant(spawning.position)) {
                 if (spawning.playerStore == null) {
-                    spawnPlayer(spawning.clientEntity, getSafeSpawnPosition());
+                    spawnPlayer(spawning.clientEntity);
                 } else if (!spawning.playerStore.hasCharacter()) {
                     spawning.playerStore.restoreEntities();
-                    spawnPlayer(spawning.clientEntity, getSafeSpawnPosition());
+                    spawnPlayer(spawning.clientEntity);
                 } else {
                     restoreCharacter(spawning.clientEntity, spawning.playerStore);
                 }
@@ -108,14 +108,18 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    private void spawnPlayer(EntityRef clientEntity, Vector3i initialSpawnPosition) {
+    private void spawnPlayer(EntityRef clientEntity) {
 
-        Vector3i spawnPos = getSafeSpawnPosition(initialSpawnPosition);
+        Spawner spawner = worldGenerator.getSpawner();
+        World world = worldGenerator.getWorld();
+        Vector3f spawnPos = spawner.getSpawnPosition(world, clientEntity);
 
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         if (client != null) {
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z), clientEntity);
+            float heightOffset = 1.5f;
+            Vector3f spawnPosition = new Vector3f(spawnPos.x, spawnPos.y + heightOffset, spawnPos.z);
+            EntityRef playerCharacter = playerFactory.newInstance(spawnPosition, clientEntity);
             Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
 
             Client clientListener = networkSystem.getOwner(clientEntity);
@@ -125,60 +129,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             clientEntity.saveComponent(client);
             playerCharacter.send(new OnPlayerSpawnedEvent());
         }
-    }
-
-    private Vector3i getSafeSpawnPosition() {
-        return getSafeSpawnPosition(new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
-    }
-
-    private Vector3i getSafeSpawnPosition(Vector3i spawnPos) {
-
-        World world = worldGenerator.getWorld();
-        if (world != null) {
-            // try and find somewhere in this chunk a spot to land
-            Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
-            //check if generation uses sea level and surfaceheight facets
-            SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
-            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
-            if (surfaceHeightFacet != null && seaLevelFacet != null) {
-                int seaLevel = seaLevelFacet.getSeaLevel();
-
-                for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-                    int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
-                    if (height > seaLevel) {
-                        pos.y = height;
-                        if (findOpenVerticalPosition(pos)) {
-                            return pos;
-                        }
-                    }
-                }
-            }
-            Vector3i pos = new Vector3i(spawnPos.x, spawnPos.y, spawnPos.z);
-            if (findOpenVerticalPosition(pos)) {
-                return pos;
-            }
-        }
-        return spawnPos;
-    }
-
-    private boolean findOpenVerticalPosition(Vector3i spawnPos) {
-        // find a spot above the surface that is big enough for this character
-        int consecutiveAirBlocks = 0;
-        for (int i = 1; i < 20; i++) {
-            spawnPos.add(0, 1, 0);
-            if (worldProvider.getBlock(spawnPos) == BlockManager.getAir()) {
-                consecutiveAirBlocks++;
-            } else {
-                consecutiveAirBlocks = 0;
-            }
-
-            if (consecutiveAirBlocks >= 2) {
-                spawnPos.add(0, 1 - consecutiveAirBlocks, 0);
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -197,16 +147,17 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         } else {
             Vector3i pos = Vector3i.zero();
             if (worldProvider.isBlockRelevant(pos)) {
-                spawnPlayer(entity, getSafeSpawnPosition());
+                spawnPlayer(entity);
             } else {
                 // Move the player (before it's spawned) to the spawn-position to make sure the relevance
                 // loads the chunk at some point
-                Vector3f spawnPosition = getSafeSpawnPosition().toVector3f();
+                Spawner spawner = worldGenerator.getSpawner();
+                World world = worldGenerator.getWorld();
+                Vector3f spawnPosition = spawner.getSpawnPosition(world, entity);
                 loc.setWorldPosition(spawnPosition);
                 entity.saveComponent(loc);
 
-                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity,
-                        spawnPosition);
+                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, spawnPosition);
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         }
@@ -217,7 +168,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         EntityRef character = playerStore.getCharacter();
         // TODO: adjust location to safe spot
         if (character == null) {
-            spawnPlayer(entity, getSafeSpawnPosition());
+            spawnPlayer(entity);
         } else {
             Client clientListener = networkSystem.getOwner(entity);
             updateRelevanceEntity(entity, clientListener.getViewDistance().getChunkDistance());
@@ -233,7 +184,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
             } else {
                 character.destroy();
-                spawnPlayer(entity, getSafeSpawnPosition());
+                spawnPlayer(entity);
             }
         }
     }
@@ -267,17 +218,21 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     @ReceiveEvent(components = {ClientComponent.class})
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
+        Spawner spawner = worldGenerator.getSpawner();
+        World world = worldGenerator.getWorld();
         if (!client.character.exists()) {
             Vector3i pos = Vector3i.zero();
             if (worldProvider.isBlockRelevant(pos)) {
-                spawnPlayer(entity, getSafeSpawnPosition());
+                spawnPlayer(entity);
             } else {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                loc.setWorldPosition(getSafeSpawnPosition().toVector3f());
+
+                Vector3f spawnPosition = spawner.getSpawnPosition(world, entity);
+                loc.setWorldPosition(spawnPosition);
                 entity.saveComponent(loc);
                 updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());
 
-                SpawningClientInfo info = new SpawningClientInfo(entity, getSafeSpawnPosition().toVector3f());
+                SpawningClientInfo info = new SpawningClientInfo(entity, spawnPosition);
                 clientsPreparingToSpawn.add(info);
             }
         }

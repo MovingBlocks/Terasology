@@ -17,7 +17,10 @@ package org.terasology.world.generation;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
+
 import org.terasology.engine.SimpleUri;
+import org.terasology.logic.players.ProximitySpawner;
+import org.terasology.logic.players.Spawner;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
@@ -34,6 +37,8 @@ import java.util.Set;
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
 
     private final SimpleUri uri;
+    private final Spawner spawner = new ProximitySpawner();
+
     private String worldSeed;
     private WorldBuilder worldBuilder;
     private World world;
@@ -120,4 +125,8 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
         return layerNames;
     }
 
+    @Override
+    public Spawner getSpawner() {
+        return spawner;
+    }
 }
