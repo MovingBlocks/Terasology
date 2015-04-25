@@ -15,6 +15,8 @@
  */
 package org.terasology.world.generation;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +86,13 @@ public class WorldImpl implements World {
 
     @Override
     public void initialize() {
+        // throw them all in a set to remove duplicates
+        Collection<FacetProvider> facetProviders = new LinkedHashSet<>(facetProviderChains.values());
+
+        for (FacetProvider facetProvider : facetProviders) {
+            facetProvider.initialize();
+        }
+
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.initialize();
         }

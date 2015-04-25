@@ -59,6 +59,11 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
 
     @Override
     public void setSeed(long seed) {
+        initialize();
+    }
+
+    @Override
+    public void initialize() {
         logger.info("Reading height map..");
 
         Texture texture = Assets.getTexture("core", configuration.heightMap);
