@@ -289,9 +289,8 @@
             "align-vertical" : "TOP"
         },
         "UIScrollbar" : {
-            "fixed-width" : 16,
             "parts" : {
-                "slider" : {
+                "sliderVertical" : {
                     "background" : "engine:sliderTrack",
                     "fixed-width" : 8,
                     "background-border" : {
@@ -299,6 +298,16 @@
                         "bottom" : 3,
                         "left" : 0,
                         "right" : 0
+                    }
+                },
+                "sliderHorizontal" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-height" : 8,
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 0,
+                        "left" : 3,
+                        "right" : 3
                     }
                 },
                 "handle" : {

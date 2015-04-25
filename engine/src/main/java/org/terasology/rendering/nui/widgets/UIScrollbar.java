@@ -39,10 +39,21 @@ public class UIScrollbar extends CoreWidget {
 
     private Binding<Integer> value = new DefaultBinding<>(0);
 
+    @LayoutConfig
+    private boolean vertical;
+
     private int sliderSize;
     private int handleSize;
     private boolean dragging;
     private int mouseOffset;
+
+    public UIScrollbar() {
+        this(true);
+    }
+
+    public UIScrollbar(boolean vertical) {
+        this.vertical = vertical;
+    }
 
     private InteractionListener handleListener = new BaseInteractionListener() {
 
@@ -50,7 +61,11 @@ public class UIScrollbar extends CoreWidget {
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
                 dragging = true;
-                mouseOffset = pos.y - pixelOffsetFor(getValue());
+                if (vertical) {
+                    mouseOffset = pos.y - pixelOffsetFor(getValue());
+                } else {
+                    mouseOffset = pos.x - pixelOffsetFor(getValue());
+                }
                 return true;
             }
             return false;
@@ -63,7 +78,11 @@ public class UIScrollbar extends CoreWidget {
 
         @Override
         public void onMouseDrag(Vector2i pos) {
-            updatePosition(pos.y - mouseOffset);
+            if (vertical) {
+                updatePosition(pos.y - mouseOffset);
+            } else {
+                updatePosition(pos.x - mouseOffset);
+            }
         }
     };
 
@@ -71,9 +90,15 @@ public class UIScrollbar extends CoreWidget {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
-                updatePosition(pos.y - mouseOffset);
+                if (vertical) {
+                    updatePosition(pos.y - mouseOffset);
 
-                setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
+                    setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
+                } else {
+                    updatePosition(pos.x - mouseOffset);
+
+                    setValue(TeraMath.clamp(pos.x - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
+                }
                 mouseOffset = handleSize / 2;
                 dragging = true;
                 return true;
@@ -83,7 +108,11 @@ public class UIScrollbar extends CoreWidget {
 
         @Override
         public void onMouseDrag(Vector2i pos) {
-            updatePosition(pos.y - mouseOffset);
+            if (vertical) {
+                updatePosition(pos.y - mouseOffset);
+            } else {
+                updatePosition(pos.x - mouseOffset);
+            }
         }
 
         @Override
@@ -94,18 +123,31 @@ public class UIScrollbar extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.setPart("slider");
+        if (vertical) {
+            canvas.setPart("sliderVertical");
+        } else {
+            canvas.setPart("sliderHorizontal");
+        }
         canvas.drawBackground();
         canvas.addInteractionRegion(sliderListener);
 
-
         canvas.setPart("handle");
-        sliderSize = canvas.size().y - canvas.getCurrentStyle().getFixedHeight();
+        if (vertical) {
+            sliderSize = canvas.size().y - canvas.getCurrentStyle().getFixedHeight();
+        } else {
+            sliderSize = canvas.size().x - canvas.getCurrentStyle().getFixedWidth();
+        }
 
         if (sliderSize > 0) {
             int drawLocation = pixelOffsetFor(getValue());
-            handleSize = canvas.getCurrentStyle().getFixedHeight();
-            Rect2i handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), handleSize);
+            Rect2i handleRegion;
+            if (vertical) {
+                handleSize = canvas.getCurrentStyle().getFixedHeight();
+                handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), handleSize);
+            } else {
+                handleSize = canvas.getCurrentStyle().getFixedWidth();
+                handleRegion = Rect2i.createFromMinAndSize(drawLocation, 0, handleSize, canvas.getCurrentStyle().getFixedHeight());
+            }
             canvas.drawBackground(handleRegion);
             canvas.addInteractionRegion(handleListener, handleRegion);
         }
