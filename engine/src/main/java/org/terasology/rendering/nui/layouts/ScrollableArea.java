@@ -104,31 +104,6 @@ public class ScrollableArea extends CoreLayout {
         } else {
             throw new IllegalStateException("ScrollableArea without any scrollbar allowed, what's the point of that?!");
         }
-
-
-//        Vector2i contentSize = canvas.calculateRestrictedSize(content, new Vector2i(maxContentWidth, maxContentHeight));
-//
-//        int availableWidth = canvas.size().x;
-//        int availableHeight = canvas.size().y;
-//
-//        if (verticalScrollbar && horizontalScrollbar &&
-//                availableHeight < contentSize.y) {
-//            // Try to layout it to show just vertical
-//            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).x;
-//            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth - scrollbarWidth, maxContentHeight));
-//            if (availableWidth - scrollbarWidth < contentSize.x) {
-//                layoutWithBothScrollbars(canvas, availableWidth, availableHeight, scrollbarWidth);
-//            } else {
-//                layoutWithJustVertical(canvas, availableWidth, availableHeight, scrollbarWidth);
-//            }
-//        } else if (verticalScrollbar && availableHeight<contentSize.y) {
-//            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).x;
-//            layoutWithJustVertical(canvas, availableWidth, availableHeight, scrollbarWidth);
-//        } else if (horizontalScrollbar && availableWidth<contentSize.x) {
-//            layoutWithJustHorizontal(canvas, availableWidth, availableHeight);
-//        } else {
-//            canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, 0, availableWidth, availableHeight));
-//        }
     }
 
     private void layoutWithBothScrollbars(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarWidth, int scrollbarHeight) {
