@@ -19,6 +19,9 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.BaseVector2i;
+import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.SpiralIterable;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
@@ -35,61 +38,40 @@ public class ProximitySpawner implements Spawner {
 
     @Override
     public Vector3f getSpawnPosition(World world, EntityRef entity) {
+        // TODO: use location component instead
+
         int centerX = ChunkConstants.SIZE_X / 2;
         int centerY = ChunkConstants.SIZE_Y / 2;
         int centerZ = ChunkConstants.SIZE_Z / 2;
-        Vector3f spawnPos = new Vector3f(centerX, centerY, centerZ);
+        Vector3i spawnPos = new Vector3i(centerX, centerY, centerZ);
         return getSpawnPosition(world, spawnPos);
     }
 
-    public Vector3f getSpawnPosition(World world, Vector3f spawnPos) {
+    private Vector3f getSpawnPosition(World world, Vector3i spawnPos) {
 
+        int rad = 16;
         // try and find somewhere in this chunk a spot to land
-        Region3i spawnArea = Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE);
+        Vector3i ext = new Vector3i(rad, 8, rad);
+        Region3i spawnArea = Region3i.createFromCenterExtents(spawnPos, ext);
         Region worldRegion = world.getWorldData(spawnArea);
+        Vector2i spawnPos2d = new Vector2i(spawnPos.getX(), spawnPos.getZ());
 
-        //check if generation uses sea level and surfaceheight facets
+        // check if generation uses sea level and surface height facets
         SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
         SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
-        if (surfaceHeightFacet != null && seaLevelFacet != null) {
-            int seaLevel = seaLevelFacet.getSeaLevel();
+        int seaLevel = (seaLevelFacet != null) ? seaLevelFacet.getSeaLevel() : 0;
 
-            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
+        if (surfaceHeightFacet != null) {
+            for (BaseVector2i pos : SpiralIterable.clockwise(spawnPos2d, rad)) {
+                float val = surfaceHeightFacet.get(pos.getX(), pos.getY());
+                int height = TeraMath.floorToInt(val);
                 if (height > seaLevel) {
-                    pos.y = height;
-                    if (findOpenVerticalPosition(pos)) {
-                        return pos.toVector3f();
-                    }
+                    return new Vector3f(pos.getX(), height, pos.getY());
                 }
             }
         }
-        Vector3i pos = new Vector3i(spawnPos.x, spawnPos.y, spawnPos.z);
-        if (findOpenVerticalPosition(pos)) {
-            return pos.toVector3f();
-        }
 
-        return spawnPos;
+        return spawnPos.toVector3f();
     }
 
-    private boolean findOpenVerticalPosition(Vector3i spawnPos) {
-        // find a spot above the surface that is big enough for this character
-        int consecutiveAirBlocks = 0;
-        for (int i = 1; i < 20; i++) {
-            spawnPos.add(0, 1, 0);
-//            if (worldProvider.getBlock(spawnPos) == BlockManager.getAir()) {
-            if (true) {
-                consecutiveAirBlocks++;
-            } else {
-                consecutiveAirBlocks = 0;
-            }
-
-            if (consecutiveAirBlocks >= 2) {
-                spawnPos.add(0, 1 - consecutiveAirBlocks, 0);
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
