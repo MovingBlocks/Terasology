@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
-public class IntegerRange {
+public class IntegerRange implements Iterable<Integer> {
     private TreeMap<Integer, Integer> ranges = new TreeMap<>();
 
     public void addNumbers(int from, int to) {
@@ -31,6 +31,11 @@ public class IntegerRange {
         if (oldTo == null || oldTo < to) {
             ranges.put(from, to);
         }
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return createIterator();
     }
 
     public Iterator<Integer> createIterator() {

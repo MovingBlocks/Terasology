@@ -150,6 +150,11 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
     }
 
     @Override
+    public EntityRef removeItem(EntityRef inventory, EntityRef instigator, int slotNo, boolean destroyRemoved, int count) {
+        throw new UnsupportedOperationException("This operation cannot be invoked on the client");
+    }
+
+    @Override
     public boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
         if (!InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count)) {
             return false;
