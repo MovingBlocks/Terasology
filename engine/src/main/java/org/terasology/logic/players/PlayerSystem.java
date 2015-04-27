@@ -115,6 +115,76 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
+    private void spawnPlayer(EntityRef clientEntity) {
+
+        LocationComponent location = clientEntity.getComponent(LocationComponent.class);
+
+        Vector3f spawnPosition = findSpawnPos(location.getWorldPosition());
+        location.setWorldPosition(spawnPosition);
+        clientEntity.saveComponent(location);
+
+        logger.debug("Spawing player at: {}", spawnPosition);
+
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+
+        PlayerFactory playerFactory = new PlayerFactory(entityManager);
+        EntityRef playerCharacter = playerFactory.newInstance(spawnPosition, clientEntity);
+        Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
+
+        Client clientListener = networkSystem.getOwner(clientEntity);
+        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
+        updateRelevanceEntity(clientEntity, distance);
+        client.character = playerCharacter;
+        clientEntity.saveComponent(client);
+        playerCharacter.send(new OnPlayerSpawnedEvent());
+    }
+
+    private Vector3f findSpawnPos(Vector3f targetPos) {
+        int targetBlockX = TeraMath.floorToInt(targetPos.x);
+        int targetBlockY = TeraMath.floorToInt(targetPos.y);
+        int targetBlockZ = TeraMath.floorToInt(targetPos.z);
+        Vector2i center = new Vector2i(targetBlockX, targetBlockZ);
+        for (BaseVector2i pos : SpiralIterable.clockwise(center).maxRadius(3).scale(2).build()) {
+
+            Vector3i testPos = new Vector3i(pos.getX(), targetBlockY, pos.getY());
+            Vector3i spawnPos = findOpenVerticalPosition(testPos, playerHeight);
+            if (spawnPos != null) {
+                return new Vector3f(spawnPos.getX(), spawnPos.getY() + playerHeight, spawnPos.getZ());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * find a spot above the surface that is big enough for this character
+     * @param spawnPos the position to check
+     * @param height the height of the entity to spawn
+     * @return the found spot or <code>null</code> if none was found
+     */
+    private Vector3i findOpenVerticalPosition(Vector3i spawnPos, float height) {
+        int consecutiveAirBlocks = 0;
+        Vector3i newSpawnPos = new Vector3i(spawnPos);
+
+        // TODO: also start looking downwards if initial spawn pos is in the air
+        for (int i = 1; i < 20; i++) {
+            if (worldProvider.isBlockRelevant(newSpawnPos)) {
+                if (worldProvider.getBlock(newSpawnPos) == BlockManager.getAir()) {
+                    consecutiveAirBlocks++;
+                } else {
+                    consecutiveAirBlocks = 0;
+                }
+
+                if (consecutiveAirBlocks >= height) {
+                    newSpawnPos.subY(consecutiveAirBlocks - 1);
+                    return newSpawnPos;
+                }
+                newSpawnPos.add(0, 1, 0);
+            }
+        }
+
+        return null;
+    }
+
     @ReceiveEvent(components = ClientComponent.class)
     public void onConnect(ConnectedEvent connected, EntityRef entity) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
@@ -144,9 +214,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 clientsPreparingToSpawn.add(new SpawningClientInfo(entity, storedLocation, playerStore));
             }
         } else {
-            Spawner spawner = worldGenerator.getSpawner();
-            World world = worldGenerator.getWorld();
-            Vector3f spawnPosition = spawner.getSpawnPosition(world, entity);
+            Vector3f spawnPosition = worldGenerator.getSpawnPosition(entity);
             loc.setWorldPosition(spawnPosition);
             entity.saveComponent(loc);
 
@@ -180,45 +248,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    private void spawnPlayer(EntityRef clientEntity) {
-
-        LocationComponent location = clientEntity.getComponent(LocationComponent.class);
-
-        Vector3f spawnPosition = findSpawnPos(location.getWorldPosition());
-        location.setWorldPosition(spawnPosition);
-        clientEntity.saveComponent(location);
-
-        logger.debug("Spawing player at: {}", spawnPosition);
-
-        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
-
-        PlayerFactory playerFactory = new PlayerFactory(entityManager);
-        EntityRef playerCharacter = playerFactory.newInstance(spawnPosition, clientEntity);
-        Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
-
-        Client clientListener = networkSystem.getOwner(clientEntity);
-        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
-        updateRelevanceEntity(clientEntity, distance);
-        client.character = playerCharacter;
-        clientEntity.saveComponent(client);
-        playerCharacter.send(new OnPlayerSpawnedEvent());
-    }
-
-    private Vector3f findSpawnPos(Vector3f targetPos) {
-        int targetBlockX = TeraMath.floorToInt(targetPos.x);
-        int targetBlockY = TeraMath.floorToInt(targetPos.y);
-        int targetBlockZ = TeraMath.floorToInt(targetPos.z);
-        for (BaseVector2i pos : SpiralIterable.clockwise(new Vector2i(targetBlockX, targetBlockZ), 4)) {
-
-            Vector3i testPos = new Vector3i(pos.getX(), targetBlockY, pos.getY());
-            Vector3i spawnPos = findOpenVerticalPosition(testPos, playerHeight);
-            if (spawnPos != null) {
-                return new Vector3f(spawnPos.getX(), spawnPos.getY() + playerHeight, spawnPos.getZ());
-            }
-        }
-        return null;
-    }
-
     private void updateRelevanceEntity(EntityRef entity, Vector3i chunkDistance) {
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
@@ -246,12 +275,10 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
-        Spawner spawner = worldGenerator.getSpawner();
-        World world = worldGenerator.getWorld();
-        Vector3f spawnPosition = spawner.getSpawnPosition(world, entity);
+        Vector3f spawnPosition = worldGenerator.getSpawnPosition(entity);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
-        loc.setLocalRotation(new Quat4f());
+        loc.setLocalRotation(new Quat4f());  // reset rotation
         entity.saveComponent(loc);
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
@@ -290,37 +317,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             clientComp.character.send(OnActivatedComponent.newInstance());
         }
         return "Teleported to " + x + " " + y + " " + z;
-    }
-
-
-    /**
-     * find a spot above the surface that is big enough for this character
-     * @param spawnPos the position to check
-     * @param height the height of the entity to spawn
-     * @return the found spot or <code>null</code> if none was found
-     */
-    private Vector3i findOpenVerticalPosition(Vector3i spawnPos, float height) {
-        int consecutiveAirBlocks = 0;
-        Vector3i newSpawnPos = new Vector3i(spawnPos);
-
-        // TODO: also start looking downwards if initial spawn pos is in the air
-        for (int i = 1; i < 20; i++) {
-            if (worldProvider.isBlockRelevant(newSpawnPos)) {
-                if (worldProvider.getBlock(newSpawnPos) == BlockManager.getAir()) {
-                    consecutiveAirBlocks++;
-                } else {
-                    consecutiveAirBlocks = 0;
-                }
-
-                if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.subY(consecutiveAirBlocks - 1);
-                    return newSpawnPos;
-                }
-                newSpawnPos.add(0, 1, 0);
-            }
-        }
-
-        return null;
     }
 
     private static class SpawningClientInfo {

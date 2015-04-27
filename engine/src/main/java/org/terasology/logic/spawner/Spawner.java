@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.players;
+package org.terasology.logic.spawner;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.world.generation.World;
 
 /**
- * TODO Type description
- * @author Martin Steiger
+ * Defines spawning points.
  */
 public interface Spawner {
 
