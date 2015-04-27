@@ -49,6 +49,7 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.Collections;
 
@@ -120,6 +121,9 @@ public class StateIngame implements GameState {
             logger.info("Shutting down Oculus SDK...");
             TeraOVR.clear();
         }
+
+        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
+        chunkProvider.dispose();
 
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {

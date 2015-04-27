@@ -551,6 +551,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         shutdown();
 
         for (Chunk chunk : nearCache.values()) {
+            unloadChunkInternal(chunk.getPosition());
             chunk.dispose();
         }
         nearCache.clear();
