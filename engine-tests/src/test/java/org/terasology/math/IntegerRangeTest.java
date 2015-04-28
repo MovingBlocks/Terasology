@@ -91,7 +91,7 @@ public class IntegerRangeTest {
     }
 
     private void validateRange(IntegerRange range, Integer...numbers) {
-        Iterator<Integer> iterator = range.createIterator();
+        Iterator<Integer> iterator = range.iterator();
         for (Integer number : numbers) {
             assertTrue(iterator.hasNext());
             assertEquals(number, iterator.next());

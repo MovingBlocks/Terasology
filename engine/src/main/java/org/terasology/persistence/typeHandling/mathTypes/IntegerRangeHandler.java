@@ -28,10 +28,7 @@ public class IntegerRangeHandler extends StringRepresentationTypeHandler<Integer
         Integer currentRangeStart = null;
         Integer currentRangeEnd = null;
 
-        Iterator<Integer> iterator = item.createIterator();
-        while (iterator.hasNext()) {
-            int nextNumber = iterator.next();
-
+        for (int nextNumber : item) {
             if (currentRangeStart != null && currentRangeEnd != null && nextNumber > currentRangeEnd + 1) {
                 appendRange(sb, currentRangeStart, currentRangeEnd);
                 currentRangeStart = nextNumber;
