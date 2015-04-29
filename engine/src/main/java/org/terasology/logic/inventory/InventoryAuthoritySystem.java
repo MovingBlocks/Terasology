@@ -36,6 +36,7 @@ import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -340,6 +341,15 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
     @Override
     public EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count) {
         return removeItemInternal(inventory, instigator, items, destroyRemoved, count);
+    }
+
+    @Override
+    public EntityRef removeItem(EntityRef inventory, EntityRef instigator, int slotNo, boolean destroyRemoved, int count) {
+        EntityRef item = InventoryUtils.getItemAt(inventory, slotNo);
+        if (InventoryUtils.getStackCount(item) < count) {
+            return null;
+        }
+        return removeItemFromSlots(instigator, destroyRemoved, inventory, Collections.singletonList(slotNo), count);
     }
 
     private EntityRef removeItemInternal(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, Integer count) {

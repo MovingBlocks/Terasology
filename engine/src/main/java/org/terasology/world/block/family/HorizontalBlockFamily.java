@@ -16,6 +16,7 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.Direction;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
@@ -63,8 +64,11 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
         if (attachmentSide.isHorizontal()) {
             return blocks.get(attachmentSide);
         }
-        return blocks.get(direction);
-
+        if (direction != null) {
+            return blocks.get(direction);
+        } else {
+            return blocks.get(Side.FRONT);
+        }
     }
 
     @Override

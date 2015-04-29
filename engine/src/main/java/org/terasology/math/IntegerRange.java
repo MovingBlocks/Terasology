@@ -20,12 +20,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
-public class IntegerRange {
+public class IntegerRange implements Iterable<Integer> {
     private TreeMap<Integer, Integer> ranges = new TreeMap<>();
 
     public void addNumbers(int from, int to) {
-        if (from > to)
+        if (from > to) {
             throw new IllegalArgumentException("From can't be larger than to");
+        }
 
         Integer oldTo = ranges.get(from);
         if (oldTo == null || oldTo < to) {
@@ -33,7 +34,8 @@ public class IntegerRange {
         }
     }
 
-    public Iterator<Integer> createIterator() {
+    @Override
+    public Iterator<Integer> iterator() {
         return new RangesIterator(ranges);
     }
 
@@ -54,8 +56,9 @@ public class IntegerRange {
 
         @Override
         public Integer next() {
-            if (next == null)
+            if (next == null) {
                 throw new NoSuchElementException("You have reached the end of the iterator");
+            }
             int result = next;
             if (next < rangeMax) {
                 next++;

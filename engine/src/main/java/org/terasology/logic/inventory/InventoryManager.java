@@ -141,6 +141,18 @@ public interface InventoryManager {
     EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count);
 
     /**
+     * Removes specified amount of item from an inventory's slot.
+     * @param inventory       Inventory to remove item from.
+     * @param instigator      Instigator of the action.
+     * @param slotNo          Slot to remove the item from.
+     * @param destroyRemoved  If the removed item should be destroyed.
+     * @param count           Amount of items to remove.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, int slotNo, boolean destroyRemoved, int count);
+
+    /**
      * Moves a specified amount of items from one inventory to another.
      *
      * @param fromInventory Inventory to move item from.
