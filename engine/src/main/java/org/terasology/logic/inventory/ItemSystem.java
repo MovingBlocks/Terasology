@@ -23,23 +23,22 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.registry.In;
 
 /**
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemSystem extends BaseComponentSystem {
+    @In
+    private InventoryManager inventoryManager;
 
     @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp.consumedOnUse) {
-            itemComp.stackCount--;
-            if (itemComp.stackCount == 0) {
-                item.destroy();
-            } else {
-                item.saveComponent(itemComp);
-            }
+            int slot = InventoryUtils.getSlotWithItem(event.getInstigator(), item);
+            inventoryManager.removeItem(event.getInstigator(), event.getInstigator(), slot, true, 1);
         }
     }
 }
