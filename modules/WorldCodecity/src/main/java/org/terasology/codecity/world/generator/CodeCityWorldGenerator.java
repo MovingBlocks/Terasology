@@ -16,6 +16,7 @@ public class CodeCityWorldGenerator extends BaseFacetedWorldGenerator {
     protected WorldBuilder createWorld(long seed) {
         return new WorldBuilder(seed)
 	        .addProvider(new CodeCityProvider())
-        	.addRasterizer(new CodeCityRasterizer());
+        	.addRasterizer(new CodeCityGroundRasterizer())
+        	.setSeaLevel(0);
     }
 }
