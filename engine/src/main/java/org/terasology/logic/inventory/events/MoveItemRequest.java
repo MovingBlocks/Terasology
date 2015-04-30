@@ -20,6 +20,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
+import java.util.Collection;
+
 /**
  * @author Immortius
  * @author Florian
@@ -31,8 +33,8 @@ public class MoveItemRequest extends AbstractMoveItemRequest implements Event {
     protected MoveItemRequest() {
     }
 
-    public MoveItemRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int changeId) {
-        super(instigator, fromInventory, fromSlot, toInventory, changeId);
+    public MoveItemRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int changeId, Collection<EntityRef> clientSideTempEntities) {
+        super(instigator, fromInventory, fromSlot, toInventory, changeId, clientSideTempEntities);
         this.toSlot = toSlot;
     }
 

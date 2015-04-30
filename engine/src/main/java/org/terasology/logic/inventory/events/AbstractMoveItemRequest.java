@@ -18,7 +18,10 @@ package org.terasology.logic.inventory.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.network.NoReplicate;
 import org.terasology.network.ServerEvent;
+
+import java.util.Collection;
 
 /**
  * @author Immortius
@@ -34,15 +37,20 @@ public abstract class AbstractMoveItemRequest implements Event {
 
     private int changeId;
 
+    @NoReplicate
+    private Collection<EntityRef> clientSideTempEntities;
+
     protected AbstractMoveItemRequest() {
     }
 
-    public AbstractMoveItemRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int changeId) {
+    public AbstractMoveItemRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int changeId,
+                                   Collection<EntityRef> clientSideTempEntities) {
         this.instigator = instigator;
         this.fromInventory = fromInventory;
         this.fromSlot = fromSlot;
         this.toInventory = toInventory;
         this.changeId = changeId;
+        this.clientSideTempEntities = clientSideTempEntities;
     }
 
     public EntityRef getFromInventory() {
@@ -63,5 +71,13 @@ public abstract class AbstractMoveItemRequest implements Event {
 
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public Collection<EntityRef> getClientSideTempEntities() {
+        return clientSideTempEntities;
+    }
+
+    public void setClientSideTempEntities(Collection<EntityRef> clientSideTempEntities) {
+        this.clientSideTempEntities = clientSideTempEntities;
     }
 }
