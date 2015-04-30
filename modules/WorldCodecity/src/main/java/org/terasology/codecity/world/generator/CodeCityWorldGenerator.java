@@ -6,7 +6,7 @@ import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
 
 
-@RegisterWorldGenerator(id = "codecity", displayName = "CodeCity3", description = "Generates the world using a CodeCity structure")
+@RegisterWorldGenerator(id = "codecity", displayName = "CodeCity", description = "Generates the world using a CodeCity structure")
 public class CodeCityWorldGenerator extends BaseFacetedWorldGenerator {
     public CodeCityWorldGenerator(SimpleUri uri) {
         super(uri);
@@ -14,6 +14,8 @@ public class CodeCityWorldGenerator extends BaseFacetedWorldGenerator {
 
     @Override
     protected WorldBuilder createWorld(long seed) {
-        return new WorldBuilder(seed);
+        return new WorldBuilder(seed)
+	        .addProvider(new CodeCityProvider())
+        	.addRasterizer(new CodeCityRasterizer());
     }
 }
