@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -79,7 +78,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
-    private ServerInfoService infoService = new ServerInfoService();
+    private ServerInfoService infoService;
 
     private ServerListDownloader downloader;
 
@@ -102,6 +101,13 @@ public class JoinGameScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public void onOpened() {
+        super.onOpened();
+
+        infoService = new ServerInfoService();
     }
 
     @Override

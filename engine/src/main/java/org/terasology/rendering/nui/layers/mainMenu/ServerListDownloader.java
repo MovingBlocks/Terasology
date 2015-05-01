@@ -23,9 +23,8 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
@@ -104,11 +103,11 @@ class ServerListDownloader {
      * @return a <b>thread-safe</b> list of servers
      */
     public List<ServerInfo> getServers() {
-        return servers;
+        return Collections.unmodifiableList(servers);
     }
 
     /**
-     * @return
+     * @return the current status
      */
     public String getStatus() {
         return status;
