@@ -227,7 +227,9 @@ public class JoinGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                getManager().pushScreen(AddServerPopup.ASSET_URI);
+                AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                // select the entry if added successfully
+                popup.onSuccess(item -> serverList.setSelection(item));
             }
         });
 
@@ -238,7 +240,11 @@ public class JoinGameScreen extends CoreScreenLayer {
                 @Override
                 public void onActivated(UIWidget button) {
                   AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-                  popup.setServerInfo(infoBinding.get());
+                  ServerInfo info = infoBinding.get();
+                  popup.setServerInfo(info);
+
+                  // editing invalidates the currently known info, so query it again
+                  popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
                 }
             });
         }
@@ -249,8 +255,10 @@ public class JoinGameScreen extends CoreScreenLayer {
             removeButton.subscribe(new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    if (serverList.getSelection() != null) {
-                        config.getNetwork().remove(serverList.getSelection());
+                    ServerInfo info = serverList.getSelection();
+                    if (info != null) {
+                        config.getNetwork().remove(info);
+                        extInfo.remove(info);
                         serverList.setSelection(null);
                     }
                 }

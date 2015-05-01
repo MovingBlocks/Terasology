@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.util.function.Consumer;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
@@ -46,6 +48,8 @@ public class AddServerPopup extends CoreScreenLayer {
     private UIButton cancelButton;
     private ServerInfo serverInfo;
 
+    private Consumer<ServerInfo> successFunc;
+
     @Override
     public void initialise() {
         nameText = find("name", UIText.class);
@@ -75,6 +79,9 @@ public class AddServerPopup extends CoreScreenLayer {
                     serverInfo.setPort(port);
                 }
 
+                if (successFunc != null) {
+                    successFunc.accept(serverInfo);
+                }
                 getManager().popScreen();
             }
         });
@@ -124,7 +131,8 @@ public class AddServerPopup extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        this.serverInfo = null;
+        serverInfo = null;
+        successFunc = null;
         nameText.setText("");
         addressText.setText("");
 
@@ -150,5 +158,12 @@ public class AddServerPopup extends CoreScreenLayer {
 
         portText.setText(Integer.toString(serverInfo.getPort()));
         portText.setCursorPosition(portText.getText().length());
+    }
+
+    /**
+     * @param success the method to call when editing is complete
+     */
+    public void onSuccess(Consumer<ServerInfo> success) {
+        this.successFunc = success;
     }
 }
