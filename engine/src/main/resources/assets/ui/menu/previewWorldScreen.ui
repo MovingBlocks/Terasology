@@ -72,6 +72,9 @@
                 "contents" : [
                     {
                         "type" : "UIImage",
+                        "skin" : "framed_image",
+                        "width" : 384,
+                        "height" : 384,
                         "id" : "preview"
                     },
                     {

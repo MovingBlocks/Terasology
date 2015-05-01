@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -24,20 +25,19 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
+import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
@@ -75,9 +75,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private int imageSize = 128;
 
-    private WorldGenerator2DPreview previewGenerator;
-
-    private SeedBinding seedBinding = new SeedBinding();
+    private WorldGenerator worldGenerator;
 
     private UILabel errorLabel;
     private UIImage previewImage;
@@ -85,6 +83,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private UIButton applyButton;
     private UIDropdown<String> layerDropdown;
     private PreviewSettings currentSettings;
+
+    private UIText seed;
 
     @Override
     public void onOpened() {
@@ -94,19 +94,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
 
         try {
-            WorldGenerator worldGenerator = worldGeneratorManager.createGenerator(info.getUri());
-            seedBinding.setWorldGenerator(worldGenerator);
-
-            if (worldGenerator instanceof WorldGenerator2DPreview) {
-                previewGenerator = (WorldGenerator2DPreview) worldGenerator;
-            } else {
-                logger.info(info.getUri().toString() + " does not support a 2d preview");
-            }
+            worldGenerator = worldGeneratorManager.createGenerator(info.getUri());
+            worldGenerator.setWorldSeed(seed.getText());
         } catch (Exception e) {
             // if errors happen, don't enable this feature
-            seedBinding = new SeedBinding();
-            previewGenerator = null;
-            logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview");
+            worldGenerator = null;
+            logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview", e);
         }
     }
 
@@ -120,6 +113,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             zoomSlider.setValue(10f);
             zoomSlider.setPrecision(0);
         }
+
+        seed = find("seed", UIText.class);
 
         applyButton = find("apply", UIButton.class);
         if (applyButton != null) {
@@ -139,17 +134,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         previewImage = find("preview", UIImage.class);
 
-        UIText seed = find("seed", UIText.class);
-        if (seed != null) {
-            seed.bindText(seedBinding);
-        }
-
         layerDropdown = find("display", UIDropdown.class);
         layerDropdown.bindOptions(new ReadOnlyBinding<List<String>>() {
             @Override
             public List<String> get() {
-                if (previewGenerator != null) {
-                    return Lists.newArrayList(previewGenerator.getLayers());
+                if (worldGenerator instanceof WorldGenerator2DPreview) {
+                    return Lists.newArrayList(((WorldGenerator2DPreview) worldGenerator).getLayers());
                 } else {
                     return Lists.newArrayList();
                 }
@@ -185,8 +175,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if (previewGenerator != null) {
-            PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
+        if (worldGenerator != null) {
+            PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seed.getText());
             if (currentSettings == null || !currentSettings.equals(newSettings)) {
                 boolean firstTime = currentSettings == null;
                 currentSettings = newSettings;
@@ -205,15 +195,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     public void bindSeed(Binding<String> binding) {
-        seedBinding.setExternalBinding(binding);
-    }
-
-    public String getSeed() {
-        return seedBinding.get();
-    }
-
-    public void setSeed(String val) {
-        seedBinding.set(val);
+        if (seed != null) {
+            seed.bindText(binding);
+        }
     }
 
     private void updatePreview() {
@@ -224,18 +208,23 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Updating Preview", "Please wait ...");
 
-        final ByteBufferProgressListener progressListener = new ByteBufferProgressListener() {
-            @Override
-            public void onProgress(float progress) {
+        ProgressListener progressListener = progress ->
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
-            }
-        };
 
         Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
             @Override
             public ByteBufferResult call() throws InterruptedException {
                 try {
-                    ByteBuffer buf = createByteBuffer(imageSize, imageSize, currentSettings.zoom, currentSettings.layer, progressListener);
+                    if (seed != null) {
+                        worldGenerator.setWorldSeed(seed.getText());
+                    }
+                    PreviewGenerator previewGen;
+//                    if (worldGenerator instanceof WorldGenerator2DPreview) {
+//                        previewGen = new SummaryPreviewGenerator((WorldGenerator2DPreview) worldGenerator, currentSettings.layer);
+//                    } else {
+                        previewGen = new FacetLayerPreview(worldGenerator);
+//                    }
+                    ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progressListener);
                     return new ByteBufferResult(true, buf, null);
                 } catch (InterruptedException e) {
                     throw e;
@@ -272,65 +261,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
 
         return Assets.generateAsset(uri, texData, Texture.class);
-    }
-
-    private ByteBuffer createByteBuffer(int width, int height, int scale, String layerName, ByteBufferProgressListener progressListener) throws InterruptedException {
-        int size = 4 * width * height;
-        final int offX = -width / 2;
-        final int offY = -height / 2;
-        ByteBuffer buf = ByteBuffer.allocateDirect(size);
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                int px = (x + offX) * scale;
-                int py = (y + offY) * scale;
-                Rect2i area = Rect2i.createFromMinAndSize(px, py, scale, scale);
-                Color c = previewGenerator.get(layerName, area);
-                c.addToBuffer(buf);
-            }
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
-            if (progressListener != null) {
-                progressListener.onProgress((float) y / height);
-            }
-        }
-        buf.flip();
-        return buf;
-    }
-
-    private static class SeedBinding implements Binding<String> {
-
-        private Binding<String> externalBinding = new DefaultBinding<>("");
-        private WorldGenerator worldGenerator;
-
-        @Override
-        public String get() {
-            return externalBinding.get();
-        }
-
-        @Override
-        public void set(String value) {
-            externalBinding.set(value);
-            if (worldGenerator != null) {
-                worldGenerator.setWorldSeed(value);
-            }
-        }
-
-        public Binding<String> getExternalBinding() {
-            return externalBinding;
-        }
-
-        public void setExternalBinding(Binding<String> externalBinding) {
-            this.externalBinding = externalBinding;
-            if (worldGenerator != null) {
-                worldGenerator.setWorldSeed(get());
-            }
-        }
-
-        public void setWorldGenerator(WorldGenerator worldGenerator) {
-            this.worldGenerator = worldGenerator;
-            worldGenerator.setWorldSeed(get());
-        }
     }
 
     private static class PreviewSettings {
@@ -372,10 +302,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             this.buf = buf;
             this.exception = exception;
         }
-    }
-
-    private interface ByteBufferProgressListener {
-        void onProgress(float percent);
     }
 }
 
