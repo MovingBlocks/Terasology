@@ -64,4 +64,12 @@ public interface CodeMap {
      * @return The set of unique MapObjects in the map
      */
     public Set<MapObject> getMapObjects();
+    
+    /**
+     * @param x Coordinate x of the map
+     * @param y Coordinate y of the map
+     * @return The MaṕObject in the indicated position
+     */
+    public MapObject getMapObject(int x, int y);
+    
 }

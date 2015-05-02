@@ -92,6 +92,11 @@ public class CodeHashMap implements CodeMap {
         objects.addAll(contentMap.values());
         return objects;
     }
+    
+    
+    public MapObject getMapObject(int x, int y){
+    	return contentMap.get(x + "," + y);
+    }
 
     /**
      * Update the size of the map if needed
