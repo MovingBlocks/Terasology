@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,35 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
 
-import com.google.common.base.Optional;
+package org.terasology.logic.spawner;
 
-import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.World;
 
 /**
- * @author Immortius
+ * Defines spawning points.
  */
-public interface WorldGenerator {
-    SimpleUri getUri();
+public interface Spawner {
 
-    String getWorldSeed();
-
-    void setWorldSeed(String seed);
-
-    void createChunk(CoreChunk chunk);
-
-    void initialize();
-
-    Optional<WorldConfigurator> getConfigurator();
-
-    World getWorld();
-
-    void setConfigurator(WorldConfigurator newConfigurator);
-
-    Vector3f getSpawnPosition(EntityRef entity);
+    Vector3f getSpawnPosition(World world, EntityRef entity);
 }

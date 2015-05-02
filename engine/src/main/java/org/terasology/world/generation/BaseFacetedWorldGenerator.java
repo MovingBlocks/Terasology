@@ -15,11 +15,16 @@
  */
 package org.terasology.world.generation;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
+import java.util.Map;
+import java.util.Set;
+
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.spawner.FixedSpawner;
+import org.terasology.logic.spawner.Spawner;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.chunks.CoreChunk;
@@ -28,12 +33,14 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
 
     private final SimpleUri uri;
+    private final Spawner spawner = new FixedSpawner(0, 0);
+
     private String worldSeed;
     private WorldBuilder worldBuilder;
     private World world;
@@ -120,4 +127,8 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
         return layerNames;
     }
 
+    @Override
+    public Vector3f getSpawnPosition(EntityRef entity) {
+        return spawner.getSpawnPosition(getWorld(), entity);
+    }
 }
