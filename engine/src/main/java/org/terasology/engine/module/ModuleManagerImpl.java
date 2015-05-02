@@ -148,7 +148,6 @@ public class ModuleManagerImpl implements ModuleManager {
         moduleSecurityManager.getBasePermissionSet().addAPIClass(Reader.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(StringReader.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(BufferedReader.class);
-        moduleSecurityManager.getBasePermissionSet().addAPIClass(java.awt.datatransfer.UnsupportedFlavorException.class);
 
         APIScanner apiScanner = new APIScanner(moduleSecurityManager);
         for (Module module : registry) {
