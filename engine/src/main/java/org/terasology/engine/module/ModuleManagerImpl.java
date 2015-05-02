@@ -34,7 +34,6 @@ import org.terasology.module.sandbox.APIScanner;
 import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
-import org.terasology.module.sandbox.PermissionProvider;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,7 +43,6 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
-import java.security.Permission;
 import java.security.Policy;
 import java.util.Collections;
 import java.util.Set;
