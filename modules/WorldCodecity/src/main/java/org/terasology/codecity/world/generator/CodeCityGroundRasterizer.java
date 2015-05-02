@@ -11,21 +11,23 @@ import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 public class CodeCityGroundRasterizer implements WorldRasterizer {
-	private Block dirt;
+    private Block dirt;
 
-	@Override
-	public void initialize() {
-		dirt = CoreRegistry.get(BlockManager.class).getBlock("Core:Dirt");
-	}
+    @Override
+    public void initialize() {
+        dirt = CoreRegistry.get(BlockManager.class).getBlock("Core:Dirt");
+    }
 
-	@Override
-	public void generateChunk(CoreChunk chunk, Region chunkRegion) {
-        SurfaceHeightFacet surfaceHeightFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
-        for(Vector3i position : chunkRegion.getRegion()) {
-            if(position.y < surfaceHeightFacet.getWorld(position.x, position.z)) {
+    @Override
+    public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+        SurfaceHeightFacet surfaceHeightFacet = chunkRegion
+                .getFacet(SurfaceHeightFacet.class);
+        for (Vector3i position : chunkRegion.getRegion()) {
+            if (position.y < surfaceHeightFacet
+                    .getWorld(position.x, position.z)) {
                 chunk.setBlock(ChunkMath.calcBlockPos(position), dirt);
             }
         }
-	}
+    }
 
 }

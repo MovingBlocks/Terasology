@@ -22,17 +22,17 @@ import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 public class CodeCityBuildingRasterizer implements WorldRasterizer {
-	private Set<MapObject> objects;
-	private Block stone;
+    private Set<MapObject> objects;
+    private Block stone;
 
-	private final CodeScale scale = new SquaredCodeScale();
-	private final CodeMapFactory factory = new CodeMapFactory(scale);
+    private final CodeScale scale = new SquaredCodeScale();
+    private final CodeMapFactory factory = new CodeMapFactory(scale);
 
-	@Override
-	public void initialize() {
-		stone = CoreRegistry.get(BlockManager.class).getBlock("core:stone");
+    @Override
+    public void initialize() {
+        stone = CoreRegistry.get(BlockManager.class).getBlock("core:stone");
 
-        CodeClass c = new CodeClass(100,150);
+        CodeClass c = new CodeClass(100, 150);
         CodePackage p = new CodePackage();
         p.addCodeContent(c);
 
@@ -42,17 +42,21 @@ public class CodeCityBuildingRasterizer implements WorldRasterizer {
 
         CodeMap map = factory.generateMap(code);
         objects = map.getMapObjects();
-	}
+    }
 
-	@Override
-	public void generateChunk(CoreChunk chunk, Region chunkRegion) {
-		SurfaceHeightFacet surfaceHeightFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
-		int yBase = (int)surfaceHeightFacet.get(0, 0);
-		for (MapObject object : objects) {
-			if (chunkRegion.getRegion().encompasses(object.getPositionX(), object.getPositionZ(), yBase)) {
-				for (int i = 0; i < object.getHeight(scale, factory); i++)
-					chunk.setBlock(ChunkMath.calcBlockPos(object.getPositionX(), yBase+i, object.getPositionZ()), stone);
-			}
-		}
-	}
+    @Override
+    public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+        SurfaceHeightFacet surfaceHeightFacet = chunkRegion
+                .getFacet(SurfaceHeightFacet.class);
+        int yBase = (int) surfaceHeightFacet.get(0, 0);
+        for (MapObject object : objects) {
+            if (chunkRegion.getRegion().encompasses(object.getPositionX(),
+                    object.getPositionZ(), yBase)) {
+                for (int i = 0; i < object.getHeight(scale, factory); i++)
+                    chunk.setBlock(
+                            ChunkMath.calcBlockPos(object.getPositionX(), yBase
+                                    + i, object.getPositionZ()), stone);
+            }
+        }
+    }
 }

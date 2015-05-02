@@ -5,16 +5,16 @@ package org.terasology.codecity.world.structure.scale;
  */
 public class SquaredCodeScale implements CodeScale {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getScaledSize(int size) {
-		return (int)Math.sqrt(size);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getScaledSize(int size) {
+        return (int) Math.sqrt(size);
+    }
 
-	@Override
-	public int getScaledSize(int size, int min) {
-		return Math.max(getScaledSize(size), min);
-	}
+    @Override
+    public int getScaledSize(int size, int min) {
+        return Math.max(getScaledSize(size), min);
+    }
 }

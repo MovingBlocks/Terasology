@@ -7,9 +7,10 @@ import org.terasology.codecity.world.map.DrawableCode;
  */
 public interface CodeRepresentation {
 
-	/**
-	 * Generate a Drawable version of the content
-	 * @return
-	 */
-	public DrawableCode getDrawableCode();
+    /**
+     * Generate a Drawable version of the content
+     * 
+     * @return
+     */
+    public DrawableCode getDrawableCode();
 }
