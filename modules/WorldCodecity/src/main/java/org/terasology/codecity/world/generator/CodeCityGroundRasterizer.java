@@ -25,9 +25,6 @@ public class CodeCityGroundRasterizer implements WorldRasterizer {
             if(position.y < surfaceHeightFacet.getWorld(position.x, position.z)) {
                 chunk.setBlock(ChunkMath.calcBlockPos(position), dirt);
             }
-            if (position.y < 20 && position.x % 10 == 0 && Math.abs(position.x) < 50) {
-            	chunk.setBlock(ChunkMath.calcBlockPos(position), dirt);
-            }
         }
 	}
 

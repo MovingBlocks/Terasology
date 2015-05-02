@@ -1,34 +1,31 @@
 package org.terasology.codecity.world.structure;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodePackage implements CodeContent, Serializable {
-	private List<CodeContent> contentList;
-	
+import org.terasology.codecity.world.map.DrawableCode;
+import org.terasology.codecity.world.map.DrawableCodePackage;
+
+public class CodePackage implements CodeRepresentation {
+	protected List<CodeRepresentation> contentList;
+
 	/**
 	 * Create a new Package representation
 	 */
 	public CodePackage() {
-		contentList = new ArrayList<CodeContent>();
+		contentList = new ArrayList<CodeRepresentation>();
 	}
 	
-	@Override
-	public int getSize(CodeScale scale) {
-		int size = 1;
-		for (CodeContent code : contentList)
-			size += 2 + code.getSize(scale);
-
-		return size;
-	}
-
-	@Override
-	public int getHeight(CodeScale scale) {
-		return 1;
-	}
-	
-	public void addCodeContent(CodeContent content) {
+	/**
+	 * Add an object to the package
+	 * @param content Object to be added
+	 */
+	public void addCodeContent(CodeRepresentation content) {
 		contentList.add(content);
+	}
+
+	@Override
+	public DrawableCode getDrawableCode() {
+		return new DrawableCodePackage(contentList);
 	}
 }

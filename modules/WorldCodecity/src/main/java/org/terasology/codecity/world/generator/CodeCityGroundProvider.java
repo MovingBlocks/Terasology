@@ -9,7 +9,7 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 @Produces(SurfaceHeightFacet.class)
-public class CodeCityProvider implements FacetProvider {
+public class CodeCityGroundProvider implements FacetProvider {
 
 	@Override
 	public void setSeed(long seed) {
