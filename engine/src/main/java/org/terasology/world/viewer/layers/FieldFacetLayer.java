@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.layers;
+package org.terasology.world.viewer.layers;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -28,52 +28,60 @@ import org.terasology.math.TeraMath;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Region;
-import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.base.FieldFacet2D;
-import org.terasology.worldviewer.color.Blender;
-import org.terasology.worldviewer.color.Blenders;
-import org.terasology.worldviewer.color.ColorModels;
-import org.terasology.worldviewer.config.FacetConfig;
+import org.terasology.world.viewer.color.Blender;
+import org.terasology.world.viewer.color.Blenders;
+import org.terasology.world.viewer.color.ColorModels;
+import org.terasology.world.viewer.config.FacetConfig;
 
+import com.google.common.base.Preconditions;
 import com.google.common.math.DoubleMath;
 
 /**
  * Provides info about an {@link FieldFacet2D}.
  * @author Martin Steiger
  */
-public class FieldFacetLayer extends AbstractFacetLayer {
+public abstract class FieldFacetLayer extends AbstractFacetLayer {
 
     private static final List<Color> GRAYS = IntStream
             .range(0, 256)
             .mapToObj(i -> new Color(i, i, i))
             .collect(Collectors.toList());
 
+    private final Class<? extends FieldFacet2D> clazz;
+
     private Config config = new Config();
 
     /**
-     * This can be called only through reflection since Config is private
+     * @param clazz the target FieldFacet2D class
      * @param config the layer configuration info
      */
-    public FieldFacetLayer(Config config) {
+    public FieldFacetLayer(Class<? extends FieldFacet2D> clazz, Config config) {
+        Preconditions.checkArgument(clazz != null, "clazz must not be null");
+        Preconditions.checkArgument(config != null, "config must not be null");
+
+        this.clazz = clazz;
         this.config = config;
     }
 
     public FieldFacetLayer(Class<? extends FieldFacet2D> clazz, double offset, double scale) {
-        this.config.clazz = clazz;
+        Preconditions.checkArgument(clazz != null, "clazz must not be null");
+
+        this.clazz = clazz;
         this.config.offset = offset;
         this.config.scale = scale;
     }
 
     @Override
     public String getWorldText(Region region, int wx, int wy) {
-        FieldFacet2D facet = region.getFacet(config.clazz);
+        FieldFacet2D facet = region.getFacet(clazz);
         double value = facet.getWorld(wx, wy);
         return String.format("%.2f", value);
     }
 
     @Override
     public void render(BufferedImage img, Region region) {
-        FieldFacet2D facet = region.getFacet(config.clazz);
+        FieldFacet2D facet = region.getFacet(clazz);
 
         int width = img.getWidth();
         int height = img.getHeight();
@@ -109,11 +117,6 @@ public class FieldFacetLayer extends AbstractFacetLayer {
         } else {
             return MISSING;
         }
-    }
-
-    @Override
-    public Class<? extends WorldFacet> getFacetClass() {
-        return config.clazz;
     }
 
     public double getOffset() {
@@ -153,7 +156,6 @@ public class FieldFacetLayer extends AbstractFacetLayer {
      * Persistent data
      */
     protected static class Config implements FacetConfig {
-        private Class<? extends FieldFacet2D> clazz;
 
         @Range(min = -100, max = 100, increment = 1f, precision = 1)
         private double offset;

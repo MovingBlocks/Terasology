@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.layers.engine;
+package org.terasology.world.viewer.layers.engine;
 
 import java.awt.image.BufferedImage;
 
 import org.terasology.world.generation.Region;
-import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
-import org.terasology.worldviewer.layers.AbstractFacetLayer;
+import org.terasology.world.viewer.layers.AbstractFacetLayer;
+import org.terasology.world.viewer.layers.Renders;
 
 /**
  * Provides information about the sea level.
  * @author Martin Steiger
  */
+@Renders(value = SeaLevelFacet.class, order = -1)
 public class SeaLevelFacetLayer extends AbstractFacetLayer {
-
-    @Override
-    public Class<? extends WorldFacet> getFacetClass() {
-        return SeaLevelFacet.class;
-    }
 
     @Override
     public void render(BufferedImage img, Region region) {

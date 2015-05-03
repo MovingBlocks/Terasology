@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.layers.engine;
+package org.terasology.core.world.viewer.layers;
 
-import org.terasology.world.generation.facets.SurfaceHeightFacet;
-import org.terasology.worldviewer.layers.FieldFacetLayer;
+import org.terasology.core.world.CoreBiome;
+import org.terasology.core.world.generator.facets.BiomeFacet;
+import org.terasology.world.viewer.layers.NominalFacetLayer;
+import org.terasology.world.viewer.layers.Renders;
+import org.terasology.world.viewer.layers.ZOrder;
 
 /**
- * Provides information about the surface height level.
+ * Maps {@link CoreBiome} facet to corresponding colors.
  * @author Martin Steiger
  */
-public class SurfaceHeightFacetLayer extends FieldFacetLayer {
+@Renders(value = BiomeFacet.class, order = ZOrder.BIOME)
+public class CoreBiomeFacetLayer extends NominalFacetLayer<CoreBiome> {
 
-    public SurfaceHeightFacetLayer(Config config) {
-        super(config);
-    }
-
-    public SurfaceHeightFacetLayer() {
-        super(SurfaceHeightFacet.class, 0d, 1.5d);
+    public CoreBiomeFacetLayer() {
+        super(BiomeFacet.class, new CoreBiomeColors());
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.layers;
+package org.terasology.world.viewer.layers;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -23,18 +23,17 @@ import java.util.function.Function;
 
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;
-import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.base.ObjectFacet2D;
-import org.terasology.worldviewer.color.Blender;
-import org.terasology.worldviewer.color.Blenders;
-import org.terasology.worldviewer.color.ColorModels;
+import org.terasology.world.viewer.color.Blender;
+import org.terasology.world.viewer.color.Blenders;
+import org.terasology.world.viewer.color.ColorModels;
 
 /**
  * Provides info about an {@link ObjectFacet2D}.
  * @param <E> the object type
  * @author Martin Steiger
  */
-public class NominalFacetLayer<E> extends AbstractFacetLayer {
+public abstract class NominalFacetLayer<E> extends AbstractFacetLayer {
 
     private final Function<? super E, Color> colorMap;
     private final Class<? extends ObjectFacet2D<E>> facetClass;
@@ -88,10 +87,5 @@ public class NominalFacetLayer<E> extends AbstractFacetLayer {
             return "<missing>";
         }
         return val.toString();
-    }
-
-    @Override
-    public Class<? extends WorldFacet> getFacetClass() {
-        return facetClass;
     }
 }

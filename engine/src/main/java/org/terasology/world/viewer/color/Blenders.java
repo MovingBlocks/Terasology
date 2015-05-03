@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.color;
+package org.terasology.world.viewer.color;
 
 import java.awt.image.ColorModel;
 

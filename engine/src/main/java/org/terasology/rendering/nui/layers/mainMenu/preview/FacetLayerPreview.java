@@ -25,18 +25,23 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Set;
+
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
+import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.worldviewer.color.ColorModels;
-import org.terasology.worldviewer.layers.FacetLayer;
-import org.terasology.worldviewer.layers.engine.SurfaceHeightFacetLayer;
+import org.terasology.world.viewer.color.ColorModels;
+import org.terasology.world.viewer.layers.FacetLayer;
+import org.terasology.world.viewer.layers.FacetLayers;
 
 import com.google.common.math.IntMath;
 
@@ -51,13 +56,19 @@ public class FacetLayerPreview implements PreviewGenerator {
 
     private final DirectColorModel colorModel = ColorModels.RGBA;
 
-    private WorldGenerator worldGenerator;
+    private final WorldGenerator worldGenerator;
+
+    private final List<FacetLayer> facetLayers;
 
     /**
+     * @param environment
      * @param worldGenerator
      */
-    public FacetLayerPreview(WorldGenerator worldGenerator) {
+    public FacetLayerPreview(ModuleEnvironment environment, WorldGenerator worldGenerator) {
         this.worldGenerator = worldGenerator;
+
+        Set<Class<? extends WorldFacet>> facets = worldGenerator.getWorld().getAllFacets();
+        facetLayers = FacetLayers.createLayersFor(facets, environment);
     }
 
     @Override
@@ -76,7 +87,7 @@ public class FacetLayerPreview implements PreviewGenerator {
         BufferedImage view = new BufferedImage(colorModel, raster, false, null);
 
         Graphics2D g = view.createGraphics();
-        g.scale(1f/scale, 1f/scale);
+        g.scale(1f / scale, 1f / scale);
         g.translate(-offX, -offY);
 
 
@@ -144,10 +155,12 @@ public class FacetLayerPreview implements PreviewGenerator {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, width, height);
 
-        FacetLayer layer = new SurfaceHeightFacetLayer();
-
         try {
-             layer.render(image, region);
+            for (FacetLayer layer : facetLayers) {
+                if (layer.isVisible()) {
+                    layer.render(image, region);
+                }
+            }
         } finally {
             g.dispose();
         }

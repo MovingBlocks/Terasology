@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.layers.engine;
+package org.terasology.world.viewer.config;
 
-import org.terasology.world.generation.facets.SurfaceHumidityFacet;
-import org.terasology.worldviewer.layers.FieldFacetLayer;
+import org.terasology.module.sandbox.API;
 
-/**
- * Provides information about the surface humidity.
- * @author Martin Steiger
- */
-public class SurfaceHumidityFacetLayer extends FieldFacetLayer {
-
-    public SurfaceHumidityFacetLayer(Config config) {
-        super(config);
-    }
-
-    public SurfaceHumidityFacetLayer() {
-        super(SurfaceHumidityFacet.class, 0d, 100d);
-    }
+@API
+public interface FacetConfig {
+    // marker
 }

@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.worldviewer.layers.engine;
+package org.terasology.world.viewer.core;
 
-import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
-import org.terasology.worldviewer.layers.FieldFacetLayer;
+import org.terasology.module.sandbox.API;
 
 /**
- * Provides information about the surface temperature.
+ * A general interface for observers
+ * @param <T> the target object type
  * @author Martin Steiger
  */
-public class SurfaceTemperatureFacetLayer extends FieldFacetLayer {
+@API
+@FunctionalInterface
+public interface Observer<T> {
 
-    public SurfaceTemperatureFacetLayer(Config config) {
-        super(config);
-    }
-
-    public SurfaceTemperatureFacetLayer() {
-        super(SurfaceTemperatureFacet.class, 0d, 100d);
-    }
+    void update(T layer);
 }
