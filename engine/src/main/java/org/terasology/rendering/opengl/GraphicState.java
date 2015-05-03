@@ -464,13 +464,15 @@ public class GraphicState {
 
         if (fbo.colorBufferTextureId != 0) {
             if (color) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId++);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
+            attachmentId++;
         }
         if (fbo.normalsBufferTextureId != 0) {
             if (normal) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId++);
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
+            attachmentId++;
         }
         if (fbo.lightBufferTextureId != 0) {
             if (lightBuffer) {
