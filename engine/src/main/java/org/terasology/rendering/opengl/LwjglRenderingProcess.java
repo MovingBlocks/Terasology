@@ -21,7 +21,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -32,7 +31,6 @@ import org.terasology.editor.EditorRange;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -47,14 +45,12 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
@@ -63,39 +59,15 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DECR;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_INCR;
-import static org.lwjgl.opengl.GL11.GL_KEEP;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
 import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
@@ -104,11 +76,9 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glNewList;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.lwjgl.opengl.GL11.glTexCoord2d;
 import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
  * The Default Rendering Process class.
@@ -178,8 +148,10 @@ public class LwjglRenderingProcess {
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
+    private GraphicState graphicState;
+
     public LwjglRenderingProcess() {
-        initialize();
+
     }
 
     public void initialize() {
@@ -197,6 +169,10 @@ public class LwjglRenderingProcess {
         readBackPBOCurrent = readBackPBOFront;
     }
 
+    public void setGraphicState(GraphicState graphicState) {
+        this.graphicState = graphicState;
+    }
+
     /**
      * Creates the scene FBOs and updates them according to the size of the viewport. The current size
      * provided by the display class is only used if the parameters overwriteRTWidth and overwriteRTHeight are set
@@ -204,7 +180,7 @@ public class LwjglRenderingProcess {
      */
     private void createOrUpdateFullscreenFbos() {
 
-        if(overwriteRtWidth == 0) {
+        if (overwriteRtWidth == 0) {
             fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
         } else {
             fullScale = new Dimensions(overwriteRtWidth, overwriteRtHeight);
@@ -230,7 +206,9 @@ public class LwjglRenderingProcess {
 
         // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
         int shadowMapResolution = renderingConfig.getShadowMapResolution();
-        new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        FBO sceneShadowMap =
+                new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        graphicState.setSceneShadowMap(sceneShadowMap);
 
         // buffers for the initial renderings
         FBO sceneOpaque =
@@ -266,6 +244,8 @@ public class LwjglRenderingProcess {
         // buffers for the Final Post-Processing
         new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
+
+        graphicState.refreshDynamicFBOs();
     }
 
     public void deleteFBO(String title) {
@@ -350,249 +330,6 @@ public class LwjglRenderingProcess {
                 currentExposure = hdrExposureDefault;
             }
         }
-    }
-
-    public void clear() {
-        bindFbo("sceneOpaque");
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        unbindFbo("sceneOpaque");
-        bindFbo("sceneReflectiveRefractive");
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        unbindFbo("sceneReflectiveRefractive");
-    }
-
-    public void beginRenderSceneOpaque() {
-        bindFbo("sceneOpaque");
-        setRenderBufferMask(true, true, true);
-    }
-
-    public void endRenderSceneOpaque() {
-        setRenderBufferMask(true, true, true);
-        unbindFbo("sceneOpaque");
-    }
-
-    public void beginRenderSimpleBlendMaterialsIntoCombinedPass() {
-        beginRenderSceneOpaque();
-        GL11.glEnable(GL_BLEND);
-        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDepthMask(false);
-    }
-
-    public void endRenderSimpleBlendMaterialsIntoCombinedPass() {
-        GL11.glDisable(GL_BLEND);
-        GL11.glDepthMask(true);
-        endRenderSceneOpaque();
-    }
-
-    public void beginRenderLightGeometryStencilPass() {
-        bindFbo("sceneOpaque");
-        setRenderBufferMask(false, false, false);
-        glDepthMask(false);
-
-        glClear(GL_STENCIL_BUFFER_BIT);
-
-        glCullFace(GL_FRONT);
-        glDisable(GL_CULL_FACE);
-
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_ALWAYS, 0, 0);
-
-        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR, GL_KEEP);
-        glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR, GL_KEEP);
-    }
-
-    public void endRenderLightGeometryStencilPass() {
-        setRenderBufferMask(true, true, true);
-        unbindFbo("sceneOpaque");
-    }
-
-    public void beginRenderLightGeometry() {
-        bindFbo("sceneOpaque");
-
-        // Only write to the light buffer
-        setRenderBufferMask(false, false, true);
-
-        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-        glDepthMask(true);
-        glDisable(GL_DEPTH_TEST);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-    }
-
-    public void endRenderLightGeometry() {
-        glDisable(GL_STENCIL_TEST);
-        glCullFace(GL_BACK);
-
-        unbindFbo("sceneOpaque");
-    }
-
-    public void beginRenderDirectionalLights() {
-        bindFbo("sceneOpaque");
-    }
-
-    public void endRenderDirectionalLights() {
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glEnable(GL_DEPTH_TEST);
-
-        setRenderBufferMask(true, true, true);
-        unbindFbo("sceneOpaque");
-
-        applyLightBufferPass("sceneOpaque");
-    }
-
-    public void preChunkRenderSetup(Vector3f chunkPositionRelativeToCamera) {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-    }
-
-    public void postChunkRenderCleanup() {
-        GL11.glPopMatrix();
-    }
-
-    public void enableWireframeIf(boolean isWireframeEnabledInRenderingDebugConfig) {
-        if (isWireframeEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-    }
-
-    public void disableWireframeIf(boolean isWireframeEnabledInRenderingDebugConfig) {
-        if (isWireframeEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-    }
-
-    public void setRenderBufferMask(boolean color, boolean normal, boolean lightBuffer) {
-        setRenderBufferMask(currentlyBoundFboName, color, normal, lightBuffer);
-    }
-
-    public void setRenderBufferMask(String fboTitle, boolean color, boolean normal, boolean lightBuffer) {
-        setRenderBufferMask(getFBO(fboTitle), color, normal, lightBuffer);
-    }
-
-    public void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
-        if (fbo == null) {
-            return;
-        }
-
-        int attachmentId = 0;
-
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-
-        if (fbo.colorBufferTextureId != 0) {
-            if (color) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-
-            attachmentId++;
-        }
-        if (fbo.normalsBufferTextureId != 0) {
-            if (normal) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-
-            attachmentId++;
-        }
-        if (fbo.lightBufferTextureId != 0) {
-            if (lightBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-
-            attachmentId++;
-        }
-
-        bufferIds.flip();
-
-        GL20.glDrawBuffers(bufferIds);
-    }
-
-    public void beginRenderSceneReflectiveRefractive(boolean isHeadUnderWater) {
-        bindFbo("sceneReflectiveRefractive");
-
-        // Make sure the water surface is rendered if the player is underwater.
-        if (isHeadUnderWater) {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-        }
-    }
-
-    public void endRenderSceneReflectiveRefractive(boolean isHeadUnderWater) {
-        if (isHeadUnderWater) {
-            GL11.glEnable(GL11.GL_CULL_FACE);
-        }
-
-        unbindFbo("sceneReflectiveRefractive");
-    }
-
-    public void beginRenderReflectedScene() {
-        FBO reflected = getFBO("sceneReflected");
-
-        if (reflected == null) {
-            return;
-        }
-
-        reflected.bind();
-
-        setViewportTo(reflected.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glCullFace(GL11.GL_FRONT);
-    }
-
-    public void endRenderReflectedScene() {
-        GL11.glCullFace(GL11.GL_BACK);
-        unbindFbo("sceneReflected");
-        setViewportToFullSize();
-    }
-
-    public void beginRenderSceneShadowMap() {
-        FBO shadowMap = getFBO("sceneShadowMap");
-
-        if (shadowMap == null) {
-            return;
-        }
-
-        shadowMap.bind();
-
-        setViewportTo(shadowMap.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glDisable(GL_CULL_FACE);
-    }
-
-    public void endRenderSceneShadowMap() {
-        GL11.glEnable(GL_CULL_FACE);
-        unbindFbo("sceneShadowMap");
-        setViewportToFullSize();
-    }
-
-    public void beginRenderSceneSky() {
-        setRenderBufferMask(true, false, false);
-    }
-
-    public void endRenderSceneSky() {
-        setRenderBufferMask(true, true, true);
-
-        if (renderingConfig.isInscattering()) {
-            generateSkyBand(0);
-            generateSkyBand(1);
-        }
-
-        bindFbo("sceneOpaque");
-    }
-
-    public void beginRenderFirstPerson() {
-        GL11.glPushMatrix();
-        GL11.glLoadIdentity();
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
-    }
-
-    public void endRenderFirstPerson() {
-        GL11.glDepthFunc(GL_LEQUAL);
-        GL11.glPopMatrix();
     }
 
     public void renderPreCombinedScene() {
@@ -768,7 +505,7 @@ public class LwjglRenderingProcess {
         attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
     }
 
-    private void applyLightBufferPass(String target) {
+    public void applyLightBufferPass(String target) {
         Material program = Assets.getMaterial("engine:prog.lightBufferPass");
         program.enable();
 
@@ -793,8 +530,9 @@ public class LwjglRenderingProcess {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        bindFbo(target + "PingPong");
-        setRenderBufferMask(true, true, true);
+        FBO targetPingPong = getFBO(target + "PingPong");
+        targetPingPong.bind();
+        graphicState.setRenderBufferMask(targetPingPong, true, true, true);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -809,7 +547,7 @@ public class LwjglRenderingProcess {
         }
     }
 
-    private void generateSkyBand(int id) {
+    public void generateSkyBand(int id) {
         FBO skyBand = getFBO("sceneSkyBand" + id);
 
         if (skyBand == null) {
@@ -817,7 +555,7 @@ public class LwjglRenderingProcess {
         }
 
         skyBand.bind();
-        setRenderBufferMask(true, false, false);
+        graphicState.setRenderBufferMask(skyBand, true, false, false);
 
         Material material = Assets.getMaterial("engine:prog.blur");
 
