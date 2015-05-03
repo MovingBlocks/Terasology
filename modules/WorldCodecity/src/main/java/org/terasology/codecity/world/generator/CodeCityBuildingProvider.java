@@ -25,6 +25,8 @@ import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.Updates;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
+import com.sun.jna.platform.unix.X11.Drawable;
+
 /**
  * Creates a new surface for buildings using an squared scale and a CodeMap.
  * This surface is created just above the ground.
@@ -42,13 +44,24 @@ public class CodeCityBuildingProvider implements FacetProvider {
     private final CodeMapFactory factory = new CodeMapFactory(scale);
 	
 	public CodeCityBuildingProvider() {
-		CodeClass c = new CodeClass(100, 150);
+		CodeClass c = new CodeClass(10, 300);
+		CodeClass c2 = new CodeClass(50, 150);
 	    CodePackage p = new CodePackage();
+	    CodePackage p1 = new CodePackage();
+	    CodePackage p2 = new CodePackage();
 	    p.addCodeContent(c);
+	    p.addCodeContent(c);
+	    p.addCodeContent(c);
+	    p1.addCodeContent(c2);
+	    p1.addCodeContent(c2);
+	    p1.addCodeContent(c2);
+	    p1.addCodeContent(c2);
+	    p2.addCodeContent(p);
 
 	    List<DrawableCode> code = new ArrayList<DrawableCode>();
-	    code.add(c.getDrawableCode());
 	    code.add(p.getDrawableCode());
+	    code.add(p1.getDrawableCode());
+	    code.add(p2.getDrawableCode());
 
 	    codeMap = factory.generateMap(code);
 	}
@@ -56,6 +69,21 @@ public class CodeCityBuildingProvider implements FacetProvider {
     @Override
     public void setSeed(long seed) {
 
+    }
+    
+    private void processPosition(CodeCityFacet facet, CodeMap codeMap, Vector2i position, Vector2i fase,int level, int base){
+        if(codeMap.isUsed(position.x-fase.x, position.y-fase.y)){
+            MapObject mapObject = codeMap.getMapObject(position.x-fase.x, position.y-fase.y);
+            int height = level+base+mapObject.getHeight(scale, factory);
+            facet.setWorld(position.x, position.y, height);
+            
+            
+            DrawableCode drawable = mapObject.getObject();
+            Vector2i auxPosition = codeMap.getCodePosition(drawable);
+            fase = new Vector2i(fase.x+auxPosition.x, fase.y+auxPosition.y);
+            CodeMap auxMap = drawable.getSubmap(scale, factory);
+            processPosition(facet, auxMap, position, fase, level+1, base);
+        }
     }
 
     @Override
@@ -67,11 +95,7 @@ public class CodeCityBuildingProvider implements FacetProvider {
         Rect2i processRegion = facet.getWorldRegion();
         //Assigns the height to every position in the region
         for (Vector2i position : processRegion) {
-        	//Just positions in the CodeMap has a building height associated.
-            if(codeMap.isUsed(position.x, position.y)){
-            	int height = base+codeMap.getMapObject(position.x, position.y).getHeight(scale, factory);
-            	facet.setWorld(position.x, position.y, height);
-            }
+            processPosition(facet, codeMap, position,Vector2i.zero(),  0, base);
             
         }
         // give our newly created and populated facet to the region

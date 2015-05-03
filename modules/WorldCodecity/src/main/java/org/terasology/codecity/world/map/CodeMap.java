@@ -3,6 +3,7 @@ package org.terasology.codecity.world.map;
 import java.util.Set;
 
 import org.terasology.codecity.world.structure.scale.CodeScale;
+import org.terasology.math.Vector2i;
 
 public interface CodeMap {
 
@@ -71,5 +72,11 @@ public interface CodeMap {
      * @return The MaṕObject in the indicated position
      */
     public MapObject getMapObject(int x, int y);
+    
+    /**
+     * @param code Used code to create this map
+     * @return Position where the code was added
+     */
+    public Vector2i getCodePosition(DrawableCode code);
     
 }

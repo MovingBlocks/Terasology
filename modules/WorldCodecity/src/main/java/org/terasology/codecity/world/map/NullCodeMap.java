@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.terasology.codecity.world.structure.scale.CodeScale;
+import org.terasology.math.Vector2i;
 
 /**
  * This class represent a null map that don't accept anything
@@ -40,5 +41,16 @@ public class NullCodeMap implements CodeMap {
     @Override
     public Set<MapObject> getMapObjects() {
         return new HashSet<MapObject>();
+    }
+
+    @Override
+    public MapObject getMapObject(int x, int y) {
+        return null;
+    }
+
+    @Override
+    public Vector2i getCodePosition(DrawableCode code) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

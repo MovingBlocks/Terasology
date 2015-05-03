@@ -5,11 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.terasology.codecity.world.structure.scale.CodeScale;
+import org.terasology.math.Vector2i;
 
 import com.google.common.base.Preconditions;
 
 public class CodeHashMap implements CodeMap {
     private HashMap<String, MapObject> contentMap;
+    private HashMap<DrawableCode, Vector2i> codePosition;
     private int size = 0;
 
     /**
@@ -17,6 +19,7 @@ public class CodeHashMap implements CodeMap {
      */
     public CodeHashMap() {
         contentMap = new HashMap<String, MapObject>();
+        codePosition = new HashMap<DrawableCode, Vector2i>();
     }
 
     /**
@@ -58,6 +61,7 @@ public class CodeHashMap implements CodeMap {
         int yMax = y0 + buildingSize;
         updateSize(xMax, yMax);
 
+        codePosition.put(content, new Vector2i(x0, y0));
         for (int i = 0; i < buildingSize; i++) {
             for (int j = 0; j < buildingSize; j++) {
                 int x = i + x0;
@@ -74,8 +78,8 @@ public class CodeHashMap implements CodeMap {
     public boolean canPlaceContent(DrawableCode content, CodeScale scale,
             CodeMapFactory factory, int x, int y) {
         int buildingSize = content.getSize(scale, factory);
-        for (int i = x; i < buildingSize; i++)
-            for (int j = y; j < buildingSize; j++)
+        for (int i = x; i < buildingSize+x; i++)
+            for (int j = y; j < buildingSize+y; j++)
                 if (!canPlaceInPosition(x, y))
                     return false;
         return true;
@@ -126,5 +130,14 @@ public class CodeHashMap implements CodeMap {
                 if (isUsed(x + i, y + j))
                     return false;
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    @Override
+    public Vector2i getCodePosition(DrawableCode code) {
+        return codePosition.get(code);
     }
 }
