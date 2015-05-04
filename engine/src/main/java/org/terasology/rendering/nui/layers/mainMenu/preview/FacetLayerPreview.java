@@ -102,6 +102,10 @@ public class FacetLayerPreview implements PreviewGenerator {
                 if (progressListener != null) {
                     progressListener.onProgress(tileIdx / tileCount);
                 }
+
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
             }
         }
 

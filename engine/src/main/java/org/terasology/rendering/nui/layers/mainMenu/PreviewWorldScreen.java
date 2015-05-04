@@ -16,8 +16,6 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -40,24 +38,20 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.WorldGenerator2DPreview;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
@@ -77,15 +71,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private int imageSize = 128;
-
     private WorldGenerator worldGenerator;
 
     private UILabel errorLabel;
     private UIImage previewImage;
     private UISlider zoomSlider;
     private UIButton applyButton;
-    private UIDropdown<String> layerDropdown;
     private PreviewSettings currentSettings;
 
     private UIText seed;
@@ -135,11 +126,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     public void initialise() {
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
-            zoomSlider.setMinimum(1.0f);
-            zoomSlider.setRange(99.f);
-            zoomSlider.setIncrement(1.0f);
-            zoomSlider.setValue(10f);
-            zoomSlider.setPrecision(0);
+            zoomSlider.setValue(2f);
         }
 
         seed = find("seed", UIText.class);
@@ -162,36 +149,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         previewImage = find("preview", UIImage.class);
 
-        layerDropdown = find("display", UIDropdown.class);
-        layerDropdown.bindOptions(new ReadOnlyBinding<List<String>>() {
-            @Override
-            public List<String> get() {
-                if (worldGenerator instanceof WorldGenerator2DPreview) {
-                    return Lists.newArrayList(((WorldGenerator2DPreview) worldGenerator).getLayers());
-                } else {
-                    return Lists.newArrayList();
-                }
-            }
-        });
-        layerDropdown.bindSelection(new Binding<String>() {
-            String selection;
-
-            @Override
-            public String get() {
-                if (selection == null && layerDropdown.getOptions().size() > 0) {
-                    // select the first one in the list
-                    selection = layerDropdown.getOptions().get(0);
-                }
-                return selection;
-            }
-
-            @Override
-            public void set(String value) {
-                selection = value;
-            }
-        });
-
-
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
@@ -204,7 +161,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     public void update(float delta) {
         super.update(delta);
         if (worldGenerator != null) {
-            PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seed.getText());
+            PreviewSettings newSettings = new PreviewSettings(TeraMath.floorToInt(zoomSlider.getValue()), seed.getText());
             if (currentSettings == null || !currentSettings.equals(newSettings)) {
                 boolean firstTime = currentSettings == null;
                 currentSettings = newSettings;
@@ -239,6 +196,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         ProgressListener progressListener = progress ->
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
+        final int imageSize = 384;
+
         Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
             @Override
             public ByteBufferResult call() throws InterruptedException {
@@ -246,8 +205,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                     if (seed != null) {
                         worldGenerator.setWorldSeed(seed.getText());
                     }
-                      ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progressListener);
-                      return new ByteBufferResult(true, buf, null);
+                    ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progressListener);
+                    return new ByteBufferResult(true, buf, null);
                 } catch (InterruptedException e) {
                     throw e;
                 } catch (Exception ex) {
@@ -268,7 +227,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 } else {
                     errorLabel.setText("Sorry: could not generate 2d preview :-(");
                     errorLabel.setVisible(true);
-                    logger.error("Error generating a 2d preview for " + layerDropdown.getSelection(), byteBufferResult.exception);
+                    logger.error("Error generating a 2d preview", byteBufferResult.exception);
                 }
                 return null;
             }
@@ -286,12 +245,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private static class PreviewSettings {
-        private String layer;
         private int zoom;
         private String seed;
 
-        public PreviewSettings(String layer, int zoom, String seed) {
-            this.layer = layer;
+        public PreviewSettings(int zoom, String seed) {
             this.zoom = zoom;
             this.seed = seed;
         }
@@ -303,14 +260,14 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
             if (obj instanceof PreviewSettings) {
                 PreviewSettings other = (PreviewSettings) obj;
-                return Objects.equals(other.layer, layer) && other.zoom == zoom && Objects.equals(other.seed, seed);
+                return other.zoom == zoom && Objects.equals(other.seed, seed);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(layer, zoom, seed);
+            return Objects.hash(zoom, seed);
         }
     }
 
