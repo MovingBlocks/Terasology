@@ -141,7 +141,6 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
             for (BlockStructuralSupport support : supports) {
                 if (support.shouldBeRemovedDueToChange(blockPosition, sideReverse)) {
-                    System.out.println("Removing block due to: " + support.getClass());
                     blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity,
                             EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
                     break;
