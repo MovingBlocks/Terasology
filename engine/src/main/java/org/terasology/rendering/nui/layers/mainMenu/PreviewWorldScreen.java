@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -49,16 +50,12 @@ import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
-import org.terasology.world.generator.RegisterWorldGenerator;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
-import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Objects;
@@ -95,31 +92,42 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private PreviewGenerator previewGen;
 
+    private ModuleEnvironment environment;
+
     @Override
     public void onOpened() {
         super.onOpened();
 
         CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary());
-        WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
+        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
 
         try {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            Name moduleName = info.getUri().getModuleName();
+            Name moduleName = worldGenUri.getModuleName();
             ResolutionResult result = resolver.resolve(moduleName);
-            try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                worldGenerator = searchForWorldGenerator(info.getUri(), environment);
+            if (result.isSuccess()) {
+                environment = moduleManager.loadEnvironment(result.getModules(), false);
+                worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
-
-//              if (worldGenerator instanceof WorldGenerator2DPreview) {
-//                  previewGen = new SummaryPreviewGenerator((WorldGenerator2DPreview) worldGenerator, currentSettings.layer);
-//              } else {
-                  previewGen = new FacetLayerPreview(environment, worldGenerator);
-//              }
+                previewGen = new FacetLayerPreview(environment, worldGenerator);
+            } else {
+                logger.error("Could not resolve modules for: {}", worldGenUri);
             }
+
         } catch (Exception e) {
             // if errors happen, don't enable this feature
             worldGenerator = null;
-            logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview", e);
+            logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
+        }
+    }
+
+    @Override
+    public void onClosed() {
+        super.onClosed();
+
+        if (environment != null) {
+            environment.close();
+            environment = null;
         }
     }
 
@@ -225,11 +233,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         errorLabel.setVisible(false);
 
         final NUIManager manager = CoreRegistry.get(NUIManager.class);
-//        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-//        popup.setMessage("Updating Preview", "Please wait ...");
+        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Updating Preview", "Please wait ...");
 
-//        ProgressListener progressListener = progress ->
-//                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+        ProgressListener progressListener = progress ->
+                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
         Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
             @Override
@@ -238,7 +246,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                     if (seed != null) {
                         worldGenerator.setWorldSeed(seed.getText());
                     }
-                      ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progress -> {});
+                      ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progressListener);
                       return new ByteBufferResult(true, buf, null);
                 } catch (InterruptedException e) {
                     throw e;
@@ -248,32 +256,25 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
         };
 
-//        popup.onSuccess(new Function<ByteBufferResult, Void>() {
-//            @Override
-//            public Void apply(ByteBufferResult byteBufferResult) {
-//                if (byteBufferResult.success) {
-//                    previewImage.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
-//                    previewImage.setVisible(true);
-//                    if (applyButton != null) {
-//                        applyButton.setEnabled(false);
-//                    }
-//                } else {
-//                    errorLabel.setText("Sorry: could not generate 2d preview :-(");
-//                    errorLabel.setVisible(true);
-//                    logger.error("Error generating a 2d preview for " + layerDropdown.getSelection(), byteBufferResult.exception);
-//                }
-//                return null;
-//            }
-//        });
+        popup.onSuccess(new Function<ByteBufferResult, Void>() {
+            @Override
+            public Void apply(ByteBufferResult byteBufferResult) {
+                if (byteBufferResult.success) {
+                    previewImage.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
+                    previewImage.setVisible(true);
+                    if (applyButton != null) {
+                        applyButton.setEnabled(false);
+                    }
+                } else {
+                    errorLabel.setText("Sorry: could not generate 2d preview :-(");
+                    errorLabel.setVisible(true);
+                    logger.error("Error generating a 2d preview for " + layerDropdown.getSelection(), byteBufferResult.exception);
+                }
+                return null;
+            }
+        });
 
-        try {
-            ByteBufferResult data = operation.call();
-            previewImage.setImage(createTexture(imageSize, imageSize, data.buf));
-            previewImage.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-//        popup.startOperation(operation, true);
+        popup.startOperation(operation, true);
     }
 
     private Texture createTexture(int width, int height, ByteBuffer buf) {
@@ -310,43 +311,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         @Override
         public int hashCode() {
             return Objects.hash(layer, zoom, seed);
-        }
-    }
-
-    private WorldGenerator searchForWorldGenerator(SimpleUri uri, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
-        for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
-            RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
-            SimpleUri generatorUri = new SimpleUri(environment.getModuleProviding(generatorClass), annotation.id());
-            if (generatorUri.equals(uri)) {
-                return loadGenerator(generatorClass, generatorUri);
-            }
-        }
-        throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");
-    }
-
-    private WorldGenerator loadGenerator(Class<?> generatorClass, SimpleUri uri) throws UnresolvedWorldGeneratorException {
-        if (isValidWorldGenerator(generatorClass)) {
-            try {
-                return (WorldGenerator) generatorClass.getConstructor(SimpleUri.class).newInstance(uri);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new UnresolvedWorldGeneratorException("Failed to instantiate world generator '" + uri + "'", e);
-            }
-        } else {
-            throw new UnresolvedWorldGeneratorException(uri + " is not a valid world generator");
-        }
-    }
-
-    private boolean isValidWorldGenerator(Class<?> generatorClass) {
-        try {
-            if (WorldGenerator.class.isAssignableFrom(generatorClass)) {
-                if (generatorClass.getConstructor(SimpleUri.class) != null) {
-                    return true;
-                }
-            }
-            return false;
-            // Being generous in catching here, because if the module is broken due to code changes or missing classes the world generator is invalid
-        } catch (Throwable e) {
-            return false;
         }
     }
 

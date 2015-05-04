@@ -119,7 +119,7 @@ public class WorldGeneratorManager {
         }
     }
 
-    private WorldGenerator searchForWorldGenerator(SimpleUri uri, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
+    public WorldGenerator searchForWorldGenerator(SimpleUri uri, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
             SimpleUri generatorUri = new SimpleUri(environment.getModuleProviding(generatorClass), annotation.id());

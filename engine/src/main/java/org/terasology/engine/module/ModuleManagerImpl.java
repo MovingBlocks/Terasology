@@ -16,6 +16,7 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
@@ -106,6 +107,7 @@ public class ModuleManagerImpl implements ModuleManager {
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent.atomic");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent.locks");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.function");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.regex");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.awt");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.awt.geom");
@@ -141,6 +143,7 @@ public class ModuleManagerImpl implements ModuleManager {
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.bulletphysics.linearmath");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("sun.reflect");
         moduleSecurityManager.getBasePermissionSet().addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(java.lang.invoke.LambdaMetafactory.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(IOException.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(LoggerFactory.class);
