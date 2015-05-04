@@ -1,6 +1,6 @@
 {
     "id" : "CoreSampleGameplay",
-    "version" : "0.53.1",
+    "version" : "0.53.2",
     "displayName" : "Core Gameplay",
     "description" : "This module introduces the core Terasology content",
     "dependencies" :
