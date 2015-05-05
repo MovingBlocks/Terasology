@@ -71,6 +71,11 @@ public class ModuleConfigSystem extends BaseComponentSystem implements ModuleCon
         return getVariable(moduleName, propertyName, Float::parseFloat, defaultValue);
     }
 
+    @Override
+    public boolean getBooleanVariable(String moduleName, String propertyName, boolean defaultValue) {
+        return getVariable(moduleName, propertyName, Boolean::parseBoolean, defaultValue);
+    }
+
     private <T> T getVariable(String moduleName, String propertyName, Function<String, T> extractFunction, T defaultValue) {
         Map<String, String> moduleProperties = propertiesPerModule.get(moduleName);
         if (moduleProperties == null) {
