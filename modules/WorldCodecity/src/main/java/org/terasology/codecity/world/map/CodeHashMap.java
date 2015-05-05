@@ -66,7 +66,8 @@ public class CodeHashMap implements CodeMap {
             for (int j = 0; j < buildingSize; j++) {
                 int x = i + x0;
                 int y = j + y0;
-                contentMap.put(x + "," + y, new MapObject(content, x, y));
+                boolean isOrigin = (i == 0 && j == 0);
+                contentMap.put(x + "," + y, new MapObject(content, x, y, isOrigin));
             }
         }
     }
@@ -78,9 +79,10 @@ public class CodeHashMap implements CodeMap {
     public boolean canPlaceContent(DrawableCode content, CodeScale scale,
             CodeMapFactory factory, int x, int y) {
         int buildingSize = content.getSize(scale, factory);
+
         for (int i = x; i < buildingSize+x; i++)
             for (int j = y; j < buildingSize+y; j++)
-                if (!canPlaceInPosition(x, y))
+                if (!canPlaceInPosition(i, j))
                     return false;
         return true;
     }

@@ -1,5 +1,6 @@
 package org.terasology.codecity.world.map;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,13 +40,14 @@ public class CodeMapFactory {
      */
     public CodeMap generateMap(List<DrawableCode> contentList) {
         // Sort the content by scale
-        Collections.sort(contentList, new DrawableCodeSizeComparator(scale,
+        List<DrawableCode> sortedContent = new ArrayList<DrawableCode>(contentList); 
+        Collections.sort(sortedContent, new DrawableCodeSizeComparator(scale,
                 this));
 
         // Start drawing in the map
         CodeMap map = new CodeHashMap();
 
-        for (DrawableCode content : contentList)
+        for (DrawableCode content : sortedContent)
             insertInMap(map, content);
 
         return map;

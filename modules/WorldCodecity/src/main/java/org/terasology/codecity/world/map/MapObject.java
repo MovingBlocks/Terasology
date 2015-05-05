@@ -9,6 +9,7 @@ public class MapObject {
     private DrawableCode object;
     private int x;
     private int z;
+    private boolean isOrigin;
 
     /**
      * Create a new Object in map
@@ -20,10 +21,11 @@ public class MapObject {
      * @param z
      *            The position of the object in the z coordinate
      */
-    public MapObject(DrawableCode object, int x, int z) {
+    public MapObject(DrawableCode object, int x, int z, boolean isOrigin) {
         this.object = object;
         this.x = x;
         this.z = z;
+        this.isOrigin = isOrigin;
     }
 
     /**
@@ -56,5 +58,9 @@ public class MapObject {
      */
     public DrawableCode getObject() {
         return object;
+    }
+    
+    public boolean isOrigin() {
+        return isOrigin;
     }
 }
