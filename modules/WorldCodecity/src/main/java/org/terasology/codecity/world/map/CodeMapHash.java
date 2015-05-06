@@ -9,7 +9,7 @@ import org.terasology.math.Vector2i;
 
 import com.google.common.base.Preconditions;
 
-public class CodeHashMap implements CodeMap {
+public class CodeMapHash implements CodeMap {
     private HashMap<String, MapObject> contentMap;
     private HashMap<DrawableCode, Vector2i> codePosition;
     private int size = 0;
@@ -17,7 +17,7 @@ public class CodeHashMap implements CodeMap {
     /**
      * Create a new map representation of a set of CodeContent
      */
-    public CodeHashMap() {
+    public CodeMapHash() {
         contentMap = new HashMap<String, MapObject>();
         codePosition = new HashMap<DrawableCode, Vector2i>();
     }
@@ -89,8 +89,6 @@ public class CodeHashMap implements CodeMap {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return
      */
     @Override
     public Set<MapObject> getMapObjects() {
@@ -99,7 +97,10 @@ public class CodeHashMap implements CodeMap {
         return objects;
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MapObject getMapObject(int x, int y){
     	return contentMap.get(x + "," + y);
     }

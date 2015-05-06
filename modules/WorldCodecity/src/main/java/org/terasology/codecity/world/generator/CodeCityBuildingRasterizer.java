@@ -12,7 +12,7 @@ import org.terasology.codecity.world.map.MapObject;
 import org.terasology.codecity.world.structure.CodeClass;
 import org.terasology.codecity.world.structure.CodePackage;
 import org.terasology.codecity.world.structure.scale.CodeScale;
-import org.terasology.codecity.world.structure.scale.SquaredCodeScale;
+import org.terasology.codecity.world.structure.scale.SquareRootCodeScale;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;

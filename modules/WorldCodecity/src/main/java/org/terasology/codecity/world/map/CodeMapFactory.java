@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.terasology.codecity.world.structure.scale.CodeScale;
-import org.terasology.codecity.world.structure.scale.SquaredCodeScale;
+import org.terasology.codecity.world.structure.scale.SquareRootCodeScale;
 
 /**
  * This class is in charge of creating maps in base of a list of code.
@@ -18,7 +18,7 @@ public class CodeMapFactory {
      * Create a new CodeMapFactory using a default scale
      */
     public CodeMapFactory() {
-        scale = new SquaredCodeScale();
+        scale = new SquareRootCodeScale();
     }
 
     /**
@@ -45,7 +45,7 @@ public class CodeMapFactory {
                 this));
 
         // Start drawing in the map
-        CodeMap map = new CodeHashMap();
+        CodeMap map = new CodeMapHash();
 
         for (DrawableCode content : sortedContent)
             insertInMap(map, content);

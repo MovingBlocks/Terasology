@@ -9,7 +9,7 @@ import org.terasology.math.Vector2i;
 /**
  * This class represent a null map that don't accept anything
  */
-public class NullCodeMap implements CodeMap {
+public class CodeMapNull implements CodeMap {
 
     @Override
     public boolean isEmpty() {

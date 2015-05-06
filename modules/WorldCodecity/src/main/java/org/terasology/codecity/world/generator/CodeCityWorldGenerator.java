@@ -13,7 +13,8 @@ public class CodeCityWorldGenerator extends BaseFacetedWorldGenerator {
 
     @Override
     protected WorldBuilder createWorld(long seed) {
-        return new WorldBuilder(seed).addProvider(new CodeCityGroundProvider())
+        return new WorldBuilder(seed)
+                .addProvider(new CodeCityGroundProvider())
         		.addProvider(new CodeCityBuildingProvider())
                 .addRasterizer(new CodeCityGroundRasterizer())
                 .addRasterizer(new CodeCityBuildingRasterizer())

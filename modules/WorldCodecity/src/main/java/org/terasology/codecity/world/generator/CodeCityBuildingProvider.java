@@ -12,7 +12,7 @@ import org.terasology.codecity.world.map.MapObject;
 import org.terasology.codecity.world.structure.CodeClass;
 import org.terasology.codecity.world.structure.CodePackage;
 import org.terasology.codecity.world.structure.scale.CodeScale;
-import org.terasology.codecity.world.structure.scale.SquaredCodeScale;
+import org.terasology.codecity.world.structure.scale.SquareRootCodeScale;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
@@ -41,7 +41,7 @@ public class CodeCityBuildingProvider implements FacetProvider {
 	
 	private CodeMap codeMap;
 
-    private final CodeScale scale = new SquaredCodeScale();
+    private final CodeScale scale = new SquareRootCodeScale();
     private final CodeMapFactory factory = new CodeMapFactory(scale);
 	
 	public CodeCityBuildingProvider() {
