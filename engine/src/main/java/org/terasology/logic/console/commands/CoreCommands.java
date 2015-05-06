@@ -15,7 +15,14 @@
  */
 package org.terasology.logic.console.commands;
 
-import com.google.common.base.Function;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -41,9 +48,6 @@ import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
-import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
@@ -51,7 +55,6 @@ import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -69,14 +72,11 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.concurrent.Callable;
+import com.google.common.base.Function;
 
 /**
  * @author Immortius
@@ -359,4 +359,88 @@ public class CoreCommands extends BaseComponentSystem {
             }
         }
     }
+    
+    @Command(shortDescription = "PMD coloring.",
+            requiredPermission = PermissionManager.NO_PERMISSION)
+    public String pmdColoring(@CommandParam(value = "sourcePath",required = true) String sourcePath,@CommandParam(value="rules",required=false) String rules,@CommandParam(value="outPutType",required=false) String outPutType) throws IOException
+    {
+    	if (rules == null) rules = "basic";
+    	if (outPutType == null) outPutType = "text";
+    	File f = new File(".");
+    	System.out.println(f.getAbsolutePath());
+    	String inputString = ".\\engine\\libs\\pmd\\bin\\pmd.bat -d "+ sourcePath+" -f "+outPutType+" -R rulesets/java/"+ rules+".xml";
+    	//String inputString = "C:\\Users\\Manuel\\Desktop\\pmd-bin-5.3.1\\bin\\pmd.bat -d "+ sourcePath+" -f text -R rulesets/java/"+ rules+".xml";
+    	/*
+    	System.out.println(inputString);
+    	Process process;
+		process = Runtime.getRuntime().exec(inputString);
+		InputStream is = process.getInputStream();
+		 InputStreamReader isr = new InputStreamReader(is);
+		 BufferedReader br = new BufferedReader(isr);
+			
+		 StringBuilder sb = new StringBuilder();
+		 String line;
+		 while ((line = br.readLine()) != null) 
+		 {
+			 console.addMessage(line);	
+			 System.out.println(line);
+		 }
+		 */
+		 /* 
+    	PrintStream out = System.out;
+    	System.setOut(new PrintStream(new ConsoleOutputStream(console)));
+    	String[] args = {"-d", "C:\\Users\\Manuel\\Documents\\Terasology-develop\\modules\\Core\\src\\main\\java\\org\\terasology\\core\\world\\generator\\facetProviders\\PositionFilters.java", "-f", "text", "-R" ,"rulesets/java/basic.xml"};
+			PMD.main(args);
+			System.setOut(out);
+		*/ 
+		
+    	Thread t = new Thread(new ThreadPMDExecution(inputString,console));
+		 t.start();
+		 
+    	/*
+		 String line = "-d C:\\Users\\Manuel\\workspace\\Tarea2Teoria -f text -R rulesets/java/basic.xml";
+	    	String []args1 = line.split(" ");
+			 PMD.main(args1);
+			 */
+		 return "Esperando por resultados del analisis...";
+    }
+
+}
+
+class ThreadPMDExecution implements Runnable
+{
+	String inputString;
+	Console console;
+	public ThreadPMDExecution(String inputString, Console console) {
+		// TODO Auto-generated constructor stub
+		this.inputString = inputString;
+		this.console = console;
+	}
+
+	@Override
+	public void run() 
+	{
+		// TODO Auto-generated method stub
+		
+		try {
+			Process process;
+			process = Runtime.getRuntime().exec(inputString);
+			InputStream is = process.getInputStream();
+			 InputStreamReader isr = new InputStreamReader(is);
+			 BufferedReader br = new BufferedReader(isr);
+				
+			 StringBuilder sb = new StringBuilder();
+			 String line;
+			 while ((line = br.readLine()) != null) 
+			 {
+				 console.addMessage(line);	
+			 }
+			 console.addMessage("Fin del Analisis");
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }
