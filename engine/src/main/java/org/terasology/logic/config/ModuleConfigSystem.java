@@ -17,8 +17,9 @@ package org.terasology.logic.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.In;
@@ -34,14 +35,14 @@ public class ModuleConfigSystem extends BaseComponentSystem implements ModuleCon
     private static final Logger logger = LoggerFactory.getLogger(ModuleConfigSystem.class);
 
     @In
-    private EntityManager entityManager;
+    private PrefabManager prefabManager;
 
     private Map<String, Map<String, String>> propertiesPerModule = new HashMap<>();
 
     @Override
     public void preBegin() {
-        for (EntityRef entityRef : entityManager.getEntitiesWith(ModuleConfigComponent.class)) {
-            ModuleConfigComponent moduleConfig = entityRef.getComponent(ModuleConfigComponent.class);
+        for (Prefab prefab : prefabManager.listPrefabs(ModuleConfigComponent.class)) {
+            ModuleConfigComponent moduleConfig = prefab.getComponent(ModuleConfigComponent.class);
             String moduleName = moduleConfig.moduleName;
             Map<String, String> properties;
             if (propertiesPerModule.containsKey(moduleName)) {
