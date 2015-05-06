@@ -366,9 +366,7 @@ public class CoreCommands extends BaseComponentSystem {
     {
     	if (rules == null) rules = "basic";
     	if (outPutType == null) outPutType = "text";
-    	File f = new File(".");
-    	System.out.println(f.getAbsolutePath());
-    	String inputString = ".\\engine\\libs\\pmd\\bin\\pmd.bat -d "+ sourcePath+" -f "+outPutType+" -R rulesets/java/"+ rules+".xml";
+    	String inputString = "java -classpath .\\engine\\libs\\pmd\\lib\\* net.sourceforge.pmd.PMD -d "+ sourcePath+" -f "+outPutType+" -R rulesets/java/"+ rules+".xml";
     	//String inputString = "C:\\Users\\Manuel\\Desktop\\pmd-bin-5.3.1\\bin\\pmd.bat -d "+ sourcePath+" -f text -R rulesets/java/"+ rules+".xml";
     	/*
     	System.out.println(inputString);
