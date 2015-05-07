@@ -94,7 +94,8 @@ public class ComponentSystemManager {
                     InjectionHelper.share(newSystem);
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);
-                } catch (RuntimeException | IllegalAccessException | InstantiationException e) {
+                } catch (RuntimeException | IllegalAccessException | InstantiationException
+                        | NoClassDefFoundError e) {
                     logger.error("Failed to load system {}", id, e);
                 }
             }
