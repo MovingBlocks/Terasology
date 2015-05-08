@@ -21,8 +21,7 @@ import java.nio.ByteBuffer;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
 
 /**
- * TODO Type description
- * @author Martin Steiger
+ * Creates 2D images based on game worlds.  
  */
 public interface PreviewGenerator {
 

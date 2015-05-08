@@ -21,23 +21,23 @@ import java.awt.image.ColorModel;
 /**
  * Maps ColorModel instances to Blender instances.
  */
-public final class Blenders {
+public final class ColorBlenders {
 
-    private static final BlenderArgb BLENDER_ARGB = new BlenderArgb();
-    private static final BlenderRgba BLENDER_RGBA = new BlenderRgba();
+    private static final ColorBlenderArgb BLENDER_ARGB = new ColorBlenderArgb();
+    private static final ColorBlenderRgba BLENDER_RGBA = new ColorBlenderRgba();
 
-    private Blenders() {
+    private ColorBlenders() {
         // no instances
     }
 
     /**
-     * Tries to find a {@link Blender} mapping from source to target.
+     * Tries to find a {@link ColorBlender} mapping from source to target.
      * @param source the source color model
      * @param target the target color model
      * @return the corresponding color blender
      * @throws UnsupportedOperationException if color model is not supported
      */
-    public static Blender forColorModel(ColorModel source, ColorModel target) {
+    public static ColorBlender forColorModel(ColorModel source, ColorModel target) {
         if (!ColorModels.RGBA.equals(source)) {
             throw new UnsupportedOperationException("source colormodel: " + source);
         }

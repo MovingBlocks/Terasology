@@ -19,9 +19,8 @@ package org.terasology.world.viewer.layers;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.terasology.engine.Observer;
 import org.terasology.world.generation.WorldFacet;
-import org.terasology.world.viewer.config.FacetConfig;
-import org.terasology.world.viewer.core.Observer;
 
 /**
  * A set of general implementations for {@link FacetLayer}.
@@ -84,7 +83,7 @@ public abstract class AbstractFacetLayer implements FacetLayer {
     }
 
     @Override
-    public FacetConfig getConfig() {
+    public FacetLayerConfig getConfig() {
         return null;
     }
 }

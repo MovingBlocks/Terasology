@@ -29,8 +29,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;
-import org.terasology.world.viewer.color.Blender;
-import org.terasology.world.viewer.color.Blenders;
+import org.terasology.world.viewer.color.ColorBlender;
+import org.terasology.world.viewer.color.ColorBlenders;
 import org.terasology.world.viewer.color.ColorModels;
 import org.terasology.world.viewer.layers.AbstractFacetLayer;
 import org.terasology.world.viewer.layers.Renders;
@@ -53,7 +53,7 @@ public class FloraFacetLayer extends AbstractFacetLayer {
         Graphics2D g = img.createGraphics();
         int width = img.getWidth();
         ColorModel colorModel = img.getColorModel();
-        Blender blender = Blenders.forColorModel(ColorModels.RGBA, colorModel);
+        ColorBlender blender = ColorBlenders.forColorModel(ColorModels.RGBA, colorModel);
         DataBufferInt dataBuffer = (DataBufferInt) img.getRaster().getDataBuffer();
 
         for (Entry<Vector3i, FloraType> entry : treeFacet.getRelativeEntries().entrySet()) {

@@ -29,10 +29,9 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.base.FieldFacet2D;
-import org.terasology.world.viewer.color.Blender;
-import org.terasology.world.viewer.color.Blenders;
+import org.terasology.world.viewer.color.ColorBlender;
+import org.terasology.world.viewer.color.ColorBlenders;
 import org.terasology.world.viewer.color.ColorModels;
-import org.terasology.world.viewer.config.FacetConfig;
 
 import com.google.common.base.Preconditions;
 import com.google.common.math.DoubleMath;
@@ -86,7 +85,7 @@ public abstract class FieldFacetLayer extends AbstractFacetLayer {
         int width = img.getWidth();
         int height = img.getHeight();
         ColorModel colorModel = img.getColorModel();
-        Blender blender = Blenders.forColorModel(ColorModels.RGBA, colorModel);
+        ColorBlender blender = ColorBlenders.forColorModel(ColorModels.RGBA, colorModel);
 
         DataBufferInt dataBuffer = (DataBufferInt) img.getRaster().getDataBuffer();
 
@@ -148,14 +147,14 @@ public abstract class FieldFacetLayer extends AbstractFacetLayer {
     }
 
     @Override
-    public FacetConfig getConfig() {
+    public FacetLayerConfig getConfig() {
         return config;
     }
 
     /**
      * Persistent data
      */
-    protected static class Config implements FacetConfig {
+    protected static class Config implements FacetLayerConfig {
 
         @Range(min = -100, max = 100, increment = 1f, precision = 1)
         private double offset;

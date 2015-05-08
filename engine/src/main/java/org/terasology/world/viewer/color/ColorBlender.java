@@ -20,7 +20,7 @@ package org.terasology.world.viewer.color;
 /**
  * Maps or blends color from a source into a target color space.
  */
-public interface Blender {
+public interface ColorBlender {
 
     /**
      * Converts a color into target space.

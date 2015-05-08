@@ -24,8 +24,8 @@ import java.util.function.Function;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.base.ObjectFacet2D;
-import org.terasology.world.viewer.color.Blender;
-import org.terasology.world.viewer.color.Blenders;
+import org.terasology.world.viewer.color.ColorBlender;
+import org.terasology.world.viewer.color.ColorBlenders;
 import org.terasology.world.viewer.color.ColorModels;
 
 /**
@@ -51,7 +51,7 @@ public abstract class NominalFacetLayer<E> extends AbstractFacetLayer {
         int height = img.getHeight();
 
         ColorModel colorModel = img.getColorModel();
-        Blender blender = Blenders.forColorModel(ColorModels.RGBA, colorModel);
+        ColorBlender blender = ColorBlenders.forColorModel(ColorModels.RGBA, colorModel);
         DataBufferInt dataBuffer = (DataBufferInt) img.getRaster().getDataBuffer();
 
         for (int z = 0; z < height; z++) {

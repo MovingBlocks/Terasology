@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.world.viewer.config;
+package org.terasology.world.viewer.layers;
 
 import org.terasology.module.sandbox.API;
 
 @API
-public interface FacetConfig {
+public interface FacetLayerConfig {
     // marker
 }

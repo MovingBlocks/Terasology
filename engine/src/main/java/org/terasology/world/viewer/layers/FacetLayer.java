@@ -18,10 +18,9 @@ package org.terasology.world.viewer.layers;
 
 import java.awt.image.BufferedImage;
 
+import org.terasology.engine.Observer;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;
-import org.terasology.world.viewer.config.FacetConfig;
-import org.terasology.world.viewer.core.Observer;
 
 /**
  * A visual representation of a facet class
@@ -53,7 +52,7 @@ public interface FacetLayer  {
     /**
      * @return a config or <code>null</code>
      */
-    FacetConfig getConfig();
+    FacetLayerConfig getConfig();
 
     /**
      * @return true if visible

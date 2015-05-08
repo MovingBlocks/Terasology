@@ -17,8 +17,7 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 /**
- * TODO Type description
- * @author Martin Steiger
+ * Gets notified whenever a long-running background task has performed some work.
  */
 public interface ProgressListener {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.viewer.core;
+package org.terasology.engine;
 
 import org.terasology.module.sandbox.API;
 

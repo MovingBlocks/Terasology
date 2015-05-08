@@ -28,8 +28,8 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.world.generation.WorldFacet;
 
 /**
- * TODO Type description
- * @author Martin Steiger
+ * Additional functionality around the {@link FacetLayer} interface that is
+ * independent from any actual implementation.
  */
 public final class FacetLayers {
 

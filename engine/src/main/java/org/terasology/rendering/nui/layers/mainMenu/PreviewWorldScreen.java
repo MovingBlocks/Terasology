@@ -70,6 +70,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+    
+    private final int imageSize = 384;
 
     private WorldGenerator worldGenerator;
 
@@ -195,8 +197,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         ProgressListener progressListener = progress ->
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
-
-        final int imageSize = 384;
 
         Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
             @Override
