@@ -41,6 +41,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
@@ -165,7 +166,8 @@ public class EventSystemImpl implements EventSystem {
                     componentParams.add((Class<? extends Component>) types[i]);
                 }
 
-                ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), requiredComponents, componentParams);
+                ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(),
+                        receiveEventAnnotation.activity(), requiredComponents, componentParams);
                 addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }
         }
@@ -456,6 +458,7 @@ public class EventSystemImpl implements EventSystem {
 
     private static class ByteCodeEventHandlerInfo implements EventHandlerInfo {
         private ComponentSystem handler;
+        private String activity;
         private MethodAccess methodAccess;
         private int methodIndex;
         private ImmutableList<Class<? extends Component>> filterComponents;
@@ -465,11 +468,13 @@ public class EventSystemImpl implements EventSystem {
         public ByteCodeEventHandlerInfo(ComponentSystem handler,
                                         Method method,
                                         int priority,
+                                        String activity,
                                         Collection<Class<? extends Component>> filterComponents,
                                         Collection<Class<? extends Component>> componentParams) {
 
 
             this.handler = handler;
+            this.activity = activity;
             this.methodAccess = MethodAccess.get(handler.getClass());
             methodIndex = methodAccess.getIndex(method.getName(), method.getParameterTypes());
             this.filterComponents = ImmutableList.copyOf(filterComponents);
@@ -494,7 +499,16 @@ public class EventSystemImpl implements EventSystem {
                 for (int i = 0; i < componentParams.size(); ++i) {
                     params[i + 2] = entity.getComponent(componentParams.get(i));
                 }
-                methodAccess.invoke(handler, methodIndex, params);
+                if (!activity.isEmpty()) {
+                    PerformanceMonitor.startActivity(activity);
+                }
+                try {
+                    methodAccess.invoke(handler, methodIndex, params);
+                } finally {
+                    if (!activity.isEmpty()) {
+                        PerformanceMonitor.endActivity();
+                    }
+                }
             } catch (IllegalArgumentException ex) {
                 logger.error("Failed to invoke event", ex);
             }
