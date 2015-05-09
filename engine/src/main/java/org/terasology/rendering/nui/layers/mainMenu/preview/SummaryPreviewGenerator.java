@@ -61,4 +61,8 @@ public class SummaryPreviewGenerator implements PreviewGenerator {
         return buf;
     }
 
+    @Override
+    public void close() {
+        // nothing to do
+    }
 }

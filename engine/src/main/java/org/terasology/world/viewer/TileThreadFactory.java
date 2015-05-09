@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui.layers.mainMenu.preview;
+package org.terasology.world.viewer;
 
-import java.nio.ByteBuffer;
-
-import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Creates 2D images based on game worlds.
+ * Creates daemon threads with low thread priority.
  */
-public interface PreviewGenerator {
+public class TileThreadFactory implements ThreadFactory {
 
-    ByteBuffer create(int width, int height, int scale, ProgressListener progressListener) throws InterruptedException;
+    private final AtomicInteger threadNumber = new AtomicInteger(1);
+    private final String namePrefix = "TileThreadPool-thread-";
 
-    /**
-     * Dispose all resources
-     */
-    void close();
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread t = new Thread(r, namePrefix + threadNumber.getAndIncrement());
+        t.setDaemon(true);
+        t.setPriority(Thread.MIN_PRIORITY);
+        return t;
+    }
 }

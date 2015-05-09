@@ -70,7 +70,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @In
     private Config config;
-    
+
     private final int imageSize = 384;
 
     private WorldGenerator worldGenerator;
@@ -121,6 +121,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (environment != null) {
             environment.close();
             environment = null;
+        }
+
+        if (previewGen != null) {
+            previewGen.close();
+            previewGen = null;
         }
     }
 
