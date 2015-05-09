@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -23,6 +28,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
@@ -39,25 +45,29 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.PropertyOrdering;
+import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.nio.ByteBuffer;
-import java.util.Objects;
-import java.util.concurrent.Callable;
+import com.google.common.collect.Maps;
 
 /**
- * @author Immortius
+ * Shows a preview of the generated world and provides some
+ * configuration options to tweak the generation process.
  */
 public class PreviewWorldScreen extends CoreScreenLayer {
+
+    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:previewWorldScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
 
@@ -72,7 +82,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private WorldGenerator worldGenerator;
 
-    private UILabel errorLabel;
     private UIImage previewImage;
     private UISlider zoomSlider;
     private UIButton applyButton;
@@ -112,6 +121,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
+                configureProperties();
             } else {
                 logger.error("Could not resolve modules for: {}", worldGenUri);
             }
@@ -120,6 +130,34 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             // if errors happen, don't enable this feature
             worldGenerator = null;
             logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
+        }
+    }
+
+    private void configureProperties() {
+
+        PropertyLayout properties = find("properties", PropertyLayout.class);
+        properties.setOrdering(PropertyOrdering.byLabel());
+        properties.clear();
+
+        if (worldGenerator.getConfigurator().isPresent()) {
+            WorldConfigurator worldConfig = worldGenerator.getConfigurator().get();
+
+            Map<String, Component> params = Maps.newHashMap(worldConfig.getProperties());
+
+            for (String key : params.keySet()) {
+                Class<? extends Component> clazz = params.get(key).getClass();
+                Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
+                if (comp != null) {
+                    params.put(key, comp);       // use the data from the config instead of defaults
+                }
+            }
+
+            for (String label : params.keySet()) {
+                PropertyProvider<?> provider = new PropertyProvider<>(params.get(label));
+                properties.addPropertyProvider(label, provider);
+            }
+        } else {
+            logger.info(worldGenerator.getUri().toString() + " does not support configuration");
         }
     }
 
@@ -156,11 +194,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                     updatePreview();
                 }
             });
-        }
-
-        errorLabel = find("error", UILabel.class);
-        if (errorLabel != null) {
-            errorLabel.setVisible(false);
         }
 
         previewImage = find("preview", UIImage.class);
@@ -204,7 +237,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private void updatePreview() {
         previewImage.setVisible(false);
-        errorLabel.setVisible(false);
 
         final NUIManager manager = CoreRegistry.get(NUIManager.class);
         final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);

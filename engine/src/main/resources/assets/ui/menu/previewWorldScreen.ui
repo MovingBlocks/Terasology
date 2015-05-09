@@ -36,7 +36,7 @@
             {
                 "type" : "UIBox",
                 "layoutInfo" : {
-                    "width" : 600,
+                    "width" : 720,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
@@ -54,9 +54,9 @@
                 "columns" : 2,
                 "verticalSpacing" : 16,
                 "horizontalSpacing" : 8,
-                "column-widths" : [0.64, 0.36],
+                "column-widths" : [0.53, 0.47],
                 "layoutInfo" : {
-                    "width" : 584,
+                    "width" : 704,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
@@ -73,8 +73,6 @@
                     {
                         "type" : "UIImage",
                         "skin" : "framed_image",
-                        "width" : 384,
-                        "height" : 384,
                         "id" : "preview"
                     },
                     {
@@ -134,6 +132,27 @@
                                 }
                             },
                             {
+                                "type" : "ScrollableArea",
+                                "content" : {
+                                    "type" : "propertyLayout",
+                                    "id" : "properties",
+                                    "rowConstraints" : "[min]"
+                                },
+                                "layoutInfo" : {
+                                    "position-horizontal-center" : {},
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "offset" : 8,
+                                        "widget" : "seed"
+                                    },
+                                    "position-bottom" : {
+                                        "target" : "TOP",
+                                        "offset" : 8,
+                                        "widget" : "apply"
+                                    }
+                                }
+                            },
+                            {
                                 "type" : "UIButton",
                                 "text" : "Apply",
                                 "id" : "apply",
@@ -144,21 +163,7 @@
                                         "offset": 4
                                     }
                                 }
-                            },
-                            {
-                                "type" : "UILabel",
-                                "id" : "error",
-                                "layoutInfo" : {
-                                    "use-content-height" : true,
-                                    "use-content-width" : true,
-                                    "position-horizontal-center" : {},
-                                    "position-top" : {
-                                        "target" : "BOTTOM",
-                                        "widget": "apply",
-                                        "offset": 8
-                                    }
-                                }
-                            },
+                            }
                         ]
                     }
                 ]

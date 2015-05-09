@@ -128,11 +128,6 @@
 		                            "layoutInfo" : {
                                         "relativeWidth" : 0.7
                                     }
-		                        },
-		                        {
-	                                "type" : "UIButton",
-	                                "text" : "Config...",
-	                                "id" : "config"
 		                        }
 	                        ]
                         }
