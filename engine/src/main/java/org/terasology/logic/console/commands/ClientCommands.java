@@ -48,4 +48,10 @@ public class ClientCommands extends BaseComponentSystem {
 
         return "World time changed";
     }
+	 @Command(shortDescription = "activate the GitHub metrics",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String github() {
+        
+        return "this comand will execute the githubs metrics";
+    }
 }
