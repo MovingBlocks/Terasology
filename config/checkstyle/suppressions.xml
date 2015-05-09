@@ -4,7 +4,8 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <suppress checks="." files="org[\\/]terasology[\\/]protobuf[\\/].*"/>
-    <suppress checks="MethodNameCheck" files="org[\\/]terasology[\\/]engine[\\/]paths[\\/]windows.*"/>
-	<suppress checks="ParameterAssignment" files="org[\\/]terasology[\\/]math[\\/]TeraMath"/>
+	<suppress checks="." files="org[\\/]terasology[\\/]protobuf[\\/].*" />
+	<suppress checks="MethodNameCheck"
+		files="org[\\/]terasology[\\/]engine[\\/]paths[\\/]windows.*" />
+	<suppress checks="ParameterAssignment" files="org[\\/]terasology[\\/]math[\\/]TeraMath" />
 </suppressions>
