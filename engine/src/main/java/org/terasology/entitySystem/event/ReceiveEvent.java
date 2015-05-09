@@ -42,4 +42,6 @@ public @interface ReceiveEvent {
     RegisterMode netFilter() default RegisterMode.ALWAYS;
 
     int priority() default EventPriority.PRIORITY_NORMAL;
+
+    String activity() default "";
 }

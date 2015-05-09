@@ -229,15 +229,15 @@ public final class InventoryUtils {
      * @param toSlots  slots that will be checked if they contain already the same type of item and have space
      * @return true if any amount > 0 got moved to the target
      */
-    static boolean moveToExistingStacksInSlots(EntityRef from, int fromSlot, EntityRef to, List<Integer> toSlots) {
+    private static int moveToExistingStacksInSlots(EntityRef from, int fromSlot, EntityRef to, List<Integer> toSlots) {
         EntityRef fromItem = getItemAt(from, fromSlot);
         ItemComponent fromItemComp = fromItem.getComponent(ItemComponent.class);
         if (fromItemComp == null) {
-            return false;
+            return 0;
         }
 
+        int oldFromStackCount = fromItemComp.stackCount;
         int newFromStackCount = fromItemComp.stackCount;
-        int slotCount = getSlotCount(to);
         for (int toSlot : toSlots) {
             EntityRef toItem = getItemAt(to, toSlot);
             if (isSameItem(toItem, fromItem)) {
@@ -248,22 +248,20 @@ public final class InventoryUtils {
                 int spaceLeft = toItemComp.maxStackSize - toItemComp.stackCount;
                 if (spaceLeft > 0) {
                     int amountToTransfer = Math.min(spaceLeft, newFromStackCount);
-                    adjustStackSize(to, toSlot, toItemComp.stackCount + amountToTransfer);
                     newFromStackCount -= amountToTransfer;
+                    if (newFromStackCount == 0) {
+                        putItemIntoSlot(from, EntityRef.NULL, fromSlot);
+                    } else {
+                        adjustStackSize(from, fromSlot, newFromStackCount);
+                    }
+                    adjustStackSize(to, toSlot, toItemComp.stackCount + amountToTransfer);
                 }
             }
-        }
-        if (newFromStackCount == 0) {
-            putItemIntoSlot(from, EntityRef.NULL, fromSlot);
-            return true;
-        } else {
-            if (newFromStackCount != fromItemComp.stackCount) {
-                adjustStackSize(from, fromSlot, newFromStackCount);
-                return true;
-            } else {
-                return false;
+            if (newFromStackCount == 0) {
+                break;
             }
         }
+        return oldFromStackCount - newFromStackCount;
     }
 
     /**
@@ -274,7 +272,7 @@ public final class InventoryUtils {
      * @param toSlots    slots that will be checked if they are free
      * @return true if at least 1 item got moved from the specified location.
      */
-    static boolean moveToFreeSlots(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, List<Integer> toSlots) {
+    private static boolean moveToFreeSlots(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, List<Integer> toSlots) {
         EntityRef fromItem = getItemAt(from, slotFrom);
         ItemComponent fromItemComp = fromItem.getComponent(ItemComponent.class);
         if (fromItemComp == null) {
@@ -288,8 +286,8 @@ public final class InventoryUtils {
                 to.send(putTo);
                 boolean allowed = !putTo.isConsumed();
                 if (allowed) {
-                    putItemIntoSlot(to, fromItem, toSlot);
                     putItemIntoSlot(from, EntityRef.NULL, slotFrom);
+                    putItemIntoSlot(to, fromItem, toSlot);
                     return true;
                 }
             }
@@ -306,11 +304,16 @@ public final class InventoryUtils {
             return false;
         }
 
-        boolean movedToStack = moveToExistingStacksInSlots(from, fromSlot, to, toSlots);
+        int stackCount = InventoryUtils.getStackCount(fromItem);
 
-        boolean movedToFreeSlot = moveToFreeSlots(instigator, from, fromSlot, to, toSlots);
+        int movedToStack = moveToExistingStacksInSlots(from, fromSlot, to, toSlots);
 
-        return movedToStack || movedToFreeSlot;
+        boolean movedToFreeSlot = false;
+        if (stackCount != movedToStack) {
+            movedToFreeSlot = moveToFreeSlots(instigator, from, fromSlot, to, toSlots);
+        }
+
+        return movedToStack > 0 || movedToFreeSlot;
     }
 
 
@@ -338,8 +341,8 @@ public final class InventoryUtils {
         if (itemFrom.exists() && itemTo.exists() && canStackInto(itemFrom, itemTo)) {
             int fromCount = itemFrom.getComponent(ItemComponent.class).stackCount;
             int toCount = itemTo.getComponent(ItemComponent.class).stackCount;
-            adjustStackSize(to, slotTo, fromCount + toCount);
             putItemIntoSlot(from, EntityRef.NULL, slotFrom);
+            adjustStackSize(to, slotTo, fromCount + toCount);
 
             return true;
         }
@@ -362,24 +365,23 @@ public final class InventoryUtils {
             copyItem.stackCount = (byte) amount;
             fromCopy.saveComponent(copyItem);
 
-            putItemIntoSlot(to, fromCopy, slotTo);
-
             ItemComponent fromItem = itemFrom.getComponent(ItemComponent.class);
             if (fromItem.stackCount == amount) {
                 putItemIntoSlot(from, EntityRef.NULL, slotFrom);
             } else {
                 adjustStackSize(from, slotFrom, fromItem.stackCount - amount);
             }
+            putItemIntoSlot(to, fromCopy, slotTo);
         } else {
-            ItemComponent itemToComponent = itemTo.getComponent(ItemComponent.class);
-            adjustStackSize(to, slotTo, itemToComponent.stackCount + amount);
-
             ItemComponent itemFromComponent = itemFrom.getComponent(ItemComponent.class);
             if (itemFromComponent.stackCount == amount) {
                 putItemIntoSlot(from, EntityRef.NULL, slotFrom);
             } else {
                 adjustStackSize(from, slotFrom, itemFromComponent.stackCount - amount);
             }
+
+            ItemComponent itemToComponent = itemTo.getComponent(ItemComponent.class);
+            adjustStackSize(to, slotTo, itemToComponent.stackCount + amount);
         }
 
         return true;
