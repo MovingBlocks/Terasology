@@ -43,6 +43,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
@@ -90,7 +91,9 @@ public class FacetLayerPreview implements PreviewGenerator {
     }
 
     @Override
-    public ByteBuffer create(int width, int height, int scale, ProgressListener progressListener) throws InterruptedException {
+    public ByteBuffer render(TextureData texData, int scale, ProgressListener progressListener) throws InterruptedException {
+        int width = texData.getWidth();
+        int height  = texData.getWidth();
         final int offX = -width * scale / 2;
         final int offY = -height * scale / 2;
 
@@ -150,7 +153,7 @@ public class FacetLayerPreview implements PreviewGenerator {
         g.dispose();
 
         int[] data = imageBuffer.getData();
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(data.length * Integer.BYTES);
+        ByteBuffer byteBuffer = texData.getBuffers()[0];
         byteBuffer.asIntBuffer().put(data);
 
         return byteBuffer;

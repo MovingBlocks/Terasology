@@ -19,6 +19,7 @@ package org.terasology.rendering.nui.layers.mainMenu.preview;
 import java.nio.ByteBuffer;
 
 import org.terasology.math.Rect2i;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
 import org.terasology.world.generator.WorldGenerator2DPreview;
@@ -37,11 +38,13 @@ public class SummaryPreviewGenerator implements PreviewGenerator {
     }
 
     @Override
-    public ByteBuffer create(int width, int height, int scale, ProgressListener progressListener) throws InterruptedException {
-        int size = 4 * width * height;
+    public ByteBuffer render(TextureData texData, int scale, ProgressListener progressListener) throws InterruptedException {
+        int width = texData.getWidth();
+        int height  = texData.getWidth();
+
         final int offX = -width / 2;
         final int offY = -height / 2;
-        ByteBuffer buf = ByteBuffer.allocateDirect(size);
+        ByteBuffer buf = texData.getBuffers()[0];
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 int px = (x + offX) * scale;

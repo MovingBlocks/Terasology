@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -71,8 +70,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private final int imageSize = 384;
-
     private WorldGenerator worldGenerator;
 
     private UILabel errorLabel;
@@ -86,6 +83,18 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private PreviewGenerator previewGen;
 
     private ModuleEnvironment environment;
+
+    private final Texture texture;
+
+    public PreviewWorldScreen() {
+        int imgWidth = 384;
+        int imgHeight = 384;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
+        ByteBuffer[] data = new ByteBuffer[]{buffer};
+        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
+        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        texture = Assets.generateAsset(uri, texData, Texture.class);
+    }
 
     @Override
     public void onOpened() {
@@ -155,6 +164,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
 
         previewImage = find("preview", UIImage.class);
+        previewImage.setImage(texture);
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -197,56 +207,26 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         errorLabel.setVisible(false);
 
         final NUIManager manager = CoreRegistry.get(NUIManager.class);
-        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Updating Preview", "Please wait ...");
 
         ProgressListener progressListener = progress ->
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
-        Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
-            @Override
-            public ByteBufferResult call() throws InterruptedException {
-                try {
-                    if (seed != null) {
-                        worldGenerator.setWorldSeed(seed.getText());
-                    }
-                    ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progressListener);
-                    return new ByteBufferResult(true, buf, null);
-                } catch (InterruptedException e) {
-                    throw e;
-                } catch (Exception ex) {
-                    return new ByteBufferResult(false, null, ex);
-                }
+        Callable<TextureData> operation = () -> {
+            if (seed != null) {
+                worldGenerator.setWorldSeed(seed.getText());
             }
+            previewGen.render(texture.getData(), currentSettings.zoom, progressListener);
+            previewImage.setVisible(true);
+            if (applyButton != null) {
+                applyButton.setEnabled(false);
+            }
+            return texture.getData();
         };
 
-        popup.onSuccess(new Function<ByteBufferResult, Void>() {
-            @Override
-            public Void apply(ByteBufferResult byteBufferResult) {
-                if (byteBufferResult.success) {
-                    previewImage.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
-                    previewImage.setVisible(true);
-                    if (applyButton != null) {
-                        applyButton.setEnabled(false);
-                    }
-                } else {
-                    errorLabel.setText("Sorry: could not generate 2d preview :-(");
-                    errorLabel.setVisible(true);
-                    logger.error("Error generating a 2d preview", byteBufferResult.exception);
-                }
-                return null;
-            }
-        });
-
+        popup.onSuccess(newData -> texture.reload(newData));
         popup.startOperation(operation, true);
-    }
-
-    private Texture createTexture(int width, int height, ByteBuffer buf) {
-        ByteBuffer[] data = new ByteBuffer[]{buf};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
-        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-
-        return Assets.generateAsset(uri, texData, Texture.class);
     }
 
     private static class PreviewSettings {
@@ -273,18 +253,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         @Override
         public int hashCode() {
             return Objects.hash(zoom, seed);
-        }
-    }
-
-    private static final class ByteBufferResult {
-        public boolean success;
-        public ByteBuffer buf;
-        public Exception exception;
-
-        private ByteBufferResult(boolean success, ByteBuffer buf, Exception exception) {
-            this.success = success;
-            this.buf = buf;
-            this.exception = exception;
         }
     }
 }

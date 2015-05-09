@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commands;
 
-import com.google.common.base.Function;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -41,9 +40,6 @@ import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
-import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
@@ -51,7 +47,6 @@ import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -69,7 +64,6 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
@@ -222,10 +216,7 @@ public class CoreCommands extends BaseComponentSystem {
         final NUIManager manager = CoreRegistry.get(NUIManager.class);
         final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
-        popup.onSuccess(new Function<JoinStatus, Void>() {
-
-            @Override
-            public Void apply(JoinStatus result) {
+        popup.onSuccess(result -> {
                 GameEngine engine = CoreRegistry.get(GameEngine.class);
                 if (result.getStatus() != JoinStatus.Status.FAILED) {
                     engine.changeState(new StateLoading(result));
@@ -233,10 +224,7 @@ public class CoreCommands extends BaseComponentSystem {
                     MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
                 }
-
-                return null;
-            }
-        });
+            });
         popup.startOperation(operation, true);
     }
 
