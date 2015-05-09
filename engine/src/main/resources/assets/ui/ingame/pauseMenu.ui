@@ -6,7 +6,7 @@
         "contents" : [
             {
                 "type" : "columnLayout",
-                "verticalSpacing" : 8,
+                "verticalSpacing" : 9,
                 "contents" : [
                     {
                         "type" : "UILabel",
@@ -37,9 +37,15 @@
                     },
                     {
                         "type" : "UIButton",
+                        "id" : "fullscreen",
+                        "text" : "FullScreen"
+                    },
+                    {
+                        "type" : "UIButton",
                         "id" : "exit",
                         "text" : "Exit Terasology"
                     }
+                    
                 ],
                 "layoutInfo" : {
                     "use-content-width" : true,
