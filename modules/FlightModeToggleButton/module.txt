@@ -1,0 +1,12 @@
+{
+    "id" : "FlightModeToggleButton",
+    "version" : "0.1.0",
+    "author" : "Josharias",
+    "displayName" : "FlightModeToggleButton",
+    "description" : "Adds a button to easily get in to flight mode",
+    "dependencies" :
+    [
+         {"id": "HUDToggleButtons", "minVersion": "0.1.0"}
+    ],
+    "isServerSideOnly" : false
+}
