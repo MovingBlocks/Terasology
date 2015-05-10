@@ -17,6 +17,7 @@ package org.terasology.math;
 
 import org.junit.Test;
 import org.terasology.config.Config;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 
@@ -32,6 +33,7 @@ public class ChunkMathTest {
 
     @Test
     public void regionPositions() {
+        CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, new Config());
 
         assertEquals(1, ChunkMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0))).length);

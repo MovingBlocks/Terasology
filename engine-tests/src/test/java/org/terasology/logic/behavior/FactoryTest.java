@@ -19,6 +19,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
@@ -80,14 +82,16 @@ public class FactoryTest {
 
     @Before
     public void setup() throws Exception {
+        Context context = new ContextImpl();
+        CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CoreRegistry.put(ReflectFactory.class, reflectFactory);
+        context.put(ReflectFactory.class, reflectFactory);
         CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-        CoreRegistry.put(CopyStrategyLibrary.class, copyStrategies);
-        CoreRegistry.put(ModuleManager.class, moduleManager);
+        context.put(CopyStrategyLibrary.class, copyStrategies);
+        context.put(ModuleManager.class, moduleManager);
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategies);
-        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        context.put(NodesClassLibrary.class, nodesClassLibrary);
         nodesClassLibrary.scan(moduleManager.getEnvironment());
     }
 }

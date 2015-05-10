@@ -23,6 +23,7 @@ import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -59,6 +60,7 @@ public class PojoPrefabManagerTest {
 
     @Before
     public void setup() throws Exception {
+        CoreRegistry.setContext(new ContextImpl());
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);

@@ -27,8 +27,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -47,7 +47,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -80,7 +79,7 @@ import java.util.Set;
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
     private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
-    private HUDScreenLayer hudScreenLayer = new HUDScreenLayer();
+    private HUDScreenLayer hudScreenLayer;
     private BiMap<AssetUri, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
     private WidgetLibrary widgetsLibrary;
@@ -95,14 +94,18 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private boolean forceReleaseMouse;
 
     private Map<AssetUri, ControlWidget> overlays = Maps.newLinkedHashMap();
+    private Context context;
 
-    public NUIManagerInternal(CanvasRenderer renderer) {
-        this.canvas = new CanvasImpl(this, CoreRegistry.get(Time.class), renderer);
+    public NUIManagerInternal(CanvasRenderer renderer, Context context) {
+        this.context = context;
+        this.hudScreenLayer = new HUDScreenLayer();
+        InjectionHelper.inject(hudScreenLayer, context);
+        this.canvas = new CanvasImpl(this, context, renderer);
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new WidgetLibrary(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
+        widgetsLibrary = new WidgetLibrary(context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
             widgetsLibrary.register(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
         }
@@ -192,7 +195,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private void onCloseScreen(UIScreenLayer screen, AssetUri screenUri, boolean sendEvents) {
         screen.onClosed();
         if (sendEvents) {
-            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            LocalPlayer localPlayer = context.get(LocalPlayer.class);
             if (localPlayer != null) {
                 localPlayer.getClientEntity().send(new ScreenLayerClosedEvent(screenUri));
             }
@@ -419,7 +422,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         for (AssetUri uri: screenLookup.keySet()) {
             if (!autoReloadingScreensUris.contains(uri)) {
                 autoReloadingScreensUris.add(uri);
-                List<URL> urls = CoreRegistry.get(AssetManager.class).getAssetURLs(uri);
+                List<URL> urls = context.get(AssetManager.class).getAssetURLs(uri);
                 URL firstURL = urls.get(0);
                 Path filePath = Paths.get(firstURL.toURI());
                 Path directory = filePath.getParent();
@@ -462,9 +465,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                     AssetUri uri = filePathToAssetUriMap.get(fullPath);
                     if (uri != null) {
 
-                        UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
+                        UIData uiData = context.get(AssetManager.class).loadAssetData(uri, UIData.class);
                         if (uiData != null) {
-                            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
+                            context.get(AssetManager.class).generateAsset(uri, uiData);
 
                             closeScreenWithoutEvent(uri);
                             pushScreen(uri);

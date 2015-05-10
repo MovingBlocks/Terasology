@@ -24,6 +24,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -62,6 +63,7 @@ public class PrefabTest {
 
     @Before
     public void setup() throws Exception {
+        CoreRegistry.setContext(new ContextImpl());
         ModuleManager moduleManager = ModuleManagerFactory.create();
 
         AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());

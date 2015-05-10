@@ -17,6 +17,7 @@ package org.terasology.engine.modes;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
@@ -29,9 +30,9 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.logic.console.ConsoleSystem;
+import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -52,6 +53,7 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
  * @version 0.3
  */
 public class StateMainMenu implements GameState {
+    private Context context;
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
@@ -70,38 +72,41 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void init(GameEngine gameEngine) {
+        context = gameEngine.createChildContext();
+        CoreRegistry.setContext(context);
 
         //let's get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(),
-                CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+        entityManager = new EntitySystemBuilder().build(context.get(ModuleManager.class).getEnvironment(),
+                context.get(NetworkSystem.class), context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
 
-        eventSystem = CoreRegistry.get(EventSystem.class);
-        CoreRegistry.put(Console.class, new ConsoleImpl());
+        eventSystem = context.get(EventSystem.class);
+        context.put(Console.class, new ConsoleImpl());
 
-        nuiManager = CoreRegistry.get(NUIManager.class);
+        nuiManager = context.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
         eventSystem.registerEventHandler(nuiManager);
 
         // TODO: Should the CSM be registered here every time or only in engine init? See Issue #1125
         componentSystemManager = new ComponentSystemManager();
-        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        context.put(ComponentSystemManager.class, componentSystemManager);
 
         // TODO: Reduce coupling between Input system and CameraTargetSystem,
         // TODO: potentially eliminating the following lines. See Issue #1126
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
-        CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
+        context.put(CameraTargetSystem.class, cameraTargetSystem);
 
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
-        inputSystem = CoreRegistry.get(InputSystem.class);
+        inputSystem = context.get(InputSystem.class);
 
         // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
         new RegisterInputSystem().step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-        LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
+        LocalPlayer localPlayer = new LocalPlayer();
+        context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();
@@ -109,7 +114,7 @@ public class StateMainMenu implements GameState {
         playBackgroundMusic();
 
         //guiManager.openWindow("main");
-        CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
+        context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
@@ -124,15 +129,14 @@ public class StateMainMenu implements GameState {
         nuiManager.clear();
 
         entityManager.clear();
-        CoreRegistry.clear();
     }
 
     private void playBackgroundMusic() {
-        CoreRegistry.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme"));
+        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme"));
     }
 
     private void stopBackgroundMusic() {
-        CoreRegistry.get(AudioManager.class).stopAllSounds();
+        context.get(AudioManager.class).stopAllSounds();
     }
 
     @Override

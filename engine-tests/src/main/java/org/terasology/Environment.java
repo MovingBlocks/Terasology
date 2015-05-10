@@ -16,11 +16,13 @@
 
 package org.terasology;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.naming.Name;
-
-import com.google.common.collect.Sets;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.util.Set;
@@ -34,12 +36,13 @@ public class Environment {
 
     private static final Logger logger = LoggerFactory.getLogger(Environment.class);
 
+    protected Context context;
+
     /**
      * Default setup order
      * @param moduleNames a list of module names
      */
     public Environment(Name ... moduleNames) {
-
         try {
             reset(Sets.newHashSet(moduleNames));
         } catch (Exception e) {
@@ -49,6 +52,8 @@ public class Environment {
     }
 
     protected void reset(Set<Name> moduleNames) throws Exception {
+        this.context = new ContextImpl();
+        CoreRegistry.setContext(context);
 
         setupPathManager();
 
@@ -139,8 +144,12 @@ public class Environment {
      * @throws Exception if something goes wrong
      */
     public void close() throws Exception {
-        // nothing to do
+        CoreRegistry.setContext(null);
+        context = null;
     }
 
+    public Context getContext() {
+        return context;
+    }
 }
 

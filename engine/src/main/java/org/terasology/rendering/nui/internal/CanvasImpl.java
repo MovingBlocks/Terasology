@@ -19,11 +19,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.Context;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
@@ -83,8 +85,8 @@ public class CanvasImpl implements CanvasControl {
 
     private CanvasState state;
 
-    private Material meshMat = Assets.getMaterial("engine:UILitMesh");
-    private Texture whiteTexture = Assets.getTexture("engine:white");
+    private Material meshMat;
+    private Texture whiteTexture;
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
@@ -107,10 +109,13 @@ public class CanvasImpl implements CanvasControl {
 
     private CanvasRenderer renderer;
 
-    public CanvasImpl(NUIManager nuiManager, Time time, CanvasRenderer renderer) {
+    public CanvasImpl(NUIManager nuiManager, Context context, CanvasRenderer renderer) {
         this.renderer = renderer;
         this.nuiManager = nuiManager;
-        this.time = time;
+        this.time = context.get(Time.class);
+        AssetManager assetManager = context.get(AssetManager.class);
+        this.meshMat = assetManager.resolveAndLoad(AssetType.MATERIAL, "engine:UILitMesh", Material.class);
+        this.whiteTexture =assetManager.resolveAndLoad(AssetType.TEXTURE, "engine:white", Texture.class);
     }
 
     @Override

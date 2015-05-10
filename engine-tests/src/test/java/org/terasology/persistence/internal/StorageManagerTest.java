@@ -27,6 +27,8 @@ import org.mockito.Matchers;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetManagerImpl;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -102,6 +104,8 @@ public class StorageManagerTest {
 
     @Before
     public void setup() throws Exception {
+        Context context = new ContextImpl();
+        CoreRegistry.setContext(context);
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(temporaryFolder.getRoot().toPath());
@@ -112,23 +116,24 @@ public class StorageManagerTest {
         moduleManager = ModuleManagerFactory.create();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        CoreRegistry.put(ModuleManager.class, moduleManager);
-        CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
-        CoreRegistry.put(NetworkSystem.class, networkSystem);
+        context.put(ModuleManager.class, moduleManager);
+        context.put(Config.class, new Config());
+        context.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
+        context.put(NetworkSystem.class, networkSystem);
 
         entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem,
                 new ReflectionReflectFactory());
 
         esm = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), entityManager, false);
-        CoreRegistry.put(StorageManager.class, esm);
+        context.put(StorageManager.class, esm);
 
         this.character = entityManager.create();
         Client client = createClientMock(PLAYER_ID, character);
 
         when(networkSystem.getPlayers()).thenReturn(Arrays.asList(client));
 
-        BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
+        BlockManagerImpl blockManager = new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry());
+        context.put(BlockManager.class, blockManager);
         testBlock = new Block();
         testBlock.setId((short) 1);
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
@@ -138,19 +143,19 @@ public class StorageManagerTest {
 
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
-        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        context.put(ComponentSystemManager.class, componentSystemManager);
 
-        CoreRegistry.put(ChunkProvider.class, mock(ChunkProvider.class));
+        context.put(ChunkProvider.class, mock(ChunkProvider.class));
 
         Game game = mock(Game.class);
         when(game.getTime()).thenReturn(mock(EngineTime.class));
-        CoreRegistry.put(Game.class, game);
+        context.put(Game.class, game);
         BiomeManager biomeManager = mock(BiomeManager.class);
         when(biomeManager.getBiomes()).thenReturn(Collections.<Biome>emptyList());
-        CoreRegistry.put(BiomeManager.class, biomeManager);
+        context.put(BiomeManager.class, biomeManager);
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
-        CoreRegistry.put(WorldProvider.class, worldProvider);
+        context.put(WorldProvider.class, worldProvider);
 
 
     }

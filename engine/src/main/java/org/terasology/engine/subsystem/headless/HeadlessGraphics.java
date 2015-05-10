@@ -20,6 +20,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -34,7 +35,6 @@ import org.terasology.engine.subsystem.headless.device.HeadlessDisplayDevice;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessRenderingSubsystemFactory;
 import org.terasology.engine.subsystem.headless.renderer.ShaderManagerHeadless;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
@@ -66,20 +66,18 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
 public class HeadlessGraphics implements EngineSubsystem {
 
     @Override
-    public void preInitialise() {
+    public void preInitialise(Context context) {
     }
 
     @Override
-    public void postInitialise(Config config) {
-        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new HeadlessRenderingSubsystemFactory());
+    public void postInitialise(Context context) {
+        context.put(RenderingSubsystemFactory.class, new HeadlessRenderingSubsystemFactory());
 
         HeadlessDisplayDevice headlessDisplay = new HeadlessDisplayDevice();
-        CoreRegistry.putPermanently(DisplayDevice.class, headlessDisplay);
-        initHeadless();
+        context.put(DisplayDevice.class, headlessDisplay);
+        initHeadless(context);
 
-        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new HeadlessCanvasRenderer()));
-
-        //        CoreRegistry.putPermanently(LwjglRenderingProcess.class, new HeadlessRenderingProcess());
+        context.put(NUIManager.class, new NUIManagerInternal(new HeadlessCanvasRenderer(), context));
     }
 
     @Override
@@ -98,8 +96,8 @@ public class HeadlessGraphics implements EngineSubsystem {
     public void dispose() {
     }
 
-    private void initHeadless() {
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+    private void initHeadless(Context context) {
+        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
             @Override
             public Font buildAsset(AssetUri uri, FontData data) {
@@ -160,7 +158,7 @@ public class HeadlessGraphics implements EngineSubsystem {
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
 
         // TODO: why headless cares about shaders?
-        CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerHeadless());
+        context.put(ShaderManager.class, new ShaderManagerHeadless());
     }
 
     @Override

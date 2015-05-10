@@ -16,7 +16,9 @@
 
 package org.terasology.entitySystem.metadata;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -24,6 +26,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +38,11 @@ public class ComponentMetadataTest {
 
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
+
+    @Before
+    public void prepare() {
+        CoreRegistry.setContext(new ContextImpl());
+    }
 
     @Test
     public void staticFieldsIgnored() {

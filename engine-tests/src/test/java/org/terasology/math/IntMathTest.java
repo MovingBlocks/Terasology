@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.config.Config;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class IntMathTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         Config config = new Config();
+        CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, config);
     }
 

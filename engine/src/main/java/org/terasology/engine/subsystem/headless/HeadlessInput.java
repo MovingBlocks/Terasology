@@ -16,21 +16,21 @@
 package org.terasology.engine.subsystem.headless;
 
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.input.InputSystem;
-import org.terasology.registry.CoreRegistry;
 
 public class HeadlessInput implements EngineSubsystem {
 
     @Override
-    public void preInitialise() {
+    public void preInitialise(Context context) {
     }
 
     @Override
-    public void postInitialise(Config config) {
-        initControls();
+    public void postInitialise(Context context) {
+        initControls(context);
     }
 
     @Override
@@ -49,9 +49,9 @@ public class HeadlessInput implements EngineSubsystem {
     public void dispose() {
     }
 
-    private void initControls() {
+    private void initControls(Context context) {
         InputSystem inputSystem = new InputSystem();
-        CoreRegistry.putPermanently(InputSystem.class, inputSystem);
+        context.put(InputSystem.class, inputSystem);
     }
 
     @Override

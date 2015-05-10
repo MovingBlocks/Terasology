@@ -113,6 +113,8 @@ public class StateLoading implements GameState {
 
     @Override
     public void init(GameEngine engine) {
+        CoreRegistry.setContext(engine.createChildContext());
+
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);

@@ -16,7 +16,6 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +25,8 @@ import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
@@ -65,7 +66,10 @@ public class EntitySerializerTest {
 
     @BeforeClass
     public static void setupClass() throws Exception {
+        Context context = new ContextImpl();
+        CoreRegistry.setContext(context);
         moduleManager = ModuleManagerFactory.create();
+
         AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
@@ -73,7 +77,7 @@ public class EntitySerializerTest {
                 return new PojoPrefab(uri, data);
             }
         });
-        CoreRegistry.put(AssetManager.class, assetManager);
+        context.put(AssetManager.class, assetManager);
     }
 
     @Before

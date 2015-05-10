@@ -15,13 +15,6 @@
  */
 package org.terasology.engine;
 
-import java.awt.GraphicsEnvironment;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -44,9 +37,15 @@ import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
@@ -122,7 +121,7 @@ public final class Terasology {
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
 
-            Config config = CoreRegistry.get(Config.class);
+            Config config = engine.getFromEngineContext(Config.class);
 
             if (!writeSaveGamesEnabled) {
                 config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
@@ -285,6 +284,7 @@ public final class Terasology {
             System.exit(0);
         }
     }
+
 
     private static Collection<EngineSubsystem> createSubsystemList() {
         if (isHeadless) {

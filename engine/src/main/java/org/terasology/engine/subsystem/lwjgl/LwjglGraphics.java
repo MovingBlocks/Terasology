@@ -15,21 +15,6 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import javax.imageio.ImageIO;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
@@ -45,6 +30,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -86,23 +72,35 @@ import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 
-public class LwjglGraphics extends BaseLwjglSubsystem {
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+
+public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
     private GLBufferPool bufferPool = new GLBufferPool(false);
 
     @Override
-    public void postInitialise(Config config) {
-        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
+    public void postInitialise(Context context) {
+        context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
-        LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice();
-        CoreRegistry.putPermanently(DisplayDevice.class, lwjglDisplay);
+        LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice(context);
+        context.put(DisplayDevice.class, lwjglDisplay);
 
-        initDisplay(config, lwjglDisplay);
-        initOpenGL();
+        initDisplay(context.get(Config.class), lwjglDisplay);
+        initOpenGL(context);
 
-        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new LwjglCanvasRenderer()));
+        context.put(NUIManager.class, new NUIManagerInternal(new LwjglCanvasRenderer(context), context));
     }
 
     @Override
@@ -186,11 +184,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
     }
 
-    private void initOpenGL() {
+    private void initOpenGL(Context context) {
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
             @Override
             public Font buildAsset(AssetUri uri, FontData data) {
@@ -249,7 +247,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
         assetManager.addResolver(AssetType.TEXTURE, new NoiseTextureAssetResolver());
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
-        CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerLwjgl());
+        context.put(ShaderManager.class, new ShaderManagerLwjgl());
     }
 
     private void checkOpenGL() {

@@ -53,6 +53,7 @@ public abstract class StateSetup implements GameState {
 
     @Override
     public void init(GameEngine gameEngine) {
+        CoreRegistry.setContext(gameEngine.createChildContext());
 
         // let's get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), CoreRegistry.get(NetworkSystem.class),
@@ -84,7 +85,6 @@ public abstract class StateSetup implements GameState {
         componentSystemManager.shutdown();
 
         entityManager.clear();
-        CoreRegistry.clear();
     }
 
     @Override

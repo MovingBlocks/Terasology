@@ -16,7 +16,6 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +25,8 @@ import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -80,7 +81,9 @@ public class PojoEntityManagerTest {
                 return new PojoPrefab(uri, data);
             }
         });
-        CoreRegistry.put(AssetManager.class, assetManager);
+        Context contex = new ContextImpl();
+        contex.put(AssetManager.class, assetManager);
+        CoreRegistry.setContext(contex);
     }
 
     @Before

@@ -16,23 +16,23 @@
 package org.terasology.engine.subsystem.headless;
 
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.headless.device.TimeSystem;
-import org.terasology.registry.CoreRegistry;
 
 public class HeadlessTimer implements EngineSubsystem {
 
     @Override
-    public void preInitialise() {
-        initTimer();
+    public void preInitialise(Context context) {
+        initTimer(context);
     }
 
     @Override
-    public void postInitialise(Config config) {
+    public void postInitialise(Context context) {
     }
 
     @Override
@@ -51,9 +51,9 @@ public class HeadlessTimer implements EngineSubsystem {
     public void dispose() {
     }
 
-    private void initTimer() {
+    private void initTimer(Context context) {
         EngineTime time = new TimeSystem();
-        CoreRegistry.putPermanently(Time.class, time);
+        context.put(Time.class, time);
     }
 
     @Override

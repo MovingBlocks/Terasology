@@ -18,6 +18,7 @@ package org.terasology.registry;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -31,7 +32,28 @@ import java.util.Map;
 public final class InjectionHelper {
     private static final Logger logger = LoggerFactory.getLogger(InjectionHelper.class);
 
-    private InjectionHelper() {
+    public InjectionHelper(Context context) {
+    }
+
+    public static void inject(final Object object, Context context) {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
+            public Object run() {
+                for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
+                    Object value = context.get(field.getType());
+                    if (value != null) {
+                        try {
+                            field.setAccessible(true);
+                            field.set(object, value);
+                        } catch (IllegalAccessException e) {
+                            logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
+                        }
+                    }
+                }
+
+                return null;
+            }
+        });
     }
 
     public static void inject(final Object object) {

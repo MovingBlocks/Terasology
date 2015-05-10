@@ -51,7 +51,6 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -93,36 +92,36 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupStorageManager() throws IOException {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        EngineEntityManager engineEntityManager = CoreRegistry.get(EngineEntityManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
 
-        CoreRegistry.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
+        context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
     }
 
     @Override
     protected void setupNetwork() {
         EngineTime mockTime = mock(EngineTime.class);
-        CoreRegistry.put(Time.class, mockTime);
-        NetworkSystem networkSystem = new NetworkSystemImpl(mockTime);
-        CoreRegistry.put(NetworkSystem.class, networkSystem);
+        context.put(Time.class, mockTime);
+        NetworkSystem networkSystem = new NetworkSystemImpl(mockTime, getContext());
+        context.put(NetworkSystem.class, networkSystem);
     }
 
     @Override
     protected void setupEntitySystem() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        NetworkSystem networkSystem = context.get(NetworkSystem.class);
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
         EngineEntityManager engineEntityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
 
-        CoreRegistry.put(EngineEntityManager.class, engineEntityManager);
+        context.put(EngineEntityManager.class, engineEntityManager);
     }
 
     @Override
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
-        CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
+        context.put(CollisionGroupManager.class, collisionGroupManager);
     }
 
     @Override
@@ -132,27 +131,27 @@ public class HeadlessEnvironment extends Environment {
         blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AttachedToSurfaceFamilyFactory());
         WorldAtlas worldAtlas = new NullWorldAtlas();
         BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, blockFamilyFactoryRegistry);
-        CoreRegistry.put(BlockManager.class, blockManager);
+        context.put(BlockManager.class, blockManager);
     }
 
     @Override
     protected void setupEmptyAssetManager() {
-        AssetManager assetManager = new AssetManagerImpl(CoreRegistry.get(ModuleManager.class).getEnvironment());
+        AssetManager assetManager = new AssetManagerImpl(context.get(ModuleManager.class).getEnvironment());
 
         // mock an empy asset factory for all asset types
         for (AssetType type : AssetType.values()) {
             assetManager.setAssetFactory(type, mock(AssetFactory.class));
         }
 
-        CoreRegistry.put(AssetManager.class, assetManager);
+        context.put(AssetManager.class, assetManager);
     }
 
     @Override
     protected void setupAssetManager() {
         setupEmptyAssetManager();
 
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        AudioManager audioManager = CoreRegistry.get(AudioManager.class);
+        AssetManager assetManager = context.get(AssetManager.class);
+        AudioManager audioManager = context.get(AudioManager.class);
         AssetType.registerAssetTypes(assetManager);
 
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
@@ -184,13 +183,13 @@ public class HeadlessEnvironment extends Environment {
     @Override
     protected void setupAudio() {
         NullAudioManager audioManager = new NullAudioManager();
-        CoreRegistry.put(AudioManager.class, audioManager);
+        context.put(AudioManager.class, audioManager);
     }
 
     @Override
     protected void setupConfig() {
         Config config = new Config();
-        CoreRegistry.put(Config.class, config);
+        context.put(Config.class, config);
     }
 
     @Override
@@ -208,7 +207,7 @@ public class HeadlessEnvironment extends Environment {
             logger.error("Could not resolve module dependencies for " + moduleNames);
         }
 
-        CoreRegistry.put(ModuleManager.class, moduleManager);
+        context.put(ModuleManager.class, moduleManager);
     }
 
     /**
@@ -225,7 +224,7 @@ public class HeadlessEnvironment extends Environment {
     protected void setupComponentManager() {
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
         componentSystemManager.initialise();
-        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        context.put(ComponentSystemManager.class, componentSystemManager);
     }
 
     @Override
@@ -242,16 +241,15 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     public void close() throws Exception {
-        // it would be nice, if elements in the CoreRegistry implemented (Auto)Closeable
+        // it would be nice, if elements in the context implemented (Auto)Closeable
 
         // The StorageManager creates a thread pool (through TaskMaster)
         // which isn't closed automatically
-        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
+        StorageManager storageManager = context.get(StorageManager.class);
         if (storageManager != null) {
             storageManager.finishSavingAndShutdown();
         }
 
-        CoreRegistry.clear();
 
         super.close();
     }

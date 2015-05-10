@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.LoadProcess;
@@ -109,7 +110,7 @@ public class JoinServer implements LoadProcess {
             moduleManager.loadEnvironment(moduleSet, true);
 
             CoreRegistry.get(Game.class).load(gameManifest);
-            ApplyModulesUtil.applyModules();
+            ApplyModulesUtil.applyModules(CoreRegistry.get(Context.class));
 
             return true;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {

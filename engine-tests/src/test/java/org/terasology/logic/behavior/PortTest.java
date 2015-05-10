@@ -19,6 +19,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.logic.behavior.nui.Port;
 import org.terasology.logic.behavior.nui.PortList;
 import org.terasology.logic.behavior.nui.RenderableNode;
@@ -37,7 +39,9 @@ public class PortTest {
     @Before
     public void setup() {
         AssetManager assetManager = mock(AssetManager.class);
-        CoreRegistry.put(AssetManager.class, assetManager);
+        Context context = new ContextImpl();
+        context.put(AssetManager.class, assetManager);
+        CoreRegistry.setContext(context);
     }
 
     @Test
