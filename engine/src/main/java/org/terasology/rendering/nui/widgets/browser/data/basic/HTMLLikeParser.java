@@ -16,16 +16,17 @@
 package org.terasology.rendering.nui.widgets.browser.data.basic;
 
 import org.terasology.asset.Assets;
-import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
-import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
-import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
+import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
+import org.terasology.rendering.nui.widgets.browser.data.basic.flow.TextFlowRenderable;
+import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
+import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,14 +74,12 @@ public final class HTMLLikeParser {
         return result.toString();
     }
 
-    // TODO: Quick and dirty - add something more solid and replaces uses of this one with it
-    public static Collection<ParagraphData> parseHTMLLike(ParagraphRenderStyle paragraphRenderStyle, String text) {
+    public static Collection<FlowRenderable> parseHTMLLike(String text) {
         if (text == null) {
-            return Collections.emptyList();
+            return null;
         }
         StringReader reader = new StringReader(text);
 
-        List<ParagraphData> result = new LinkedList<>();
         int character;
         try {
             StringBuilder sb = new StringBuilder();
@@ -88,36 +87,30 @@ public final class HTMLLikeParser {
             Color color = null;
             String hyperlink = null;
 
-            HyperlinkParagraphData hyperlinkParagraphData = new HyperlinkParagraphData(paragraphRenderStyle);
+            List<FlowRenderable> result = new LinkedList<>();
             while ((character = reader.read()) != -1) {
                 char c = (char) character;
                 if (c == '\n') {
-                    hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
-                    result.add(hyperlinkParagraphData);
-                    sb.setLength(0);
-                    hyperlinkParagraphData = new HyperlinkParagraphData(paragraphRenderStyle);
-                    font = null;
-                    color = null;
-                    hyperlink = null;
+                    throw new IllegalArgumentException("Parsed text cannot contain line breaks.");
                 } else if (c == '<') {
                     char nextChar = (char) reader.read();
                     if (nextChar == '/') {
                         char id = (char) reader.read();
                         if (id == 'f') {
                             if (sb.length() > 0) {
-                                hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                                result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
                                 sb.setLength(0);
                             }
                             font = null;
                         } else if (id == 'c') {
                             if (sb.length() > 0) {
-                                hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                                result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
                                 sb.setLength(0);
                             }
                             color = null;
                         } else if (id == 'h') {
                             if (sb.length() > 0) {
-                                hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                                result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
                                 sb.setLength(0);
                             }
                             hyperlink = null;
@@ -127,21 +120,21 @@ public final class HTMLLikeParser {
                         reader.read();
                     } else if (nextChar == 'f') {
                         if (sb.length() > 0) {
-                            hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                            result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
                             sb.setLength(0);
                         }
                         reader.read();
                         font = Assets.getFont(readUntilCharacter(reader, '>'));
                     } else if (nextChar == 'c') {
                         if (sb.length() > 0) {
-                            hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                            result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
                             sb.setLength(0);
                         }
                         reader.read();
                         color = new Color(Integer.parseInt(readUntilCharacter(reader, '>'), 16));
                     } else if (nextChar == 'h') {
                         if (sb.length() > 0) {
-                            hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                            result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
                             sb.setLength(0);
                         }
                         reader.read();
@@ -167,14 +160,28 @@ public final class HTMLLikeParser {
             }
 
             if (sb.length() > 0) {
-                hyperlinkParagraphData.append(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink);
+                result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));
             }
-            result.add(hyperlinkParagraphData);
+            return result;
         } catch (IOException exp) {
             // Ignore - can't happen
         }
 
-        return result;
+        return null;
+    }
+
+    // TODO: Quick and dirty - add something more solid and replaces uses of this one with it
+    public static ParagraphData parseHTMLLikeParagraph(ParagraphRenderStyle paragraphRenderStyle, String text) {
+        Collection<FlowRenderable> flowRenderables = parseHTMLLike(text);
+        if (flowRenderables == null) {
+            return null;
+        }
+        FlowParagraphData paragraphData = new FlowParagraphData(paragraphRenderStyle);
+        for (FlowRenderable flowRenderable : flowRenderables) {
+            paragraphData.append(flowRenderable);
+        }
+
+        return paragraphData;
     }
 
     private static String readUntilCharacter(StringReader reader, char c) throws IOException {

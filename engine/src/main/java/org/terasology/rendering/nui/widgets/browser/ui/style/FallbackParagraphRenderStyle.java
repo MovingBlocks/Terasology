@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
 
 public class FallbackParagraphRenderStyle extends FallbackTextRenderStyle implements ParagraphRenderStyle {
     private ParagraphRenderStyle style;
@@ -115,5 +116,14 @@ public class FallbackParagraphRenderStyle extends FallbackTextRenderStyle implem
             paragraphMinimumWidth = fallback.getParagraphMinimumWidth();
         }
         return paragraphMinimumWidth;
+    }
+
+    @Override
+    public HorizontalAlign getHorizontalAlignment() {
+        HorizontalAlign horizontalAlignment = style.getHorizontalAlignment();
+        if (horizontalAlignment == null) {
+            horizontalAlignment = fallback.getHorizontalAlignment();
+        }
+        return horizontalAlignment;
     }
 }

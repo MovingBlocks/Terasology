@@ -15,16 +15,18 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
+import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 
 public interface ParagraphRenderable {
-    void render(Canvas canvas, Rect2i region, TextRenderStyle defaultStyle, HyperlinkRegister hyperlinkRegister);
+    void render(Canvas canvas, Rect2i region, TextRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister);
 
-    int getPreferredHeight(Canvas canvas, TextRenderStyle defaultStyle, int width);
+    int getPreferredHeight(TextRenderStyle defaultStyle, int width);
 
-    int getMinWidth(Canvas canvas, TextRenderStyle defaultStyle);
+    int getMinWidth(TextRenderStyle defaultStyle);
 
     public interface HyperlinkRegister {
         void registerHyperlink(Rect2i region, String hyperlink);

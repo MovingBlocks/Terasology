@@ -23,14 +23,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class FlowLineBuilder {
-    private FlowLineBuilder() { }
+    private FlowLineBuilder() {
+    }
 
-    public static <T extends FlowRenderable<T>> Iterable<LaidFlowLine<T>> getLines(Collection<T> flowRenderables, TextRenderStyle defaultRenderStyle, int width) {
+    public static <T extends FlowRenderable<T>> Iterable<LaidFlowLine<T>> getLines(Collection<T> flowRenderables, TextRenderStyle defaultRenderStyle, RenderSpace renderSpace) {
         // Take into account a minimum width
         int minWidth = determineMinWidth(flowRenderables, defaultRenderStyle);
-        int availableWidth = Math.max(minWidth, width);
 
         int x = 0;
+        int y = 0;
+
+        int availableWidth = Math.max(minWidth, renderSpace.getWidthForVerticalPosition(y));
 
         List<LaidFlowLine<T>> result = new LinkedList<>();
 
@@ -46,6 +49,8 @@ public final class FlowLineBuilder {
                 result.add(new DefaultLaidFlowLine<T>(x, maxHeightInLine, renderablesInLine));
                 renderablesInLine = new LinkedList<>();
                 x = 0;
+                y += maxHeightInLine;
+                availableWidth = Math.max(minWidth, renderSpace.getWidthForVerticalPosition(y));
                 maxHeightInLine = 0;
                 renderablesQueue.addFirst(splitResult.rest);
             } else {
@@ -61,6 +66,8 @@ public final class FlowLineBuilder {
                     result.add(new DefaultLaidFlowLine<T>(x, maxHeightInLine, renderablesInLine));
                     renderablesInLine = new LinkedList<>();
                     x = 0;
+                    y += maxHeightInLine;
+                    availableWidth = Math.max(minWidth, renderSpace.getWidthForVerticalPosition(y));
                     maxHeightInLine = 0;
                     renderablesQueue.addFirst(splitResult.rest);
                 }
