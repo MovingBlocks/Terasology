@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
 
 public interface ParagraphRenderStyle extends TextRenderStyle {
     default Integer getParagraphIndentTop(boolean firstParagraph) {
@@ -57,4 +58,6 @@ public interface ParagraphRenderStyle extends TextRenderStyle {
     default Integer getParagraphMinimumWidth() {
         return null;
     }
+
+    default HorizontalAlign getHorizontalAlignment() { return null; }
 }

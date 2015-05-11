@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 
 public interface FlowRenderable<T extends FlowRenderable<T>> {
     void render(Canvas canvas, Rect2i bounds, TextRenderStyle defaultRenderStyle);
@@ -27,6 +27,8 @@ public interface FlowRenderable<T extends FlowRenderable<T>> {
     int getWidth(TextRenderStyle defaultRenderStyle);
 
     int getHeight(TextRenderStyle defaultRenderStyle);
+
+    String getAction();
 
     SplitResult<T> splitAt(TextRenderStyle defaultRenderStyle, int width);
 

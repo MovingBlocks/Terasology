@@ -16,14 +16,16 @@
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
 
 public class DefaultDocumentRenderStyle implements DocumentRenderStyle {
-    private Canvas canvas;
+    private Font defaultFont;
+    private Color defaultColor;
 
-    public DefaultDocumentRenderStyle(Canvas canvas) {
-        this.canvas = canvas;
+    public DefaultDocumentRenderStyle(Font defaultFont, Color defaultColor) {
+        this.defaultFont = defaultFont;
+        this.defaultColor = defaultColor;
     }
 
     @Override
@@ -93,7 +95,7 @@ public class DefaultDocumentRenderStyle implements DocumentRenderStyle {
 
     @Override
     public Font getFont(boolean hyperlink) {
-        return canvas.getCurrentStyle().getFont();
+        return defaultFont;
     }
 
     @Override
@@ -101,7 +103,7 @@ public class DefaultDocumentRenderStyle implements DocumentRenderStyle {
         if (hyperlink) {
             return Color.BLUE;
         } else {
-            return canvas.getCurrentStyle().getTextColor();
+            return defaultColor;
         }
     }
 
@@ -113,5 +115,10 @@ public class DefaultDocumentRenderStyle implements DocumentRenderStyle {
     @Override
     public Color getParagraphBackground() {
         return null;
+    }
+
+    @Override
+    public HorizontalAlign getHorizontalAlignment() {
+        return HorizontalAlign.LEFT;
     }
 }
