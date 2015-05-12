@@ -17,15 +17,11 @@ public class JeditCommand  extends BaseComponentSystem {
 		 try{
 		        String cmd = "jedit "+baseFolder+className;
 		        Process p=Runtime.getRuntime().exec(cmd);
-		        p.waitFor();
 		        return "Work";
 		        
 		 }
 		 catch(IOException e1) {
 			 return e1.toString();
-		 }
-		 catch(InterruptedException e2) {
-			 return e2.toString();
 		 }
 	 }
 }
