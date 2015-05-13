@@ -86,7 +86,8 @@ public class FacetLayerPreview implements PreviewGenerator {
     public FacetLayerPreview(ModuleEnvironment environment, WorldGenerator worldGenerator) {
         this.worldGenerator = worldGenerator;
 
-        Set<Class<? extends WorldFacet>> facets = worldGenerator.getWorld().getAllFacets();
+        World world = worldGenerator.getWorld();
+        Set<Class<? extends WorldFacet>> facets = world.getAllFacets();
         facetLayers = FacetLayers.createLayersFor(facets, environment);
     }
 

@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -80,6 +81,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    private final int imageSize = 384;
+
     private WorldGenerator worldGenerator;
 
     private UIImage previewImage;
@@ -109,15 +112,16 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary());
         SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
+        Name moduleName = worldGenUri.getModuleName();
 
         try {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            Name moduleName = worldGenUri.getModuleName();
             ResolutionResult result = resolver.resolve(moduleName);
             if (result.isSuccess()) {
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
+                CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment));
+                CoreRegistry.get(AssetManager.class).setEnvironment(environment);
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
@@ -166,6 +170,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         super.onClosed();
 
         if (environment != null) {
+            CoreRegistry.get(AssetManager.class).setEnvironment(moduleManager.getEnvironment());
             environment.close();
             environment = null;
         }
