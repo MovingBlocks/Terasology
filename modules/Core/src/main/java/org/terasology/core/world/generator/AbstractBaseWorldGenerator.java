@@ -15,7 +15,6 @@
  */
 package org.terasology.core.world.generator;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -31,7 +30,6 @@ import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.base.ColorSummaryFacet;
 import org.terasology.world.generator.ChunkGenerationPass;
-import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
@@ -112,15 +110,6 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
             }
         }
         return layerNames;
-    }
-
-    @Override
-    public Optional<WorldConfigurator> getConfigurator() {
-        return Optional.absent();
-    }
-
-    @Override
-    public void setConfigurator(WorldConfigurator worldConfigurator) {
     }
 
     @Override

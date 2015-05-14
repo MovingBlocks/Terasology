@@ -137,25 +137,21 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         properties.setOrdering(PropertyOrdering.byLabel());
         properties.clear();
 
-        if (worldGenerator.getConfigurator().isPresent()) {
-            WorldConfigurator worldConfig = worldGenerator.getConfigurator().get();
+        WorldConfigurator worldConfig = worldGenerator.getConfigurator();
 
-            Map<String, Component> params = worldConfig.getProperties();
+        Map<String, Component> params = worldConfig.getProperties();
 
-            for (String key : params.keySet()) {
-                Class<? extends Component> clazz = params.get(key).getClass();
-                Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
-                if (comp != null) {
-                    worldConfig.setProperty(key, comp);       // use the data from the config instead of defaults
-                }
+        for (String key : params.keySet()) {
+            Class<? extends Component> clazz = params.get(key).getClass();
+            Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
+            if (comp != null) {
+                worldConfig.setProperty(key, comp);       // use the data from the config instead of defaults
             }
+        }
 
-            for (String label : params.keySet()) {
-                PropertyProvider<?> provider = new PropertyProvider<>(params.get(label));
-                properties.addPropertyProvider(label, provider);
-            }
-        } else {
-            logger.info(worldGenerator.getUri().toString() + " does not support configuration");
+        for (String label : params.keySet()) {
+            PropertyProvider<?> provider = new PropertyProvider<>(params.get(label));
+            properties.addPropertyProvider(label, provider);
         }
     }
 
@@ -175,13 +171,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             previewGen = null;
         }
 
-        if (worldGenerator.getConfigurator().isPresent()) {
-            WorldConfigurator worldConfig = worldGenerator.getConfigurator().get();
+        WorldConfigurator worldConfig = worldGenerator.getConfigurator();
 
-            Map<String, Component> params = worldConfig.getProperties();
-            if (params != null) {
-                config.setModuleConfigs(worldGenerator.getUri(), params);
-            }
+        Map<String, Component> params = worldConfig.getProperties();
+        if (params != null) {
+            config.setModuleConfigs(worldGenerator.getUri(), params);
         }
 
         super.onClosed();

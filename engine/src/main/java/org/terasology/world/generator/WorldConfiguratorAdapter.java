@@ -15,25 +15,23 @@
  */
 package org.terasology.world.generator;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.terasology.entitySystem.Component;
 
 /**
- * Allows for configuration of world generators.
- * @author Martin Steiger
+ * A dummy implementation of {@link WorldConfigurator} that does nothing.
  */
-public interface WorldConfigurator  {
+public class WorldConfiguratorAdapter implements WorldConfigurator {
 
-    /**
-     * The values are supposed to be annotated with {@link org.terasology.rendering.nui.properties.Property}
-     * @return a map (label to object)
-     */
-    Map<String, Component> getProperties();
+    @Override
+    public Map<String, Component> getProperties() {
+        return Collections.emptyMap();
+    }
 
-    /**
-     * @param key the name of the configuration
-     * @param comp the configuration component
-     */
-    void setProperty(String key, Component comp);
+    @Override
+    public void setProperty(String key, Component comp) {
+        // simply ignore
+    }
 }

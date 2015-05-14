@@ -29,7 +29,6 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
@@ -80,14 +79,9 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     }
 
     @Override
-    public Optional<WorldConfigurator> getConfigurator() {
-        return Optional.of(worldConfigurator);
+    public WorldConfigurator getConfigurator() {
+        return worldConfigurator;
     }
-
-    @Override
-    public void setConfigurator(WorldConfigurator newConfigurator) {
-    }
-
 
     @Override
     public World getWorld() {
