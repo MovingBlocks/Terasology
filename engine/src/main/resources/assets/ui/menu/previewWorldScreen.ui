@@ -154,7 +154,7 @@
                             },
                             {
                                 "type" : "UIButton",
-                                "text" : "Apply",
+                                "text" : "Recompute",
                                 "id" : "apply",
                                 "layoutInfo" : {
                                     "height" : 32,

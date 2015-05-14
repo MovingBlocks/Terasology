@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -60,8 +59,6 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import com.google.common.collect.Maps;
-
 /**
  * Shows a preview of the generated world and provides some
  * configuration options to tweak the generation process.
@@ -81,14 +78,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private final int imageSize = 384;
-
     private WorldGenerator worldGenerator;
 
     private UIImage previewImage;
     private UISlider zoomSlider;
     private UIButton applyButton;
-    private PreviewSettings currentSettings;
 
     private UIText seed;
 
@@ -146,7 +140,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (worldGenerator.getConfigurator().isPresent()) {
             WorldConfigurator worldConfig = worldGenerator.getConfigurator().get();
 
-            Map<String, Component> params = Maps.newHashMap(worldConfig.getProperties());
+            Map<String, Component> params = worldConfig.getProperties();
 
             for (String key : params.keySet()) {
                 Class<? extends Component> clazz = params.get(key).getClass();
@@ -167,7 +161,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        super.onClosed();
+
+        CoreRegistry.remove(WorldGeneratorPluginLibrary.class);
 
         if (environment != null) {
             CoreRegistry.get(AssetManager.class).setEnvironment(moduleManager.getEnvironment());
@@ -179,6 +174,17 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             previewGen.close();
             previewGen = null;
         }
+
+        if (worldGenerator.getConfigurator().isPresent()) {
+            WorldConfigurator worldConfig = worldGenerator.getConfigurator().get();
+
+            Map<String, Component> params = worldConfig.getProperties();
+            if (params != null) {
+                config.setModuleConfigs(worldGenerator.getUri(), params);
+            }
+        }
+
+        super.onClosed();
     }
 
     @Override
@@ -192,7 +198,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         applyButton = find("apply", UIButton.class);
         if (applyButton != null) {
-            applyButton.setEnabled(false);
             applyButton.subscribe(new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget widget) {
@@ -213,23 +218,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     @Override
-    public void update(float delta) {
-        super.update(delta);
-        if (worldGenerator != null) {
-            PreviewSettings newSettings = new PreviewSettings(TeraMath.floorToInt(zoomSlider.getValue()), seed.getText());
-            if (currentSettings == null || !currentSettings.equals(newSettings)) {
-                boolean firstTime = currentSettings == null;
-                currentSettings = newSettings;
-                if (applyButton != null && !firstTime) {
-                    applyButton.setEnabled(true);
-                } else {
-                    updatePreview();
-                }
-            }
-        }
-    }
-
-    @Override
     public boolean isLowerLayerVisible() {
         return false;
     }
@@ -241,8 +229,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
-        previewImage.setVisible(false);
-
         final NUIManager manager = CoreRegistry.get(NUIManager.class);
         final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Updating Preview", "Please wait ...");
@@ -254,43 +240,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             if (seed != null) {
                 worldGenerator.setWorldSeed(seed.getText());
             }
-            previewGen.render(texture.getData(), currentSettings.zoom, progressListener);
-            previewImage.setVisible(true);
-            if (applyButton != null) {
-                applyButton.setEnabled(false);
-            }
+            int zoom = TeraMath.floorToInt(zoomSlider.getValue());
+            previewGen.render(texture.getData(), zoom, progressListener);
             return texture.getData();
         };
 
         popup.onSuccess(newData -> texture.reload(newData));
         popup.startOperation(operation, true);
-    }
-
-    private static class PreviewSettings {
-        private int zoom;
-        private String seed;
-
-        public PreviewSettings(int zoom, String seed) {
-            this.zoom = zoom;
-            this.seed = seed;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj instanceof PreviewSettings) {
-                PreviewSettings other = (PreviewSettings) obj;
-                return other.zoom == zoom && Objects.equals(other.seed, seed);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(zoom, seed);
-        }
     }
 }
 

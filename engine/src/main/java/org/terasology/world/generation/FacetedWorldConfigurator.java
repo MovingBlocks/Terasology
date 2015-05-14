@@ -22,7 +22,8 @@ import org.terasology.world.generator.WorldConfigurator;
 import java.util.Map;
 
 public class FacetedWorldConfigurator implements WorldConfigurator {
-    Map<String, Component> properties = Maps.newHashMap();
+
+    private final Map<String, Component> properties = Maps.newHashMap();
 
     public void addProperty(String name, Component data) {
         if (!properties.containsKey(name)) {
@@ -30,6 +31,7 @@ public class FacetedWorldConfigurator implements WorldConfigurator {
         }
     }
 
+    @Override
     public Map<String, Component> getProperties() {
         return properties;
     }
