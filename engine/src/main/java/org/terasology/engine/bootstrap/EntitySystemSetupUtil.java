@@ -16,7 +16,9 @@
 
 package org.terasology.engine.bootstrap;
 
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -32,29 +34,61 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.logic.behavior.asset.NodesClassLibrary;
-
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 
 /**
- * @author Immortius
+ * Provides static methods that can be used to put entity system related objects into a {@link Context} instance.
  */
-// TODO: Review - This could be a static class but its existence is also questionable.
-public class EntitySystemBuilder {
+public class EntitySystemSetupUtil {
 
-    public EngineEntityManager build(ModuleEnvironment environment, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
-        return build(environment, networkSystem, reflectFactory, new CopyStrategyLibrary(reflectFactory));
+
+    private EntitySystemSetupUtil() {
+        // static utility class, no instance needed
     }
 
-    public EngineEntityManager build(ModuleEnvironment environment, NetworkSystem networkSystem, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+    public static void addReflectionBasedLibraries(Context context) {
+        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+        context.put(ReflectFactory.class, reflectFactory);
+        context.put(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
+    }
+
+
+    /**
+     * Objects for the following classes must be available in the context:
+     * <ul>
+     *     <li>{@link ModuleEnvironment}</li>
+     *     <li>{@link NetworkSystem}</li>
+     *     <li>{@link ReflectFactory}</li>
+     *     <li>{@link CopyStrategyLibrary}</li>
+     * </ul>
+     *
+     * The method will make objects for the following classes available in the context:
+     * <ul>
+     *     <li>{@link EngineEntityManager}</li>
+     *     <li>{@link ComponentLibrary}</li>
+     *     <li>{@link EventLibrary}</li>
+     *     <li>{@link PrefabManager}</li>
+     *     <li>{@link EventSystem}</li>
+     *     <li>{@link NodesClassLibrary}</li>
+     * </ul>
+     *
+     */
+    public static void addEntityManagementRelatedClasses(Context context) {
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        NetworkSystem networkSystem = context.get(NetworkSystem.class);
+        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
+        CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
+
         // Entity Manager
-        PojoEntityManager entityManager = CoreRegistry.put(EntityManager.class, new PojoEntityManager());
-        CoreRegistry.put(EngineEntityManager.class, entityManager);
+        PojoEntityManager entityManager = new PojoEntityManager();
+        context.put(EntityManager.class, entityManager);
+        context.put(EngineEntityManager.class, entityManager);
 
         // Standard serialization library
         TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(entityManager,
@@ -62,37 +96,35 @@ public class EntitySystemBuilder {
         entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
 
         // Entity System Library
-        EntitySystemLibrary library = CoreRegistry.put(EntitySystemLibrary.class, new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, typeSerializationLibrary));
+        EntitySystemLibrary library = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, typeSerializationLibrary);
+        context.put(EntitySystemLibrary.class, library);
         entityManager.setComponentLibrary(library.getComponentLibrary());
-        CoreRegistry.put(ComponentLibrary.class, library.getComponentLibrary());
-        CoreRegistry.put(EventLibrary.class, library.getEventLibrary());
+        context.put(ComponentLibrary.class, library.getComponentLibrary());
+        context.put(EventLibrary.class, library.getEventLibrary());
 
         // Prefab Manager
         PrefabManager prefabManager = new PojoPrefabManager();
         entityManager.setPrefabManager(prefabManager);
-        CoreRegistry.put(PrefabManager.class, prefabManager);
+        context.put(PrefabManager.class, prefabManager);
 
         // Event System
         EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
         entityManager.setEventSystem(eventSystem);
-        CoreRegistry.put(EventSystem.class, eventSystem);
+        context.put(EventSystem.class, eventSystem);
 
         // TODO: Review - NodeClassLibrary related to the UI for behaviours. Should not be here and probably not even in the CoreRegistry
-        CoreRegistry.put(OneOfProviderFactory.class, new OneOfProviderFactory());
+        context.put(OneOfProviderFactory.class, new OneOfProviderFactory());
 
         // Behaviour Trees Node Library
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
-        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        context.put(NodesClassLibrary.class, nodesClassLibrary);
         nodesClassLibrary.scan(environment);
 
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);
-        return entityManager;
     }
 
-
-
-    private void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
+    private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
@@ -101,7 +133,7 @@ public class EntitySystemBuilder {
         }
     }
 
-    private void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
+    private static void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
                 eventSystem.registerEvent(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);

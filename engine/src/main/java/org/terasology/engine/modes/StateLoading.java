@@ -18,9 +18,9 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
@@ -72,6 +72,7 @@ public class StateLoading implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
+    private Context context;
     private GameManifest gameManifest;
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
@@ -113,13 +114,14 @@ public class StateLoading implements GameState {
 
     @Override
     public void init(GameEngine engine) {
-        CoreRegistry.setContext(engine.createChildContext());
+        this.context = engine.createChildContext();
+        CoreRegistry.setContext(context);
 
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
 
-        CoreRegistry.get(Game.class).load(gameManifest);
+        context.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:
                 initClient();
@@ -148,7 +150,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterBiomes(gameManifest));
         loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseGraphics());
-        loadProcesses.add(new InitialiseEntitySystem());
+        loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new ProcessBlockPrefabs());
         loadProcesses.add(new RegisterInputSystem());
@@ -173,7 +175,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterBiomes(gameManifest));
         loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseGraphics());
-        loadProcesses.add(new InitialiseEntitySystem());
+        loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new ProcessBlockPrefabs());
         loadProcesses.add(new RegisterInputSystem());

@@ -16,17 +16,20 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.network.NetworkSystem;
+import org.terasology.context.Context;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 
 /**
  * @author Immortius
  */
 public class InitialiseEntitySystem extends SingleStepLoadProcess {
+
+    private final Context context;
+
+    public InitialiseEntitySystem(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Initialising Entity System...";
@@ -34,9 +37,7 @@ public class InitialiseEntitySystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        new EntitySystemBuilder().build(moduleManager.getEnvironment(), CoreRegistry.get(NetworkSystem.class),
-                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         return true;
     }
 

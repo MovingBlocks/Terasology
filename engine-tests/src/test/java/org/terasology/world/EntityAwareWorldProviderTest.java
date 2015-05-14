@@ -32,7 +32,7 @@ import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -59,7 +59,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.testUtil.WorldProviderCoreStub;
@@ -126,14 +125,16 @@ public class EntityAwareWorldProviderTest {
                 return new PojoPrefab(uri, data);
             }
         });
-        EntitySystemBuilder builder = new EntitySystemBuilder();
-
-        CoreRegistry.put(ComponentSystemManager.class, mock(ComponentSystemManager.class));
+        context.put(ComponentSystemManager.class, mock(ComponentSystemManager.class));
 
         blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        context.put(NetworkSystem.class, networkSystem);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+
+        entityManager = context.get(EngineEntityManager.class);
         worldStub = new WorldProviderCoreStub();
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 

@@ -15,10 +15,10 @@
  */
 package org.terasology.engine.modes;
 
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -28,9 +28,6 @@ import org.terasology.logic.console.ConsoleSystem;
 import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkSystem;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
@@ -53,26 +50,28 @@ public abstract class StateSetup implements GameState {
 
     @Override
     public void init(GameEngine gameEngine) {
-        CoreRegistry.setContext(gameEngine.createChildContext());
+        Context context = gameEngine.createChildContext();
+        CoreRegistry.setContext(context);
 
         // let's get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), CoreRegistry.get(NetworkSystem.class),
-                                                        CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = CoreRegistry.get(EventSystem.class);
-        CoreRegistry.put(Console.class, new ConsoleImpl());
+        context.put(Console.class, new ConsoleImpl());
 
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 
         componentSystemManager = new ComponentSystemManager();
-        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        context.put(ComponentSystemManager.class, componentSystemManager);
 
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-        LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
+        LocalPlayer localPlayer = new LocalPlayer();
+        context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();

@@ -28,7 +28,7 @@ import org.terasology.asset.Assets;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -44,7 +44,6 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
@@ -58,17 +57,20 @@ import static org.mockito.Mockito.mock;
  */
 public class EntitySerializerTest {
 
+    private static Context context;
     private static ModuleManager moduleManager;
     private ComponentLibrary componentLibrary;
     private EngineEntityManager entityManager;
     private EntitySerializer entitySerializer;
     private Prefab prefab;
 
+
     @BeforeClass
     public static void setupClass() throws Exception {
-        Context context = new ContextImpl();
+        context = new ContextImpl();
         CoreRegistry.setContext(context);
         moduleManager = ModuleManagerFactory.create();
+        context.put(ModuleManager.class, moduleManager);
 
         AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
@@ -82,9 +84,11 @@ public class EntitySerializerTest {
 
     @Before
     public void setup() {
+        context.put(NetworkSystem.class, mock(NetworkSystem.class));
 
-        EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = context.get(EngineEntityManager.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
