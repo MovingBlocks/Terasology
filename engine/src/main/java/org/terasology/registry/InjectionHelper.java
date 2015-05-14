@@ -32,7 +32,7 @@ import java.util.Map;
 public final class InjectionHelper {
     private static final Logger logger = LoggerFactory.getLogger(InjectionHelper.class);
 
-    public InjectionHelper(Context context) {
+    private InjectionHelper() {
     }
 
     public static void inject(final Object object, Context context) {

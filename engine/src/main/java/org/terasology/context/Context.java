@@ -26,7 +26,7 @@ package org.terasology.context;
  *
  * This class is intended to replace the CoreRegistry and other static means to get utility objects.
  *
- * Contexts must be thread save!
+ * Contexts must be thread safe!
  */
 public interface Context {
 
