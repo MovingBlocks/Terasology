@@ -23,10 +23,10 @@ import com.google.common.collect.Sets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,18 +39,12 @@ public class WorldBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);
 
-    private final long seed;
     private final List<FacetProvider> providersList = Lists.newArrayList();
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private int seaLevel = 32;
 
-    public WorldBuilder(long seed) {
-        this.seed = seed;
-    }
-
     public WorldBuilder addProvider(FacetProvider provider) {
-        provider.setSeed(seed);
         providersList.add(provider);
         return this;
     }
@@ -80,6 +74,12 @@ public class WorldBuilder {
     public WorldBuilder setSeaLevel(int level) {
         this.seaLevel = level;
         return this;
+    }
+
+    public void setSeed(long seed) {
+        for (FacetProvider provider : providersList) {
+            provider.setSeed(seed);
+        }
     }
 
     public World build() {
@@ -209,26 +209,13 @@ public class WorldBuilder {
     }
 
     public FacetedWorldConfigurator createConfigurator() {
-        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator();
+        List<ConfigurableFacetProvider> configurables = new ArrayList<>();
         for (FacetProvider facetProvider : providersList) {
             if (facetProvider instanceof ConfigurableFacetProvider) {
-                ConfigurableFacetProvider configurableFacetProvider = (ConfigurableFacetProvider) facetProvider;
-                worldConfigurator.addProperty(configurableFacetProvider.getConfigurationName(), configurableFacetProvider.getConfiguration());
+                configurables.add((ConfigurableFacetProvider) facetProvider);
             }
         }
+        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator(configurables);
         return worldConfigurator;
-    }
-
-    public void setConfigurator(FacetedWorldConfigurator worldConfigurator) {
-        Map<String, Component> configurationMap = worldConfigurator.getProperties();
-        for (FacetProvider facetProvider : providersList) {
-            if (facetProvider instanceof ConfigurableFacetProvider) {
-                ConfigurableFacetProvider configurableFacetProvider = (ConfigurableFacetProvider) facetProvider;
-                Component configuration = configurationMap.get(configurableFacetProvider.getConfigurationName());
-                if (configuration != null) {
-                    configurableFacetProvider.setConfiguration(configuration);
-                }
-            }
-        }
     }
 }

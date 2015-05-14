@@ -146,7 +146,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 Class<? extends Component> clazz = params.get(key).getClass();
                 Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
                 if (comp != null) {
-                    params.put(key, comp);       // use the data from the config instead of defaults
+                    worldConfig.setProperty(key, comp);       // use the data from the config instead of defaults
                 }
             }
 

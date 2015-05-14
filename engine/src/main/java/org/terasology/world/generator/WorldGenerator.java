@@ -39,6 +39,10 @@ public interface WorldGenerator {
 
     World getWorld();
 
+    /**
+     * Use getConfigurator.setProperty instead
+     */
+    @Deprecated
     void setConfigurator(WorldConfigurator newConfigurator);
 
     /**

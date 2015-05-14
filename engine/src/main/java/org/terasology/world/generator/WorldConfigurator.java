@@ -30,4 +30,10 @@ public interface WorldConfigurator  {
      * @return a map (label to object)
      */
     Map<String, Component> getProperties();
+
+    /**
+     * @param key
+     * @param comp
+     */
+    void setProperty(String key, Component comp);
 }
