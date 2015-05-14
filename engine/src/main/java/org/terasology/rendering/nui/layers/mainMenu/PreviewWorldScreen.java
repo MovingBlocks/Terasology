@@ -73,6 +73,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private ModuleManager moduleManager;
 
     @In
+    private AssetManager assetManager;
+
+    @In
     private WorldGeneratorManager worldGeneratorManager;
 
     @In
@@ -91,6 +94,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private ModuleEnvironment environment;
 
     private final Texture texture;
+
+    private boolean triggerUpdate;
 
     public PreviewWorldScreen() {
         int imgWidth = 384;
@@ -115,11 +120,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             if (result.isSuccess()) {
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
                 CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment));
-                CoreRegistry.get(AssetManager.class).setEnvironment(environment);
+                assetManager.setEnvironment(environment);
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
                 configureProperties();
+                triggerUpdate = true;
             } else {
                 logger.error("Could not resolve modules for: {}", worldGenUri);
             }
@@ -129,6 +135,16 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             worldGenerator = null;
             logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
         }
+    }
+
+    @Override
+    public void update(float delta) {
+         super.update(delta);
+
+         if (triggerUpdate) {
+             updatePreview();
+             triggerUpdate = false;
+         }
     }
 
     private void configureProperties() {
@@ -161,7 +177,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         CoreRegistry.remove(WorldGeneratorPluginLibrary.class);
 
         if (environment != null) {
-            CoreRegistry.get(AssetManager.class).setEnvironment(moduleManager.getEnvironment());
+            assetManager.setEnvironment(moduleManager.getEnvironment());
             environment.close();
             environment = null;
         }
