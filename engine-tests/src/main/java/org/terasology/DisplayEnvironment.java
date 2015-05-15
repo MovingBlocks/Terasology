@@ -31,9 +31,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -87,7 +84,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
 
         try {
             Display.setDisplayMode(new DisplayMode(1, 1));
-            Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
+            Display.create(context.get(Config.class).getRendering().getPixelFormat());
         } catch (LWJGLException e) {
             throw new IllegalStateException(e);
         }
@@ -95,8 +92,8 @@ public class DisplayEnvironment extends HeadlessEnvironment {
 
     @Override
     protected void setupAssetManager() {
-        AssetManager assetManager = new AssetManagerImpl(CoreRegistry.get(ModuleManager.class).getEnvironment());
-        CoreRegistry.put(AssetManager.class, assetManager);
+        AssetManager assetManager = new AssetManagerImpl(context.get(ModuleManager.class).getEnvironment());
+        context.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);
 
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
@@ -149,7 +146,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
                 return new MeshAnimationImpl(uri, data);
             }
         });
-        CoreRegistry.get(AssetManager.class).setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
+        context.get(AssetManager.class).setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
             @Override
             public UISkin buildAsset(AssetUri uri, UISkinData data) {
                 return new UISkin(uri, data);
@@ -164,7 +161,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
         blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AttachedToSurfaceFamilyFactory());
         BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlasImpl(4096), blockFamilyFactoryRegistry);
-        CoreRegistry.put(BlockManager.class, blockManager);
+        context.put(BlockManager.class, blockManager);
     }
 
     @Override

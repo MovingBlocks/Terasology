@@ -44,9 +44,7 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -104,7 +102,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new WidgetLibrary(context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        widgetsLibrary = new WidgetLibrary(context);
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
             widgetsLibrary.register(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);

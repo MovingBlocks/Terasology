@@ -96,7 +96,7 @@ public class EntitySystemSetupUtil {
         entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
 
         // Entity System Library
-        EntitySystemLibrary library = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, typeSerializationLibrary);
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
         context.put(EntitySystemLibrary.class, library);
         entityManager.setComponentLibrary(library.getComponentLibrary());
         context.put(ComponentLibrary.class, library.getComponentLibrary());
@@ -116,7 +116,7 @@ public class EntitySystemSetupUtil {
         context.put(OneOfProviderFactory.class, new OneOfProviderFactory());
 
         // Behaviour Trees Node Library
-        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(context);
         context.put(NodesClassLibrary.class, nodesClassLibrary);
         nodesClassLibrary.scan(environment);
 

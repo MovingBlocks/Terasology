@@ -181,7 +181,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterInputSystem());
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
-        loadProcesses.add(new InitialiseWorld(gameManifest));
+        loadProcesses.add(new InitialiseWorld(gameManifest, context));
         loadProcesses.add(new EnsureSaveGameConsistency());
         loadProcesses.add(new InitialisePhysics());
         loadProcesses.add(new InitialiseSystems());
