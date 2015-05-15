@@ -98,7 +98,7 @@ public class StateMainMenu implements GameState {
         inputSystem = context.get(InputSystem.class);
 
         // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
-        new RegisterInputSystem().step();
+        new RegisterInputSystem(context).step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();

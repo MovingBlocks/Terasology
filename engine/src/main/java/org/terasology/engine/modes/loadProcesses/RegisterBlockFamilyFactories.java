@@ -18,9 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -32,6 +32,12 @@ import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 public class RegisterBlockFamilyFactories extends SingleStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterBlockFamilyFactories.class);
 
+    private final Context context;
+
+    public RegisterBlockFamilyFactories(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Registering BlockFamilyFactories...";
@@ -40,11 +46,11 @@ public class RegisterBlockFamilyFactories extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         DefaultBlockFamilyFactoryRegistry registry = new DefaultBlockFamilyFactoryRegistry();
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
 
         loadFamilies(registry, moduleManager.getEnvironment());
 
-        CoreRegistry.put(BlockFamilyFactoryRegistry.class, registry);
+        context.put(BlockFamilyFactoryRegistry.class, registry);
 
         return true;
     }

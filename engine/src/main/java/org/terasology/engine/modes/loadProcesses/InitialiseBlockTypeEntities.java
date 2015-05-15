@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -26,6 +26,12 @@ import org.terasology.world.block.typeEntity.BlockTypeEntityGenerator;
  */
 public class InitialiseBlockTypeEntities extends SingleStepLoadProcess {
 
+    private final Context context;
+
+    public InitialiseBlockTypeEntities(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Initialising Block Type Entities";
@@ -33,8 +39,8 @@ public class InitialiseBlockTypeEntities extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        BlockManagerImpl blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
-        blockManager.subscribe(new BlockTypeEntityGenerator(CoreRegistry.get(EntityManager.class), blockManager));
+        BlockManagerImpl blockManager = (BlockManagerImpl) context.get(BlockManager.class);
+        blockManager.subscribe(new BlockTypeEntityGenerator(context.get(EntityManager.class), blockManager));
         return true;
     }
 

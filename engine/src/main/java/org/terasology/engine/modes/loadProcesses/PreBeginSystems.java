@@ -15,9 +15,9 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Iterator;
 
@@ -25,6 +25,12 @@ import java.util.Iterator;
  * @author Immortius
  */
 public class PreBeginSystems extends StepBasedLoadProcess {
+
+    private final Context context;
+
+    public PreBeginSystems(Context context) {
+        this.context = context;
+    }
 
     private Iterator<ComponentSystem> componentSystems;
 
@@ -43,7 +49,7 @@ public class PreBeginSystems extends StepBasedLoadProcess {
 
     @Override
     public void begin() {
-        ComponentSystemManager csm = CoreRegistry.get(ComponentSystemManager.class);
+        ComponentSystemManager csm = context.get(ComponentSystemManager.class);
         componentSystems = csm.iterateAll().iterator();
     }
 

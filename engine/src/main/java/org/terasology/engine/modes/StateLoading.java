@@ -96,7 +96,6 @@ public class StateLoading implements GameState {
         Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
 
         this.gameManifest = gameManifest;
-        this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = netMode;
     }
 
@@ -107,7 +106,6 @@ public class StateLoading implements GameState {
      */
     public StateLoading(JoinStatus joinStatus) {
         this.gameManifest = new GameManifest();
-        this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = NetworkMode.CLIENT;
         this.joinStatus = joinStatus;
     }
@@ -117,7 +115,9 @@ public class StateLoading implements GameState {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
 
-        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        this.nuiManager = context.get(NUIManager.class);
+
+        EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
 
@@ -143,53 +143,53 @@ public class StateLoading implements GameState {
     }
 
     private void initClient() {
-        loadProcesses.add(new JoinServer(gameManifest, joinStatus));
+        loadProcesses.add(new JoinServer(context, gameManifest, joinStatus));
         loadProcesses.add(new CacheTextures());
-        loadProcesses.add(new RegisterBlockFamilyFactories());
-        loadProcesses.add(new RegisterBlocks(gameManifest));
-        loadProcesses.add(new RegisterBiomes(gameManifest));
+        loadProcesses.add(new RegisterBlockFamilyFactories(context));
+        loadProcesses.add(new RegisterBlocks(context, gameManifest));
+        loadProcesses.add(new RegisterBiomes(context, gameManifest));
         loadProcesses.add(new CacheBlocks());
-        loadProcesses.add(new InitialiseGraphics());
+        loadProcesses.add(new InitialiseGraphics(context));
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new LoadPrefabs());
-        loadProcesses.add(new ProcessBlockPrefabs());
-        loadProcesses.add(new RegisterInputSystem());
-        loadProcesses.add(new RegisterSystems(netMode));
-        loadProcesses.add(new InitialiseCommandSystem());
-        loadProcesses.add(new InitialiseRemoteWorld(gameManifest));
-        loadProcesses.add(new InitialisePhysics());
-        loadProcesses.add(new InitialiseSystems());
-        loadProcesses.add(new PreBeginSystems());
-        loadProcesses.add(new CreateRemoteWorldEntity());
-        loadProcesses.add(new PostBeginSystems());
-        loadProcesses.add(new SetupRemotePlayer());
-        loadProcesses.add(new AwaitCharacterSpawn());
-        loadProcesses.add(new PrepareWorld());
+        loadProcesses.add(new ProcessBlockPrefabs(context));
+        loadProcesses.add(new RegisterInputSystem(context));
+        loadProcesses.add(new RegisterSystems(context, netMode));
+        loadProcesses.add(new InitialiseCommandSystem(context));
+        loadProcesses.add(new InitialiseRemoteWorld(context, gameManifest));
+        loadProcesses.add(new InitialisePhysics(context));
+        loadProcesses.add(new InitialiseSystems(context));
+        loadProcesses.add(new PreBeginSystems(context));
+        loadProcesses.add(new CreateRemoteWorldEntity(context));
+        loadProcesses.add(new PostBeginSystems(context));
+        loadProcesses.add(new SetupRemotePlayer(context));
+        loadProcesses.add(new AwaitCharacterSpawn(context));
+        loadProcesses.add(new PrepareWorld(context));
     }
 
     private void initHost() {
-        loadProcesses.add(new RegisterMods(gameManifest));
+        loadProcesses.add(new RegisterMods(context, gameManifest));
         loadProcesses.add(new CacheTextures());
-        loadProcesses.add(new RegisterBlockFamilyFactories());
-        loadProcesses.add(new RegisterBlocks(gameManifest));
-        loadProcesses.add(new RegisterBiomes(gameManifest));
+        loadProcesses.add(new RegisterBlockFamilyFactories(context));
+        loadProcesses.add(new RegisterBlocks(context, gameManifest));
+        loadProcesses.add(new RegisterBiomes(context, gameManifest));
         loadProcesses.add(new CacheBlocks());
-        loadProcesses.add(new InitialiseGraphics());
+        loadProcesses.add(new InitialiseGraphics(context));
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new LoadPrefabs());
-        loadProcesses.add(new ProcessBlockPrefabs());
-        loadProcesses.add(new RegisterInputSystem());
-        loadProcesses.add(new RegisterSystems(netMode));
-        loadProcesses.add(new InitialiseCommandSystem());
+        loadProcesses.add(new ProcessBlockPrefabs(context));
+        loadProcesses.add(new RegisterInputSystem(context));
+        loadProcesses.add(new RegisterSystems(context, netMode));
+        loadProcesses.add(new InitialiseCommandSystem(context));
         loadProcesses.add(new InitialiseWorld(gameManifest, context));
-        loadProcesses.add(new EnsureSaveGameConsistency());
-        loadProcesses.add(new InitialisePhysics());
-        loadProcesses.add(new InitialiseSystems());
-        loadProcesses.add(new LoadEntities());
-        loadProcesses.add(new PreBeginSystems());
-        loadProcesses.add(new InitialiseBlockTypeEntities());
-        loadProcesses.add(new CreateWorldEntity());
-        loadProcesses.add(new InitialiseWorldGenerator());
+        loadProcesses.add(new EnsureSaveGameConsistency(context));
+        loadProcesses.add(new InitialisePhysics(context));
+        loadProcesses.add(new InitialiseSystems(context));
+        loadProcesses.add(new LoadEntities(context));
+        loadProcesses.add(new PreBeginSystems(context));
+        loadProcesses.add(new InitialiseBlockTypeEntities(context));
+        loadProcesses.add(new CreateWorldEntity(context));
+        loadProcesses.add(new InitialiseWorldGenerator(context));
         if (netMode.isServer()) {
             boolean dedicated;
             if (netMode == NetworkMode.DEDICATED_SERVER) {
@@ -199,14 +199,14 @@ public class StateLoading implements GameState {
             } else {
                 throw new IllegalStateException("Invalid server mode: " + netMode);
             }
-            loadProcesses.add(new StartServer(dedicated));
+            loadProcesses.add(new StartServer(context, dedicated));
         }
-        loadProcesses.add(new PostBeginSystems());
+        loadProcesses.add(new PostBeginSystems(context));
         if (netMode.hasLocalClient()) {
-            loadProcesses.add(new SetupLocalPlayer());
-            loadProcesses.add(new AwaitCharacterSpawn());
+            loadProcesses.add(new SetupLocalPlayer(context));
+            loadProcesses.add(new AwaitCharacterSpawn(context));
         }
-        loadProcesses.add(new PrepareWorld());
+        loadProcesses.add(new PrepareWorld(context));
     }
 
     private void popStep() {
@@ -223,7 +223,7 @@ public class StateLoading implements GameState {
 
     @Override
     public void dispose() {
-        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(false);
     }
 
@@ -233,8 +233,8 @@ public class StateLoading implements GameState {
 
     @Override
     public void update(float delta) {
-        GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
-        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        GameEngine gameEngine = context.get(GameEngine.class);
+        EngineTime time = (EngineTime) context.get(Time.class);
         long startTime = time.getRawTimeInMs();
         while (current != null && time.getRawTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
             if (current.step()) {
@@ -244,7 +244,7 @@ public class StateLoading implements GameState {
         if (current == null) {
             nuiManager.closeScreen(loadingScreen);
             nuiManager.setHUDVisible(true);
-            CoreRegistry.get(GameEngine.class).changeState(new StateIngame(gameManifest));
+            context.get(GameEngine.class).changeState(new StateIngame(gameManifest));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);

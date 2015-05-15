@@ -16,11 +16,11 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.biomes.BiomeRegistry;
 
@@ -29,9 +29,11 @@ import org.terasology.world.biomes.BiomeRegistry;
  */
 public class RegisterBiomes extends SingleStepLoadProcess {
 
-    private GameManifest gameManifest;
+    private final Context context;
+    private final GameManifest gameManifest;
 
-    public RegisterBiomes(GameManifest gameManifest) {
+    public RegisterBiomes(Context context, GameManifest gameManifest) {
+        this.context = context;
         this.gameManifest = gameManifest;
     }
 
@@ -42,8 +44,8 @@ public class RegisterBiomes extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        ModuleEnvironment moduleEnvironment = CoreRegistry.get(ModuleManager.class).getEnvironment();
+        NetworkSystem networkSystem = context.get(NetworkSystem.class);
+        ModuleEnvironment moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
 
         BiomeManager biomeManager;
         if (networkSystem.getMode().isAuthority()) {
@@ -53,8 +55,8 @@ public class RegisterBiomes extends SingleStepLoadProcess {
         } else {
             biomeManager = new BiomeManager(moduleEnvironment, gameManifest.getBiomeIdMap());
         }
-        CoreRegistry.put(BiomeManager.class, biomeManager);
-        CoreRegistry.put(BiomeRegistry.class, biomeManager); // This registration is for other modules
+        context.put(BiomeManager.class, biomeManager);
+        context.put(BiomeRegistry.class, biomeManager); // This registration is for other modules
 
         return true;
     }

@@ -16,8 +16,8 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.players.LocalPlayer;
@@ -29,7 +29,12 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class AwaitCharacterSpawn implements LoadProcess {
 
+    private final Context context;
     private WorldRenderer worldRenderer;
+
+    public AwaitCharacterSpawn(Context context) {
+        this.context = context;
+    }
 
     @Override
     public String getMessage() {
@@ -38,14 +43,14 @@ public class AwaitCharacterSpawn implements LoadProcess {
 
     @Override
     public boolean step() {
-        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+        ComponentSystemManager componentSystemManager = context.get(ComponentSystemManager.class);
         for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
             updater.update(0.0f);
         }
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = context.get(LocalPlayer.class);
         ClientComponent client = localPlayer.getClientEntity().getComponent(ClientComponent.class);
         if (client != null && client.character.exists()) {
-            worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
+            worldRenderer.setPlayer(context.get(LocalPlayer.class));
             return true;
         } else {
             worldRenderer.getChunkProvider().completeUpdate();
@@ -56,7 +61,7 @@ public class AwaitCharacterSpawn implements LoadProcess {
 
     @Override
     public void begin() {
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        worldRenderer = context.get(WorldRenderer.class);
     }
 
     @Override

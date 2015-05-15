@@ -20,12 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
@@ -34,6 +34,11 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterInputSystem.class);
 
+    private final Context context;
+
+    public RegisterInputSystem(Context context) {
+        this.context = context;
+    }
     @Override
     public String getMessage() {
         return "Setting up Input Systems...";
@@ -41,19 +46,19 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        ComponentSystemManager componentSystemManager = context.get(ComponentSystemManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
 
         LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem();
         componentSystemManager.register(localPlayerSystem, "engine:localPlayerSystem");
-        CoreRegistry.put(LocalPlayerSystem.class, localPlayerSystem);
+        context.put(LocalPlayerSystem.class, localPlayerSystem);
 
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
-        CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
+        context.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 
-        BindsConfig bindsConfig = CoreRegistry.get(Config.class).getInput().getBinds();
-        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
+        BindsConfig bindsConfig = context.get(Config.class).getInput().getBinds();
+        InputSystem inputSystem = context.get(InputSystem.class);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         bindsConfig.applyBinds(inputSystem, moduleManager);

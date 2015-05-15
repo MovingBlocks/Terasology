@@ -16,7 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
@@ -26,6 +26,13 @@ import org.terasology.network.internal.NetworkSystemImpl;
  * @author Immortius
  */
 public class SetupRemotePlayer extends SingleStepLoadProcess {
+
+    private final Context context;
+
+    public SetupRemotePlayer(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Awaiting player data";
@@ -33,10 +40,10 @@ public class SetupRemotePlayer extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        NetworkSystemImpl networkSystem = (NetworkSystemImpl) CoreRegistry.get(NetworkSystem.class);
+        NetworkSystemImpl networkSystem = (NetworkSystemImpl) context.get(NetworkSystem.class);
         EntityRef client = networkSystem.getServer().getClientEntity();
         if (client.exists()) {
-            CoreRegistry.get(LocalPlayer.class).setClientEntity(client);
+            context.get(LocalPlayer.class).setClientEntity(client);
             return true;
         }
         return false;
