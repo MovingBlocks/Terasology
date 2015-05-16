@@ -172,6 +172,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         return displayNameComponent.name;
     }
 
+    /*
     private boolean isPredictionOfEventCorrect(EntityRef character, ActivationRequest event) {
         LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
@@ -184,12 +185,13 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
+        
         if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
             return false;
         }
-
+        
         if (event.isOwnedEntityUsage()) {
             if (!event.getUsedOwnedEntity().exists()) {
                 String msg = "Denied activation attempt by {} since the used entity does not exist on the authority";
@@ -229,7 +231,100 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                  * Tip for debugging this issue: Obtain the network id of hit entity and search it in both client and
                  * server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
                  * hit test.
-                 */
+                String msg = "Denied activation attempt by {} since at the authority another entity would have been activated";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+
+            if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+                String msg = "Denied activation attempt by {} since at the authority the object got hit at a differnt position";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+        } else {
+            // In order to trust the data later we need to verify it even if it should be correct if no one cheats:
+            if (event.getTarget().exists()) {
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a target";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+            if (!(vectorsAreAboutEqual(event.getHitPosition(), originPos))) {
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit postion";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+        }
+        return true;
+    }*/
+    
+    private boolean isPredictionOfEventCorrect(EntityRef character, ActivationRequest event) {
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f originPos = location.getWorldPosition();
+        originPos.y += characterComponent.eyeOffset;
+
+        checkDirectionConsistency(character, event);
+        
+        boolean isCorrect = true;
+        isCorrect &= checkPositionConsistency(character, event, originPos);
+        isCorrect &= checkEntityOwner(character, event);
+        isCorrect &= checkTarget(character, event, originPos);
+        return isCorrect;
+    }
+    
+    private void checkDirectionConsistency(EntityRef character, ActivationRequest event){
+        Vector3f direction = event.getDirection();
+        if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
+            logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
+        }
+    }
+    private boolean checkPositionConsistency(EntityRef character, ActivationRequest event, Vector3f originPos){
+        if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
+            String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
+            logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
+            return false;
+        }
+        return true;
+    }
+    private boolean checkEntityOwner(EntityRef character, ActivationRequest event){
+        if (event.isOwnedEntityUsage()) {
+            if (!event.getUsedOwnedEntity().exists()) {
+                String msg = "Denied activation attempt by {} since the used entity does not exist on the authority";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+            if (!networkSystem.getOwnerEntity(event.getUsedOwnedEntity()).equals(networkSystem.getOwnerEntity(character))) {
+                String msg = "Denied activation attempt by {} since it does not own the entity at the authority";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+        } else {
+            // check for cheats so that data can later be trusted:
+            if (event.getUsedOwnedEntity().exists()) {
+                String msg = "Denied activation attempt by {} since it is not properly marked as owned entity usage";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean checkTarget(EntityRef character, ActivationRequest event, Vector3f originPos){
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (event.isEventWithTarget()) {
+            if (!event.getTarget().exists()) {
+                String msg = "Denied activation attempt by {} since the target does not exist on the authority";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false; // can happen if target existed on client
+            }
+
+            HitResult result = physics.rayTrace(originPos, event.getDirection(), characterComponent.interactionRange, filter);
+            if (!result.isHit()) {
+                String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+            EntityRef hitEntity = result.getEntity();
+            if (!hitEntity.equals(event.getTarget())) {
                 String msg = "Denied activation attempt by {} since at the authority another entity would have been activated";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
@@ -255,8 +350,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
         return true;
     }
-
-
+        
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {
         //make sure we own the item and it exists
