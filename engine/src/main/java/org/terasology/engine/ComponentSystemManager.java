@@ -48,7 +48,9 @@ import java.util.Map;
  * <li>Inactive: In this state the registered systems are created, but not initialised</li>
  * <li>Active: In this state all the registered systems are initialised</li>
  * </ul>
- * It becomes active when initialise() is called, and inactive when shutdown() is called.
+ * It starts inactive and becomes active when initialise() is called.
+ *
+ * After a call of shutdown it should not be used anymore.
  *
  * @author Immortius
  */
@@ -131,6 +133,8 @@ public class ComponentSystemManager {
                 initialiseSystem(system);
             }
             initialised = true;
+        } else {
+            logger.error("ComponentSystemManager got initialized twice");
         }
     }
 
@@ -156,18 +160,6 @@ public class ComponentSystemManager {
         return namedLookup.get(name);
     }
 
-    private void clear() {
-        for (ComponentSystem system : store) {
-            InjectionHelper.unshare(system);
-        }
-        console = null;
-        namedLookup.clear();
-        store.clear();
-        updateSubscribers.clear();
-        renderSubscribers.clear();
-        initialised = false;
-    }
-
     public Iterable<ComponentSystem> iterateAll() {
         return store;
     }
@@ -184,6 +176,5 @@ public class ComponentSystemManager {
         for (ComponentSystem system : iterateAll()) {
             system.shutdown();
         }
-        clear();
     }
 }
