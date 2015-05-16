@@ -40,7 +40,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 import java.util.List;
 
 /**
- * @author Marcin Sciesinski
+ * This class is used to generate the drop of items using a grammar system
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockDropGrammarSystem extends BaseComponentSystem {
@@ -77,80 +77,176 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            List<String> blockDrops = blockDrop.blockDrops;
-            List<String> itemDrops = blockDrop.itemDrops;
+            processDropBlock(event, blockDrop, locationComp, blockDamageModifierComponent);
+        }
+    }
 
-            if (blockDamageModifierComponent != null && blockDrop.droppedWithTool != null) {
-                for (String toolType : blockDamageModifierComponent.materialDamageMultiplier.keySet()) {
-                    if (blockDrop.droppedWithTool.containsKey(toolType)) {
-                        BlockDropGrammarComponent.DropDefinition dropDefinition = blockDrop.droppedWithTool.get(toolType);
-                        blockDrops = dropDefinition.blockDrops;
-                        itemDrops = dropDefinition.itemDrops;
-                        break;
-                    }
+    /**
+     * Process the drop of a block when is destroyed
+     * @param event Event which trigger the drop
+     * @param blockDrop Block which was destroyed
+     * @param locationComp Location and facing of the object
+     * @param blockDamageModifierComponent Block modifier
+     */
+    private void processDropBlock(DoDestroyEvent event, BlockDropGrammarComponent blockDrop, LocationComponent locationComp, BlockDamageModifierComponent blockDamageModifierComponent) {
+        List<String> blockDrops = blockDrop.blockDrops;
+        List<String> itemDrops = blockDrop.itemDrops;
+
+        BlockDropGrammarComponent.DropDefinition dropDefinition = getDropDefinition(itemDrops, blockDrop, blockDamageModifierComponent);
+        if (dropDefinition != null) {
+            blockDrops = dropDefinition.blockDrops;
+            itemDrops = dropDefinition.itemDrops;
+        }
+
+        if (blockDrops != null) {
+            processBlockDrops(blockDrops, event, locationComp, blockDamageModifierComponent);
+        }
+
+        if (itemDrops != null) {
+            processItemDrops(itemDrops, event, locationComp, blockDamageModifierComponent);
+        }
+    }
+
+    /**
+     * Get the definition of the drop
+     * @param itemDrops Base item drops
+     * @param blockDrop Base block drops
+     * @param blockDamageModifierComponent Block Modifier
+     * @return The block definition if it is founded, null otherwise
+     */
+    private BlockDropGrammarComponent.DropDefinition getDropDefinition(List<String> itemDrops, BlockDropGrammarComponent blockDrop, BlockDamageModifierComponent blockDamageModifierComponent) {
+        if (blockDamageModifierComponent != null && blockDrop.droppedWithTool != null) {
+            for (String toolType : blockDamageModifierComponent.materialDamageMultiplier.keySet()) {
+                if (blockDrop.droppedWithTool.containsKey(toolType)) {
+                    return blockDrop.droppedWithTool.get(toolType);
                 }
             }
+        }
+        return null;
+    }
 
-            if (blockDrops != null) {
-                for (String drop : blockDrops) {
-                    String dropResult = drop;
-                    boolean dropping = true;
-                    int pipeIndex = dropResult.indexOf('|');
-                    if (pipeIndex > -1) {
-                        float chance = Float.parseFloat(dropResult.substring(0, pipeIndex));
-                        if (random.nextFloat() >= chance) {
-                            dropping = false;
-                        }
-                        dropResult = dropResult.substring(pipeIndex + 1);
-                    }
-                    if (dropping) {
-                        DropParser dropParser = new DropParser(random, dropResult).invoke();
-                        EntityRef dropItem = blockItemFactory.newInstance(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
-                        if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
-                            createDrop(dropItem, locationComp.getWorldPosition(), true);
-                        }
-                    }
-                }
-            }
-
-            if (itemDrops != null) {
-                for (String drop : itemDrops) {
-                    String dropResult = drop;
-                    boolean dropping = true;
-                    int pipeIndex = dropResult.indexOf('|');
-                    if (pipeIndex > -1) {
-                        float chance = Float.parseFloat(dropResult.substring(0, pipeIndex));
-                        if (random.nextFloat() >= chance) {
-                            dropping = false;
-                        }
-                        dropResult = dropResult.substring(pipeIndex + 1);
-                    }
-                    if (dropping) {
-                        DropParser dropParser = new DropParser(random, dropResult).invoke();
-                        EntityBuilder dropEntity = entityManager.newBuilder(dropParser.getDrop());
-                        if (dropParser.getCount() > 1) {
-                            ItemComponent itemComponent = dropEntity.getComponent(ItemComponent.class);
-                            itemComponent.stackCount = (byte) dropParser.getCount();
-                        }
-                        EntityRef dropItem = dropEntity.build();
-                        if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
-                            createDrop(dropItem, locationComp.getWorldPosition(), false);
-                        }
-                    }
-                }
+    /**
+     * Process the item drop for the given list
+     * @param itemDrops Items to be dropped
+     * @param event Event which trigger the drop
+     * @param locationComp Location and facing of the object
+     * @param blockDamageModifierComponent Block Modifier
+     */
+    private void processItemDrops(List<String> itemDrops, DoDestroyEvent event, LocationComponent locationComp, BlockDamageModifierComponent blockDamageModifierComponent) {
+        for (String drop : itemDrops) {
+            if (isDropped(drop)) {
+                dropFromItem(getDropResult(drop), event, locationComp, blockDamageModifierComponent);
             }
         }
     }
 
-    private boolean shouldDropToWorld(DoDestroyEvent event, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef dropItem) {
+    /**
+     * Generate the drop of the selected item from a item
+     * @param dropResult Item to be dropped
+     * @param event Event which trigger the drop
+     * @param locationComp Location and facing of the object
+     * @param blockDamageModifierComponent Block Modifier
+     */
+    private void dropFromItem(String dropResult, DoDestroyEvent event, LocationComponent locationComp, BlockDamageModifierComponent blockDamageModifierComponent) {
+        DropParser dropParser = new DropParser(random, dropResult).invoke();
+        EntityBuilder dropEntity = entityManager.newBuilder(dropParser.getDrop());
+        if (dropParser.getCount() > 1) {
+            ItemComponent itemComponent = dropEntity.getComponent(ItemComponent.class);
+            itemComponent.stackCount = (byte) dropParser.getCount();
+        }
+        EntityRef dropItem = dropEntity.build();
+        if (shouldDropToWorld(dropItem, event, blockDamageModifierComponent)) {
+            createDrop(dropItem, locationComp.getWorldPosition(), false);
+        }
+    }
+
+    /**
+     * Process the block drop for the given list
+     * @param blockDrops Items to be dropped
+     * @param event Event which trigger the drop
+     * @param locationComp Location and facing of the object
+     * @param blockDamageModifierComponent Block Modifier
+     */
+    private void processBlockDrops(List<String> blockDrops, DoDestroyEvent event, LocationComponent locationComp, BlockDamageModifierComponent blockDamageModifierComponent) {
+        for (String drop : blockDrops) {
+            if (isDropped(drop)) {
+                dropFromBlock(getDropResult(drop), event, locationComp, blockDamageModifierComponent);
+            }
+        }
+    }
+    
+    /**
+     * Check if the given drop is going to be dropped using the chance
+     * @param drop String with the information of the drop
+     * @return True if the item is dropped, False otherwise
+     */
+    private boolean isDropped(String drop) {
+        int pipeIndex = drop.indexOf('|');
+        if (pipeIndex > -1) {
+            float chance = Float.parseFloat(drop.substring(0, pipeIndex));
+            if (random.nextFloat() >= chance) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Get the item to be dropped from the String with the drop information
+     * @param drop String with the information of the drop
+     * @return Item to be dropped
+     */
+    private String getDropResult(String drop) {
+        int pipeIndex = drop.indexOf('|');
+        if (pipeIndex > -1) {
+            return drop.substring(pipeIndex + 1);
+        }
+        return drop;
+    }
+
+    /**
+     * Generate the drop for the selected item from a block
+     * @param dropResult Item to be dropped
+     * @param event Event which trigger the drop
+     * @param locationComp Location and facing of the object
+     * @param blockDamageModifierComponent Block Modifier
+     */
+    private void dropFromBlock(String dropResult, DoDestroyEvent event, LocationComponent locationComp, BlockDamageModifierComponent blockDamageModifierComponent) {
+        DropParser dropParser = new DropParser(random, dropResult).invoke();
+        EntityRef dropItem = blockItemFactory.newInstance(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
+        if (shouldDropToWorld(dropItem, event, blockDamageModifierComponent)) {
+            createDrop(dropItem, locationComp.getWorldPosition(), true);
+        }
+    }
+
+    /**
+     * Verify if the item should be dropped in the world
+     * @param dropItem Item to be dropped
+     * @param event Event which trigger the drop
+     * @param blockDamageModifierComponent Block Modifier
+     * @return True if the items should be dropped
+     */
+    private boolean shouldDropToWorld(EntityRef dropItem, DoDestroyEvent event, BlockDamageModifierComponent blockDamageModifierComponent) {
         return blockDamageModifierComponent == null || !blockDamageModifierComponent.directPickup
                 || !giveItem(event.getInstigator(), dropItem);
     }
 
+    /**
+     * Give the item to the selected entity
+     * @param instigator Entity to give the item
+     * @param dropItem Entity of the item
+     * @return True if the operation was successful
+     */
     private boolean giveItem(EntityRef instigator, EntityRef dropItem) {
         return inventoryManager.giveItem(instigator, instigator, dropItem);
     }
 
+    /**
+     * Generate the drop of the entity
+     * @param item Reference to the dropped item
+     * @param location Location where the item must be created
+     * @param applyMovement Apply an impulse on the creation
+     */
     private void createDrop(EntityRef item, Vector3f location, boolean applyMovement) {
         EntityRef pickup = pickupBuilder.createPickupFor(item, location, 60, true);
         if (applyMovement) {
@@ -158,6 +254,9 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * This class is used to parse the drop information
+     */
     private class DropParser {
         private Random rnd;
         private String drop;
@@ -169,14 +268,23 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
             this.drop = drop;
         }
 
+        /**
+         * @return The drop information
+         */
         public String getDrop() {
             return resultDrop;
         }
 
+        /**
+         * @return Number of items to be dropped
+         */
         public int getCount() {
             return count;
         }
 
+        /**
+         * @return The DropParser with the calculated result
+         */
         public DropParser invoke() {
             resultDrop = drop;
             int timesIndex = resultDrop.indexOf('*');
