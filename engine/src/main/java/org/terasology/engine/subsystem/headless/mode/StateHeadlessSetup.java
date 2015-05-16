@@ -17,19 +17,33 @@ package org.terasology.engine.subsystem.headless.mode;
 
 import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
+import org.terasology.context.Context;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.modes.GameState;
 import org.terasology.engine.modes.StateLoading;
-import org.terasology.engine.modes.StateSetup;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.game.GameManifest;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleImpl;
+import org.terasology.logic.console.ConsoleSystem;
+import org.terasology.logic.console.commands.CoreCommands;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.internal.WorldInfo;
@@ -45,14 +59,42 @@ import java.util.List;
  * @author Marcel Lehwald
  * @author Florian
  */
-public class StateHeadlessSetup extends StateSetup {
+public class StateHeadlessSetup implements GameState {
+
+    private EngineEntityManager entityManager;
+    private EventSystem eventSystem;
+    private ComponentSystemManager componentSystemManager;
 
     public StateHeadlessSetup() {
     }
 
     @Override
     public void init(GameEngine gameEngine) {
-        super.init(gameEngine);
+        Context context = gameEngine.createChildContext();
+        CoreRegistry.setContext(context);
+
+        // let's get the entity event system running
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = context.get(EngineEntityManager.class);
+
+        eventSystem = CoreRegistry.get(EventSystem.class);
+        context.put(Console.class, new ConsoleImpl());
+
+        NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
+
+        componentSystemManager = new ComponentSystemManager();
+        context.put(ComponentSystemManager.class, componentSystemManager);
+
+        componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
+        componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
+
+        EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
+        LocalPlayer localPlayer = new LocalPlayer();
+        context.put(LocalPlayer.class, localPlayer);
+        localPlayer.setClientEntity(localPlayerEntity);
+
+        componentSystemManager.initialise();
 
         GameManifest gameManifest = null;
         List<GameInfo> savedGames = GameProvider.getSavedGames();
@@ -104,7 +146,11 @@ public class StateHeadlessSetup extends StateSetup {
 
     @Override
     public void dispose() {
-        super.dispose();
+        eventSystem.process();
+
+        componentSystemManager.shutdown();
+
+        entityManager.clear();
     }
 
     @Override
@@ -113,7 +159,7 @@ public class StateHeadlessSetup extends StateSetup {
 
     @Override
     public void update(float delta) {
-        super.update(delta);
+        eventSystem.process();;
     }
 
     @Override
