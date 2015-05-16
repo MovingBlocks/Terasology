@@ -82,8 +82,7 @@ public class StateMainMenu implements GameState {
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
         eventSystem.registerEventHandler(nuiManager);
 
-        // TODO: Should the CSM be registered here every time or only in engine init? See Issue #1125
-        componentSystemManager = new ComponentSystemManager();
+        componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
 
         // TODO: Reduce coupling between Input system and CameraTargetSystem,

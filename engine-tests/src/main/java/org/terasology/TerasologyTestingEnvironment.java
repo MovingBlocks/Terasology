@@ -106,7 +106,7 @@ public abstract class TerasologyTestingEnvironment {
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
 
-        componentSystemManager = new ComponentSystemManager();
+        componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
 

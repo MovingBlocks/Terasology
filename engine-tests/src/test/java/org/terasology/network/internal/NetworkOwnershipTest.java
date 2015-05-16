@@ -63,7 +63,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = (PojoEntityManager) context.get(EntityManager.class);
-        context.put(ComponentSystemManager.class, new ComponentSystemManager());
+        context.put(ComponentSystemManager.class, new ComponentSystemManager(context));
         entityManager.clear();
         client = mock(NetClient.class);
         NetworkComponent clientNetComp = new NetworkComponent();

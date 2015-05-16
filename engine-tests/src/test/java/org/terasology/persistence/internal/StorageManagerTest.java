@@ -145,7 +145,7 @@ public class StorageManagerTest {
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
 
 
-        ComponentSystemManager componentSystemManager = new ComponentSystemManager();
+        ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));

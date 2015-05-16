@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -33,7 +34,6 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 
 import java.util.List;
@@ -62,14 +62,16 @@ public class ComponentSystemManager {
     private List<ComponentSystem> store = Lists.newArrayList();
 
     private Console console;
+    private Context context;
 
     private boolean initialised;
 
-    public ComponentSystemManager() {
+    public ComponentSystemManager(Context context) {
+        this.context = context;
     }
 
     public void loadSystems(ModuleEnvironment environment, NetworkMode netMode) {
-        DisplayDevice displayDevice = CoreRegistry.get(DisplayDevice.class);
+        DisplayDevice displayDevice = context.get(DisplayDevice.class);
         boolean isHeadless = displayDevice.isHeadless();
 
         ListMultimap<Name, Class<?>> systemsByModule = ArrayListMultimap.create();
@@ -110,7 +112,7 @@ public class ComponentSystemManager {
         if (object instanceof RenderSystem) {
             renderSubscribers.add((RenderSystem) object);
         }
-        CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler(object);
+        context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
             initialiseSystem(object);
@@ -124,7 +126,7 @@ public class ComponentSystemManager {
 
     public void initialise() {
         if (!initialised) {
-            console = CoreRegistry.get(Console.class);
+            console = context.get(Console.class);
             for (ComponentSystem system : iterateAll()) {
                 initialiseSystem(system);
             }

@@ -321,7 +321,6 @@ public class TerasologyEngine implements GameEngine {
         context.put(AssetManager.class, assetManager);
         context.put(CollisionGroupManager.class, new CollisionGroupManager());
         context.put(WorldGeneratorManager.class, new WorldGeneratorManager(context));
-        context.put(ComponentSystemManager.class, new ComponentSystemManager());
         context.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
         context.put(NetworkSystem.class, new NetworkSystemImpl(time, context));
         context.put(Game.class, new Game(this, time));

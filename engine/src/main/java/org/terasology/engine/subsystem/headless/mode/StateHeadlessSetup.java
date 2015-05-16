@@ -83,7 +83,7 @@ public class StateHeadlessSetup implements GameState {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 
-        componentSystemManager = new ComponentSystemManager();
+        componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
 
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
