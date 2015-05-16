@@ -19,8 +19,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.module.sandbox.API;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.PropertyProvider;
@@ -33,24 +33,24 @@ import java.security.PrivilegedAction;
  *         <br><br>
  *         Debug property editor. Usage:
  *         <br><br>
- *         CoreRegistry.get(DebugPropertiesSystem.class).addProperty("Model 1", model);
+ *         context.get(DebugPropertiesSystem.class).addProperty("Model 1", model);
  *         <br><br>
  *         Ingame press F1 to see the property editor. Only annotated fields will show up.
  */
 @API
 @RegisterSystem(RegisterMode.CLIENT)
+@Share(DebugPropertiesSystem.class)
 public class DebugPropertiesSystem extends BaseComponentSystem {
     @In
-    NUIManager nuiManager;
+    private NUIManager nuiManager;
 
-    PropertyLayout properties;
+    private PropertyLayout properties;
 
     @Override
     public void initialise() {
         DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().addHUDElement("engine:DebugProperties");
         debugProperties.setVisible(false);
         properties = debugProperties.getPropertyLayout();
-        CoreRegistry.put(DebugPropertiesSystem.class, this);
     }
 
     public void addProperty(final String group, final Object o) {
