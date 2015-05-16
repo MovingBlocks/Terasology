@@ -1,0 +1,9 @@
+{
+    "id" : "PMDColoring",
+    "version" : "0.1.0",
+    "author" : "",
+    "displayName" : "PMDColoring",
+    "description" : "",
+    "dependencies" : [],
+    "isServerSideOnly" : false
+}
