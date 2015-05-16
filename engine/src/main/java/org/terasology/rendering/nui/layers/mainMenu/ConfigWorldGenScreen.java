@@ -23,7 +23,6 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -69,7 +68,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(context));
+        context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(context));
 
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());
