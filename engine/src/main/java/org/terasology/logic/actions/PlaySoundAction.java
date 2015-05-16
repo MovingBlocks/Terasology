@@ -73,7 +73,12 @@ public class PlaySoundAction extends BaseComponentSystem {
         }
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         StaticSound sound = random.nextItem(playSound.sounds);
-        if (sound != null) {
+        verifyAndPlaySound(event, playSound, sound);
+    }
+
+	private void verifyAndPlaySound(ActivateEvent event,
+			PlaySoundActionComponent playSound, StaticSound sound) {
+		if (sound != null) {
             Vector3f pos = null;
             switch (playSound.relativeTo) {
                 case Target:
@@ -88,5 +93,5 @@ public class PlaySoundAction extends BaseComponentSystem {
             }
             audioManager.playSound(sound, pos, playSound.volume, AudioManager.PRIORITY_NORMAL);
         }
-    }
+	}
 }
