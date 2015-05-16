@@ -79,7 +79,11 @@ public class ExplosionAction extends BaseComponentSystem {
         builder.build();
 
         Vector3i blockPos = new Vector3i();
-        for (int i = 0; i < 64; i++) {
+        handleExplosionEvent(origin, blockPos);
+    }
+
+	private void handleExplosionEvent(Vector3f origin, Vector3i blockPos) {
+		for (int i = 0; i < 64; i++) {
             Vector3f direction = random.nextVector3f(1.0f);
             Vector3f impulse = new Vector3f(direction);
             impulse.scale(150);
@@ -99,5 +103,5 @@ public class ExplosionAction extends BaseComponentSystem {
                 }
             }
         }
-    }
+	}
 }
