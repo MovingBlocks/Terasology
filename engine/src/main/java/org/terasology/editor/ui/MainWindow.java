@@ -64,7 +64,22 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     private JMenuItem propertiesMenuScene;
 
     private JScrollPane propertyPanelScrollPane;
-
+    
+    public MainWindow(TeraEd teraEd){
+    	this.teraEd = teraEd;
+    	this.addWindowListener(this);
+    	
+    	viewport = new Viewport();
+    	buildLayout();
+    	initFileMenu();
+    	initPropertiesMenu();
+    	initMainMenuBar();
+    	
+    	pack();
+    	setVisible(true);
+    }
+    
+    /*
     public MainWindow(TeraEd teraEd) {
         this.teraEd = teraEd;
         this.addWindowListener(this);
@@ -114,12 +129,57 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
         pack();
         setVisible(true);
-    }
+    }*/
 
     public Viewport getViewport() {
         return viewport;
     }
-
+    
+    private void buildLayout(){
+    	borderLayout = new BorderLayout();
+        getContentPane().setLayout(borderLayout);
+        
+    	propertyPanel = new PropertyPanel();
+    	initPropertyPanelScrollPane();
+    	initVerticalSplitPane();
+    	
+        setTitle("TeraEd - Terasology" + " | " + "Pre Alpha");
+    }
+    private void initPropertyPanelScrollPane(){
+    	propertyPanelScrollPane = new JScrollPane(
+                propertyPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        propertyPanelScrollPane.setMinimumSize(new Dimension(350, 720));
+        propertyPanelScrollPane.setPreferredSize(new Dimension(350, 720));
+    }
+    private void initVerticalSplitPane(){
+    	verticalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewport, propertyPanelScrollPane);
+        verticalSplitPane.setContinuousLayout(true);
+        verticalSplitPane.setResizeWeight(0.5);
+        getContentPane().add(verticalSplitPane, BorderLayout.CENTER);
+    }
+    private void initFileMenu(){
+    	fileMenu = new JMenu("File");
+        fileMenuExitItem = new JMenuItem("Exit");
+        fileMenuExitItem.addActionListener(this);
+        fileMenu.add(fileMenuExitItem);
+    }
+    private void initPropertiesMenu(){
+    	shaderPropertiesMenu = new JMenu("Shader Properties");
+    	propertiesMenu = new JMenu("Properties");
+        propertiesMenuScene = new JMenuItem("Scene");
+        propertiesMenuScene.addActionListener(this);
+        propertiesMenu.add(propertiesMenuScene);
+    }
+    private void initMainMenuBar(){
+    	mainMenuBar = new JMenuBar();
+        setJMenuBar(mainMenuBar);
+    	mainMenuBar.add(fileMenu);
+        mainMenuBar.add(shaderPropertiesMenu);
+        mainMenuBar.add(propertiesMenu);
+    }
+    
     public void onStateChange() {
         shaderPropertyMenuEntries.clear();
         shaderPropertiesMenu.removeAll();

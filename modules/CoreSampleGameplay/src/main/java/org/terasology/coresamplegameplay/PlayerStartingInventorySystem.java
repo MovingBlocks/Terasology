@@ -45,7 +45,8 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
     InventoryManager inventoryManager;
     @In
     EntityManager entityManager;
-
+    
+    /*
     @ReceiveEvent(components = InventoryComponent.class)
     public void onPlayerSpawnedEvent(OnPlayerSpawnedEvent event, EntityRef player) {
         BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
@@ -92,8 +93,81 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:explodeTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, chest);
+    }*/
+    
+    @ReceiveEvent(components = InventoryComponent.class)
+    public void onPlayerSpawnedEvent(OnPlayerSpawnedEvent event, EntityRef player){
+    	BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
+    	giveGoodieChest(blockFactory, player);
+    	giveTools(blockFactory, player);
     }
+    
+    private void giveGoodieChest(BlockItemFactory blockFactory, EntityRef player){
+    	EntityRef chest = createGoodieChest(blockFactory);
+    	inventoryManager.giveItem(player, EntityRef.NULL, chest);
+    }
+    private void giveInnerGoodieChest(BlockItemFactory blockFactory, EntityRef chest){
+    	EntityRef innerChest = createInnerGoodieChest(blockFactory);
+        inventoryManager.giveItem(chest, EntityRef.NULL, innerChest);
+    }
+    private void giveDoorItem(BlockItemFactory blockFactory, EntityRef chest){
+    	EntityRef doorItem = createDoor(blockFactory);
+        inventoryManager.giveItem(chest, EntityRef.NULL, doorItem);
+    }
+    private void giveTools(BlockItemFactory blockFactory, EntityRef player){
+    	inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:pickaxe"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:axe"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:shovel"));
+        inventoryManager.giveItem(player, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Torch"), 99));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:explodeTool"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:railgunTool"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:mrbarsack"));
+    }
+    private void giveBaseBlocks(BlockItemFactory blockFactory, EntityRef chest, int amount){
+    	inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:companion"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:brick:engine:stair"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Brick"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Ice"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Plank"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Tnt"), amount));
+    }
+    private void giveLiquidBlocks(BlockItemFactory blockFactory, EntityRef chest, int amount){
+    	inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:lava"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:water"), amount));
+    }
+    private void givePlantBlocks(BlockItemFactory blockFactory, EntityRef chest, int amount){
+    	inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Iris"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Dandelion"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Tulip"), amount));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:YellowFlower"), amount));
+    }
+    
+    private EntityRef createGoodieChest(BlockItemFactory blockFactory){
+    	EntityRef chest = blockFactory.newInstance(blockManager.getBlockFamily("core:chest"));
+        chest.addComponent(new InventoryComponent(30));
+        
+        giveBaseBlocks(blockFactory, chest, 99);
+        giveDoorItem(blockFactory, chest);
+        giveInnerGoodieChest(blockFactory, chest);
+        
+    	return chest;
+    }
+    private EntityRef createDoor(BlockItemFactory blockFactory){
+    	EntityRef doorItem = entityManager.create("core:door");
+        ItemComponent doorItemComp = doorItem.getComponent(ItemComponent.class);
+        doorItemComp.stackCount = 20;
+        doorItem.saveComponent(doorItemComp);
+        return doorItem;
+    }
+    private EntityRef createInnerGoodieChest(BlockItemFactory blockFactory){
+    	EntityRef innerChest = blockFactory.newInstance(blockManager.getBlockFamily("core:Chest"));
+        innerChest.addComponent(new InventoryComponent(30));
 
+        giveLiquidBlocks(blockFactory, innerChest, 99);
+        givePlantBlocks(blockFactory, innerChest, 99);
+        
+        return innerChest;
+    }
 
     @Command
     public String test(@CommandParam("first") String first, @CommandParam("remainder") String... remainder) {
