@@ -46,4 +46,5 @@ public enum MovementMode {
         this.maxSpeed = maxSpeed;
         this.applyInertiaToVertical = applyInertiaToVertical;
     }
+    
 }
