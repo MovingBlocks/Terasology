@@ -76,7 +76,13 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition());
         blockPos.y--; // The block *below* the character's feet is interesting to us
         Block block = worldProvider.getBlock(blockPos);
-        if (block != null && !block.getSounds().getStepSounds().isEmpty()) {
+        handleFootstepSoundBlock(entity, characterSounds, footstepSounds, block);
+    }
+
+	private void handleFootstepSoundBlock(EntityRef entity,
+			CharacterSoundComponent characterSounds,
+			List<StaticSound> footstepSounds, Block block) {
+		if (block != null && !block.getSounds().getStepSounds().isEmpty()) {
             footstepSounds = block.getSounds().getStepSounds();
         }
 
@@ -86,7 +92,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
             characterSounds.lastSoundTime = time.getGameTimeInMs();
             entity.saveComponent(characterSounds);
         }
-    }
+	}
 
     @ReceiveEvent
     public void onJump(JumpEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
@@ -118,7 +124,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
             soundVolumeModifier = LANDING_VOLUME_MAX;
         }
 
-        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+        handleOnLandedSound(entity, characterSounds, soundVolumeModifier);
+    }
+
+	private void handleOnLandedSound(EntityRef entity,
+			CharacterSoundComponent characterSounds, float soundVolumeModifier) {
+		if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             StaticSound sound = null;
             if (characterSounds.landingSounds.size() > 0) {
                 sound = random.nextItem(characterSounds.landingSounds);
@@ -131,7 +142,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
                 entity.saveComponent(characterSounds);
             }
         }
-    }
+	}
 
     @ReceiveEvent
     public void onCrash(HorizontalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds, HealthComponent healthComponent) {
@@ -203,18 +214,25 @@ public class CharacterSoundSystem extends BaseComponentSystem {
             boolean oldBlockIsLiquid = event.getOldBlock().isLiquid();
             boolean newBlockIsLiquid = event.getNewBlock().isLiquid();
             StaticSound sound = null;
-            if (!oldBlockIsLiquid && newBlockIsLiquid) {
-                sound = random.nextItem(characterSounds.enterWaterSounds);
-            } else if (oldBlockIsLiquid && !newBlockIsLiquid) {
-                sound = random.nextItem(characterSounds.leaveWaterSounds);
-            }
-            if (sound != null) {
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
-                characterSounds.lastSoundTime = time.getGameTimeInMs();
-                entity.saveComponent(characterSounds);
-            }
+            handleOnEnterBlockSound(entity, characterSounds, oldBlockIsLiquid,
+					newBlockIsLiquid, sound);
         }
     }
+
+	private void handleOnEnterBlockSound(EntityRef entity,
+			CharacterSoundComponent characterSounds, boolean oldBlockIsLiquid,
+			boolean newBlockIsLiquid, StaticSound sound) {
+		if (!oldBlockIsLiquid && newBlockIsLiquid) {
+		    sound = random.nextItem(characterSounds.enterWaterSounds);
+		} else if (oldBlockIsLiquid && !newBlockIsLiquid) {
+		    sound = random.nextItem(characterSounds.leaveWaterSounds);
+		}
+		if (sound != null) {
+		    entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
+		    characterSounds.lastSoundTime = time.getGameTimeInMs();
+		    entity.saveComponent(characterSounds);
+		}
+	}
 
 
 }
