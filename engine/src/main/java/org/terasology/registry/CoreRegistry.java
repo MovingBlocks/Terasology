@@ -66,8 +66,4 @@ public final class CoreRegistry {
         return context.get(type);
     }
 
-    public static <T> void remove(Class<T> type) {
-        context.remove(type);
-    }
-
 }

@@ -109,12 +109,4 @@ public final class InjectionHelper {
         }
     }
 
-    public static void unshare(Object object) {
-        Share share = object.getClass().getAnnotation(Share.class);
-        if (share != null && share.value() != null) {
-            for (Class interfaceType : share.value()) {
-                CoreRegistry.remove(interfaceType);
-            }
-        }
-    }
 }
