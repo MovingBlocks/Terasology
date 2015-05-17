@@ -175,7 +175,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
             }
         }
 
-        if (ai.isInDanger()) {
+        if (!ai.isInDanger()) {
 
             //----------------eat----------
             // if anything edible is in front
