@@ -16,6 +16,11 @@
 
 package org.terasology.logic.characters;
 
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.events.FootstepEvent;
+import org.terasology.logic.characters.events.SwimStrokeEvent;
+import org.terasology.world.block.Block;
+
 /**
  * @author Immortius
  */
@@ -46,4 +51,16 @@ public enum MovementMode {
         this.maxSpeed = maxSpeed;
         this.applyInertiaToVertical = applyInertiaToVertical;
     }
+
+	public void updateEntity(EntityRef entity, Block block) {
+		switch (this){
+			case WALKING:
+		        entity.send(new FootstepEvent());
+		        break;
+		    case DIVING:
+		    case SWIMMING:
+		        entity.send(new SwimStrokeEvent(block));
+		        break;
+		}
+	}
 }
