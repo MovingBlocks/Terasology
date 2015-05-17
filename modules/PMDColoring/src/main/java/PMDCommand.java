@@ -56,7 +56,6 @@ class ThreadPMDExecution implements Runnable
 			 InputStreamReader isr = new InputStreamReader(is);
 			 BufferedReader br = new BufferedReader(isr);
 				
-			 StringBuilder sb = new StringBuilder();
 			 String line;
 			 while ((line = br.readLine()) != null) 
 			 {
