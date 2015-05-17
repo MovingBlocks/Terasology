@@ -36,53 +36,100 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Immortius
+ * This class is used to register all the World Generators registered
+ * with the annotations.
  */
 public class WorldGeneratorManager {
     private static final Logger logger = LoggerFactory.getLogger(WorldGeneratorManager.class);
 
     private ImmutableList<WorldGeneratorInfo> generatorInfo;
 
+    /**
+     * Create a new WorldGeneratorManager
+     */
     public WorldGeneratorManager() {
         refresh();
     }
 
+    /**
+     * Refresh the list of WorldGeneratos which are available
+     */
     public void refresh() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (module.isCodeModule()) {
-                DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-                ResolutionResult resolutionResult = resolver.resolve(module.getId());
-                if (resolutionResult.isSuccess()) {
-                    try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
-                        for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
-                            if (tempEnvironment.getModuleProviding(generatorClass).equals(module.getId())) {
-                                RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
-                                if (isValidWorldGenerator(generatorClass)) {
-                                    SimpleUri uri = new SimpleUri(moduleId, annotation.id());
-                                    infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
-                                } else {
-                                    logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor",
-                                            generatorClass);
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
-                    }
-                }
+                resolveModule(moduleId, module, infos, moduleManager);
             }
         }
         Collections.sort(infos);
         generatorInfo = ImmutableList.copyOf(infos);
     }
 
+    /**
+     * Resolve the module dependencies and register it in the enviroment
+     * @param moduleId Module ID
+     * @param module Reference to the module
+     * @param infos List with the registered World Generators
+     * @param moduleManager Module Manager
+     */
+    private void resolveModule(Name moduleId, Module module, List<WorldGeneratorInfo> infos, ModuleManager moduleManager) {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult resolutionResult = resolver.resolve(module.getId());
+        if (resolutionResult.isSuccess()) {
+            try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
+                registreModuleEnviroment(tempEnvironment, moduleId, module, infos);
+            } catch (Exception e) {
+                logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
+            }
+        }
+    }
+
+    /**
+     * Register the module in the environment
+     * @param tempEnvironment Temporal environment to verify the requerimients
+     * @param moduleId Module ID
+     * @param module Reference to the module
+     * @param infos List with the registered World Generators
+     */
+    private void registreModuleEnviroment(ModuleEnvironment tempEnvironment, Name moduleId, Module module, List<WorldGeneratorInfo> infos) {
+        for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
+            if (tempEnvironment.getModuleProviding(generatorClass).equals(module.getId())) {
+                RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
+                registreWorldGenerator(annotation, generatorClass, moduleId, infos);
+            }
+        }
+    }
+
+    /**
+     * Register the generator class in the World Generator List
+     * @param annotation Reference to the annotation of the World Generator
+     * @param generatorClass Reference to the actual World Generator
+     * @param moduleId Module ID
+     * @param infos List with the registered World Generators
+     */
+    private void registreWorldGenerator(RegisterWorldGenerator annotation, Class<?> generatorClass, Name moduleId, List<WorldGeneratorInfo> infos) {
+        if (isValidWorldGenerator(generatorClass)) {
+            SimpleUri uri = new SimpleUri(moduleId, annotation.id());
+            infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
+        } else {
+            logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor",
+                    generatorClass);
+        }
+    }
+
+    /**
+     * @return Get the available World Generators
+     */
     public List<WorldGeneratorInfo> getWorldGenerators() {
         return generatorInfo;
     }
 
+    /**
+     * @param uri Uri of the World Generator Info
+     * @return WorldGeneratorInfo of the give uri
+     */
     public WorldGeneratorInfo getWorldGeneratorInfo(SimpleUri uri) {
         for (WorldGeneratorInfo info : generatorInfo) {
             if (info.getUri().equals(uri)) {
@@ -93,30 +140,57 @@ public class WorldGeneratorManager {
     }
 
     /**
-     * @param uri
+     * @param uri Uri of the World Generator
      * @return The instantiated world generator.
      */
     public WorldGenerator createGenerator(SimpleUri uri) throws UnresolvedWorldGeneratorException {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         Module module = moduleManager.getEnvironment().get(uri.getModuleName());
         if (module == null) {
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(uri.getModuleName());
-            if (!result.isSuccess()) {
-                if (moduleManager.getRegistry().getLatestModuleVersion(uri.getModuleName()) == null) {
-                    throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");
-                } else {
-                    throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - unable to resolve module dependencies");
-                }
-            }
-            try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                return searchForWorldGenerator(uri, environment);
-            }
+            return resolveModuleDependency(uri, moduleManager);
         } else {
             return searchForWorldGenerator(uri, moduleManager.getEnvironment());
         }
     }
 
+    /**
+     * Resolve the module dependencies of the given module
+     * @param uri Uri of the WorldGeneratorInfo
+     * @param moduleManager Reference to the ModuleManager
+     * @return The generated WorldGenerator
+     * @throws UnresolvedWorldGeneratorException
+     */
+    private WorldGenerator resolveModuleDependency(SimpleUri uri, ModuleManager moduleManager) throws UnresolvedWorldGeneratorException {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(uri.getModuleName());
+        if (!result.isSuccess()) {
+            throw getUnresolvedWorldGeneratorException(uri, moduleManager);
+        }
+        try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+            return searchForWorldGenerator(uri, environment);
+        }
+    }
+
+    /**
+     * @param uri Uri of the WorldGenerator
+     * @param moduleManager Reference to the ModuleManager 
+     * @return The associated exception from an unresolved world generator.
+     */
+    private UnresolvedWorldGeneratorException getUnresolvedWorldGeneratorException(SimpleUri uri, ModuleManager moduleManager) {
+        if (moduleManager.getRegistry().getLatestModuleVersion(uri.getModuleName()) == null) {
+            return new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");
+        } else {
+            return new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - unable to resolve module dependencies");
+        }
+    }
+
+    /**
+     * 
+     * @param uri Uri of the WorldGenerator
+     * @param environment Environment to search the WorldGenerator
+     * @return The world generator associated with the given uri
+     * @throws UnresolvedWorldGeneratorException
+     */
     private WorldGenerator searchForWorldGenerator(SimpleUri uri, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
@@ -128,6 +202,13 @@ public class WorldGeneratorManager {
         throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");
     }
 
+    /**
+     * Load the give WorldGenerator
+     * @param generatorClass Generator to be loaded
+     * @param uri Uri of the WorldGenerator
+     * @return The loaded WorldGenerator
+     * @throws UnresolvedWorldGeneratorException
+     */
     private WorldGenerator loadGenerator(Class<?> generatorClass, SimpleUri uri) throws UnresolvedWorldGeneratorException {
         if (isValidWorldGenerator(generatorClass)) {
             try {
@@ -140,6 +221,11 @@ public class WorldGeneratorManager {
         }
     }
 
+    /**
+     * Verify if the WorldGenerator is valid
+     * @param generatorClass World Generator to be tested
+     * @return True if it is valid, False otherwise
+     */
     private boolean isValidWorldGenerator(Class<?> generatorClass) {
         try {
             if (WorldGenerator.class.isAssignableFrom(generatorClass)) {
