@@ -302,18 +302,18 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
         // Add the activated features for this shader
         for (ShaderProgramFeature feature : features) {
-            shader.append("#define ").append(feature.name()).append("\n");
+            shader.append("#define ").append(feature.name()).append('\n');
         }
 
-        shader.append("\n");
+        shader.append('\n');
 
         shader.append(includedDefines);
         shader.append(includedUniforms);
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
-            shader.append(includedFunctionsFragment).append("\n");
+            shader.append(includedFunctionsFragment).append('\n');
         } else {
-            shader.append(includedFunctionsVertex).append("\n");
+            shader.append(includedFunctionsVertex).append('\n');
         }
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
