@@ -29,7 +29,9 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
     HUDToggleButtonsClientSystem toggleButtonsClientSystem;
     @In
     EntityManager entityManager;
-
+    @In
+    Console console;
+    
     EntityRef localClientEntity;
 
     @Override
@@ -37,7 +39,10 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         toggleButtonsClientSystem.registerToggleButton(this);
     }
 
-
+    /**
+     * @return localClientEntity A reference to the local client Entity
+     * Get the current client Entity (The local one)
+     */
     private EntityRef getLocalClientEntity() {
         if (localClientEntity == null) {
             for (EntityRef entityRef : entityManager.getEntitiesWith(ClientComponent.class)) {
@@ -48,16 +53,22 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
                 }
             }
         }
-
         return localClientEntity;
     }
 
+    /**
+     * @return EntityRef A reference to the local character Entity
+     * Get the current character Entity (The local one)
+     */
     private EntityRef getLocalCharacterEntity() {
         EntityRef clientEntity = getLocalClientEntity();
         ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
         return clientComponent.character;
     }
 
+    /* 
+     * Overrides the toggle method for the flying button
+     */
     @Override
     public void toggle() {
         MovementMode nextMode = MovementMode.WALKING;
@@ -68,7 +79,12 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         setNewSpeed();
     }
     
-    private String setNewSpeed(){
+    
+    /**
+     * @return A string with a console message, showing the new speed for flying mode
+     * This private method sets the new speed when the flying mode is toggled by clicking the button
+     */
+    private void setNewSpeed(){
     	MovementMode move = getMovementMode();
         ClientComponent clientComp = getLocalClientEntity().getComponent(ClientComponent.class);
         CharacterMovementComponent newMove = clientComp.character.getComponent(CharacterMovementComponent.class);
@@ -76,13 +92,13 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
             newMove.speedMultiplier = 8.0f;
 //            float d = calculateSpeed();
             clientComp.character.saveComponent(newMove);
-            //console.addMessage("Speed multiplier set to " + 8f + " (was " + oldSpeedMultipler + ")");
+            console.addMessage("Speed multiplier set to " + 8.0f + " (was 1.0f)");
         }
         else{
         	newMove.speedMultiplier = 1.0f;
         	clientComp.character.saveComponent(newMove);
+        	console.addMessage("Setting the speed multiplier to the original value (1.0f)");
         }
-        return "";
     }
     
 //    private float calculateSpeed(){
@@ -98,12 +114,19 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         return true;
     }
 
+    /**
+     * @return An instance of the current movement mode of the character
+     * Method that returns the current movement mode of the character
+     */
     private MovementMode getMovementMode() {
         EntityRef character = getLocalCharacterEntity();
         CharacterMovementComponent movementComponent = character.getComponent(CharacterMovementComponent.class);
         return movementComponent.mode;
     }
 
+/*
+ * Set the right text into the button label
+ */
     @Override
     public String getText() {
         switch (getMovementMode()) {
