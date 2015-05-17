@@ -13,8 +13,15 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.world.WorldComponent;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.World;
+import org.terasology.world.generator.WorldGenerator;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class FlightModeHUDToggleButton extends BaseComponentSystem implements HUDToggleButtonsClientSystem.HUDToggleButtonState {
@@ -24,8 +31,6 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
     EntityManager entityManager;
 
     EntityRef localClientEntity;
-    
-    Console console;
 
     @Override
     public void initialise() {
@@ -69,6 +74,7 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         CharacterMovementComponent newMove = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move == MovementMode.FLYING) {
             newMove.speedMultiplier = 8.0f;
+//            float d = calculateSpeed();
             clientComp.character.saveComponent(newMove);
             //console.addMessage("Speed multiplier set to " + 8f + " (was " + oldSpeedMultipler + ")");
         }
@@ -78,6 +84,14 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         }
         return "";
     }
+    
+//    private float calculateSpeed(){
+//    	World world = getLocalCharacterEntity().getComponent(new WorldComponent());
+//        if (world != null) {
+//            Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
+//        }
+//        return 1.0f;
+//    }
 
     @Override
     public boolean isValid() {
