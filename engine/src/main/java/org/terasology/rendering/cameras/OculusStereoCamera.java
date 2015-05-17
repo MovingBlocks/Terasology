@@ -209,7 +209,7 @@ public class OculusStereoCamera extends Camera {
         updateViewMatrixReflected();
         updateViewProjectionMatrix();
         updateInverseMatrices();
-        dirtyChecks();
+        forDirtyChecks();
         updateFrustum();
     }
     
