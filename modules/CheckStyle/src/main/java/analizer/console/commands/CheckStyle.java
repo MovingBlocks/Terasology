@@ -1,4 +1,5 @@
-package org.terasology.analizer.console.commands;
+package analizer.console.commands;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,8 +28,8 @@ public class CheckStyle extends BaseComponentSystem{
 						 @CommandParam("Metrica") String metric,
 						 @CommandParam("Maximo valor booleano") Integer max) throws IOException {
 		
-		String pathDefault = "engine/PruebasCheckStyle";
-		String pathMetric = pathDefault;
+		String pathDefault = "./modules/CheckStyle/PruebasCheckStyle";
+		String pathMetric = pathDefault;	
 		
 		if (metric.equals("-b")) pathMetric += "/booleanRule.xml";
 		else if (metric.equals("-c")) pathMetric += "/cyclomaticRule.xml";
