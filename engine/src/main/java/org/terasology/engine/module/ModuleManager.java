@@ -16,6 +16,7 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
@@ -36,6 +37,8 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 
+import java.io.File;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -106,6 +109,7 @@ public class ModuleManager {
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.lang.ref");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.math");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.io"); //For use java.io into the new modules
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent.atomic");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent.locks");
@@ -158,7 +162,14 @@ public class ModuleManager {
 
         moduleSecurityManager.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         moduleSecurityManager.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
-
+        
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("<<ALL FILES>>","execute"));//For calling Runtime.execute into the new modules
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/out.xml", "write"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/booleanRule.xml", "write"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/In.java", "read"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/booleanRule.xml", "read"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/cyclomaticRule.xml", "read"));
+        
         moduleSecurityManager.getBasePermissionSet().addAPIClass(java.nio.ByteBuffer.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(java.nio.IntBuffer.class);
 
