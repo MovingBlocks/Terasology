@@ -270,7 +270,7 @@ public class OculusStereoCamera extends Camera {
         inverseProjectionMatrixLeftEye.invert(projectionMatrixLeftEye);
         inverseProjectionMatrixRightEye.invert(projectionMatrixRightEye);
     }
-    private void dirtyChecks(){
+    private void forDirtyChecks(){
         cachedPosition.set(getPosition());
         cachedViewigDirection.set(getViewingDirection());
         cachedZFar = zFar;
