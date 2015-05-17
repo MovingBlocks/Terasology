@@ -81,5 +81,14 @@ public final class HierarchicalAIComponent implements Component {
     public int damage = 50;
     public int damageFrequency = 500;
 
+    /**
+     * determines wheter or not the AI should be updated
+     *
+     * @param tempTime
+     */
+    public boolean needsUpdate(long tempTime) {
+    	return tempTime - this.lastProgressedUpdateAt >= this.updateFrequency;
+	}
+
 
 }

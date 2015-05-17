@@ -92,7 +92,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         long lastAttack = 0;
 
         // skip update if set to skip them
-        if (tempTime - ai.lastProgressedUpdateAt < ai.updateFrequency) {
+        if (!ai.needsUpdate(tempTime)) {
             ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
                     .getGameTimeInMs();
             return;
