@@ -50,7 +50,7 @@ public class DebugPropertiesSystem extends BaseComponentSystem {
         DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().addHUDElement("engine:DebugProperties");
         debugProperties.setVisible(false);
         properties = debugProperties.getPropertyLayout();
-        CoreRegistry.putPermanently(DebugPropertiesSystem.class, this);
+        CoreRegistry.put(DebugPropertiesSystem.class, this);
     }
 
     public void addProperty(final String group, final Object o) {

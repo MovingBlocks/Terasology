@@ -25,9 +25,9 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
-import org.terasology.registry.CoreRegistry;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
 
@@ -36,13 +36,13 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     private AudioManager audioManager;
 
     @Override
-    public synchronized void preInitialise() {
-        super.preInitialise();
+    public synchronized void preInitialise(Context context) {
+        super.preInitialise(context);
     }
 
     @Override
-    public void postInitialise(Config config) {
-        initOpenAL(config);
+    public void postInitialise(Context context) {
+        initOpenAL(context);
     }
 
     @Override
@@ -65,7 +65,8 @@ public class LwjglAudio extends BaseLwjglSubsystem {
         }
     }
 
-    private void initOpenAL(Config config) {
+    private void initOpenAL(Context context) {
+        Config config = context.get(Config.class);
         if (config.getAudio().isDisableSound()) {
             audioManager = new NullAudioManager();
         } else {
@@ -76,8 +77,8 @@ public class LwjglAudio extends BaseLwjglSubsystem {
                 audioManager = new NullAudioManager();
             }
         }
-        CoreRegistry.putPermanently(AudioManager.class, audioManager);
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        context.put(AudioManager.class, audioManager);
+        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
         assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }

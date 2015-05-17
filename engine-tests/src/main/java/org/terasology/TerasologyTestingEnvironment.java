@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
@@ -41,7 +42,6 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 
 import java.nio.file.FileSystem;
@@ -56,8 +56,7 @@ import static org.mockito.Mockito.mock;
  */
 public abstract class TerasologyTestingEnvironment {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
-
-    private static boolean setup;
+    protected static Context context;
 
     private static BlockManager blockManager;
     private static Config config;
@@ -78,41 +77,35 @@ public abstract class TerasologyTestingEnvironment {
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
 
-        if (!setup) {
-            setup = true;
+        /*
+         * Create at least for each class a new headless environemnt as it is fast and prevents side effects
+         * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
+         */
+        env = new HeadlessEnvironment();
+        context = env.getContext();
+        assetManager = context.get(AssetManager.class);
+        blockManager = context.get(BlockManager.class);
+        config = context.get(Config.class);
+        audioManager = context.get(AudioManager.class);
+        collisionGroupManager = context.get(CollisionGroupManager.class);
+        moduleManager = context.get(ModuleManager.class);
 
-            env = new HeadlessEnvironment();
-            assetManager = CoreRegistry.get(AssetManager.class);
-            blockManager = CoreRegistry.get(BlockManager.class);
-            config = CoreRegistry.get(Config.class);
-            audioManager = CoreRegistry.get(AudioManager.class);
-            collisionGroupManager = CoreRegistry.get(CollisionGroupManager.class);
-            moduleManager = CoreRegistry.get(ModuleManager.class);
-
-        } else {
-            CoreRegistry.put(AssetManager.class, assetManager);
-            CoreRegistry.put(BlockManager.class, blockManager);
-            CoreRegistry.put(Config.class, config);
-            CoreRegistry.put(AudioManager.class, audioManager);
-            CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
-            CoreRegistry.put(ModuleManager.class, moduleManager);
-        }
     }
 
     @Before
     public void setup() throws Exception {
-        CoreRegistry.put(ModuleManager.class, moduleManager);
+        context.put(ModuleManager.class, moduleManager);
 
         mockTime = mock(EngineTime.class);
-        CoreRegistry.put(Time.class, mockTime);
-        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime);
-        CoreRegistry.put(NetworkSystem.class, networkSystem);
-        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        context.put(Time.class, mockTime);
+        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
+        context.put(NetworkSystem.class, networkSystem);
+        engineEntityManager = new EntitySystemBuilder().build(context.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
         Path savePath = PathManager.getInstance().getSavePath("world1");
-        CoreRegistry.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
+        context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();
-        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        context.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
 
         boolean complete = false;
@@ -120,12 +113,11 @@ public abstract class TerasologyTestingEnvironment {
         while (!complete) {
             complete = prefabLoadStep.step();
         }
-        CoreRegistry.get(ComponentSystemManager.class).initialise();
+        context.get(ComponentSystemManager.class).initialise();
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        CoreRegistry.clear();
         env.close();
     }
 

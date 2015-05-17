@@ -20,6 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
@@ -62,8 +64,10 @@ public class WorldSerializerTest {
 
     @Before
     public void setup() {
-
-        AssetManager assetManager = CoreRegistry.put(AssetManager.class, mock(AssetManager.class));
+        Context context = new ContextImpl();
+        AssetManager assetManager = mock(AssetManager.class);
+        context.put(AssetManager.class,assetManager);
+        CoreRegistry.setContext(context);
         when(assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class)).thenReturn(Collections.<Prefab>emptyList());
         EntitySystemBuilder builder = new EntitySystemBuilder();
         entityManager = builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());

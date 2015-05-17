@@ -31,6 +31,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindAxisEvent;
@@ -145,8 +146,8 @@ public final class BindsConfig {
     /**
      * Updates a config with any binds that it may be missing, through reflection over RegisterBindButton annotations
      */
-    public void updateForChangedMods() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+    public void updateForChangedMods(Context context) {
+        ModuleManager moduleManager = context.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {

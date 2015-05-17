@@ -20,22 +20,22 @@ import org.terasology.asset.AssetType;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.registry.CoreRegistry;
 
 public class HeadlessAudio implements EngineSubsystem {
 
     private AudioManager audioManager;
 
     @Override
-    public void preInitialise() {
+    public void preInitialise(Context context) {
     }
 
     @Override
-    public void postInitialise(Config config) {
-        initNoSound();
+    public void postInitialise(Context context) {
+        initNoSound(context);
     }
 
     @Override
@@ -56,10 +56,10 @@ public class HeadlessAudio implements EngineSubsystem {
         audioManager.dispose();
     }
 
-    private void initNoSound() {
+    private void initNoSound(Context context) {
         audioManager = new NullAudioManager();
-        CoreRegistry.putPermanently(AudioManager.class, audioManager);
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        context.put(AudioManager.class, audioManager);
+        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
         assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }

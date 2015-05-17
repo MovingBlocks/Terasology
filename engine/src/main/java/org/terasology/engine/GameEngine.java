@@ -16,6 +16,7 @@
 
 package org.terasology.engine;
 
+import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 
 /**
@@ -111,4 +112,9 @@ public interface GameEngine extends AutoCloseable {
     void unsubscribeToStateChange(StateChangeSubscriber subscriber);
 
 
+    /**
+     * Creates a context that provides read access to the objects of the engine context and can
+     * be populated with it's own private objects.
+     */
+    public Context createChildContext();
 }

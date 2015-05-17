@@ -30,7 +30,6 @@ import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         super.setup();
         CertificateGenerator generator = new CertificateGenerator();
         CertificatePair serverIdentiy = generator.generateSelfSigned();
-        CoreRegistry.get(Config.class).getSecurity().setServerCredentials(serverIdentiy.getPublicCert(), serverIdentiy.getPrivateCert());
+        context.get(Config.class).getSecurity().setServerCredentials(serverIdentiy.getPublicCert(), serverIdentiy.getPrivateCert());
     }
 
     @After
@@ -64,14 +63,14 @@ public class TestNetwork extends TerasologyTestingEnvironment {
     public void testNetwork() throws Exception {
         EngineEntityManager entityManager = getEntityManager();
         EngineTime time = mock(EngineTime.class);
-        NetworkSystem server = new NetworkSystemImpl(time);
+        NetworkSystem server = new NetworkSystemImpl(time, context);
         netSystems.add(server);
-        server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
+        server.connectToEntitySystem(entityManager, context.get(EntitySystemLibrary.class), null);
         server.host(7777, true);
 
         Thread.sleep(500);
 
-        NetworkSystem client = new NetworkSystemImpl(time);
+        NetworkSystem client = new NetworkSystemImpl(time, context);
         netSystems.add(client);
         client.join("localhost", 7777);
 
@@ -89,9 +88,9 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         netComp.setNetworkId(122);
         EntityRef entity = entityManager.create(netComp);
         EngineTime time = mock(EngineTime.class);
-        NetworkSystem server = new NetworkSystemImpl(time);
+        NetworkSystem server = new NetworkSystemImpl(time, context);
         netSystems.add(server);
-        server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
+        server.connectToEntitySystem(entityManager, context.get(EntitySystemLibrary.class), null);
         server.host(7777, true);
 
         assertFalse(122 == entity.getComponent(NetworkComponent.class).getNetworkId());

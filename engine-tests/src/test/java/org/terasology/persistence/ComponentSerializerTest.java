@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
@@ -40,6 +41,7 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import static org.junit.Assert.assertEquals;
@@ -59,6 +61,7 @@ public class ComponentSerializerTest {
     @BeforeClass
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
+        CoreRegistry.setContext(new ContextImpl());
     }
 
     @Before

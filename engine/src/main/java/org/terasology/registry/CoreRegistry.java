@@ -15,13 +15,8 @@
  */
 package org.terasology.registry;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import org.terasology.context.Context;
 import org.terasology.module.sandbox.API;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
@@ -30,8 +25,7 @@ import java.util.Set;
  */
 @API
 public final class CoreRegistry {
-    private static Map<Class<? extends Object>, Object> store = Maps.newConcurrentMap();
-    private static Set<Class<? extends Object>> permStore = Sets.newSetFromMap(Maps.<Class<? extends Object>, Boolean>newConcurrentMap());
+    private static Context context;
 
     private CoreRegistry() {
     }
@@ -44,26 +38,19 @@ public final class CoreRegistry {
      * @param <T>
      */
     public static <T, U extends T> U put(Class<T> type, U object) {
-        store.put(type, object);
+        context.put(type, object);
         return object;
     }
 
     /**
-     * Registers an object. These objects are not removed when CoreRegistry.clear() is called.
-     *
-     * Requires the "permRegister" RuntimePermission
-     *
-     * @param type   The interface which the system fulfils
-     * @param object The system itself
-     * @param <T>
+     * Sets the context that powers this class.
+     * @param context
      */
-    public static <T, U extends T> U putPermanently(Class<T> type, U object) {
+    public static void setContext(Context context) {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(new RuntimePermission("permRegister"));
         }
-        store.put(type, object);
-        permStore.add(type);
-        return object;
+        CoreRegistry.context = context;
     }
 
     /**
@@ -73,29 +60,14 @@ public final class CoreRegistry {
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
-        return type.cast(store.get(type));
-    }
-
-    /**
-     * Clears all non-permanent objects from the registry.
-     *
-     * Requires the "clearRegistry" RuntimePermission
-     */
-    public static void clear() {
-        if (System.getSecurityManager() != null) {
-            System.getSecurityManager().checkPermission(new RuntimePermission("clearRegistry"));
+        if (type == Context.class) {
+            return context.get(type);
         }
-        Iterator<Map.Entry<Class<?>, Object>> iterator = store.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Class<?>, Object> entry = iterator.next();
-            if (!permStore.contains(entry.getKey())) {
-                iterator.remove();
-            }
-        }
+        return context.get(type);
     }
 
     public static <T> void remove(Class<T> type) {
-        store.remove(type);
+        context.remove(type);
     }
 
 }

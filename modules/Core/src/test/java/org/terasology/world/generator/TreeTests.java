@@ -24,6 +24,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.core.world.generator.trees.Trees;
 import org.terasology.math.Rect2i;
@@ -49,8 +50,11 @@ public class TreeTests {
 
     @BeforeClass
     public static void setup() {
+        ContextImpl context = new ContextImpl();
+        CoreRegistry.setContext(context);
+
         // Needed only as long as #1536 is unresolved
-        CoreRegistry.putPermanently(Config.class, new Config());
+        context.put(Config.class, new Config());
 
         BlockManager blockManager = Mockito.mock(BlockManager.class);
         Block air = BlockManager.getAir();
@@ -58,7 +62,7 @@ public class TreeTests {
         Mockito.when(blockManager.getBlock(Matchers.<BlockUri>any())).thenReturn(air);
         Mockito.when(blockManager.getBlock(Matchers.<String>any())).thenReturn(air);
 
-        CoreRegistry.putPermanently(BlockManager.class, blockManager);
+        context.put(BlockManager.class, blockManager);
     }
 
     @Test

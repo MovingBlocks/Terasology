@@ -19,7 +19,6 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -29,6 +28,8 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
@@ -133,6 +134,11 @@ public class TerasologyEngine implements GameEngine {
     private Deque<EngineSubsystem> subsystems;
 
     /**
+     * Contains objects that life for the duration of this engine.
+     */
+    private Context context;
+
+    /**
      * This constructor initializes the engine by initializing its systems,
      * subsystems and managers. It also verifies that some required systems
      * are up and running after they have been initialized.
@@ -144,6 +150,13 @@ public class TerasologyEngine implements GameEngine {
 
         Stopwatch totalInitTime = Stopwatch.createStarted();
 
+        this.context = new ContextImpl();
+        /*
+         * We can't load the engine without core registry yet.
+         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
+         * And the engine loads assets while it gets created.
+         */
+        CoreRegistry.setContext(context);
         this.subsystems = Queues.newArrayDeque(subsystems);
 
         try {
@@ -160,7 +173,7 @@ public class TerasologyEngine implements GameEngine {
 
             // time must be set here as it is required by some of the managers.
             verifyRequiredSystemIsRegistered(Time.class);
-            time = (EngineTime) CoreRegistry.get(Time.class);
+            time = (EngineTime) context.get(Time.class);
 
             GameThread.setToCurrentThread();
 
@@ -182,12 +195,17 @@ public class TerasologyEngine implements GameEngine {
             initAdvancedMonitor();
 
             engineState = EngineState.INITIALIZED;
-
+            /**
+             * Prevent objects being put in engine context after init phase. Engine states should use/create a
+             * child context.
+             */
+            CoreRegistry.setContext(null);
         } catch (RuntimeException e) {
             logger.error("Failed to initialise Terasology", e);
             cleanup();
             throw e;
         }
+
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
@@ -231,7 +249,7 @@ public class TerasologyEngine implements GameEngine {
 
         renderingConfig = config.getRendering();
         logger.info("Video Settings: " + renderingConfig.toString());
-        CoreRegistry.putPermanently(Config.class, config);
+        context.put(Config.class, config);
     }
 
     private boolean validateServerIdentity() {
@@ -256,7 +274,7 @@ public class TerasologyEngine implements GameEngine {
      */
     private void preInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
-            subsystem.preInitialise();
+            subsystem.preInitialise(context);
         }
     }
 
@@ -265,7 +283,7 @@ public class TerasologyEngine implements GameEngine {
      */
     private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
-            subsystem.postInitialise(config);
+            subsystem.postInitialise(context);
         }
     }
 
@@ -276,7 +294,7 @@ public class TerasologyEngine implements GameEngine {
      * @throws IllegalStateException Details the required system that has not been registered.
      */
     private void verifyRequiredSystemIsRegistered(Class<?> clazz) {
-        if (CoreRegistry.get(clazz) == null) {
+        if (context.get(clazz) == null) {
             throw new IllegalStateException(clazz.getSimpleName() + " not registered as a core system.");
         }
     }
@@ -284,27 +302,32 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         SplashScreen.getInstance().post("Loading modules ...");
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl());
+        ModuleManager moduleManager = new ModuleManagerImpl();
+        context.put(ModuleManager.class, moduleManager);
 
         SplashScreen.getInstance().post("Loading reflections ...");
-        ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
-        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.putPermanently(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
 
-        CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
+        ReflectFactory reflectFactory = new ReflectionReflectFactory();
+        context.put(ReflectFactory.class, reflectFactory);
+
+        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
+        context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
+        context.put(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory,
+                copyStrategyLibrary));
 
         SplashScreen.getInstance().post("Loading assets ...");
-        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
+        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         assetManager.setEnvironment(moduleManager.getEnvironment());
-        CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
-        CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
-        CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.putPermanently(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
-        CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
-        CoreRegistry.putPermanently(Game.class, new Game(this, time));
-        assetManager.setEnvironment(moduleManager.getEnvironment());
+        context.put(AssetManager.class, assetManager);
+        context.put(CollisionGroupManager.class, new CollisionGroupManager());
+        context.put(WorldGeneratorManager.class, new WorldGeneratorManager(context));
+        context.put(ComponentSystemManager.class, new ComponentSystemManager());
+        context.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
+        context.put(NetworkSystem.class, new NetworkSystemImpl(time, context));
+        context.put(Game.class, new Game(this, time));
 
         AssetType.registerAssetTypes(assetManager);
-        ApplyModulesUtil.applyModules();
+        ApplyModulesUtil.applyModules(context);
     }
 
     /**
@@ -318,7 +341,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
             @Override
@@ -366,7 +389,7 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void run(GameState initialState) {
         try {
-            CoreRegistry.putPermanently(GameEngine.class, this);
+            context.put(GameEngine.class, this);
             changeState(initialState);
             engineState = EngineState.RUNNING;
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -395,9 +418,9 @@ public class TerasologyEngine implements GameEngine {
      * and disposal occur afterwards.
      */
     private void mainLoop() {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        NetworkSystem networkSystem = context.get(NetworkSystem.class);
 
-        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+        DisplayDevice display = context.get(DisplayDevice.class);
 
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
@@ -567,7 +590,7 @@ public class TerasologyEngine implements GameEngine {
             subscriber.onStateChange();
         }
         // drain input queues
-        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
+        InputSystem inputSystem = context.get(InputSystem.class);
         inputSystem.getMouseDevice().getInputQueue();
         inputSystem.getKeyboard().getInputQueue();
     }
@@ -613,7 +636,7 @@ public class TerasologyEngine implements GameEngine {
     public void setFullscreen(boolean state) {
         if (renderingConfig.isFullscreen() != state) {
             renderingConfig.setFullscreen(state);
-            DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+            DisplayDevice display = context.get(DisplayDevice.class);
             display.setFullscreen(state);
         }
     }
@@ -630,7 +653,7 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public boolean hasFocus() {
-        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+        DisplayDevice display = context.get(DisplayDevice.class);
         return gameFocused && display.isActive();
     }
 
@@ -694,5 +717,23 @@ public class TerasologyEngine implements GameEngine {
 
     public void restartThreads() {
         commonThreadPool.restart();
+    }
+
+
+    @Override
+    public Context createChildContext() {
+        return new ContextImpl(context);
+    }
+
+    /**
+     * Allows it to obtain objects directly from the context of the game engine. It exists only for situations in
+     * which no child context exists yet. If there is a child context then it automatically contains the objects of
+     * the engine context. Thus normal code should just work with the (child) context that is available to it
+     * instead of using this method.
+     *
+     * @return a object directly from the context of the game engine
+     */
+    public <T> T getFromEngineContext(Class<? extends T> type) {
+        return context.get(type);
     }
 }

@@ -16,13 +16,14 @@
 package org.terasology.engine.subsystem;
 
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 
 public interface EngineSubsystem {
-    void preInitialise();
+    void preInitialise(Context context);
 
-    void postInitialise(Config config);
+    void postInitialise(Context context);
 
     void preUpdate(GameState currentState, float delta);
 

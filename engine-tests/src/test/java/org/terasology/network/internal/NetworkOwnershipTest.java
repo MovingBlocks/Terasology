@@ -17,7 +17,6 @@
 package org.terasology.network.internal;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.ComponentSystemManager;
@@ -30,7 +29,6 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.NetworkComponent;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.BlockEntityRegistry;
 
@@ -50,20 +48,17 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     private NetClient client;
     private EntityRef clientEntity;
 
-    @BeforeClass
-    public static void initialise() throws Exception {
-        ModuleManager moduleManager = ModuleManagerFactory.create();
-        CoreRegistry.put(ModuleManager.class, moduleManager);
-    }
 
     @Before
     public void setup() throws Exception {
         super.setup();
+        ModuleManager moduleManager = ModuleManagerFactory.create();
+        context.put(ModuleManager.class, moduleManager);
         EngineTime mockTime = mock(EngineTime.class);
-        networkSystem = new NetworkSystemImpl(mockTime);
+        networkSystem = new NetworkSystemImpl(mockTime, context);
 
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+        entityManager = new EntitySystemBuilder().build(context.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        context.put(ComponentSystemManager.class, new ComponentSystemManager());
         entityManager.clear();
         client = mock(NetClient.class);
         NetworkComponent clientNetComp = new NetworkComponent();
@@ -72,7 +67,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         when(client.getEntity()).thenReturn(clientEntity);
         when(client.getId()).thenReturn("dummyID");
         networkSystem.mockHost();
-        networkSystem.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), mock(BlockEntityRegistry.class));
+        networkSystem.connectToEntitySystem(entityManager, context.get(EntitySystemLibrary.class), mock(BlockEntityRegistry.class));
         networkSystem.registerNetworkEntity(clientEntity);
     }
 

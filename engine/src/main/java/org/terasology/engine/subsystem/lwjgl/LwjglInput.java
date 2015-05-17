@@ -21,6 +21,7 @@ import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
@@ -36,14 +37,14 @@ public class LwjglInput extends BaseLwjglSubsystem {
     private boolean mouseGrabbed;
 
     @Override
-    public void preInitialise() {
-        super.preInitialise();
+    public void preInitialise(Context context) {
+        super.preInitialise(context);
     }
 
     @Override
-    public void postInitialise(Config config) {
-        initControls();
-        updateInputConfig(config);
+    public void postInitialise(Context context) {
+        initControls(context);
+        updateInputConfig(context);
         Mouse.setGrabbed(false);
     }
 
@@ -75,12 +76,13 @@ public class LwjglInput extends BaseLwjglSubsystem {
         Keyboard.destroy();
     }
 
-    private void initControls() {
+    private void initControls(Context context) {
         try {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            InputSystem inputSystem = CoreRegistry.putPermanently(InputSystem.class, new InputSystem());
+            InputSystem inputSystem = new InputSystem();
+            context.put(InputSystem.class, inputSystem);
             inputSystem.setMouseDevice(new LwjglMouseDevice());
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
         } catch (LWJGLException e) {
@@ -88,8 +90,9 @@ public class LwjglInput extends BaseLwjglSubsystem {
         }
     }
 
-    private void updateInputConfig(Config config) {
-        config.getInput().getBinds().updateForChangedMods();
+    private void updateInputConfig(Context context) {
+        Config config = context.get(Config.class);
+        config.getInput().getBinds().updateForChangedMods(context);
         config.save();
     }
 

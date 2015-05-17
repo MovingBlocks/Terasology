@@ -24,7 +24,7 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.ControlWidget;
@@ -43,7 +43,9 @@ public class HUDScreenLayer extends CoreScreenLayer {
 
     private Map<AssetUri, HUDElement> elementsLookup = Maps.newLinkedHashMap();
 
-    private AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+    @In
+    private AssetManager assetManager;
+
     private NUIManager manager;
 
     public ControlWidget addHUDElement(String uri) {

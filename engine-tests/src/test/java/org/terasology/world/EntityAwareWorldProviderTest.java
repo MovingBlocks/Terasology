@@ -19,7 +19,6 @@ package org.terasology.world;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,6 +28,8 @@ import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
@@ -104,9 +105,14 @@ public class EntityAwareWorldProviderTest {
     private Block blockInFamilyOne;
     private Block blockInFamilyTwo;
 
+    private static Context context;
+
     @BeforeClass
     public static void commonSetup() throws Exception {
-        moduleManager = CoreRegistry.put(ModuleManager.class, ModuleManagerFactory.create());
+        context = new ContextImpl();
+        CoreRegistry.setContext(context);
+        moduleManager = ModuleManagerFactory.create();
+        context.put(ModuleManager.class, moduleManager);
     }
 
     @Before

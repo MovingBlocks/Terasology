@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.utilities.LWJGLHelper;
 
@@ -34,7 +35,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     private static boolean initialised;
 
     @Override
-    public synchronized void preInitialise() {
+    public synchronized void preInitialise(Context context) {
         if (!initialised) {
             initLogger();
             LWJGLHelper.initNativeLibs();

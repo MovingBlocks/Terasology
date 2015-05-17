@@ -17,9 +17,9 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.StateMainMenu;
@@ -70,7 +70,7 @@ public class RegisterMods extends SingleStepLoadProcess {
                 logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
             }
 
-            ApplyModulesUtil.applyModules();
+            ApplyModulesUtil.applyModules(CoreRegistry.get(Context.class));
         } else {
             logger.warn("Missing at least one required module or dependency: {}", moduleIds);
             CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));

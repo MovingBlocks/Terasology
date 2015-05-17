@@ -86,6 +86,7 @@ public class StateIngame implements GameState {
 
     @Override
     public void init(GameEngine engine) {
+        // context from loading state gets used.
         nuiManager = CoreRegistry.get(NUIManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         eventSystem = CoreRegistry.get(EventSystem.class);
@@ -154,7 +155,6 @@ public class StateIngame implements GameState {
         ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
         CoreRegistry.get(AssetManager.class).setEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
-        CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);
         GameThread.clearWaitingProcesses();
 

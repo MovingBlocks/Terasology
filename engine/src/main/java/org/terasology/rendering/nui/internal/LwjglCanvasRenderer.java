@@ -17,12 +17,14 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
@@ -84,10 +86,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private static final Rect2f FULL_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
     private Matrix4f modelView;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-    private Mesh billboard = Assets.getMesh("engine:UIBillboard");
+    private Mesh billboard;
     private Line line = new Line();
 
-    private Material textureMat = Assets.getMaterial("engine:UITexture");
+    private Material textureMat;
 
     // Text mesh caching
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
@@ -101,6 +103,14 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Rect2i currentTextureCropRegion;
 
     private Map<AssetUri, FrameBufferObject> fboMap = Maps.newHashMap();
+
+
+    public LwjglCanvasRenderer(Context context) {
+        AssetManager assetManager = context.get(AssetManager.class);
+        this.textureMat = assetManager.resolveAndLoad(AssetType.MATERIAL, "engine:UITexture", Material.class);
+        this.billboard = assetManager.resolveAndLoad(AssetType.MESH, "engine:UIBillboard", Mesh.class);
+    }
+
 
     @Override
     public void preRender() {
