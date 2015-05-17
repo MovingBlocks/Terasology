@@ -63,7 +63,7 @@ extensions
 /facades/*
 !/facades/PC
 !/facades/subprojects.gradle
-/modules/*
+#/modules/*
 !/modules/Core
 !/modules/CoreSampleGameplay
 !/modules/subprojects.gradle

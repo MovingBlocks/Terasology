@@ -1,0 +1,9 @@
+{
+    "id" : "WorldCodecity",
+    "version" : "0.1.0",
+    "author" : "",
+    "displayName" : "WorldCodecity",
+    "description" : "",
+    "dependencies" : [],
+    "isServerSideOnly" : false
+}
