@@ -113,6 +113,7 @@ public class BulletPhysics implements PhysicsEngine {
     private Map<EntityRef, BulletCharacterMoverCollider> entityColliders = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
     private List<PhysicsSystem.CollisionPair> collisions = new ArrayList<>();
+    private ShapeFactory shapeFactory = new ShapeFactory();
 
     public BulletPhysics(WorldProvider world) {
         broadphase = new DbvtBroadphase();
@@ -601,29 +602,28 @@ public class BulletPhysics implements PhysicsEngine {
      * If the entity has somehow got multiple shapes, only one is picked. The
      * order of priority is: Sphere, Capsule, Cylinder, arbitrary.
      * <br><br>
-     * TODO: Flyweight this (take scale as parameter)
      *
      * @param entity the entity to get the shape of.
      * @return the shape of the entity, ready to be used by Bullet.
      */
-    private ConvexShape getShapeFor(EntityRef entity) {
+     private ConvexShape getShapeFor(EntityRef entity) {
         BoxShapeComponent box = entity.getComponent(BoxShapeComponent.class);
         if (box != null) {
             Vector3f halfExtents = new Vector3f(VecMath.to(box.extents));
             halfExtents.scale(0.5f);
-            return new BoxShape(halfExtents);
+            return shapeFactory.getBoxShape(halfExtents);
         }
         SphereShapeComponent sphere = entity.getComponent(SphereShapeComponent.class);
         if (sphere != null) {
-            return new SphereShape(sphere.radius);
+            return shapeFactory.getSphereShape(sphere.radius);
         }
         CapsuleShapeComponent capsule = entity.getComponent(CapsuleShapeComponent.class);
         if (capsule != null) {
-            return new CapsuleShape(capsule.radius, capsule.height);
+            return shapeFactory.getCapsuleShape(capsule.radius, capsule.height);
         }
         CylinderShapeComponent cylinder = entity.getComponent(CylinderShapeComponent.class);
         if (cylinder != null) {
-            return new CylinderShape(new Vector3f(cylinder.radius, 0.5f * cylinder.height, cylinder.radius));
+            return shapeFactory.getCylinderShape(new Vector3f(cylinder.radius, 0.5f * cylinder.height, cylinder.radius));
         }
         HullShapeComponent hull = entity.getComponent(HullShapeComponent.class);
         if (hull != null) {
@@ -636,11 +636,11 @@ public class BulletPhysics implements PhysicsEngine {
                 newVert.z = iterator.next();
                 verts.add(newVert);
             }
-            return new ConvexHullShape(verts);
+            return shapeFactory.getConvexHullShape(verts);
         }
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
-            return new CapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
+            return shapeFactory.getCapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
         }
         logger.error("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has neither. Entity: {}", entity);
         throw new IllegalArgumentException("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has neither. Entity: " + entity);
