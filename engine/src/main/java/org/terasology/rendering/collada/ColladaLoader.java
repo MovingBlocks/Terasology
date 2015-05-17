@@ -780,17 +780,19 @@ public class ColladaLoader {
                         }
 
                         // TODO: Sometimes we get the normal attached to the triangle, sometimes to the vertex
-                        if (null != faceInput.vertexNormalSource) {
-                            int normalStride = faceInput.vertexNormalSource.stride;
+                        if (null != faceInput.vertexNormalSource || "NORMAL".equals(faceInput.semantic)) {
+                        	Source source = faceInput.vertexNormalSource;
+                        	if(source == null) source = faceInput.normalSource;
+                            int normalStride = source.stride;
                             if (3 != normalStride) {
-                                throw new ColladaParseException("Found non-3 stride of " + faceInput.vertexNormalSource.stride
+                                throw new ColladaParseException("Found non-3 stride of " + source.stride
                                         + " for vertex Input semantic " + faceInput.semantic +
                                         " for geometry id=" + geometry.id() + " name=" + geometry.name());
                             }
                             // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
-                            float normalX = faceInput.vertexNormalSource.floatValues[index * normalStride + 0];
-                            float normalY = faceInput.vertexNormalSource.floatValues[index * normalStride + 1];
-                            float normalZ = faceInput.vertexNormalSource.floatValues[index * normalStride + 2];
+                            float normalX = source.floatValues[index * normalStride + 0];
+                            float normalY = source.floatValues[index * normalStride + 1];
+                            float normalZ = source.floatValues[index * normalStride + 2];
                             if (yUp) {
                                 normalsParam.add(normalX);
                                 normalsParam.add(normalY);
@@ -805,28 +807,6 @@ public class ColladaLoader {
                         //                        // TODO: how to triangulate faces on the fly
                         //                        indicesParam.add(vertCount++);
 
-                    } else if ("NORMAL".equals(faceInput.semantic)) {
-                        // TODO: Sometimes we get the normal attached to the triangle, sometimes to the vertex
-
-                        int normalStride = faceInput.normalSource.stride;
-                        if (3 != normalStride) {
-                            throw new ColladaParseException("Found non-3 stride of " + faceInput.normalSource.stride
-                                    + " for vertex Input semantic " + faceInput.semantic +
-                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
-                        }
-                        // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
-                        float normalX = faceInput.normalSource.floatValues[index * normalStride + 0];
-                        float normalY = faceInput.normalSource.floatValues[index * normalStride + 1];
-                        float normalZ = faceInput.normalSource.floatValues[index * normalStride + 2];
-                        if (yUp) {
-                            normalsParam.add(normalX);
-                            normalsParam.add(normalY);
-                            normalsParam.add(normalZ);
-                        } else if (zUp) {
-                            normalsParam.add(normalX);
-                            normalsParam.add(normalZ);
-                            normalsParam.add(normalY);
-                        }
                     } else if ("TEXCOORD".equals(faceInput.semantic)) {
                         int texCoordStride = faceInput.texCoordSource.stride;
                         if (2 > texCoordStride) {
