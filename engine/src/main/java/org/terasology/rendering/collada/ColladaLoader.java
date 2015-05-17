@@ -936,9 +936,7 @@ public class ColladaLoader {
                         + " name="
                         + sourceElement.name());
             }
-            for (int i = 0; i < nameStrings.length; i++) {
-                source.nameValues[i] = nameStrings[i];
-            }
+            System.arraycopy(nameStrings, 0, source.nameValues, 0, nameStrings.length);
         } else {
             throw new ColladaParseException("Unsupported parameter type " + source.parameterTypes[0]);
         }
