@@ -33,7 +33,6 @@ import org.terasology.network.Replicate;
  * @author Immortius
  */
 public final class CharacterComponent implements Component {
-    public Vector3f spawnPosition = new Vector3f();
     public float eyeOffset = 0.6f;
     /**
      * Specifies the maximium range at which this character is able to interact with other objects.
