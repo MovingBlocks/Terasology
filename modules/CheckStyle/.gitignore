@@ -13,4 +13,4 @@ bin/
 build/
 
 # Ignorar archivo de salida del proceso de CheckStyle
-PruebasCheckStyle/out.xml
+PruebasCheckStyle/
