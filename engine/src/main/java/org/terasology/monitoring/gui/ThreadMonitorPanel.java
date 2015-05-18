@@ -97,80 +97,97 @@ public class ThreadMonitorPanel extends JPanel {
             public MyRenderer() {
                 setBackground(BACKGROUND);
                 setLayout(new BorderLayout());
-
-                pHead.setLayout(new BorderLayout());
-                pHead.setBackground(BACKGROUND);
-                pHead.add(pList, BorderLayout.LINE_START);
-                pHead.add(lActive, BorderLayout.LINE_END);
-                pHead.add(pError, BorderLayout.PAGE_END);
-
+                setFeaturesPHead();         
                 lId.setHorizontalAlignment(SwingConstants.RIGHT);
                 lName.setForeground(Color.blue);
-                lCounters.setForeground(Color.gray);
+                lCounters.setForeground(Color.gray);            
+                setFeaturesPList();
+                setFeaturesPError();
+                lError.setForeground(Color.red);
+                add(pHead, BorderLayout.PAGE_START);
+            }
 
-                pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
-                pList.setBackground(BACKGROUND);
-                pList.add(lId);
-                pList.add(lName);
-                pList.add(lCounters);
-
-                pError.setVisible(false);
+            private void setFeaturesPError() {
+            	pError.setVisible(false);
                 pError.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 pError.setBackground(BACKGROUND);
                 pError.add(lErrorSpacer);
                 pError.add(lError);
+			}
 
-                lError.setForeground(Color.red);
+			private void setFeaturesPList() {
+            	 pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+                 pList.setBackground(BACKGROUND);
+                 pList.add(lId);
+                 pList.add(lName);
+                 pList.add(lCounters);
+			}
 
-                add(pHead, BorderLayout.PAGE_START);
-            }
+			private void setFeaturesPHead() {
+            	 pHead.setLayout(new BorderLayout());
+                 pHead.setBackground(BACKGROUND);
+                 pHead.add(pList, BorderLayout.LINE_START);
+                 pHead.add(lActive, BorderLayout.LINE_END);
+                 pHead.add(pError, BorderLayout.PAGE_END);
+			}
 
-            public void setMonitor(SingleThreadMonitor monitor) {
+			public void setMonitor(SingleThreadMonitor monitor) {
                 if (monitor != null) {
-
-                    lName.setPreferredSize(null);
-                    lName.setText(monitor.getName());
-                    Dimension tmp = lName.getPreferredSize();
-                    if (tmp.width > dName.width || tmp.height > dName.height) {
-                        dName = tmp;
-                    }
-                    lName.setPreferredSize(dName);
-
-                    lId.setPreferredSize(null);
-                    lId.setText("" + monitor.getThreadId());
-                    tmp = lId.getPreferredSize();
-                    if (tmp.width > dId.width || tmp.height > dId.height) {
-                        dId = tmp;
-                    }
-                    lId.setPreferredSize(dId);
-
+                	setLName(monitor);
+                    setLId(monitor);
                     lCounters.setText(monitor.getLastTask());
-
-                    if (monitor.isAlive()) {
-                        if (monitor.isActive()) {
-                            lActive.setForeground(Color.green);
-                            lActive.setText("Active");
-                        } else {
-                            lActive.setForeground(Color.gray);
-                            lActive.setText("Inactive");
-                        }
-                    } else {
-                        lActive.setForeground(Color.red);
-                        lActive.setText("Disposed");
-                    }
-
+                    setLActive(monitor);
                     pError.setVisible(monitor.hasErrors());
-                    if (monitor.hasErrors()) {
-                        lErrorSpacer.setPreferredSize(dId);
-                        lError.setText(monitor.getNumErrors() + " Error(s), [" + monitor.getLastError().getClass().getSimpleName() + "] "
-                                + monitor.getLastError().getMessage());
-                    }
+                    setLErrors(monitor);    
                 } else {
                     lName.setText("");
                     lId.setText("");
                     lActive.setText("");
                 }
             }
+
+			private void setLErrors(SingleThreadMonitor monitor) {
+				if (monitor.hasErrors()) {
+                    lErrorSpacer.setPreferredSize(dId);
+                    lError.setText(monitor.getNumErrors() + " Error(s), [" + monitor.getLastError().getClass().getSimpleName() + "] "
+                            + monitor.getLastError().getMessage());
+                }
+			}
+
+			private void setLActive(SingleThreadMonitor monitor) {
+				 if (monitor.isAlive()) {
+                     if (monitor.isActive()) {
+                         lActive.setForeground(Color.green);
+                         lActive.setText("Active");
+                     } else {
+                         lActive.setForeground(Color.gray);
+                         lActive.setText("Inactive");
+                     }
+                 } else {
+                     lActive.setForeground(Color.red);
+                     lActive.setText("Disposed");
+                 }
+			}
+
+			private void setLId(SingleThreadMonitor monitor) {
+				lId.setPreferredSize(null);
+                lId.setText("" + monitor.getThreadId());
+                Dimension tmp = lId.getPreferredSize();
+                if (tmp.width > dId.width || tmp.height > dId.height) {
+                    dId = tmp;
+                }
+                lId.setPreferredSize(dId);
+			}
+
+			private void setLName(SingleThreadMonitor monitor) {
+				lName.setPreferredSize(null);
+                lName.setText(monitor.getName());
+                Dimension tmp = lName.getPreferredSize();
+                if (tmp.width > dName.width || tmp.height > dName.height) {
+                    dName = tmp;
+                }
+                lName.setPreferredSize(dName);
+			}
 
         }
     }
@@ -183,17 +200,13 @@ public class ThreadMonitorPanel extends JPanel {
 
         private ThreadListModel() {
             ThreadMonitor.registerForEvents(this);
-            queue.add(new Task("Sort Monitors") {
-                @Override
-                public void execute() {
-                    ThreadMonitor.getThreadMonitors(monitors, false);
-                    if (monitors.size() > 0) {
-                        Collections.sort(monitors);
-                        invokeIntervalAdded(0, monitors.size() - 1);
-                    }
-                }
-            });
-            executor.execute(new Runnable() {
+            addSortMonitorsToQueue();
+            setExecutor();
+            
+        }
+
+        private void setExecutor() {
+        	executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
@@ -218,9 +231,22 @@ public class ThreadMonitorPanel extends JPanel {
                     invokeContentsChanged(0, monitors.size() - 1);
                 }
             });
-        }
+		}
 
-        private void invokeIntervalAdded(final int a, final int b) {
+		private void addSortMonitorsToQueue() {
+        	queue.add(new Task("Sort Monitors") {
+                @Override
+                public void execute() {
+                    ThreadMonitor.getThreadMonitors(monitors, false);
+                    if (monitors.size() > 0) {
+                        Collections.sort(monitors);
+                        invokeIntervalAdded(0, monitors.size() - 1);
+                    }
+                }
+            });
+		}
+
+		private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
