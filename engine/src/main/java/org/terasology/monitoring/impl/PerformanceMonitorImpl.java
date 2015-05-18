@@ -82,33 +82,29 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     public void rollCycle() {
         metricData.add(currentData);
         allocationData.add(currentMemData);
-        spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
-            public boolean execute(String s, double v) {
-                spikeData.put(s, v * DECAY_RATE);
-                return true;
-            }
-        });
+        setSpikeData();
+        setCurrentData();
+        setCurrentMemData();
+        setMetricData();
+        setAllocationData();
+        currentData = new TObjectLongHashMap<>();
+        currentMemData = new TObjectLongHashMap<>();
+    }
+    
+    private void setAllocationData() {
+    	 while (allocationData.size() > RETAINED_CYCLES) {
+             allocationData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
+                 public boolean execute(String s, long v) {
+                     runningAllocationTotals.adjustValue(s, -v);
+                     return true;
+                 }
+             });
+             allocationData.remove(0);
+         }
+	}
 
-        currentData.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long v) {
-                runningTotals.adjustOrPutValue(s, v, v);
-                double time = v * timeFactor;
-                double prev = spikeData.get(s);
-                if (time > prev) {
-                    spikeData.put(s, time);
-                }
-                return true;
-            }
-        });
-
-        currentMemData.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long v) {
-                runningAllocationTotals.adjustOrPutValue(s, v, v);
-                return true;
-            }
-        });
-
-        while (metricData.size() > RETAINED_CYCLES) {
+	private void setMetricData() {
+    	while (metricData.size() > RETAINED_CYCLES) {
             metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
                 public boolean execute(String s, long v) {
                     runningTotals.adjustValue(s, -v);
@@ -117,19 +113,39 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             });
             metricData.remove(0);
         }
-        while (allocationData.size() > RETAINED_CYCLES) {
-            allocationData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
-                public boolean execute(String s, long v) {
-                    runningAllocationTotals.adjustValue(s, -v);
-                    return true;
-                }
-            });
-            allocationData.remove(0);
-        }
-        currentData = new TObjectLongHashMap<>();
-        currentMemData = new TObjectLongHashMap<>();
-    }
+	}
 
+	private void setCurrentMemData() {
+    	currentMemData.forEachEntry(new TObjectLongProcedure<String>() {
+            public boolean execute(String s, long v) {
+                runningAllocationTotals.adjustOrPutValue(s, v, v);
+                return true;
+            }
+        });
+	}
+
+	private void setCurrentData() {
+    	 currentData.forEachEntry(new TObjectLongProcedure<String>() {
+             public boolean execute(String s, long v) {
+                 runningTotals.adjustOrPutValue(s, v, v);
+                 double time = v * timeFactor;
+                 double prev = spikeData.get(s);
+                 if (time > prev) {
+                     spikeData.put(s, time);
+                 }
+                 return true;
+             }
+         });
+	}
+
+	private void setSpikeData(){
+    	spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
+            public boolean execute(String s, double v) {
+                spikeData.put(s, v * DECAY_RATE);
+                return true;
+            }
+        });
+    }
     public Activity startActivity(String activity) {
         if (Thread.currentThread() != mainThread) {
             return OFF_THREAD_ACTIVITY;
