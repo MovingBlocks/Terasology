@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * @author Nym Traveel
  */
 public class ClimateSimulator {
-	//lindo cambio :)
     private static final Logger logger = LoggerFactory.getLogger(ClimateSimulator.class);
     private float[][] heightmap;
     private float[][] climate;
