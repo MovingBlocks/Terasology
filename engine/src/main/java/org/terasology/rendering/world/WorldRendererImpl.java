@@ -48,6 +48,7 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.WorldProvider;
@@ -107,6 +108,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private LwjglRenderingProcess renderingProcess;
     private GraphicState graphicState;
+    private PostProcessor postProcessor;
 
     public WorldRendererImpl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
                              WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
@@ -147,8 +149,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         CoreRegistry.put(LwjglRenderingProcess.class, renderingProcess);
 
         graphicState = new GraphicState(renderingProcess);
+        postProcessor = new PostProcessor(renderingProcess, graphicState);
+        CoreRegistry.put(PostProcessor.class, postProcessor);
 
         renderingProcess.setGraphicState(graphicState);
+        renderingProcess.setPostProcessor(postProcessor);
         renderingProcess.initialize();
 
         CoreRegistry.get(ShaderManager.class).initShaders();
@@ -352,8 +357,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         graphicState.midRenderChangesBackdrop();
 
         if (renderingConfig.isInscattering()) {
-            renderingProcess.generateSkyBand(0);
-            renderingProcess.generateSkyBand(1);
+            postProcessor.generateSkyBand(0);
+            postProcessor.generateSkyBand(1);
         }
 
         graphicState.postRenderCleanupBackdrop();
@@ -455,7 +460,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         graphicState.postRenderCleanupDirectionalLights();
 
-        renderingProcess.applyLightBufferPass("sceneOpaque");
+        postProcessor.applyLightBufferPass("sceneOpaque");
         PerformanceMonitor.endActivity();
     }
 
@@ -513,7 +518,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             LightGeometryHelper.renderSphereGeometry();
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
             // Directional lights cover all pixels on the screen
-            renderingProcess.renderFullscreenQuad();
+            postProcessor.renderFullscreenQuad();
         }
 
         if (!geometryOnly) {
@@ -543,7 +548,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void combineRefractiveReflectiveAndOpaquePasses() {
         PerformanceMonitor.startActivity("Render Combined Scene");
-        renderingProcess.renderPreCombinedScene();
+        postProcessor.renderPreCombinedScene();
         PerformanceMonitor.endActivity();
     }
 
@@ -561,7 +566,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void renderFinalPostProcessedScene() {
         PerformanceMonitor.startActivity("Render Post-Processing");
-        renderingProcess.renderPost(currentRenderingStage);
+        postProcessor.renderPost(currentRenderingStage);
         PerformanceMonitor.endActivity();
     }
 

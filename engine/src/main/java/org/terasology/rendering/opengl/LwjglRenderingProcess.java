@@ -19,24 +19,14 @@ import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
-import org.terasology.editor.EditorRange;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.math.TeraMath;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
-import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
 import org.terasology.rendering.opengl.FBO.Dimensions;
 
 import javax.imageio.ImageIO;
@@ -51,34 +41,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTexCoord2d;
-import static org.lwjgl.opengl.GL11.glVertex3i;
-import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * The Default Rendering Process class.
@@ -118,11 +82,11 @@ public class LwjglRenderingProcess {
     // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
-    private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
     private GraphicState graphicState;
+    private PostProcessor postProcessor;
 
     public LwjglRenderingProcess() {
 
@@ -147,12 +111,16 @@ public class LwjglRenderingProcess {
         this.graphicState = graphicState;
     }
 
+    public void setPostProcessor(PostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
+    }
+
     /**
      * Creates the scene FBOs and updates them according to the size of the viewport. The current size
      * provided by the display class is only used if the parameters overwriteRTWidth and overwriteRTHeight are set
      * to zero.
      */
-    private void createOrUpdateFullscreenFbos() {
+    public void createOrUpdateFullscreenFbos() {
 
         if (overwriteRtWidth == 0) {
             fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
@@ -220,6 +188,7 @@ public class LwjglRenderingProcess {
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
 
         graphicState.refreshDynamicFBOs();
+        postProcessor.setFullScale(fullScale);
     }
 
     public void deleteFBO(String title) {
@@ -392,6 +361,22 @@ public class LwjglRenderingProcess {
 
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
+    }
+
+    public void swapReadbackPBOs() {
+        if (readBackPBOCurrent == readBackPBOFront) {
+            readBackPBOCurrent = readBackPBOBack;
+        } else {
+            readBackPBOCurrent = readBackPBOFront;
+        }
+    }
+
+    public PBO getCurrentReadbackPBO() {
+        return readBackPBOCurrent;
+    }
+
+    public boolean isTakingScreenshot() {
+        return takeScreenshot;
     }
 
     /**

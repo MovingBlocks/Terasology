@@ -19,7 +19,12 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -35,9 +40,11 @@ import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Created by manu on 17.05.2015.
+ * TODO: write javadoc
  */
 public class PostProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
 
     /* PROPERTIES */
     @EditorRange(min = 0.0f, max = 10.0f)
@@ -66,9 +73,21 @@ public class PostProcessor {
     private float currentSceneLuminance = 1.0f;
 
     private int displayListQuad = -1;
+    private FBO.Dimensions fullScale;
+
+    private LwjglRenderingProcess renderingProcess;
+    private GraphicState graphicState;
+
+    private RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
+    private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
+
+    public PostProcessor(LwjglRenderingProcess renderingProcess, GraphicState graphicState) {
+        this.renderingProcess = renderingProcess;
+        this.graphicState = graphicState;
+    }
 
     public void generateSkyBand(int id) {
-        FBO skyBand = getFBO("sceneSkyBand" + id);
+        FBO skyBand = renderingProcess.getFBO("sceneSkyBand" + id);
 
         if (skyBand == null) {
             return;
@@ -84,9 +103,9 @@ public class PostProcessor {
         material.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
 
         if (id == 0) {
-            bindFboTexture("sceneOpaque");
+            renderingProcess.bindFboTexture("sceneOpaque");
         } else {
-            bindFboTexture("sceneSkyBand" + (id - 1));
+            renderingProcess.bindFboTexture("sceneSkyBand" + (id - 1));
         }
 
         setViewportTo(skyBand.dimensions());
@@ -102,7 +121,7 @@ public class PostProcessor {
         Material program = Assets.getMaterial("engine:prog.lightBufferPass");
         program.enable();
 
-        FBO targetFbo = getFBO(target);
+        FBO targetFbo = renderingProcess.getFBO(target);
 
         int texId = 0;
         if (targetFbo != null) {
@@ -123,7 +142,7 @@ public class PostProcessor {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        FBO targetPingPong = getFBO(target + "PingPong");
+        FBO targetPingPong = renderingProcess.getFBO(target + "PingPong");
         targetPingPong.bind();
         graphicState.setRenderBufferMask(targetPingPong, true, true, true);
 
@@ -131,9 +150,9 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        unbindFbo(target + "PingPong");
+        renderingProcess.unbindFbo(target + "PingPong");
 
-        flipPingPongFbo(target);
+        renderingProcess.flipPingPongFbo(target);
 
         if (target.equals("sceneOpaque")) {
             attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
@@ -141,7 +160,7 @@ public class PostProcessor {
     }
 
     public void renderPreCombinedScene() {
-        createOrUpdateFullscreenFbos();
+        renderingProcess.createOrUpdateFullscreenFbos();
 
         if (renderingConfig.isOutline()) {
             generateSobel();
@@ -158,7 +177,7 @@ public class PostProcessor {
     private void generateSobel() {
         Assets.getMaterial("engine:prog.sobel").enable();
 
-        FBO sobel = getFBO("sobel");
+        FBO sobel = renderingProcess.getFBO("sobel");
 
         if (sobel == null) {
             return;
@@ -179,7 +198,7 @@ public class PostProcessor {
         Material ssaoShader = Assets.getMaterial("engine:prog.ssao");
         ssaoShader.enable();
 
-        FBO ssao = getFBO("ssao");
+        FBO ssao = renderingProcess.getFBO("ssao");
 
         if (ssao == null) {
             return;
@@ -203,7 +222,7 @@ public class PostProcessor {
         Material shader = Assets.getMaterial("engine:prog.ssaoBlur");
         shader.enable();
 
-        FBO ssao = getFBO("ssaoBlurred");
+        FBO ssao = renderingProcess.getFBO("ssaoBlurred");
 
         if (ssao == null) {
             return;
@@ -214,7 +233,7 @@ public class PostProcessor {
 
         setViewportTo(ssao.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bindFboTexture("ssao");
+        renderingProcess.bindFboTexture("ssao");
 
         renderFullscreenQuad();
 
@@ -225,15 +244,15 @@ public class PostProcessor {
     private void generateCombinedScene() {
         Assets.getMaterial("engine:prog.combine").enable();
 
-        bindFbo("sceneOpaquePingPong");
+        renderingProcess.bindFbo("sceneOpaquePingPong");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        unbindFbo("sceneOpaquePingPong");
+        renderingProcess.unbindFbo("sceneOpaquePingPong");
 
-        flipPingPongFbo("sceneOpaque");
+        renderingProcess.flipPingPongFbo("sceneOpaque");
         attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
     }
 
@@ -282,12 +301,12 @@ public class PostProcessor {
         PerformanceMonitor.startActivity("Rendering final scene");
         if (worldRenderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE
                 || worldRenderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE
-                || (worldRenderingStage == WorldRenderer.WorldRenderingStage.MONO && takeScreenshot)) {
+                || (worldRenderingStage == WorldRenderer.WorldRenderingStage.MONO && renderingProcess.isTakingScreenshot())) {
 
             renderFinalSceneToRT(worldRenderingStage);
 
-            if (takeScreenshot) {
-                saveScreenshot();
+            if (renderingProcess.isTakingScreenshot()) {
+                renderingProcess.saveScreenshot();
             }
         }
 
@@ -301,7 +320,7 @@ public class PostProcessor {
     private void generateLightShafts() {
         Assets.getMaterial("engine:prog.lightshaft").enable();
 
-        FBO lightshaft = getFBO("lightShafts");
+        FBO lightshaft = renderingProcess.getFBO("lightShafts");
 
         if (lightshaft == null) {
             return;
@@ -321,13 +340,13 @@ public class PostProcessor {
     private void generatePrePost() {
         Assets.getMaterial("engine:prog.prePost").enable();
 
-        bindFbo("scenePrePost");
+        renderingProcess.bindFbo("scenePrePost");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        unbindFbo("scenePrePost");
+        renderingProcess.unbindFbo("scenePrePost");
     }
 
     private void generateDownsampledScene() {
@@ -340,20 +359,20 @@ public class PostProcessor {
             int size = TeraMath.pow(2, i);
             shader.setFloat("size", size, true);
 
-            bindFbo("scene" + size);
+            renderingProcess.bindFbo("scene" + size);
             glViewport(0, 0, size, size);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (i == 4) {
-                bindFboTexture("scenePrePost");
+                renderingProcess.bindFboTexture("scenePrePost");
             } else {
-                bindFboTexture("scene" + sizePrev);
+                renderingProcess.bindFboTexture("scene" + sizePrev);
             }
 
             renderFullscreenQuad();
 
-            unbindFbo("scene" + size);
+            renderingProcess.unbindFbo("scene" + size);
         }
 
         setViewportToFullSize();
@@ -361,21 +380,17 @@ public class PostProcessor {
 
     private void updateExposure() {
         if (renderingConfig.isEyeAdaptation()) {
-            FBO scene = getFBO("scene1");
+            FBO scene = renderingProcess.getFBO("scene1");
 
             if (scene == null) {
                 return;
             }
 
-            readBackPBOCurrent.copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            renderingProcess.getCurrentReadbackPBO().copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
-            if (readBackPBOCurrent == readBackPBOFront) {
-                readBackPBOCurrent = readBackPBOBack;
-            } else {
-                readBackPBOCurrent = readBackPBOFront;
-            }
+            renderingProcess.swapReadbackPBOs();
 
-            ByteBuffer pixels = readBackPBOCurrent.readBackPixels();
+            ByteBuffer pixels = renderingProcess.getCurrentReadbackPBO().readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -416,13 +431,13 @@ public class PostProcessor {
     private void generateToneMappedScene() {
         Assets.getMaterial("engine:prog.hdr").enable();
 
-        bindFbo("sceneToneMapped");
+        renderingProcess.bindFbo("sceneToneMapped");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        unbindFbo("sceneToneMapped");
+        renderingProcess.unbindFbo("sceneToneMapped");
     }
 
     private void generateHighPass() {
@@ -430,7 +445,7 @@ public class PostProcessor {
         program.setFloat("highPassThreshold", bloomHighPassThreshold, true);
         program.enable();
 
-        FBO highPass = getFBO("sceneHighPass");
+        FBO highPass = renderingProcess.getFBO("sceneHighPass");
 
         if (highPass == null) {
             return;
@@ -438,7 +453,7 @@ public class PostProcessor {
 
         highPass.bind();
 
-        FBO sceneOpaque = getFBO("sceneOpaque");
+        FBO sceneOpaque = renderingProcess.getFBO("sceneOpaque");
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -464,7 +479,7 @@ public class PostProcessor {
         shader.enable();
         shader.setFloat("radius", bloomBlurRadius, true);
 
-        FBO bloom = getFBO("sceneBloom" + id);
+        FBO bloom = renderingProcess.getFBO("sceneBloom" + id);
 
         if (bloom == null) {
             return;
@@ -478,9 +493,9 @@ public class PostProcessor {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            getFBO("sceneHighPass").bindTexture();
+            renderingProcess.getFBO("sceneHighPass").bindTexture();
         } else {
-            getFBO("sceneBloom" + (id - 1)).bindTexture();
+            renderingProcess.getFBO("sceneBloom" + (id - 1)).bindTexture();
         }
 
         renderFullscreenQuad();
@@ -495,7 +510,7 @@ public class PostProcessor {
 
         material.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
 
-        FBO blur = getFBO("sceneBlur" + id);
+        FBO blur = renderingProcess.getFBO("sceneBlur" + id);
 
         if (blur == null) {
             return;
@@ -509,9 +524,9 @@ public class PostProcessor {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0) {
-            bindFboTexture("sceneToneMapped");
+            renderingProcess.bindFboTexture("sceneToneMapped");
         } else {
-            bindFboTexture("sceneBlur" + (id - 1));
+            renderingProcess.bindFboTexture("sceneBlur" + (id - 1));
         }
 
         renderFullscreenQuad();
@@ -532,7 +547,7 @@ public class PostProcessor {
 
         material.enable();
 
-        bindFbo("sceneFinal");
+        renderingProcess.bindFbo("sceneFinal");
 
         if (renderingStage == WorldRenderer.WorldRenderingStage.MONO || renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -550,7 +565,7 @@ public class PostProcessor {
                 break;
         }
 
-        unbindFbo("sceneFinal");
+        renderingProcess.unbindFbo("sceneFinal");
     }
 
     private void updateOcShaderParametersForVP(Material program, int vpX, int vpY, int vpWidth, int vpHeight, WorldRenderer.WorldRenderingStage renderingStage) {
@@ -669,8 +684,8 @@ public class PostProcessor {
     }
 
     public boolean attachDepthBufferToFbo(String sourceFboName, String targetFboName) {
-        FBO source = getFBO(sourceFboName);
-        FBO target = getFBO(targetFboName);
+        FBO source = renderingProcess.getFBO(sourceFboName);
+        FBO target = renderingProcess.getFBO(targetFboName);
 
         if (source == null || target == null) {
             return false;
@@ -694,8 +709,11 @@ public class PostProcessor {
         glViewport(0, 0, dimensions.width(), dimensions.height());
     }
 
-
     public float getExposure() {
         return currentExposure;
+    }
+
+    public void setFullScale(FBO.Dimensions newFullScale) {
+        this.fullScale = newFullScale;
     }
 }

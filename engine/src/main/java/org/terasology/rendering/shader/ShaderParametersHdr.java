@@ -20,6 +20,7 @@ import org.terasology.editor.EditorRange;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.PostProcessor;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -37,12 +38,13 @@ public class ShaderParametersHdr extends ShaderParametersBase {
         super.applyParameters(program);
 
         LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        PostProcessor postProcessor = CoreRegistry.get(PostProcessor.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         renderingProcess.bindFboTexture("scenePrePost");
 
         program.setInt("texScene", 0, true);
-        program.setFloat("exposure", renderingProcess.getExposure() * exposureBias, true);
+        program.setFloat("exposure", postProcessor.getExposure() * exposureBias, true);
         program.setFloat("whitePoint", whitePoint, true);
     }
 
