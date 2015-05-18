@@ -12,6 +12,7 @@ The creators of Terasology are a diverse mix of software developers, game tester
 Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology).
 
 [![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
+[![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/latest/total.svg "Downloads")](../../releases/latest)
 [![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
