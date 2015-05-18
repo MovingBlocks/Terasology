@@ -140,31 +140,38 @@ public class PerspectiveCamera extends Camera {
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
                 up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
-
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
-
+        updateReflectionMatrix();
+        
         viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
 
         inverseProjectionMatrix.invert(projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
 
         // Used for dirty checks
-        cachedPosition.set(getPosition());
+        cachedFov = fov;
+        setCachedDirections();
+
+        updateFrustum();
+    }
+    
+    private void updateReflectionMatrix() {
+    	reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
+        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
+        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
+        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+    }
+    
+    private void setCachedDirections() {
+    	cachedPosition.set(getPosition());
         cachedViewigDirection.set(getViewingDirection());
         cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
         cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
-        cachedFov = fov;
         cachedZNear = getzNear();
         cachedZFar = getzFar();
         cachedReflectionHeight = getReflectionHeight();
-
-        updateFrustum();
     }
 
     public void setBobbingRotationOffsetFactor(float f) {
