@@ -16,10 +16,12 @@
 package org.terasology.rendering.collada;
 
 import com.google.common.collect.Lists;
+
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+
 import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.ElementSet;
@@ -130,7 +132,137 @@ public class ColladaLoader {
             createMd5JointForElementAndParent(md5JointBySidMap, element, parentMD5Joint);
         }
 
-        ElementSet controllerSet = rootElement.find("library_controllers", "controller");
+        populateJointList(md5JointList, md5JointBySidMap, rootElement);
+        Deque<MD5Joint> jointsToProcess = new LinkedList<MD5Joint>(md5JointList);
+        while (!jointsToProcess.isEmpty()) {
+            MD5Joint joint = jointsToProcess.pop();
+            MD5Joint parentJoint = joint.parent;
+            if (null != parentJoint) {
+                if (!md5JointList.contains(parentJoint)) {
+                    md5JointList.add(parentJoint);
+                    jointsToProcess.push(parentJoint);
+                }
+            }
+        }
+
+        for (MD5Joint joint : md5JointList) {
+            if (null == joint.position) {
+                throw new ColladaParseException("no joint position for joint with element id " + joint.element.id());
+            }
+            if (null == joint.orientation) {
+                throw new ColladaParseException("no joint orientation for joint with element id " + joint.element.id());
+            }
+            // index argument is not used for anything currently, so we'll just set it to -1
+            joint.bone = new Bone(-1, joint.name, joint.position, joint.orientation);
+        }
+
+        for (MD5Joint joint : md5JointList) {
+            for (MD5Joint childJoint : joint.childList) {
+                // We can probably skip unused end nodes
+                if (null != childJoint.bone) {
+                    joint.bone.addChild(childJoint.bone);
+                }
+            }
+        }
+
+        for (MD5Joint joint : md5JointList) {
+            skeletonBuilder.addBone(joint.bone);
+        }
+
+        if (!md5MeshList.isEmpty()) {
+            // TODO: Support multiple mesh somehow?
+            MD5Mesh mesh = md5MeshList.get(0);
+            for (MD5Weight weight : mesh.weightList) {
+                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
+            }
+
+            List<Vector2f> uvs = Lists.newArrayList();
+
+            TIntList vertexStartWeight = new TIntArrayList(vertices.size() / 3);
+            TIntList vertexWeightCount = new TIntArrayList(vertices.size() / 3);
+            //            for (MD5Vertex vert : mesh.vertexList) {
+            //                uvs.add(vert.uv);
+            //                vertexStartWeight.add(vert.startWeight);
+            //                vertexWeightCount.add(vert.countWeight);
+            //            }
+
+            for (int i = 0; i < vertices.size() / 3; i++) {
+                vertexStartWeight.add(i);
+                vertexWeightCount.add(1);
+            }
+
+            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
+
+            for (int i = 0; i < normals.size() / 2; i++) {
+                uvs.add(new Vector2f(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
+            }
+            skeletonBuilder.setUvs(uvs);
+            skeletonBuilder.setIndices(indices);
+        }
+
+        // Now if you have come this far, you should be able to read the geometry data,
+        // as well as the skeleton and skinning data from COLLADA documents. And you should be able to draw
+        // the model in raw triangles, as well as draw the skeleton. Although I haven't discussed how you
+        // can accumulate the world matrices for each joint and then draw in world coordinates for debugging
+        // purposes but I think I gave a hint that we have to multiply parent joint's world matrix with current
+        // joint's Joint matrix and save the result in current joint's world matrix. We have to start this
+        // process from the root bone. So that we don't have dirty world matrices from parents, and the root
+        // Joint's world matrix becomes the Joint matrix, since root don't have any parent. If you are also
+        // reading the COLLADA specification version 1.5 you can find the skinning equation so you should also
+        // be able to put the model in bind shape. How can we animate this model is still not covered and will
+        // be covered in the following sections.
+
+        // THIS IS THE TARGET GOAL:
+
+        /*
+        Bones
+        - String name
+        - int index
+        - V3 object position
+        - Quat4f obj rotation
+        - parent / children bones
+
+        SkeletalMesh
+
+
+        // This part may not be required if we can implement SkeletalMeshData methods without it
+
+        //////////////
+
+        public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights,
+           List<Vector2f> uvs,
+           TIntList vertexStartWeights, TIntList vertexWeightCounts,
+           TIntList indices) {
+
+        BoneWeight
+        Vector3f position = new Vector3f();
+        float bias;
+        int boneIndex;
+        Vector3f normal = new Vector3f();
+
+        //////////////
+
+
+           public Collection<Bone> getBones();
+           public Bone getRootBone();
+           public Bone getBone(String name);
+
+           public int getVertexCount();
+
+           public List<Vector3f> getBindPoseVertexPositions();
+           public List<Vector3f> getVertexPositions(List<Vector3f> bonePositions, List<Quat4f> boneRotations);
+
+           public List<Vector3f> getBindPoseVertexNormals();
+           public List<Vector3f> getVertexNormals(List<Vector3f> bonePositions, List<Quat4f> boneRotations);
+
+           public TIntList getIndices();
+           public List<Vector2f> getUVs();
+         */
+    }
+
+    
+    private void populateJointList(List<MD5Joint> md5JointList, Map<String, MD5Joint> md5JointBySidMap, Element rootElement) throws ColladaParseException{
+    	ElementSet controllerSet = rootElement.find("library_controllers", "controller");
         for (Element controller : controllerSet) {
             ElementSet skinSet = controller.find("skin");
             if (1 != skinSet.size()) {
@@ -296,134 +428,7 @@ public class ColladaLoader {
                 md5JointList.add(md5Joint);
             }
         }
-
-        Deque<MD5Joint> jointsToProcess = new LinkedList<MD5Joint>(md5JointList);
-        while (!jointsToProcess.isEmpty()) {
-            MD5Joint joint = jointsToProcess.pop();
-            MD5Joint parentJoint = joint.parent;
-            if (null != parentJoint) {
-                if (!md5JointList.contains(parentJoint)) {
-                    md5JointList.add(parentJoint);
-                    jointsToProcess.push(parentJoint);
-                }
-            }
-        }
-
-        for (MD5Joint joint : md5JointList) {
-            if (null == joint.position) {
-                throw new ColladaParseException("no joint position for joint with element id " + joint.element.id());
-            }
-            if (null == joint.orientation) {
-                throw new ColladaParseException("no joint orientation for joint with element id " + joint.element.id());
-            }
-            // index argument is not used for anything currently, so we'll just set it to -1
-            joint.bone = new Bone(-1, joint.name, joint.position, joint.orientation);
-        }
-
-        for (MD5Joint joint : md5JointList) {
-            for (MD5Joint childJoint : joint.childList) {
-                // We can probably skip unused end nodes
-                if (null != childJoint.bone) {
-                    joint.bone.addChild(childJoint.bone);
-                }
-            }
-        }
-
-        for (MD5Joint joint : md5JointList) {
-            skeletonBuilder.addBone(joint.bone);
-        }
-
-        if (md5MeshList.size() > 0) {
-            // TODO: Support multiple mesh somehow?
-            MD5Mesh mesh = md5MeshList.get(0);
-            for (MD5Weight weight : mesh.weightList) {
-                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
-            }
-
-            List<Vector2f> uvs = Lists.newArrayList();
-
-            TIntList vertexStartWeight = new TIntArrayList(vertices.size() / 3);
-            TIntList vertexWeightCount = new TIntArrayList(vertices.size() / 3);
-            //            for (MD5Vertex vert : mesh.vertexList) {
-            //                uvs.add(vert.uv);
-            //                vertexStartWeight.add(vert.startWeight);
-            //                vertexWeightCount.add(vert.countWeight);
-            //            }
-
-            for (int i = 0; i < vertices.size() / 3; i++) {
-                vertexStartWeight.add(i);
-                vertexWeightCount.add(1);
-            }
-
-            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
-
-            for (int i = 0; i < normals.size() / 2; i++) {
-                uvs.add(new Vector2f(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
-            }
-            skeletonBuilder.setUvs(uvs);
-            skeletonBuilder.setIndices(indices);
-        }
-
-        // Now if you have come this far, you should be able to read the geometry data,
-        // as well as the skeleton and skinning data from COLLADA documents. And you should be able to draw
-        // the model in raw triangles, as well as draw the skeleton. Although I haven't discussed how you
-        // can accumulate the world matrices for each joint and then draw in world coordinates for debugging
-        // purposes but I think I gave a hint that we have to multiply parent joint's world matrix with current
-        // joint's Joint matrix and save the result in current joint's world matrix. We have to start this
-        // process from the root bone. So that we don't have dirty world matrices from parents, and the root
-        // Joint's world matrix becomes the Joint matrix, since root don't have any parent. If you are also
-        // reading the COLLADA specification version 1.5 you can find the skinning equation so you should also
-        // be able to put the model in bind shape. How can we animate this model is still not covered and will
-        // be covered in the following sections.
-
-        // THIS IS THE TARGET GOAL:
-
-        /*
-        Bones
-        - String name
-        - int index
-        - V3 object position
-        - Quat4f obj rotation
-        - parent / children bones
-
-        SkeletalMesh
-
-
-        // This part may not be required if we can implement SkeletalMeshData methods without it
-
-        //////////////
-
-        public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights,
-           List<Vector2f> uvs,
-           TIntList vertexStartWeights, TIntList vertexWeightCounts,
-           TIntList indices) {
-
-        BoneWeight
-        Vector3f position = new Vector3f();
-        float bias;
-        int boneIndex;
-        Vector3f normal = new Vector3f();
-
-        //////////////
-
-
-           public Collection<Bone> getBones();
-           public Bone getRootBone();
-           public Bone getBone(String name);
-
-           public int getVertexCount();
-
-           public List<Vector3f> getBindPoseVertexPositions();
-           public List<Vector3f> getVertexPositions(List<Vector3f> bonePositions, List<Quat4f> boneRotations);
-
-           public List<Vector3f> getBindPoseVertexNormals();
-           public List<Vector3f> getVertexNormals(List<Vector3f> bonePositions, List<Quat4f> boneRotations);
-
-           public TIntList getIndices();
-           public List<Vector2f> getUVs();
-         */
     }
-
     private MD5Joint createMD5Joint(Element jointNodeElement) throws ColladaParseException {
         MD5Joint md5Joint = new MD5Joint();
 
