@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -107,8 +108,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         // TODO use context to get assets instead of static methods
         this.textureMat = Assets.getMaterial("engine:UITexture").get();
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
+        // failure to load these can be due to failing shaders or missing resources
     }
-
 
     @Override
     public void preRender() {

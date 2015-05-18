@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
@@ -53,10 +54,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * GLSL Shader Program Instance class.
@@ -99,6 +97,8 @@ public class GLSLShader extends Shader {
     private ShaderData shaderProgramBase;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
 
+    private Config config = CoreRegistry.get(Config.class);
+
     public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
         super(urn, assetType);
         reload(data);
@@ -120,7 +120,7 @@ public class GLSLShader extends Shader {
 
     @Override
     public void recompile() {
-        compileAllShaderPermutations();
+        registerAllShaderPermutations();
         // TODO: reload materials
     }
 
@@ -151,82 +151,84 @@ public class GLSLShader extends Shader {
         shaderProgramBase = null;
     }
 
-    private static StringBuilder createShaderBuilder() {
+    private StringBuilder createShaderBuilder() {
         String preProcessorPreamble = "#version 120\n";
 
         // TODO: Implement a system for this - this has gotten way out of hand.
-        if (CoreRegistry.get(WorldAtlas.class) != null) {
-            preProcessorPreamble += "#define TEXTURE_OFFSET " + CoreRegistry.get(WorldAtlas.class).getRelativeTileSize() + "\n";
+        WorldAtlas worldAtlas = CoreRegistry.get(WorldAtlas.class);
+        if (worldAtlas != null) {
+            preProcessorPreamble += "#define TEXTURE_OFFSET " + worldAtlas.getRelativeTileSize() + "\n";
         } else {
             preProcessorPreamble += "#define TEXTURE_OFFSET 0.06125\n";
         }
+        RenderingConfig renderConfig = config.getRendering();
+
         preProcessorPreamble += "#define BLOCK_LIGHT_POW " + WorldRenderer.BLOCK_LIGHT_POW + "\n";
         preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";
         preProcessorPreamble += "#define BLOCK_INTENSITY_FACTOR " + WorldRenderer.BLOCK_INTENSITY_FACTOR + "\n";
-        preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) CoreRegistry.get(Config.class).getRendering().getShadowMapResolution() + "\n";
+        preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) renderConfig.getShadowMapResolution() + "\n";
         preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + ShaderParametersSSAO.SSAO_KERNEL_ELEMENTS + "\n";
         preProcessorPreamble += "#define SSAO_NOISE_SIZE " + ShaderParametersSSAO.SSAO_NOISE_SIZE + "\n";
         // TODO: This shouldn't be hardcoded
         preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
 
-        Config config = CoreRegistry.get(Config.class);
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
-        if (config.getRendering().isAnimateGrass()) {
+        if (renderConfig.isAnimateGrass()) {
             builder.append("#define ANIMATED_GRASS \n");
         }
-        if (config.getRendering().isAnimateWater()) {
+        if (renderConfig.isAnimateWater()) {
             builder.append("#define ANIMATED_WATER \n");
         }
-        if (config.getRendering().getBlurIntensity() == 0) {
+        if (renderConfig.getBlurIntensity() == 0) {
             builder.append("#define NO_BLUR \n");
         }
-        if (config.getRendering().isFlickeringLight()) {
+        if (renderConfig.isFlickeringLight()) {
             builder.append("#define FLICKERING_LIGHT \n");
         }
-        if (config.getRendering().isVignette()) {
+        if (renderConfig.isVignette()) {
             builder.append("#define VIGNETTE \n");
         }
-        if (config.getRendering().isBloom()) {
+        if (renderConfig.isBloom()) {
             builder.append("#define BLOOM \n");
         }
-        if (config.getRendering().isMotionBlur()) {
+        if (renderConfig.isMotionBlur()) {
             builder.append("#define MOTION_BLUR \n");
         }
-        if (config.getRendering().isSsao()) {
+        if (renderConfig.isSsao()) {
             builder.append("#define SSAO \n");
         }
-        if (config.getRendering().isFilmGrain()) {
+        if (renderConfig.isFilmGrain()) {
             builder.append("#define FILM_GRAIN \n");
         }
-        if (config.getRendering().isOutline()) {
+        if (renderConfig.isOutline()) {
             builder.append("#define OUTLINE \n");
         }
-        if (config.getRendering().isLightShafts()) {
+        if (renderConfig.isLightShafts()) {
             builder.append("#define LIGHT_SHAFTS \n");
         }
-        if (config.getRendering().isDynamicShadows()) {
+        if (renderConfig.isDynamicShadows()) {
             builder.append("#define DYNAMIC_SHADOWS \n");
         }
-        if (config.getRendering().isNormalMapping()) {
+        if (renderConfig.isNormalMapping()) {
             builder.append("#define NORMAL_MAPPING \n");
         }
-        if (config.getRendering().isParallaxMapping()) {
+        if (renderConfig.isParallaxMapping()) {
             builder.append("#define PARALLAX_MAPPING \n");
         }
-        if (config.getRendering().isDynamicShadowsPcfFiltering()) {
+        if (renderConfig.isDynamicShadowsPcfFiltering()) {
             builder.append("#define DYNAMIC_SHADOWS_PCF \n");
         }
-        if (config.getRendering().isCloudShadows()) {
+        if (renderConfig.isCloudShadows()) {
             builder.append("#define CLOUD_SHADOWS \n");
         }
-        if (config.getRendering().isLocalReflections()) {
+        if (renderConfig.isLocalReflections()) {
             builder.append("#define LOCAL_REFLECTIONS \n");
         }
-        if (config.getRendering().isInscattering()) {
+        if (renderConfig.isInscattering()) {
             builder.append("#define INSCATTERING \n");
         }
         // TODO A 3D wizard should take a look at this. Configurable for the moment to make better comparisons possible.
-        if (config.getRendering().isClampLighting()) {
+        if (renderConfig.isClampLighting()) {
             builder.append("#define CLAMP_LIGHTING \n");
         }
 
@@ -258,25 +260,34 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private void compileShaders(Set<ShaderProgramFeature> features) {
-        compileShader(GL20.GL_FRAGMENT_SHADER, features);
-        compileShader(GL20.GL_VERTEX_SHADER, features);
-    }
+    /**
+     * Compiles all combination of available features and stores them in two maps for
+     * lookup based on a unique hash of features.
+     */
+    private void registerAllShaderPermutations() {
+        Set<Set<ShaderProgramFeature>> allPermutations = Sets.powerSet(availableFeatures);
 
-    private void compileAllShaderPermutations() {
-        compileShaders(Collections.<ShaderProgramFeature>emptySet());
+        for (Set<ShaderProgramFeature> permutation : allPermutations) {
+            int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
+            int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
 
-        int counter = 1;
-
-        for (Set<ShaderProgramFeature> permutation : Sets.powerSet(availableFeatures)) {
-            compileShaders(permutation);
-            counter++;
+            if (compileSuccess(fragShaderId) && compileSuccess(vertShaderId)) {
+                int featureHash = ShaderProgramFeature.getBitset(permutation);
+                fragmentPrograms.put(featureHash, fragShaderId);
+                vertexPrograms.put(featureHash, vertShaderId);
+            } else {
+                throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.\n\n"
+                        + "Vertex Shader Info: \n%s\n"
+                        + "Fragment Shader Info: \n%s",
+                        getUrn(), permutation,
+                        getLogInfo(vertShaderId), getLogInfo(fragShaderId)));
+            }
         }
-        logger.debug("Compiled {} permutations for {}.", counter, getUrn());
+
+        logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn());
     }
 
-    private void compileShader(int type, Set<ShaderProgramFeature> features) {
-        int shaderId = GL20.glCreateShader(type);
+    private String assembleShader(int type, Set<ShaderProgramFeature> features) {
         StringBuilder shader = createShaderBuilder();
 
         // Add the activated features for this shader
@@ -290,96 +301,70 @@ public class GLSLShader extends Shader {
         shader.append(includedUniforms);
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
-            shader.append(includedFunctionsFragment).append("\n");
-        } else {
-            shader.append(includedFunctionsVertex).append("\n");
-        }
-
-        if (type == GL20.GL_FRAGMENT_SHADER) {
+            shader.append(includedFunctionsFragment);
+            shader.append("\n");
             shader.append(shaderProgramBase.getFragmentProgram());
-        } else if (type == GL20.GL_VERTEX_SHADER) {
+        } else {
+            shader.append(includedFunctionsVertex);
+            shader.append("\n");
             shader.append(shaderProgramBase.getVertexProgram());
         }
 
+        return shader.toString();
+    }
+
+    private void dumpCode(int type, Set<ShaderProgramFeature> features, String sourceCode) {
         String debugShaderType = "UNKNOWN";
         int featureHash = ShaderProgramFeature.getBitset(features);
         if (type == GL20.GL_FRAGMENT_SHADER) {
-            fragmentPrograms.put(featureHash, shaderId);
             debugShaderType = "FRAGMENT";
         } else if (type == GL20.GL_VERTEX_SHADER) {
-            vertexPrograms.put(featureHash, shaderId);
             debugShaderType = "VERTEX";
         }
 
-        Config config = CoreRegistry.get(Config.class);
-        if (config.getRendering().isDumpShaders()) {
-            // Dump all final shader sources to the log directory
-            final String strippedTitle = getUrn().toString().replace(":", "-");
+        // Dump all final shader sources to the log directory
+        final String strippedTitle = getUrn().toString().replace(":", "-");
 
-            String fname = debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl";
-            Path path = PathManager.getInstance().getShaderLogPath().resolve(fname);
-            try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
-                writer.write(shader.toString());
-            } catch (IOException e) {
-                logger.error("Failed to dump shader source.");
-            }
-        }
-
-        GL20.glShaderSource(shaderId, shader.toString());
-        GL20.glCompileShader(shaderId);
-
-        StringBuilder error = new StringBuilder();
-        boolean success = printLogInfo(shaderId, error);
-
-        String errorLine = "";
-        if (error.length() > 0) {
-            try {
-                Pattern p = Pattern.compile("-?\\d+");
-                Matcher m = p.matcher(error.toString());
-
-                int counter = 0;
-                while (m.find()) {
-                    if (counter++ % 2 == 1) {
-                        int lineNumberInt = Integer.parseInt(m.group());
-
-                        try (Scanner reader = new Scanner(shader.toString())) {
-                            for (int i = 0; i < lineNumberInt - 1; ++i) {
-                                reader.nextLine();
-                            }
-
-                            errorLine = reader.nextLine();
-                            errorLine = "Error prone line: '" + errorLine + "'";
-
-                            logger.warn("{} \n Line: {}", error, errorLine);
-                        }
-                        break;
-                    }
-                }
-
-            } catch (Exception e) {
-                logger.error("Error parsing shader compile error: {}", error, e);
-            }
-        }
-
-        if (!success) {
-            String errorMessage = debugShaderType + " Shader '" + getUrn() + "' failed to compile. Terasology might not look quite as good as it should now...\n\n"
-                    + error + "\n\n" + errorLine;
-
-            logger.error(errorMessage);
-            JOptionPane.showMessageDialog(null, errorMessage, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
+        // example: fragment_shader-engine-font_0.glsl
+        String fname = debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl";
+        Path path = PathManager.getInstance().getShaderLogPath().resolve(fname);
+        try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
+            writer.write(sourceCode);
+        } catch (IOException e) {
+            logger.error("Failed to dump shader source.");
         }
     }
 
-    private boolean printLogInfo(int shaderId, StringBuilder logEntry) {
+    private int compileShader(int type, Set<ShaderProgramFeature> features) {
+        int shaderId = GL20.glCreateShader(type);
+
+        String shader = assembleShader(type, features);
+
+        if (config.getRendering().isDumpShaders()) {
+            dumpCode(type, features, shader);
+        }
+
+        GL20.glShaderSource(shaderId, shader);
+        GL20.glCompileShader(shaderId);
+
+        return shaderId;
+    }
+
+    private String getLogInfo(int shaderId) {
         int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
+        if (length > 0) {
+            return ARBShaderObjects.glGetInfoLogARB(shaderId, length);
+        }
+
+        return "No Info";
+    }
+
+    private boolean compileSuccess(int shaderId) {
         int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
         //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
         //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
 
-        if (length > 0) {
-            logEntry.append(ARBShaderObjects.glGetInfoLogARB(shaderId, length));
-        }
 
         if (compileStatus == 0 /*|| linkStatus == 0 || validateStatus == 0*/) {
             return false;
