@@ -64,14 +64,15 @@ public class BlockSelectionRenderer {
     }
 
     private void initialize(Vector2f effectsTextureWidth) {
-        Vector2f texPos = new Vector2f(0.0f, 0.0f);
-        Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-        overlayMesh = tessellator.generateMesh();
-        tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-        overlayMesh2 = tessellator.generateMesh();
+        readyTesselator(effectsTextureWidth, new Vector4f(1, 1, 1, 1f));
+        readyTesselator(effectsTextureWidth, new Vector4f(1, 1, 1, .2f));
         defaultTextured = Assets.getMaterial("engine:prog.defaultTextured");
+    }
+    
+    public void readyTesselator(Vector2f effectsTextureWidth, Vector4f vector4f) {
+    	Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), new Vector2f(0.0f, 0.0f), effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        overlayMesh = tessellator.generateMesh();
     }
 
     public void setEffectsTexture(Texture newEffectsTexture) {
