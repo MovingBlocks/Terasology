@@ -206,38 +206,44 @@ public class InputSystem extends BaseComponentSystem {
         processBindRepeats(delta);
         processBindAxis(delta);
     }
+    
+    
+    private void mouseXEvent(Vector2i deltaMouse, float delta){
+        MouseAxisEvent event = new MouseXAxisEvent(deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
+        setupTarget(event);
+        for (EntityRef entity : getInputEntities()) {
+            entity.send(event);
+            if (event.isConsumed()) {
+                break;
+            }
+        }
+    }
+     
+    private void mouseYEvent(Vector2i deltaMouse, float delta){
+        int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
+        MouseAxisEvent event = new MouseYAxisEvent(yMovement * config.getInput().getMouseSensitivity(), delta);
+        setupTarget(event);
+        for (EntityRef entity : getInputEntities()) {
+            entity.send(event);
+            if (event.isConsumed()) {
+                break;
+            }
+        }
+    }
 
     private void processMouseInput(float delta) {
-        if (!engine.hasFocus()) {
-            return;
-        }
-
+    	
+        if (!engine.hasFocus()) return;
+        
         Vector2i deltaMouse = mouse.getDelta();
         //process mouse movement x axis
         if (deltaMouse.x != 0) {
-            MouseAxisEvent event = new MouseXAxisEvent(deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
-            setupTarget(event);
-            for (EntityRef entity : getInputEntities()) {
-                entity.send(event);
-                if (event.isConsumed()) {
-                    break;
-                }
-            }
+        	mouseXEvent(deltaMouse,delta);
         }
-
         //process mouse movement y axis
         if (deltaMouse.y != 0) {
-            int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
-            MouseAxisEvent event = new MouseYAxisEvent(yMovement * config.getInput().getMouseSensitivity(), delta);
-            setupTarget(event);
-            for (EntityRef entity : getInputEntities()) {
-                entity.send(event);
-                if (event.isConsumed()) {
-                    break;
-                }
-            }
+        	mouseYEvent(deltaMouse,delta);
         }
-
         //process mouse clicks
         for (InputAction action : mouse.getInputQueue()) {
             switch (action.getInput().getType()) {
