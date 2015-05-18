@@ -73,10 +73,7 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
     @Override
     public boolean isSufficientlySupported(Vector3i location, Map<Vector3i, Block> blockOverrides) {
         final SideBlockSupportRequiredComponent component = getComponent(location, blockOverrides);
-        if (component != null) {
-            return isSufficientlySupported(location, null, blockOverrides, component);
-        }
-        return true;
+        return component == null || isSufficientlySupported(location, null, blockOverrides, component);
     }
 
     private EntityRef getEntity(Vector3i location, Map<Vector3i, Block> blockOverrides) {
@@ -127,10 +124,8 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {
         final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition);
-        if (!getWorldProvider().isBlockRelevant(sideBlockPosition)) {
-            return true;
-        }
-        return getBlockWithOverrides(sideBlockPosition, blockOverrides).canAttachTo(side.reverse());
+        return !getWorldProvider().isBlockRelevant(sideBlockPosition)
+        		|| getBlockWithOverrides(sideBlockPosition, blockOverrides).canAttachTo(side.reverse());
     }
 
     private Block getBlockWithOverrides(Vector3i location, Map<Vector3i, Block> blockOverrides) {
