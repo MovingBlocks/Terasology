@@ -234,6 +234,21 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             }
         }
     }
+    
+    private void modifySubNodeVal(Node processedNode,float[] position,T value, int subNodeIndex){
+        float[] min = new float[dimensions];
+        float[] max = new float[dimensions];
+        for (int i = 0; i < dimensions; i++) {
+            if (position[i] > processedNode.center[i]) {
+                min[i] = processedNode.center[i];
+                max[i] = processedNode.maxValues[i];
+            } else {
+                min[i] = processedNode.minValues[i];
+                max[i] = processedNode.center[i];
+            }
+        }
+        processedNode.subNodes[subNodeIndex] = createNewNode(position, min, max, value);
+    }
 
     private T addToNode(float[] position, Node node, T value) {
         Node processedNode = node;
@@ -248,18 +263,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 } else {
                     Node subNode = processedNode.subNodes[subNodeIndex];
                     if (subNode == null) {
-                        float[] min = new float[dimensions];
-                        float[] max = new float[dimensions];
-                        for (int i = 0; i < dimensions; i++) {
-                            if (position[i] > processedNode.center[i]) {
-                                min[i] = processedNode.center[i];
-                                max[i] = processedNode.maxValues[i];
-                            } else {
-                                min[i] = processedNode.minValues[i];
-                                max[i] = processedNode.center[i];
-                            }
-                        }
-                        processedNode.subNodes[subNodeIndex] = createNewNode(position, min, max, value);
+                    	modifySubNodeVal(processedNode, position, value, subNodeIndex);
                         return null;
                     } else {
                         processedNode = subNode;
