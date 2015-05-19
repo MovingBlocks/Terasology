@@ -101,10 +101,9 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         if (move == MovementMode.FLYING) {
         	// We must save the position before the fly mode was toggled
         	saveOldPosition(clientComp);
-            newMove.speedMultiplier = 8.0f;
-            float velocity = calculateSpeed();
+            newMove.speedMultiplier = calculateSpeed();
             clientComp.character.saveComponent(newMove);
-            console.addMessage("Speed multiplier set to " + velocity + " (was 1.0f)");
+            console.addMessage("Speed multiplier set to " + newMove.speedMultiplier + " (was 1.0f)");
         }
         else{
         	// In this case we're toggling the walking mode. We need to get back to the old position.
