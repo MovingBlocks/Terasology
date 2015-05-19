@@ -11,6 +11,13 @@ The creators of Terasology are a diverse mix of software developers, game tester
 
 Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology).
 
+[![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
+[![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/latest/total.svg "Downloads")](../../releases/latest)
+[![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
+[![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
+
 Setup
 --------
 
@@ -160,9 +167,6 @@ If you want to pull down the source code for a module you can easily do so via G
 * `gradlew idea`
 
 This fetches the module source for the "Sample" module and the second command fetches any dependencies and updates the IntelliJ project structure so you can see it as a module. Likewise for Eclipse or any other setup you should run any one `gradlew` command to make sure the new module's dependencies have been fetched as well. See [Codebase Structure](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) in the wiki for more.
-
-[![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
-[![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
 
 Modules
 --------
