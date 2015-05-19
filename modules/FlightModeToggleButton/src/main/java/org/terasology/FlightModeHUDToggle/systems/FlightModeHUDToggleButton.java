@@ -38,6 +38,8 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
     EntityManager entityManager;
     @In
     Console console;
+    @In
+    private WorldGenerator worldGenerator;
     
     EntityRef localClientEntity;
     Vector3f oldLocation;
@@ -100,9 +102,9 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         	// We must save the position before the fly mode was toggled
         	saveOldPosition(clientComp);
             newMove.speedMultiplier = 8.0f;
-//            float d = calculateSpeed();
+            float velocity = calculateSpeed();
             clientComp.character.saveComponent(newMove);
-            console.addMessage("Speed multiplier set to " + 8.0f + " (was 1.0f)");
+            console.addMessage("Speed multiplier set to " + velocity + " (was 1.0f)");
         }
         else{
         	// In this case we're toggling the walking mode. We need to get back to the old position.
@@ -141,13 +143,25 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
 		console.addMessage("Saved the initial position. It was: "+ this.oldLocation.toString());
 	}
 	
-//    private float calculateSpeed(){
-//    	World world = getLocalCharacterEntity().getComponent(new WorldComponent());
-//        if (world != null) {
-//            Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
-//        }
-//        return 1.0f;
-//    }
+	/**
+	 * @return A float value of the calculated Velocity.
+	 * Method that calculates the velocity of the character according to the size of the map.
+	 */
+	private float calculateSpeed() {
+		World world = worldGenerator.getWorld();
+		if (world != null) {
+			Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0),ChunkConstants.CHUNK_SIZE));
+			// We get the mean of the Max and Min values of each coordenate
+			float meanX = (float) (( worldRegion.getRegion().maxX() - worldRegion.getRegion().minX() ) / 2.0);
+			float meanY = (float) (( worldRegion.getRegion().maxY() - worldRegion.getRegion().minY() ) / 2.0);
+			float meanZ = (float) (( worldRegion.getRegion().maxZ() - worldRegion.getRegion().minZ() ) / 2.0);
+			// We take the log2 of the module of the resultant vector, for a better scaling
+			float calculatedVelocity = (float) ((float) Math.log(Math.sqrt(meanX*meanX + meanY*meanY + meanZ*meanZ)) / Math.log(2));
+			console.addMessage("The calculated Velocity according to the map is :" + calculatedVelocity);
+			return calculatedVelocity;
+		}
+		return 0;
+	}
 
     @Override
     public boolean isValid() {
