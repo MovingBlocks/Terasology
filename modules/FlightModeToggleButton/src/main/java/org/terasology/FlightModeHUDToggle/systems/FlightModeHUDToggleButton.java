@@ -3,6 +3,8 @@ package org.terasology.FlightModeHUDToggle.systems;
 import org.terasology.HUDToggleButtons.systems.HUDToggleButtonsClientSystem;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -12,8 +14,10 @@ import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -23,6 +27,9 @@ import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generator.WorldGenerator;
 
+/**
+ * Class that toggles the Flying mode in Terasology when clicking a button
+ */
 @RegisterSystem(RegisterMode.CLIENT)
 public class FlightModeHUDToggleButton extends BaseComponentSystem implements HUDToggleButtonsClientSystem.HUDToggleButtonState {
     @In
@@ -33,6 +40,7 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
     Console console;
     
     EntityRef localClientEntity;
+    Vector3f oldLocation;
 
     @Override
     public void initialise() {
@@ -89,18 +97,50 @@ public class FlightModeHUDToggleButton extends BaseComponentSystem implements HU
         ClientComponent clientComp = getLocalClientEntity().getComponent(ClientComponent.class);
         CharacterMovementComponent newMove = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move == MovementMode.FLYING) {
+        	// We must save the position before the fly mode was toggled
+        	saveOldPosition(clientComp);
             newMove.speedMultiplier = 8.0f;
 //            float d = calculateSpeed();
             clientComp.character.saveComponent(newMove);
             console.addMessage("Speed multiplier set to " + 8.0f + " (was 1.0f)");
         }
         else{
+        	// In this case we're toggling the walking mode. We need to get back to the old position.
+        	goBack(clientComp);
         	newMove.speedMultiplier = 1.0f;
         	clientComp.character.saveComponent(newMove);
         	console.addMessage("Setting the speed multiplier to the original value (1.0f)");
         }
     }
     
+	/**
+	 * @param clientComp Instance of the current ClientComponent
+	 * Helper method that changes back the position of the character to the old position (Before flying).
+	 */
+	private void goBack(ClientComponent clientComp) {
+        // Deactivate the character to reset the CharacterPredictionSystem,
+        // which would overwrite the character location
+        clientComp.character.send(BeforeDeactivateComponent.newInstance());
+		LocationComponent newLocation = clientComp.character.getComponent(LocationComponent.class);
+		console.addMessage("Current position is: " + newLocation.getWorldPosition().toString());
+        newLocation.setWorldPosition(this.oldLocation);
+        clientComp.character.saveComponent(newLocation);
+
+        // We must reactive the character
+        clientComp.character.send(OnActivatedComponent.newInstance());
+        console.addMessage("You're back to the initial position. You're in: "+ this.oldLocation.toString());
+	}
+
+	/**
+	 * @param clientComp Instance of the current ClientComponent
+	 * Helper method that saves the position of the character before flying.
+	 */
+	private void saveOldPosition(ClientComponent clientComp) {
+		LocationComponent oldLocation = clientComp.character.getComponent(LocationComponent.class);
+		this.oldLocation = oldLocation.getWorldPosition();
+		console.addMessage("Saved the initial position. It was: "+ this.oldLocation.toString());
+	}
+	
 //    private float calculateSpeed(){
 //    	World world = getLocalCharacterEntity().getComponent(new WorldComponent());
 //        if (world != null) {

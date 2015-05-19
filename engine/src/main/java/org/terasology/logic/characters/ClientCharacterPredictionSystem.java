@@ -122,7 +122,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
             authoritiveState = state;
             Iterator<CharacterMoveInputEvent> inputIterator = inputs.iterator();
             CharacterStateEvent newState = authoritiveState;
-            interateAndSetPredicted(state, entity, inputIterator, newState);
+            iterateAndSetPredicted(state, entity, inputIterator, newState);
         } else {
             playerStates.get(entity).add(state);
         }
@@ -135,7 +135,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
 	 * @param newState The new state that will be set to the predicted state
 	 * Helper method that iterates over all the input Character move events, and sets the new predicted state
 	 */
-	private void interateAndSetPredicted(CharacterStateEvent state,
+	private void iterateAndSetPredicted(CharacterStateEvent state,
 			EntityRef entity, Iterator<CharacterMoveInputEvent> inputIterator,
 			CharacterStateEvent newState) {
 		while (inputIterator.hasNext()) {
