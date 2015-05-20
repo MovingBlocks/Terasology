@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,7 +31,44 @@ public class PMDCommand extends BaseComponentSystem{
 		return "Esperando por resultados del analisis...";
     }
 	private String buildInputString(String sourcePath, String outPutType, String rules) {
-		return "java -classpath .\\modules\\PMDColoring\\libs\\pmd\\lib\\* net.sourceforge.pmd.PMD -d "+ sourcePath+" -f "+outPutType+" -R rulesets/java/"+ rules+".xml";
+		
+		String OS = System.getProperty("os.name");
+		String beforePath = null;
+		String separator = null;
+		if (OS.startsWith("Linux"))
+		{
+			beforePath = ":";
+			separator = "/";
+		}
+		else if (OS.startsWith("Windows"))
+		{
+			beforePath = "";
+			separator = "\\";
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("java -cp ");
+		sb.append(beforePath);
+		sb.append('.');
+		sb.append(separator);
+		sb.append("modules");
+		sb.append(separator);
+		sb.append("PMDColoring");
+		sb.append(separator);
+		sb.append("libs");
+		sb.append(separator);
+		sb.append("pmd");
+		sb.append(separator);
+		sb.append("lib");
+		sb.append(separator);
+		sb.append("* net.sourceforge.pmd.PMD -d ");
+		sb.append(sourcePath);
+		sb.append(" -f ");
+		sb.append(outPutType);
+		sb.append(" -R rulesets/java/");
+		sb.append(rules);
+		sb.append(".xml");
+		return sb.toString();
 	}
 }
 
