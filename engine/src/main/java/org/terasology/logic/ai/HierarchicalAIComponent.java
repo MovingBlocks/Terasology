@@ -16,7 +16,9 @@
 package org.terasology.logic.ai;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.utilities.random.Random;
 
 /**
  * @author Esa-Petri Tirkkonen
@@ -24,62 +26,360 @@ import org.terasology.math.geom.Vector3f;
 public final class HierarchicalAIComponent implements Component {
 
     //how often updates are progressed, handle whit care
-    public int updateFrequency;
-    public long lastProgressedUpdateAt;
+    private int updateFrequency;
+    private long lastProgressedUpdateAt;
 
-    public Vector3f movementTarget = new Vector3f();
+    private Vector3f movementTarget = new Vector3f();
 
-    public long lastChangeOfDirectionAt;
-    public long lastChangeOfMovementAt;
-    public long lastChangeOfidlingtAt;
-    public long lastChangeOfDangerAt;
+    private long lastChangeOfDirectionAt;
+    private long lastChangeOfMovementAt;
+    private long lastChangeOfidlingtAt;
+    private long lastChangeOfDangerAt;
 
     //how long ai move
-    public int moveUpdateTime = 600;
+    private int moveUpdateTime = 600;
     // how long ai move to one direction
-    public int directionUpdateTime = 300;
+    private int directionUpdateTime = 300;
     // how long ai idles
-    public int idlingUpdateTime = 500;
+    private int idlingUpdateTime = 500;
     // how often danger direction is checked
-    public int dangerUpdateTime = 100;
+    private int dangerUpdateTime = 100;
 
-    public boolean dieIfPlayerFar = true;
-    public int dieDistance = 2000;
+    private boolean dieIfPlayerFar = true;
+    private int dieDistance = 2000;
 
     //define type of AI 
-    public boolean hunter;
-    public boolean aggressive;
-    public boolean wild;
-    public boolean flying;
+    private boolean hunter;
+    private boolean aggressive;
+    private boolean wild;
+    private boolean flying;
 
     //AI properties
     // if flying maximum altitude
-    public int maxAltitude = 200;
+    private int maxAltitude = 200;
     //AI moves more whit higher values
-    public int hectic = 2;
+    private int hectic = 2;
     //AI runs more straight lines whit higher values
-    public int straightLined = 2;
+    private int straightLined = 2;
     //accurate how accurate AI kills you, values from 0 to up. Do not give negative values something will turn oposite
-    public float forgiving = 5f;
+    private float forgiving = 5f;
 
     //how well this AI finds player when hunter
-    public int playerSense = 30;
+    private int playerSense = 30;
     //how close AI comes when hunter
-    public int playerdistance = 3;
+    private int playerdistance = 3;
     //does damage if nearer that this when aggressive
-    public int attackDistance = 1;
+    private int attackDistance = 1;
     //runs if player nearer than this when wild
-    public int runDistance = 30;
+    private int runDistance = 30;
     //start attack instead running when wild
-    public int panicDistance = 10;
+    private int panicDistance = 10;
 
     //doing something
-    public boolean inDanger;
+    private boolean inDanger;
 
 
     //TODO remove this when fight system is ready!!!
-    public int damage = 50;
-    public int damageFrequency = 500;
+    private int damage = 50;
+    private int damageFrequency = 500;
 
+    /**
+     * determines whether or not the AI should be updated
+     *
+     * @param tempTime
+     */
+    public boolean needsUpdate(long tempTime) {
+    	return tempTime - this.lastProgressedUpdateAt >= this.updateFrequency;
+	}
+
+    /**
+     * sets the last progressed updated time
+     * 
+     * @param timeInMs
+     */
+	public void setLastProgressedUpdated(long timeInMs) 
+	{
+		this.lastProgressedUpdateAt = timeInMs;
+	}
+	
+	/**
+	 * sets the last change of danger time
+	 * 
+	 * @param timeInMs
+	 */
+	public void setLastChangeOfDanger(long timeInMs) 
+	{
+		this.lastChangeOfDangerAt = timeInMs;
+	}
+
+	/**
+	 * sets the last change of idiling time
+	 * 
+	 * @param timeInMs
+	 */
+	public void setLastChangeOfIdiling(long timeInMs) 
+	{
+		this.lastChangeOfidlingtAt = timeInMs;
+	}
+	
+	/**
+	 * sets the last change of movement time
+	 * 
+	 * @param timeInMs
+	 */
+	public void setLastChangeOfMovement(long timeInMs) 
+	{
+		this.lastChangeOfMovementAt = timeInMs;
+	}
+	
+	/**
+	 * sets the last change of direction time
+	 * 
+	 * @param timeInMs
+	 */
+	public void setLastChangeOfDirection(long timeInMs) 
+	{
+		this.lastChangeOfDirectionAt = timeInMs;
+	}
+
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public long getMoveUpdateTime() {
+		return this.moveUpdateTime; 
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public long getIdlingUpdateTime() 
+	{
+		return this.idlingUpdateTime;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public long getDangerUpdateTime() {
+		return this.dangerUpdateTime;
+	}
+
+	/**
+	 * Puts the AI in danger
+	 */
+	public void setInDanger() {
+		this.inDanger = true;
+	}
+
+	/**
+	 * Puts the AI in safe mode
+	 */
+	public void setSafe() {
+		this.inDanger = false;
+	}
+
+	/**
+	 * Determines whether or not the ai should die for being far from a point
+	 * 
+	 * @param distanceToPlayer
+	 * @return
+	 */
+	public boolean shouldDieForDistance(double distanceToPlayer) 
+	{
+		return this.dieIfPlayerFar && distanceToPlayer > this.dieDistance;
+	}
+
+	/**
+	 * Determines wheter or not the ai will atack
+	 * 
+	 * @param lastAttack 
+	 * @param tempTime 
+	 * @param distanceToPlayer 
+	 * 
+	 * @return
+	 */
+	public boolean willAtack(double distanceToPlayer, long tempTime, long lastAttack) {
+		return this.aggressive && distanceToPlayer <= this.attackDistance && tempTime - lastAttack > this.damageFrequency;
+	}
+	
+	/**
+	 * Determines whether or not the ai should hurt for time
+	 * 
+	 * @param tempTime
+	 * @param dangerChangeTime
+	 * @return
+	 */
+	public boolean shouldHurt(long tempTime, long dangerChangeTime) {
+		return tempTime - this.lastChangeOfDangerAt > dangerChangeTime;
+	}
+
+	/**
+	 * Returns whether or not the ai should idle according to time
+	 * 
+	 * @param tempTime
+	 * @param idleChangeTime
+	 * @return
+	 */
+	public boolean shouldIdle(long tempTime, long idleChangeTime) 
+	{
+		return tempTime - this.lastChangeOfidlingtAt > idleChangeTime;
+	}
+	
+	/**
+	 * Returns whether or not the ai should move according to time
+	 * 
+	 * @param tempTime
+	 * @param moveChangeTime
+	 * @return
+	 */
+	public boolean shouldMove(long tempTime, long moveChangeTime) {
+		return tempTime - this.lastChangeOfMovementAt > moveChangeTime;
+	}
+	
+	/**
+	 * Returns whether or not the ai should change its direction according to time
+	 * 
+	 * @param tempTime
+	 * @param directionChangeTime
+	 * @return
+	 */
+	public boolean shouldChangeDirection(long tempTime, long directionChangeTime) {
+		return tempTime - this.lastChangeOfDirectionAt > directionChangeTime;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public int getDamage() {
+		return this.damage;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public boolean isInDanger() {
+		return this.inDanger;
+	}
+
+	public boolean isWild() {
+		return this.wild;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public boolean isFlying() 
+	{
+		return flying;
+	}
+
+	/**
+	 * Returns a new direction change time which depends on the update time and hectic of the current ai
+	 * 
+	 * @param random
+	 * @return
+	 */
+	public long getNewDirectionChangeTime(Random random) {
+		return newChangeTime(random);
+	}
+	
+	/**
+	 * Returns a new move change time which depends on the update time and hectic of the current ai
+	 * 
+	 * @param random
+	 * @return
+	 */
+	public long getNewMoveChangeTime(Random random) {
+		return newChangeTime(random);
+	}
+	
+	/**
+	 * Returns a new danger change time which depends on the update time and hectic of the current ai
+	 * 
+	 * @param random
+	 * @return
+	 */
+	public long getNewDangerChangeTime(Random random) {
+		return newChangeTime(random);
+	}
+	
+	/**
+	 * Returns a new idiling change time which depends on the update time and hectic of the current ai
+	 * 
+	 * @param random
+	 * @return
+	 */
+	public long getNewIdilingChangeTime(Random random) 
+	{
+		return newChangeTime(random);
+	}
+
+	private long newChangeTime(Random random)
+	{
+		return (long) (this.idlingUpdateTime * random.nextDouble() * this.hectic);
+	}
+
+	/**
+	 * Returns whether or not the ai senses the player
+	 * 
+	 * @param distanceToPlayer
+	 * @return
+	 */
+	public boolean sensePlayer(double distanceToPlayer) 
+	{
+		return this.hunter && distanceToPlayer > this.playerdistance && distanceToPlayer < this.playerSense;
+	}
+
+	/**
+	 * Returns whether or not the ai is in panic(for player's prescence) 
+	 * 
+	 * @param distanceToPlayer
+	 * @return
+	 */
+	public boolean isInPanic(double distanceToPlayer) 
+	{
+		return this.wild && distanceToPlayer > this.panicDistance && distanceToPlayer < this.runDistance;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public float forgiving() {
+		return this.forgiving;
+	}
+
+	
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public Vector3f getMovementTarget() {
+		return this.movementTarget;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return
+	 */
+	public float getMaxAltitude() {
+		return this.maxAltitude;
+	}
 
 }

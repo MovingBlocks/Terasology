@@ -173,23 +173,9 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     private static StringBuilder createShaderBuilder() {
-        String preProcessorPreamble = "#version 120\n";
+    	StringBuilder preProcessorPreamble = getPreProcessorPreamble();
 
-        // TODO: Implement a system for this - this has gotten way out of hand.
-        if (CoreRegistry.get(WorldAtlas.class) != null) {
-            preProcessorPreamble += "#define TEXTURE_OFFSET " + CoreRegistry.get(WorldAtlas.class).getRelativeTileSize() + "\n";
-        } else {
-            preProcessorPreamble += "#define TEXTURE_OFFSET 0.06125\n";
-        }
-        preProcessorPreamble += "#define BLOCK_LIGHT_POW " + WorldRenderer.BLOCK_LIGHT_POW + "\n";
-        preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";
-        preProcessorPreamble += "#define BLOCK_INTENSITY_FACTOR " + WorldRenderer.BLOCK_INTENSITY_FACTOR + "\n";
-        preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) CoreRegistry.get(Config.class).getRendering().getShadowMapResolution() + "\n";
-        preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + ShaderParametersSSAO.SSAO_KERNEL_ELEMENTS + "\n";
-        preProcessorPreamble += "#define SSAO_NOISE_SIZE " + ShaderParametersSSAO.SSAO_NOISE_SIZE + "\n";
         // TODO: This shouldn't be hardcoded
-        preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
-
         Config config = CoreRegistry.get(Config.class);
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
         if (config.getRendering().isAnimateGrass()) {
@@ -262,6 +248,48 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         return builder;
     }
 
+	private static StringBuilder getPreProcessorPreamble() {
+		StringBuilder preProcessorPreamble = new StringBuilder();
+        preProcessorPreamble.append("#version 120\n");
+
+        // TODO: Implement a system for this - this has gotten way out of hand.
+        if (CoreRegistry.get(WorldAtlas.class) != null) {
+            preProcessorPreamble.append("#define TEXTURE_OFFSET ");
+            preProcessorPreamble.append(CoreRegistry.get(WorldAtlas.class).getRelativeTileSize());
+            preProcessorPreamble.append('\n');
+        } else {
+            preProcessorPreamble.append("#define TEXTURE_OFFSET 0.06125\n");
+        }
+        preProcessorPreamble.append("#define BLOCK_LIGHT_POW ");
+        preProcessorPreamble.append(WorldRenderer.BLOCK_LIGHT_POW);
+        preProcessorPreamble.append('\n');
+        
+        preProcessorPreamble.append("#define BLOCK_LIGHT_SUN_POW ");
+        preProcessorPreamble.append(WorldRenderer.BLOCK_LIGHT_SUN_POW);
+        preProcessorPreamble.append('\n');
+        
+        preProcessorPreamble.append("#define BLOCK_INTENSITY_FACTOR ");
+        preProcessorPreamble.append(WorldRenderer.BLOCK_INTENSITY_FACTOR);
+        preProcessorPreamble.append('\n');
+        
+        preProcessorPreamble.append("#define SHADOW_MAP_RESOLUTION ");
+        preProcessorPreamble.append((float) CoreRegistry.get(Config.class).getRendering().getShadowMapResolution());
+        preProcessorPreamble.append('\n');
+        
+        preProcessorPreamble.append("#define SSAO_KERNEL_ELEMENTS ");
+        preProcessorPreamble.append(ShaderParametersSSAO.SSAO_KERNEL_ELEMENTS);
+        preProcessorPreamble.append('\n');
+        
+        preProcessorPreamble.append("#define SSAO_NOISE_SIZE ");
+        preProcessorPreamble.append(ShaderParametersSSAO.SSAO_NOISE_SIZE);
+        preProcessorPreamble.append('\n');
+        
+        preProcessorPreamble.append("#define TEXTURE_OFFSET_EFFECTS ");
+        preProcessorPreamble.append(0.0625f);
+        preProcessorPreamble.append('\n');
+		return preProcessorPreamble;
+	}
+
     private void updateAvailableFeatures() {
         availableFeatures.clear();
 
@@ -302,18 +330,18 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
         // Add the activated features for this shader
         for (ShaderProgramFeature feature : features) {
-            shader.append("#define ").append(feature.name()).append("\n");
+            shader.append("#define ").append(feature.name()).append('\n');
         }
 
-        shader.append("\n");
+        shader.append('\n');
 
         shader.append(includedDefines);
         shader.append(includedUniforms);
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
-            shader.append(includedFunctionsFragment).append("\n");
+            shader.append(includedFunctionsFragment).append('\n');
         } else {
-            shader.append(includedFunctionsVertex).append("\n");
+            shader.append(includedFunctionsVertex).append('\n');
         }
 
         if (type == GL20.GL_FRAGMENT_SHADER) {

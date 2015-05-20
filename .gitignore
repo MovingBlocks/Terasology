@@ -66,6 +66,7 @@ extensions
 #/modules/*
 !/modules/Core
 !/modules/CoreSampleGameplay
+!/modules/PMDColoring
 !/modules/subprojects.gradle
 /meta/*
 !/meta/subprojects.gradle
