@@ -77,6 +77,7 @@ public class PostProcessor {
 
     private LwjglRenderingProcess renderingProcess;
     private GraphicState graphicState;
+    private Materials materials = new Materials();
 
     private RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
@@ -84,6 +85,30 @@ public class PostProcessor {
     public PostProcessor(LwjglRenderingProcess renderingProcess, GraphicState graphicState) {
         this.renderingProcess = renderingProcess;
         this.graphicState = graphicState;
+    }
+
+    public void initializeMaterials() {
+        // initial renderings
+        materials.lightBufferPass = Assets.getMaterial("engine:prog.lightBufferPass");
+
+        // pre-post composite
+        materials.sobel    = Assets.getMaterial("engine:prog.sobel");       // TODO: rename shader to outline
+        materials.ssao     = Assets.getMaterial("engine:prog.ssao");
+        materials.ssaoBlur = Assets.getMaterial("engine:prog.ssaoBlur");
+        materials.combine  = Assets.getMaterial("engine:prog.combine");     // TODO: rename to prePostComposite
+
+        // initial post-processing
+        materials.lightShafts = Assets.getMaterial("engine:prog.lightshaft");   // TODO: rename shaders to lightShafts
+        materials.downSampler = Assets.getMaterial("engine:prog.down");     // TODO: rename to downSampler
+        materials.highPass    = Assets.getMaterial("engine:prog.highp");    // TODO: rename to highPass
+        materials.blur        = Assets.getMaterial("engine:prog.blur");
+        materials.hdr         = Assets.getMaterial("engine:prog.hdr");      // TODO: rename shader to toneMapping
+        materials.prePost     = Assets.getMaterial("engine:prog.prePost");  // TODO: rename shader to initialPost
+
+        // final post-processing
+        materials.ocDistortion = Assets.getMaterial("engine:prog.ocDistortion");
+        materials.post         = Assets.getMaterial("engine:prog.post");    // TODO: rename shader to finalPost
+        materials.debug        = Assets.getMaterial("engine:prog.debug");
     }
 
     public void generateSkyBand(int id) {
@@ -96,11 +121,9 @@ public class PostProcessor {
         skyBand.bind();
         graphicState.setRenderBufferMask(skyBand, true, false, false);
 
-        Material material = Assets.getMaterial("engine:prog.blur");
-
-        material.enable();
-        material.setFloat("radius", 8.0f, true);
-        material.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
+        materials.blur.enable();
+        materials.blur.setFloat("radius", 8.0f, true);
+        materials.blur.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
 
         if (id == 0) {
             renderingProcess.bindFboTexture("sceneOpaque");
@@ -118,8 +141,7 @@ public class PostProcessor {
     }
 
     public void applyLightBufferPass(String target) {
-        Material program = Assets.getMaterial("engine:prog.lightBufferPass");
-        program.enable();
+        materials.lightBufferPass.enable();
 
         FBO targetFbo = renderingProcess.getFBO(target);
 
@@ -127,19 +149,19 @@ public class PostProcessor {
         if (targetFbo != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindTexture();
-            program.setInt("texSceneOpaque", texId++);
+            materials.lightBufferPass.setInt("texSceneOpaque", texId++);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindDepthTexture();
-            program.setInt("texSceneOpaqueDepth", texId++);
+            materials.lightBufferPass.setInt("texSceneOpaqueDepth", texId++);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindNormalsTexture();
-            program.setInt("texSceneOpaqueNormals", texId++);
+            materials.lightBufferPass.setInt("texSceneOpaqueNormals", texId++);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             targetFbo.bindLightBufferTexture();
-            program.setInt("texSceneOpaqueLightBuffer", texId++, true);
+            materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
         FBO targetPingPong = renderingProcess.getFBO(target + "PingPong");
@@ -175,7 +197,7 @@ public class PostProcessor {
     }
 
     private void generateSobel() {
-        Assets.getMaterial("engine:prog.sobel").enable();
+        materials.sobel.enable();
 
         FBO sobel = renderingProcess.getFBO("sobel");
 
@@ -195,8 +217,7 @@ public class PostProcessor {
     }
 
     private void generateSSAO() {
-        Material ssaoShader = Assets.getMaterial("engine:prog.ssao");
-        ssaoShader.enable();
+        materials.ssao.enable();
 
         FBO ssao = renderingProcess.getFBO("ssao");
 
@@ -204,8 +225,8 @@ public class PostProcessor {
             return;
         }
 
-        ssaoShader.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
-        ssaoShader.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
+        materials.ssao.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
+        materials.ssao.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
 
         ssao.bind();
 
@@ -219,8 +240,7 @@ public class PostProcessor {
     }
 
     private void generateBlurredSSAO() {
-        Material shader = Assets.getMaterial("engine:prog.ssaoBlur");
-        shader.enable();
+        materials.ssaoBlur.enable();
 
         FBO ssao = renderingProcess.getFBO("ssaoBlurred");
 
@@ -228,7 +248,7 @@ public class PostProcessor {
             return;
         }
 
-        shader.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
+        materials.ssaoBlur.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
         ssao.bind();
 
         setViewportTo(ssao.dimensions());
@@ -242,7 +262,7 @@ public class PostProcessor {
     }
 
     private void generateCombinedScene() {
-        Assets.getMaterial("engine:prog.combine").enable();
+        materials.combine.enable();
 
         renderingProcess.bindFbo("sceneOpaquePingPong");
 
@@ -318,7 +338,7 @@ public class PostProcessor {
     }
 
     private void generateLightShafts() {
-        Assets.getMaterial("engine:prog.lightshaft").enable();
+        materials.lightShafts.enable();
 
         FBO lightshaft = renderingProcess.getFBO("lightShafts");
 
@@ -338,7 +358,7 @@ public class PostProcessor {
     }
 
     private void generatePrePost() {
-        Assets.getMaterial("engine:prog.prePost").enable();
+        materials.prePost.enable();
 
         renderingProcess.bindFbo("scenePrePost");
 
@@ -350,14 +370,13 @@ public class PostProcessor {
     }
 
     private void generateDownsampledScene() {
-        Material shader = Assets.getMaterial("engine:prog.down");
-        shader.enable();
+        materials.downSampler.enable();
 
         for (int i = 4; i >= 0; i--) {
             int sizePrev = TeraMath.pow(2, i + 1);
 
             int size = TeraMath.pow(2, i);
-            shader.setFloat("size", size, true);
+            materials.downSampler.setFloat("size", size, true);
 
             renderingProcess.bindFbo("scene" + size);
             glViewport(0, 0, size, size);
@@ -429,7 +448,7 @@ public class PostProcessor {
     }
 
     private void generateToneMappedScene() {
-        Assets.getMaterial("engine:prog.hdr").enable();
+        materials.hdr.enable();
 
         renderingProcess.bindFbo("sceneToneMapped");
 
@@ -441,9 +460,8 @@ public class PostProcessor {
     }
 
     private void generateHighPass() {
-        Material program = Assets.getMaterial("engine:prog.highp");
-        program.setFloat("highPassThreshold", bloomHighPassThreshold, true);
-        program.enable();
+        materials.highPass.enable();
+        materials.highPass.setFloat("highPassThreshold", bloomHighPassThreshold, true);
 
         FBO highPass = renderingProcess.getFBO("sceneHighPass");
 
@@ -458,7 +476,7 @@ public class PostProcessor {
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         sceneOpaque.bindTexture();
-        program.setInt("tex", texId++);
+        materials.highPass.setInt("tex", texId++);
 
 //        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
 //        sceneOpaque.bindDepthTexture();
@@ -474,10 +492,8 @@ public class PostProcessor {
     }
 
     private void generateBloom(int id) {
-        Material shader = Assets.getMaterial("engine:prog.blur");
-
-        shader.enable();
-        shader.setFloat("radius", bloomBlurRadius, true);
+        materials.blur.enable();
+        materials.blur.setFloat("radius", bloomBlurRadius, true);
 
         FBO bloom = renderingProcess.getFBO("sceneBloom" + id);
 
@@ -485,7 +501,7 @@ public class PostProcessor {
             return;
         }
 
-        shader.setFloat2("texelSize", 1.0f / bloom.width(), 1.0f / bloom.height(), true);
+        materials.blur.setFloat2("texelSize", 1.0f / bloom.width(), 1.0f / bloom.height(), true);
 
         bloom.bind();
 
@@ -505,10 +521,8 @@ public class PostProcessor {
     }
 
     private void generateBlur(int id) {
-        Material material = Assets.getMaterial("engine:prog.blur");
-        material.enable();
-
-        material.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
+        materials.blur.enable();
+        materials.blur.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
 
         FBO blur = renderingProcess.getFBO("sceneBlur" + id);
 
@@ -516,7 +530,7 @@ public class PostProcessor {
             return;
         }
 
-        material.setFloat2("texelSize", 1.0f / blur.width(), 1.0f / blur.height(), true);
+        materials.blur.setFloat2("texelSize", 1.0f / blur.width(), 1.0f / blur.height(), true);
 
         blur.bind();
 
@@ -540,9 +554,9 @@ public class PostProcessor {
         Material material;
 
         if (renderingDebugConfig.isEnabled()) {
-            material = Assets.getMaterial("engine:prog.debug");
+            material = materials.debug;
         } else {
-            material = Assets.getMaterial("engine:prog.post");
+            material = materials.post;
         }
 
         material.enable();
@@ -595,15 +609,15 @@ public class PostProcessor {
         Material material;
 
         if (renderingConfig.isOculusVrSupport()) {
-            material = Assets.getMaterial("engine:prog.ocDistortion");
+            material = materials.ocDistortion;
             material.enable();
 
             updateOcShaderParametersForVP(material, 0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
         } else {
             if (renderingDebugConfig.isEnabled()) {
-                material = Assets.getMaterial("engine:prog.debug");
+                material = materials.debug;
             } else {
-                material = Assets.getMaterial("engine:prog.post");
+                material = materials.post;
             }
 
             material.enable();
@@ -715,5 +729,29 @@ public class PostProcessor {
 
     public void setFullScale(FBO.Dimensions newFullScale) {
         this.fullScale = newFullScale;
+    }
+
+    private class Materials {
+        // initial renderings
+        public Material lightBufferPass;
+
+        // pre-post composite
+        public Material sobel;
+        public Material ssao;
+        public Material ssaoBlur;
+        public Material combine;
+        public Material prePost;
+
+        // initial post-processing
+        public Material lightShafts;
+        public Material downSampler;
+        public Material highPass;
+        public Material blur;
+        public Material hdr;
+
+        // final post-processing
+        public Material ocDistortion;
+        public Material post;
+        public Material debug;
     }
 }

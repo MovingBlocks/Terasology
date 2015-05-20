@@ -157,6 +157,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingProcess.initialize();
 
         CoreRegistry.get(ShaderManager.class).initShaders();
+        postProcessor.initializeMaterials();
         initMaterials();
     }
 
