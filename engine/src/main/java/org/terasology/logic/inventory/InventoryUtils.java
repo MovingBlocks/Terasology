@@ -251,6 +251,7 @@ public final class InventoryUtils {
                     newFromStackCount -= amountToTransfer;
                     if (newFromStackCount == 0) {
                         putItemIntoSlot(from, EntityRef.NULL, fromSlot);
+                        fromItem.destroy();
                     } else {
                         adjustStackSize(from, fromSlot, newFromStackCount);
                     }
