@@ -293,7 +293,14 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
-        combineRefractiveReflectiveAndOpaquePasses();
+        PerformanceMonitor.startActivity("Render Combined Scene");
+        renderingProcess.createOrUpdateFullscreenFbos();
+
+        postProcessor.generateSobel();
+        postProcessor.generateAmbientOcclusionPasses();
+        postProcessor.generateCombinedScene();
+        PerformanceMonitor.endActivity();
+
         renderSimpleBlendMaterialsIntoCombinedPass();
 
         renderFinalPostProcessedScene();
@@ -356,11 +363,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         backdropRenderer.render(playerCamera);
         graphicState.midRenderChangesBackdrop();
-
-        if (renderingConfig.isInscattering()) {
-            postProcessor.generateSkyBand(0);
-            postProcessor.generateSkyBand(1);
-        }
+        postProcessor.generateSkyBands();
 
         graphicState.postRenderCleanupBackdrop();
 
@@ -461,7 +464,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         graphicState.postRenderCleanupDirectionalLights();
 
-        postProcessor.applyLightBufferPass("sceneOpaque");
+        postProcessor.applyLightBufferPass();
         PerformanceMonitor.endActivity();
     }
 
@@ -544,12 +547,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
 
         graphicState.postRenderCleanupSceneReflectiveRefractive(isHeadUnderWater);
-        PerformanceMonitor.endActivity();
-    }
-
-    private void combineRefractiveReflectiveAndOpaquePasses() {
-        PerformanceMonitor.startActivity("Render Combined Scene");
-        postProcessor.renderPreCombinedScene();
         PerformanceMonitor.endActivity();
     }
 

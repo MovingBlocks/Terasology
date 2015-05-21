@@ -102,6 +102,8 @@ public class LwjglRenderingProcess {
         new FBObuilder("scene2",   2,  2, FBO.Type.DEFAULT).build();
         new FBObuilder("scene1",   1,  1, FBO.Type.DEFAULT).build();
 
+        postProcessor.obtainStaticFBOs();
+
         readBackPBOFront = new PBO(1, 1);
         readBackPBOBack = new PBO(1, 1);
         readBackPBOCurrent = readBackPBOFront;
@@ -188,7 +190,7 @@ public class LwjglRenderingProcess {
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
 
         graphicState.refreshDynamicFBOs();
-        postProcessor.setFullScale(fullScale);
+        postProcessor.refreshDynamicFBOs();
     }
 
     public void deleteFBO(String title) {
@@ -361,6 +363,14 @@ public class LwjglRenderingProcess {
 
         fboLookup.put(title, fbo2);
         fboLookup.put(title + "PingPong", fbo1);
+    }
+
+    public void swapSceneOpaqueFBOs() {
+        FBO temp = fboLookup.get("sceneOpaque");
+        fboLookup.put("sceneOpaque", fboLookup.get("sceneOpaquePingPong"));
+        fboLookup.put("sceneOpaquePingPong", temp);
+
+        postProcessor.refreshSceneOpaqueFBOs();
     }
 
     public void swapReadbackPBOs() {

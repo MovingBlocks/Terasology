@@ -78,6 +78,7 @@ public class PostProcessor {
     private LwjglRenderingProcess renderingProcess;
     private GraphicState graphicState;
     private Materials materials = new Materials();
+    private Buffers buffers = new Buffers();
 
     private RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
@@ -111,13 +112,66 @@ public class PostProcessor {
         materials.debug        = Assets.getMaterial("engine:prog.debug");
     }
 
-    public void generateSkyBand(int id) {
-        FBO skyBand = renderingProcess.getFBO("sceneSkyBand" + id);
+    public void obtainStaticFBOs() {
+        buffers.downSampledScene[4] = renderingProcess.getFBO("scene16");
+        buffers.downSampledScene[3] = renderingProcess.getFBO("scene8");
+        buffers.downSampledScene[2] = renderingProcess.getFBO("scene4");
+        buffers.downSampledScene[1] = renderingProcess.getFBO("scene2");
+        buffers.downSampledScene[0] = renderingProcess.getFBO("scene1");
+    }
 
-        if (skyBand == null) {
-            return;
+    public void refreshDynamicFBOs() {
+        // initial renderings
+        buffers.sceneOpaque         = renderingProcess.getFBO("sceneOpaque");
+        buffers.sceneOpaquePingPong = renderingProcess.getFBO("sceneOpaquePingPong");
+
+        buffers.sceneSkyBand0   = renderingProcess.getFBO("sceneSkyBand0");
+        buffers.sceneSkyBand1   = renderingProcess.getFBO("sceneSkyBand1");
+
+        buffers.sceneReflectiveRefractive   = renderingProcess.getFBO("sceneReflectiveRefractive");
+        // sceneReflected is not used by the post-processor.
+
+        // pre-post composite
+        buffers.sobel           = renderingProcess.getFBO("sobel");
+        buffers.ssao            = renderingProcess.getFBO("ssao");
+        buffers.ssaoBlurred     = renderingProcess.getFBO("ssaoBlurred");
+
+        // initial post-processing
+        buffers.lightShafts     = renderingProcess.getFBO("lightShafts");
+        buffers.currentReadbackPBO = renderingProcess.getCurrentReadbackPBO();
+        buffers.sceneToneMapped = renderingProcess.getFBO("sceneToneMapped");
+
+        buffers.sceneHighPass   = renderingProcess.getFBO("sceneHighPass");
+        buffers.sceneBloom0     = renderingProcess.getFBO("sceneBloom0");
+        buffers.sceneBloom1     = renderingProcess.getFBO("sceneBloom1");
+        buffers.sceneBloom2     = renderingProcess.getFBO("sceneBloom2");
+
+        buffers.sceneBlur0     = renderingProcess.getFBO("sceneBlur0");
+        buffers.sceneBlur1     = renderingProcess.getFBO("sceneBlur1");
+
+        buffers.scenePrePost   = renderingProcess.getFBO("scenePrePost");
+
+        // final post-processing
+        buffers.ocUndistorted   = renderingProcess.getFBO("ocUndistorted");
+        buffers.sceneFinal      = renderingProcess.getFBO("sceneFinal");
+
+        fullScale = buffers.sceneOpaque.dimensions();
+    }
+
+    public void refreshSceneOpaqueFBOs() {
+        buffers.sceneOpaque         = renderingProcess.getFBO("sceneOpaque");
+        buffers.sceneOpaquePingPong = renderingProcess.getFBO("sceneOpaquePingPong");
+    }
+
+    public void generateSkyBands() {
+        // TODO: verify this is actually doing something
+        if (renderingConfig.isInscattering()) {
+            generateSkyBand(buffers.sceneSkyBand0);
+            generateSkyBand(buffers.sceneSkyBand1);
         }
+    }
 
+    public void generateSkyBand(FBO skyBand) {
         skyBand.bind();
         graphicState.setRenderBufferMask(skyBand, true, false, false);
 
@@ -125,10 +179,10 @@ public class PostProcessor {
         materials.blur.setFloat("radius", 8.0f, true);
         materials.blur.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
 
-        if (id == 0) {
-            renderingProcess.bindFboTexture("sceneOpaque");
+        if (skyBand == buffers.sceneSkyBand0) {
+            buffers.sceneOpaque.bindTexture();
         } else {
-            renderingProcess.bindFboTexture("sceneSkyBand" + (id - 1));
+            buffers.sceneSkyBand0.bindTexture();
         }
 
         setViewportTo(skyBand.dimensions());
@@ -136,187 +190,126 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        skyBand.unbind();
+        graphicState.bindDisplay();
         setViewportToFullSize();
     }
 
-    public void applyLightBufferPass(String target) {
-        materials.lightBufferPass.enable();
-
-        FBO targetFbo = renderingProcess.getFBO(target);
+    public void applyLightBufferPass() {
 
         int texId = 0;
-        if (targetFbo != null) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            targetFbo.bindTexture();
-            materials.lightBufferPass.setInt("texSceneOpaque", texId++);
 
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            targetFbo.bindDepthTexture();
-            materials.lightBufferPass.setInt("texSceneOpaqueDepth", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        buffers.sceneOpaque.bindTexture();
+        materials.lightBufferPass.setInt("texSceneOpaque", texId++);
 
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            targetFbo.bindNormalsTexture();
-            materials.lightBufferPass.setInt("texSceneOpaqueNormals", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        buffers.sceneOpaque.bindDepthTexture();
+        materials.lightBufferPass.setInt("texSceneOpaqueDepth", texId++);
 
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            targetFbo.bindLightBufferTexture();
-            materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId++, true);
-        }
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        buffers.sceneOpaque.bindNormalsTexture();
+        materials.lightBufferPass.setInt("texSceneOpaqueNormals", texId++);
 
-        FBO targetPingPong = renderingProcess.getFBO(target + "PingPong");
-        targetPingPong.bind();
-        graphicState.setRenderBufferMask(targetPingPong, true, true, true);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        buffers.sceneOpaque.bindLightBufferTexture();
+        materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId++, true);
 
+        buffers.sceneOpaquePingPong.bind();
+        graphicState.setRenderBufferMask(buffers.sceneOpaquePingPong, true, true, true);
+
+        setViewportTo(buffers.sceneOpaquePingPong.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        renderingProcess.unbindFbo(target + "PingPong");
+        graphicState.bindDisplay();
 
-        renderingProcess.flipPingPongFbo(target);
+        renderingProcess.swapSceneOpaqueFBOs();
+        buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
+    }
 
-        if (target.equals("sceneOpaque")) {
-            attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
+    public void generateSobel() {
+        if (renderingConfig.isOutline()) {
+            materials.sobel.enable();
+
+            buffers.sobel.bind();
+
+            setViewportTo(buffers.sobel.dimensions());
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            renderFullscreenQuad();
+
+            graphicState.bindDisplay();
+            setViewportToFullSize();
         }
     }
 
-    public void renderPreCombinedScene() {
-        renderingProcess.createOrUpdateFullscreenFbos();
-
-        if (renderingConfig.isOutline()) {
-            generateSobel();
-        }
-
+    public void generateAmbientOcclusionPasses() {
         if (renderingConfig.isSsao()) {
             generateSSAO();
             generateBlurredSSAO();
         }
-
-        generateCombinedScene();
-    }
-
-    private void generateSobel() {
-        materials.sobel.enable();
-
-        FBO sobel = renderingProcess.getFBO("sobel");
-
-        if (sobel == null) {
-            return;
-        }
-
-        sobel.bind();
-
-        setViewportTo(sobel.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        renderFullscreenQuad();
-
-        sobel.unbind();
-        setViewportToFullSize();
     }
 
     private void generateSSAO() {
         materials.ssao.enable();
 
-        FBO ssao = renderingProcess.getFBO("ssao");
-
-        if (ssao == null) {
-            return;
-        }
-
-        materials.ssao.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
+        materials.ssao.setFloat2("texelSize", 1.0f / buffers.ssao.width(), 1.0f / buffers.ssao.height(), true);
         materials.ssao.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
 
-        ssao.bind();
+        buffers.ssao.bind();
 
-        setViewportTo(ssao.dimensions());
+        setViewportTo(buffers.ssao.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        ssao.unbind();
+        graphicState.bindDisplay();
         setViewportToFullSize();
     }
 
     private void generateBlurredSSAO() {
         materials.ssaoBlur.enable();
+        materials.ssaoBlur.setFloat2("texelSize", 1.0f / buffers.ssaoBlurred.width(), 1.0f / buffers.ssaoBlurred.height(), true);
 
-        FBO ssao = renderingProcess.getFBO("ssaoBlurred");
+        buffers.ssaoBlurred.bind();
 
-        if (ssao == null) {
-            return;
-        }
-
-        materials.ssaoBlur.setFloat2("texelSize", 1.0f / ssao.width(), 1.0f / ssao.height(), true);
-        ssao.bind();
-
-        setViewportTo(ssao.dimensions());
+        setViewportTo(buffers.ssaoBlurred.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderingProcess.bindFboTexture("ssao");
+        buffers.ssao.bindTexture();
 
         renderFullscreenQuad();
 
-        ssao.unbind();
+        graphicState.bindDisplay();
         setViewportToFullSize();
     }
 
-    private void generateCombinedScene() {
+    public void generateCombinedScene() {
         materials.combine.enable();
 
-        renderingProcess.bindFbo("sceneOpaquePingPong");
-
+        buffers.sceneOpaquePingPong.bind();
+        setViewportTo(buffers.sceneOpaquePingPong.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        renderingProcess.unbindFbo("sceneOpaquePingPong");
+        graphicState.bindDisplay();
+        setViewportToFullSize();
 
-        renderingProcess.flipPingPongFbo("sceneOpaque");
-        attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
+        renderingProcess.swapSceneOpaqueFBOs();
+        buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
     public void renderPost(WorldRenderer.WorldRenderingStage worldRenderingStage) {
-        if (renderingConfig.isLightShafts()) {
-            PerformanceMonitor.startActivity("Rendering light shafts");
-            generateLightShafts();
-            PerformanceMonitor.endActivity();
-        }
 
-        PerformanceMonitor.startActivity("Pre-post processing");
+        generateLightShafts();
         generatePrePost();
-        PerformanceMonitor.endActivity();
 
-        if (renderingConfig.isEyeAdaptation()) {
-            PerformanceMonitor.startActivity("Rendering eye adaption");
-            generateDownsampledScene();
-            PerformanceMonitor.endActivity();
-        }
-
-        PerformanceMonitor.startActivity("Updating exposure");
         updateExposure();
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Tone mapping");
         generateToneMappedScene();
-        PerformanceMonitor.endActivity();
 
-        if (renderingConfig.isBloom()) {
-            PerformanceMonitor.startActivity("Applying bloom");
-            generateHighPass();
-            for (int i = 0; i < 3; i++) {
-                generateBloom(i);
-            }
-            PerformanceMonitor.endActivity();
-        }
-
-        PerformanceMonitor.startActivity("Applying blur");
-        for (int i = 0; i < 2; i++) {
-            if (renderingConfig.getBlurIntensity() != 0) {
-                generateBlur(i);
-            }
-        }
-        PerformanceMonitor.endActivity();
+        generateBloomPasses();
+        generateBlurPasses();
 
         PerformanceMonitor.startActivity("Rendering final scene");
         if (worldRenderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE
@@ -338,74 +331,81 @@ public class PostProcessor {
     }
 
     private void generateLightShafts() {
-        materials.lightShafts.enable();
+        if (renderingConfig.isLightShafts()) {
+            PerformanceMonitor.startActivity("Rendering light shafts");
 
-        FBO lightshaft = renderingProcess.getFBO("lightShafts");
+            materials.lightShafts.enable();
 
-        if (lightshaft == null) {
-            return;
+            buffers.lightShafts.bind();
+
+            setViewportTo(buffers.lightShafts.dimensions());
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            renderFullscreenQuad();
+
+            graphicState.bindDisplay();
+            setViewportToFullSize();
+
+            PerformanceMonitor.endActivity();
         }
-
-        lightshaft.bind();
-
-        setViewportTo(lightshaft.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        renderFullscreenQuad();
-
-        lightshaft.unbind();
-        setViewportToFullSize();
     }
 
     private void generatePrePost() {
+        PerformanceMonitor.startActivity("Pre-post processing");
         materials.prePost.enable();
 
-        renderingProcess.bindFbo("scenePrePost");
+        buffers.scenePrePost.bind();
 
+        setViewportTo(buffers.scenePrePost.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        renderingProcess.unbindFbo("scenePrePost");
+        graphicState.bindDisplay();
+        setViewportToFullSize();
+
+        PerformanceMonitor.endActivity();
     }
 
-    private void generateDownsampledScene() {
+    private void downsampleSceneInto1x1pixelsBuffer() {
+        PerformanceMonitor.startActivity("Rendering eye adaption");
+
         materials.downSampler.enable();
+        FBO downSampledFBO;
 
         for (int i = 4; i >= 0; i--) {
-            int sizePrev = TeraMath.pow(2, i + 1);
 
-            int size = TeraMath.pow(2, i);
-            materials.downSampler.setFloat("size", size, true);
+            downSampledFBO = buffers.downSampledScene[i];
+            materials.downSampler.setFloat("size", downSampledFBO.width(), true);
 
-            renderingProcess.bindFbo("scene" + size);
-            glViewport(0, 0, size, size);
+            downSampledFBO.bind();
 
+            setViewportTo(downSampledFBO.dimensions());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (i == 4) {
-                renderingProcess.bindFboTexture("scenePrePost");
+                buffers.scenePrePost.bindTexture();
             } else {
-                renderingProcess.bindFboTexture("scene" + sizePrev);
+                buffers.downSampledScene[i + 1].bindTexture();
             }
 
             renderFullscreenQuad();
 
-            renderingProcess.unbindFbo("scene" + size);
+            graphicState.bindDisplay(); // TODO: probably can be removed or moved out of the loop
         }
 
         setViewportToFullSize();
+
+        PerformanceMonitor.endActivity();
     }
 
     private void updateExposure() {
         if (renderingConfig.isEyeAdaptation()) {
-            FBO scene = renderingProcess.getFBO("scene1");
+            PerformanceMonitor.startActivity("Updating exposure");
 
-            if (scene == null) {
-                return;
-            }
+            downsampleSceneInto1x1pixelsBuffer();
 
-            renderingProcess.getCurrentReadbackPBO().copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            renderingProcess.getCurrentReadbackPBO().copyFromFBO(buffers.downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
             renderingProcess.swapReadbackPBOs();
 
@@ -445,108 +445,113 @@ public class PostProcessor {
                 currentExposure = hdrExposureDefault;
             }
         }
+        PerformanceMonitor.endActivity();
     }
 
     private void generateToneMappedScene() {
+        PerformanceMonitor.startActivity("Tone mapping");
+
         materials.hdr.enable();
 
-        renderingProcess.bindFbo("sceneToneMapped");
-
+        buffers.sceneToneMapped.bind();
+        setViewportTo(buffers.sceneToneMapped.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        renderingProcess.unbindFbo("sceneToneMapped");
+        graphicState.bindDisplay();
+        setViewportToFullSize();
+
+        PerformanceMonitor.endActivity();
+    }
+
+    public void generateBloomPasses() {
+        if (renderingConfig.isBloom()) {
+            PerformanceMonitor.startActivity("Generating Bloom Passes");
+            generateHighPass();
+            generateBloom(buffers.sceneBloom0);
+            generateBloom(buffers.sceneBloom1);
+            generateBloom(buffers.sceneBloom2);
+            PerformanceMonitor.endActivity();
+        }
     }
 
     private void generateHighPass() {
         materials.highPass.enable();
         materials.highPass.setFloat("highPassThreshold", bloomHighPassThreshold, true);
 
-        FBO highPass = renderingProcess.getFBO("sceneHighPass");
-
-        if (highPass == null) {
-            return;
-        }
-
-        highPass.bind();
-
-        FBO sceneOpaque = renderingProcess.getFBO("sceneOpaque");
+        buffers.sceneHighPass.bind();
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindTexture();
+        buffers.sceneOpaque.bindTexture();
         materials.highPass.setInt("tex", texId++);
 
 //        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-//        sceneOpaque.bindDepthTexture();
+//        buffers.sceneOpaque.bindDepthTexture();
 //        program.setInt("texDepth", texId++);
 
-        setViewportTo(highPass.dimensions());
+        setViewportTo(buffers.sceneHighPass.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
-        highPass.unbind();
+        graphicState.bindDisplay();
         setViewportToFullSize();
     }
 
-    private void generateBloom(int id) {
+    private void generateBloom(FBO sceneBloom) {
         materials.blur.enable();
         materials.blur.setFloat("radius", bloomBlurRadius, true);
+        materials.blur.setFloat2("texelSize", 1.0f / sceneBloom.width(), 1.0f / sceneBloom.height(), true);
 
-        FBO bloom = renderingProcess.getFBO("sceneBloom" + id);
+        sceneBloom.bind();
 
-        if (bloom == null) {
-            return;
-        }
-
-        materials.blur.setFloat2("texelSize", 1.0f / bloom.width(), 1.0f / bloom.height(), true);
-
-        bloom.bind();
-
-        setViewportTo(bloom.dimensions());
+        graphicState.setViewportToSizeOf(sceneBloom);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (id == 0) {
-            renderingProcess.getFBO("sceneHighPass").bindTexture();
+        if (sceneBloom == buffers.sceneBloom0) {
+            buffers.sceneHighPass.bindTexture();
+        } else if (sceneBloom == buffers.sceneBloom1) {
+            buffers.sceneBloom0.bindTexture();
         } else {
-            renderingProcess.getFBO("sceneBloom" + (id - 1)).bindTexture();
+            buffers.sceneBloom1.bindTexture();
         }
 
         renderFullscreenQuad();
 
-        bloom.unbind();
+        graphicState.bindDisplay();
         setViewportToFullSize();
     }
 
-    private void generateBlur(int id) {
+    public void generateBlurPasses() {
+        if (renderingConfig.getBlurIntensity() != 0) {
+            PerformanceMonitor.startActivity("Generating Blur Passes");
+            generateBlur(buffers.sceneBlur0);
+            generateBlur(buffers.sceneBlur1);
+            PerformanceMonitor.endActivity();
+        }
+    }
+
+    private void generateBlur(FBO sceneBlur) {
         materials.blur.enable();
         materials.blur.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
+        materials.blur.setFloat2("texelSize", 1.0f / sceneBlur.width(), 1.0f / sceneBlur.height(), true);
 
-        FBO blur = renderingProcess.getFBO("sceneBlur" + id);
+        sceneBlur.bind();
 
-        if (blur == null) {
-            return;
-        }
-
-        materials.blur.setFloat2("texelSize", 1.0f / blur.width(), 1.0f / blur.height(), true);
-
-        blur.bind();
-
-        setViewportTo(blur.dimensions());
+        graphicState.setViewportToSizeOf(sceneBlur);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (id == 0) {
-            renderingProcess.bindFboTexture("sceneToneMapped");
+        if (sceneBlur == buffers.sceneBlur0) {
+            buffers.sceneToneMapped.bindTexture();
         } else {
-            renderingProcess.bindFboTexture("sceneBlur" + (id - 1));
+            buffers.sceneBlur0.bindTexture();
         }
 
         renderFullscreenQuad();
 
-        blur.unbind();
-
+        graphicState.bindDisplay();
         setViewportToFullSize();
     }
 
@@ -561,7 +566,7 @@ public class PostProcessor {
 
         material.enable();
 
-        renderingProcess.bindFbo("sceneFinal");
+        buffers.sceneFinal.bind();
 
         if (renderingStage == WorldRenderer.WorldRenderingStage.MONO || renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -579,7 +584,8 @@ public class PostProcessor {
                 break;
         }
 
-        renderingProcess.unbindFbo("sceneFinal");
+        graphicState.bindDisplay();
+        setViewportToFullSize();
     }
 
     private void updateOcShaderParametersForVP(Material program, int vpX, int vpY, int vpWidth, int vpHeight, WorldRenderer.WorldRenderingStage renderingStage) {
@@ -651,6 +657,7 @@ public class PostProcessor {
 
     public void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
         glViewport(x, y, viewportWidth, viewportHeight);
+        // TODO: replace what follows with renderFullscreenQuad()
 
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -668,6 +675,7 @@ public class PostProcessor {
         glPopMatrix();
     }
 
+    // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
     private void renderQuad() {
         if (displayListQuad == -1) {
             displayListQuad = glGenLists(1);
@@ -697,24 +705,6 @@ public class PostProcessor {
         glCallList(displayListQuad);
     }
 
-    public boolean attachDepthBufferToFbo(String sourceFboName, String targetFboName) {
-        FBO source = renderingProcess.getFBO(sourceFboName);
-        FBO target = renderingProcess.getFBO(targetFboName);
-
-        if (source == null || target == null) {
-            return false;
-        }
-
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, target.fboId);
-
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, source.depthStencilRboId);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, source.depthStencilTextureId, 0);
-
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-        return true;
-    }
-
     private void setViewportToFullSize() {
         glViewport(0, 0, fullScale.width(), fullScale.height());
     }
@@ -725,10 +715,6 @@ public class PostProcessor {
 
     public float getExposure() {
         return currentExposure;
-    }
-
-    public void setFullScale(FBO.Dimensions newFullScale) {
-        this.fullScale = newFullScale;
     }
 
     private class Materials {
@@ -753,5 +739,43 @@ public class PostProcessor {
         public Material ocDistortion;
         public Material post;
         public Material debug;
+    }
+
+    private class Buffers {
+        // initial renderings
+        public FBO sceneOpaque;
+        public FBO sceneOpaquePingPong;
+
+        public FBO sceneSkyBand0;
+        public FBO sceneSkyBand1;
+
+        public FBO sceneReflectiveRefractive;
+        // sceneReflected is not used by the postProcessor
+
+        // pre-post composite
+        public FBO sobel;
+        public FBO ssao;
+        public FBO ssaoBlurred;
+        public FBO scenePrePost;
+
+        // initial post-processing
+        public FBO lightShafts;
+
+        public FBO[] downSampledScene = new FBO[5];
+        public PBO currentReadbackPBO;
+
+        public FBO sceneToneMapped;
+
+        public FBO sceneHighPass;
+        public FBO sceneBloom0;
+        public FBO sceneBloom1;
+        public FBO sceneBloom2;
+
+        public FBO sceneBlur0;
+        public FBO sceneBlur1;
+
+        // final post-processing
+        public FBO ocUndistorted;
+        public FBO sceneFinal;
     }
 }
