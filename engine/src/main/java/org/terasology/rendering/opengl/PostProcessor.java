@@ -36,7 +36,6 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -46,7 +45,6 @@ public class PostProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
 
-    /* PROPERTIES */
     @EditorRange(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
     @EditorRange(min = 0.0f, max = 10.0f)
@@ -68,7 +66,6 @@ public class PostProcessor {
     @EditorRange(min = 0.0f, max = 16.0f)
     private float overallBlurRadiusFactor = 0.8f;
 
-    /* HDR */
     private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
 
@@ -191,7 +188,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
     }
 
     public void applyLightBufferPass() {
@@ -223,6 +220,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
+        setViewportToWholeDisplay();
 
         renderingProcess.swapSceneOpaqueFBOs();
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
@@ -240,7 +238,7 @@ public class PostProcessor {
             renderFullscreenQuad();
 
             graphicState.bindDisplay();
-            setViewportToFullSize();
+            setViewportToWholeDisplay();
         }
     }
 
@@ -265,7 +263,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
     }
 
     private void generateBlurredSSAO() {
@@ -281,7 +279,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
     }
 
     public void generateCombinedScene() {
@@ -294,43 +292,13 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
 
         renderingProcess.swapSceneOpaqueFBOs();
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
-    public void renderPost(WorldRenderer.WorldRenderingStage worldRenderingStage) {
-
-        generateLightShafts();
-        generatePrePost();
-
-        updateExposure();
-        generateToneMappedScene();
-
-        generateBloomPasses();
-        generateBlurPasses();
-
-        PerformanceMonitor.startActivity("Rendering final scene");
-        if (worldRenderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE
-                || worldRenderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE
-                || (worldRenderingStage == WorldRenderer.WorldRenderingStage.MONO && renderingProcess.isTakingScreenshot())) {
-
-            renderFinalSceneToRT(worldRenderingStage);
-
-            if (renderingProcess.isTakingScreenshot()) {
-                renderingProcess.saveScreenshot();
-            }
-        }
-
-        if (worldRenderingStage == WorldRenderer.WorldRenderingStage.MONO
-                || worldRenderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) {
-            renderFinalScene();
-        }
-        PerformanceMonitor.endActivity();
-    }
-
-    private void generateLightShafts() {
+    public void generateLightShafts() {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("Rendering light shafts");
 
@@ -344,13 +312,13 @@ public class PostProcessor {
             renderFullscreenQuad();
 
             graphicState.bindDisplay();
-            setViewportToFullSize();
+            setViewportToWholeDisplay();
 
             PerformanceMonitor.endActivity();
         }
     }
 
-    private void generatePrePost() {
+    public void initialPostProcessing() {
         PerformanceMonitor.startActivity("Pre-post processing");
         materials.prePost.enable();
 
@@ -362,7 +330,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
 
         PerformanceMonitor.endActivity();
     }
@@ -394,12 +362,12 @@ public class PostProcessor {
             graphicState.bindDisplay(); // TODO: probably can be removed or moved out of the loop
         }
 
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
 
         PerformanceMonitor.endActivity();
     }
 
-    private void updateExposure() {
+    public void downsampleSceneAndUpdateExposure() {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("Updating exposure");
 
@@ -448,7 +416,7 @@ public class PostProcessor {
         PerformanceMonitor.endActivity();
     }
 
-    private void generateToneMappedScene() {
+    public void generateToneMappedScene() {
         PerformanceMonitor.startActivity("Tone mapping");
 
         materials.hdr.enable();
@@ -460,7 +428,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
 
         PerformanceMonitor.endActivity();
     }
@@ -497,7 +465,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
     }
 
     private void generateBloom(FBO sceneBloom) {
@@ -521,7 +489,7 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
     }
 
     public void generateBlurPasses() {
@@ -552,43 +520,109 @@ public class PostProcessor {
         renderFullscreenQuad();
 
         graphicState.bindDisplay();
-        setViewportToFullSize();
+        setViewportToWholeDisplay();
     }
 
-    private void renderFinalSceneToRT(WorldRenderer.WorldRenderingStage renderingStage) {
-        Material material;
+    public void finalPostProcessing(WorldRenderer.WorldRenderingStage renderingStage) {
+        PerformanceMonitor.startActivity("Rendering final scene");
 
-        if (renderingDebugConfig.isEnabled()) {
-            material = materials.debug;
+        if (!renderingDebugConfig.isEnabled()) {
+            materials.post.enable();
         } else {
-            material = materials.post;
+            materials.debug.enable();
         }
 
-        material.enable();
+        if (!renderingConfig.isOculusVrSupport()) {
+            renderFinalMonoImage();
+        } else {
+            renderFinalStereoImage(renderingStage);
+        }
 
-        buffers.sceneFinal.bind();
+        PerformanceMonitor.endActivity();
+    }
 
-        if (renderingStage == WorldRenderer.WorldRenderingStage.MONO || renderingStage == WorldRenderer.WorldRenderingStage.LEFT_EYE) {
+    private void renderFinalMonoImage() {
+
+        if (renderingProcess.isNotTakingScreenshot()) {
+            graphicState.bindDisplay();
+            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+
+        } else {
+            buffers.sceneFinal.bind();
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
+
+            renderingProcess.saveScreenshot();
+            // when saving a screenshot we do not send the image to screen,
+            // to avoid the brief one-frame flicker of the screenshot
+
+            // This is needed to avoid the UI (which is not currently saved within the
+            // screenshot) being rendered for one frame with buffers.sceneFinal size.
+            setViewportToWholeDisplay();
+        }
+    }
+
+    // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
+    // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
+    private void renderFinalStereoImage(WorldRenderer.WorldRenderingStage renderingStage) {
+        if (renderingProcess.isNotTakingScreenshot()) {
+            buffers.sceneFinal.bind();
+        } else {
+            buffers.ocUndistorted.bind();
         }
 
         switch (renderingStage) {
-            case MONO:
-                renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
-                break;
             case LEFT_EYE:
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad(0, 0, fullScale.width() / 2, fullScale.height());
+
                 break;
+
             case RIGHT_EYE:
-                renderFullscreenQuad(fullScale.width() / 2, 0, fullScale.width() / 2, fullScale.height());
+                // no glClear() here: the rendering for the second eye is being added besides the first eye's rendering
+                renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
+
+                if (renderingProcess.isNotTakingScreenshot()) {
+                    graphicState.bindDisplay();
+                    applyOculusDistortion(buffers.sceneFinal);
+
+                } else {
+                    buffers.sceneFinal.bind();
+                    applyOculusDistortion(buffers.ocUndistorted);
+                    renderingProcess.saveScreenshot();
+                    // when saving a screenshot we do NOT send the image to screen,
+                    // to avoid the brief flicker of the screenshot for one frame
+                }
+
                 break;
         }
-
-        graphicState.bindDisplay();
-        setViewportToFullSize();
     }
 
-    private void updateOcShaderParametersForVP(Material program, int vpX, int vpY, int vpWidth, int vpHeight, WorldRenderer.WorldRenderingStage renderingStage) {
+    private void applyOculusDistortion(FBO inputBuffer) {
+        materials.ocDistortion.enable();
+
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        inputBuffer.bindTexture();
+        materials.ocDistortion.setInt("texInputBuffer", texId, true);
+
+        if (renderingProcess.isNotTakingScreenshot()) {
+            updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
+            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+            updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
+            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+
+        } else {
+            // what follows -should- work also when there is no screenshot being taken, but somehow it doesn't, hence the block above
+            updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
+            renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
+            updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
+            renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
+        }
+    }
+
+    private void updateOcShaderParametersForVP(int vpX, int vpY, int vpWidth, int vpHeight, WorldRenderer.WorldRenderingStage renderingStage) {
         float w = (float) vpWidth / fullScale.width();
         float h = (float) vpHeight / fullScale.height();
         float x = (float) vpX / fullScale.width();
@@ -596,46 +630,19 @@ public class PostProcessor {
 
         float as = (float) vpWidth / vpHeight;
 
-        program.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
+        materials.ocDistortion.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
                 OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3], true);
 
-        float ocLensCenter = (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE) ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
+        float ocLensCenter = (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE)
+                ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 
-        program.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f, true);
-        program.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f, true);
+        materials.ocDistortion.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f, true);
+        materials.ocDistortion.setFloat2("ocScreenCenter", x + w * 0.5f, y + h * 0.5f, true);
 
         float scaleFactor = 1.0f / OculusVrHelper.getScaleFactor();
 
-        program.setFloat2("ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
-        program.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
-    }
-
-    private void renderFinalScene() {
-
-        Material material;
-
-        if (renderingConfig.isOculusVrSupport()) {
-            material = materials.ocDistortion;
-            material.enable();
-
-            updateOcShaderParametersForVP(material, 0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
-        } else {
-            if (renderingDebugConfig.isEnabled()) {
-                material = materials.debug;
-            } else {
-                material = materials.post;
-            }
-
-            material.enable();
-        }
-
-        renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), org.lwjgl.opengl.Display.getHeight());
-
-        if (renderingConfig.isOculusVrSupport()) {
-            updateOcShaderParametersForVP(material, fullScale.width() / 2, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
-
-            renderFullscreenQuad(0, 0, org.lwjgl.opengl.Display.getWidth(), Display.getHeight());
-        }
+        materials.ocDistortion.setFloat2("ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
+        materials.ocDistortion.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
     }
 
     public void renderFullscreenQuad() {
@@ -705,7 +712,7 @@ public class PostProcessor {
         glCallList(displayListQuad);
     }
 
-    private void setViewportToFullSize() {
+    private void setViewportToWholeDisplay() {
         glViewport(0, 0, fullScale.width(), fullScale.height());
     }
 

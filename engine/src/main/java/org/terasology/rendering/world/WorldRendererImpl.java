@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.world;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -60,6 +62,8 @@ import org.terasology.world.chunks.RenderableChunk;
  * @author Benjamin Glatzel
  */
 public final class WorldRendererImpl implements WorldRenderer {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
@@ -230,6 +234,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void preRenderUpdate(WorldRenderingStage renderingStage) {
+        resetStats();
 
         currentRenderingStage = renderingStage;
         if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.LEFT_EYE) {
@@ -266,44 +271,58 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Override
     public void render(WorldRenderingStage renderingStage) {
-        resetStats();
         preRenderUpdate(renderingStage);
 
-        renderShadowMap();
-        renderWorldReflection();
+        renderShadowMap();          // into shadowMap buffer
+        renderWorldReflection();    // into sceneReflect buffer
 
         graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
         graphicState.initialClearing();
 
         graphicState.preRenderSetupSceneOpaque();
-        renderSky();
+        renderBackdrop();   // into sceneOpaque and skyBands[0-1] buffers
 
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
-            renderObjectsOpaque();
-            renderChunksOpaque();
-            renderChunksAlphaReject();
-            renderOverlays();
-            renderFirstPersonView();
+            renderObjectsOpaque();      //
+            renderChunksOpaque();       //
+            renderChunksAlphaReject();  //  all into sceneOpaque buffer
+            renderOverlays();           //
+            renderFirstPersonView();    //
 
             graphicState.postRenderCleanupSceneOpaque();
 
-            renderLightGeometry();
-            renderChunksRefractiveReflective();
+            renderLightGeometry();              // into sceneOpaque buffer
+            renderChunksRefractiveReflective(); // into sceneReflectiveRefractive buffer
         }
 
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
-        PerformanceMonitor.startActivity("Render Combined Scene");
+        PerformanceMonitor.startActivity("Pre-post composite");
         renderingProcess.createOrUpdateFullscreenFbos();
 
-        postProcessor.generateSobel();
-        postProcessor.generateAmbientOcclusionPasses();
-        postProcessor.generateCombinedScene();
+
+        postProcessor.generateSobel();                      // into sobel buffer
+        postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
+        postProcessor.generateCombinedScene();              // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
         PerformanceMonitor.endActivity();
 
-        renderSimpleBlendMaterialsIntoCombinedPass();
+        renderSimpleBlendMaterials();                       // into sceneOpaque buffer
 
-        renderFinalPostProcessedScene();
+        PerformanceMonitor.startActivity("Post-Processing");
+        postProcessor.generateLightShafts();                // into lightShafts buffer
+
+        // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
+        postProcessor.initialPostProcessing();              // into sceneOpaque buffer
+
+        // Post-Processing proper: tone mapping, bloom and blur passes
+        postProcessor.downsampleSceneAndUpdateExposure();   // downSampledScene buffer used only to update exposure value
+        postProcessor.generateToneMappedScene();            // into sceneToneMapped buffer
+        postProcessor.generateBloomPasses();                // into sceneHighPass and sceneBloom[0-2]
+        postProcessor.generateBlurPasses();                 // into sceneBlur[0-1]
+
+        // Final Post-Processing: depth-of-field blur, motion blur, film grain, grading, OculusVR distortion
+        postProcessor.finalPostProcessing(renderingStage);  // to screen normally, to a buffer if a screenshot is being taken
+        PerformanceMonitor.endActivity();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
@@ -356,7 +375,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderSky() {
+    private void renderBackdrop() {
         PerformanceMonitor.startActivity("Render Sky");
         playerCamera.lookThroughNormalized();
         graphicState.preRenderSetupBackdrop();
@@ -550,7 +569,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderSimpleBlendMaterialsIntoCombinedPass() {
+    private void renderSimpleBlendMaterials() {
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
         graphicState.preRenderSetupSimpleBlendMaterials();
 
@@ -559,12 +578,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
 
         graphicState.postRenderCleanupSimpleBlendMaterials();
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderFinalPostProcessedScene() {
-        PerformanceMonitor.startActivity("Render Post-Processing");
-        postProcessor.renderPost(currentRenderingStage);
         PerformanceMonitor.endActivity();
     }
 

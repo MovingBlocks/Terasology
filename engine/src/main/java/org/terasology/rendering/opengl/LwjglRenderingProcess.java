@@ -76,7 +76,7 @@ public class LwjglRenderingProcess {
     //private int currentlyBoundTextureId = -1;
 
     /* VARIOUS */
-    private boolean takeScreenshot;
+    private boolean isTakingScreenshot;
 
     // Note: this assumes that the settings in the configs might change at runtime,
     // but the config objects will not. At some point this might change, i.e. implementing presets.
@@ -206,7 +206,7 @@ public class LwjglRenderingProcess {
     }
 
     public void takeScreenshot() {
-        takeScreenshot = true;
+        isTakingScreenshot = true;
 
         overwriteRtWidth = renderingConfig.getScreenshotSize().getWidth(Display.getWidth());
         overwriteRtHeight = renderingConfig.getScreenshotSize().getHeight(Display.getHeight());
@@ -215,7 +215,7 @@ public class LwjglRenderingProcess {
     }
 
     public void saveScreenshot() {
-        if (!takeScreenshot) {
+        if (!isTakingScreenshot) {
             return;
         }
 
@@ -262,7 +262,7 @@ public class LwjglRenderingProcess {
 
         CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", task);
 
-        takeScreenshot = false;
+        isTakingScreenshot = false;
         overwriteRtWidth = 0;
         overwriteRtHeight = 0;
 
@@ -366,10 +366,11 @@ public class LwjglRenderingProcess {
     }
 
     public void swapSceneOpaqueFBOs() {
-        FBO temp = fboLookup.get("sceneOpaque");
-        fboLookup.put("sceneOpaque", fboLookup.get("sceneOpaquePingPong"));
-        fboLookup.put("sceneOpaquePingPong", temp);
+        FBO currentSceneOpaquePingPong = fboLookup.get("sceneOpaquePingPong");
+        fboLookup.put("sceneOpaquePingPong", fboLookup.get("sceneOpaque"));
+        fboLookup.put("sceneOpaque", currentSceneOpaquePingPong);
 
+        graphicState.setSceneOpaqueFBO(currentSceneOpaquePingPong);
         postProcessor.refreshSceneOpaqueFBOs();
     }
 
@@ -386,7 +387,11 @@ public class LwjglRenderingProcess {
     }
 
     public boolean isTakingScreenshot() {
-        return takeScreenshot;
+        return isTakingScreenshot;
+    }
+
+    public boolean isNotTakingScreenshot() {
+        return !isTakingScreenshot;
     }
 
     /**
