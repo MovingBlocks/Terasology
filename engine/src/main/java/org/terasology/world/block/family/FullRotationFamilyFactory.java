@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rotation;
