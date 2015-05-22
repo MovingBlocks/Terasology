@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
