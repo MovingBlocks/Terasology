@@ -136,7 +136,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         footerGrid.setHorizontalSpacing(8);
 
         RelativeLayout layout = new RelativeLayout();
-        layout.addWidget(new UIImage("title", Assets.getTexture("engine:terasology")),
+        layout.addWidget(new UIImage("title", Assets.getTexture("engine:terasology").get()),
                 HorizontalHint.create().fixedWidth(512).center(),
                 VerticalHint.create().fixedHeight(128).alignTop(48));
         layout.addWidget(new UILabel("subtitle", "title", "Input Settings"),

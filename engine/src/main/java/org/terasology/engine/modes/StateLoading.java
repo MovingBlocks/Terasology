@@ -18,7 +18,6 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -47,7 +46,6 @@ import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
 import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
 import org.terasology.engine.modes.loadProcesses.RegisterBiomes;
-import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
 import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.engine.modes.loadProcesses.RegisterMods;
@@ -141,7 +139,6 @@ public class StateLoading implements GameState {
     private void initClient() {
         loadProcesses.add(new JoinServer(gameManifest, joinStatus));
         loadProcesses.add(new CacheTextures());
-        loadProcesses.add(new RegisterBlockFamilyFactories());
         loadProcesses.add(new RegisterBlocks(gameManifest));
         loadProcesses.add(new RegisterBiomes(gameManifest));
         loadProcesses.add(new CacheBlocks());
@@ -166,7 +163,6 @@ public class StateLoading implements GameState {
     private void initHost() {
         loadProcesses.add(new RegisterMods(gameManifest));
         loadProcesses.add(new CacheTextures());
-        loadProcesses.add(new RegisterBlockFamilyFactories());
         loadProcesses.add(new RegisterBlocks(gameManifest));
         loadProcesses.add(new RegisterBiomes(gameManifest));
         loadProcesses.add(new CacheBlocks());

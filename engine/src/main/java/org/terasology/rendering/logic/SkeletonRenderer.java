@@ -295,7 +295,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         if (config.getRendering().getDebug().isRenderSkeletons()) {
             glDisable(GL_DEPTH_TEST);
             Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-            Material material = Assets.getMaterial("engine:white");
+            Material material = Assets.getMaterial("engine:white").get();
             material.setFloat("sunlight", 1.0f, true);
             material.setFloat("blockLight", 1.0f, true);
             material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());

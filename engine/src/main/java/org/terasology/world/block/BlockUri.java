@@ -17,14 +17,17 @@
 package org.terasology.world.block;
 
 import com.google.common.base.Objects;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.engine.Uri;
 import org.terasology.naming.Name;
 
+import java.util.Optional;
+
 /**
- * Identifier for both blocks and block families.
- * The block uri has a pattern of:
+ * Identifier for both blocks and block families. It is a combination of the ResourceUrn of a block family definition, the id of a block, and optionally the
+ * ResourceUrn of a shape.
+ * The final pattern is
  * [package]:[blockFamily]:[shapePackage]:[shapeName].[blockIdentifier]
  * the third and forth parts are only used for blocks that don't use the engine:cube shape, and which
  * are generated from a multi-shape block.
@@ -39,140 +42,125 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     public static final String IDENTIFIER_SEPARATOR = ".";
     public static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
 
-    private AssetUri shape;
+    private final ResourceUrn blockFamilyDefinition;
+    private final Optional<ResourceUrn> shape;
+    private final Optional<Name> blockName;
 
-    private Name moduleName = Name.EMPTY;
-    private Name familyName = Name.EMPTY;
-    private Name blockIdentifier = Name.EMPTY;
-
-    public BlockUri(String moduleName, String familyName) {
-        this(new Name(moduleName), new Name(familyName));
+    public BlockUri(String uri) throws BlockUriParseException {
+        try {
+            String[] split = uri.split(MODULE_SEPARATOR, 4);
+            if (split.length <= 1) {
+                throw new BlockUriParseException("Could not parse block uri: '" + uri + "'");
+            }
+            Name blockFamilyDefModule = new Name(split[0]);
+            if (split.length == 4) {
+                blockFamilyDefinition = new ResourceUrn(blockFamilyDefModule, new Name(split[1]));
+                Name shapeModuleName = new Name(split[2]);
+                split = split[3].split(IDENTIFIER_SEPARATOR_REGEX, 2);
+                shape = Optional.of(new ResourceUrn(shapeModuleName, new Name(split[0])));
+                if (split.length > 1) {
+                    blockName = Optional.of(new Name(split[1]));
+                } else {
+                    blockName = Optional.empty();
+                }
+            } else {
+                shape = Optional.empty();
+                split = split[1].split(IDENTIFIER_SEPARATOR_REGEX, 2);
+                blockFamilyDefinition = new ResourceUrn(blockFamilyDefModule, new Name(split[0]));
+                if (split.length > 1) {
+                    blockName = Optional.of(new Name(split[1]));
+                } else {
+                    blockName = Optional.empty();
+                }
+            }
+        } catch (InvalidUrnException e) {
+            throw new BlockUriParseException("Could not parse block uri: '" + uri + "'", e);
+        }
     }
 
-    public BlockUri(Name moduleName, Name familyName) {
-        this.moduleName = moduleName;
-        this.familyName = familyName;
+    public BlockUri(ResourceUrn blockFamilyDefinition) {
+        this(blockFamilyDefinition, Optional.empty(), Optional.empty());
     }
 
-    public BlockUri(String moduleName, String familyName, String identifier) {
-        this(new Name(moduleName), new Name(familyName), new Name(identifier));
+    public BlockUri(ResourceUrn blockFamilyDefinition, ResourceUrn shape) {
+        this(blockFamilyDefinition, Optional.of(shape), Optional.empty());
     }
 
-    public BlockUri(Name moduleName, Name familyName, Name identifier) {
-        this(moduleName, familyName);
-        this.blockIdentifier = identifier;
+    public BlockUri(ResourceUrn blockFamilyDefinition, Name blockName) {
+        this(blockFamilyDefinition, Optional.empty(), Optional.of(blockName));
     }
 
-    public BlockUri(String moduleName, String familyName, String shapeModuleName, String shapeName) {
-        this(new Name(moduleName), new Name(familyName), new Name(shapeModuleName), new Name(shapeName));
+    public BlockUri(ResourceUrn blockFamilyDefinition, ResourceUrn shape, Name blockName) {
+        this(blockFamilyDefinition, Optional.of(shape), Optional.of(blockName));
     }
 
-    public BlockUri(Name moduleName, Name familyName, Name shapeModuleName, Name shapeName) {
-        this(moduleName, familyName);
-        this.shape = new AssetUri(AssetType.SHAPE, shapeModuleName, shapeName);
+    public BlockUri(BlockUri parentUri, Name blockName) {
+        this(parentUri.getBlockFamilyDefinitionUrn(), parentUri.getShapeUrn(), Optional.of(blockName));
     }
 
-    public BlockUri(Name moduleName, Name familyName, AssetUri shape, Name identifier) {
-        this(moduleName, familyName, identifier);
+    private BlockUri(ResourceUrn blockFamilyDefinition, Optional<ResourceUrn> shape, Optional<Name> blockName) {
+        this.blockFamilyDefinition = blockFamilyDefinition;
         this.shape = shape;
-    }
-
-    public BlockUri(BlockUri familyUri, String identifier) {
-        this(familyUri.moduleName, familyUri.familyName, familyUri.shape, new Name(identifier));
-    }
-
-    public BlockUri(String uri) {
-        String[] split = uri.split(MODULE_SEPARATOR, 4);
-        if (split.length > 1) {
-            moduleName = new Name(split[0]);
-        }
-        if (split.length == 4) {
-            familyName = new Name(split[1]);
-            String shapeModuleName = split[2];
-            split = split[3].split(IDENTIFIER_SEPARATOR_REGEX, 2);
-            if (split.length > 1) {
-                shape = new AssetUri(AssetType.SHAPE, shapeModuleName, split[0]);
-                blockIdentifier = new Name(split[1]);
-            } else if (split.length == 1) {
-                shape = new AssetUri(AssetType.SHAPE, shapeModuleName, split[0]);
-            }
-        } else if (split.length == 2) {
-            split = split[1].split(IDENTIFIER_SEPARATOR_REGEX, 2);
-            if (split.length > 1) {
-                familyName = new Name(split[0]);
-                blockIdentifier = new Name(split[1]);
-            } else if (split.length == 1) {
-                familyName = new Name(split[0]);
-            }
-        }
-    }
-
-    public boolean isValid() {
-        return !moduleName.isEmpty() && !familyName.isEmpty() && (shape == null || shape.isValid());
+        this.blockName = blockName;
     }
 
     @Override
     public Name getModuleName() {
-        return moduleName;
+        return blockFamilyDefinition.getModuleName();
     }
 
-    public Name getFamilyName() {
-        return familyName;
+    @Override
+    public boolean isValid() {
+        return true;
     }
 
-    public boolean hasShape() {
-        return shape != null;
+    public ResourceUrn getBlockFamilyDefinitionUrn() {
+        return blockFamilyDefinition;
     }
 
-    public AssetUri getShapeUri() {
+    public Optional<ResourceUrn> getShapeUrn() {
         return shape;
     }
 
-    public Name getIdentifier() {
-        return blockIdentifier;
+    public Optional<Name> getIdentifier() {
+        return blockName;
     }
 
     /**
      * @return The uri of the block's family, including shape
      */
     public BlockUri getFamilyUri() {
-        if (blockIdentifier.isEmpty()) {
+        if (blockName.isPresent()) {
+            return new BlockUri(blockFamilyDefinition, shape, Optional.empty());
+        } else {
             return this;
         }
-        if (shape != null) {
-            return new BlockUri(moduleName, familyName, shape.getModuleName(), shape.getAssetName());
-        }
-        return new BlockUri(moduleName, familyName);
     }
 
     /**
      * @return The uri of the block's family, excluding shape
      */
     public BlockUri getRootFamilyUri() {
-        if (blockIdentifier.isEmpty() && shape == null) {
+        if (blockName.isPresent() || shape.isPresent()) {
+            return new BlockUri(blockFamilyDefinition);
+        } else {
             return this;
         }
-        return new BlockUri(moduleName, familyName);
     }
 
     @Override
     public String toString() {
-        if (isValid()) {
-            StringBuilder builder = new StringBuilder();
-            builder.append(moduleName);
+        StringBuilder builder = new StringBuilder();
+        builder.append(blockFamilyDefinition.toString());
+        if (shape.isPresent()) {
             builder.append(MODULE_SEPARATOR);
-            builder.append(familyName);
-            if (shape != null) {
-                builder.append(MODULE_SEPARATOR);
-                builder.append(shape.toSimpleString());
-            }
-            if (!blockIdentifier.isEmpty()) {
-                builder.append(IDENTIFIER_SEPARATOR);
-                builder.append(blockIdentifier);
-            }
-            return builder.toString();
+            builder.append(shape.get().toString());
         }
-        return "";
+        if (blockName.isPresent()) {
+            builder.append(IDENTIFIER_SEPARATOR);
+            builder.append(blockName.get().toString());
+        }
+        return builder.toString();
     }
 
     @Override
@@ -182,30 +170,46 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         }
         if (obj instanceof BlockUri) {
             BlockUri other = (BlockUri) obj;
-            return Objects.equal(other.moduleName, moduleName)
-                    && Objects.equal(other.familyName, familyName)
-                    && Objects.equal(other.shape, shape)
-                    && Objects.equal(other.blockIdentifier, blockIdentifier);
+            return Objects.equal(other.blockFamilyDefinition, blockFamilyDefinition)
+                    && Objects.equal(other.blockName, blockName)
+                    && Objects.equal(other.shape, shape);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(moduleName, familyName, shape, blockIdentifier);
+        return Objects.hashCode(blockFamilyDefinition, shape, blockName);
     }
 
     @Override
     public int compareTo(BlockUri o) {
-        int result = moduleName.compareTo(o.getModuleName());
+        int result = blockFamilyDefinition.compareTo(o.blockFamilyDefinition);
         if (result == 0) {
-            result = familyName.compareTo(o.getFamilyName());
-        }
-        if (result == 0 && shape != null && o.shape != null) {
-            result = shape.compareTo(o.shape);
+            if (shape.isPresent()) {
+                if (o.shape.isPresent()) {
+                    result = shape.get().compareTo(o.shape.get());
+                } else {
+                    return 1;
+                }
+            } else {
+                if (o.shape.isPresent()) {
+                    return -1;
+                }
+            }
         }
         if (result == 0) {
-            result = blockIdentifier.compareTo(o.blockIdentifier);
+            if (blockName.isPresent()) {
+                if (o.blockName.isPresent()) {
+                    result = blockName.get().compareTo(o.blockName.get());
+                } else {
+                    return 1;
+                }
+            } else {
+                if (o.blockName.isPresent()) {
+                    return -1;
+                }
+            }
         }
         return result;
     }

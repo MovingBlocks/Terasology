@@ -21,7 +21,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * @author synopia
  */
-public class BehaviorTreeData {
+public class BehaviorTreeData implements AssetData {
     private Map<Node, RenderableNode> renderableNodes = Maps.newHashMap();
     private Node root;
     private RenderableNode renderableRoot;

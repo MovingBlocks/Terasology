@@ -17,13 +17,13 @@ package org.terasology.editor.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.editor.TeraEd;
 import org.terasology.editor.properties.PropertyProvider;
 import org.terasology.editor.properties.ReflectionProvider;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.StateChangeSubscriber;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.GLSLMaterial;
 
 import javax.swing.*;
@@ -123,19 +123,17 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     public void onStateChange() {
         shaderPropertyMenuEntries.clear();
         shaderPropertiesMenu.removeAll();
-        for (GLSLMaterial material : CoreRegistry.get(AssetManager.class).listLoadedAssets(AssetType.MATERIAL, GLSLMaterial.class)) {
-            if (material.getShaderParameters() != null) {
-                GLSLMaterial finalMat = material;
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        for (Material material : assetManager.getLoadedAssets(Material.class)) {
+            GLSLMaterial finalMat = (GLSLMaterial) material;
+            if (finalMat.getShaderParameters() != null) {
                 final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters());
                 if (!provider.getProperties().isEmpty()) {
-                    final String programName = material.getURI().toString();
+                    final String programName = material.getUrn().toString();
                     JMenuItem menuItem = new JMenuItem(programName);
-                    menuItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            propertyPanel.setActivePropertyProvider(provider);
-                            propertyPanel.setTitle(programName);
-                        }
+                    menuItem.addActionListener(e -> {
+                        propertyPanel.setActivePropertyProvider(provider);
+                        propertyPanel.setTitle(programName);
                     });
                     shaderPropertyMenuEntries.add(menuItem);
                     shaderPropertiesMenu.add(menuItem);

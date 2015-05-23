@@ -19,8 +19,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -46,7 +47,7 @@ import static org.lwjgl.opengl.GL11.glTexParameterf;
 /**
  * @author Immortius
  */
-public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture {
+public class OpenGLTexture extends Texture {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLTexture.class);
 
@@ -61,24 +62,13 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     // TODO: Make the retention of this dependent on a keep-in-memory setting
     private TextureData textureData;
 
-    /**
-     * Note: Generally should not be called directly. Instead use Assets.generateAsset().
-     *
-     * @param uri
-     * @param data
-     */
-    // TODO: Create lwjgl renderer subsystem, and make this package private
-    public OpenGLTexture(AssetUri uri, TextureData data) {
-        super(uri);
-
-        onReload(data);
+    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
-    protected void onReload(TextureData data) {
-        this.width = data.getWidth();
-        this.height = data.getHeight();
-        this.depth = data.getDepth();
+    protected void doReload(TextureData data) {
         this.wrapMode = data.getWrapMode();
         this.filterMode = data.getFilterMode();
         this.textureType = data.getType();
@@ -90,7 +80,10 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
         switch (textureType) {
             case TEXTURE2D:
-                logger.debug("Bound texture '{}' - {}", getURI(), id);
+                logger.debug("Bound texture '{}' - {}", getUrn(), id);
+                width = data.getWidth();
+                height = data.getHeight();
+                depth = 1;
                 glBindTexture(GL11.GL_TEXTURE_2D, id);
 
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, getGLMode(wrapMode));
@@ -109,7 +102,34 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 }
                 break;
             case TEXTURE3D:
-                logger.debug("Bound texture '{}' - {}", getURI(), id);
+                final int byteLength = 4 * 16 * 16 * 16;
+                final int strideX = 16 * 4;
+                final int strideY = 16 * 16 * 4;
+                final int strideZ = 4;
+
+                if (data.getWidth() % data.getHeight() != 0 || data.getWidth() / data.getHeight() != data.getHeight()) {
+                    throw new RuntimeException("3D texture must be cubic (height^3) - width must thus be a multiple of height");
+                }
+                width = data.getHeight();
+                height = data.getHeight();
+                depth = data.getHeight();
+
+                ByteBuffer alignedBuffer = ByteBuffer.allocateDirect(byteLength);
+                for (int x = 0; x < height; x++) {
+                    for (int y = 0; y < height; y++) {
+                        for (int z = 0; z < height; z++) {
+                            final int index = x * strideX + z * strideZ + strideY * y;
+
+                            alignedBuffer.put(data.getBuffers()[0].get(index));
+                            alignedBuffer.put(data.getBuffers()[0].get(index + 1));
+                            alignedBuffer.put(data.getBuffers()[0].get(index + 2));
+                            alignedBuffer.put(data.getBuffers()[0].get(index + 3));
+                        }
+                    }
+                }
+                alignedBuffer.flip();
+
+                logger.debug("Bound texture '{}' - {}", getUrn(), id);
                 glBindTexture(GL12.GL_TEXTURE_3D, id);
 
                 glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, getGLMode(wrapMode));
@@ -122,13 +142,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
                 GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, data.getBuffers().length - 1);
 
-                if (data.getBuffers().length > 0) {
-                    for (int i = 0; i < data.getBuffers().length; i++) {
-                        GL12.glTexImage3D(GL12.GL_TEXTURE_3D, i, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
-                    }
-                } else {
-                    GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
-                }
+                GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, alignedBuffer);
 
                 break;
         }
@@ -168,7 +182,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         if (id != 0) {
             glDeleteTextures(id);
             id = 0;
@@ -177,6 +191,11 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     public int getId() {
         return id;
+    }
+
+    @Override
+    public int getDepth() {
+        return depth;
     }
 
     public int getWidth() {

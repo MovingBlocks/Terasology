@@ -18,7 +18,6 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
@@ -26,12 +25,13 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -71,14 +71,13 @@ public class GLSLMaterial extends BaseMaterial {
     private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
     private int activeFeaturesMask;
 
-    private ShaderManager shaderManager;
+    private final ShaderManager shaderManager;
     private ShaderParameters shaderParameters;
-    private boolean disposed;
 
-    public GLSLMaterial(AssetUri uri, MaterialData data) {
-        super(uri);
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
+        super(urn, assetType);
         shaderManager = CoreRegistry.get(ShaderManager.class);
-        onReload(data);
+        reload(data);
     }
 
     public ShaderParameters getShaderParameters() {
@@ -140,8 +139,8 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public final void onReload(MaterialData data) {
-        disposeData();
+    public final void doReload(MaterialData data) {
+        doDispose();
 
         shader = (GLSLShader) data.getShader();
         recompile();
@@ -179,14 +178,10 @@ public class GLSLMaterial extends BaseMaterial {
         }
     }
 
-    @Override
-    protected void onDispose() {
-        logger.debug("Disposing material {}.", getURI());
-        disposeData();
-        disposed = true;
-    }
 
-    private void disposeData() {
+    @Override
+    protected void doDispose() {
+        logger.debug("Disposing material {}.", getUrn());
         TIntIntIterator it = shaderPrograms.iterator();
         while (it.hasNext()) {
             it.advance();
@@ -231,7 +226,7 @@ public class GLSLMaterial extends BaseMaterial {
             activeFeaturesMask = ShaderProgramFeature.getBitset(activeFeatures);
             activeFeaturesChanged = true;
         } else {
-            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getURI(), shader.getURI());
+            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getUrn(), shader.getUrn());
         }
     }
 

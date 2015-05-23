@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.assets.atlas;
 
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class AtlasData {
+public class AtlasData implements AssetData {
 
     private Map<Name, SubtextureData> subtextures;
 

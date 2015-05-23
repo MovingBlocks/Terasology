@@ -16,10 +16,8 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.base.Function;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.TerasologyEngine;
@@ -56,14 +54,11 @@ import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
-import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -71,6 +66,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 /**
@@ -104,68 +100,22 @@ public class CoreCommands extends BaseComponentSystem {
         pickupBuilder = new PickupBuilder(entityManager);
     }
 
-    @Command(shortDescription = "Reloads a skin")
-    public String reloadSkin(@CommandParam("skin") String skin) {
-        AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
-        UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
-        if (uiSkinData != null) {
-            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiSkinData);
-            return "Success";
-        } else {
-            return "Unable to resolve skin '" + skin + "'";
-        }
-    }
-
-    @Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
-    public String enableAutoScreenReloading() {
-        CoreRegistry.get(NUIManager.class).enableAutoReload();
-        return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
-    }
-
     @Command(shortDescription = "Reloads a ui screen")
     public String reloadScreen(@CommandParam("ui") String ui) {
-
-        AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
-        UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
-        if (uiData != null) {
+        Optional<UIElement> uiData = CoreRegistry.get(AssetManager.class).getAsset(ui, UIElement.class);
+        if (uiData.isPresent()) {
             NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
-            boolean wasOpen = nuiManager.isOpen(uri);
+            boolean wasOpen = nuiManager.isOpen(uiData.get().getUrn());
             if (wasOpen) {
-                nuiManager.closeScreen(uri);
+                nuiManager.closeScreen(uiData.get().getUrn());
             }
 
-            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
-
             if (wasOpen) {
-                nuiManager.pushScreen(uri);
+                nuiManager.pushScreen(uiData.get());
             }
             return "Success";
         } else {
             return "Unable to resolve ui '" + ui + "'";
-        }
-    }
-
-    @Command(shortDescription = "Reloads a shader")
-    public String reloadShader(@CommandParam("shader") String shader) {
-        AssetUri uri = new AssetUri(AssetType.SHADER, shader);
-        ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
-        if (shaderData != null) {
-            CoreRegistry.get(AssetManager.class).generateAsset(uri, shaderData);
-            return "Success";
-        } else {
-            return "Unable to resolve shader '" + shader + "'";
-        }
-    }
-
-    @Command(shortDescription = "Reloads a material")
-    public String reloadMaterial(@CommandParam("material") String material) {
-        AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
-        MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
-        if (materialData != null) {
-            CoreRegistry.get(AssetManager.class).generateAsset(uri, materialData);
-            return "Success";
-        } else {
-            return "Unable to resolve material '" + material + "'";
         }
     }
 
@@ -188,7 +138,7 @@ public class CoreCommands extends BaseComponentSystem {
         Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
         if (prefab != null) {
             for (EntityRef entity : entityManager.getAllEntities()) {
-                if (prefab.getURI().equals(entity.getPrefabURI())) {
+                if (prefab.equals(entity.getParentPrefab())) {
                     entity.destroy();
                 }
             }
@@ -273,11 +223,11 @@ public class CoreCommands extends BaseComponentSystem {
         }
         Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
-        Prefab prefab = Assets.getPrefab(prefabName);
-        if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-            entityManager.create(prefab, spawnPos, rotation);
+        Optional<Prefab> prefab = Assets.getPrefab(prefabName);
+        if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
+            entityManager.create(prefab.get(), spawnPos, rotation);
             return "Done";
-        } else if (prefab == null) {
+        } else if (!prefab.isPresent()) {
             return "Unknown prefab";
         } else {
             return "Prefab cannot be spawned (no location component)";

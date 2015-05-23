@@ -21,6 +21,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 
+import java.util.Optional;
+
 /**
  * @author Immortius
  */
@@ -31,7 +33,7 @@ public class NullSound extends StaticSound {
     private float length;
 
 
-    public NullSound(ResourceUrn urn, StaticSoundData data, AssetType<?, StaticSoundData> assetType) {
+    public NullSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data) {
         super(urn, assetType);
         reload(data);
     }
@@ -79,8 +81,8 @@ public class NullSound extends StaticSound {
     }
 
     @Override
-    protected Asset<StaticSoundData> doCreateInstance(ResourceUrn instanceUrn, AssetType<?, StaticSoundData> parentAssetType) {
-        return new NullSound(instanceUrn, parentAssetType, channels, sampleRate, length);
+    protected Optional<? extends Asset<StaticSoundData>> doCreateCopy(ResourceUrn instanceUrn, AssetType<?, StaticSoundData> parentAssetType) {
+        return Optional.of(new NullSound(instanceUrn, parentAssetType, channels, sampleRate, length));
     }
 
     @Override

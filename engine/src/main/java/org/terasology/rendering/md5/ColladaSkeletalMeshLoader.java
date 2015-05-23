@@ -15,45 +15,47 @@
  */
 package org.terasology.rendering.md5;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetLoader;
-import org.terasology.module.Module;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.format.AbstractAssetFileFormat;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.collada.ColladaLoader;
+import org.terasology.rendering.collada.ColladaParseException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Importer for Collada data exchange model files.  Supports skeletal mesh data
- * 
- * The development of this loader was greatly influenced by 
+ * <p>
+ * The development of this loader was greatly influenced by
  * http://www.wazim.com/Collada_Tutorial_1.htm
  *
  * @author mkienenb@gmail.com
  */
-
-public class ColladaSkeletalMeshLoader extends ColladaLoader implements AssetLoader<SkeletalMeshData> {
+@RegisterAssetFileFormat
+public class ColladaSkeletalMeshLoader extends AbstractAssetFileFormat<SkeletalMeshData> {
 
     private static final Logger logger = LoggerFactory.getLogger(ColladaSkeletalMeshLoader.class);
 
-    @Override
-    public SkeletalMeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
-        logger.info("Loading skeletal mesh for " + urls);
-
-        try {
-            parseSkeletalMeshData(stream);
-        } catch (ColladaParseException e) {
-            logger.error("Unable to load skeletal mesh for " + urls, e);
-            return null;
-        }
-
-        SkeletalMeshData skeletalMesh = skeletonBuilder.build();
-
-        return skeletalMesh;
+    public ColladaSkeletalMeshLoader() {
+        super("dae");
     }
 
+    @Override
+    public SkeletalMeshData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
+        logger.info("Loading skeletal mesh for " + urn);
+
+
+        try (InputStream stream = inputs.get(0).openStream()) {
+            ColladaLoader loader = new ColladaLoader();
+            return loader.parseSkeletalMeshData(stream);
+        } catch (ColladaParseException e) {
+            throw new IOException("Unable to load skeletal mesh for " + urn, e);
+        }
+    }
 }

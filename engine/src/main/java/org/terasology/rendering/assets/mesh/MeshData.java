@@ -19,12 +19,12 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 
 /**
  * @author Immortius
  */
-public class MeshData {
+public class MeshData implements AssetData {
 
     private TFloatList vertices = new TFloatArrayList();
     private TFloatList texCoord0 = new TFloatArrayList();

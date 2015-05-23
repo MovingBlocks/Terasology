@@ -63,6 +63,9 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -675,9 +678,9 @@ public class LwjglRenderingProcess {
         Material material;
 
         if (renderingDebugConfig.isEnabled()) {
-            material = Assets.getMaterial("engine:prog.debug");
+            material = Assets.getMaterial("engine:prog.debug").get();
         } else {
-            material = Assets.getMaterial("engine:prog.post");
+            material = Assets.getMaterial("engine:prog.post").get();
         }
 
         material.enable();
@@ -730,15 +733,15 @@ public class LwjglRenderingProcess {
         Material material;
 
         if (renderingConfig.isOculusVrSupport()) {
-            material = Assets.getMaterial("engine:prog.ocDistortion");
+            material = Assets.getMaterial("engine:prog.ocDistortion").get();
             material.enable();
 
             updateOcShaderParametersForVP(material, 0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderingStage.LEFT_EYE);
         } else {
             if (renderingDebugConfig.isEnabled()) {
-                material = Assets.getMaterial("engine:prog.debug");
+                material = Assets.getMaterial("engine:prog.debug").get();
             } else {
-                material = Assets.getMaterial("engine:prog.post");
+                material = Assets.getMaterial("engine:prog.post").get();
             }
 
             material.enable();
@@ -754,7 +757,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateCombinedScene() {
-        Assets.getMaterial("engine:prog.combine").enable();
+        Assets.getMaterial("engine:prog.combine").get().enable();
 
         bindFbo("sceneOpaquePingPong");
 
@@ -769,7 +772,7 @@ public class LwjglRenderingProcess {
     }
 
     private void applyLightBufferPass(String target) {
-        Material program = Assets.getMaterial("engine:prog.lightBufferPass");
+        Material program = Assets.getMaterial("engine:prog.lightBufferPass").get();
         program.enable();
 
         FBO targetFbo = getFBO(target);
@@ -819,7 +822,7 @@ public class LwjglRenderingProcess {
         skyBand.bind();
         setRenderBufferMask(true, false, false);
 
-        Material material = Assets.getMaterial("engine:prog.blur");
+        Material material = Assets.getMaterial("engine:prog.blur").get();
 
         material.enable();
         material.setFloat("radius", 8.0f, true);
@@ -841,7 +844,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateToneMappedScene() {
-        Assets.getMaterial("engine:prog.hdr").enable();
+        Assets.getMaterial("engine:prog.hdr").get().enable();
 
         bindFbo("sceneToneMapped");
 
@@ -853,7 +856,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateLightShafts() {
-        Assets.getMaterial("engine:prog.lightshaft").enable();
+        Assets.getMaterial("engine:prog.lightshaft").get().enable();
 
         FBO lightshaft = getFBO("lightShafts");
 
@@ -873,7 +876,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateSSAO() {
-        Material ssaoShader = Assets.getMaterial("engine:prog.ssao");
+        Material ssaoShader = Assets.getMaterial("engine:prog.ssao").get();
         ssaoShader.enable();
 
         FBO ssao = getFBO("ssao");
@@ -897,7 +900,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateSobel() {
-        Assets.getMaterial("engine:prog.sobel").enable();
+        Assets.getMaterial("engine:prog.sobel").get().enable();
 
         FBO sobel = getFBO("sobel");
 
@@ -917,7 +920,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateBlurredSSAO() {
-        Material shader = Assets.getMaterial("engine:prog.ssaoBlur");
+        Material shader = Assets.getMaterial("engine:prog.ssaoBlur").get();
         shader.enable();
 
         FBO ssao = getFBO("ssaoBlurred");
@@ -940,7 +943,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generatePrePost() {
-        Assets.getMaterial("engine:prog.prePost").enable();
+        Assets.getMaterial("engine:prog.prePost").get().enable();
 
         bindFbo("scenePrePost");
 
@@ -952,7 +955,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateHighPass() {
-        Material program = Assets.getMaterial("engine:prog.highp");
+        Material program = Assets.getMaterial("engine:prog.highp").get();
         program.setFloat("highPassThreshold", bloomHighPassThreshold, true);
         program.enable();
 
@@ -985,7 +988,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateBlur(int id) {
-        Material material = Assets.getMaterial("engine:prog.blur");
+        Material material = Assets.getMaterial("engine:prog.blur").get();
         material.enable();
 
         material.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
@@ -1017,7 +1020,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateBloom(int id) {
-        Material shader = Assets.getMaterial("engine:prog.blur");
+        Material shader = Assets.getMaterial("engine:prog.blur").get();
 
         shader.enable();
         shader.setFloat("radius", bloomBlurRadius, true);
@@ -1048,7 +1051,7 @@ public class LwjglRenderingProcess {
     }
 
     private void generateDownsampledScene() {
-        Material shader = Assets.getMaterial("engine:prog.down");
+        Material shader = Assets.getMaterial("engine:prog.down").get();
         shader.enable();
 
         for (int i = 4; i >= 0; i--) {

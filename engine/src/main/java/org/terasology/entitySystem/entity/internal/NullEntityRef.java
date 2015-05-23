@@ -15,7 +15,6 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
-import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
@@ -99,7 +98,7 @@ public final class NullEntityRef extends EntityRef {
     public boolean isPersistent() {
         return false;
     }
-    
+
     @Override
     public boolean isAlwaysRelevant() {
         return false;
@@ -122,12 +121,6 @@ public final class NullEntityRef extends EntityRef {
     public Prefab getParentPrefab() {
         return null;
     }
-
-    @Override
-    public AssetUri getPrefabURI() {
-        return null;
-    }
-
 
     @Override
     public String toString() {

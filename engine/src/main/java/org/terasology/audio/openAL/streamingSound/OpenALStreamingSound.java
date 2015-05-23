@@ -16,33 +16,35 @@
 package org.terasology.audio.openAL.streamingSound;
 
 import org.lwjgl.openal.AL10;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.OpenALManager;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
-public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData> implements StreamingSound {
+public final class OpenALStreamingSound extends StreamingSound {
     private static final int BUFFER_POOL_SIZE = 8;
     private static final int BUFFER_SIZE = 4096 * 8;
 
     protected int[] buffers = new int[0];
     protected int lastUpdatedBuffer;
 
-    private OpenALManager audioManager;
+    private final OpenALManager audioManager;
     private StreamingSoundData stream;
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
-    public OpenALStreamingSound(AssetUri uri, StreamingSoundData data, OpenALManager audioManager) {
-        super(uri);
+    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager) {
+        super(urn, assetType);
         this.audioManager = audioManager;
-        onReload(data);
+        reload(data);
     }
 
     public int[] getBuffers() {
@@ -114,8 +116,23 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    protected void onDispose() {
+    public void reset() {
+        stream.reset();
+    }
 
+    @Override
+    protected void doReload(StreamingSoundData data) {
+        stream = data;
+        this.initializeBuffers();
+    }
+
+    @Override
+    protected Optional<? extends Asset<StreamingSoundData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, StreamingSoundData> parentAssetType) {
+        return Optional.of(new OpenALStreamingSound(copyUrn, parentAssetType, stream, audioManager));
+    }
+
+    @Override
+    protected void doDispose() {
         audioManager.purgeSound(this);
 
         // TODO: Fix this - probably failing if sound is playing
@@ -126,16 +143,5 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
         }
         OpenALException.checkState("Deleting buffer data");
         buffers = new int[0];
-    }
-
-    @Override
-    protected void onReload(StreamingSoundData data) {
-        stream = data;
-        this.initializeBuffers();
-    }
-
-    @Override
-    public void reset() {
-        stream.reset();
     }
 }

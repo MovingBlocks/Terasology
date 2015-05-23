@@ -19,6 +19,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
@@ -34,6 +35,15 @@ public class LwjglCustomViewPort extends BaseLwjglSubsystem {
     @Override
     public void preInitialise() {
         super.preInitialise();
+    }
+
+    @Override
+    public void initialise(Config config) {
+
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
     }
 
     @Override

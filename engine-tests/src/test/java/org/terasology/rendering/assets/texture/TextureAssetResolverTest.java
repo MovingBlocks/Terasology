@@ -16,42 +16,26 @@
 
 package org.terasology.rendering.assets.texture;
 
-import java.nio.ByteBuffer;
-
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.subsystem.headless.assets.HeadlessTexture;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
+import java.nio.ByteBuffer;
+import java.util.Optional;
+
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests texture asset resolvers.
+ *
  * @author Martin Steiger
  */
 public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
-
-    @BeforeClass
-    public static void setupAssetManager() {
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
-            @Override
-            public Texture buildAsset(AssetUri uri, TextureData data) {
-                return new HeadlessTexture(uri, data);
-            }
-        });
-
-        assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
-        assetManager.addResolver(AssetType.TEXTURE, new NoiseTextureAssetResolver());
-    }
 
     @Test
     public void testColorTextures() {
@@ -61,10 +45,11 @@ public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
         for (int i = 0; i < 10; i++) {
             int rgba = r.nextInt();
             Color red = new Color(rgba);
-            AssetUri textureUriForColor = TextureUtil.getTextureUriForColor(red);
-            String simpleString = textureUriForColor.toSimpleString();
-            Texture tex = Assets.getTexture(simpleString);
-            ByteBuffer dataBuffer = tex.getData().getBuffers()[0];
+            ResourceUrn textureUriForColor = TextureUtil.getTextureUriForColor(red);
+            String simpleString = textureUriForColor.toString();
+            Optional<Texture> tex = Assets.getTexture(simpleString);
+            assertTrue(tex.isPresent());
+            ByteBuffer dataBuffer = tex.get().getData().getBuffers()[0];
             int firstPixel = dataBuffer.asIntBuffer().get(0);
 
             Assert.assertEquals(rgba, firstPixel);
@@ -76,12 +61,13 @@ public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
 
         int size = 256;
 
-        AssetUri textureUriForWhiteNoise = TextureUtil.getTextureUriForWhiteNoise(size, 123354, 0, 255);
-        String simpleString = textureUriForWhiteNoise.toSimpleString();
-        Texture tex = Assets.getTexture(simpleString);
+        ResourceUrn textureUriForWhiteNoise = TextureUtil.getTextureUriForWhiteNoise(size, 123354, 0, 255);
+        String simpleString = textureUriForWhiteNoise.toString();
+        Optional<Texture> tex = Assets.getTexture(simpleString);
 
-        Assert.assertTrue(tex.getWidth() == size);
-        Assert.assertTrue(tex.getHeight() == size);
+        assertTrue(tex.isPresent());
+        assertTrue(tex.get().getWidth() == size);
+        assertTrue(tex.get().getHeight() == size);
     }
 }
 

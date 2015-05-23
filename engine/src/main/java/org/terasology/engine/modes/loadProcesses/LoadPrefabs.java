@@ -16,12 +16,10 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.Iterator;
@@ -32,7 +30,7 @@ import java.util.Iterator;
 public class LoadPrefabs extends StepBasedLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(LoadPrefabs.class);
 
-    private Iterator<AssetUri> prefabs;
+    private Iterator<ResourceUrn> prefabs;
 
     @Override
     public String getMessage() {
@@ -50,8 +48,8 @@ public class LoadPrefabs extends StepBasedLoadProcess {
 
     @Override
     public void begin() {
-        prefabs = Assets.list(AssetType.PREFAB).iterator();
-        setTotalSteps(Lists.newArrayList(Assets.list(AssetType.PREFAB)).size());
+        prefabs = Assets.list(Prefab.class).iterator();
+        setTotalSteps(Assets.list(Prefab.class).size());
     }
 
     @Override

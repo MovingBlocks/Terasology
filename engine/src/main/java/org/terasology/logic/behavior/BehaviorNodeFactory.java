@@ -19,9 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.engine.ComponentFieldUri;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -53,6 +54,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Factory to create node instances from node entities.
@@ -83,8 +85,8 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     @In
     private ComponentLibrary componentLibrary;
 
-    private List<AssetUri> sounds = Lists.newArrayList();
-    private List<AssetUri> music = Lists.newArrayList();
+    private List<ResourceUrn> sounds = Lists.newArrayList();
+    private List<ResourceUrn> music = Lists.newArrayList();
 
     public BehaviorNodeFactory() {
         CoreRegistry.put(BehaviorNodeFactory.class, this);
@@ -96,33 +98,29 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     }
 
     public void refreshLibrary() {
-        for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
-            sounds.add(uri);
-        }
-        for (AssetUri uri : assetManager.listAssets(AssetType.MUSIC)) {
-            music.add(uri);
-        }
-        providerFactory.register("sounds", new ReadOnlyBinding<List<AssetUri>>() {
+        sounds.addAll(assetManager.getAvailableAssets(StaticSound.class).stream().collect(Collectors.toList()));
+        music.addAll(assetManager.getAvailableAssets(StreamingSound.class).stream().collect(Collectors.toList()));
+        providerFactory.register("sounds", new ReadOnlyBinding<List<ResourceUrn>>() {
                     @Override
-                    public List<AssetUri> get() {
+                    public List<ResourceUrn> get() {
                         return sounds;
                     }
-                }, new StringTextRenderer<AssetUri>() {
+                }, new StringTextRenderer<ResourceUrn>() {
                     @Override
-                    public String getString(AssetUri value) {
-                        return value.getAssetName().toString();
+                    public String getString(ResourceUrn value) {
+                        return value.getResourceName().toString();
                     }
                 }
         );
-        providerFactory.register("music", new ReadOnlyBinding<List<AssetUri>>() {
+        providerFactory.register("music", new ReadOnlyBinding<List<ResourceUrn>>() {
                     @Override
-                    public List<AssetUri> get() {
+                    public List<ResourceUrn> get() {
                         return music;
                     }
-                }, new StringTextRenderer<AssetUri>() {
+                }, new StringTextRenderer<ResourceUrn>() {
                     @Override
-                    public String getString(AssetUri value) {
-                        return value.getAssetName().toString();
+                    public String getString(ResourceUrn value) {
+                        return value.getResourceName().toString();
                     }
                 }
         );
@@ -180,7 +178,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         for (Prefab prefab : prefabs) {
             EntityBuilder entityBuilder = entityManager.newBuilder(prefab);
             entityBuilder.setPersistent(false);
-            EntityRef entityRef =entityBuilder.build();
+            EntityRef entityRef = entityBuilder.build();
             BehaviorNodeComponent component = entityRef.getComponent(BehaviorNodeComponent.class);
             ClassMetadata<? extends Node, ?> classMetadata = nodesClassLibrary.resolve(component.type);
             if (classMetadata != null) {

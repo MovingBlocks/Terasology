@@ -15,13 +15,15 @@
  */
 package org.terasology.logic.behavior;
 
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.asset.AssetManager;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.MonitorNode;
 import org.terasology.logic.behavior.tree.ParallelNode;
@@ -33,11 +35,13 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author synopia
@@ -49,15 +53,19 @@ public class FactoryTest {
         CoreRegistry.put(AssetManager.class, assetManager);
         BehaviorNodeFactory nodeFactory = mock(BehaviorNodeFactory.class);
         CoreRegistry.put(BehaviorNodeFactory.class, nodeFactory);
-        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        BehaviorTreeFormat loader = new BehaviorTreeFormat();
         BehaviorTreeData data = buildSample();
 
         ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
         loader.save(os, data);
         byte[] jsonExpected = os.toByteArray();
-        data = loader.load(null, new ByteArrayInputStream(jsonExpected), null, null);
+
+        AssetDataFile assetDataFile = mock(AssetDataFile.class);
+        when(assetDataFile.openStream()).thenReturn(new BufferedInputStream(new ByteArrayInputStream(jsonExpected)));
+
+        data = loader.load(null, Lists.newArrayList(assetDataFile));
         os = new ByteArrayOutputStream(10000);
-        loader = new BehaviorTreeLoader();
+        loader = new BehaviorTreeFormat();
         loader.save(os, data);
         byte[] jsonActual = os.toByteArray();
         Assert.assertArrayEquals(jsonActual, jsonExpected);

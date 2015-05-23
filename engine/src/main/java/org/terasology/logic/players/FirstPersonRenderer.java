@@ -16,12 +16,11 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Maps;
-
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Asset;
 import org.terasology.asset.Assets;
+import org.terasology.assets.Asset;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -85,7 +84,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
         handMesh = tessellator.generateMesh();
-        handTex = Assets.getTexture("engine:char");
+        handTex = Assets.getTexture("engine:char").get();
     }
 
     @Override
@@ -135,7 +134,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:prog.block");
+        Material shader = Assets.getMaterial("engine:prog.block").get();
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -159,7 +158,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
 
     private void renderIcon(TextureRegion iconTexture, float bobOffset, float handMovementAnimationOffset) {
         if (iconTexture != null) {
-            Material shader = Assets.getMaterial("engine:prog.block");
+            Material shader = Assets.getMaterial("engine:prog.block").get();
             shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
             shader.enable();
@@ -197,7 +196,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
         Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
-        Material shader = Assets.getMaterial("engine:prog.block");
+        Material shader = Assets.getMaterial("engine:prog.block").get();
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();

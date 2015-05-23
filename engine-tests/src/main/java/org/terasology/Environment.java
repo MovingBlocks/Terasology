@@ -16,11 +16,11 @@
 
 package org.terasology;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.naming.Name;
-
-import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.util.Set;
@@ -36,9 +36,10 @@ public class Environment {
 
     /**
      * Default setup order
+     *
      * @param moduleNames a list of module names
      */
-    public Environment(Name ... moduleNames) {
+    public Environment(Name... moduleNames) {
 
         try {
             reset(Sets.newHashSet(moduleNames));
@@ -60,9 +61,9 @@ public class Environment {
 
         setupAudio();
 
-        setupAssetManager();
+        AssetManager assetManager = setupAssetManager();
 
-        setupBlockManager();
+        setupBlockManager(assetManager);
 
         setupCollisionManager();
 
@@ -105,15 +106,17 @@ public class Environment {
         // empty
     }
 
-    protected void setupAssetManager() {
+    protected AssetManager setupAssetManager() {
         // empty
+        return null;
     }
 
-    protected void setupEmptyAssetManager() {
+    protected AssetManager setupEmptyAssetManager() {
         // empty
+        return null;
     }
 
-    protected void setupBlockManager() {
+    protected void setupBlockManager(AssetManager assetManager) {
         // empty
     }
 

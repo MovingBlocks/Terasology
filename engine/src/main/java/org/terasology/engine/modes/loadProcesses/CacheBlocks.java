@@ -36,11 +36,13 @@ public class CacheBlocks extends StepBasedLoadProcess {
 
     @Override
     public boolean step() {
-        BlockFamily family = blockFamilyIterator.next();
-        if (!family.getArchetypeBlock().isInvisible()) {
-            family.getArchetypeBlock().getMesh();
+        if (blockFamilyIterator.hasNext()) {
+            BlockFamily family = blockFamilyIterator.next();
+            if (!family.getArchetypeBlock().isInvisible()) {
+                family.getArchetypeBlock().getMesh();
+            }
+            stepDone();
         }
-        stepDone();
         return !blockFamilyIterator.hasNext();
     }
 

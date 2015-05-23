@@ -16,14 +16,14 @@
 package org.terasology.rendering.assets.shader;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class ShaderData {
+public class ShaderData implements AssetData {
 
     private String vertexProgram;
     private String fragmentProgram;

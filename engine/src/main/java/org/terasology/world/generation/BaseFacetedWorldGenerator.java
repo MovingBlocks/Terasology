@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generation;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Rect2i;
@@ -29,6 +28,7 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {

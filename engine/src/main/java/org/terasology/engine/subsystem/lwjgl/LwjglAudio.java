@@ -19,9 +19,10 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.OpenALException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
@@ -41,8 +42,19 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void postInitialise(Config config) {
+    public void initialise(Config config) {
         initOpenAL(config);
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+        assetTypeManager.registerCoreAssetType(StaticSound.class, audioManager.getStaticSoundFactory(), "sounds");
+        assetTypeManager.registerCoreAssetType(StreamingSound.class, audioManager.getStreamingSoundFactory(), "music");
+    }
+
+    @Override
+    public void postInitialise(Config config) {
+
     }
 
     @Override
@@ -66,20 +78,13 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     }
 
     private void initOpenAL(Config config) {
-        if (config.getAudio().isDisableSound()) {
+        try {
+            audioManager = new OpenALManager(config.getAudio());
+        } catch (LWJGLException | OpenALException e) {
+            logger.warn("Could not load OpenAL manager - sound is disabled", e);
             audioManager = new NullAudioManager();
-        } else {
-            try {
-                audioManager = new OpenALManager(config.getAudio());
-            } catch (LWJGLException | OpenALException e) {
-                logger.warn("Could not load OpenAL manager - sound is disabled", e);
-                audioManager = new NullAudioManager();
-            }
         }
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
-        assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }
 
     @Override

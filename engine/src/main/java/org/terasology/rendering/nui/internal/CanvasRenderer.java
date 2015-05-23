@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -44,7 +44,7 @@ public interface CanvasRenderer {
 
     void crop(Rect2i cropRegion);
 
-    FrameBufferObject getFBO(AssetUri uri, Vector2i size);
+    FrameBufferObject getFBO(ResourceUrn urn, Vector2i size);
 
     void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha);
 

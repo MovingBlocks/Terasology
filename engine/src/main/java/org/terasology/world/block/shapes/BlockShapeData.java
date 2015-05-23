@@ -17,8 +17,7 @@ package org.terasology.world.block.shapes;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Maps;
-
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
@@ -29,7 +28,7 @@ import java.util.EnumMap;
 /**
  * @author Immortius
  */
-public class BlockShapeData {
+public class BlockShapeData implements AssetData {
     private String displayName = "";
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);

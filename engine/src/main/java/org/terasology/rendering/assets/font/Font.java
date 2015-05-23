@@ -16,7 +16,9 @@
 
 package org.terasology.rendering.assets.font;
 
-import org.terasology.asset.Asset;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Vector2i;
 
 import java.util.List;
@@ -24,19 +26,23 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public interface Font extends Asset<FontData> {
+public abstract class Font extends Asset<FontData> {
 
-    int getWidth(String text);
+    protected Font(ResourceUrn urn, AssetType<?, FontData> assetType) {
+        super(urn, assetType);
+    }
 
-    int getWidth(Character c);
+    public abstract int getWidth(String text);
 
-    int getHeight(String text);
+    public abstract int getWidth(Character c);
 
-    int getLineHeight();
+    public abstract int getHeight(String text);
 
-    Vector2i getSize(List<String> lines);
+    public abstract int getLineHeight();
 
-    boolean hasCharacter(Character c);
+    public abstract Vector2i getSize(List<String> lines);
 
-    FontCharacter getCharacterData(Character c);
+    public abstract boolean hasCharacter(Character c);
+
+    public abstract FontCharacter getCharacterData(Character c);
 }

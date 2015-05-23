@@ -15,9 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -29,14 +27,9 @@ import org.terasology.rendering.nui.widgets.UILabel;
  */
 public class MessagePopup extends CoreScreenLayer {
 
-    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:messagePopup");
-    
-    public final ActivateEventListener defaultCloseAction = new ActivateEventListener() {
-        @Override
-        public void onActivated(UIWidget button) {
-            getManager().popScreen();
-        }
-    };
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:messagePopup!instance");
+
+    public final ActivateEventListener defaultCloseAction = button -> getManager().popScreen();
 
     @Override
     public void initialise() {
@@ -55,11 +48,4 @@ public class MessagePopup extends CoreScreenLayer {
         }
     }
 
-    @Override
-    public void onClosed() {
-        super.onClosed();
-
-        // don't save this asset in the cache -> don't persist changes to this class
-        Assets.dispose(Assets.get(MessagePopup.ASSET_URI));
-    }
 }

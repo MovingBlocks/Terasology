@@ -15,15 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -31,17 +28,19 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * A popup message that is shown while a long-term background operation is running.
  * Some of them can be cancelled.
+ *
  * @author Martin Steiger
  */
 public class WaitPopup<T> extends CoreScreenLayer {
 
-    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:waitPopup");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:waitPopup!instance");
 
     private static final Logger logger = LoggerFactory.getLogger(WaitPopup.class);
 
@@ -66,7 +65,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
         cancelButton = find("cancel", UIButton.class);
         Preconditions.checkNotNull(cancelButton, "UIButton 'cancel' not found");
     }
-    
+
     public void setMessage(String title, String message) {
         titleLabel.setText(title);
         messageLabel.setText(message);
@@ -75,15 +74,15 @@ public class WaitPopup<T> extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        
+
         if (parallelTask == null) {
             return; // idle
         }
-        
+
         if (!parallelTask.isDone()) {
             return; // still running
-        } 
-            
+        }
+
         if (parallelTask.isCancelled()) {
             // wait for the thread to die
             if (!thread.isAlive()) {
@@ -103,7 +102,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
             getManager().popScreen();
         }
     }
-    
+
     /**
      * @param runnable will be called once the result is available
      */
@@ -112,35 +111,27 @@ public class WaitPopup<T> extends CoreScreenLayer {
     }
 
     /**
-     * @param operation the operation to run - the executing thread will be interrupted when the operation is cancelled
-     * @param canBeCancelled true if the operation is aborted when the {@link Thread#isInterrupted()} flag is set 
-     * @throws NullPointerException if operation is null
+     * @param operation      the operation to run - the executing thread will be interrupted when the operation is cancelled
+     * @param canBeCancelled true if the operation is aborted when the {@link Thread#isInterrupted()} flag is set
+     * @throws NullPointerException     if operation is null
      * @throws IllegalArgumentException if startOperation() was called before
      */
     public void startOperation(Callable<T> operation, boolean canBeCancelled) {
         Preconditions.checkState(parallelTask == null, "startOperation() cannot be called twice");
 
         cancelButton.setVisible(canBeCancelled);
-            
+
         parallelTask = new FutureTask<>(operation);
 
         thread = new Thread(parallelTask, "Parallel Operation");
         thread.start();
-        
+
         WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 parallelTask.cancel(true);
             }
         });
-    }
-
-    @Override
-    public void onClosed() {
-        super.onClosed();
-
-        // don't save this asset in the cache -> don't persist changes to this class
-        Assets.dispose(Assets.get(WaitPopup.ASSET_URI));
     }
 
     public boolean canBeCancelled() {

@@ -77,7 +77,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
             }
 
             if (CoreRegistry.get(Config.class).getRendering().isCloudShadows()) {
-                Texture clouds = Assets.getTexture("engine:perlinNoiseTileable");
+                Texture clouds = Assets.getTexture("engine:perlinNoiseTileable").get();
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 glBindTexture(GL11.GL_TEXTURE_2D, clouds.getId());

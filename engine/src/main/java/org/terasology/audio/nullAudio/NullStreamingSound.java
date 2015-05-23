@@ -22,6 +22,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 
+import java.util.Optional;
+
 /**
  *
  */
@@ -30,7 +32,7 @@ public final class NullStreamingSound extends StreamingSound {
     private int channels;
     private int sampleRate;
 
-    public NullStreamingSound(ResourceUrn urn, StreamingSoundData data, AssetType<?, StreamingSoundData> assetType) {
+    public NullStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data) {
         super(urn, assetType);
         reload(data);
     }
@@ -76,8 +78,8 @@ public final class NullStreamingSound extends StreamingSound {
     }
 
     @Override
-    protected Asset<StreamingSoundData> doCreateInstance(ResourceUrn instanceUrn, AssetType<?, StreamingSoundData> parentAssetType) {
-        return new NullStreamingSound(instanceUrn, parentAssetType, channels, sampleRate);
+    protected Optional<? extends Asset<StreamingSoundData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, StreamingSoundData> parentAssetType) {
+        return Optional.of(new NullStreamingSound(copyUrn, parentAssetType, channels, sampleRate));
     }
 
     @Override

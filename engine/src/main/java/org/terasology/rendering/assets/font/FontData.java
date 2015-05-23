@@ -16,14 +16,14 @@
 package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class FontData {
+public class FontData implements AssetData {
     private int lineHeight;
     private Map<Integer, FontCharacter> characters;
 

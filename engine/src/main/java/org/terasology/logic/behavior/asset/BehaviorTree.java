@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.behavior.asset;
 
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
 
@@ -30,13 +31,24 @@ import java.util.List;
  *
  * @author synopia
  */
-public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
+public class BehaviorTree extends Asset<BehaviorTreeData> {
     private BehaviorTreeData data;
 
-    public BehaviorTree(AssetUri uri, BehaviorTreeData data) {
-        super(uri);
-        this.data = data;
+    /**
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     *
+     * @param urn       The urn identifying the asset.
+     * @param assetType The asset type this asset belongs to.
+     */
+    public BehaviorTree(ResourceUrn urn, AssetType<?, BehaviorTreeData> assetType, BehaviorTreeData data) {
+        super(urn, assetType);
+        reload(data);
     }
+
+//    public BehaviorTree(AssetUri uri, BehaviorTreeData data) {
+//        super(uri);
+//        this.data = data;
+//    }
 
     public Node getRoot() {
         return data.getRoot();
@@ -64,16 +76,16 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
 
     @Override
     public String toString() {
-        return getURI().getAssetName().toString();
+        return getUrn().toString();
     }
 
     @Override
-    protected void onReload(BehaviorTreeData newData) {
+    protected void doReload(BehaviorTreeData newData) {
         this.data = newData;
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         this.data = null;
     }
 

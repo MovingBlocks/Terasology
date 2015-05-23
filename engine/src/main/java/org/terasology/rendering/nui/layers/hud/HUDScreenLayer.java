@@ -16,10 +16,8 @@
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -31,17 +29,18 @@ import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Immortius
  */
 public class HUDScreenLayer extends CoreScreenLayer {
 
-    private Map<AssetUri, HUDElement> elementsLookup = Maps.newLinkedHashMap();
+    private Map<ResourceUrn, HUDElement> elementsLookup = Maps.newLinkedHashMap();
 
     private AssetManager assetManager = CoreRegistry.get(AssetManager.class);
     private NUIManager manager;
@@ -50,35 +49,35 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return addHUDElement(uri, ControlWidget.class, Rect2f.createFromMinAndSize(0, 0, 1, 1));
     }
 
-    public <T extends ControlWidget> T addHUDElement(String uri, Class<T> type, Rect2f region) {
-        AssetUri resolvedUri = Assets.resolveAssetUri(AssetType.UI_ELEMENT, uri);
-        if (resolvedUri != null) {
-            return addHUDElement(resolvedUri, type, region);
+    public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rect2f region) {
+        Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
+        if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
+            return addHUDElement(data.get().getUrn(), type.cast(data.get().getRootWidget()), region);
         }
         return null;
     }
 
-    public <T extends ControlWidget> T addHUDElement(AssetUri uri, Class<T> type, Rect2f region) {
-        UIData data = assetManager.loadAssetData(uri, UIData.class);
-        if (data != null && type.isInstance(data.getRootWidget())) {
-            return addHUDElement(uri, type.cast(data.getRootWidget()), region);
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rect2f region) {
+        Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
+        if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
+            return addHUDElement(urn, type.cast(data.get().getRootWidget()), region);
         }
         return null;
     }
 
-    public <T extends ControlWidget> T addHUDElement(AssetUri uri, T widget, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rect2f region) {
         InjectionHelper.inject(widget);
         widget.onOpened();
-        elementsLookup.put(uri, new HUDElement(widget, region));
+        elementsLookup.put(urn, new HUDElement(widget, region));
         return widget;
     }
 
-    public ControlWidget getHUDElement(String uri) {
-        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT, uri));
+    public ControlWidget getHUDElement(String urn) {
+        return getHUDElement(new ResourceUrn(urn));
     }
 
-    public ControlWidget getHUDElement(AssetUri uri) {
-        HUDElement element = elementsLookup.get(uri);
+    public ControlWidget getHUDElement(ResourceUrn urn) {
+        HUDElement element = elementsLookup.get(urn);
         if (element != null) {
             return element.widget;
         }
@@ -86,18 +85,18 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public <T extends ControlWidget> T getHUDElement(String uri, Class<T> type) {
-        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT, uri), type);
+        return getHUDElement(new ResourceUrn(uri), type);
     }
 
-    public <T extends ControlWidget> T getHUDElement(AssetUri uri, Class<T> type) {
-        ControlWidget widget = getHUDElement(uri);
+    public <T extends ControlWidget> T getHUDElement(ResourceUrn urn, Class<T> type) {
+        ControlWidget widget = getHUDElement(urn);
         if (widget != null && type.isInstance(widget)) {
             return type.cast(widget);
         }
         return null;
     }
 
-    public boolean removeHUDElement(AssetUri uri) {
+    public boolean removeHUDElement(ResourceUrn uri) {
         HUDElement removed = elementsLookup.remove(uri);
         if (removed != null) {
             removed.widget.onClosed();
@@ -107,9 +106,9 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public boolean removeHUDElement(ControlWidget element) {
-        Iterator<Map.Entry<AssetUri, HUDElement>> iterator = elementsLookup.entrySet().iterator();
+        Iterator<Map.Entry<ResourceUrn, HUDElement>> iterator = elementsLookup.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<AssetUri, HUDElement> item = iterator.next();
+            Map.Entry<ResourceUrn, HUDElement> item = iterator.next();
             if (item.getValue().widget.equals(element)) {
                 iterator.remove();
                 item.getValue().widget.onClosed();

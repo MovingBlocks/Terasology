@@ -20,16 +20,13 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.collision.shapes.CompoundShapeChild;
 import com.bulletphysics.collision.shapes.ConvexHullShape;
-
-import org.terasology.math.QuaternionUtil;
-
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Maps;
-
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Pitch;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -46,7 +43,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements BlockShape {
+public class BlockShapeImpl extends BlockShape {
 
     private String displayName;
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
@@ -59,9 +56,9 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
 
     private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
 
-    public BlockShapeImpl(AssetUri uri, BlockShapeData data) {
-        super(uri);
-        onReload(data);
+    public BlockShapeImpl(ResourceUrn urn, AssetType<?, BlockShapeData> assetType, BlockShapeData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
@@ -78,7 +75,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     }
 
     @Override
-    protected void onReload(BlockShapeData data) {
+    protected void doReload(BlockShapeData data) {
         collisionShape.clear();
         displayName = data.getDisplayName();
         for (BlockPart part : BlockPart.values()) {
@@ -97,7 +94,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
     }
 
     public CollisionShape getCollisionShape(Rotation rot) {

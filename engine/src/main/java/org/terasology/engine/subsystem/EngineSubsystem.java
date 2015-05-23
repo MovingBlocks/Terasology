@@ -15,13 +15,37 @@
  */
 package org.terasology.engine.subsystem;
 
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 
 public interface EngineSubsystem {
+
+    /**
+     * Called on each system before initialisation
+     */
     void preInitialise();
 
+    /**
+     * Called to initialise the system
+     *
+     * @param config Access to config
+     */
+    void initialise(Config config);
+
+    /**
+     * Called to register any core asset types this system provides. This happens after initialise and before postInitialise
+     *
+     * @param assetTypeManager
+     */
+    void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager);
+
+    /**
+     * Called to do any final initialisation after asset types are registered.
+     *
+     * @param config
+     */
     void postInitialise(Config config);
 
     void preUpdate(GameState currentState, float delta);

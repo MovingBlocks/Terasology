@@ -16,8 +16,7 @@
 package org.terasology.logic.console.suggesters;
 
 import com.google.common.collect.Sets;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
@@ -32,7 +31,7 @@ public class PrefabSuggester implements CommandParameterSuggester<Prefab> {
     @Override
     public Set<Prefab> suggest(EntityRef sender, Object... resolvedParameters) {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        Iterable<Prefab> loadedPrefabs = assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class);
+        Iterable<Prefab> loadedPrefabs = assetManager.getLoadedAssets(Prefab.class);
 
         return Sets.newHashSet(loadedPrefabs);
     }

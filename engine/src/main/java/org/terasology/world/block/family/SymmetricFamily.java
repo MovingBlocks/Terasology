@@ -57,7 +57,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockFor(BlockUri blockUri) {
-        if (getURI().equals(blockUri.getFamilyUri()) && blockUri.getIdentifier().isEmpty()) {
+        if (getURI().equals(blockUri.getFamilyUri()) && !blockUri.getIdentifier().isPresent()) {
             return block;
         }
         return null;

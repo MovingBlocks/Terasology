@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commandSystem;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Primitives;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,6 +26,7 @@ import org.terasology.registry.CoreRegistry;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**

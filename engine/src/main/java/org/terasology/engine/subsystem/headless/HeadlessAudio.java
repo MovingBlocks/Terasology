@@ -15,9 +15,10 @@
  */
 package org.terasology.engine.subsystem.headless;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
@@ -31,6 +32,17 @@ public class HeadlessAudio implements EngineSubsystem {
 
     @Override
     public void preInitialise() {
+    }
+
+    @Override
+    public void initialise(Config config) {
+
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+        assetTypeManager.registerCoreAssetType(StaticSound.class, audioManager.getStaticSoundFactory(), "sounds");
+        assetTypeManager.registerCoreAssetType(StreamingSound.class, audioManager.getStreamingSoundFactory(), "music");
     }
 
     @Override
@@ -59,9 +71,6 @@ public class HeadlessAudio implements EngineSubsystem {
     private void initNoSound() {
         audioManager = new NullAudioManager();
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
-        assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }
 
     @Override

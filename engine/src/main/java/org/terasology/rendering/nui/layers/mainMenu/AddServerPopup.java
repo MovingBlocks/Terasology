@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import com.google.common.primitives.Ints;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
@@ -28,14 +28,12 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import com.google.common.primitives.Ints;
-
 /**
  * @author Immortius
  */
 public class AddServerPopup extends CoreScreenLayer {
 
-    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:addServerPopup");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:addServerPopup!instance");
 
     @In
     private Config config;
@@ -84,8 +82,8 @@ public class AddServerPopup extends CoreScreenLayer {
             @Override
             public Boolean get() {
                 return !nameText.getText().isEmpty()
-                    && !addressText.getText().isEmpty()
-                    && Ints.tryParse(portText.getText()) != null;
+                        && !addressText.getText().isEmpty()
+                        && Ints.tryParse(portText.getText()) != null;
             }
         });
 

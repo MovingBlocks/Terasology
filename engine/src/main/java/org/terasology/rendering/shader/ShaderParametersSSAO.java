@@ -18,14 +18,13 @@ package org.terasology.rendering.shader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.editor.EditorRange;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -38,6 +37,7 @@ import org.terasology.utilities.random.Random;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -123,8 +123,8 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     }
 
     private Texture updateNoiseTexture() {
-        Texture texture = CoreRegistry.get(AssetManager.class).tryLoadAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), Texture.class);
-        if (texture == null) {
+        Optional<Texture> texture = CoreRegistry.get(AssetManager.class).getAsset("engine:ssaoNoise", Texture.class);
+        if (!texture.isPresent()) {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
 
             for (int i = 0; i < SSAO_NOISE_SIZE * SSAO_NOISE_SIZE; ++i) {
@@ -139,10 +139,10 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
             noiseValues.flip();
 
-            texture = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE,
+            return Assets.generateAsset(new ResourceUrn("engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE,
                     new ByteBuffer[]{noiseValues}, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST), Texture.class);
         }
-        return texture;
+        return texture.get();
     }
 
 }

@@ -21,6 +21,7 @@ import java.nio.IntBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -61,7 +62,7 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
     public void setSeed(long seed) {
         logger.info("Reading height map..");
 
-        Texture texture = Assets.getTexture("core", configuration.heightMap);
+        Texture texture = Assets.getTexture(new ResourceUrn("core", configuration.heightMap)).get();
         ByteBuffer[] bb = texture.getData().getBuffers();
         IntBuffer intBuf = bb[0].asIntBuffer();
 

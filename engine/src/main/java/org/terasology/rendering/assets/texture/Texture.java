@@ -16,14 +16,20 @@
 
 package org.terasology.rendering.assets.texture;
 
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2f;
 
 /**
  * @author Immortius
  */
-public interface Texture extends TextureRegionAsset<TextureData> {
+public abstract class Texture extends TextureRegionAsset<TextureData> {
 
-    Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
+    public static final Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
+
+    protected Texture(ResourceUrn urn, AssetType<?, TextureData> assetType) {
+        super(urn, assetType);
+    }
 
     public enum WrapMode {
         CLAMP,
@@ -35,18 +41,22 @@ public interface Texture extends TextureRegionAsset<TextureData> {
         LINEAR
     }
 
-    WrapMode getWrapMode();
-
-    FilterMode getFilterMode();
-
-    // TODO: Remove when no longer needed
-    TextureData getData();
-
-    // TODO: This shouldn't be on texture
-    int getId();
-
     public enum Type {
         TEXTURE2D,
         TEXTURE3D
     }
+
+    public abstract WrapMode getWrapMode();
+
+    public abstract FilterMode getFilterMode();
+
+    // TODO: Remove when no longer needed
+    public abstract TextureData getData();
+
+    // TODO: This shouldn't be on texture
+    public abstract int getId();
+
+    public abstract int getDepth();
+
+
 }

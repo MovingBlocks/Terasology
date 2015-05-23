@@ -53,7 +53,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
@@ -166,7 +165,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         int consecutiveAirBlocks = 0;
         for (int i = 1; i < 20; i++) {
             spawnPos.add(0, 1, 0);
-            if (worldProvider.getBlock(spawnPos) == BlockManager.getAir()) {
+            if (worldProvider.getBlock(spawnPos).isPenetrable()) {
                 consecutiveAirBlocks++;
             } else {
                 consecutiveAirBlocks = 0;

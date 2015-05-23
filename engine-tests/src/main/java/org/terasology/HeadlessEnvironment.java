@@ -21,11 +21,8 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetManagerImpl;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
@@ -37,9 +34,6 @@ import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
@@ -52,19 +46,14 @@ import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AttachedToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.NullWorldAtlas;
-import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.shapes.BlockShapeData;
-import org.terasology.world.block.shapes.BlockShapeImpl;
+import org.terasology.world.block.tiles.NullWorldAtlas;
+import org.terasology.world.block.tiles.WorldAtlas;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -85,9 +74,10 @@ public class HeadlessEnvironment extends Environment {
 
     /**
      * Setup a headless ( = no graphics ) environment
+     *
      * @param modules a set of module names that should be loaded (latest version)
      */
-    public HeadlessEnvironment(Name ... modules) {
+    public HeadlessEnvironment(Name... modules) {
         super(modules);
     }
 
@@ -126,59 +116,31 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    protected void setupBlockManager() {
+    protected void setupBlockManager(AssetManager assetManager) {
         DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
         blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
         blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AttachedToSurfaceFamilyFactory());
         WorldAtlas worldAtlas = new NullWorldAtlas();
-        BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, blockFamilyFactoryRegistry);
+        BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, assetManager);
         CoreRegistry.put(BlockManager.class, blockManager);
     }
 
     @Override
-    protected void setupEmptyAssetManager() {
-        AssetManager assetManager = new AssetManagerImpl(CoreRegistry.get(ModuleManager.class).getEnvironment());
+    protected AssetManager setupEmptyAssetManager() {
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager.switchEnvironment(CoreRegistry.get(ModuleManager.class).getEnvironment());
 
-        // mock an empy asset factory for all asset types
-        for (AssetType type : AssetType.values()) {
-            assetManager.setAssetFactory(type, mock(AssetFactory.class));
-        }
-
-        CoreRegistry.put(AssetManager.class, assetManager);
+        CoreRegistry.put(AssetManager.class, assetTypeManager.getAssetManager());
+        return assetTypeManager.getAssetManager();
     }
 
     @Override
-    protected void setupAssetManager() {
-        setupEmptyAssetManager();
+    protected AssetManager setupAssetManager() {
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager.switchEnvironment(CoreRegistry.get(ModuleManager.class).getEnvironment());
 
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        AudioManager audioManager = CoreRegistry.get(AudioManager.class);
-        AssetType.registerAssetTypes(assetManager);
-
-        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
-
-            @Override
-            public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                return new PojoPrefab(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
-
-            @Override
-            public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
-                return new BlockShapeImpl(uri, data);
-            }
-        });
-
-        assetManager.setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
-            @Override
-            public UISkin buildAsset(AssetUri uri, UISkinData data) {
-                return new UISkin(uri, data);
-            }
-        });
-
-        assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
-        assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
+        CoreRegistry.put(AssetManager.class, assetTypeManager.getAssetManager());
+        return assetTypeManager.getAssetManager();
     }
 
     @Override

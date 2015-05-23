@@ -19,18 +19,20 @@ package org.terasology.world.generator;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
-import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -50,25 +52,24 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     @Before
     public void setup() throws Exception {
         super.setup();
-        BlockManagerImpl blockManager = new BlockManagerImpl(new NullWorldAtlas(), new DefaultBlockFamilyFactoryRegistry());
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        BlockManagerImpl blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
         CoreRegistry.put(BlockManager.class, blockManager);
-        airBlock = BlockManager.getAir();
-        solidBlock = new Block();
-        solidBlock.setDisplayName("Stone");
-        solidBlock.setUri(new BlockUri("engine:stone"));
-        solidBlock.setId((short) 1);
-        for (Side side : Side.values()) {
-            solidBlock.setFullSide(side, true);
-        }
-        solidBlock.setTranslucent(false);
-        blockManager.addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock), true);
+        airBlock = blockManager.getBlock(BlockManager.AIR_ID);
 
-        fullLight = new Block();
-        fullLight.setDisplayName("Torch");
-        fullLight.setUri(new BlockUri("engine:torch"));
-        fullLight.setId((short) 2);
-        fullLight.setLuminance(ChunkConstants.MAX_LIGHT);
-        blockManager.addBlockFamily(new SymmetricFamily(fullLight.getURI(), fullLight), true);
+        BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
+        solidData.getBaseSection().setDisplayName("Stone");
+        solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        solidData.getBaseSection().setTranslucent(false);
+        assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
+        solidBlock = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
+
+        BlockFamilyDefinitionData fullLightData = new BlockFamilyDefinitionData();
+        fullLightData.getBaseSection().setDisplayName("Torch");
+        fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
+        assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
+        fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
     }
 
     @Test

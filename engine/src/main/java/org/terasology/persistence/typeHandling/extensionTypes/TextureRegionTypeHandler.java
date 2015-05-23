@@ -15,25 +15,38 @@
  */
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.asset.Asset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.assets.Asset;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
+
+import java.util.Optional;
 
 /**
  * @author Immortius
  */
 public class TextureRegionTypeHandler extends StringRepresentationTypeHandler<TextureRegion> {
+    private static final Logger logger = LoggerFactory.getLogger(TextureRegionTypeHandler.class);
+
     @Override
     public String getAsString(TextureRegion item) {
         if (item instanceof Asset) {
-            return ((Asset) item).getURI().toSimpleString();
+            return ((Asset) item).getUrn().toString();
         }
         return "";
     }
 
     @Override
     public TextureRegion getFromString(String representation) {
-        return Assets.getTextureRegion(representation);
+        Optional<TextureRegionAsset> region = Assets.getTextureRegion(representation);
+        if (region.isPresent()) {
+            return region.get();
+        } else {
+            logger.error("Failed to resolve texture region '" + representation + "'");
+            return Assets.getTextureRegion("engine:default").get();
+        }
     }
 }

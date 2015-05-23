@@ -38,4 +38,8 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegi
         }
         return factory;
     }
+
+    public void clear() {
+        registryMap.clear();
+    }
 }

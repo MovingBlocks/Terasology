@@ -19,11 +19,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
@@ -83,8 +82,8 @@ public class CanvasImpl implements CanvasControl {
 
     private CanvasState state;
 
-    private Material meshMat = Assets.getMaterial("engine:UILitMesh");
-    private Texture whiteTexture = Assets.getTexture("engine:white");
+    private Material meshMat = Assets.getMaterial("engine:UILitMesh").get();
+    private Texture whiteTexture = Assets.getTexture("engine:white").get();
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
@@ -253,7 +252,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public SubRegion subRegionFBO(AssetUri uri, Vector2i size) {
+    public SubRegion subRegionFBO(ResourceUrn uri, Vector2i size) {
         return new SubRegionFBOImpl(uri, size);
     }
 
@@ -700,7 +699,7 @@ public class CanvasImpl implements CanvasControl {
      * The state of the canvas
      */
     private static class CanvasState {
-        public UISkin skin = Assets.getSkin("engine:default");
+        public UISkin skin = Assets.getSkin("engine:default").get();
         public String family = "";
         public UIWidget element;
         public String part = "";
@@ -794,7 +793,7 @@ public class CanvasImpl implements CanvasControl {
         private FrameBufferObject fbo;
         private CanvasState previousState;
 
-        private SubRegionFBOImpl(AssetUri uri, Vector2i size) {
+        private SubRegionFBOImpl(ResourceUrn uri, Vector2i size) {
             previousState = state;
 
             fbo = renderer.getFBO(uri, size);

@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.subsystem.headless.renderer;
 
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -70,7 +70,7 @@ public class HeadlessCanvasRenderer implements CanvasRenderer {
     }
 
     @Override
-    public FrameBufferObject getFBO(AssetUri uri, Vector2i region) {
+    public FrameBufferObject getFBO(ResourceUrn uri, Vector2i region) {
         return null;
     }
 

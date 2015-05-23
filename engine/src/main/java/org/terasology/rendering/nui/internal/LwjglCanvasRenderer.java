@@ -17,12 +17,11 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
@@ -84,10 +83,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private static final Rect2f FULL_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
     private Matrix4f modelView;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-    private Mesh billboard = Assets.getMesh("engine:UIBillboard");
+    private Mesh billboard = Assets.getMesh("engine:UIBillboard").get();
     private Line line = new Line();
 
-    private Material textureMat = Assets.getMaterial("engine:UITexture");
+    private Material textureMat = Assets.getMaterial("engine:UITexture").get();
 
     // Text mesh caching
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
@@ -100,7 +99,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Rect2i requestedCropRegion;
     private Rect2i currentTextureCropRegion;
 
-    private Map<AssetUri, FrameBufferObject> fboMap = Maps.newHashMap();
+    private Map<ResourceUrn, FrameBufferObject> fboMap = Maps.newHashMap();
 
     @Override
     public void preRender() {
@@ -136,7 +135,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
             if (!usedText.contains(entry.getKey())) {
                 for (Mesh mesh : entry.getValue().values()) {
-                    Assets.dispose(mesh);
+                    mesh.dispose();
                 }
                 textIterator.remove();
             }
@@ -147,7 +146,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         while (textureIterator.hasNext()) {
             Map.Entry<TextureCacheKey, Mesh> entry = textureIterator.next();
             if (!usedTextures.contains(entry.getKey())) {
-                Assets.dispose(entry.getValue());
+                entry.getValue().dispose();
                 textureIterator.remove();
             }
         }
@@ -232,11 +231,11 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     }
 
     @Override
-    public FrameBufferObject getFBO(AssetUri uri, Vector2i size) {
-        FrameBufferObject frameBufferObject = fboMap.get(uri);
+    public FrameBufferObject getFBO(ResourceUrn urn, Vector2i size) {
+        FrameBufferObject frameBufferObject = fboMap.get(urn);
         if (frameBufferObject == null) {
-            frameBufferObject = new LwjglFrameBufferObject(uri, size);
-            fboMap.put(uri, frameBufferObject);
+            frameBufferObject = new LwjglFrameBufferObject(urn, size);
+            fboMap.put(urn, frameBufferObject);
         }
         return frameBufferObject;
     }

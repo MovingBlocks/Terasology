@@ -31,6 +31,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldProviderCoreImpl;
@@ -59,10 +60,12 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider();
+        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager);
 
-        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider);
+        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
+                blockManager.getBlock(BlockManager.AIR_ID));
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         CoreRegistry.put(WorldProvider.class, worldProvider);
@@ -82,7 +85,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
 
         RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(backdropProvider, backdropRenderer,
-                                                                                 worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+                worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         float reflectionHeight = CoreRegistry.get(NetworkSystem.class).getServer().getInfo().getReflectionHeight();
         worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);

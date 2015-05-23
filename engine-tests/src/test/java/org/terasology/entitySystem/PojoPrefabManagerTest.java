@@ -17,12 +17,10 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetManagerImpl;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -68,14 +66,12 @@ public class PojoPrefabManagerTest {
         entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
-        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
-        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
-            @Override
-            public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                return new PojoPrefab(uri, data);
-            }
-        });
-        CoreRegistry.put(AssetManager.class, assetManager);
+
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, "prefabs");
+
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+        CoreRegistry.put(AssetManager.class, assetTypeManager.getAssetManager());
     }
 
     @Test
@@ -87,7 +83,7 @@ public class PojoPrefabManagerTest {
     public void retrievePrefab() {
         PrefabData data = new PrefabData();
         data.addComponent(new StringComponent("Test"));
-        Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, PREFAB_NAME), data, Prefab.class);
+        Prefab prefab = Assets.generateAsset(new ResourceUrn(PREFAB_NAME), data, Prefab.class);
         Prefab ref = prefabManager.getPrefab(PREFAB_NAME);
         assertNotNull(ref);
         assertEquals(PREFAB_NAME, ref.getName());

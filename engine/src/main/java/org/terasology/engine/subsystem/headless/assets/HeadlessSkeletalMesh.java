@@ -15,30 +15,37 @@
  */
 package org.terasology.engine.subsystem.headless.assets;
 
-import java.util.Collection;
-
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 
-public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
+import java.util.Collection;
+import java.util.Optional;
+
+public class HeadlessSkeletalMesh extends SkeletalMesh {
 
     private SkeletalMeshData data;
 
-    public HeadlessSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
-        super(uri);
-        onReload(data);
+    public HeadlessSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
-    protected void onReload(SkeletalMeshData skeletalMeshData) {
+    protected void doReload(SkeletalMeshData skeletalMeshData) {
         this.data = skeletalMeshData;
     }
 
     @Override
-    protected void onDispose() {
+    protected Optional<? extends Asset<SkeletalMeshData>> doCreateCopy(ResourceUrn instanceUrn, AssetType<?, SkeletalMeshData> parentAssetType) {
+        return Optional.of(new HeadlessSkeletalMesh(instanceUrn, parentAssetType, data));
+    }
+
+    @Override
+    protected void doDispose() {
         data = null;
     }
 

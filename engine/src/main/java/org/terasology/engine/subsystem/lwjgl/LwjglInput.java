@@ -20,6 +20,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
@@ -38,6 +39,15 @@ public class LwjglInput extends BaseLwjglSubsystem {
     @Override
     public void preInitialise() {
         super.preInitialise();
+    }
+
+    @Override
+    public void initialise(Config config) {
+
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
     }
 
     @Override

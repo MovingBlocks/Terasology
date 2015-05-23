@@ -36,22 +36,14 @@ public final class OpenALSound extends StaticSound {
 
     protected float length;
     private final OpenALManager audioManager;
-    private StaticSoundData data;
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
-    public OpenALSound(ResourceUrn urn, StaticSoundData data, AssetType<?, StaticSoundData> assetType, OpenALManager audioManager) {
+    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager) {
         super(urn, assetType);
         this.audioManager = audioManager;
         reload(data);
-    }
-
-    private OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, OpenALManager audioManager, float length, int bufferId) {
-        super(urn, assetType);
-        this.audioManager = audioManager;
-        this.length = length;
-        this.bufferId = bufferId;
     }
 
     @Override
@@ -94,7 +86,6 @@ public final class OpenALSound extends StaticSound {
 
     @Override
     protected void doReload(StaticSoundData newData) {
-        this.data = newData;
         if (bufferId == 0) {
             bufferId = alGenBuffers();
         } else {
@@ -111,10 +102,6 @@ public final class OpenALSound extends StaticSound {
         length = (float) size / channels / (bits / 8) / frequency;
     }
 
-    @Override
-    protected Asset<StaticSoundData> doCreateInstance(ResourceUrn instanceUrn, AssetType<?, StaticSoundData> parentAssetType) {
-        return new OpenALSound(instanceUrn, data, parentAssetType, audioManager);
-    }
 
     @Override
     protected void doDispose() {
@@ -123,7 +110,6 @@ public final class OpenALSound extends StaticSound {
             alDeleteBuffers(bufferId);
             bufferId = 0;
             OpenALException.checkState("Deleting buffer data");
-            data = null;
         }
     }
 }

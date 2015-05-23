@@ -16,16 +16,13 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetManagerImpl;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
@@ -66,14 +63,10 @@ public class EntitySerializerTest {
     @BeforeClass
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
-        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
-        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
-            @Override
-            public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                return new PojoPrefab(uri, data);
-            }
-        });
-        CoreRegistry.put(AssetManager.class, assetManager);
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, "prefabs");
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+        CoreRegistry.put(AssetManager.class, assetTypeManager.getAssetManager());
     }
 
     @Before
@@ -89,7 +82,7 @@ public class EntitySerializerTest {
 
         PrefabData prefabData = new PrefabData();
         prefabData.addComponent(new StringComponent("Value"));
-        prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "test:Test"), prefabData, Prefab.class);
+        prefab = Assets.generateAsset(new ResourceUrn("test:Test"), prefabData, Prefab.class);
     }
 
     @Test

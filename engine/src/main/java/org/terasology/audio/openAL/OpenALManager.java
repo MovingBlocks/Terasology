@@ -27,8 +27,6 @@ import org.lwjgl.openal.ALCdevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
@@ -288,22 +286,12 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory() {
-        return new AssetFactory<StaticSound, StaticSoundData>() {
-            @Override
-            public StaticSound build(ResourceUrn urn, StaticSoundData data, AssetType<StaticSound, StaticSoundData> assetType) {
-                return new OpenALSound(urn, data, assetType, OpenALManager.this);
-            }
-        };
+        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data, OpenALManager.this);
     }
 
     @Override
     public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
-        return new AssetFactory<StreamingSound, StreamingSoundData>() {
-            @Override
-            public StreamingSound build(ResourceUrn urn, StreamingSoundData data, AssetType<StreamingSound, StreamingSoundData> assetType) {
-                return new OpenALStreamingSound(urn, data, assetType, OpenALManager.this);
-            }
-        };
+        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data, OpenALManager.this);
     }
 
     public void purgeSound(Sound<?> sound) {

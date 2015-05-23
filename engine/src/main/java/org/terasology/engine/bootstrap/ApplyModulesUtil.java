@@ -17,13 +17,18 @@ package org.terasology.engine.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.world.block.family.BlockFamilyFactory;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 
 /**
  * @author Immortius
@@ -55,7 +60,32 @@ public final class ApplyModulesUtil {
             }
         }
 
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.setEnvironment(moduleManager.getEnvironment());
+        ModuleAwareAssetTypeManager assetTypeManager = CoreRegistry.get(ModuleAwareAssetTypeManager.class);
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+
+
+        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
+        loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
+    }
+
+    private static void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, ModuleEnvironment environment) {
+        registry.clear();
+        for (Class<?> blockFamilyFactory : environment.getTypesAnnotatedWith(RegisterBlockFamilyFactory.class)) {
+            if (!BlockFamilyFactory.class.isAssignableFrom(blockFamilyFactory)) {
+                logger.error("Cannot load {}, must be a subclass of BlockFamilyFactory", blockFamilyFactory.getSimpleName());
+                continue;
+            }
+
+            RegisterBlockFamilyFactory registerInfo = blockFamilyFactory.getAnnotation(RegisterBlockFamilyFactory.class);
+            String id = registerInfo.value();
+            logger.debug("Registering blockFamilyFactory {}", id);
+            try {
+                BlockFamilyFactory newBlockFamilyFactory = (BlockFamilyFactory) blockFamilyFactory.newInstance();
+                registry.setBlockFamilyFactory(id, newBlockFamilyFactory);
+                logger.debug("Loaded blockFamilyFactory {}", id);
+            } catch (InstantiationException | IllegalAccessException e) {
+                logger.error("Failed to load blockFamilyFactory {}", id, e);
+            }
+        }
     }
 }

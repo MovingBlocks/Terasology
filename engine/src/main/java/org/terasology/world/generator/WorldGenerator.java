@@ -15,10 +15,11 @@
  */
 package org.terasology.world.generator;
 
-import com.google.common.base.Optional;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.World;
+
+import java.util.Optional;
 
 /**
  * @author Immortius

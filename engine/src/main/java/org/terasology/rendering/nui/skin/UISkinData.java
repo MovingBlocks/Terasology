@@ -16,14 +16,14 @@
 package org.terasology.rendering.nui.skin;
 
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class UISkinData {
+public class UISkinData implements AssetData {
     Map<String, UIStyleFamily> skinFamilies;
 
     public UISkinData(Map<String, UIStyleFamily> families) {

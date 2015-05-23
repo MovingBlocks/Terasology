@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.prefab;
 
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class PrefabData implements MutableComponentContainer {
+public class PrefabData implements MutableComponentContainer, AssetData {
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
     private boolean persisted = true;
