@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.headless;
 
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -32,7 +33,17 @@ public class HeadlessTimer implements EngineSubsystem {
     }
 
     @Override
+    public void initialise(Context context) {
+
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+    }
+
+    @Override
     public void postInitialise(Context context) {
+
     }
 
     @Override

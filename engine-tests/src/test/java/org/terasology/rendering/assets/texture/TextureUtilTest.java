@@ -16,8 +16,7 @@
 package org.terasology.rendering.assets.texture;
 
 import org.junit.Test;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.naming.Name;
 import org.terasology.rendering.nui.Color;
@@ -31,19 +30,19 @@ public class TextureUtilTest {
 
     @Test
     public void testColorTransformedToTextureUri() throws Exception {
-        AssetUri assetUri = TextureUtil.getTextureUriForColor(Color.RED);
-        assertEquals(AssetType.TEXTURE, assetUri.getAssetType());
+        ResourceUrn assetUri = TextureUtil.getTextureUriForColor(Color.RED);
         assertEquals(TerasologyConstants.ENGINE_MODULE, assetUri.getModuleName());
-        assertEquals(new Name("color.ff0000ff"), assetUri.getAssetName());
+        assertEquals(new Name("color"), assetUri.getResourceName());
+        assertEquals(new Name("ff0000ff"), assetUri.getFragmentName());
 
         int red = 0x12;
         int green = 0x3;
         int blue = 0xc4;
         int alpha = 0xe;
         assetUri = TextureUtil.getTextureUriForColor(new Color(red, green, blue, alpha));
-        assertEquals(AssetType.TEXTURE, assetUri.getAssetType());
         assertEquals(TerasologyConstants.ENGINE_MODULE, assetUri.getModuleName());
-        assertEquals(new Name("color.1203c40e"), assetUri.getAssetName());
+        assertEquals(new Name("color"), assetUri.getResourceName());
+        assertEquals(new Name("1203c40e"), assetUri.getFragmentName());
     }
 
     @Test
@@ -64,8 +63,8 @@ public class TextureUtilTest {
     @Test
     public void testColorTransformedToAssetUriTransformedToColor() throws Exception {
         Color expectedColor = Color.RED;
-        AssetUri assetUri = TextureUtil.getTextureUriForColor(expectedColor);
-        Color actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toLowerCase().substring("color.".length()));
+        ResourceUrn assetUri = TextureUtil.getTextureUriForColor(expectedColor);
+        Color actualColor = TextureUtil.getColorForColorName(assetUri.getFragmentName().toLowerCase());
         assertEquals(expectedColor, actualColor);
 
         int red = 0x12;
@@ -74,7 +73,7 @@ public class TextureUtilTest {
         int alpha = 0xe;
         expectedColor = new Color(red, green, blue, alpha);
         assetUri = TextureUtil.getTextureUriForColor(expectedColor);
-        actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toLowerCase().substring("color.".length()));
+        actualColor = TextureUtil.getColorForColorName(assetUri.getFragmentName().toLowerCase());
         assertEquals(expectedColor, actualColor);
     }
 }

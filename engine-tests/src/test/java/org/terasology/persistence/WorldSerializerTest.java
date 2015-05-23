@@ -18,8 +18,7 @@ package org.terasology.persistence;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -28,7 +27,6 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -39,11 +37,8 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
@@ -67,7 +62,6 @@ public class WorldSerializerTest {
         AssetManager assetManager = mock(AssetManager.class);
         context.put(AssetManager.class,assetManager);
         CoreRegistry.setContext(context);
-        when(assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class)).thenReturn(Collections.<Prefab>emptyList());
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = context.get(EngineEntityManager.class);
@@ -82,7 +76,7 @@ public class WorldSerializerTest {
         EntityBuilder entityBuilder = entityManager.newBuilder();
         entityBuilder.setPersistent(false);
         @SuppressWarnings("unused") // just used to express that an entity got created
-        EntityRef entity = entityBuilder.build();
+                EntityRef entity = entityBuilder.build();
 
         EntityData.GlobalStore worldData = worldSerializer.serializeWorld(false);
         assertEquals(0, worldData.getEntityCount());

@@ -35,7 +35,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 public class UILoadBar extends CoreWidget {
 
     @LayoutConfig
-    private TextureRegion fillTexture = Assets.getTexture("engine:loadBar");
+    private TextureRegion fillTexture;
 
     @LayoutConfig
     private boolean animate = true;

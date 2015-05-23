@@ -73,7 +73,7 @@ public final class RenderHelper {
     public static float evaluateOceanHeightAtPosition(Vector3f position, float days) {
         float height = 0.0f;
 
-        GLSLMaterial chunkMaterial = (GLSLMaterial) Assets.getMaterial("engine:prog.chunk");
+        GLSLMaterial chunkMaterial = (GLSLMaterial) Assets.getMaterial("engine:prog.chunk").get();
         ShaderParametersChunk chunkParameters = (ShaderParametersChunk) chunkMaterial.getShaderParameters();
 
         float size = chunkParameters.waveSize;

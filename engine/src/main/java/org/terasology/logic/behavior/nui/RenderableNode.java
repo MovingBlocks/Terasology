@@ -43,7 +43,7 @@ import java.util.List;
  * @author synopia
  */
 public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, TreeAccessor<RenderableNode> {
-    private TextureRegion texture = Assets.getTextureRegion("engine:button");
+    private TextureRegion texture = Assets.getTextureRegion("engine:button").get();
 
     private final List<RenderableNode> children = Lists.newArrayList();
     private PortList portList;

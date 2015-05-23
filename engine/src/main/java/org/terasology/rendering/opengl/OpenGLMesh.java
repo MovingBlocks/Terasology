@@ -17,24 +17,22 @@ package org.terasology.rendering.opengl;
 
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
-
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
@@ -58,7 +56,7 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
 /**
  * @author Immortius
  */
-public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
+public class OpenGLMesh extends Mesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
 
     private static final int FLOAT_SIZE = 4;
@@ -84,19 +82,19 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     private GLBufferPool bufferPool;
 
-    public OpenGLMesh(AssetUri uri, MeshData data, GLBufferPool bufferPool) {
-        super(uri);
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data) {
+        super(urn, assetType);
         this.bufferPool = bufferPool;
-        onReload(data);
+        reload(data);
     }
 
     @Override
-    protected void onReload(MeshData newData) {
+    protected void doReload(MeshData newData) {
         buildMesh(newData);
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;
@@ -157,7 +155,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
                 glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
             }
         } else {
-            logger.error("Attempted to render disposed mesh: {}", getURI());
+            logger.error("Attempted to render disposed mesh: {}", getUrn());
         }
     }
 
@@ -177,7 +175,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         } else {
-            logger.error("Attempted to render disposed mesh: {}", getURI());
+            logger.error("Attempted to render disposed mesh: {}", getUrn());
         }
     }
 
@@ -185,7 +183,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         if (!isDisposed()) {
             GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         } else {
-            logger.error("Attempted to render disposed mesh: {}", getURI());
+            logger.error("Attempted to render disposed mesh: {}", getUrn());
         }
     }
 
@@ -195,7 +193,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             doRender();
             postRender();
         } else {
-            logger.error("Attempted to render disposed mesh: {}", getURI());
+            logger.error("Attempted to render disposed mesh: {}", getUrn());
         }
     }
 
@@ -295,7 +293,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         }
         vertexBuffer.flip();
         if (vboVertexBuffer == 0) {
-            vboVertexBuffer = bufferPool.get(getURI().toSimpleString());
+            vboVertexBuffer = bufferPool.get(getUrn().toString());
         }
         VertexBufferObjectUtil.bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
         vertexBuffer.flip();
@@ -310,7 +308,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         indexBuffer.flip();
 
         if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
+            vboIndexBuffer = bufferPool.get(getUrn().toString());
         }
         VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
         indexBuffer.flip();

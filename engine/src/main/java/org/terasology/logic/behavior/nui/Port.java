@@ -40,8 +40,8 @@ import org.terasology.rendering.nui.InteractionListener;
 public abstract class Port extends CoreWidget {
     protected RenderableNode node;
     protected Rect2f rect;
-    private TextureRegion active = Assets.getTextureRegion("engine:checkboxChecked");
-    private TextureRegion inactive = Assets.getTextureRegion("engine:checkbox");
+    private TextureRegion active = Assets.getTextureRegion("engine:checkboxChecked").get();
+    private TextureRegion inactive = Assets.getTextureRegion("engine:checkbox").get();
 
     private InteractionListener connectListener = new BaseInteractionListener() {
         @Override

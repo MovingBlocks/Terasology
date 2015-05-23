@@ -16,45 +16,46 @@
 package org.terasology.rendering.assets.atlas;
 
 import com.google.common.collect.Maps;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.naming.Name;
-import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Immortius
  */
-public class Atlas extends AbstractAsset<AtlasData> {
-    private Map<Name, Subtexture> subtextures = Maps.newHashMap();
+public class Atlas extends Asset<AtlasData> {
+    private Map<ResourceUrn, SubtextureData> subtextures = Maps.newHashMap();
 
-    public Atlas(AssetUri uri, AtlasData data) {
-        super(uri);
-        onReload(data);
+    /**
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     *
+     * @param urn       The urn identifying the asset.
+     * @param assetType The asset type this asset belongs to.
+     */
+    public Atlas(ResourceUrn urn, AssetType<?, AtlasData> assetType, AtlasData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
-    protected void onReload(AtlasData data) {
+    protected void doReload(AtlasData data) {
         subtextures.clear();
         for (Map.Entry<Name, SubtextureData> entry : data.getSubtextures().entrySet()) {
-            String subtextureName = getURI().getAssetName() + "." + entry.getKey();
-            Subtexture subtexture = Assets.generateAsset(new AssetUri(AssetType.SUBTEXTURE, getURI().getModuleName(), subtextureName), entry.getValue(), Subtexture.class);
-            if (subtexture != null) {
-                subtextures.put(entry.getKey(), subtexture);
-            }
+            ResourceUrn subtextureUrn = new ResourceUrn(getUrn().getModuleName(), getUrn().getResourceName(), entry.getKey());
+            subtextures.put(subtextureUrn, entry.getValue());
         }
     }
-
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         subtextures.clear();
     }
 
-    public Subtexture getSubtexture(String name) {
-        return subtextures.get(new Name(name));
+    public Optional<SubtextureData> getSubtexture(ResourceUrn name) {
+        return Optional.ofNullable(subtextures.get(name));
     }
 }

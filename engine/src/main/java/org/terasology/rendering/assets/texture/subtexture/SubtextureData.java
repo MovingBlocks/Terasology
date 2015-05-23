@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.assets.texture.subtexture;
 
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.math.Rect2f;
 import org.terasology.rendering.assets.texture.Texture;
 

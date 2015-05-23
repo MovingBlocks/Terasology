@@ -19,8 +19,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -49,7 +50,7 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
 /**
  * @author Immortius
  */
-public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
+public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private static final int TEX_COORD_SIZE = 2;
     private static final int VECTOR3_SIZE = 3;
@@ -67,10 +68,10 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     private Vector3f scale;
     private Vector3f translate;
 
-    public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
-        super(uri);
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data, GLBufferPool bufferPool) {
+        super(urn, assetType);
         this.bufferPool = bufferPool;
-        onReload(data);
+        reload(data);
     }
 
     public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
@@ -79,18 +80,18 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    protected void onReload(SkeletalMeshData newData) {
+    protected void doReload(SkeletalMeshData newData) {
         this.data = newData;
 
         if (vboPosNormBuffer == 0) {
-            vboPosNormBuffer = bufferPool.get(getURI().toSimpleString());
+            vboPosNormBuffer = bufferPool.get(getUrn().toString());
         }
 
         IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
         indexBuffer.put(newData.getIndices().toArray());
         indexBuffer.flip();
         if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
+            vboIndexBuffer = bufferPool.get(getUrn().toString());
         }
         VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
@@ -102,13 +103,13 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         uvBuffer.flip();
 
         if (vboUVBuffer == 0) {
-            vboUVBuffer = bufferPool.get(getURI().toSimpleString());
+            vboUVBuffer = bufferPool.get(getUrn().toString());
         }
         VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         if (vboIndexBuffer != 0) {
             bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;

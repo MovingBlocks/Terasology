@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.characters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -52,6 +54,8 @@ import java.util.List;
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(CharacterSoundSystem.class);
+
     private static final long MIN_TIME = 10;
     private static final float LANDING_VOLUME_MODIFIER = 0.2f; //The sound volume is multiplied by this number
     private static final float LANDING_VELOCITY_THRESHOLD = 7; //How fast do you have to be falling for the sound to play
@@ -76,8 +80,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition());
         blockPos.y--; // The block *below* the character's feet is interesting to us
         Block block = worldProvider.getBlock(blockPos);
-        if (block != null && !block.getSounds().getStepSounds().isEmpty()) {
-            footstepSounds = block.getSounds().getStepSounds();
+        if (block != null) {
+            if (block.getSounds() == null) {
+                logger.error("Block '{}' has no sounds", block.getURI());
+            } else if (!block.getSounds().getStepSounds().isEmpty()) {
+                footstepSounds = block.getSounds().getStepSounds();
+            }
         }
 
         if (footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {

@@ -45,10 +45,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     private Block air;
     private Biome defaultBiome;
 
-    public WorldProviderCoreStub() {
-        this(BlockManager.getAir(), BiomeManager.getUnknownBiome());
-    }
-
     public WorldProviderCoreStub(Block air, Biome defaultBiome) {
         this.air = air;
         this.defaultBiome = defaultBiome;

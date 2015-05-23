@@ -4,7 +4,7 @@
         "name": "Improved Pick Axe + 2"
     },
     "Item": {
-        "icon": "engine:items.pick",
+        "icon": "engine:items#pick",
         "renderWithIcon": true,
         "damageType": "pickaxeTier2Damage",
         "baseDamage" : 2

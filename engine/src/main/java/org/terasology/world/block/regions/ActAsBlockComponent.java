@@ -26,5 +26,5 @@ import org.terasology.world.block.family.BlockFamily;
  * @author Immortius
  */
 public final class ActAsBlockComponent implements Component {
-    public BlockFamily block = BlockManager.getAirFamily();
+    public BlockFamily block;
 }

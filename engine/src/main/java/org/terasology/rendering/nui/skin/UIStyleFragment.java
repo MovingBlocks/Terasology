@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.skin;
 
-import com.google.common.base.Optional;
 import com.google.gson.annotations.SerializedName;
 import org.terasology.math.Border;
 import org.terasology.rendering.assets.font.Font;
@@ -25,11 +24,13 @@ import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.VerticalAlign;
 
+import java.util.Optional;
+
 /**
  * @author Immortius
  */
 public class UIStyleFragment {
-    private Optional<TextureRegion> background;
+    private Optional<TextureRegion> background = Optional.empty();
     @SerializedName("background-border")
     private Border backgroundBorder;
     @SerializedName("background-scale-mode")
@@ -73,8 +74,8 @@ public class UIStyleFragment {
 
 
     public void applyTo(UIStyle style) {
-        if (background != null) {
-            style.setBackground(background.orNull());
+        if (background.isPresent()) {
+            style.setBackground(background.get());
         }
         if (backgroundBorder != null) {
             style.setBackgroundBorder(backgroundBorder);
@@ -133,11 +134,11 @@ public class UIStyleFragment {
     }
 
     public TextureRegion getBackground() {
-        return background.orNull();
+        return background.orElse(null);
     }
 
     public void setBackground(TextureRegion background) {
-        this.background = Optional.fromNullable(background);
+        this.background = Optional.ofNullable(background);
     }
 
     public Border getBackgroundBorder() {

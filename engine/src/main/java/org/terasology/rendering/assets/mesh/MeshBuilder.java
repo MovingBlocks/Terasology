@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.assets.mesh;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.module.sandbox.API;
@@ -138,11 +137,11 @@ public class MeshBuilder {
     }
 
     public Mesh build() {
-        return Assets.generateAsset(AssetType.MESH, meshData, Mesh.class);
+        return Assets.generateAsset(meshData, Mesh.class);
     }
 
-    public Mesh build(AssetUri uri) {
-        return Assets.generateAsset(uri, meshData, Mesh.class);
+    public Mesh build(ResourceUrn urn) {
+        return Assets.generateAsset(urn, meshData, Mesh.class);
     }
 
     /**

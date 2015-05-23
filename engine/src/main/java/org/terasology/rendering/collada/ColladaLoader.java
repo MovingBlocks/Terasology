@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
 import java.io.IOException;
@@ -75,19 +76,48 @@ public class ColladaLoader {
 
     protected SkeletalMeshDataBuilder skeletonBuilder;
 
-    protected void parseSkeletalMeshData(InputStream inputStream) throws ColladaParseException, IOException {
+    public SkeletalMeshData parseSkeletalMeshData(InputStream inputStream) throws ColladaParseException, IOException {
         Document document = Xml.readAndClose(inputStream);
         Element rootElement = document.getRootElement();
 
         parseMeshData(rootElement);
         parseSkeletalMeshData(rootElement);
+        return skeletonBuilder.build();
     }
 
-    protected void parseMeshData(InputStream inputStream) throws ColladaParseException, IOException {
+    public void parseMeshData(InputStream inputStream) throws ColladaParseException, IOException {
         Document document = Xml.readAndClose(inputStream);
         Element rootElement = document.getRootElement();
 
         parseMeshData(rootElement);
+    }
+
+    public TFloatList getVertices() {
+        return vertices;
+    }
+
+    public TFloatList getTexCoord0() {
+        return texCoord0;
+    }
+
+    public TFloatList getTexCoord1() {
+        return texCoord1;
+    }
+
+    public TFloatList getNormals() {
+        return normals;
+    }
+
+    public TFloatList getColors() {
+        return colors;
+    }
+
+    public TIntList getIndices() {
+        return indices;
+    }
+
+    public double getUnitsPerMeter() {
+        return unitsPerMeter;
     }
 
     private void createMd5JointForElementAndParent(Map<String, MD5Joint> md5JointBySidMap,
@@ -976,14 +1006,6 @@ public class ColladaLoader {
         public int stride;
         public String[] parameterNames;
         public String[] parameterTypes;
-    }
-
-    protected class ColladaParseException extends Exception {
-        private static final long serialVersionUID = 1L;
-
-        public ColladaParseException(String msg) {
-            super(msg);
-        }
     }
 
     private static class MD5Joint {

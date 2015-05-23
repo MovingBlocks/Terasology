@@ -18,8 +18,7 @@ package org.terasology.rendering.primitives;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
@@ -186,6 +185,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 }
             }
         }
-        mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, block.getURI().toString()));
+        mesh = tessellator.generateMesh(new ResourceUrn("engine", "blockmesh", block.getURI().toString()));
     }
 }

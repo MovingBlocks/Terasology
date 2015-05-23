@@ -18,8 +18,8 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -70,7 +70,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             }
         }
 
-        Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1");
+        Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1").get();
 
         if (colorGradingLut != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -85,8 +85,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
             sceneCombined.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
 
-            AssetUri noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
-            Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri.toSimpleString());
+            ResourceUrn noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
+            Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri).get();
 
             if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

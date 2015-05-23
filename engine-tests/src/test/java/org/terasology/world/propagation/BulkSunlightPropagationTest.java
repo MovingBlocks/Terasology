@@ -20,17 +20,19 @@ import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Region3i;
-import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
@@ -62,28 +64,27 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
         super.setup();
 
         regenRules = new SunlightRegenPropagationRules();
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(),
-                Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true);
         CoreRegistry.put(BlockManager.class, blockManager);
 
-        solid = new Block();
-        solid.setDisplayName("Solid");
-        solid.setUri(new BlockUri("engine:solid"));
-        solid.setId((short) 5);
-        for (Side side : Side.values()) {
-            solid.setFullSide(side, true);
-        }
-        blockManager.addBlockFamily(new SymmetricFamily(solid.getURI(), solid), true);
+        BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
+        solidData.getBaseSection().setDisplayName("Stone");
+        solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        solidData.getBaseSection().setTranslucent(false);
+        assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
+        solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
+
+        air = blockManager.getBlock(BlockManager.AIR_ID);
 
         Map<Vector3i, Block> blockData = Maps.newHashMap();
-        regenWorldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, blockData);
-        lightWorldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, blockData);
+        regenWorldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, air, blockData);
+        lightWorldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, air, blockData);
 
         lightRules = new SunlightPropagationRules(regenWorldView);
         sunlightPropagator = new StandardBatchPropagator(lightRules, lightWorldView);
         propagator = new SunlightRegenBatchPropagator(regenRules, regenWorldView, sunlightPropagator, lightWorldView);
 
-        air = BlockManager.getAir();
 
     }
 

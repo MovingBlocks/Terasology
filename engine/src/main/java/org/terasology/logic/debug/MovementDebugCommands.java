@@ -15,11 +15,10 @@
  */
 package org.terasology.logic.debug;
 
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -31,6 +30,8 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
+
+import java.util.Optional;
 
 /**
  * @author Immortius
@@ -142,8 +143,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
     public String restoreSpeed(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
 
-        Asset<?> asset = Assets.get(new AssetUri("prefab:engine:player"));
-        CharacterMovementComponent moveDefault = ((PojoPrefab) asset).getComponent(CharacterMovementComponent.class);
+        Optional<Prefab> prefab = Assets.get(new ResourceUrn("engine:player"), Prefab.class);
+        CharacterMovementComponent moveDefault = prefab.get().getComponent(CharacterMovementComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null && moveDefault != null) {
             move.jumpSpeed = moveDefault.jumpSpeed;
@@ -155,7 +156,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             clientComp.character.saveComponent(move);
         }
 
-        HealthComponent healthDefault = ((PojoPrefab) asset).getComponent(HealthComponent.class);
+        HealthComponent healthDefault = prefab.get().getComponent(HealthComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null && healthDefault != null) {
             health.fallingDamageSpeedThreshold = healthDefault.fallingDamageSpeedThreshold;

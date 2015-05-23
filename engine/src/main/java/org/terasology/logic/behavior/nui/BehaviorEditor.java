@@ -16,14 +16,15 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.base.Charsets;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -41,13 +42,12 @@ import org.terasology.rendering.nui.layouts.ZoomableLayout;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
 
 /**
  * @author synopia
  */
 public class BehaviorEditor extends ZoomableLayout {
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorEditor.class);
     private Port activeConnectionStart;
     private RenderableNode selectedNode;
     private RenderableNode newNode;
@@ -102,7 +102,7 @@ public class BehaviorEditor extends ZoomableLayout {
     }
 
     public String save() {
-        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        BehaviorTreeFormat loader = new BehaviorTreeFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         try {
             loader.save(baos, tree.getData());
@@ -232,12 +232,12 @@ public class BehaviorEditor extends ZoomableLayout {
     public void copyNode(RenderableNode node) {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(node.getNode());
-        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        BehaviorTreeFormat loader = new BehaviorTreeFormat();
         ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
 
         try {
             loader.save(os, data);
-            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null, Collections.<URL>emptyList());
+            BehaviorTreeData copy = loader.load(new ByteArrayInputStream(os.toByteArray()));
             Port.OutputPort parent = node.getInputPort().getTargetPort();
             copy.createRenderable();
             RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());
@@ -254,7 +254,7 @@ public class BehaviorEditor extends ZoomableLayout {
             oldPos.sub(nodeToLayout.getPosition());
             nodeToLayout.move(oldPos);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to copy node", e);
         }
     }
 

@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 
 import java.util.Map;
 

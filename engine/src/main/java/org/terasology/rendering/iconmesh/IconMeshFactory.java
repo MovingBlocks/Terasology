@@ -15,14 +15,15 @@
  */
 package org.terasology.rendering.iconmesh;
 
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.module.sandbox.API;
+import org.terasology.assets.Asset;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2i;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -37,8 +38,13 @@ public final class IconMeshFactory {
 
     public static Mesh getIconMesh(TextureRegion region) {
         if (region instanceof Asset) {
-            AssetUri iconUri = ((Asset) region).getURI();
-            return Assets.get(new AssetUri(AssetType.MESH, iconUri.getModuleName(), IconMeshResolver.ICON_DISCRIMINATOR + "." + iconUri.getAssetName()), Mesh.class);
+            ResourceUrn urn = ((Asset) region).getUrn();
+            if (urn.getFragmentName().isEmpty()) {
+                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, urn.getResourceName()), Mesh.class).get();
+            } else {
+                Name fragName = new Name(urn.getResourceName().toString() + ResourceUrn.FRAGMENT_SEPARATOR + urn.getFragmentName().toString());
+                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, fragName), Mesh.class).get();
+            }
         } else {
             return generateIconMesh(region);
         }
@@ -48,11 +54,23 @@ public final class IconMeshFactory {
         return generateIconMesh(null, tex, 0, false, null);
     }
 
-    public static Mesh generateIconMesh(AssetUri uri, TextureRegion tex) {
-        return generateIconMesh(uri, tex, 0, false, null);
+    public static Mesh generateIconMesh(ResourceUrn urn, TextureRegion tex) {
+        return generateIconMesh(urn, tex, 0, false, null);
     }
 
-    public static Mesh generateIconMesh(AssetUri uri, TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
+    public static MeshData generateIconMeshData(TextureRegion tex) {
+        return generateIconMeshData(tex, 0, false, null);
+    }
+
+    public static Mesh generateIconMesh(ResourceUrn urn, TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
+        if (urn == null) {
+            return Assets.generateAsset(generateIconMeshData(tex, alphaLimit, withContour, colorContour), Mesh.class);
+        } else {
+            return Assets.generateAsset(urn, generateIconMeshData(tex, alphaLimit, withContour, colorContour), Mesh.class);
+        }
+    }
+
+    public static MeshData generateIconMeshData(TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
         ByteBuffer buffer = tex.getTexture().getData().getBuffers()[0];
 
         Rect2i pixelRegion = tex.getPixelRegion();
@@ -129,11 +147,7 @@ public final class IconMeshFactory {
                 }
             }
         }
-        if (uri == null) {
-            return tessellator.generateMesh();
-        } else {
-            return tessellator.generateMesh(uri);
-        }
+        return tessellator.generateMeshData();
     }
 
 }

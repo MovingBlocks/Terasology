@@ -15,7 +15,6 @@
  */
 package org.terasology.core.world.generator;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -37,6 +36,7 @@ import org.terasology.world.generator.WorldGenerator2DPreview;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -116,7 +116,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
 
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

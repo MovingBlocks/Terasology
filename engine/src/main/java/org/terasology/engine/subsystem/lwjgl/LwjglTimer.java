@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -29,6 +30,15 @@ public class LwjglTimer extends BaseLwjglSubsystem {
     public void preInitialise(Context context) {
         super.preInitialise(context);
         initTimer(context); // Dependent on LWJGL
+    }
+
+    @Override
+    public void initialise(Context context) {
+
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
     }
 
     @Override

@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.assets.atlas;
 
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 

@@ -18,9 +18,8 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -37,6 +36,7 @@ import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Immortius
@@ -97,25 +97,25 @@ final class GlobalStoreLoader {
     }
 
     private Prefab loadPrefab(EntityData.Prefab prefabData, Map<String, EntityData.Prefab> pendingPrefabs) {
-        Prefab result = Assets.getPrefab(prefabData.getName());
-        if (result == null) {
+        Optional<Prefab> result = Assets.getPrefab(prefabData.getName());
+        if (!result.isPresent()) {
             if (prefabData.hasParentName() && pendingPrefabs.containsKey(prefabData.getParentName())) {
                 loadPrefab(pendingPrefabs.get(prefabData.getParentName()), pendingPrefabs);
             }
             Module module = environment.get(new SimpleUri(prefabData.getName()).getModuleName());
             try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
-                result = createPrefab(prefabData);
+                return createPrefab(prefabData);
             } catch (Exception e) {
                 logger.error("Failed to load prefab {}", prefabData.getParentName(), e);
+                return null;
             }
         }
-        return result;
+        return result.get();
     }
 
     private Prefab createPrefab(EntityData.Prefab prefabData) {
         PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
-        Prefab prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
-        return prefab;
+        return Assets.generateAsset(new ResourceUrn(prefabData.getName()), protoPrefab, Prefab.class);
     }
 
     private void loadComponentMapping(EntityData.GlobalStore globalStore) {

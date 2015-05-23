@@ -16,7 +16,7 @@
 package org.terasology.world.generator.plugin;
 
 import com.google.common.collect.Sets;
-import org.terasology.asset.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
@@ -29,6 +29,7 @@ import java.util.Set;
 
 /**
  * A fake environment so that plugins can be loaded for configuration.
+ *
  * @author Immortius
  */
 public class TempWorldGeneratorPluginLibrary extends DefaultWorldGeneratorPluginLibrary {
@@ -39,8 +40,8 @@ public class TempWorldGeneratorPluginLibrary extends DefaultWorldGeneratorPlugin
 
     private static ModuleEnvironment getEnv(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
-        AssetManager assetManager = context.get(AssetManager.class);
         Config config = context.get(Config.class);
+
 
         Set<Module> selectedModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
@@ -53,7 +54,7 @@ public class TempWorldGeneratorPluginLibrary extends DefaultWorldGeneratorPlugin
             }
         }
         ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
-        assetManager.setEnvironment(environment);
+        context.get(ModuleAwareAssetTypeManager.class).switchEnvironment(environment);
         return environment;
     }
 }

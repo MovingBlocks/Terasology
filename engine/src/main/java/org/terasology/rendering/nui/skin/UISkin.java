@@ -15,29 +15,30 @@
  */
 package org.terasology.rendering.nui.skin;
 
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
  */
-public class UISkin extends AbstractAsset<UISkinData> {
+public class UISkin extends Asset<UISkinData> {
 
     private UISkinData skinData;
 
-    public UISkin(AssetUri uri, UISkinData data) {
-        super(uri);
-        onReload(data);
+    public UISkin(ResourceUrn urn, AssetType<?, UISkinData> assetType, UISkinData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
-    protected void onReload(UISkinData data) {
+    protected void doReload(UISkinData data) {
         this.skinData = data;
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         this.skinData = null;
     }
 

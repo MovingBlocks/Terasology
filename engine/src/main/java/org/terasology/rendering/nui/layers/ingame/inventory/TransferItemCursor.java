@@ -59,7 +59,7 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
                         }
                         BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
                         if (blockItemComp == null || blockItemComp.blockFamily == null) {
-                            return Assets.getTextureRegion("engine:items.questionMark");
+                            return Assets.getTextureRegion("engine:items#questionMark").orElse(null);
                         }
                     }
                     return null;
@@ -75,7 +75,7 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
                     return null;
                 }
             });
-            icon.setMeshTexture(Assets.getTexture("engine:terrain"));
+            icon.setMeshTexture(Assets.getTexture("engine:terrain").get());
             icon.bindQuantity(new ReadOnlyBinding<Integer>() {
                 @Override
                 public Integer get() {

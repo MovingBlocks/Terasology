@@ -19,15 +19,13 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetManagerImpl;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -75,14 +73,10 @@ public class PojoEntityManagerTest {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
-        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
-        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
-            @Override
-            public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                return new PojoPrefab(uri, data);
-            }
-        });
-        context.put(AssetManager.class, assetManager);
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, "prefabs");
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+        context.put(AssetManager.class, assetTypeManager.getAssetManager());
         CoreRegistry.setContext(context);
     }
 
@@ -95,7 +89,7 @@ public class PojoEntityManagerTest {
 
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.addComponent(new StringComponent("Test"));
-        prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "unittest:myprefab"), protoPrefab, Prefab.class);
+        prefab = Assets.generateAsset(new ResourceUrn("unittest:myprefab"), protoPrefab, Prefab.class);
     }
 
     @Test
@@ -338,7 +332,7 @@ public class PojoEntityManagerTest {
     public void prefabPersistedRetainedCorrectly() {
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.setPersisted(false);
-        prefab = Assets.generateAsset(new AssetUri(AssetType.PREFAB, "unittest:nonpersistentPrefab"), protoPrefab, Prefab.class);
+        prefab = Assets.generateAsset(new ResourceUrn("unittest:nonpersistentPrefab"), protoPrefab, Prefab.class);
 
         EntityRef entity1 = entityManager.create(prefab);
         assertFalse(entity1.isPersistent());

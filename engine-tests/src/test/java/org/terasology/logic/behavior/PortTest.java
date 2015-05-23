@@ -15,12 +15,12 @@
  */
 package org.terasology.logic.behavior;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.asset.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.logic.behavior.nui.Port;
 import org.terasology.logic.behavior.nui.PortList;
 import org.terasology.logic.behavior.nui.RenderableNode;

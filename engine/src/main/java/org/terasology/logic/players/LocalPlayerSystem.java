@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.players;
 
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -299,7 +299,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             return;
         }
 
-        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
+        ResourceUrn activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
             InteractionUtil.cancelInteractionAsClient(character);
             return;

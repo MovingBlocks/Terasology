@@ -15,7 +15,7 @@
  */
 package org.terasology.audio;
 
-import org.terasology.asset.AssetFactory;
+import org.terasology.assets.AssetFactory;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -73,7 +73,7 @@ public interface AudioManager {
 
     void stopAllSounds();
 
-    AssetFactory<StaticSoundData, StaticSound> getStaticSoundFactory();
+    AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory();
 
-    AssetFactory<StreamingSoundData, StreamingSound> getStreamingSoundFactory();
+    AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory();
 }

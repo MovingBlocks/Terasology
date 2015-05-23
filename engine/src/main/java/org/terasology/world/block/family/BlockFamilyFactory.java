@@ -15,20 +15,47 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.gson.JsonObject;
-import org.terasology.asset.AssetUri;
-import org.terasology.world.block.loader.BlockDefinition;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.SetMultimap;
+import org.terasology.world.block.BlockBuilderHelper;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
+
+import javax.annotation.concurrent.Immutable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public interface BlockFamilyFactory {
+
+    BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder);
+
+    default BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        throw new UnsupportedOperationException("Freeform blocks not supported");
+    }
+
     /**
-     * Called by the Block Loader to create a block family.
-     *
-     * @param blockBuilder
-     * @param blockDefUri
-     * @param blockDefinition
-     * @param blockDefJson
-     * @return
+     * @return The set of block names this family contains. A block definition will be loaded for each one.
      */
-    BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson);
+    default Set<String> getSectionNames() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * @return The multi-sections that should be applied to the final main sections.
+     */
+    default List<MultiSection> getMultiSections() {
+        return Collections.emptyList();
+    }
+
+    default boolean isFreeformSupported() {
+        return false;
+    }
 
 }

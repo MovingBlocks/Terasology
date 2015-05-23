@@ -35,10 +35,13 @@ public class BlockRegionSystem extends BaseComponentSystem {
     @In
     private WorldProvider worldProvider;
 
+    @In
+    private BlockManager blockManager;
+
     @ReceiveEvent
     public void onDestroyed(DoDestroyEvent event, EntityRef entity, BlockRegionComponent blockRegion) {
         for (Vector3i blockPosition : blockRegion.region) {
-            worldProvider.setBlock(blockPosition, BlockManager.getAir());
+            worldProvider.setBlock(blockPosition, blockManager.getBlock(BlockManager.AIR_ID));
         }
     }
 }

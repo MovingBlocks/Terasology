@@ -16,20 +16,19 @@
 
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.Asset;
 import org.terasology.asset.Assets;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
+
+import java.util.Optional;
 
 /**
  * @author Immortius
  */
 public class AssetTypeHandler<T extends Asset> extends StringRepresentationTypeHandler<T> {
     private Class<T> assetClass;
-    private AssetType type;
 
-    public AssetTypeHandler(AssetType type, Class<T> assetClass) {
-        this.type = type;
+    public AssetTypeHandler(Class<T> assetClass) {
         this.assetClass = assetClass;
     }
 
@@ -38,14 +37,14 @@ public class AssetTypeHandler<T extends Asset> extends StringRepresentationTypeH
         if (item == null) {
             return "";
         }
-        return item.getURI().toSimpleString();
+        return item.getUrn().toString();
     }
 
     @Override
     public T getFromString(String representation) {
-        Asset asset = Assets.resolve(type, representation);
-        if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
-            return assetClass.cast(asset);
+        Optional<T> asset = Assets.get(representation, assetClass);
+        if (asset.isPresent()) {
+            return assetClass.cast(asset.get());
         }
         return null;
     }

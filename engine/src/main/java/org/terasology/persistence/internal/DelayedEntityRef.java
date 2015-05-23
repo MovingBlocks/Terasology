@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.internal;
 
-import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -24,7 +23,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 
 /**
  * The class represents a future entity ref that has yet to be bound to an entity manager.
- *
+ * <p>
  * Currently it gets used by the StorageManager to create entity refs on the main thread for storage off the main
  * thread. During the storage the entities will be bound to the entity manager that is private the the saving thread.
  *
@@ -111,11 +110,6 @@ public class DelayedEntityRef extends EntityRef {
     @Override
     public Prefab getParentPrefab() {
         return getEntityRef().getParentPrefab();
-    }
-
-    @Override
-    public AssetUri getPrefabURI() {
-        return getEntityRef().getPrefabURI();
     }
 
     @Override

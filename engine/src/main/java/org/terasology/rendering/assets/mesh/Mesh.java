@@ -16,21 +16,27 @@
 package org.terasology.rendering.assets.mesh;
 
 import gnu.trove.list.TFloatList;
-import org.terasology.asset.Asset;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.AABB;
 
-public interface Mesh extends Asset<MeshData> {
+public abstract class Mesh extends Asset<MeshData> {
 
-    int VERTEX_SIZE = 3;
-    int TEX_COORD_0_SIZE = 2;
-    int TEX_COORD_1_SIZE = 3;
-    int COLOR_SIZE = 4;
-    int NORMAL_SIZE = 3;
+    public static final int VERTEX_SIZE = 3;
+    public static final int TEX_COORD_0_SIZE = 2;
+    public static final int TEX_COORD_1_SIZE = 3;
+    public static final int COLOR_SIZE = 4;
+    public static final int NORMAL_SIZE = 3;
 
-    AABB getAABB();
+    protected Mesh(ResourceUrn urn, AssetType<?, MeshData> assetType) {
+        super(urn, assetType);
+    }
 
-    TFloatList getVertices();
+    public abstract AABB getAABB();
+
+    public abstract TFloatList getVertices();
 
     // TODO: Remove? At least review.
-    void render();
+    public abstract void render();
 }

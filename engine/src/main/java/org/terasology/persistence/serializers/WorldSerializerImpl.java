@@ -20,9 +20,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
@@ -144,7 +143,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         SimpleUri uri = new SimpleUri(prefabData.getName());
         try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getEnvironment().get(uri.getModuleName()))) {
             PrefabData protoPrefab = prefabSerializer.deserialize(prefabData);
-            Assets.generateAsset(new AssetUri(AssetType.PREFAB, prefabData.getName()), protoPrefab, Prefab.class);
+            Assets.generateAsset(new ResourceUrn(prefabData.getName()), protoPrefab, Prefab.class);
         } catch (Exception e) {
             logger.error("Failed to create prefab {}", prefabData.getName());
         }

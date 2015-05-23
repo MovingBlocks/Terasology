@@ -1,0 +1,343 @@
+/*
+ * Copyright 2015 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.terasology.world.block.loader;
+
+import com.google.common.collect.Maps;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
+import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.DefaultColorSource;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.sounds.BlockSounds;
+import org.terasology.world.block.tiles.BlockTile;
+
+import java.util.EnumMap;
+
+/**
+ * @author Immortius
+ */
+public class SectionDefinitionData {
+    private String displayName = "";
+    private boolean liquid;
+    private int hardness = 0x3;
+
+    private boolean attachmentAllowed = true;
+    private boolean replacementAllowed;
+    private boolean supportRequired;
+
+    private boolean penetrable;
+    private boolean targetable = true;
+    private boolean climbable;
+
+    private boolean invisible;
+    private boolean translucent;
+    private boolean doubleSided;
+    private boolean shadowCasting = true;
+    private boolean waving;
+    private BlockSounds sounds;
+
+    private byte luminance;
+
+    private Vector3f tint = new Vector3f();
+
+    private EnumMap<BlockPart, BlockTile> blockTiles = Maps.newEnumMap(BlockPart.class);
+
+    private EnumMap<BlockPart, DefaultColorSource> colorSources;
+
+    private EnumMap<BlockPart, Vector4f> colorOffsets;
+
+    private float mass = 10f;
+    private boolean debrisOnDestroy = true;
+
+    private EntityData entity = new EntityData();
+    private InventoryData inventory = new InventoryData();
+
+    private BlockShape shape;
+    private boolean water;
+    private boolean lava;
+    private boolean grass;
+    private boolean ice;
+
+    public SectionDefinitionData() {
+        colorSources = Maps.newEnumMap(BlockPart.class);
+        colorOffsets = Maps.newEnumMap(BlockPart.class);
+        for (BlockPart part : BlockPart.values()) {
+            colorSources.put(part, DefaultColorSource.DEFAULT);
+            colorOffsets.put(part, new Vector4f(1, 1, 1, 1));
+        }
+    }
+
+    public SectionDefinitionData(SectionDefinitionData other) {
+        this.displayName = other.displayName;
+        this.liquid = other.liquid;
+        this.hardness = other.hardness;
+
+        this.attachmentAllowed = other.attachmentAllowed;
+        this.replacementAllowed = other.replacementAllowed;
+        this.supportRequired = other.supportRequired;
+
+        this.penetrable = other.penetrable;
+        this.targetable = other.targetable;
+        this.climbable = other.climbable;
+
+        this.invisible = other.invisible;
+        this.translucent = other.translucent;
+        this.doubleSided = other.doubleSided;
+        this.shadowCasting = other.shadowCasting;
+        this.waving = other.waving;
+        this.sounds = other.sounds;
+
+        this.luminance = other.luminance;
+        this.tint = new Vector3f(other.tint);
+
+        this.blockTiles = new EnumMap<>(other.blockTiles);
+        this.colorSources = Maps.newEnumMap(other.colorSources);
+        this.colorOffsets = Maps.newEnumMap(other.colorOffsets);
+
+        this.mass = other.mass;
+        this.debrisOnDestroy = other.debrisOnDestroy;
+
+        this.entity = new EntityData(other.entity);
+        this.inventory = new InventoryData(other.inventory);
+
+        this.shape = other.shape;
+
+        this.water = other.water;
+        this.lava = other.lava;
+        this.grass = other.grass;
+        this.ice = other.ice;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public boolean isLiquid() {
+        return liquid;
+    }
+
+    public void setLiquid(boolean liquid) {
+        this.liquid = liquid;
+    }
+
+    public int getHardness() {
+        return hardness;
+    }
+
+    public void setHardness(int hardness) {
+        this.hardness = hardness;
+    }
+
+    public boolean isAttachmentAllowed() {
+        return attachmentAllowed;
+    }
+
+    public void setAttachmentAllowed(boolean attachmentAllowed) {
+        this.attachmentAllowed = attachmentAllowed;
+    }
+
+    public boolean isReplacementAllowed() {
+        return replacementAllowed;
+    }
+
+    public void setReplacementAllowed(boolean replacementAllowed) {
+        this.replacementAllowed = replacementAllowed;
+    }
+
+    public boolean isSupportRequired() {
+        return supportRequired;
+    }
+
+    public void setSupportRequired(boolean supportRequired) {
+        this.supportRequired = supportRequired;
+    }
+
+    public boolean isPenetrable() {
+        return penetrable;
+    }
+
+    public void setPenetrable(boolean penetrable) {
+        this.penetrable = penetrable;
+    }
+
+    public boolean isTargetable() {
+        return targetable;
+    }
+
+    public void setTargetable(boolean targetable) {
+        this.targetable = targetable;
+    }
+
+    public boolean isClimbable() {
+        return climbable;
+    }
+
+    public void setClimbable(boolean climbable) {
+        this.climbable = climbable;
+    }
+
+    public boolean isInvisible() {
+        return invisible;
+    }
+
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+    }
+
+    public boolean isTranslucent() {
+        return translucent;
+    }
+
+    public void setTranslucent(boolean translucent) {
+        this.translucent = translucent;
+    }
+
+    public boolean isDoubleSided() {
+        return doubleSided;
+    }
+
+    public void setDoubleSided(boolean doubleSided) {
+        this.doubleSided = doubleSided;
+    }
+
+    public boolean isShadowCasting() {
+        return shadowCasting;
+    }
+
+    public void setShadowCasting(boolean shadowCasting) {
+        this.shadowCasting = shadowCasting;
+    }
+
+    public boolean isWaving() {
+        return waving;
+    }
+
+    public void setWaving(boolean waving) {
+        this.waving = waving;
+    }
+
+    public BlockSounds getSounds() {
+        return sounds;
+    }
+
+    public void setSounds(BlockSounds sounds) {
+        this.sounds = sounds;
+    }
+
+    public byte getLuminance() {
+        return luminance;
+    }
+
+    public void setLuminance(byte luminance) {
+        this.luminance = luminance;
+    }
+
+    public Vector3f getTint() {
+        return tint;
+    }
+
+    public void setTint(Vector3f tint) {
+        this.tint = tint;
+    }
+
+    public EnumMap<BlockPart, BlockTile> getBlockTiles() {
+        return blockTiles;
+    }
+
+    public EnumMap<BlockPart, DefaultColorSource> getColorSources() {
+        return colorSources;
+    }
+
+    public EnumMap<BlockPart, Vector4f> getColorOffsets() {
+        return colorOffsets;
+    }
+
+    public float getMass() {
+        return mass;
+    }
+
+    public void setMass(float mass) {
+        this.mass = mass;
+    }
+
+    public boolean isDebrisOnDestroy() {
+        return debrisOnDestroy;
+    }
+
+    public void setDebrisOnDestroy(boolean debrisOnDestroy) {
+        this.debrisOnDestroy = debrisOnDestroy;
+    }
+
+    public EntityData getEntity() {
+        return entity;
+    }
+
+    public void setEntity(EntityData entity) {
+        this.entity = entity;
+    }
+
+    public InventoryData getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(InventoryData inventory) {
+        this.inventory = inventory;
+    }
+
+    public BlockShape getShape() {
+        return shape;
+    }
+
+    public void setShape(BlockShape shape) {
+        this.shape = shape;
+    }
+
+    public boolean isWater() {
+        return water;
+    }
+
+    public void setWater(boolean water) {
+        this.water = water;
+    }
+
+    public boolean isLava() {
+        return lava;
+    }
+
+    public void setLava(boolean lava) {
+        this.lava = lava;
+    }
+
+    public boolean isGrass() {
+        return grass;
+    }
+
+    public void setGrass(boolean grass) {
+        this.grass = grass;
+    }
+
+    public boolean isIce() {
+        return ice;
+    }
+
+    public void setIce(boolean ice) {
+        this.ice = ice;
+    }
+}

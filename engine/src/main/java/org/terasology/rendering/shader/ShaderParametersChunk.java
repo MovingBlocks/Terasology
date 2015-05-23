@@ -26,6 +26,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
+import java.util.Optional;
+
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
@@ -74,17 +76,17 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        Texture terrain = Assets.getTexture("engine:terrain");
-        Texture terrainNormal = Assets.getTexture("engine:terrainNormal");
-        Texture terrainHeight = Assets.getTexture("engine:terrainHeight");
+        Optional<Texture> terrain = Assets.getTexture("engine:terrain");
+        Optional<Texture> terrainNormal = Assets.getTexture("engine:terrainNormal");
+        Optional<Texture> terrainHeight = Assets.getTexture("engine:terrainHeight");
 
-        Texture water = Assets.getTexture("engine:waterStill");
-        Texture lava = Assets.getTexture("engine:lavaStill");
-        Texture waterNormal = Assets.getTexture("engine:waterNormal");
-        Texture waterNormalAlt = Assets.getTexture("engine:waterNormalAlt");
-        Texture effects = Assets.getTexture("engine:effects");
+        Optional<Texture> water = Assets.getTexture("engine:waterStill");
+        Optional<Texture> lava = Assets.getTexture("engine:lavaStill");
+        Optional<Texture> waterNormal = Assets.getTexture("engine:waterNormal");
+        Optional<Texture> waterNormalAlt = Assets.getTexture("engine:waterNormalAlt");
+        Optional<Texture> effects = Assets.getTexture("engine:effects");
 
-        if (terrain == null || water == null || lava == null || waterNormal == null || effects == null) {
+        if (!terrain.isPresent() || !water.isPresent() || !lava.isPresent() || !waterNormal.isPresent() || !effects.isPresent()) {
             return;
         }
 
@@ -92,22 +94,22 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, terrain.get().getId());
         program.setInt("textureAtlas", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, water.get().getId());
         program.setInt("textureWater", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, lava.get().getId());
         program.setInt("textureLava", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.get().getId());
         program.setInt("textureWaterNormal", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.get().getId());
         program.setInt("textureWaterNormalAlt", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, effects.get().getId());
         program.setInt("textureEffects", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         renderingProcess.bindFboTexture("sceneReflected");
@@ -118,12 +120,12 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.getId());
+            glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.get().getId());
             program.setInt("textureAtlasNormal", texId++, true);
 
             if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.getId());
+                glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.get().getId());
                 program.setInt("textureAtlasHeight", texId++, true);
             }
         }

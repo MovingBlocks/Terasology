@@ -24,8 +24,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Matchers;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetManagerImpl;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
@@ -56,11 +57,10 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -118,9 +118,12 @@ public class StorageManagerTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(ModuleManager.class, moduleManager);
         context.put(Config.class, new Config());
-        context.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
-        context.put(NetworkSystem.class, networkSystem);
 
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+        context.put(AssetManager.class, assetTypeManager.getAssetManager());
+
+        context.put(NetworkSystem.class, networkSystem);
 
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
@@ -135,15 +138,14 @@ public class StorageManagerTest {
 
         when(networkSystem.getPlayers()).thenReturn(Arrays.asList(client));
 
-        BlockManagerImpl blockManager = new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry());
-        context.put(BlockManager.class, blockManager);
-        testBlock = new Block();
-        testBlock.setId((short) 1);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
-        testBlock2 = new Block();
-        testBlock2.setId((short) 2);
-        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
 
+        BlockManagerImpl blockManager = new BlockManagerImpl(mock(WorldAtlas.class), assetTypeManager.getAssetManager());
+        context.put(BlockManager.class, blockManager);
+
+        assetTypeManager.getAssetManager().loadAsset(new ResourceUrn("test:testblock"), new BlockFamilyDefinitionData(), BlockFamilyDefinition.class);
+        assetTypeManager.getAssetManager().loadAsset(new ResourceUrn("test:testblock2"), new BlockFamilyDefinitionData(), BlockFamilyDefinition.class);
+        testBlock = blockManager.getBlock("test:testblock");
+        testBlock2 = blockManager.getBlock("test:testblock2");
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
         context.put(ComponentSystemManager.class, componentSystemManager);

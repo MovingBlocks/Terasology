@@ -16,8 +16,9 @@
 package org.terasology.audio.openAL.staticSound;
 
 import org.lwjgl.openal.AL10;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.openAL.OpenALException;
@@ -31,7 +32,7 @@ import static org.lwjgl.openal.AL10.alDeleteBuffers;
 import static org.lwjgl.openal.AL10.alGenBuffers;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
-public final class OpenALSound extends AbstractAsset<StaticSoundData> implements StaticSound {
+public final class OpenALSound extends StaticSound {
 
     protected float length;
     private final OpenALManager audioManager;
@@ -39,11 +40,10 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
-
-    public OpenALSound(AssetUri uri, StaticSoundData data, OpenALManager audioManager) {
-        super(uri);
+    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager) {
+        super(urn, assetType);
         this.audioManager = audioManager;
-        onReload(data);
+        reload(data);
     }
 
     @Override
@@ -85,30 +85,31 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     }
 
     @Override
-    protected void onDispose() {
-        if (bufferId != 0) {
-            audioManager.purgeSound(this);
-            alDeleteBuffers(bufferId);
-            bufferId = 0;
-            OpenALException.checkState("Deleting buffer data");
-        }
-    }
-
-    @Override
-    protected void onReload(StaticSoundData data) {
+    protected void doReload(StaticSoundData newData) {
         if (bufferId == 0) {
             bufferId = alGenBuffers();
         } else {
             audioManager.purgeSound(this);
         }
 
-        AL10.alBufferData(bufferId, data.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, data.getData(), data.getSampleRate());
+        AL10.alBufferData(bufferId, newData.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, newData.getData(), newData.getSampleRate());
         OpenALException.checkState("Allocating sound buffer");
 
-        int bits = data.getBufferBits();
+        int bits = newData.getBufferBits();
         int size = getBufferSize();
         int channels = getChannels();
         int frequency = getSamplingRate();
         length = (float) size / channels / (bits / 8) / frequency;
+    }
+
+
+    @Override
+    protected void doDispose() {
+        if (bufferId != 0) {
+            audioManager.purgeSound(this);
+            alDeleteBuffers(bufferId);
+            bufferId = 0;
+            OpenALException.checkState("Deleting buffer data");
+        }
     }
 }

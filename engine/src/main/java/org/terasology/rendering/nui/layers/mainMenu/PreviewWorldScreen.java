@@ -18,9 +18,8 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -241,7 +240,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private Texture createTexture(int width, int height, ByteBuffer buf) {
         ByteBuffer[] data = new ByteBuffer[]{buf};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
+        ResourceUrn uri = new ResourceUrn("engine:terrainPreview");
         TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
 
         return Assets.generateAsset(uri, texData, Texture.class);

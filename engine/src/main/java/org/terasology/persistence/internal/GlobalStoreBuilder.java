@@ -59,7 +59,9 @@ final class GlobalStoreBuilder {
         Set<Prefab> prefabsRequiredForEntityStorage = new HashSet<>();
         for (EntityRef entityRef : entityManager.getAllEntities()) {
             Prefab prefab = entityRef.getParentPrefab();
-            prefabsRequiredForEntityStorage.add(prefab);
+            if (prefab != null) {
+                prefabsRequiredForEntityStorage.add(prefab);
+            }
         }
         for (Prefab prefab: prefabsRequiredForEntityStorage) {
             store.addPrefab(prefabSerializer.serialize(prefab));

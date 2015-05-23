@@ -57,7 +57,7 @@ public class TreeTests {
         context.put(Config.class, new Config());
 
         BlockManager blockManager = Mockito.mock(BlockManager.class);
-        Block air = BlockManager.getAir();
+        Block air = blockManager.getBlock(BlockManager.AIR_ID);
 
         Mockito.when(blockManager.getBlock(Matchers.<BlockUri>any())).thenReturn(air);
         Mockito.when(blockManager.getBlock(Matchers.<String>any())).thenReturn(air);

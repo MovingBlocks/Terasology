@@ -36,10 +36,12 @@ import java.util.Map;
 public class FloraRasterizer implements WorldRasterizer {
 
     private final Map<FloraType, List<Block>> flora = Maps.newEnumMap(FloraType.class);
+    private Block air;
 
     @Override
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        air = blockManager.getBlock(BlockManager.AIR_ID);
 
         flora.put(FloraType.GRASS, ImmutableList.<Block>of(
                 blockManager.getBlock("core:TallGrass1"),
@@ -65,7 +67,6 @@ public class FloraRasterizer implements WorldRasterizer {
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         FloraFacet facet = chunkRegion.getFacet(FloraFacet.class);
-        Block air = BlockManager.getAir();
 
         WhiteNoise noise = new WhiteNoise(chunk.getPosition().hashCode());
 

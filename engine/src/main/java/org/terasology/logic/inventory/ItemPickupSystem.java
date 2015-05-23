@@ -55,7 +55,7 @@ public class ItemPickupSystem extends BaseComponentSystem {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
 
         if (inventoryManager.giveItem(event.getOtherEntity(), entity, pickupComponent.itemEntity)) {
-            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
+            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot").get(), 1.0f));
             pickupComponent.itemEntity = EntityRef.NULL;
             entity.destroy();
         }
@@ -68,7 +68,7 @@ public class ItemPickupSystem extends BaseComponentSystem {
         if (builder.hasComponent(MeshComponent.class)) {
             MeshComponent mesh = builder.getComponent(MeshComponent.class);
             mesh.mesh = blockFamily.getArchetypeBlock().getMesh();
-            mesh.material = Assets.getMaterial("engine:terrain");
+            mesh.material = Assets.getMaterial("engine:terrain").get();
         }
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
             javax.vecmath.Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new javax.vecmath.Vector3f());

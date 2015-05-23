@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.asset;
 
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
 

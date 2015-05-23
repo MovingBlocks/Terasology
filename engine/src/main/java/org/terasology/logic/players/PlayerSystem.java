@@ -60,6 +60,9 @@ import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generation.Region;
+
 import org.terasology.world.generation.World;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -168,12 +171,11 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         // TODO: also start looking downwards if initial spawn pos is in the air
         for (int i = 1; i < 20; i++) {
             if (worldProvider.isBlockRelevant(newSpawnPos)) {
-                if (worldProvider.getBlock(newSpawnPos) == BlockManager.getAir()) {
+                if (worldProvider.getBlock(spawnPos).isPenetrable()) {
                     consecutiveAirBlocks++;
                 } else {
                     consecutiveAirBlocks = 0;
                 }
-
                 if (consecutiveAirBlocks >= height) {
                     newSpawnPos.subY(consecutiveAirBlocks - 1);
                     return newSpawnPos;

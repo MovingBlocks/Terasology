@@ -15,18 +15,19 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import gnu.trove.iterator.TByteObjectIterator;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.terasology.asset.AssetUri;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
+import org.terasology.naming.Name;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.loader.BlockDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +45,8 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     public static final String FOUR_CONNECTIONS_SIDE = "3d_side";
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
+
+    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of(NO_CONNECTIONS, ONE_CONNECTION, TWO_CONNECTIONS_LINE, TWO_CONNECTIONS_CORNER, THREE_CONNECTIONS_CORNER, THREE_CONNECTIONS_T, FOUR_CONNECTIONS_CROSS, FOUR_CONNECTIONS_SIDE, FIVE_CONNECTIONS, SIX_CONNECTIONS);
 
     private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING =
             new HashMap<String, Byte>() {
@@ -84,74 +87,66 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     }
 
     @Override
-    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
-        TByteObjectMap<BlockDefinition>[] basicBlocks = new TByteObjectMap[7];
+    public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<>();
 
         basicBlocks[0] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[0], blockBuilder, blockDefJson, NO_CONNECTIONS);
+        basicBlocks[0].put(shapeMapping.get(NO_CONNECTIONS), NO_CONNECTIONS);
 
         basicBlocks[1] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[1], blockBuilder, blockDefJson, ONE_CONNECTION);
+        basicBlocks[1].put(shapeMapping.get(ONE_CONNECTION), ONE_CONNECTION);
 
         basicBlocks[2] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[2], blockBuilder, blockDefJson, TWO_CONNECTIONS_LINE);
-        putBlockDefinition(basicBlocks[2], blockBuilder, blockDefJson, TWO_CONNECTIONS_CORNER);
+        basicBlocks[2].put(shapeMapping.get(TWO_CONNECTIONS_LINE), TWO_CONNECTIONS_LINE);
+        basicBlocks[2].put(shapeMapping.get(TWO_CONNECTIONS_CORNER), TWO_CONNECTIONS_CORNER);
 
         basicBlocks[3] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[3], blockBuilder, blockDefJson, THREE_CONNECTIONS_CORNER);
-        putBlockDefinition(basicBlocks[3], blockBuilder, blockDefJson, THREE_CONNECTIONS_T);
+        basicBlocks[3].put(shapeMapping.get(THREE_CONNECTIONS_CORNER), THREE_CONNECTIONS_CORNER);
+        basicBlocks[3].put(shapeMapping.get(THREE_CONNECTIONS_T), THREE_CONNECTIONS_T);
 
         basicBlocks[4] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[4], blockBuilder, blockDefJson, FOUR_CONNECTIONS_CROSS);
-        putBlockDefinition(basicBlocks[4], blockBuilder, blockDefJson, FOUR_CONNECTIONS_SIDE);
+        basicBlocks[4].put(shapeMapping.get(FOUR_CONNECTIONS_CROSS), FOUR_CONNECTIONS_CROSS);
+        basicBlocks[4].put(shapeMapping.get(FOUR_CONNECTIONS_SIDE), FOUR_CONNECTIONS_SIDE);
 
         basicBlocks[5] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[5], blockBuilder, blockDefJson, FIVE_CONNECTIONS);
+        basicBlocks[5].put(shapeMapping.get(FIVE_CONNECTIONS), FIVE_CONNECTIONS);
 
         basicBlocks[6] = new TByteObjectHashMap<>();
-        putBlockDefinition(basicBlocks[6], blockBuilder, blockDefJson, SIX_CONNECTIONS);
+        basicBlocks[6].put(shapeMapping.get(SIX_CONNECTIONS), SIX_CONNECTIONS);
 
-        BlockUri blockUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName());
+        BlockUri blockUri = new BlockUri(definition.getUrn());
 
         // Now make sure we have all combinations based on the basic set (above) and rotations
         for (byte connections = 0; connections < 64; connections++) {
             // Only the allowed connections should be created
             if ((connections & connectionSides) == connections) {
-                Block block = constructBlockForConnections(connections, blockBuilder, blockDefUri, basicBlocks);
+                Block block = constructBlockForConnections(connections, blockBuilder, definition, basicBlocks);
                 if (block == null) {
                     throw new IllegalStateException("Unable to find correct block definition for connections: " + connections);
                 }
-                block.setUri(new BlockUri(blockUri, String.valueOf(connections)));
+                block.setUri(new BlockUri(blockUri, new Name(String.valueOf(connections))));
                 blocksForConnections.put(connections, block);
             }
         }
 
         final Block archetypeBlock = blocksForConnections.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
-        return new UpdatesWithNeighboursFamily(connectionCondition, blockUri, blockDefinition.categories,
+        return new UpdatesWithNeighboursFamily(connectionCondition, blockUri, definition.getCategories(),
                 archetypeBlock, blocksForConnections, connectionSides);
     }
 
-    private void putBlockDefinition(TByteObjectMap<BlockDefinition> blockDefinitions, BlockBuilderHelper blockBuilder, JsonObject blockDefJson,
-                                    String connections) {
-        Byte value = shapeMapping.get(connections);
-        if (value != null) {
-            blockDefinitions.put(value, getBlockDefinition(connections, blockBuilder, blockDefJson));
-        }
-    }
-
     private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder,
-                                               final AssetUri blockDefUri, TByteObjectMap<BlockDefinition>[] basicBlocks) {
+                                               BlockFamilyDefinition definition, TByteObjectMap<String>[] basicBlocks) {
         int connectionCount = SideBitFlag.getSides(connections).size();
-        TByteObjectMap<BlockDefinition> possibleBlockDefinitions = basicBlocks[connectionCount];
-        final TByteObjectIterator<BlockDefinition> blockDefinitionIterator = possibleBlockDefinitions.iterator();
+        TByteObjectMap<String> possibleBlockDefinitions = basicBlocks[connectionCount];
+        final TByteObjectIterator<String> blockDefinitionIterator = possibleBlockDefinitions.iterator();
         while (blockDefinitionIterator.hasNext()) {
             blockDefinitionIterator.advance();
             final byte originalConnections = blockDefinitionIterator.key();
-            final BlockDefinition blockDefinition = blockDefinitionIterator.value();
+            final String section = blockDefinitionIterator.value();
             Rotation rot = getRotationToAchieve(originalConnections, connections);
             if (rot != null) {
-                return blockBuilder.constructTransformedBlock(blockDefUri, blockDefinition, rot);
+                return blockBuilder.constructTransformedBlock(definition, section, rot);
             }
         }
         return null;
@@ -175,7 +170,9 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         return null;
     }
 
-    private BlockDefinition getBlockDefinition(String definition, BlockBuilderHelper blockBuilder, JsonObject blockDefJson) {
-        return blockBuilder.getBlockDefinitionForSection(blockDefJson, definition);
+    @Override
+    public Set<String> getSectionNames() {
+        return BLOCK_NAMES;
     }
+
 }

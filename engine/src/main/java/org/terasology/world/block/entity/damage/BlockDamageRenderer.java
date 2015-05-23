@@ -71,7 +71,7 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
 
     @Override
     public void initialise() {
-        this.effectsTexture = Assets.getTexture("engine:effects");
+        this.effectsTexture = Assets.getTexture("engine:effects").get();
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
@@ -86,7 +86,7 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
             return;
         }
 
-        Material defaultTextured = Assets.getMaterial("engine:prog.defaultTextured");
+        Material defaultTextured = Assets.getMaterial("engine:prog.defaultTextured").get();
         defaultTextured.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
         defaultTextured.enable();
 

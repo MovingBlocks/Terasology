@@ -18,9 +18,8 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -43,10 +42,14 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -107,86 +110,87 @@ public class BlockCommands extends BaseComponentSystem {
         return items.toString();
     }
 
-    @Command(shortDescription = "List all available blocks", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listBlocks() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Used Blocks");
-        stringBuilder.append(Message.NEW_LINE);
-        stringBuilder.append("-----------");
-        stringBuilder.append(Message.NEW_LINE);
-        List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
-        for (BlockUri blockUri : registeredBlocks) {
-            stringBuilder.append(blockUri.toString());
-            stringBuilder.append(Message.NEW_LINE);
-        }
-        stringBuilder.append(Message.NEW_LINE);
-
-        stringBuilder.append("Available Blocks");
-        stringBuilder.append(Message.NEW_LINE);
-        stringBuilder.append("----------------");
-        stringBuilder.append(Message.NEW_LINE);
-        List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
-        for (BlockUri blockUri : availableBlocks) {
-            stringBuilder.append(blockUri.toString());
-            stringBuilder.append(Message.NEW_LINE);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    @Command(shortDescription = "Lists all blocks by category", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listBlocksByCategory() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String category : blockManager.getBlockCategories()) {
-            stringBuilder.append(category);
-            stringBuilder.append(Message.NEW_LINE);
-            stringBuilder.append("-----------");
-            stringBuilder.append(Message.NEW_LINE);
-            List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
-            for (BlockUri uri : categoryBlocks) {
-                stringBuilder.append(uri.toString());
-                stringBuilder.append(Message.NEW_LINE);
-            }
-            stringBuilder.append(Message.NEW_LINE);
-        }
-        return stringBuilder.toString();
-    }
-
-    @Command(shortDescription = "Lists all available shapes",
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listShapes() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Shapes");
-        stringBuilder.append(Message.NEW_LINE);
-        stringBuilder.append("-----------");
-        stringBuilder.append(Message.NEW_LINE);
-        List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
-        for (AssetUri uri : sortedUris) {
-            stringBuilder.append(uri.toSimpleString());
-            stringBuilder.append(Message.NEW_LINE);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    @Command(shortDescription = "Lists available free shape blocks",
-            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.",
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listFreeShapeBlocks() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Free Shape Blocks");
-        stringBuilder.append(Message.NEW_LINE);
-        stringBuilder.append("-----------------");
-        stringBuilder.append(Message.NEW_LINE);
-        List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
-        for (BlockUri uri : sortedUris) {
-            stringBuilder.append(uri.toString());
-            stringBuilder.append(Message.NEW_LINE);
-        }
-
-        return stringBuilder.toString();
-    }
-
+    //
+//    @Command(shortDescription = "List all available blocks", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+//    public String listBlocks() {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        stringBuilder.append("Used Blocks");
+//        stringBuilder.append(Message.NEW_LINE);
+//        stringBuilder.append("-----------");
+//        stringBuilder.append(Message.NEW_LINE);
+//        List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
+//        for (BlockUri blockUri : registeredBlocks) {
+//            stringBuilder.append(blockUri.toString());
+//            stringBuilder.append(Message.NEW_LINE);
+//        }
+//        stringBuilder.append(Message.NEW_LINE);
+//
+//        stringBuilder.append("Available Blocks");
+//        stringBuilder.append(Message.NEW_LINE);
+//        stringBuilder.append("----------------");
+//        stringBuilder.append(Message.NEW_LINE);
+//        List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
+//        for (BlockUri blockUri : availableBlocks) {
+//            stringBuilder.append(blockUri.toString());
+//            stringBuilder.append(Message.NEW_LINE);
+//        }
+//
+//        return stringBuilder.toString();
+//    }
+//
+//    @Command(shortDescription = "Lists all blocks by category", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+//    public String listBlocksByCategory() {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (String category : blockManager.getBlockCategories()) {
+//            stringBuilder.append(category);
+//            stringBuilder.append(Message.NEW_LINE);
+//            stringBuilder.append("-----------");
+//            stringBuilder.append(Message.NEW_LINE);
+//            List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
+//            for (BlockUri uri : categoryBlocks) {
+//                stringBuilder.append(uri.toString());
+//                stringBuilder.append(Message.NEW_LINE);
+//            }
+//            stringBuilder.append(Message.NEW_LINE);
+//        }
+//        return stringBuilder.toString();
+//    }
+//
+//    @Command(shortDescription = "Lists all available shapes",
+//            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+//    public String listShapes() {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        stringBuilder.append("Shapes");
+//        stringBuilder.append(Message.NEW_LINE);
+//        stringBuilder.append("-----------");
+//        stringBuilder.append(Message.NEW_LINE);
+//        List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
+//        for (ResourceUrn uri : sortedUris) {
+//            stringBuilder.append(uri.toString());
+//            stringBuilder.append(Message.NEW_LINE);
+//        }
+//
+//        return stringBuilder.toString();
+//    }
+//
+//    @Command(shortDescription = "Lists available free shape blocks",
+//            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.",
+//            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+//    public String listFreeShapeBlocks() {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        stringBuilder.append("Free Shape Blocks");
+//        stringBuilder.append(Message.NEW_LINE);
+//        stringBuilder.append("-----------------");
+//        stringBuilder.append(Message.NEW_LINE);
+//        List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
+//        for (BlockUri uri : sortedUris) {
+//            stringBuilder.append(uri.toString());
+//            stringBuilder.append(Message.NEW_LINE);
+//        }
+//
+//        return stringBuilder.toString();
+//    }
+//
     @Command(shortDescription = "Adds a block to your inventory",
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -196,52 +200,45 @@ public class BlockCommands extends BaseComponentSystem {
             @CommandParam(value = "quantity", required = false) Integer quantityParam,
             @CommandParam(value = "shapeName", required = false) String shapeUriParam) {
         int quantity = quantityParam != null ? quantityParam : 16;
-        if (shapeUriParam == null) {
-            List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(uri);
-            if (matchingUris.size() == 1) {
-                BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
-                return giveBlock(blockFamily, quantity, sender);
-            } else if (matchingUris.isEmpty()) {
-                throw new IllegalArgumentException("No block found for '" + uri + "'");
-            } else {
-                StringBuilder builder = new StringBuilder();
-                builder.append("Non-unique block name, possible matches: ");
-                Joiner.on(", ").appendTo(builder, matchingUris);
-                return builder.toString();
-            }
-        } else {
-            List<BlockUri> resolvedBlockUris = blockManager.resolveAllBlockFamilyUri(uri);
-            if (resolvedBlockUris.isEmpty()) {
-                throw new IllegalArgumentException("No block found for '" + uri + "'");
-            } else if (resolvedBlockUris.size() > 1) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("Non-unique block name, possible matches: ");
-                Joiner.on(", ").appendTo(builder, resolvedBlockUris);
-                return builder.toString();
-            }
-            List<AssetUri> resolvedShapeUris = Assets.resolveAllUri(AssetType.SHAPE, shapeUriParam);
-            if (resolvedShapeUris.isEmpty()) {
-                throw new IllegalArgumentException("No shape found for '" + shapeUriParam + "'");
-            } else if (resolvedShapeUris.size() > 1) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("Non-unique shape name, possible matches: ");
-                Iterator<AssetUri> shapeUris = resolvedShapeUris.iterator();
-                while (shapeUris.hasNext()) {
-                    builder.append(shapeUris.next().toSimpleString());
-                    if (shapeUris.hasNext()) {
-                        builder.append(", ");
+        Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
+        if (matchingUris.size() == 1) {
+            Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
+            if (def.isPresent()) {
+                if (def.get().isFreeform()) {
+                    if (shapeUriParam == null) {
+                        return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), new ResourceUrn("engine:cube"))), quantity, sender);
+                    } else {
+                        Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
+                        if (resolvedShapeUris.isEmpty()) {
+                            throw new IllegalArgumentException("No shape found for '" + shapeUriParam + "'");
+                        } else if (resolvedShapeUris.size() > 1) {
+                            StringBuilder builder = new StringBuilder();
+                            builder.append("Non-unique shape name, possible matches: ");
+                            Iterator<ResourceUrn> shapeUris = sortItems(resolvedShapeUris).iterator();
+                            while (shapeUris.hasNext()) {
+                                builder.append(shapeUris.next().toString());
+                                if (shapeUris.hasNext()) {
+                                    builder.append(", ");
+                                }
+                            }
+
+                            return builder.toString();
+                        }
+                        return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next())), quantity, sender);
                     }
+                } else {
+                    return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn())), quantity, sender);
                 }
-
-                return builder.toString();
+            } else {
+                throw new IllegalArgumentException("No block found for '" + uri + "'");
             }
-
-            BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.MODULE_SEPARATOR + resolvedShapeUris.get(0).toSimpleString());
-            if (blockUri.isValid()) {
-                return giveBlock(blockManager.getBlockFamily(blockUri), quantity, sender);
-            }
-
-            throw new IllegalArgumentException("Invalid block or shape");
+        } else if (matchingUris.isEmpty()) {
+            throw new IllegalArgumentException("No block found for '" + uri + "'");
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Non-unique block name, possible matches: ");
+            Joiner.on(", ").appendTo(builder, matchingUris);
+            return builder.toString();
         }
     }
 
@@ -269,7 +266,7 @@ public class BlockCommands extends BaseComponentSystem {
         return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
     }
 
-    private <T extends Comparable<? super T>> List<T> sortItems(Iterable<T> items) {
+    private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {
         List<T> result = Lists.newArrayList();
         for (T item : items) {
             result.add(item);

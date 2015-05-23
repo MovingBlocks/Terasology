@@ -16,7 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import com.google.common.base.Optional;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -30,6 +29,7 @@ import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Immortius

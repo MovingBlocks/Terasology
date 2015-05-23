@@ -43,7 +43,7 @@ public enum EngineDamageTypes {
     }
 
     public Prefab get() {
-        return Assets.getPrefab(prefabId);
+        return Assets.getPrefab(prefabId).get();
     }
 
 }

@@ -21,10 +21,8 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
@@ -113,9 +111,8 @@ public class CanvasImpl implements CanvasControl {
         this.renderer = renderer;
         this.nuiManager = nuiManager;
         this.time = context.get(Time.class);
-        AssetManager assetManager = context.get(AssetManager.class);
-        this.meshMat = assetManager.resolveAndLoad(AssetType.MATERIAL, "engine:UILitMesh", Material.class);
-        this.whiteTexture =assetManager.resolveAndLoad(AssetType.TEXTURE, "engine:white", Texture.class);
+        this.meshMat = Assets.getMaterial("engine:UILitMesh").get();
+        this.whiteTexture = Assets.getTexture("engine:white").get();
     }
 
     @Override
@@ -258,7 +255,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public SubRegion subRegionFBO(AssetUri uri, Vector2i size) {
+    public SubRegion subRegionFBO(ResourceUrn uri, Vector2i size) {
         return new SubRegionFBOImpl(uri, size);
     }
 
@@ -705,7 +702,7 @@ public class CanvasImpl implements CanvasControl {
      * The state of the canvas
      */
     private static class CanvasState {
-        public UISkin skin = Assets.getSkin("engine:default");
+        public UISkin skin = Assets.getSkin("engine:default").get();
         public String family = "";
         public UIWidget element;
         public String part = "";
@@ -799,7 +796,7 @@ public class CanvasImpl implements CanvasControl {
         private FrameBufferObject fbo;
         private CanvasState previousState;
 
-        private SubRegionFBOImpl(AssetUri uri, Vector2i size) {
+        private SubRegionFBOImpl(ResourceUrn uri, Vector2i size) {
             previousState = state;
 
             fbo = renderer.getFBO(uri, size);

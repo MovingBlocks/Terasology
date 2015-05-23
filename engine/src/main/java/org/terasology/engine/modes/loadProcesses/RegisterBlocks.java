@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.game.GameManifest;
@@ -23,8 +24,8 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.block.loader.WorldAtlasImpl;
+import org.terasology.world.block.tiles.WorldAtlas;
+import org.terasology.world.block.tiles.WorldAtlasImpl;
 
 /**
  * @author Immortius
@@ -50,12 +51,11 @@ public class RegisterBlocks extends SingleStepLoadProcess {
         context.put(WorldAtlas.class, atlas);
 
         BlockManagerImpl blockManager;
-        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true, blockFamilyFactoryRegistry);
+            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true);
             blockManager.subscribe(context.get(NetworkSystem.class));
         } else {
-            blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false, blockFamilyFactoryRegistry);
+            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false);
         }
         context.put(BlockManager.class, blockManager);
 
