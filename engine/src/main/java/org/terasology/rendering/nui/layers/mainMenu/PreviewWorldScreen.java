@@ -26,6 +26,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
@@ -81,6 +82,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    @In
+    private Context context;
+
     private WorldGenerator worldGenerator;
 
     private UIImage previewImage;
@@ -119,10 +123,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             ResolutionResult result = resolver.resolve(moduleName);
             if (result.isSuccess()) {
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
-                CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment));
+                context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment));
                 assetManager.setEnvironment(environment);
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
+                worldGenerator.initialize();
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
                 configureProperties();
                 triggerUpdate = true;
@@ -174,7 +179,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void onClosed() {
 
-        CoreRegistry.remove(WorldGeneratorPluginLibrary.class);
+        context.remove(WorldGeneratorPluginLibrary.class);
 
         if (environment != null) {
             assetManager.setEnvironment(moduleManager.getEnvironment());
