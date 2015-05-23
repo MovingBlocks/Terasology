@@ -20,4 +20,5 @@ import org.terasology.world.block.Block;
 
 public interface SideDefinedBlockFamily extends BlockFamily {
     Block getBlockForSide(Side side);
+    Side getSide(Block block);
 }

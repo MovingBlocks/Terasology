@@ -17,24 +17,27 @@ package org.terasology.math;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
-
+import gnu.trove.map.TByteByteMap;
 import gnu.trove.map.TByteObjectMap;
+import gnu.trove.map.hash.TByteByteHashMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import gnu.trove.procedure.TByteObjectProcedure;
+import org.terasology.math.geom.Quat4f;
 
 import java.util.List;
-
-import org.terasology.math.geom.Quat4f;
 
 /**
  * Rotation provides easy access to 90 degree increments of rotations - intended for block-related rotations.
  * <br><br>
  * Uses the fly weight pattern to cache the 64 combinations of rotation.
+ * Note (Marcin Sciesinski): there are actually only 24 possible combinations, the remaining 40 are just duplicates
  *
  * @author Immortius
  */
 public final class Rotation {
 
     private static final TByteObjectMap<Rotation> ROTATIONS;
+    private static final TByteByteMap DUPLICATE_ROTATIONS;
     private static final ImmutableList<Rotation> HORIZONTAL_ROTATIONS;
 
     private Yaw yaw;
@@ -79,19 +82,40 @@ public final class Rotation {
         return ROTATIONS.get(indexFor(yaw, pitch, roll));
     }
 
+    public static Rotation findReverse(Rotation rotation) {
+        Side frontResult = rotation.rotate(Side.FRONT);
+        Side topResult = rotation.rotate(Side.TOP);
+
+        for (Rotation possibility : values()) {
+            if (possibility.rotate(frontResult) == Side.FRONT
+                && possibility.rotate(topResult) == Side.TOP) {
+                return possibility;
+            }
+        }
+        return null;
+    }
+
     public static List<Rotation> horizontalRotations() {
         return HORIZONTAL_ROTATIONS;
     }
 
     static {
         ROTATIONS = new TByteObjectHashMap<>();
+        DUPLICATE_ROTATIONS = new TByteByteHashMap();
         for (Pitch pitch : Pitch.values()) {
             for (Yaw yaw : Yaw.values()) {
                 for (Roll roll : Roll.values()) {
-                    ROTATIONS.put(indexFor(yaw, pitch, roll), new Rotation(yaw, pitch, roll));
+                    Rotation rotation = new Rotation(yaw, pitch, roll);
+                    Byte duplicateIndex = findDuplicateRotation(rotation);
+                    if (duplicateIndex != null) {
+                        DUPLICATE_ROTATIONS.put(indexFor(yaw, pitch, roll), duplicateIndex);
+                    } else {
+                        ROTATIONS.put(indexFor(yaw, pitch, roll), new Rotation(yaw, pitch, roll));
+                    }
                 }
             }
         }
+
         HORIZONTAL_ROTATIONS = ImmutableList.of(
                 ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE)),
                 ROTATIONS.get(indexFor(Yaw.CLOCKWISE_90, Pitch.NONE, Roll.NONE)),
@@ -99,8 +123,36 @@ public final class Rotation {
                 ROTATIONS.get(indexFor(Yaw.CLOCKWISE_270, Pitch.NONE, Roll.NONE)));
     }
 
+    private static Byte findDuplicateRotation(Rotation rotation) {
+        Side frontResult = rotation.rotate(Side.FRONT);
+        Side topResult = rotation.rotate(Side.TOP);
+        byte[] result = new byte[]{127};
+        ROTATIONS.forEachEntry(
+                new TByteObjectProcedure<Rotation>() {
+                    @Override
+                    public boolean execute(byte a, Rotation b) {
+                        if (b.rotate(Side.FRONT) == frontResult
+                                && b.rotate(Side.TOP) == topResult) {
+                            result[0] = a;
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+
+        if (result[0] != 127) {
+            return result[0];
+        } else {
+            return null;
+        }
+    }
+
     private static byte indexFor(Yaw yaw, Pitch pitch, Roll roll) {
-        return (byte) ((yaw.getIndex() << 4) + (pitch.getIndex() << 2) + roll.getIndex());
+        byte index = (byte) ((yaw.getIndex() << 4) + (pitch.getIndex() << 2) + roll.getIndex());
+        if (DUPLICATE_ROTATIONS.containsKey(index)) {
+            return DUPLICATE_ROTATIONS.get(index);
+        }
+        return index;
     }
 
     public Yaw getYaw() {
