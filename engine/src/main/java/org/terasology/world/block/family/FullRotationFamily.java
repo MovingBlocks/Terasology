@@ -78,16 +78,16 @@ public class FullRotationFamily extends AbstractBlockFamily implements RotationB
     }
 
     @Override
-    public Block getRolledClockwise(Block currentBlock, Side relativeSide) {
+    public Block getBlockForClockwiseRotation(Block currentBlock, Side sideToRotateAround) {
         // This definitely can be done more efficiently, but I'm too lazy to figure it out and it's going to be
         // invoked once in a blue moon anyway, so we can do it the hard way
         Rotation currentRotation = findRotationForBlock(currentBlock);
 
         // Pick a side we want to rotate
-        SideMapping sideMapping = findSideMappingForSide(relativeSide);
+        SideMapping sideMapping = findSideMappingForSide(sideToRotateAround);
 
         // Find which side the side we want to keep was originally at
-        Side originalSide = findOriginalSide(currentRotation, relativeSide);
+        Side originalSide = findOriginalSide(currentRotation, sideToRotateAround);
 
         // Find which side we want to rotate was originally at
         Side originalRotatedSide = findOriginalSide(currentRotation, sideMapping.originalSide);
@@ -95,7 +95,7 @@ public class FullRotationFamily extends AbstractBlockFamily implements RotationB
         // This is the side we want the leftRelativeToEndUpAt
         Side resultRotatedSide = sideMapping.resultSide;
 
-        Rotation resultRotation = findDesiredRotation(originalSide, relativeSide, originalRotatedSide, resultRotatedSide);
+        Rotation resultRotation = findDesiredRotation(originalSide, sideToRotateAround, originalRotatedSide, resultRotatedSide);
 
         return blocks.get(resultRotation);
     }

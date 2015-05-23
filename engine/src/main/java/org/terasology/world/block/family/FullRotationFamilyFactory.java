@@ -25,6 +25,9 @@ import org.terasology.world.block.loader.BlockDefinition;
 
 import java.util.Map;
 
+/**
+ * Block families created with this factory will contain a full set of rotations for the block.
+ */
 @RegisterBlockFamilyFactory("fullRotation")
 public class FullRotationFamilyFactory implements BlockFamilyFactory {
     @Override
