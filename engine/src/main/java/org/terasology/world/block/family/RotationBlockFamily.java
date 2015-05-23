@@ -19,8 +19,30 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 
+/**
+ * Block family interface that defined its blocks by rotation.
+ */
 public interface RotationBlockFamily {
-    Block getRolledClockwise(Block currentBlock, Side relativeSide);
+    /**
+     * Returns a block from the family that is a clock-wise rotation transformation of the block passed in the parameter
+     * where the "front" is the side specified in the parameter.
+     * @param currentBlock Current block to transform.
+     * @param sideToRotateAround Side to rotate around.
+     * @return
+     */
+    Block getBlockForClockwiseRotation(Block currentBlock, Side sideToRotateAround);
+
+    /**
+     * Returns block from the block family for the specified rotation.
+     * @param rotation
+     * @return
+     */
     Block getBlockForRotation(Rotation rotation);
+
+    /**
+     * Returns rotation used to create the specified block.
+     * @param block
+     * @return
+     */
     Rotation getRotation(Block block);
 }
