@@ -90,22 +90,22 @@ public class PostProcessor {
         materials.lightBufferPass = Assets.getMaterial("engine:prog.lightBufferPass");
 
         // pre-post composite
-        materials.sobel    = Assets.getMaterial("engine:prog.sobel");       // TODO: rename shader to outline
-        materials.ssao     = Assets.getMaterial("engine:prog.ssao");
-        materials.ssaoBlur = Assets.getMaterial("engine:prog.ssaoBlur");
-        materials.combine  = Assets.getMaterial("engine:prog.combine");     // TODO: rename to prePostComposite
+        materials.outline          = Assets.getMaterial("engine:prog.sobel");
+        materials.ssao             = Assets.getMaterial("engine:prog.ssao");
+        materials.ssaoBlurred      = Assets.getMaterial("engine:prog.ssaoBlur");
+        materials.prePostComposite = Assets.getMaterial("engine:prog.combine");
 
         // initial post-processing
-        materials.lightShafts = Assets.getMaterial("engine:prog.lightshaft");   // TODO: rename shaders to lightShafts
-        materials.downSampler = Assets.getMaterial("engine:prog.down");     // TODO: rename to downSampler
-        materials.highPass    = Assets.getMaterial("engine:prog.highp");    // TODO: rename to highPass
+        materials.lightShafts = Assets.getMaterial("engine:prog.lightshaft");   // TODO: rename shader to lightShafts
+        materials.initialPost = Assets.getMaterial("engine:prog.prePost");      // TODO: rename shader to initialPost
+        materials.downSampler = Assets.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
+        materials.highPass    = Assets.getMaterial("engine:prog.highp");        // TODO: rename shader to highPass
         materials.blur        = Assets.getMaterial("engine:prog.blur");
-        materials.hdr         = Assets.getMaterial("engine:prog.hdr");      // TODO: rename shader to toneMapping
-        materials.prePost     = Assets.getMaterial("engine:prog.prePost");  // TODO: rename shader to initialPost
+        materials.toneMapping = Assets.getMaterial("engine:prog.hdr");          // TODO: rename shader to toneMapping
 
         // final post-processing
         materials.ocDistortion = Assets.getMaterial("engine:prog.ocDistortion");
-        materials.post         = Assets.getMaterial("engine:prog.post");    // TODO: rename shader to finalPost
+        materials.finalPost    = Assets.getMaterial("engine:prog.post");        // TODO: rename shader to finalPost
         materials.debug        = Assets.getMaterial("engine:prog.debug");
     }
 
@@ -126,15 +126,16 @@ public class PostProcessor {
         buffers.sceneSkyBand1   = renderingProcess.getFBO("sceneSkyBand1");
 
         buffers.sceneReflectiveRefractive   = renderingProcess.getFBO("sceneReflectiveRefractive");
-        // sceneReflected is not used by the post-processor.
+        // sceneReflected, in case one wonders, is not used by the post-processor.
 
         // pre-post composite
-        buffers.sobel           = renderingProcess.getFBO("sobel");
+        buffers.outline         = renderingProcess.getFBO("outline");
         buffers.ssao            = renderingProcess.getFBO("ssao");
         buffers.ssaoBlurred     = renderingProcess.getFBO("ssaoBlurred");
 
         // initial post-processing
         buffers.lightShafts     = renderingProcess.getFBO("lightShafts");
+        buffers.initialPost     = renderingProcess.getFBO("initialPost");
         buffers.currentReadbackPBO = renderingProcess.getCurrentReadbackPBO();
         buffers.sceneToneMapped = renderingProcess.getFBO("sceneToneMapped");
 
@@ -145,8 +146,6 @@ public class PostProcessor {
 
         buffers.sceneBlur0     = renderingProcess.getFBO("sceneBlur0");
         buffers.sceneBlur1     = renderingProcess.getFBO("sceneBlur1");
-
-        buffers.scenePrePost   = renderingProcess.getFBO("scenePrePost");
 
         // final post-processing
         buffers.ocUndistorted   = renderingProcess.getFBO("ocUndistorted");
@@ -160,8 +159,13 @@ public class PostProcessor {
         buffers.sceneOpaquePingPong = renderingProcess.getFBO("sceneOpaquePingPong");
     }
 
+    public void dispose() {
+        renderingProcess = null;
+        graphicState = null;
+        fullScale = null;
+    }
+
     public void generateSkyBands() {
-        // TODO: verify this is actually doing something
         if (renderingConfig.isInscattering()) {
             generateSkyBand(buffers.sceneSkyBand0);
             generateSkyBand(buffers.sceneSkyBand1);
@@ -226,13 +230,13 @@ public class PostProcessor {
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
-    public void generateSobel() {
+    public void generateOutline() {
         if (renderingConfig.isOutline()) {
-            materials.sobel.enable();
+            materials.outline.enable();
 
-            buffers.sobel.bind();
+            buffers.outline.bind();
 
-            setViewportTo(buffers.sobel.dimensions());
+            setViewportTo(buffers.outline.dimensions());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             renderFullscreenQuad();
@@ -267,8 +271,8 @@ public class PostProcessor {
     }
 
     private void generateBlurredSSAO() {
-        materials.ssaoBlur.enable();
-        materials.ssaoBlur.setFloat2("texelSize", 1.0f / buffers.ssaoBlurred.width(), 1.0f / buffers.ssaoBlurred.height(), true);
+        materials.ssaoBlurred.enable();
+        materials.ssaoBlurred.setFloat2("texelSize", 1.0f / buffers.ssaoBlurred.width(), 1.0f / buffers.ssaoBlurred.height(), true);
 
         buffers.ssaoBlurred.bind();
 
@@ -282,8 +286,8 @@ public class PostProcessor {
         setViewportToWholeDisplay();
     }
 
-    public void generateCombinedScene() {
-        materials.combine.enable();
+    public void generatePrePostComposite() {
+        materials.prePostComposite.enable();
 
         buffers.sceneOpaquePingPong.bind();
         setViewportTo(buffers.sceneOpaquePingPong.dimensions());
@@ -319,12 +323,12 @@ public class PostProcessor {
     }
 
     public void initialPostProcessing() {
-        PerformanceMonitor.startActivity("Pre-post processing");
-        materials.prePost.enable();
+        PerformanceMonitor.startActivity("Initial Post-Processing");
+        materials.initialPost.enable();
 
-        buffers.scenePrePost.bind();
+        buffers.initialPost.bind();
 
-        setViewportTo(buffers.scenePrePost.dimensions());
+        setViewportTo(buffers.initialPost.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -352,7 +356,7 @@ public class PostProcessor {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (i == 4) {
-                buffers.scenePrePost.bindTexture();
+                buffers.initialPost.bindTexture();
             } else {
                 buffers.downSampledScene[i + 1].bindTexture();
             }
@@ -419,7 +423,7 @@ public class PostProcessor {
     public void generateToneMappedScene() {
         PerformanceMonitor.startActivity("Tone mapping");
 
-        materials.hdr.enable();
+        materials.toneMapping.enable();
 
         buffers.sceneToneMapped.bind();
         setViewportTo(buffers.sceneToneMapped.dimensions());
@@ -527,7 +531,7 @@ public class PostProcessor {
         PerformanceMonitor.startActivity("Rendering final scene");
 
         if (!renderingDebugConfig.isEnabled()) {
-            materials.post.enable();
+            materials.finalPost.enable();
         } else {
             materials.debug.enable();
         }
@@ -729,22 +733,22 @@ public class PostProcessor {
         public Material lightBufferPass;
 
         // pre-post composite
-        public Material sobel;
+        public Material outline;
         public Material ssao;
-        public Material ssaoBlur;
-        public Material combine;
-        public Material prePost;
+        public Material ssaoBlurred;
+        public Material prePostComposite;
 
         // initial post-processing
         public Material lightShafts;
         public Material downSampler;
         public Material highPass;
         public Material blur;
-        public Material hdr;
+        public Material toneMapping;
+        public Material initialPost;
 
         // final post-processing
         public Material ocDistortion;
-        public Material post;
+        public Material finalPost;
         public Material debug;
     }
 
@@ -760,10 +764,10 @@ public class PostProcessor {
         // sceneReflected is not used by the postProcessor
 
         // pre-post composite
-        public FBO sobel;
+        public FBO outline;
         public FBO ssao;
         public FBO ssaoBlurred;
-        public FBO scenePrePost;
+        public FBO initialPost;
 
         // initial post-processing
         public FBO lightShafts;

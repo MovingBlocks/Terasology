@@ -95,13 +95,13 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboTexture("ssaoBlurred");
+            renderingProcess.bindFboColorTexture("ssaoBlurred");
             program.setInt("texSsao", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboTexture("sobel");
+            renderingProcess.bindFboColorTexture("outline");
             program.setInt("texEdges", texId++, true);
 
             program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
@@ -110,7 +110,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboTexture("sceneSkyBand1");
+            renderingProcess.bindFboColorTexture("sceneSkyBand1");
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();

@@ -168,13 +168,13 @@ public class LwjglRenderingProcess {
         new FBObuilder("sceneReflected",  halfScale,    FBO.Type.DEFAULT).useDepthBuffer().build();
 
         // buffers for the prePost-Processing composite
-        new FBObuilder("sobel",           fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("outline",         fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("ssao",            fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("ssaoBlurred",     fullScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("scenePrePost",    fullScale,    FBO.Type.HDR).build();
 
         // buffers for the Initial Post-Processing
         new FBObuilder("lightShafts",     halfScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("initialPost",     fullScale,    FBO.Type.HDR).build();
         new FBObuilder("sceneToneMapped", fullScale,    FBO.Type.HDR).build();
 
         new FBObuilder("sceneHighPass",   fullScale,    FBO.Type.DEFAULT).build();
@@ -305,7 +305,7 @@ public class LwjglRenderingProcess {
         return false;
     }
 
-    public boolean bindFboTexture(String title) {
+    public boolean bindFboColorTexture(String title) {
         FBO fbo = fboLookup.get(title);
 
         if (fbo != null) {
@@ -313,7 +313,7 @@ public class LwjglRenderingProcess {
             return true;
         }
 
-        logger.error("Failed to bind FBO texture since the requested FBO could not be found!");
+        logger.error("Failed to bind FBO color texture since the requested " + title + " FBO could not be found!");
         return false;
     }
 
@@ -325,7 +325,7 @@ public class LwjglRenderingProcess {
             return true;
         }
 
-        logger.error("Failed to bind FBO depth texture since the requested FBO could not be found!");
+        logger.error("Failed to bind FBO depth texture since the requested " + title + " FBO could not be found!");
         return false;
     }
 
@@ -337,7 +337,7 @@ public class LwjglRenderingProcess {
             return true;
         }
 
-        logger.error("Failed to bind FBO normals texture since the requested FBO could not be found!");
+        logger.error("Failed to bind FBO normals texture since the requested " + title + " FBO could not be found!");
         return false;
     }
 
@@ -349,7 +349,7 @@ public class LwjglRenderingProcess {
             return true;
         }
 
-        logger.error("Failed to bind FBO texture since the requested FBO could not be found!");
+        logger.error("Failed to bind FBO light buffer texture since the requested " + title + " FBO could not be found!");
         return false;
     }
 

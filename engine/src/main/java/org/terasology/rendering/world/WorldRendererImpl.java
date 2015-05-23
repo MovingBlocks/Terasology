@@ -301,9 +301,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingProcess.createOrUpdateFullscreenFbos();
 
 
-        postProcessor.generateSobel();                      // into sobel buffer
+        postProcessor.generateOutline();                      // into outline buffer
         postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
-        postProcessor.generateCombinedScene();              // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
+        postProcessor.generatePrePostComposite();              // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
         PerformanceMonitor.endActivity();
 
         renderSimpleBlendMaterials();                       // into sceneOpaque buffer
@@ -653,6 +653,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.dispose();
         worldProvider.dispose();
         graphicState.dispose();
+        postProcessor.dispose();
     }
 
     /**

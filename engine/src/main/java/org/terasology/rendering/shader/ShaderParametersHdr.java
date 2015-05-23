@@ -41,7 +41,7 @@ public class ShaderParametersHdr extends ShaderParametersBase {
         PostProcessor postProcessor = CoreRegistry.get(PostProcessor.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        renderingProcess.bindFboTexture("scenePrePost");
+        renderingProcess.bindFboColorTexture("initialPost");
 
         program.setInt("texScene", 0, true);
         program.setFloat("exposure", postProcessor.getExposure() * exposureBias, true);
