@@ -173,9 +173,6 @@ public class PostProcessor {
     }
 
     public void generateSkyBand(FBO skyBand) {
-        skyBand.bind();
-        graphicState.setRenderBufferMask(skyBand, true, false, false);
-
         materials.blur.enable();
         materials.blur.setFloat("radius", 8.0f, true);
         materials.blur.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
@@ -185,6 +182,9 @@ public class PostProcessor {
         } else {
             buffers.sceneSkyBand0.bindTexture();
         }
+
+        skyBand.bind();
+        graphicState.setRenderBufferMask(skyBand, true, false, false);
 
         setViewportTo(skyBand.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -255,7 +255,6 @@ public class PostProcessor {
 
     private void generateSSAO() {
         materials.ssao.enable();
-
         materials.ssao.setFloat2("texelSize", 1.0f / buffers.ssao.width(), 1.0f / buffers.ssao.height(), true);
         materials.ssao.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
 
@@ -274,11 +273,12 @@ public class PostProcessor {
         materials.ssaoBlurred.enable();
         materials.ssaoBlurred.setFloat2("texelSize", 1.0f / buffers.ssaoBlurred.width(), 1.0f / buffers.ssaoBlurred.height(), true);
 
+        buffers.ssao.bindTexture();
+
         buffers.ssaoBlurred.bind();
 
         setViewportTo(buffers.ssaoBlurred.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        buffers.ssao.bindTexture();
 
         renderFullscreenQuad();
 
@@ -290,6 +290,7 @@ public class PostProcessor {
         materials.prePostComposite.enable();
 
         buffers.sceneOpaquePingPong.bind();
+
         setViewportTo(buffers.sceneOpaquePingPong.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -426,6 +427,7 @@ public class PostProcessor {
         materials.toneMapping.enable();
 
         buffers.sceneToneMapped.bind();
+
         setViewportTo(buffers.sceneToneMapped.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -452,8 +454,6 @@ public class PostProcessor {
         materials.highPass.enable();
         materials.highPass.setFloat("highPassThreshold", bloomHighPassThreshold, true);
 
-        buffers.sceneHighPass.bind();
-
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindTexture();
@@ -462,6 +462,8 @@ public class PostProcessor {
 //        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
 //        buffers.sceneOpaque.bindDepthTexture();
 //        program.setInt("texDepth", texId++);
+
+        buffers.sceneHighPass.bind();
 
         setViewportTo(buffers.sceneHighPass.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -477,11 +479,6 @@ public class PostProcessor {
         materials.blur.setFloat("radius", bloomBlurRadius, true);
         materials.blur.setFloat2("texelSize", 1.0f / sceneBloom.width(), 1.0f / sceneBloom.height(), true);
 
-        sceneBloom.bind();
-
-        graphicState.setViewportToSizeOf(sceneBloom);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         if (sceneBloom == buffers.sceneBloom0) {
             buffers.sceneHighPass.bindTexture();
         } else if (sceneBloom == buffers.sceneBloom1) {
@@ -489,6 +486,11 @@ public class PostProcessor {
         } else {
             buffers.sceneBloom1.bindTexture();
         }
+
+        sceneBloom.bind();
+
+        graphicState.setViewportToSizeOf(sceneBloom);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
@@ -510,16 +512,16 @@ public class PostProcessor {
         materials.blur.setFloat("radius", overallBlurRadiusFactor * renderingConfig.getBlurRadius(), true);
         materials.blur.setFloat2("texelSize", 1.0f / sceneBlur.width(), 1.0f / sceneBlur.height(), true);
 
-        sceneBlur.bind();
-
-        graphicState.setViewportToSizeOf(sceneBlur);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         if (sceneBlur == buffers.sceneBlur0) {
             buffers.sceneToneMapped.bindTexture();
         } else {
             buffers.sceneBlur0.bindTexture();
         }
+
+        sceneBlur.bind();
+
+        graphicState.setViewportToSizeOf(sceneBlur);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
 
