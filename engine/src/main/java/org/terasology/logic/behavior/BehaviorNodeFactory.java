@@ -38,8 +38,8 @@ import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
@@ -60,6 +60,7 @@ import java.util.Map;
  * @author synopia
  */
 @RegisterSystem
+@Share(BehaviorNodeFactory.class)
 public class BehaviorNodeFactory extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
 
@@ -85,10 +86,6 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
 
     private List<AssetUri> sounds = Lists.newArrayList();
     private List<AssetUri> music = Lists.newArrayList();
-
-    public BehaviorNodeFactory() {
-        CoreRegistry.put(BehaviorNodeFactory.class, this);
-    }
 
     @Override
     public void postBegin() {

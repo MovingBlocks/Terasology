@@ -20,13 +20,13 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,16 +40,17 @@ import java.util.Set;
  */
 public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
-    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+    private ModuleManager moduleManager;
     protected final CopyStrategyLibrary copyStrategyLibrary;
     private ReflectFactory reflectFactory;
 
     private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> classLookup = Maps.newHashMap();
     private Table<Name, Name, ClassMetadata<? extends T, ?>> uriLookup = HashBasedTable.create();
 
-    public AbstractClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
-        this.reflectFactory = factory;
-        this.copyStrategyLibrary = copyStrategies;
+    public AbstractClassLibrary(Context context) {
+        this.moduleManager = context.get(ModuleManager.class);
+        this.reflectFactory = context.get(ReflectFactory.class);
+        this.copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
     }
 
     public AbstractClassLibrary(AbstractClassLibrary<T> factory, CopyStrategyLibrary copyStrategies) {

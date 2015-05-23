@@ -31,7 +31,7 @@ import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -49,7 +49,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
@@ -101,10 +100,11 @@ public class StorageManagerTest {
     private Block testBlock2;
     private EntityRef character;
     private Path savePath;
+    private Context context;
 
     @Before
     public void setup() throws Exception {
-        Context context = new ContextImpl();
+        context = new ContextImpl();
         CoreRegistry.setContext(context);
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
@@ -121,8 +121,11 @@ public class StorageManagerTest {
         context.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));
         context.put(NetworkSystem.class, networkSystem);
 
-        entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem,
-                new ReflectionReflectFactory());
+
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+
+        entityManager = context.get(EngineEntityManager.class);
 
         esm = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), entityManager, false);
         context.put(StorageManager.class, esm);
@@ -229,7 +232,11 @@ public class StorageManagerTest {
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
+
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -247,7 +254,9 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
@@ -296,7 +305,9 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager,
                 storeChunkInZips);
         newSM.loadGlobalStore();
@@ -329,7 +340,9 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 

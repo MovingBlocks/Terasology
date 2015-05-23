@@ -22,6 +22,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.TeraMath;
@@ -29,7 +30,6 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -70,6 +70,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+
+    @In
+    private Context context;
     
     private final int imageSize = 384;
 
@@ -91,7 +94,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary());
+        context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(context));
         SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
 
         try {
@@ -191,7 +194,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         previewImage.setVisible(false);
         errorLabel.setVisible(false);
 
-        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        final NUIManager manager = context.get(NUIManager.class);
         final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Updating Preview", "Please wait ...");
 

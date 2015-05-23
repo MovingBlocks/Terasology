@@ -27,8 +27,9 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -43,9 +44,7 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
@@ -66,14 +65,16 @@ import static org.mockito.Mockito.verify;
  * @author Immortius
  */
 public class PojoEntityManagerTest {
-    private static ModuleManager moduleManager;
 
     private PojoEntityManager entityManager;
     private Prefab prefab;
+    private static Context context;
 
     @BeforeClass
     public static void setupClass() throws Exception {
-        moduleManager = ModuleManagerFactory.create();
+        context = new ContextImpl();
+        ModuleManager moduleManager = ModuleManagerFactory.create();
+        context.put(ModuleManager.class, moduleManager);
         AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
@@ -81,19 +82,16 @@ public class PojoEntityManagerTest {
                 return new PojoPrefab(uri, data);
             }
         });
-        Context contex = new ContextImpl();
-        contex.put(AssetManager.class, assetManager);
-        CoreRegistry.setContext(contex);
+        context.put(AssetManager.class, assetManager);
+        CoreRegistry.setContext(context);
     }
 
     @Before
     public void setup() {
-        EntitySystemBuilder builder = new EntitySystemBuilder();
-
-        ModuleEnvironment environment = moduleManager.getEnvironment();
-        NetworkSystem network = mock(NetworkSystem.class);
-        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        entityManager = (PojoEntityManager) builder.build(environment, network, reflectFactory);
+        context.put(NetworkSystem.class, mock(NetworkSystem.class));
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = (PojoEntityManager) context.get(EntityManager.class);
 
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.addComponent(new StringComponent("Test"));

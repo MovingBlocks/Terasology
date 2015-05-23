@@ -16,8 +16,7 @@
 
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.context.Context;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 /**
@@ -31,10 +30,10 @@ public class EntitySystemLibrary {
     private final ComponentLibrary componentLibrary;
     private final EventLibrary eventLibrary;
 
-    public EntitySystemLibrary(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies, TypeSerializationLibrary typeSerializationLibrary) {
+    public EntitySystemLibrary(Context context, TypeSerializationLibrary typeSerializationLibrary) {
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.componentLibrary = new ComponentLibrary(reflectFactory, copyStrategies);
-        this.eventLibrary = new EventLibrary(reflectFactory, copyStrategies);
+        this.componentLibrary = new ComponentLibrary(context);
+        this.eventLibrary = new EventLibrary(context);
     }
 
     /**

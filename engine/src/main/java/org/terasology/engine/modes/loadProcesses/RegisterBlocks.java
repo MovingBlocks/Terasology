@@ -17,7 +17,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.block.BlockManager;
@@ -30,10 +30,11 @@ import org.terasology.world.block.loader.WorldAtlasImpl;
  * @author Immortius
  */
 public class RegisterBlocks extends SingleStepLoadProcess {
+    private final Context context;
+    private final GameManifest gameManifest;
 
-    private GameManifest gameManifest;
-
-    public RegisterBlocks(GameManifest gameManifest) {
+    public RegisterBlocks(Context context, GameManifest gameManifest) {
+        this.context = context;
         this.gameManifest = gameManifest;
     }
 
@@ -44,19 +45,19 @@ public class RegisterBlocks extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        WorldAtlas atlas = new WorldAtlasImpl(CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution());
-        CoreRegistry.put(WorldAtlas.class, atlas);
+        NetworkSystem networkSystem = context.get(NetworkSystem.class);
+        WorldAtlas atlas = new WorldAtlasImpl(context.get(Config.class).getRendering().getMaxTextureAtlasResolution());
+        context.put(WorldAtlas.class, atlas);
 
         BlockManagerImpl blockManager;
-        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = CoreRegistry.get(BlockFamilyFactoryRegistry.class);
+        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         if (networkSystem.getMode().isAuthority()) {
             blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), true, blockFamilyFactoryRegistry);
-            blockManager.subscribe(CoreRegistry.get(NetworkSystem.class));
+            blockManager.subscribe(context.get(NetworkSystem.class));
         } else {
             blockManager = new BlockManagerImpl(atlas, gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap(), false, blockFamilyFactoryRegistry);
         }
-        CoreRegistry.put(BlockManager.class, blockManager);
+        context.put(BlockManager.class, blockManager);
 
         return true;
     }

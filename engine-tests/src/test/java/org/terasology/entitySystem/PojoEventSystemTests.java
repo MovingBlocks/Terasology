@@ -59,12 +59,13 @@ public class PojoEventSystemTests {
 
     @Before
     public void setup() {
-        CoreRegistry.setContext(new ContextImpl());
+        ContextImpl context = new ContextImpl();
+        CoreRegistry.setContext(context);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategies);
 
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, serializationLibrary);
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         compLibrary = entitySystemLibrary.getComponentLibrary();
         entityManager = new PojoEntityManager();
         entityManager.setComponentLibrary(entitySystemLibrary.getComponentLibrary());

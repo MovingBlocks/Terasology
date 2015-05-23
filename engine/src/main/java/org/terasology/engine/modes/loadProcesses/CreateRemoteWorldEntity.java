@@ -15,9 +15,9 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
 
@@ -29,6 +29,12 @@ import org.terasology.world.WorldComponent;
  */
 public class CreateRemoteWorldEntity extends SingleStepLoadProcess {
 
+    private final Context context;
+
+    public CreateRemoteWorldEntity(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Linking world";
@@ -36,8 +42,8 @@ public class CreateRemoteWorldEntity extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        EntityManager entityManager = context.get(EntityManager.class);
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
 
         EntityRef worldEntity = entityManager.create();
         worldEntity.addComponent(new WorldComponent());

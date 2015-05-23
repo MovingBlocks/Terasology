@@ -31,7 +31,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -41,7 +41,6 @@ import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.world.block.BlockManager;
 
 import java.nio.file.FileSystem;
@@ -100,7 +99,10 @@ public abstract class TerasologyTestingEnvironment {
         context.put(Time.class, mockTime);
         NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
         context.put(NetworkSystem.class, networkSystem);
-        engineEntityManager = new EntitySystemBuilder().build(context.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        engineEntityManager = context.get(EngineEntityManager.class);
+
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
 

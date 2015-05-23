@@ -16,18 +16,25 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 
 /**
  * @author Immortius
  */
 public class InitialiseSystems extends SingleStepLoadProcess {
+
+    private final Context context;
+
+    public InitialiseSystems(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Initialising Systems...";
@@ -35,12 +42,12 @@ public class InitialiseSystems extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        EntitySystemLibrary entitySystemLibrary = CoreRegistry.get(EntitySystemLibrary.class);
-        BlockEntityRegistry blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
+        EntitySystemLibrary entitySystemLibrary = context.get(EntitySystemLibrary.class);
+        BlockEntityRegistry blockEntityRegistry = context.get(BlockEntityRegistry.class);
 
-        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
-        ComponentSystemManager csm = CoreRegistry.get(ComponentSystemManager.class);
+        context.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
+        ComponentSystemManager csm = context.get(ComponentSystemManager.class);
         csm.initialise();
 
         return true;

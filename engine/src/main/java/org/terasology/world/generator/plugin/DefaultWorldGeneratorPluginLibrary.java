@@ -15,17 +15,15 @@
  */
 package org.terasology.world.generator.plugin;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -34,8 +32,8 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
 
     private ClassLibrary<WorldGeneratorPlugin> library;
 
-    public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
-        library = new DefaultClassLibrary<>(reflectFactory, copyStrategyLibrary);
+    public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, Context context) {
+        library = new DefaultClassLibrary<>(context);
         for (Class entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
                 library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry);

@@ -19,10 +19,10 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -59,13 +59,16 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    @In
+    private Context context;
+
     private Map<String, Component> params;
 
     @Override
     public void onOpened() {
         super.onOpened();
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary());
+        context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(context));
 
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());

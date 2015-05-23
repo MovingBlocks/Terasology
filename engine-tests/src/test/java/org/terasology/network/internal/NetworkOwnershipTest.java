@@ -21,14 +21,16 @@ import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityBuilder;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.NetworkComponent;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.network.NetworkSystem;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.BlockEntityRegistry;
 
@@ -56,8 +58,11 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         context.put(ModuleManager.class, moduleManager);
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime, context);
+        context.put(NetworkSystem.class, networkSystem);
 
-        entityManager = new EntitySystemBuilder().build(context.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = (PojoEntityManager) context.get(EntityManager.class);
         context.put(ComponentSystemManager.class, new ComponentSystemManager());
         entityManager.clear();
         client = mock(NetClient.class);

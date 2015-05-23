@@ -16,13 +16,13 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -57,22 +57,27 @@ public class ComponentSerializerTest {
     private ComponentSerializer componentSerializer;
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-
+    private Context context;
     @BeforeClass
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
-        CoreRegistry.setContext(new ContextImpl());
     }
 
     @Before
     public void setup() {
+        context = new ContextImpl();
+        context.put(ModuleManager.class, moduleManager);
+        CoreRegistry.setContext(context);
+
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
-        EntitySystemBuilder builder = new EntitySystemBuilder();
-        EngineEntityManager entityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        context.put(NetworkSystem.class, networkSystem);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EngineEntityManager entityManager = context.get(EngineEntityManager.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);

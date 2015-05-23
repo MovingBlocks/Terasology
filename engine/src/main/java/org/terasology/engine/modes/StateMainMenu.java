@@ -21,9 +21,8 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -35,9 +34,6 @@ import org.terasology.logic.console.ConsoleSystem;
 import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkSystem;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
@@ -76,8 +72,8 @@ public class StateMainMenu implements GameState {
         CoreRegistry.setContext(context);
 
         //let's get the entity event system running
-        entityManager = new EntitySystemBuilder().build(context.get(ModuleManager.class).getEnvironment(),
-                context.get(NetworkSystem.class), context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl());
@@ -102,7 +98,7 @@ public class StateMainMenu implements GameState {
         inputSystem = context.get(InputSystem.class);
 
         // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
-        new RegisterInputSystem().step();
+        new RegisterInputSystem(context).step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();

@@ -17,10 +17,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.context.Context;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.primitives.Tessellator;
@@ -30,6 +29,13 @@ import org.terasology.rendering.primitives.TessellatorHelper;
  * @author Immortius
  */
 public class InitialiseGraphics extends SingleStepLoadProcess {
+
+    private final Context context;
+
+    public InitialiseGraphics(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Initialising Graphics";
@@ -37,7 +43,7 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        NUIManager nuiManager = context.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 
         // TODO: This should be elsewhere

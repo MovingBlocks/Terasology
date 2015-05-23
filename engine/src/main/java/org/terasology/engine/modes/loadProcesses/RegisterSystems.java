@@ -18,23 +18,24 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkMode;
-import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
  */
 public class RegisterSystems extends SingleStepLoadProcess {
-    private static final Logger logger = LoggerFactory.getLogger(RegisterSystems.class);
-    private NetworkMode netMode;
+    private final Context context;
+    private final NetworkMode netMode;
     private ComponentSystemManager componentSystemManager;
 
-    public RegisterSystems(NetworkMode netMode) {
+    public RegisterSystems(Context context, NetworkMode netMode) {
+        this.context = context;
         this.netMode = netMode;
     }
 
@@ -45,10 +46,10 @@ public class RegisterSystems extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        componentSystemManager = context.get(ComponentSystemManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
 
-        TerasologyEngine terasologyEngine = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+        TerasologyEngine terasologyEngine = (TerasologyEngine) context.get(GameEngine.class);
         for (EngineSubsystem subsystem : terasologyEngine.getSubsystems()) {
             subsystem.registerSystems(componentSystemManager);
         }

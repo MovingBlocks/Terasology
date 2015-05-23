@@ -45,12 +45,14 @@ import static org.mockito.Mockito.mock;
  * @author synopia
  */
 public class FactoryTest {
+    private Context context;
+
     @Test
     public void testSaveLoad() throws IOException {
         AssetManager assetManager = mock(AssetManager.class);
-        CoreRegistry.put(AssetManager.class, assetManager);
+        context.put(AssetManager.class, assetManager);
         BehaviorNodeFactory nodeFactory = mock(BehaviorNodeFactory.class);
-        CoreRegistry.put(BehaviorNodeFactory.class, nodeFactory);
+        context.put(BehaviorNodeFactory.class, nodeFactory);
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
         BehaviorTreeData data = buildSample();
 
@@ -82,7 +84,7 @@ public class FactoryTest {
 
     @Before
     public void setup() throws Exception {
-        Context context = new ContextImpl();
+        this.context = new ContextImpl();
         CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
@@ -90,7 +92,7 @@ public class FactoryTest {
         CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategies);
         context.put(ModuleManager.class, moduleManager);
-        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategies);
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(context);
         context.put(NodesClassLibrary.class, nodesClassLibrary);
         nodesClassLibrary.scan(moduleManager.getEnvironment());
     }
