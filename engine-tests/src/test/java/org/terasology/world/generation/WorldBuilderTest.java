@@ -25,7 +25,8 @@ import static org.junit.Assert.assertEquals;
 public class WorldBuilderTest {
     @Test
     public void borderCalculation() {
-        WorldBuilder worldBuilder = new WorldBuilder(12L);
+        WorldBuilder worldBuilder = new WorldBuilder();
+        worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
 
@@ -42,7 +43,8 @@ public class WorldBuilderTest {
 
     @Test
     public void cumulativeBorderCalculation() {
-        WorldBuilder worldBuilder = new WorldBuilder(12L);
+        WorldBuilder worldBuilder = new WorldBuilder();
+        worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
         worldBuilder.addProvider(new Facet3Provider());
@@ -63,7 +65,8 @@ public class WorldBuilderTest {
 
     @Test
     public void multiplePathsBorderCalculation() {
-        WorldBuilder worldBuilder = new WorldBuilder(12L);
+        WorldBuilder worldBuilder = new WorldBuilder();
+        worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
         worldBuilder.addProvider(new Facet4Provider());

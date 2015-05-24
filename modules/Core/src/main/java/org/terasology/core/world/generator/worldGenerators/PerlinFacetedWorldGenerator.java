@@ -47,8 +47,8 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
     }
 
     @Override
-    protected WorldBuilder createWorld(long seed) {
-        return new WorldBuilder(seed)
+    protected WorldBuilder createWorld() {
+        return new WorldBuilder()
                 .addProvider(new World2dPreviewProvider())
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new PerlinHumidityProvider())

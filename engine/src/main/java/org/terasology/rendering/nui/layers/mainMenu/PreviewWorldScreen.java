@@ -15,9 +15,13 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import com.google.common.base.Function;
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -25,6 +29,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
@@ -40,30 +45,35 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.PropertyOrdering;
+import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.nio.ByteBuffer;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-
 /**
- * @author Immortius
+ * Shows a preview of the generated world and provides some
+ * configuration options to tweak the generation process.
  */
 public class PreviewWorldScreen extends CoreScreenLayer {
+
+    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:previewWorldScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
 
     @In
     private ModuleManager moduleManager;
+
+    @In
+    private AssetManager assetManager;
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
@@ -73,16 +83,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @In
     private Context context;
-    
-    private final int imageSize = 384;
 
     private WorldGenerator worldGenerator;
 
-    private UILabel errorLabel;
     private UIImage previewImage;
     private UISlider zoomSlider;
     private UIButton applyButton;
-    private PreviewSettings currentSettings;
 
     private UIText seed;
 
@@ -90,22 +96,39 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private ModuleEnvironment environment;
 
+    private final Texture texture;
+
+    private boolean triggerUpdate;
+
+    public PreviewWorldScreen() {
+        int imgWidth = 384;
+        int imgHeight = 384;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
+        ByteBuffer[] data = new ByteBuffer[]{buffer};
+        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
+        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        texture = Assets.generateAsset(uri, texData, Texture.class);
+    }
+
     @Override
     public void onOpened() {
         super.onOpened();
 
-        context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(context));
         SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
+        Name moduleName = worldGenUri.getModuleName();
 
         try {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            Name moduleName = worldGenUri.getModuleName();
             ResolutionResult result = resolver.resolve(moduleName);
             if (result.isSuccess()) {
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
+                context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
+                assetManager.setEnvironment(environment);
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
+                configureProperties();
+                triggerUpdate = true;
             } else {
                 logger.error("Could not resolve modules for: {}", worldGenUri);
             }
@@ -118,13 +141,63 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void update(float delta) {
+         super.update(delta);
+
+         if (triggerUpdate) {
+             updatePreview();
+             triggerUpdate = false;
+         }
+    }
+
+    private void configureProperties() {
+
+        PropertyLayout properties = find("properties", PropertyLayout.class);
+        properties.setOrdering(PropertyOrdering.byLabel());
+        properties.clear();
+
+        WorldConfigurator worldConfig = worldGenerator.getConfigurator();
+
+        Map<String, Component> params = worldConfig.getProperties();
+
+        for (String key : params.keySet()) {
+            Class<? extends Component> clazz = params.get(key).getClass();
+            Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
+            if (comp != null) {
+                worldConfig.setProperty(key, comp);       // use the data from the config instead of defaults
+            }
+        }
+
+        for (String label : params.keySet()) {
+            PropertyProvider<?> provider = new PropertyProvider<>(params.get(label));
+            properties.addPropertyProvider(label, provider);
+        }
+    }
+
+    @Override
     public void onClosed() {
-        super.onClosed();
+
+        context.remove(WorldGeneratorPluginLibrary.class);
 
         if (environment != null) {
+            assetManager.setEnvironment(moduleManager.getEnvironment());
             environment.close();
             environment = null;
         }
+
+        if (previewGen != null) {
+            previewGen.close();
+            previewGen = null;
+        }
+
+        WorldConfigurator worldConfig = worldGenerator.getConfigurator();
+
+        Map<String, Component> params = worldConfig.getProperties();
+        if (params != null) {
+            config.setModuleConfigs(worldGenerator.getUri(), params);
+        }
+
+        super.onClosed();
     }
 
     @Override
@@ -138,7 +211,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         applyButton = find("apply", UIButton.class);
         if (applyButton != null) {
-            applyButton.setEnabled(false);
             applyButton.subscribe(new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget widget) {
@@ -147,12 +219,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             });
         }
 
-        errorLabel = find("error", UILabel.class);
-        if (errorLabel != null) {
-            errorLabel.setVisible(false);
-        }
-
         previewImage = find("preview", UIImage.class);
+        previewImage.setImage(texture);
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -160,23 +228,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-        if (worldGenerator != null) {
-            PreviewSettings newSettings = new PreviewSettings(TeraMath.floorToInt(zoomSlider.getValue()), seed.getText());
-            if (currentSettings == null || !currentSettings.equals(newSettings)) {
-                boolean firstTime = currentSettings == null;
-                currentSettings = newSettings;
-                if (applyButton != null && !firstTime) {
-                    applyButton.setEnabled(true);
-                } else {
-                    updatePreview();
-                }
-            }
-        }
     }
 
     @Override
@@ -191,99 +242,25 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
-        previewImage.setVisible(false);
-        errorLabel.setVisible(false);
 
         final NUIManager manager = context.get(NUIManager.class);
-        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Updating Preview", "Please wait ...");
 
         ProgressListener progressListener = progress ->
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
-        Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
-            @Override
-            public ByteBufferResult call() throws InterruptedException {
-                try {
-                    if (seed != null) {
-                        worldGenerator.setWorldSeed(seed.getText());
-                    }
-                    ByteBuffer buf = previewGen.create(imageSize, imageSize, currentSettings.zoom, progressListener);
-                    return new ByteBufferResult(true, buf, null);
-                } catch (InterruptedException e) {
-                    throw e;
-                } catch (Exception ex) {
-                    return new ByteBufferResult(false, null, ex);
-                }
+        Callable<TextureData> operation = () -> {
+            if (seed != null) {
+                worldGenerator.setWorldSeed(seed.getText());
             }
+            int zoom = TeraMath.floorToInt(zoomSlider.getValue());
+            previewGen.render(texture.getData(), zoom, progressListener);
+            return texture.getData();
         };
 
-        popup.onSuccess(new Function<ByteBufferResult, Void>() {
-            @Override
-            public Void apply(ByteBufferResult byteBufferResult) {
-                if (byteBufferResult.success) {
-                    previewImage.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
-                    previewImage.setVisible(true);
-                    if (applyButton != null) {
-                        applyButton.setEnabled(false);
-                    }
-                } else {
-                    errorLabel.setText("Sorry: could not generate 2d preview :-(");
-                    errorLabel.setVisible(true);
-                    logger.error("Error generating a 2d preview", byteBufferResult.exception);
-                }
-                return null;
-            }
-        });
-
+        popup.onSuccess(newData -> texture.reload(newData));
         popup.startOperation(operation, true);
-    }
-
-    private Texture createTexture(int width, int height, ByteBuffer buf) {
-        ByteBuffer[] data = new ByteBuffer[]{buf};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
-        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-
-        return Assets.generateAsset(uri, texData, Texture.class);
-    }
-
-    private static class PreviewSettings {
-        private int zoom;
-        private String seed;
-
-        public PreviewSettings(int zoom, String seed) {
-            this.zoom = zoom;
-            this.seed = seed;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj instanceof PreviewSettings) {
-                PreviewSettings other = (PreviewSettings) obj;
-                return other.zoom == zoom && Objects.equals(other.seed, seed);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(zoom, seed);
-        }
-    }
-
-    private static final class ByteBufferResult {
-        public boolean success;
-        public ByteBuffer buf;
-        public Exception exception;
-
-        private ByteBufferResult(boolean success, ByteBuffer buf, Exception exception) {
-            this.success = success;
-            this.buf = buf;
-            this.exception = exception;
-        }
     }
 }
 

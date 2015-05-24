@@ -15,8 +15,6 @@
  */
 package org.terasology.world.generator;
 
-import com.google.common.base.Optional;
-
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.spawner.FixedSpawner;
@@ -35,11 +33,9 @@ public interface WorldGenerator {
 
     void initialize();
 
-    Optional<WorldConfigurator> getConfigurator();
+    WorldConfigurator getConfigurator();
 
     World getWorld();
-
-    void setConfigurator(WorldConfigurator newConfigurator);
 
     /**
      * Determines a spawn position suitable for this world, such as that used to spawn the initial player.

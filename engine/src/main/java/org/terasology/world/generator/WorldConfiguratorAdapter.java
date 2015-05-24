@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.world.generator;
 
-package org.terasology.rendering.nui.layers.mainMenu.preview;
+import java.util.Collections;
+import java.util.Map;
 
-import java.nio.ByteBuffer;
-
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
+import org.terasology.entitySystem.Component;
 
 /**
- * Creates 2D images based on game worlds.
+ * A dummy implementation of {@link WorldConfigurator} that does nothing.
  */
-public interface PreviewGenerator {
+public class WorldConfiguratorAdapter implements WorldConfigurator {
 
-    ByteBuffer render(TextureData texData, int scale, ProgressListener progressListener) throws InterruptedException;
+    @Override
+    public Map<String, Component> getProperties() {
+        return Collections.emptyMap();
+    }
 
-    /**
-     * Dispose all resources
-     */
-    void close();
+    @Override
+    public void setProperty(String key, Component comp) {
+        // simply ignore
+    }
 }

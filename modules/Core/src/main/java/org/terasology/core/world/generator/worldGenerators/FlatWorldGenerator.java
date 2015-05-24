@@ -39,8 +39,8 @@ public class FlatWorldGenerator extends BaseFacetedWorldGenerator {
     }
 
     @Override
-    protected WorldBuilder createWorld(long seed) {
-        return new WorldBuilder(seed)
+    protected WorldBuilder createWorld() {
+        return new WorldBuilder()
                 .addProvider(new SeaLevelProvider(32))
                         // height of 40 so that it is far enough from sea level so that it doesnt just create beachfront
                 .addProvider(new FlatSurfaceHeightProvider(40))

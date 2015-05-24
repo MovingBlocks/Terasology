@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 
 /**
@@ -49,7 +49,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
 
     private Thread thread;
 
-    private Function<T, Void> resultEvent;
+    private Consumer<T> resultEvent;
 
     private UILabel titleLabel;
     private UILabel messageLabel;
@@ -66,7 +66,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
         cancelButton = find("cancel", UIButton.class);
         Preconditions.checkNotNull(cancelButton, "UIButton 'cancel' not found");
     }
-    
+
     public void setMessage(String title, String message) {
         titleLabel.setText(title);
         messageLabel.setText(message);
@@ -75,15 +75,15 @@ public class WaitPopup<T> extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        
+
         if (parallelTask == null) {
             return; // idle
         }
-        
+
         if (!parallelTask.isDone()) {
             return; // still running
-        } 
-            
+        }
+
         if (parallelTask.isCancelled()) {
             // wait for the thread to die
             if (!thread.isAlive()) {
@@ -96,24 +96,24 @@ public class WaitPopup<T> extends CoreScreenLayer {
             T result = parallelTask.get();
             getManager().popScreen();
             if (resultEvent != null) {
-                resultEvent.apply(result);
+                resultEvent.accept(result);
             }
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("An error occurred during execution", e);
             getManager().popScreen();
         }
     }
-    
+
     /**
      * @param runnable will be called once the result is available
      */
-    public void onSuccess(Function<T, Void> runnable) {
+    public void onSuccess(Consumer<T> runnable) {
         this.resultEvent = runnable;
     }
 
     /**
      * @param operation the operation to run - the executing thread will be interrupted when the operation is cancelled
-     * @param canBeCancelled true if the operation is aborted when the {@link Thread#isInterrupted()} flag is set 
+     * @param canBeCancelled true if the operation is aborted when the {@link Thread#isInterrupted()} flag is set
      * @throws NullPointerException if operation is null
      * @throws IllegalArgumentException if startOperation() was called before
      */
@@ -121,12 +121,12 @@ public class WaitPopup<T> extends CoreScreenLayer {
         Preconditions.checkState(parallelTask == null, "startOperation() cannot be called twice");
 
         cancelButton.setVisible(canBeCancelled);
-            
+
         parallelTask = new FutureTask<>(operation);
 
         thread = new Thread(parallelTask, "Parallel Operation");
         thread.start();
-        
+
         WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {

@@ -25,7 +25,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.properties.OneOf.List;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
@@ -160,7 +159,9 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
         @Enum(description = "Wrap Mode")
         private WrapMode wrapMode = WrapMode.REPEAT;
 
-        @List(items = { "platec_heightmap", "opposing_islands" }, description = "Height Map")
+        // Changing the terrain asset after initialize() is not yet supported
+        // TODO: add notification system so that WorldGens can reload data when necessary
+//        @List(items = { "platec_heightmap", "opposing_islands" }, description = "Height Map")
         private String heightMap = "platec_heightmap";
 
         @Range(min = 0, max = 50f, increment = 1f, precision = 0, description = "Height Offset")
