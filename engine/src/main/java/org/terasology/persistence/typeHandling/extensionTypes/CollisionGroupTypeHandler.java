@@ -28,8 +28,8 @@ public class CollisionGroupTypeHandler extends StringRepresentationTypeHandler<C
 
     private CollisionGroupManager groupManager;
 
-    public CollisionGroupTypeHandler() {
-        groupManager = CoreRegistry.get(CollisionGroupManager.class);
+    public CollisionGroupTypeHandler(CollisionGroupManager groupManager) {
+        this.groupManager = groupManager;
     }
 
     @Override

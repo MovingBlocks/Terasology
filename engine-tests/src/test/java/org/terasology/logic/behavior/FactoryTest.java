@@ -19,8 +19,11 @@ import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.management.AssetTypeManager;
+import org.terasology.assets.management.MapAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.module.ModuleManager;
@@ -48,13 +51,10 @@ import static org.mockito.Mockito.when;
 /**
  * @author synopia
  */
-public class FactoryTest {
-    private Context context;
+public class FactoryTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testSaveLoad() throws IOException {
-        AssetManager assetManager = mock(AssetManager.class);
-        context.put(AssetManager.class, assetManager);
         BehaviorNodeFactory nodeFactory = mock(BehaviorNodeFactory.class);
 
         context.put(BehaviorNodeFactory.class, nodeFactory);
@@ -91,18 +91,18 @@ public class FactoryTest {
         return tree;
     }
 
-    @Before
-    public void setup() throws Exception {
-        this.context = new ContextImpl();
-        CoreRegistry.setContext(context);
-        ModuleManager moduleManager = ModuleManagerFactory.create();
-        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        context.put(ReflectFactory.class, reflectFactory);
-        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-        context.put(CopyStrategyLibrary.class, copyStrategies);
-        context.put(ModuleManager.class, moduleManager);
-        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(context);
-        context.put(NodesClassLibrary.class, nodesClassLibrary);
-        nodesClassLibrary.scan(moduleManager.getEnvironment());
-    }
+//    @Before
+//    public void setup() throws Exception {
+//        this.context = new ContextImpl();
+//        CoreRegistry.setContext(context);
+//        ModuleManager moduleManager = ModuleManagerFactory.create();
+//        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+//        context.put(ReflectFactory.class, reflectFactory);
+//        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
+//        context.put(CopyStrategyLibrary.class, copyStrategies);
+//        context.put(ModuleManager.class, moduleManager);
+//        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(context);
+//        context.put(NodesClassLibrary.class, nodesClassLibrary);
+//        nodesClassLibrary.scan(moduleManager.getEnvironment());
+//    }
 }

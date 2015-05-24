@@ -30,6 +30,7 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
+import org.terasology.world.time.WorldTimeImpl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -172,7 +173,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public WorldTime getTime() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new WorldTimeImpl();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

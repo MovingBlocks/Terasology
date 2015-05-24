@@ -160,7 +160,6 @@ public class TypeSerializationLibrary {
         serializationLibrary.add(Vector2i.class, new Vector2iTypeHandler());
         serializationLibrary.add(Rect2i.class, new Rect2iTypeHandler());
         serializationLibrary.add(Rect2f.class, new Rect2fTypeHandler());
-        serializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler());
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));

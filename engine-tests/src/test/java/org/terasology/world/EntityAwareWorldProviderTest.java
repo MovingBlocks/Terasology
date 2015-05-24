@@ -19,16 +19,11 @@ package org.terasology.world;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -42,7 +37,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.event.internal.EventReceiver;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.stubs.ForceBlockActiveComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
@@ -50,18 +45,18 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.testUtil.WorldProviderCoreStub;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.tiles.WorldAtlas;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -69,19 +64,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
  */
-public class EntityAwareWorldProviderTest {
+public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
-    private static ModuleManager moduleManager;
     private EntityAwareWorldProvider worldProvider;
-    private EngineEntityManager entityManager;
-    private BlockManagerImpl blockManager;
     private WorldProviderCoreStub worldStub;
+
+    private EngineEntityManager entityManager;
+    private Prefab prefabWithString;
 
     private Block airBlock;
     private Block plainBlock;
@@ -92,81 +85,69 @@ public class EntityAwareWorldProviderTest {
     private Block blockInFamilyOne;
     private Block blockInFamilyTwo;
 
-    private static Context context;
-
-    @BeforeClass
-    public static void commonSetup() throws Exception {
-        context = new ContextImpl();
-        CoreRegistry.setContext(context);
-        moduleManager = ModuleManagerFactory.create();
-        context.put(ModuleManager.class, moduleManager);
-    }
-
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        super.setup();
         GameThread.setToCurrentThread();
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, "prefabs");
-        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
-        AssetManager assetManager = assetTypeManager.getAssetManager();
-        context.put(AssetManager.class, assetManager);
 
-        context.put(ComponentSystemManager.class, mock(ComponentSystemManager.class));
+        this.entityManager = context.get(EngineEntityManager.class);
+        AssetManager assetManager = context.get(AssetManager.class);
+        BlockManager blockManager = context.get(BlockManager.class);
 
-        blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), assetManager));
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
-        NetworkSystem networkSystem = mock(NetworkSystem.class);
-        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        context.put(NetworkSystem.class, networkSystem);
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
 
-        entityManager = context.get(EngineEntityManager.class);
         worldStub = new WorldProviderCoreStub(airBlock, null);
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 
-//        plainBlock = new Block();
-//        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:plainBlock"), plainBlock), true);
-//
-//        blockWithString = new Block();
-//        PrefabData prefabData = new PrefabData();
-//        prefabData.addComponent(new StringComponent("Test"));
-//        Assets.generateAsset(new AssetUri(AssetType.PREFAB, "test:prefabWithString"), prefabData, Prefab.class);
-//        blockWithString.setPrefab("test:prefabWithString");
-//        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithString"), blockWithString), true);
-//
-//        blockWithDifferentString = new Block();
-//        prefabData = new PrefabData();
-//        prefabData.addComponent(new StringComponent("Test2"));
-//        Assets.generateAsset(
-//                new AssetUri(AssetType.PREFAB, "test:prefabWithDifferentString"), prefabData, Prefab.class);
-//        blockWithDifferentString.setPrefab("test:prefabWithDifferentString");
-//        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithDifferentString"), blockWithDifferentString), true);
-//
-//        blockWithRetainedComponent = new Block();
-//        prefabData = new PrefabData();
-//        prefabData.addComponent(new RetainedOnBlockChangeComponent(3));
-//        Assets.generateAsset(
-//                new AssetUri(AssetType.PREFAB, "test:prefabWithRetainedComponent"), prefabData, Prefab.class);
-//        blockWithRetainedComponent.setPrefab("test:prefabWithRetainedComponent");
-//        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:blockWithRetainedComponent"), blockWithRetainedComponent), true);
-//
-//        blockInFamilyOne = new Block();
-//        blockInFamilyOne.setKeepActive(true);
-//        blockInFamilyOne.setPrefab("test:prefabWithString");
-//        blockInFamilyTwo = new Block();
-//        blockInFamilyTwo.setPrefab("test:prefabWithString");
-//        blockInFamilyTwo.setKeepActive(true);
-//        blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"),
-//                ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne),
-//                Collections.<String>emptyList()), true);
-//
-//        keepActiveBlock = new Block();
-//        keepActiveBlock.setKeepActive(true);
-//        keepActiveBlock.setPrefab("test:prefabWithString");
-//        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:keepActiveBlock"), keepActiveBlock), true);
+        plainBlock = createBlock("test:plainblock", assetManager, blockManager);
+        prefabWithString = createPrefabWithString("test:prefabWithString", "Test", assetManager);
+        blockWithString = createBlockWithPrefab("test:blockWithString", prefabWithString, false, assetManager, blockManager);
+        keepActiveBlock = createBlockWithPrefab("test:keepActiveBlock", prefabWithString, true, assetManager, blockManager);
+        Prefab prefabWithDifferentString = createPrefabWithString("test:prefabWithDifferentString", "Test2", assetManager);
+        blockWithDifferentString = createBlockWithPrefab("test:prefabWithDifferentString", prefabWithDifferentString, false, assetManager, blockManager);
 
+        BlockFamily blockFamily = createBlockFamily("test:blockFamily", prefabWithString, assetManager, blockManager);
+        Iterator<Block> iterator = blockFamily.getBlocks().iterator();
+        blockInFamilyOne = iterator.next();
+        blockInFamilyTwo = iterator.next();
+
+        PrefabData retainedPrefabData = new PrefabData();
+        retainedPrefabData.addComponent(new RetainedOnBlockChangeComponent(3));
+        Prefab retainedPrefab = assetManager.loadAsset(new ResourceUrn("test:retainedPrefab"), retainedPrefabData, Prefab.class);
+
+        blockWithRetainedComponent = createBlockWithPrefab("test:blockWithRetainedComponent", retainedPrefab, false, assetManager, blockManager);
         worldProvider.initialise();
+    }
+
+    private Block createBlockWithPrefab(String urn, Prefab prefab, boolean keepActive, AssetManager assetManager, BlockManager blockManager) {
+        BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
+        data.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        data.getBaseSection().getEntity().setPrefab(prefab);
+        data.getBaseSection().getEntity().setKeepActive(keepActive);
+        assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
+        return blockManager.getBlock(urn);
+    }
+
+    private Prefab createPrefabWithString(String urn, String text, AssetManager assetManager) {
+        PrefabData prefabData = new PrefabData();
+        prefabData.addComponent(new StringComponent(text));
+        return assetManager.loadAsset(new ResourceUrn(urn), prefabData, Prefab.class);
+    }
+
+    private Block createBlock(String urn, AssetManager assetManager, BlockManager blockManager) {
+        BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
+        data.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
+        return blockManager.getBlock(urn);
+    }
+
+    private BlockFamily createBlockFamily(String urn, Prefab prefab, AssetManager assetManager, BlockManager blockManager) {
+        BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
+        data.setFamilyFactory(new HorizontalBlockFamilyFactory());
+        data.getBaseSection().getEntity().setKeepActive(true);
+        data.getBaseSection().getEntity().setPrefab(prefab);
+        assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
+        return blockManager.getBlockFamily(urn);
     }
 
     @Test
@@ -255,9 +236,9 @@ public class EntityAwareWorldProviderTest {
     @Test
     public void testPrefabUpdatedWhenBlockChanged() {
         worldProvider.setBlock(Vector3i.zero(), blockWithString);
-        assertEquals(blockWithString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
+        assertEquals(blockWithString.getPrefab().get().getName(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
         worldProvider.setBlock(Vector3i.zero(), blockWithDifferentString);
-        assertEquals(blockWithDifferentString.getPrefab(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
+        assertEquals(blockWithDifferentString.getPrefab().get().getName(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
     }
 
     @Test
@@ -432,7 +413,7 @@ public class EntityAwareWorldProviderTest {
         worldProvider.setBlock(Vector3i.zero(), blockWithString);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         worldProvider.setBlock(Vector3i.zero(), blockWithDifferentString);
-        assertEquals(blockWithDifferentString.getPrefab(), entity.getParentPrefab().getUrn().toString());
+        assertEquals(blockWithDifferentString.getPrefab().get().getUrn(), entity.getParentPrefab().getUrn());
     }
 
     @Test
@@ -448,7 +429,7 @@ public class EntityAwareWorldProviderTest {
         worldProvider.setBlock(Vector3i.zero(), plainBlock);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         worldProvider.setBlock(Vector3i.zero(), blockWithString);
-        assertEquals(blockWithString.getPrefab(), entity.getParentPrefab().getUrn().toString());
+        assertEquals(blockWithString.getPrefab().get().getUrn().toString(), entity.getParentPrefab().getUrn().toString());
     }
 
     public static class LifecycleEventChecker {

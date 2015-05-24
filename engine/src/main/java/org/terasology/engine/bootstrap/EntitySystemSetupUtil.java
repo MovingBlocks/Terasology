@@ -57,29 +57,31 @@ public final class EntitySystemSetupUtil {
     public static void addReflectionBasedLibraries(Context context) {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         context.put(ReflectFactory.class, reflectFactory);
-        context.put(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
+        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
+        context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
+        context.put(TypeSerializationLibrary.class, TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary));
     }
 
 
     /**
      * Objects for the following classes must be available in the context:
      * <ul>
-     *     <li>{@link ModuleEnvironment}</li>
-     *     <li>{@link NetworkSystem}</li>
-     *     <li>{@link ReflectFactory}</li>
-     *     <li>{@link CopyStrategyLibrary}</li>
+     * <li>{@link ModuleEnvironment}</li>
+     * <li>{@link NetworkSystem}</li>
+     * <li>{@link ReflectFactory}</li>
+     * <li>{@link CopyStrategyLibrary}</li>
+     * <li>{@link org.terasology.persistence.typeHandling.TypeSerializationLibrary}</li>
      * </ul>
-     *
+     * <p>
      * The method will make objects for the following classes available in the context:
      * <ul>
-     *     <li>{@link EngineEntityManager}</li>
-     *     <li>{@link ComponentLibrary}</li>
-     *     <li>{@link EventLibrary}</li>
-     *     <li>{@link PrefabManager}</li>
-     *     <li>{@link EventSystem}</li>
-     *     <li>{@link NodesClassLibrary}</li>
+     * <li>{@link EngineEntityManager}</li>
+     * <li>{@link ComponentLibrary}</li>
+     * <li>{@link EventLibrary}</li>
+     * <li>{@link PrefabManager}</li>
+     * <li>{@link EventSystem}</li>
+     * <li>{@link NodesClassLibrary}</li>
      * </ul>
-     *
      */
     public static void addEntityManagementRelatedClasses(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();

@@ -24,13 +24,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Matchers;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
@@ -43,6 +39,7 @@ import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
@@ -51,16 +48,14 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.internal.BlockManagerImpl;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
-import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -84,7 +79,7 @@ import static org.mockito.Mockito.when;
  * @author Immortius
  * @author Florian
  */
-public class StorageManagerTest {
+public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     public static final String PLAYER_ID = "someId";
     public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
@@ -92,20 +87,17 @@ public class StorageManagerTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private ModuleManager moduleManager;
-    private NetworkSystem networkSystem;
+    private ModuleEnvironment moduleEnvironment;
     private ReadWriteStorageManager esm;
     private EngineEntityManager entityManager;
     private Block testBlock;
     private Block testBlock2;
     private EntityRef character;
     private Path savePath;
-    private Context context;
 
     @Before
     public void setup() throws Exception {
-        context = new ContextImpl();
-        CoreRegistry.setContext(context);
+        super.setup();
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(temporaryFolder.getRoot().toPath());
@@ -113,45 +105,28 @@ public class StorageManagerTest {
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
-        moduleManager = ModuleManagerFactory.create();
-        networkSystem = mock(NetworkSystem.class);
-        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        context.put(ModuleManager.class, moduleManager);
-        context.put(Config.class, new Config());
-
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
-        context.put(AssetManager.class, assetTypeManager.getAssetManager());
-
-        context.put(NetworkSystem.class, networkSystem);
-
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-
         entityManager = context.get(EngineEntityManager.class);
+        moduleEnvironment = context.get(ModuleEnvironment.class);
 
-        esm = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), entityManager, false);
+        esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, false);
         context.put(StorageManager.class, esm);
 
         this.character = entityManager.create();
         Client client = createClientMock(PLAYER_ID, character);
-
+        NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         when(networkSystem.getPlayers()).thenReturn(Arrays.asList(client));
+        context.put(NetworkSystem.class, networkSystem);
 
-
-        BlockManagerImpl blockManager = new BlockManagerImpl(mock(WorldAtlas.class), assetTypeManager.getAssetManager());
-        context.put(BlockManager.class, blockManager);
-
-        assetTypeManager.getAssetManager().loadAsset(new ResourceUrn("test:testblock"), new BlockFamilyDefinitionData(), BlockFamilyDefinition.class);
-        assetTypeManager.getAssetManager().loadAsset(new ResourceUrn("test:testblock2"), new BlockFamilyDefinitionData(), BlockFamilyDefinition.class);
-        testBlock = blockManager.getBlock("test:testblock");
-        testBlock2 = blockManager.getBlock("test:testblock2");
-
-        ComponentSystemManager componentSystemManager = new ComponentSystemManager();
-        context.put(ComponentSystemManager.class, componentSystemManager);
+        AssetManager assetManager = context.get(AssetManager.class);
+        BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
+        data.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn("test:testblock"), data, BlockFamilyDefinition.class);
+        assetManager.loadAsset(new ResourceUrn("test:testblock2"), data, BlockFamilyDefinition.class);
+        testBlock = context.get(BlockManager.class).getBlock("test:testblock");
+        testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));
-
         Game game = mock(Game.class);
         when(game.getTime()).thenReturn(mock(EngineTime.class));
         context.put(Game.class, game);
@@ -161,8 +136,6 @@ public class StorageManagerTest {
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         context.put(WorldProvider.class, worldProvider);
-
-
     }
 
     private Client createClientMock(String clientId, EntityRef charac) {
@@ -239,7 +212,7 @@ public class StorageManagerTest {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
 
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, false);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -259,7 +232,7 @@ public class StorageManagerTest {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, false);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -310,7 +283,7 @@ public class StorageManagerTest {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager,
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,
                 storeChunkInZips);
         newSM.loadGlobalStore();
 
@@ -345,7 +318,7 @@ public class StorageManagerTest {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);

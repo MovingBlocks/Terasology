@@ -22,6 +22,9 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
@@ -63,7 +66,9 @@ public final class ApplyModulesUtil {
         }
 
         ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        context.put(TypeSerializationLibrary.class, TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary));
+        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+        typeSerializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
 
         BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
