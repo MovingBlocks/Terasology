@@ -126,7 +126,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 assetManager.setEnvironment(environment);
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
-                worldGenerator.initialize();
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
                 configureProperties();
                 triggerUpdate = true;
@@ -243,7 +242,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
-        previewImage.setVisible(false);
 
         final NUIManager manager = context.get(NUIManager.class);
         final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);

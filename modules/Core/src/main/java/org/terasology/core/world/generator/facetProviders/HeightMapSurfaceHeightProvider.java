@@ -58,7 +58,7 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
 
     @Override
     public void setSeed(long seed) {
-        // ignore
+        initialize();
     }
 
     @Override
