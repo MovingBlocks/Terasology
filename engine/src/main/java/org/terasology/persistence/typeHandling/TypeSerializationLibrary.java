@@ -29,7 +29,10 @@ import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.IntegerRange;
+import org.terasology.math.Rect2f;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
+import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -60,8 +63,11 @@ import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Rect2fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
@@ -131,12 +137,9 @@ public class TypeSerializationLibrary {
         add(Number.class, new NumberTypeHandler());
     }
 
-    public static TypeSerializationLibrary createDefaultLibrary(PojoEntityManager entityManager,
-                                                                ReflectFactory factory,
+    public static TypeSerializationLibrary createDefaultLibrary(ReflectFactory factory,
                                                                 CopyStrategyLibrary copyStrategies) {
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
-        serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
-        serializationLibrary.add(Block.class, new BlockTypeHandler());
         serializationLibrary.add(Color.class, new ColorTypeHandler());
         serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(Texture.class));
@@ -154,9 +157,11 @@ public class TypeSerializationLibrary {
         serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
         serializationLibrary.add(Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.add(Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.add(Rect2i.class, new Rect2iTypeHandler());
+        serializationLibrary.add(Rect2f.class, new Rect2fTypeHandler());
         serializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler());
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
-        serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));
         serializationLibrary.add(IntegerRange.class, new IntegerRangeHandler());

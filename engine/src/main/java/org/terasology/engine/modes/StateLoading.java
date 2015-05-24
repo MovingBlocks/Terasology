@@ -146,9 +146,9 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new RegisterBiomes(context, gameManifest));
-        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseGraphics(context));
         loadProcesses.add(new InitialiseEntitySystem(context));
+        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new RegisterInputSystem(context));
@@ -170,9 +170,9 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new RegisterBiomes(context, gameManifest));
-        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseGraphics(context));
         loadProcesses.add(new InitialiseEntitySystem(context));
+        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new RegisterInputSystem(context));

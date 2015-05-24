@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,41 +15,36 @@
  */
 package org.terasology.world.block.family;
 
-import org.terasology.world.block.Block;
+import com.google.common.collect.Sets;
 import org.terasology.world.block.BlockBuilderHelper;
-import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-@RegisterBlockFamilyFactory("symmetric")
-public class SymmetricBlockFamilyFactory implements BlockFamilyFactory {
+/**
+ * @author Immortius
+ */
+@RegisterBlockFamilyFactory("freeform")
+public class FreeformBlockFamilyFactory implements BlockFamilyFactory {
+
+    private BlockFamilyFactory horizontal = new HorizontalBlockFamilyFactory();
+    private BlockFamilyFactory symmetric = new SymmetricBlockFamilyFactory();
 
     @Override
     public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        if (definition.isFreeform()) {
-            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
-        }
-        Block block = blockBuilder.constructSimpleBlock(definition);
-        return new SymmetricFamily(new BlockUri(definition.getUrn()), block, definition.getCategories());
+        throw new UnsupportedOperationException("Shape expected");
     }
 
     @Override
     public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        if (!definition.isFreeform()) {
-            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
-        }
-        Block block = blockBuilder.constructSimpleBlock(definition, shape);
-        BlockUri uri;
-        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
-            uri = new BlockUri(definition.getUrn());
+        if (shape.isCollisionYawSymmetric()) {
+            return symmetric.createBlockFamily(definition, shape, blockBuilder);
         } else {
-            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+            return horizontal.createBlockFamily(definition, shape, blockBuilder);
         }
-        return new SymmetricFamily(uri, block, definition.getCategories());
     }
 
     @Override
     public boolean isFreeformSupported() {
-        return false;
+        return true;
     }
 }

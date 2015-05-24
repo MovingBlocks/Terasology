@@ -15,12 +15,14 @@
  */
 package org.terasology.world.block.loader;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.BlockTile;
 
@@ -55,18 +57,19 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
     }
 
     public boolean isFreeform() {
-        Set<BlockTile> tileSet = Sets.newHashSet((getData().getBaseSection().getBlockTiles().values()));
-        return getData().getBaseSection().getShape() == null && getData().getFamilyFactory() == null && !getData().getBaseSection().isLiquid()
-                && tileSet.size() == 1;
+        return getData().getFamilyFactory().isFreeformSupported();
     }
 
     public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
+        Preconditions.checkState(!isFreeform());
         return getData().getFamilyFactory().createBlockFamily(this, blockBuilderHelper);
     }
 
     public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
+        Preconditions.checkState(isFreeform());
         return getData().getFamilyFactory().createBlockFamily(this, shape, blockBuilderHelper);
     }
+
 
     public BlockFamilyDefinitionData getData() {
         return new BlockFamilyDefinitionData(data);

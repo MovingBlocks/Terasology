@@ -20,7 +20,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.BlockEntityRegistry;
 
@@ -43,10 +43,10 @@ public class InitialiseSystems extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
-        EntitySystemLibrary entitySystemLibrary = context.get(EntitySystemLibrary.class);
+        EventLibrary eventLibrary = context.get(EventLibrary.class);
         BlockEntityRegistry blockEntityRegistry = context.get(BlockEntityRegistry.class);
 
-        context.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
+        context.get(NetworkSystem.class).connectToEntitySystem(entityManager, eventLibrary, blockEntityRegistry);
         ComponentSystemManager csm = context.get(ComponentSystemManager.class);
         csm.initialise();
 

@@ -80,7 +80,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
 
         regenRules = new SunlightRegenPropagationRules();
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
         CoreRegistry.put(BlockManager.class, blockManager);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();

@@ -50,8 +50,6 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
 
     @In
     private LocalPlayer localPlayer;
-    @In
-    private EntitySystemLibrary entitySystemLibrary;
 
     private Map<Integer, AbstractMoveItemRequest> pendingMoves = new LinkedHashMap<>();
 

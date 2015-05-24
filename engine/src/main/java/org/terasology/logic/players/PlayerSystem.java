@@ -171,7 +171,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         // TODO: also start looking downwards if initial spawn pos is in the air
         for (int i = 1; i < 20; i++) {
             if (worldProvider.isBlockRelevant(newSpawnPos)) {
-                if (worldProvider.getBlock(spawnPos).isPenetrable()) {
+                if (worldProvider.getBlock(newSpawnPos).isPenetrable()) {
                     consecutiveAirBlocks++;
                 } else {
                     consecutiveAirBlocks = 0;

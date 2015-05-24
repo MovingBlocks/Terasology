@@ -35,6 +35,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.identity.PublicIdentityCertificate;
@@ -89,7 +90,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private Channel channel;
     private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
-    private EntitySystemLibrary entitySystemLibrary;
+    private EventLibrary eventLibrary;
     private NetMetricSource metricSource;
     private BiomeManager biomeManager;
 
@@ -324,10 +325,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     public void connected(EntityManager entityManager, NetworkEntitySerializer newEntitySerializer,
-                          EventSerializer newEventSerializer, EntitySystemLibrary newSystemLibrary) {
+                          EventSerializer newEventSerializer, EventLibrary newEventLibrary) {
         this.entitySerializer = newEntitySerializer;
         this.eventSerializer = newEventSerializer;
-        this.entitySystemLibrary = newSystemLibrary;
+        this.eventLibrary = newEventLibrary;
 
         createEntity(preferredName, color, entityManager);
     }
@@ -504,7 +505,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         for (NetData.EventMessage eventMessage : message.getEventList()) {
             try {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());
-                EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(event.getClass());
+                EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
                 if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
                     logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
                     continue;

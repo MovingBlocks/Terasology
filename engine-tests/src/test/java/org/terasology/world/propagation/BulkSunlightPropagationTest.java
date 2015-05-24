@@ -65,7 +65,7 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
 
         regenRules = new SunlightRegenPropagationRules();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
         CoreRegistry.put(BlockManager.class, blockManager);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();

@@ -28,6 +28,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.family.BlockFamilyFactory;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.SectionDefinitionData;
 import org.terasology.world.block.shapes.BlockMeshPart;

@@ -118,37 +118,9 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     @Override
     public UIData load(ResourceUrn resourceUrn, List<AssetDataFile> inputs) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
-        ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
-        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
-
-        // TODO: Get this library from elsewhere
-        TypeSerializationLibrary library = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
-        library.add(BlockFamily.class, new BlockFamilyTypeHandler());
-        library.add(Block.class, new BlockTypeHandler());
-        library.add(Color.class, new ColorTypeHandler());
-        library.add(Quat4f.class, new Quat4fTypeHandler());
-        library.add(Texture.class, new AssetTypeHandler<>(Texture.class));
-        library.add(Mesh.class, new AssetTypeHandler<>(Mesh.class));
-        library.add(StaticSound.class, new AssetTypeHandler<>(StaticSound.class));
-        library.add(StreamingSound.class, new AssetTypeHandler<>(StreamingSound.class));
-        library.add(Material.class, new AssetTypeHandler<>(Material.class));
-        library.add(SkeletalMesh.class, new AssetTypeHandler<>(SkeletalMesh.class));
-        library.add(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
-        library.add(Name.class, new NameTypeHandler());
+        TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
         library.add(UISkin.class, new AssetTypeHandler<>(UISkin.class));
-        library.add(Vector4f.class, new Vector4fTypeHandler());
-        library.add(Vector3f.class, new Vector3fTypeHandler());
-        library.add(Vector2f.class, new Vector2fTypeHandler());
-        library.add(Vector3i.class, new Vector3iTypeHandler());
-        library.add(Vector2i.class, new Vector2iTypeHandler());
-        library.add(Rect2i.class, new Rect2iTypeHandler());
-        library.add(Rect2f.class, new Rect2fTypeHandler());
-        library.add(CollisionGroup.class, new CollisionGroupTypeHandler());
-        library.add(Region3i.class, new Region3iTypeHandler());
-        library.add(Prefab.class, new PrefabTypeHandler());
         library.add(Border.class, new BorderTypeHandler());
-        library.add(TextureRegion.class, new TextureRegionTypeHandler());
-        library.add(TextureRegionAsset.class, new TextureRegionTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())

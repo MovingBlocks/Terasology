@@ -213,4 +213,12 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         }
         return result;
     }
+
+    public BlockUri getShapelessUri() {
+        if (getIdentifier().isPresent()) {
+            return new BlockUri(blockFamilyDefinition, getIdentifier().get());
+        } else {
+            return new BlockUri(blockFamilyDefinition);
+        }
+    }
 }

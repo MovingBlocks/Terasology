@@ -19,6 +19,7 @@ package org.terasology.network;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
@@ -55,7 +56,7 @@ public interface NetworkSystem extends BlockRegistrationListener {
 
     void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider);
 
-    void connectToEntitySystem(EngineEntityManager entityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry);
+    void connectToEntitySystem(EngineEntityManager entityManager, EventLibrary library, BlockEntityRegistry blockEntityRegistry);
 
     int getIncomingMessagesDelta();
 

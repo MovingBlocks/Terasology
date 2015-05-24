@@ -61,8 +61,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         super.setup();
         lightRules = new LightPropagationRules();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager,
-                Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
         CoreRegistry.put(BlockManager.class, blockManager);
         BlockFamilyDefinitionData fullLightData = new BlockFamilyDefinitionData();
         fullLightData.getBaseSection().setDisplayName("Torch");

@@ -16,9 +16,7 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -69,7 +67,13 @@ public class HorizontalBlockFamilyFactory implements BlockFamilyFactory {
             blockMap.put(side, blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot));
         }
 
-        return new HorizontalBlockFamily(new BlockUri(definition.getUrn(), shape.getUrn()), getArchetypeSide(), blockMap, definition.getCategories());
+        BlockUri uri;
+        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
+            uri = new BlockUri(definition.getUrn());
+        } else {
+            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+        }
+        return new HorizontalBlockFamily(uri, getArchetypeSide(), blockMap, definition.getCategories());
     }
 
     @Override

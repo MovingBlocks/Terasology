@@ -19,8 +19,10 @@ import com.google.common.collect.Sets;
 import org.terasology.assets.AssetDataProducer;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
 import org.terasology.naming.Name;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.family.FreeformBlockFamilyFactory;
 import org.terasology.world.block.tiles.BlockTile;
 
 import java.io.IOException;
@@ -30,12 +32,15 @@ import java.util.Set;
 /**
  * @author Immortius
  */
+@RegisterAssetDataProducer
 public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitionData> {
 
     private AssetManager assetManager;
+    private FreeformBlockFamilyFactory freeformBlockFamilyFactory;
 
     public AutoBlockProvider(AssetManager assetManager) {
         this.assetManager = assetManager;
+        this.freeformBlockFamilyFactory = new FreeformBlockFamilyFactory();
     }
 
     @Override
@@ -72,6 +77,7 @@ public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitio
             for (BlockPart part : BlockPart.values()) {
                 data.getBaseSection().getBlockTiles().put(part, blockTile.get());
             }
+            data.setFamilyFactory(freeformBlockFamilyFactory);
             return Optional.of(data);
         }
         return Optional.empty();

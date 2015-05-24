@@ -45,7 +45,10 @@ import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.FreeformBlockFamilyFactory;
+import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.family.MultiSection;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
@@ -68,6 +71,9 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
     private static final ResourceUrn DEFAULT_SOUNDS = new ResourceUrn("engine", "default");
 
+    private final BlockFamilyFactory symmetricFamily = new SymmetricBlockFamilyFactory();
+    private final BlockFamilyFactory horizontalFamily = new HorizontalBlockFamilyFactory();
+    private final BlockFamilyFactory freeformFamily = new FreeformBlockFamilyFactory();
     private final AssetManager assetManager;
     private final Gson gson;
 
@@ -91,6 +97,17 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
             applyDefaults(resourceUrn, data.getBaseSection());
             data.getSections().values().stream().forEach(section -> applyDefaults(resourceUrn, section));
+            if (!data.isTemplate()) {
+                if (data.getFamilyFactory() == null && data.getBaseSection().getShape() != null) {
+                    if (data.getBaseSection().getShape().isCollisionYawSymmetric()) {
+                        data.setFamilyFactory(symmetricFamily);
+                    } else {
+                        data.setFamilyFactory(horizontalFamily);
+                    }
+                } else if (data.getFamilyFactory() == null) {
+                    data.setFamilyFactory(freeformFamily);
+                }
+            }
 
             return data;
         }
@@ -108,6 +125,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         if (section.getSounds() == null) {
             section.setSounds(assetManager.getAsset(DEFAULT_SOUNDS, BlockSounds.class).get());
         }
+
     }
 
     private class BlockFamilyDefinitionDataHandler implements JsonDeserializer<BlockFamilyDefinitionData> {
@@ -134,33 +152,34 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
             deserializeSectionDefinitionData(result.getBaseSection(), jsonObject, context);
 
-            for (MultiSection multiSection : result.getFamilyFactory().getMultiSections()) {
-                if (jsonObject.has(multiSection.getName()) && jsonObject.get(multiSection.getName()).isJsonObject()) {
-                    JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.getName());
-                    for (String section : multiSection.getAppliesToSections()) {
+            if (result.getFamilyFactory() != null) {
+                for (MultiSection multiSection : result.getFamilyFactory().getMultiSections()) {
+                    if (jsonObject.has(multiSection.getName()) && jsonObject.get(multiSection.getName()).isJsonObject()) {
+                        JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.getName());
+                        for (String section : multiSection.getAppliesToSections()) {
+                            SectionDefinitionData sectionData = result.getSections().get(section);
+                            if (sectionData == null) {
+                                sectionData = new SectionDefinitionData(base.getSection(section));
+                                deserializeSectionDefinitionData(sectionData, jsonObject, context);
+                                result.getSections().put(section, sectionData);
+                            }
+                            deserializeSectionDefinitionData(sectionData, jsonMultiSection, context);
+                        }
+                    }
+                }
+
+                for (String section : result.getFamilyFactory().getSectionNames()) {
+                    if (jsonObject.has(section) && jsonObject.get(section).isJsonObject()) {
                         SectionDefinitionData sectionData = result.getSections().get(section);
                         if (sectionData == null) {
                             sectionData = new SectionDefinitionData(base.getSection(section));
                             deserializeSectionDefinitionData(sectionData, jsonObject, context);
                             result.getSections().put(section, sectionData);
                         }
-                        deserializeSectionDefinitionData(sectionData, jsonMultiSection, context);
+                        deserializeSectionDefinitionData(sectionData, jsonObject.getAsJsonObject(section), context);
                     }
                 }
             }
-
-            for (String section : result.getFamilyFactory().getSectionNames()) {
-                if (jsonObject.has(section) && jsonObject.get(section).isJsonObject()) {
-                    SectionDefinitionData sectionData = result.getSections().get(section);
-                    if (sectionData == null) {
-                        sectionData = new SectionDefinitionData(base.getSection(section));
-                        deserializeSectionDefinitionData(sectionData, jsonObject, context);
-                        result.getSections().put(section, sectionData);
-                    }
-                    deserializeSectionDefinitionData(sectionData, jsonObject.getAsJsonObject(section), context);
-                }
-            }
-
 
             return result;
         }
@@ -301,7 +320,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 }
             }
             BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-            data.setFamilyFactory(factoryRegistry.getBlockFamilyFactory("symmetric"));
             data.getBaseSection().setSounds(assetManager.getAsset("engine:default", BlockSounds.class).get());
             return data;
         }

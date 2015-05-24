@@ -52,8 +52,9 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.module.Module;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -119,7 +120,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
-    private EntitySystemLibrary entitySystemLibrary;
+    private ComponentLibrary componentLibrary;
+    private EventLibrary eventLibrary;
     private EventSerializer eventSerializer;
     private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
@@ -264,7 +266,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         mode = NetworkMode.NONE;
         entityManager = null;
-        entitySystemLibrary = null;
+        eventLibrary = null;
+        componentLibrary = null;
         eventSerializer = null;
         entitySerializer = null;
         clientList.clear();
@@ -451,7 +454,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 if (newOwner != null) {
                     int id = netComponent.getNetworkId();
                     for (Component component : entity.iterateComponents()) {
-                        if (entitySystemLibrary.getComponentLibrary().getMetadata(component.getClass()).isReplicated()) {
+                        if (componentLibrary.getMetadata(component.getClass()).isReplicated()) {
                             newOwner.setComponentDirty(id, component.getClass());
                         }
                     }
@@ -513,7 +516,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void connectToEntitySystem(EngineEntityManager newEntityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
+    public void connectToEntitySystem(EngineEntityManager newEntityManager, EventLibrary newEventLibrary, BlockEntityRegistry blockEntityRegistry) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
@@ -523,16 +526,17 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         this.biomeManager = CoreRegistry.get(BiomeManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = CoreRegistry.get(StorageManager.class);
-        this.entitySystemLibrary = library;
+        this.eventLibrary = newEventLibrary;
+        this.componentLibrary = entityManager.getComponentLibrary();
 
         CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary(library.getSerializationLibrary());
+        TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary(entityManager.getTypeSerializerLibrary());
         typeSerializationLibrary.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
-        eventSerializer = new EventSerializer(library.getEventLibrary(), typeSerializationLibrary);
-        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeSerializationLibrary);
+        eventSerializer = new EventSerializer(eventLibrary, typeSerializationLibrary);
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -547,7 +551,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
-        ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
+        ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
         if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
             if (mode.isServer()) {
@@ -564,7 +568,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
-        ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
+        ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
         if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
             if (mode.isServer()) {
@@ -596,7 +600,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public void onEntityComponentChange(EntityRef entity, Class<? extends Component> component) {
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
+        ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(component);
         if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
             switch (mode) {
                 case LISTEN_SERVER:
@@ -766,7 +770,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void processNewClient(NetClient client) {
-        client.connected(entityManager, entitySerializer, eventSerializer, entitySystemLibrary);
+        client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         // log after connect so that the name has been set:
         logger.info("New client connected: {}", client.getName());
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
@@ -844,7 +848,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         Map<Class<? extends Event>, Integer> eventIdTable = eventSerializer.getIdMapping();
         for (Map.Entry<Class<? extends Event>, Integer> eventMapping : eventIdTable.entrySet()) {
             ByteString.Output fieldIds = ByteString.newOutput();
-            EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(eventMapping.getKey());
+            EventMetadata<?> metadata = eventLibrary.getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
                     .setName(metadata.getUri().toString());
@@ -861,7 +865,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         Map<Class<? extends Component>, Integer> componentIdTable = entitySerializer.getIdMapping();
         for (Map.Entry<Class<? extends Component>, Integer> componentIdMapping : componentIdTable.entrySet()) {
             ByteString.Output fieldIds = ByteString.newOutput();
-            ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(componentIdMapping.getKey());
+            ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
                     .setName(metadata.getUri().toString());
@@ -880,8 +884,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void generateSerializationTables() {
-        entitySerializer.setIdMapping(generateIds(entitySystemLibrary.getComponentLibrary()));
-        eventSerializer.setIdMapping(generateIds(entitySystemLibrary.getEventLibrary()));
+        entitySerializer.setIdMapping(generateIds(componentLibrary));
+        eventSerializer.setIdMapping(generateIds(eventLibrary));
     }
 
     private <T> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T> classLibrary) {
@@ -905,8 +909,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void applySerializationTables() {
         NetData.ServerInfoMessage serverInfo = server.getRawInfo();
-        entitySerializer.setIdMapping(applySerializationInfo(serverInfo.getComponentList(), entitySystemLibrary.getComponentLibrary()));
-        eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), entitySystemLibrary.getEventLibrary()));
+        entitySerializer.setIdMapping(applySerializationInfo(serverInfo.getComponentList(), componentLibrary));
+        eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), eventLibrary));
     }
 
     private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
@@ -946,8 +950,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
         }
     }
-
-
 
 
 }

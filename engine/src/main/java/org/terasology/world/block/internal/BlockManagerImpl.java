@@ -19,7 +19,6 @@ package org.terasology.world.block.internal;
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectShortIterator;
@@ -36,6 +35,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.WorldAtlas;
@@ -60,6 +60,7 @@ public class BlockManagerImpl extends BlockManager {
     // we set them to the last id (don't want to use 0 as they would override air)
     private static final short UNKNOWN_ID = (short) 65535;
     private static final int MAX_ID = 65534;
+    private static final ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
 
     private AssetManager assetManager;
 
@@ -75,23 +76,26 @@ public class BlockManagerImpl extends BlockManager {
     private int nextId = 1;
 
     public BlockManagerImpl(WorldAtlas atlas, AssetManager assetManager) {
-        this(atlas, assetManager, Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true);
+        this(atlas, assetManager, true);
     }
 
     public BlockManagerImpl(WorldAtlas atlas,
                             AssetManager assetManager,
-                            List<String> registeredBlockFamilies,
-                            Map<String, Short> knownBlockMappings,
                             boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
         this.blockBuilder = new BlockBuilder(assetManager, atlas);
+    }
+
+    public void initialise(List<String> registeredBlockFamilies,
+                           Map<String, Short> knownBlockMappings) {
 
         if (knownBlockMappings.size() >= MAX_ID) {
             nextId = UNKNOWN_ID;
         } else if (knownBlockMappings.size() > 0) {
             nextId = (short) knownBlockMappings.size();
         }
+        registeredBlockInfo.set(new RegisteredState());
 
         for (String rawFamilyUri : registeredBlockFamilies) {
             try {
@@ -112,8 +116,6 @@ public class BlockManagerImpl extends BlockManager {
                         }
                     }
                     registerFamily(family.get());
-                } else {
-                    logger.error("Family not available {}", rawFamilyUri);
                 }
             } catch (BlockUriParseException e) {
                 logger.error("Failed to parse block family, skipping", e);
@@ -158,8 +160,6 @@ public class BlockManagerImpl extends BlockManager {
             } finally {
                 lock.unlock();
             }
-        } else {
-            logger.error("Block family not available: {}", familyUri);
         }
     }
 
@@ -207,21 +207,33 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public BlockFamily getBlockFamily(String uri) {
-        Set<ResourceUrn> resourceUrns = assetManager.resolve(uri, BlockFamilyDefinition.class);
-        if (resourceUrns.size() == 1) {
-            return getBlockFamily(new BlockUri(resourceUrns.iterator().next()));
-        } else {
-            if (resourceUrns.size() > 0) {
-                logger.error("Failed to resolve block family '{}', too many options - {}", uri, resourceUrns);
+        if (!uri.contains(":")) {
+            Set<ResourceUrn> resourceUrns = assetManager.resolve(uri, BlockFamilyDefinition.class);
+            if (resourceUrns.size() == 1) {
+                return getBlockFamily(new BlockUri(resourceUrns.iterator().next()));
             } else {
-                logger.error("Failed to resolve block family '{}'", uri);
+                if (resourceUrns.size() > 0) {
+                    logger.error("Failed to resolve block family '{}', too many options - {}", uri, resourceUrns);
+                } else {
+                    logger.error("Failed to resolve block family '{}'", uri);
+                }
             }
-            return getBlockFamily(AIR_ID);
+        } else {
+            try {
+                BlockUri blockUri = new BlockUri(uri);
+                return getBlockFamily(blockUri);
+            } catch (BlockUriParseException e) {
+                logger.error("Failed to resolve block family '{}', invalid uri", uri);
+            }
         }
+        return getBlockFamily(AIR_ID);
     }
 
     @Override
     public BlockFamily getBlockFamily(BlockUri uri) {
+        if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
+            return getBlockFamily(uri.getShapelessUri());
+        }
         BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
         if (family == null && generateNewIds) {
             Optional<BlockFamily> newFamily = loadFamily(uri);
@@ -244,8 +256,14 @@ public class BlockManagerImpl extends BlockManager {
     private Optional<BlockFamily> loadFamily(BlockUri uri) {
         Optional<BlockFamilyDefinition> familyDef = assetManager.getAsset(uri.getBlockFamilyDefinitionUrn(), BlockFamilyDefinition.class);
         if (familyDef.isPresent() && !familyDef.get().getData().isTemplate()) {
-            if (familyDef.get().isFreeform() && uri.getShapeUrn().isPresent()) {
-                Optional<BlockShape> shape = assetManager.getAsset(uri.getShapeUrn().get(), BlockShape.class);
+            if (familyDef.get().isFreeform()) {
+                ResourceUrn shapeUrn;
+                if (uri.getShapeUrn().isPresent()) {
+                    shapeUrn = uri.getShapeUrn().get();
+                } else {
+                    shapeUrn = CUBE_SHAPE_URN;
+                }
+                Optional<BlockShape> shape = assetManager.getAsset(shapeUrn, BlockShape.class);
                 if (shape.isPresent()) {
                     return Optional.of(familyDef.get().createFamily(shape.get(), blockBuilder));
                 }
@@ -270,6 +288,9 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public Block getBlock(BlockUri uri) {
+        if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
+            return getBlock(uri.getShapelessUri());
+        }
         Block block = registeredBlockInfo.get().blocksByUri.get(uri);
         if (block == null) {
             // Check if partially registered by getting the block family

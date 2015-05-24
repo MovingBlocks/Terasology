@@ -21,9 +21,11 @@ import org.terasology.context.Context;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
@@ -60,12 +62,15 @@ public final class ApplyModulesUtil {
             }
         }
 
-        ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
-        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
-
+        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
+        context.put(TypeSerializationLibrary.class, TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary));
 
         BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
+
+        ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+
     }
 
     private static void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, ModuleEnvironment environment) {
