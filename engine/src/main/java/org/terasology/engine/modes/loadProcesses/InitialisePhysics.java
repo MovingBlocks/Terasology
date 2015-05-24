@@ -15,16 +15,22 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.physics.Physics;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
 
 /**
  * @author Immortius
  */
 public class InitialisePhysics extends SingleStepLoadProcess {
+    private final Context context;
+
+    public InitialisePhysics(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Turning on gravity";
@@ -32,9 +38,9 @@ public class InitialisePhysics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        BulletPhysics physicsEngine = new BulletPhysics(CoreRegistry.get(WorldProvider.class));
-        CoreRegistry.put(Physics.class, physicsEngine);
-        CoreRegistry.put(PhysicsEngine.class, physicsEngine);
+        BulletPhysics physicsEngine = new BulletPhysics(context.get(WorldProvider.class));
+        context.put(Physics.class, physicsEngine);
+        context.put(PhysicsEngine.class, physicsEngine);
         return true;
     }
 

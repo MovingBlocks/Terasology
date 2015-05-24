@@ -33,7 +33,6 @@ import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.ServerInfoMessage;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
@@ -46,11 +45,14 @@ import java.util.Set;
 public class JoinServer implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(JoinServer.class);
 
-    private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+    private Context context;
+    private NetworkSystem networkSystem;
     private GameManifest gameManifest;
     private JoinStatus joinStatus;
 
-    public JoinServer(GameManifest gameManifest, JoinStatus joinStatus) {
+    public JoinServer(Context context, GameManifest gameManifest, JoinStatus joinStatus) {
+        this.context = context;
+        this.networkSystem = context.get(NetworkSystem.class);
         this.gameManifest = gameManifest;
         this.joinStatus = joinStatus;
     }
@@ -92,14 +94,14 @@ public class JoinServer implements LoadProcess {
             gameManifest.setBiomeIdMap(biomeMap);
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
-            ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+            ModuleManager moduleManager = context.get(ModuleManager.class);
 
             Set<Module> moduleSet = Sets.newLinkedHashSet();
             for (NameVersion moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 Module module = moduleManager.getRegistry().getModule(moduleInfo.getName(), moduleInfo.getVersion());
                 if (module == null) {
                     StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo);
-                    CoreRegistry.get(GameEngine.class).changeState(mainMenu);
+                    context.get(GameEngine.class).changeState(mainMenu);
                     return false;
                 } else {
                     logger.info("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
@@ -109,13 +111,13 @@ public class JoinServer implements LoadProcess {
             }
             moduleManager.loadEnvironment(moduleSet, true);
 
-            CoreRegistry.get(Game.class).load(gameManifest);
-            ApplyModulesUtil.applyModules(CoreRegistry.get(Context.class));
+            context.get(Game.class).load(gameManifest);
+            ApplyModulesUtil.applyModules(context.get(Context.class));
 
             return true;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             StateMainMenu mainMenu = new StateMainMenu("Failed to connect to server: " + joinStatus.getErrorMessage());
-            CoreRegistry.get(GameEngine.class).changeState(mainMenu);
+            context.get(GameEngine.class).changeState(mainMenu);
         }
         return false;
     }

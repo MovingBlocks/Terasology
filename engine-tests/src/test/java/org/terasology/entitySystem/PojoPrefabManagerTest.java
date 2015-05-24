@@ -60,14 +60,15 @@ public class PojoPrefabManagerTest {
 
     @Before
     public void setup() throws Exception {
-        CoreRegistry.setContext(new ContextImpl());
+        ContextImpl context = new ContextImpl();
+        CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         lib.add(Vector3f.class, new Vector3fTypeHandler());
         lib.add(Quat4f.class, new Quat4fTypeHandler());
-        entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
+        entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
         AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
@@ -77,7 +78,7 @@ public class PojoPrefabManagerTest {
                 return new PojoPrefab(uri, data);
             }
         });
-        CoreRegistry.put(AssetManager.class, assetManager);
+        context.put(AssetManager.class, assetManager);
     }
 
     @Test

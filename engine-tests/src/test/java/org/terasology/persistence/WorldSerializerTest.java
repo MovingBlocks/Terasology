@@ -23,7 +23,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,12 +32,10 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
@@ -65,12 +63,14 @@ public class WorldSerializerTest {
     @Before
     public void setup() {
         Context context = new ContextImpl();
+        context.put(ModuleManager.class, moduleManager);
         AssetManager assetManager = mock(AssetManager.class);
         context.put(AssetManager.class,assetManager);
         CoreRegistry.setContext(context);
         when(assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class)).thenReturn(Collections.<Prefab>emptyList());
-        EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = context.get(EngineEntityManager.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);

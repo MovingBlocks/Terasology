@@ -25,9 +25,8 @@ import org.terasology.asset.AssetManagerImpl;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -37,7 +36,6 @@ import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
@@ -63,12 +61,13 @@ public class PrefabTest {
 
     @Before
     public void setup() throws Exception {
-        CoreRegistry.setContext(new ContextImpl());
+        ContextImpl context = new ContextImpl();
+        CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
+        context.put(ModuleManager.class, moduleManager);
 
         AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
-        CoreRegistry.put(ModuleManager.class, moduleManager);
-        CoreRegistry.put(AssetManager.class, assetManager);
+        context.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
@@ -78,7 +77,9 @@ public class PrefabTest {
         });
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        EntityManager em = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        context.put(NetworkSystem.class, networkSystem);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         prefabManager = new PojoPrefabManager();
     }
 

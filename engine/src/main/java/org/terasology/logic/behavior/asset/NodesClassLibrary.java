@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.asset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.module.ModuleEnvironment;
@@ -33,8 +34,8 @@ import org.terasology.reflection.reflect.ReflectFactory;
 public class NodesClassLibrary extends AbstractClassLibrary<Node> {
     private static final Logger logger = LoggerFactory.getLogger(NodesClassLibrary.class);
 
-    public NodesClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
-        super(factory, copyStrategies);
+    public NodesClassLibrary(Context context) {
+        super(context);
     }
 
     public void scan(ModuleEnvironment environment) {

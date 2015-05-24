@@ -31,7 +31,6 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 
@@ -42,9 +41,11 @@ public class RegisterMods extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterMods.class);
 
-    private GameManifest gameManifest;
+    private final Context context;
+    private final GameManifest gameManifest;
 
-    public RegisterMods(GameManifest gameManifest) {
+    public RegisterMods(Context context, GameManifest gameManifest) {
+        this.context = context;
         this.gameManifest = gameManifest;
     }
 
@@ -55,7 +56,7 @@ public class RegisterMods extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
         List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
         for (NameVersion moduleInfo : gameManifest.getModules()) {
             moduleIds.add(moduleInfo.getName());
@@ -70,10 +71,10 @@ public class RegisterMods extends SingleStepLoadProcess {
                 logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
             }
 
-            ApplyModulesUtil.applyModules(CoreRegistry.get(Context.class));
+            ApplyModulesUtil.applyModules(context.get(Context.class));
         } else {
             logger.warn("Missing at least one required module or dependency: {}", moduleIds);
-            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
+            context.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
         }
         return true;
     }

@@ -17,12 +17,13 @@ package org.terasology.entitySystem.metadata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.reflection.metadata.AbstractClassLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.AbstractClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * The library for metadata about events (and their fields).
@@ -33,8 +34,8 @@ public class EventLibrary extends AbstractClassLibrary<Event> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventLibrary.class);
 
-    public EventLibrary(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies) {
-        super(reflectFactory, copyStrategies);
+    public EventLibrary(Context context) {
+        super(context);
     }
 
     @Override

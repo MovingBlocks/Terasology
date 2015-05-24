@@ -17,9 +17,10 @@ package org.terasology.reflection.metadata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.engine.SimpleUri;
 
 /**
  * A simple implementation of ClassLibrary. It provides ClassMetadata for a type of class. These classes are identified through their simple name.
@@ -30,8 +31,8 @@ import org.terasology.engine.SimpleUri;
 public final class DefaultClassLibrary<T> extends AbstractClassLibrary<T> {
     private static final Logger logger = LoggerFactory.getLogger(DefaultClassLibrary.class);
 
-    public DefaultClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
-        super(factory, copyStrategies);
+    public DefaultClassLibrary(Context context) {
+        super(context);
     }
 
     protected <C extends T> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {

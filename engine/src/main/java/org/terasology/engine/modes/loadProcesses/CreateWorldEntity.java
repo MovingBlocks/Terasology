@@ -17,11 +17,11 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.generator.WorldConfigurator;
@@ -34,6 +34,13 @@ import java.util.Map;
  * @author Immortius
  */
 public class CreateWorldEntity extends SingleStepLoadProcess {
+
+    private final Context context;
+
+    public CreateWorldEntity(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Creating World Entity...";
@@ -41,8 +48,8 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        EntityManager entityManager = context.get(EntityManager.class);
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
 
         Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         // TODO: Move the world renderer bits elsewhere
@@ -52,7 +59,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
             // get the world generator config from the world entity
             // replace the world generator values from the components in the world entity
-            WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
+            WorldGenerator worldGenerator = context.get(WorldGenerator.class);
             WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
             Map<String, Component> params = worldConfigurator.getProperties();
             for (Map.Entry<String, Component> entry : params.entrySet()) {
@@ -68,9 +75,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
 
             // transfer all world generation parameters from Config to WorldEntity
-            WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
+            WorldGenerator worldGenerator = context.get(WorldGenerator.class);
             SimpleUri generatorUri = worldGenerator.getUri();
-            Config config = CoreRegistry.get(Config.class);
+            Config config = context.get(Config.class);
 
             // get the map of properties from the world generator.
             // Replace its values with values from the config set by the UI.

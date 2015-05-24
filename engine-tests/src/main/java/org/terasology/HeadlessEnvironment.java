@@ -32,7 +32,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -50,7 +50,6 @@ import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -109,13 +108,8 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupEntitySystem() {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        NetworkSystem networkSystem = context.get(NetworkSystem.class);
-
-        EntitySystemBuilder builder = new EntitySystemBuilder();
-        EngineEntityManager engineEntityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-
-        context.put(EngineEntityManager.class, engineEntityManager);
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
     }
 
     @Override

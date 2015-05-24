@@ -18,7 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
 import org.terasology.config.PlayerConfig;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
@@ -27,6 +27,13 @@ import org.terasology.network.NetworkSystem;
  * @author Immortius
  */
 public class SetupLocalPlayer extends SingleStepLoadProcess {
+
+    private final Context context;
+
+    public SetupLocalPlayer(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Setting up local player";
@@ -34,9 +41,9 @@ public class SetupLocalPlayer extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        PlayerConfig playerConfig = CoreRegistry.get(Config.class).getPlayer();
-        Client localClient = CoreRegistry.get(NetworkSystem.class).joinLocal(playerConfig.getName(), playerConfig.getColor());
-        CoreRegistry.get(LocalPlayer.class).setClientEntity(localClient.getEntity());
+        PlayerConfig playerConfig = context.get(Config.class).getPlayer();
+        Client localClient = context.get(NetworkSystem.class).joinLocal(playerConfig.getName(), playerConfig.getColor());
+        context.get(LocalPlayer.class).setClientEntity(localClient.getEntity());
         return true;
     }
 

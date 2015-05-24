@@ -35,7 +35,6 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -123,7 +122,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             ResolutionResult result = resolver.resolve(moduleName);
             if (result.isSuccess()) {
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
-                context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment));
+                context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
                 assetManager.setEnvironment(environment);
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
@@ -244,7 +243,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
-        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        previewImage.setVisible(false);
+
+        final NUIManager manager = context.get(NUIManager.class);
         final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Updating Preview", "Please wait ...");
 

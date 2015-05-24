@@ -16,7 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -29,6 +29,12 @@ import org.terasology.world.generator.WorldGenerator;
  */
 public class InitialiseWorldGenerator extends SingleStepLoadProcess {
 
+    private final Context context;
+
+    public InitialiseWorldGenerator(Context context) {
+        this.context = context;
+    }
+
     @Override
     public String getMessage() {
         return "Initialize world generator ...";
@@ -37,10 +43,10 @@ public class InitialiseWorldGenerator extends SingleStepLoadProcess {
     @Override
     public boolean step() {
 
-        WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
+        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
         worldGenerator.initialize();
 
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
         worldRenderer.getActiveCamera().setReflectionHeight(worldGenerator.getWorld().getSeaLevel());
 
         return true;

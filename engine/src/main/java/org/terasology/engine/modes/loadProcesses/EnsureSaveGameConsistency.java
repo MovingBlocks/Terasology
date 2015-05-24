@@ -15,9 +15,9 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.context.Context;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.persistence.StorageManager;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
 
@@ -27,7 +27,11 @@ import java.io.IOException;
  * @author Florian
  */
 public class EnsureSaveGameConsistency implements LoadProcess {
+    private final Context context;
 
+    public EnsureSaveGameConsistency(Context context) {
+        this.context = context;
+    }
 
     @Override
     public String getMessage() {
@@ -37,7 +41,7 @@ public class EnsureSaveGameConsistency implements LoadProcess {
     @Override
     public boolean step() {
         try {
-            CoreRegistry.get(StorageManager.class).checkAndRepairSaveIfNecessary();
+            context.get(StorageManager.class).checkAndRepairSaveIfNecessary();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
