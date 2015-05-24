@@ -63,111 +63,226 @@ public class DoorSystem extends BaseComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
+    /**
+     * Place a new door when the player activates the event for building doors.
+     * @param event Event received
+     * @param entity Reference entity
+     */
     @ReceiveEvent(components = {DoorComponent.class, ItemComponent.class})
     public void placeDoor(ActivateEvent event, EntityRef entity) {
         DoorComponent door = entity.getComponent(DoorComponent.class);
         BlockComponent targetBlockComp = event.getTarget().getComponent(BlockComponent.class);
-        if (targetBlockComp == null) {
+        
+        //Marks the event as consumed if there is not a target block
+        if (targetBlockComp == null){
             event.consume();
             return;
         }
-
-        Vector3f horizDir = new Vector3f(event.getDirection());
-        horizDir.y = 0;
-        Side facingDir = Side.inDirection(horizDir);
+        
+        //Check if the event is facing in the XZ plane.
+        Side facingDir = getEventFacingDirection(event);
         if (!facingDir.isHorizontal()) {
             event.consume();
             return;
         }
+        
+        //Calculates the interaction direction between the player and the event
+        Side offsetDir = getOffsetDirection(event, targetBlockComp);
 
-        Vector3f offset = new Vector3f(event.getHitPosition());
-        offset.sub(targetBlockComp.getPosition().toVector3f());
-        Side offsetDir = Side.inDirection(offset);
-
+        //Finds the block pushed by the target.
         Vector3i primePos = new Vector3i(targetBlockComp.getPosition());
         primePos.add(offsetDir.getVector3i());
         Block primeBlock = worldProvider.getBlock(primePos);
+        
+        //Test if this block can be replaced
         if (!primeBlock.isReplacementAllowed()) {
             event.consume();
             return;
         }
-        Block belowBlock = worldProvider.getBlock(primePos.x, primePos.y - 1, primePos.z);
-        Block aboveBlock = worldProvider.getBlock(primePos.x, primePos.y + 1, primePos.z);
 
         // Determine top and bottom blocks
-        Vector3i bottomBlockPos;
-        Vector3i topBlockPos;
-        if (belowBlock.isReplacementAllowed()) {
-            bottomBlockPos = new Vector3i(primePos.x, primePos.y - 1, primePos.z);
+        Vector3i bottomBlockPos = new Vector3i(primePos.x, primePos.y - 1, primePos.z);
+        Vector3i topBlockPos = new Vector3i(primePos.x, primePos.y + 1, primePos.z);
+        if (isReplaceAllowed(bottomBlockPos)) {
             topBlockPos = primePos;
-        } else if (aboveBlock.isReplacementAllowed()) {
+        } else if (isReplaceAllowed(topBlockPos)) {
             bottomBlockPos = primePos;
-            topBlockPos = new Vector3i(primePos.x, primePos.y + 1, primePos.z);
         } else {
             event.consume();
             return;
         }
-
+        
+        //Determine what side of the door would attached
         Side attachSide = determineAttachSide(facingDir, offsetDir, bottomBlockPos, topBlockPos);
+        
+        //Checks is that side is a correct side
         if (attachSide == null) {
             event.consume();
             return;
         }
 
-        Side closedSide = facingDir.reverse();
-        if (closedSide == attachSide || closedSide.reverse() == attachSide) {
-            closedSide = attachSide.yawClockwise(1);
-        }
+        //Gets the closed side of the door
+        Side closedSide = getClosedSide(facingDir, attachSide);
 
+        //Builds a map using the bottom block and the top one. Those blocks determines the door to be placed.
+        Map<Vector3i, Block> blockMap = buildBlockMap(door, bottomBlockPos,
+                topBlockPos, closedSide);
+        
+        //Create an event to place the two blocks of the previous map as the door.
+        PlaceBlocks blockEvent = new PlaceBlocks(blockMap, event.getInstigator());
+        worldProvider.getWorldEntity().send(blockEvent);
+
+        //If the event was successful, then a new door is created.
+        if (!blockEvent.isConsumed()) {
+            buildDoor(entity, bottomBlockPos, topBlockPos, attachSide,
+                    closedSide);
+        }
+    }
+
+    /**
+     * Builds a new door.
+     * @param entity
+     * @param bottomBlockPos Bottom block of the door
+     * @param topBlockPos Top block of the door
+     * @param attachSide Attach side of the door
+     * @param closedSide Closed side of the door
+     */
+    private void buildDoor(EntityRef entity, Vector3i bottomBlockPos,
+            Vector3i topBlockPos, Side attachSide, Side closedSide) {
+        EntityRef newDoor = entityManager.copy(entity);
+        newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
+        Vector3f doorCenter = bottomBlockPos.toVector3f();
+        doorCenter.y += 0.5f;
+        newDoor.addComponent(new LocationComponent(doorCenter));
+        DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);
+        newDoorComp.closedSide = closedSide;
+        newDoorComp.openSide = attachSide.reverse();
+        newDoorComp.isOpen = false;
+        newDoor.saveComponent(newDoorComp);
+        newDoor.removeComponent(ItemComponent.class);
+        audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
+        logger.info("Closed Side: {}", newDoorComp.closedSide);
+        logger.info("Open Side: {}", newDoorComp.openSide);
+    }
+
+    /**
+     * Creates a hashmap that contains two blocks of a door.
+     * @param door Door component
+     * @param bottomBlockPos Bottom position of the door.
+     * @param topBlockPos Top position of the door.
+     * @param closedSide Closed side of the door.
+     * @return
+     */
+    private Map<Vector3i, Block> buildBlockMap(DoorComponent door,
+            Vector3i bottomBlockPos, Vector3i topBlockPos, Side closedSide) {
         Block newBottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
         Block newTopBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
 
         Map<Vector3i, Block> blockMap = new HashMap<>();
         blockMap.put(bottomBlockPos, newBottomBlock);
         blockMap.put(topBlockPos, newTopBlock);
-        PlaceBlocks blockEvent = new PlaceBlocks(blockMap, event.getInstigator());
-        worldProvider.getWorldEntity().send(blockEvent);
-
-        if (!blockEvent.isConsumed()) {
-            EntityRef newDoor = entityManager.copy(entity);
-            newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
-            Vector3f doorCenter = bottomBlockPos.toVector3f();
-            doorCenter.y += 0.5f;
-            newDoor.addComponent(new LocationComponent(doorCenter));
-            DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);
-            newDoorComp.closedSide = closedSide;
-            newDoorComp.openSide = attachSide.reverse();
-            newDoorComp.isOpen = false;
-            newDoor.saveComponent(newDoorComp);
-            newDoor.removeComponent(ItemComponent.class);
-            audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
-            logger.info("Closed Side: {}", newDoorComp.closedSide);
-            logger.info("Open Side: {}", newDoorComp.openSide);
-        }
+        return blockMap;
     }
 
+    /**
+     * Get the closed side of a door given its facing side and the attach one.
+     * @param facingDir Facing side of the door
+     * @param attachSide Attach side of the door
+     * @return
+     */
+    private Side getClosedSide(Side facingDir, Side attachSide) {
+        Side closedSide = facingDir.reverse();
+        if (closedSide == attachSide || closedSide.reverse() == attachSide) {
+            closedSide = attachSide.yawClockwise(1);
+        }
+        return closedSide;
+    }
+
+    /**
+     * @param bottomBlockPos Block position
+     * @return true if can be replaced
+     */
+    private boolean isReplaceAllowed(Vector3i bottomBlockPos) {
+        Block belowBlock = worldProvider.getBlock(bottomBlockPos.x, bottomBlockPos.y, bottomBlockPos.z);
+        return belowBlock.isReplacementAllowed();
+    }
+
+    /**
+     * Gets the direction between the target and the event source point
+     * @param event Event
+     * @param targetBlockComp Target block
+     * @return Direction from target to event
+     */
+    private Side getOffsetDirection(ActivateEvent event,
+            BlockComponent targetBlockComp) {
+        Vector3f offset = new Vector3f(event.getHitPosition());
+        offset.sub(targetBlockComp.getPosition().toVector3f());
+        return Side.inDirection(offset);
+    }
+
+    /**
+     * @param event Event
+     * @return Event facing direction
+     */
+    private Side getEventFacingDirection(ActivateEvent event) {
+        Vector3f horizDir = new Vector3f(event.getDirection());
+        horizDir.y = 0;
+        return Side.inDirection(horizDir);
+    }
+
+    /**
+     * Determines the attached side of the door. 
+     * @param facingDir Facing side of the door.
+     * @param offsetDir Side of direction where the player look.
+     * @param bottomBlockPos Bottom position of the door
+     * @param topBlockPos Top position of the door.
+     * @return
+     */
     private Side determineAttachSide(Side facingDir, Side offsetDir, Vector3i bottomBlockPos, Vector3i topBlockPos) {
         Side attachSide = null;
         if (offsetDir.isHorizontal()) {
-            if (canAttachTo(topBlockPos, offsetDir.reverse()) && canAttachTo(bottomBlockPos, offsetDir.reverse())) {
+            Side reversed = offsetDir.reverse();
+            if (canBeAttachedSide(bottomBlockPos, topBlockPos, reversed)) {
                 attachSide = offsetDir.reverse();
             }
         }
-        if (attachSide == null) {
-            Side clockwise = facingDir.yawClockwise(1);
-            if (canAttachTo(topBlockPos, clockwise) && canAttachTo(bottomBlockPos, clockwise)) {
-                attachSide = clockwise;
-            }
+        
+        if(attachSide != null)
+            return attachSide;
+        
+        Side clockwise = facingDir.yawClockwise(1);
+        if (canBeAttachedSide(bottomBlockPos, topBlockPos, clockwise)) {
+            attachSide = clockwise;
         }
-        if (attachSide == null) {
-            Side anticlockwise = facingDir.yawClockwise(-1);
-            if (canAttachTo(topBlockPos, anticlockwise) && canAttachTo(bottomBlockPos, anticlockwise)) {
-                attachSide = anticlockwise;
-            }
+        
+        if(attachSide != null)
+            return attachSide;
+        
+        Side anticlockwise = facingDir.yawClockwise(-1);
+        if (canBeAttachedSide(bottomBlockPos, topBlockPos, anticlockwise)) {
+            attachSide = anticlockwise;
         }
         return attachSide;
     }
 
+    /**
+     * @param bottomBlockPos Door bottom position
+     * @param topBlockPos Door top position
+     * @param side
+     * @return true if side can be attached from both positions
+     */
+    private boolean canBeAttachedSide(Vector3i bottomBlockPos,
+            Vector3i topBlockPos, Side side) {
+        return canAttachTo(topBlockPos, side) && canAttachTo(bottomBlockPos, side);
+    }
+    
+
+    /**
+     * Verifies if the side can be the attached one from a position.
+     * @param doorPos Door position
+     * @param side Side of the door.
+     * @return true if the indicated side of the door can be its attached side.
+     */
     private boolean canAttachTo(Vector3i doorPos, Side side) {
         Vector3i adjacentBlockPos = new Vector3i(doorPos);
         adjacentBlockPos.add(side.getVector3i());

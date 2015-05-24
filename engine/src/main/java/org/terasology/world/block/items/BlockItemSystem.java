@@ -42,9 +42,9 @@ import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius
+ * This class is used to process the placement of blocks in the world.
+ * TODO: Predict placement client-side (and handle confirm/denial)
  */
-// TODO: Predict placement client-side (and handle confirm/denial)
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockItemSystem extends BaseComponentSystem {
 
@@ -60,6 +60,11 @@ public class BlockItemSystem extends BaseComponentSystem {
     @In
     private NetworkSystem networkSystem;
 
+    /**
+     * Process the placement of a block
+     * @param event Event which trigger the placement
+     * @param item Reference to the item which trigger the event
+     */
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         if (!event.getTarget().exists()) {
@@ -84,23 +89,53 @@ public class BlockItemSystem extends BaseComponentSystem {
 
         Block block = type.getBlockForPlacement(worldProvider, blockEntityRegistry, placementPos, surfaceSide, secondaryDirection);
 
+        tryPlaceBlock(event, item, targetBlock, placementPos, block);
+    }
+
+    /**
+     * Try to place a block in a given position
+     * @param event Event which trigger the placement
+     * @param item Reference to the item which trigger the event
+     * @param targetBlock Relative position where the block is going to be placed
+     * @param placementPos Absolute position where the block is going to be placed
+     * @param block Block which is being placed
+     */
+    private void tryPlaceBlock(ActivateEvent event, EntityRef item, Vector3i targetBlock, Vector3i placementPos, Block block) {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
-            // TODO: Fix this for changes.
-            if (networkSystem.getMode().isAuthority()) {
-                PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
-                worldProvider.getWorldEntity().send(placeBlocks);
-                if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
-                } else {
-                    event.consume();
-                }
-            }
+            placeBlock(event, item, placementPos, block);
             event.getInstigator().send(new PlaySoundEvent(event.getInstigator(), Assets.getSound("engine:PlaceBlock"), 0.5f));
         } else {
             event.consume();
         }
     }
 
+    /**
+     * Place the block in the given position
+     * @param event Event which trigger the placement
+     * @param item  Reference to the item which trigger the event
+     * @param placementPos Position where the block is placed
+     * @param block Block which is being placed
+     */
+    private void placeBlock(ActivateEvent event, EntityRef item, Vector3i placementPos, Block block) {
+        // TODO: Fix this for changes.
+        if (networkSystem.getMode().isAuthority()) {
+            PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
+            worldProvider.getWorldEntity().send(placeBlocks);
+            if (!placeBlocks.isConsumed()) {
+                item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
+            } else {
+                event.consume();
+            }
+        }
+    }
+
+    /**
+     * Verify if we can place a block in a given position
+     * @param block Block to be placed
+     * @param targetBlock Relativa position where the block is going to be placed
+     * @param blockPos Absolute position where the block is going to be placed
+     * @return True if can be placed, false otherwise
+     */
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
         if (block == null) {
             return false;
