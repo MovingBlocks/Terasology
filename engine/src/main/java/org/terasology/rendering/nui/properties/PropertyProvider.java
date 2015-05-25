@@ -76,7 +76,7 @@ public class PropertyProvider {
         factories.put(TextField.class, new TextPropertyFactory());
     }
 
-    public List<Property<?,?>> createProperties(Object target) {
+    public List<Property<?, ?>> createProperties(Object target) {
         List<Property<?, ?>> properties = Lists.newArrayList();
         try {
             Class<?> type = target.getClass();
@@ -110,21 +110,20 @@ public class PropertyProvider {
         return null;
     }
 
-    protected <T> TextBinding<T> createTextBinding(Object target, final FieldMetadata<Object, T> fieldMetadata) {
-        Class<?> type = fieldMetadata.getType();
-        TextBinding<?> textBinding;
+    protected <T> TextMapper<T> createTextMapping(Class<?> type) {
+        TextMapper<?> textBinding = null;
         if (type == String.class) {
-            textBinding = new StringTextBinding(target, (FieldMetadata<Object, String>) fieldMetadata);
+            textBinding = new StringTextBinding();
         } else if (type == Integer.TYPE || type == Integer.class) {
-            textBinding = new IntegerTextBinding(target, (FieldMetadata<Object, Integer>) fieldMetadata);
+            textBinding = new IntegerTextBinding();
         } else if (type == Float.TYPE || type == Float.class) {
-            textBinding = new FloatTextBinding(target, (FieldMetadata<Object, Float>) fieldMetadata);
+            textBinding = new FloatTextBinding();
         } else if (type == Vector3f.class) {
-            textBinding = new Vector3fTextBinding(target, (FieldMetadata<Object, Vector3f>) fieldMetadata);
+            textBinding = new Vector3fTextBinding();
         } else {
             throw new IllegalArgumentException("Cannot create Binding<String> for a field of type " + type);
         }
-        return (TextBinding<T>) textBinding;
+        return (TextMapper<T>) textBinding;
     }
 
 
@@ -203,7 +202,7 @@ public class PropertyProvider {
         @Override
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, Checkbox info) {
             UICheckbox checkbox = new UICheckbox();
-            Binding<Boolean> binding = new BooleanTextBinding(target, (FieldMetadata<Object, Boolean>) fieldMetadata);
+            Binding<Boolean> binding = new TextBinding(target, (FieldMetadata<Object, Boolean>) fieldMetadata);
             checkbox.bindChecked(binding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, binding, checkbox, info.description());
@@ -215,7 +214,7 @@ public class PropertyProvider {
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, OneOf.List info) {
             UIDropdown<String> dropdown = new UIDropdown<>();
             dropdown.bindOptions(new DefaultBinding<>(Arrays.asList(info.items())));
-            Binding<String> binding = createTextBinding(target, (FieldMetadata<Object, String>) fieldMetadata);
+            Binding<String> binding = new TextBinding(target, (FieldMetadata<Object, String>) fieldMetadata);
             dropdown.bindSelection(binding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, binding, dropdown, info.description());
@@ -278,16 +277,21 @@ public class PropertyProvider {
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, TextField info) {
             UITextEntry<T> text = new UITextEntry<>();
 
-            TextBinding<T> textBinding = createTextBinding(target, (FieldMetadata<Object, T>) fieldMetadata);
-            text.setFormatter(textBinding);
-            text.setParser(textBinding);
+            Binding<T> textBinding = new TextBinding(target, (FieldMetadata<Object, T>) fieldMetadata);
+            TextMapper<T> textMapper = createTextMapping(fieldMetadata.getType());
+            text.setFormatter(textMapper);
+            text.setParser(textMapper);
             text.bindValue(textBinding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, textBinding, text, info.description());
         }
     }
 
-    private abstract class TextBinding<T> implements UITextEntry.Formatter<T>, UITextEntry.Parser<T>, Binding<T> {
+    private interface TextMapper<T> extends UITextEntry.Formatter<T>, UITextEntry.Parser<T> {
+
+    }
+
+    private class TextBinding<T> implements Binding<T> {
         private FieldMetadata<Object, T> fieldMetadata;
         private final Object target;
 
@@ -307,10 +311,7 @@ public class PropertyProvider {
         }
     }
 
-    private final class StringTextBinding extends TextBinding<String> {
-        private StringTextBinding(Object target, FieldMetadata<Object, String> fieldMetadata) {
-            super(target, fieldMetadata);
-        }
+    private final class StringTextBinding implements TextMapper<String> {
 
         @Override
         public String toString(String value) {
@@ -323,10 +324,7 @@ public class PropertyProvider {
         }
     }
 
-    private final class IntegerTextBinding extends TextBinding<Integer> {
-        private IntegerTextBinding(Object target, FieldMetadata<Object, Integer> fieldMetadata) {
-            super(target, fieldMetadata);
-        }
+    private final class IntegerTextBinding implements TextMapper<Integer> {
 
         @Override
         public String toString(Integer value) {
@@ -339,11 +337,7 @@ public class PropertyProvider {
         }
     }
 
-    private final class FloatTextBinding extends TextBinding<Float> {
-
-        private FloatTextBinding(Object target, FieldMetadata<Object, Float> fieldMetadata) {
-            super(target, fieldMetadata);
-        }
+    private final class FloatTextBinding implements TextMapper<Float> {
 
         @Override
         public String toString(Float value) {
@@ -357,10 +351,7 @@ public class PropertyProvider {
 
     }
 
-    private final class BooleanTextBinding extends TextBinding<Boolean> {
-        private BooleanTextBinding(Object target, FieldMetadata<Object, Boolean> fieldMetadata) {
-            super(target, fieldMetadata);
-        }
+    private final class BooleanTextBinding implements TextMapper<Boolean> {
 
         @Override
         public String toString(Boolean value) {
@@ -373,11 +364,7 @@ public class PropertyProvider {
         }
     }
 
-    private final class Vector3fTextBinding extends TextBinding<Vector3f> {
-
-        private Vector3fTextBinding(Object target, FieldMetadata<Object, Vector3f> fieldMetadata) {
-            super(target, fieldMetadata);
-        }
+    private final class Vector3fTextBinding implements TextMapper<Vector3f> {
 
         @Override
         public String toString(Vector3f value) {

@@ -43,6 +43,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -57,6 +58,7 @@ import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
