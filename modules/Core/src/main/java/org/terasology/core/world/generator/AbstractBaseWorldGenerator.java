@@ -31,6 +31,7 @@ import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.base.ColorSummaryFacet;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.generator.WorldConfigurator;
+import org.terasology.world.generator.WorldConfiguratorAdapter;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
@@ -53,7 +54,15 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
         this.uri = uri;
     }
 
-    public abstract void initialize();
+    @Override
+    public void initialize() {
+        // do nothing
+    }
+
+    @Override
+    public WorldConfigurator getConfigurator() {
+        return new WorldConfiguratorAdapter();
+    }
 
     @Override
     public final SimpleUri getUri() {
@@ -112,15 +121,6 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
             }
         }
         return layerNames;
-    }
-
-    @Override
-    public Optional<WorldConfigurator> getConfigurator() {
-        return Optional.empty();
-    }
-
-    @Override
-    public void setConfigurator(WorldConfigurator worldConfigurator) {
     }
 
     @Override

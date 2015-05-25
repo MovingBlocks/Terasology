@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.Asset;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
@@ -68,7 +69,7 @@ public class ModuleManagerImpl implements ModuleManager {
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);
-            engineModule = ClasspathModule.create(metadata, getClass(), Module.class);
+            engineModule = ClasspathModule.create(metadata, getClass(), Module.class, Asset.class);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read engine metadata", e);
         } catch (URISyntaxException e) {
@@ -101,12 +102,14 @@ public class ModuleManagerImpl implements ModuleManager {
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("org.terasology.world.biomes");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("org.terasology.math.geom");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.lang");
+        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.lang.invoke");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.lang.ref");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.math");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent.atomic");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent.locks");
+        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.function");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.regex");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt.geom");

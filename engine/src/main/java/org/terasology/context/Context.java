@@ -15,6 +15,8 @@
  */
 package org.terasology.context;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * Provides classes with the utility objects that belong to the context they are running in.
  *
@@ -28,6 +30,7 @@ package org.terasology.context;
  *
  * Contexts must be thread safe!
  */
+@API
 public interface Context {
 
     /**

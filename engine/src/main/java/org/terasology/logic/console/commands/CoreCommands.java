@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commands;
 
-import com.google.common.base.Function;
 import org.terasology.asset.Assets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.GameEngine;
@@ -167,10 +166,7 @@ public class CoreCommands extends BaseComponentSystem {
         final NUIManager manager = CoreRegistry.get(NUIManager.class);
         final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
-        popup.onSuccess(new Function<JoinStatus, Void>() {
-
-            @Override
-            public Void apply(JoinStatus result) {
+        popup.onSuccess(result -> {
                 GameEngine engine = CoreRegistry.get(GameEngine.class);
                 if (result.getStatus() != JoinStatus.Status.FAILED) {
                     engine.changeState(new StateLoading(result));
@@ -178,10 +174,7 @@ public class CoreCommands extends BaseComponentSystem {
                     MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
                 }
-
-                return null;
-            }
-        });
+            });
         popup.startOperation(operation, true);
     }
 

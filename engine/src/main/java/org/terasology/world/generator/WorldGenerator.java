@@ -37,11 +37,9 @@ public interface WorldGenerator {
 
     void initialize();
 
-    Optional<WorldConfigurator> getConfigurator();
+    WorldConfigurator getConfigurator();
 
     World getWorld();
-
-    void setConfigurator(WorldConfigurator newConfigurator);
 
     /**
      * Determines a spawn position suitable for this world, such as that used to spawn the initial player.

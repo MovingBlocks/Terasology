@@ -221,7 +221,7 @@ public class OpenGLTexture extends Texture {
 
     @Override
     public TextureData getData() {
-        return textureData;
+        return new TextureData(textureData);
     }
 
     @Override

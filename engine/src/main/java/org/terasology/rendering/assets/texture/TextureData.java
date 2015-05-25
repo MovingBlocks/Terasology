@@ -74,6 +74,15 @@ public class TextureData implements AssetData {
         this(width, height, mipmaps, wrapMode, filterMode, Texture.Type.TEXTURE2D);
     }
 
+    public TextureData(TextureData fromCopy) {
+        this(fromCopy.width, fromCopy.height, fromCopy.wrapMode, fromCopy.filterMode);
+        this.type = fromCopy.type;
+        this.data = new ByteBuffer[fromCopy.data.length];
+        for (int i = 0; i < fromCopy.data.length; ++i) {
+            data[i] = fromCopy.data[i].duplicate();
+        }
+    }
+
     public int getWidth() {
         return width;
     }
@@ -95,7 +104,7 @@ public class TextureData implements AssetData {
     }
 
     public ByteBuffer[] getBuffers() {
-        return Arrays.copyOf(data, data.length);
+        return data;
     }
 
     public void setFilterMode(Texture.FilterMode filterMode) {

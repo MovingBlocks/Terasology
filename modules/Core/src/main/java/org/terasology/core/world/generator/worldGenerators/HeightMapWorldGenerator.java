@@ -15,6 +15,7 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
+import org.terasology.context.Context;
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.HeightMapSurfaceHeightProvider;
@@ -27,6 +28,7 @@ import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
@@ -41,8 +43,8 @@ public class HeightMapWorldGenerator extends BaseFacetedWorldGenerator {
     }
 
     @Override
-    protected WorldBuilder createWorld(long seed) {
-        return new WorldBuilder(seed)
+    protected WorldBuilder createWorld() {
+        return new WorldBuilder(CoreRegistry.get(Context.class))
                 .setSeaLevel(16)
                 .addProvider(new SeaLevelProvider(16))
                 .addProvider(new HeightMapSurfaceHeightProvider())

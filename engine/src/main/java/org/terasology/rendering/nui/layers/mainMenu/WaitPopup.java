@@ -15,11 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -28,9 +31,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 /**
  * A popup message that is shown while a long-term background operation is running.
@@ -48,7 +48,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
 
     private Thread thread;
 
-    private Function<T, Void> resultEvent;
+    private Consumer<T> resultEvent;
 
     private UILabel titleLabel;
     private UILabel messageLabel;
@@ -95,7 +95,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
             T result = parallelTask.get();
             getManager().popScreen();
             if (resultEvent != null) {
-                resultEvent.apply(result);
+                resultEvent.accept(result);
             }
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("An error occurred during execution", e);
@@ -106,14 +106,14 @@ public class WaitPopup<T> extends CoreScreenLayer {
     /**
      * @param runnable will be called once the result is available
      */
-    public void onSuccess(Function<T, Void> runnable) {
+    public void onSuccess(Consumer<T> runnable) {
         this.resultEvent = runnable;
     }
 
     /**
-     * @param operation      the operation to run - the executing thread will be interrupted when the operation is cancelled
+     * @param operation the operation to run - the executing thread will be interrupted when the operation is cancelled
      * @param canBeCancelled true if the operation is aborted when the {@link Thread#isInterrupted()} flag is set
-     * @throws NullPointerException     if operation is null
+     * @throws NullPointerException if operation is null
      * @throws IllegalArgumentException if startOperation() was called before
      */
     public void startOperation(Callable<T> operation, boolean canBeCancelled) {
