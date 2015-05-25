@@ -85,6 +85,8 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
         palette = find("palette", UIList.class);
 
         behaviorEditor.bindSelection(new Binding<RenderableNode>() {
+            private PropertyProvider provider = new PropertyProvider();
+
             @Override
             public RenderableNode get() {
                 return selectedNode;
@@ -95,8 +97,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
                 selectedNode = value;
                 properties.clear();
                 if (value != null) {
-                    PropertyProvider<?> provider = new PropertyProvider<>(value.getNode());
-                    properties.addPropertyProvider("Behavior Node", provider);
+                    properties.addProperties("Behavior Node", provider.createProperties(value.getNode()));
                 }
             }
         });
@@ -132,6 +133,8 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
         });
 
         selectEntity.bindSelection(new Binding<Interpreter>() {
+            private PropertyProvider provider = new PropertyProvider();
+
             @Override
             public Interpreter get() {
                 return selectedInterpreter;
@@ -147,7 +150,8 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
                     EntityRef minion = value.actor().minion();
                     entityProperties.clear();
                     for (Component component : minion.iterateComponents()) {
-                        entityProperties.addPropertyProvider(component.getClass().getSimpleName().replace("Component", ""), new PropertyProvider<>(component));
+                        String name = component.getClass().getSimpleName().replace("Component", "");
+                        entityProperties.addProperties(name, provider.createProperties(component));
                     }
                 }
                 updateDebugger();

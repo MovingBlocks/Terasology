@@ -16,15 +16,16 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
-import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -42,7 +43,7 @@ public class PropertyLayout extends MigLayout {
     public PropertyLayout(String id) {
         super(id);
     }
-    
+
     public void setOrdering(Comparator<? super Property<?, ?>> comparator) {
         this.propertyComparator = comparator;
     }
@@ -51,8 +52,8 @@ public class PropertyLayout extends MigLayout {
      * Adds a provider for properties to this layout. All properties appears in a list that may be collapsed/expanded.
      * Initially the list is expanded.
      */
-    public void addPropertyProvider(String groupLabel, final PropertyProvider<?> propertyProvider) {
-        if (propertyProvider.getProperties().size() > 0) {
+    public void addProperties(String groupLabel, final Collection<Property<?, ?>> properties) {
+        if (properties.size() > 0) {
             final UIButton expand = new UIButton("", "-");
             expand.setTooltip("Click to collapse");
             final UILabel headline = new UILabel(groupLabel);
@@ -71,7 +72,7 @@ public class PropertyLayout extends MigLayout {
                         button.setText("+");
                         button.setTooltip("Click to expand");
                     } else {
-                        expand(propertyProvider, layout);
+                        expand(properties, layout);
                         button.setText("-");
                         button.setTooltip("Click to collapse");
                     }
@@ -81,12 +82,12 @@ public class PropertyLayout extends MigLayout {
             addWidget(headline, new CCHint());
             addWidget(layout, new CCHint("newline, spanx 2"));
 
-            expand(propertyProvider, layout);
+            expand(properties, layout);
         }
     }
 
-    private void expand(PropertyProvider<?> propertyProvider, MigLayout layout) {
-        List<Property<?, ?>> props = Lists.newArrayList(propertyProvider.getProperties());
+    private void expand(Collection<Property<?, ?>> properties, MigLayout layout) {
+        List<Property<?, ?>> props = Lists.newArrayList(properties);
         Collections.sort(props, propertyComparator);
         for (Property<?, ?> property : props) {
             UILabel label = property.getLabel();

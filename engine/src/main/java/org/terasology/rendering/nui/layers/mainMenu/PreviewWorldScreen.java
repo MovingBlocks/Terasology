@@ -164,9 +164,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private void configureProperties() {
 
-        PropertyLayout properties = find("properties", PropertyLayout.class);
-        properties.setOrdering(PropertyOrdering.byLabel());
-        properties.clear();
+        PropertyLayout propLayout = find("properties", PropertyLayout.class);
+        propLayout.setOrdering(PropertyOrdering.byLabel());
+        propLayout.clear();
 
         WorldConfigurator worldConfig = worldGenerator.getConfigurator();
 
@@ -180,9 +180,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
         }
 
+        PropertyProvider provider = new PropertyProvider();
+
         for (String label : params.keySet()) {
-            PropertyProvider<?> provider = new PropertyProvider<>(params.get(label));
-            properties.addPropertyProvider(label, provider);
+            Component target = params.get(label);
+            List<Property<?, ?>> properties = provider.createProperties(target);
+            propLayout.addProperties(label, properties);
         }
     }
 
