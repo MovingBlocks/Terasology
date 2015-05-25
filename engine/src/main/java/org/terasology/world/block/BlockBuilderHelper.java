@@ -18,6 +18,7 @@ package org.terasology.world.block;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.SectionDefinitionData;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Map;
@@ -39,5 +40,7 @@ public interface BlockBuilderHelper {
     Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation);
 
     Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation);
+
+    Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section);
 
 }

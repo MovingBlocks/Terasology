@@ -28,8 +28,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.family.BlockFamilyFactory;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.SectionDefinitionData;
 import org.terasology.world.block.shapes.BlockMeshPart;
@@ -69,7 +67,7 @@ public class BlockBuilder implements BlockBuilderHelper {
             shape = cubeShape;
         }
 
-        Block block = constructBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getBaseSection());
+        Block block = constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getBaseSection());
 
         // Lowered mesh for liquids
         if (block.isLiquid()) {
@@ -80,7 +78,7 @@ public class BlockBuilder implements BlockBuilderHelper {
 
     @Override
     public Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape) {
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getBaseSection());
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getBaseSection());
     }
 
     @Override
@@ -90,12 +88,12 @@ public class BlockBuilder implements BlockBuilderHelper {
             shape = cubeShape;
         }
 
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getSection(section));
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getSection(section));
     }
 
     @Override
     public Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, String section) {
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getSection(section));
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getSection(section));
     }
 
     @Override
@@ -105,7 +103,7 @@ public class BlockBuilder implements BlockBuilderHelper {
             shape = cubeShape;
         }
 
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getBaseSection());
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getBaseSection());
     }
 
     @Override
@@ -115,20 +113,21 @@ public class BlockBuilder implements BlockBuilderHelper {
             shape = cubeShape;
         }
 
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getSection(section));
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getSection(section));
     }
 
     @Override
     public Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation) {
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getBaseSection());
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getBaseSection());
     }
 
     @Override
     public Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation) {
-        return constructBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getSection(section));
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, rotation, definition.getData().getSection(section));
     }
 
-    private Block constructBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section) {
+    @Override
+    public Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section) {
         Block block = createRawBlock(defaultName, section);
         block.setDirection(rotation.rotate(Side.FRONT));
         block.setPrimaryAppearance(createAppearance(shape, section.getBlockTiles(), rotation));
