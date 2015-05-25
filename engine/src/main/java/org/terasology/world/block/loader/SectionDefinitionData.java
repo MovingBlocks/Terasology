@@ -16,6 +16,7 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.world.block.BlockPart;
@@ -261,12 +262,30 @@ public class SectionDefinitionData {
         return blockTiles;
     }
 
+    public void setAllTiles(BlockTile tile) {
+        for (BlockPart part : BlockPart.values()) {
+            blockTiles.put(part, tile);
+        }
+    }
+
     public EnumMap<BlockPart, DefaultColorSource> getColorSources() {
         return colorSources;
     }
 
+    public void setAllColorSources(DefaultColorSource source) {
+        for (BlockPart part : BlockPart.values()) {
+            colorSources.put(part, source);
+        }
+    }
+
     public EnumMap<BlockPart, Vector4f> getColorOffsets() {
         return colorOffsets;
+    }
+
+    public void setAllColorOffsets(BaseVector4f offset) {
+        for (BlockPart part : BlockPart.values()) {
+            colorOffsets.put(part, new Vector4f(offset));
+        }
     }
 
     public float getMass() {
