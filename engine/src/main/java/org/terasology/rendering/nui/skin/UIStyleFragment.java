@@ -30,7 +30,8 @@ import java.util.Optional;
  * @author Immortius
  */
 public class UIStyleFragment {
-    private Optional<TextureRegion> background = Optional.empty();
+    // This field is intentionally null, so it can represent no change (null), empty and a background
+    private Optional<TextureRegion> background;
     @SerializedName("background-border")
     private Border backgroundBorder;
     @SerializedName("background-scale-mode")
@@ -74,8 +75,8 @@ public class UIStyleFragment {
 
 
     public void applyTo(UIStyle style) {
-        if (background.isPresent()) {
-            style.setBackground(background.get());
+        if (background != null) {
+            style.setBackground(background.orElse(null));
         }
         if (backgroundBorder != null) {
             style.setBackgroundBorder(backgroundBorder);
