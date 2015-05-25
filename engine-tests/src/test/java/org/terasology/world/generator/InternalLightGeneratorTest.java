@@ -28,6 +28,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -61,6 +62,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
+        solidData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
         solidBlock = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
@@ -68,6 +70,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         fullLightData.getBaseSection().setDisplayName("Torch");
         fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
+        fullLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
         fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
     }

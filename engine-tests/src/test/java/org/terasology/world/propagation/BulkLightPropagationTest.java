@@ -29,6 +29,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -67,6 +68,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         fullLightData.getBaseSection().setDisplayName("Torch");
         fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
+        fullLightData.getBaseSection().setTranslucent(true);
+        fullLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
         fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
 
@@ -74,6 +77,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         weakLightData.getBaseSection().setDisplayName("PartLight");
         weakLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         weakLightData.getBaseSection().setLuminance((byte) 2);
+        weakLightData.getBaseSection().setTranslucent(true);
+        weakLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:weakLight"), weakLightData, BlockFamilyDefinition.class);
         weakLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:weakLight")));
 
@@ -81,6 +86,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         mediumLightData.getBaseSection().setDisplayName("MediumLight");
         mediumLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         mediumLightData.getBaseSection().setLuminance((byte) 5);
+        mediumLightData.getBaseSection().setTranslucent(true);
+        mediumLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:mediumLight"), mediumLightData, BlockFamilyDefinition.class);
         mediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:mediumLight")));
 
@@ -88,6 +95,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
+        solidData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
         solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
@@ -96,6 +104,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         solidMediumLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidMediumLightData.getBaseSection().setTranslucent(false);
         solidMediumLightData.getBaseSection().setLuminance((byte) 5);
+        solidMediumLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:solidMediumLight"), solidMediumLightData, BlockFamilyDefinition.class);
         solidMediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:solidMediumLight")));
 

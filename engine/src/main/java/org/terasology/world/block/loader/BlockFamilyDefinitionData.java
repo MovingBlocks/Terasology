@@ -50,7 +50,7 @@ public class BlockFamilyDefinitionData implements AssetData {
     }
 
     public boolean isTemplate() {
-        return template;
+        return template || familyFactory == null;
     }
 
     public void setTemplate(boolean template) {

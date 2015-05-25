@@ -31,6 +31,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -87,6 +88,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
+        solidData.setFamilyFactory(new SymmetricBlockFamilyFactory());
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
         solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
