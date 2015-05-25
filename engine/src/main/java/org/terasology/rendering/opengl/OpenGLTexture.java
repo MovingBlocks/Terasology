@@ -19,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2f;
@@ -144,8 +143,10 @@ public class OpenGLTexture extends Texture {
 
                 GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, alignedBuffer);
 
+
                 break;
         }
+
     }
 
     private int getGLMode(WrapMode mode) {

@@ -44,7 +44,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
 
     private final ResourceUrn blockFamilyDefinition;
     private final Optional<ResourceUrn> shape;
-    private final Optional<Name> blockName;
+    private final Name blockName;
 
     public BlockUri(String uri) throws BlockUriParseException {
         try {
@@ -59,18 +59,18 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
                 split = split[3].split(IDENTIFIER_SEPARATOR_REGEX, 2);
                 shape = Optional.of(new ResourceUrn(shapeModuleName, new Name(split[0])));
                 if (split.length > 1) {
-                    blockName = Optional.of(new Name(split[1]));
+                    blockName = new Name(split[1]);
                 } else {
-                    blockName = Optional.empty();
+                    blockName = Name.EMPTY;
                 }
             } else {
                 shape = Optional.empty();
                 split = split[1].split(IDENTIFIER_SEPARATOR_REGEX, 2);
                 blockFamilyDefinition = new ResourceUrn(blockFamilyDefModule, new Name(split[0]));
                 if (split.length > 1) {
-                    blockName = Optional.of(new Name(split[1]));
+                    blockName = new Name(split[1]);
                 } else {
-                    blockName = Optional.empty();
+                    blockName = Name.EMPTY;
                 }
             }
         } catch (InvalidUrnException e) {
@@ -79,26 +79,26 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     }
 
     public BlockUri(ResourceUrn blockFamilyDefinition) {
-        this(blockFamilyDefinition, Optional.empty(), Optional.empty());
+        this(blockFamilyDefinition, Optional.empty(), Name.EMPTY);
     }
 
     public BlockUri(ResourceUrn blockFamilyDefinition, ResourceUrn shape) {
-        this(blockFamilyDefinition, Optional.of(shape), Optional.empty());
+        this(blockFamilyDefinition, Optional.of(shape), Name.EMPTY);
     }
 
     public BlockUri(ResourceUrn blockFamilyDefinition, Name blockName) {
-        this(blockFamilyDefinition, Optional.empty(), Optional.of(blockName));
+        this(blockFamilyDefinition, Optional.empty(), blockName);
     }
 
     public BlockUri(ResourceUrn blockFamilyDefinition, ResourceUrn shape, Name blockName) {
-        this(blockFamilyDefinition, Optional.of(shape), Optional.of(blockName));
+        this(blockFamilyDefinition, Optional.of(shape), blockName);
     }
 
     public BlockUri(BlockUri parentUri, Name blockName) {
-        this(parentUri.getBlockFamilyDefinitionUrn(), parentUri.getShapeUrn(), Optional.of(blockName));
+        this(parentUri.getBlockFamilyDefinitionUrn(), parentUri.getShapeUrn(), blockName);
     }
 
-    private BlockUri(ResourceUrn blockFamilyDefinition, Optional<ResourceUrn> shape, Optional<Name> blockName) {
+    private BlockUri(ResourceUrn blockFamilyDefinition, Optional<ResourceUrn> shape, Name blockName) {
         this.blockFamilyDefinition = blockFamilyDefinition;
         this.shape = shape;
         this.blockName = blockName;
@@ -122,7 +122,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         return shape;
     }
 
-    public Optional<Name> getIdentifier() {
+    public Name getIdentifier() {
         return blockName;
     }
 
@@ -130,8 +130,8 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
      * @return The uri of the block's family, including shape
      */
     public BlockUri getFamilyUri() {
-        if (blockName.isPresent()) {
-            return new BlockUri(blockFamilyDefinition, shape, Optional.empty());
+        if (!blockName.isEmpty()) {
+            return new BlockUri(blockFamilyDefinition, shape, Name.EMPTY);
         } else {
             return this;
         }
@@ -141,7 +141,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
      * @return The uri of the block's family, excluding shape
      */
     public BlockUri getRootFamilyUri() {
-        if (blockName.isPresent() || shape.isPresent()) {
+        if (!blockName.isEmpty() || shape.isPresent()) {
             return new BlockUri(blockFamilyDefinition);
         } else {
             return this;
@@ -156,9 +156,9 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
             builder.append(MODULE_SEPARATOR);
             builder.append(shape.get().toString());
         }
-        if (blockName.isPresent()) {
+        if (!blockName.isEmpty()) {
             builder.append(IDENTIFIER_SEPARATOR);
-            builder.append(blockName.get().toString());
+            builder.append(blockName.toString());
         }
         return builder.toString();
     }
@@ -199,14 +199,14 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
             }
         }
         if (result == 0) {
-            if (blockName.isPresent()) {
-                if (o.blockName.isPresent()) {
-                    result = blockName.get().compareTo(o.blockName.get());
+            if (!blockName.isEmpty()) {
+                if (!o.blockName.isEmpty()) {
+                    result = blockName.compareTo(o.blockName);
                 } else {
                     return 1;
                 }
             } else {
-                if (o.blockName.isPresent()) {
+                if (!o.blockName.isEmpty()) {
                     return -1;
                 }
             }
@@ -215,8 +215,8 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     }
 
     public BlockUri getShapelessUri() {
-        if (getIdentifier().isPresent()) {
-            return new BlockUri(blockFamilyDefinition, getIdentifier().get());
+        if (!getIdentifier().isEmpty()) {
+            return new BlockUri(blockFamilyDefinition, getIdentifier());
         } else {
             return new BlockUri(blockFamilyDefinition);
         }

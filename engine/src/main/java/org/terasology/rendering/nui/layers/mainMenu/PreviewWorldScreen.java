@@ -99,18 +99,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private Context subContext;
     private ModuleEnvironment environment;
 
-    private final Texture texture;
+    private Texture texture;
 
     private boolean triggerUpdate;
 
     public PreviewWorldScreen() {
-        int imgWidth = 384;
-        int imgHeight = 384;
-        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
-        ByteBuffer[] data = new ByteBuffer[]{buffer};
-        ResourceUrn uri = new ResourceUrn("engine:terrainPreview");
-        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-        texture = Assets.generateAsset(uri, texData, Texture.class);
     }
 
     @Override
@@ -129,6 +122,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
                 subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
                 assetTypeManager.switchEnvironment(environment);
+                genTexture();
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
@@ -143,6 +137,19 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             worldGenerator = null;
             logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
         }
+    }
+
+    private void genTexture() {
+        int imgWidth = 384;
+        int imgHeight = 384;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
+        ByteBuffer[] data = new ByteBuffer[]{buffer};
+        ResourceUrn uri = new ResourceUrn("engine:terrainPreview");
+        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        texture = Assets.generateAsset(uri, texData, Texture.class);
+
+        previewImage = find("preview", UIImage.class);
+        previewImage.setImage(texture);
     }
 
     @Override
@@ -223,9 +230,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 }
             });
         }
-
-        previewImage = find("preview", UIImage.class);
-        previewImage.setImage(texture);
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override

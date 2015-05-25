@@ -156,7 +156,6 @@ public class FacetLayerPreview implements PreviewGenerator {
         int[] data = imageBuffer.getData();
         ByteBuffer byteBuffer = texData.getBuffers()[0];
         byteBuffer.asIntBuffer().put(data);
-        byteBuffer.rewind();
 
         return byteBuffer;
     }
