@@ -255,7 +255,7 @@ public class BlockManagerImpl extends BlockManager {
 
     private Optional<BlockFamily> loadFamily(BlockUri uri) {
         Optional<BlockFamilyDefinition> familyDef = assetManager.getAsset(uri.getBlockFamilyDefinitionUrn(), BlockFamilyDefinition.class);
-        if (familyDef.isPresent() && !familyDef.get().getData().isTemplate()) {
+        if (familyDef.isPresent() && familyDef.get().isLoadable()) {
             if (familyDef.get().isFreeform()) {
                 ResourceUrn shapeUrn;
                 if (uri.getShapeUrn().isPresent()) {

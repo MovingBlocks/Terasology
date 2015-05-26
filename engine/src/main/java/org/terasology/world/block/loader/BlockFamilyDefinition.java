@@ -75,4 +75,7 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
         return new BlockFamilyDefinitionData(data);
     }
 
+    public boolean isLoadable() {
+        return getData().isValid() && !getData().isTemplate();
+    }
 }

@@ -49,8 +49,12 @@ public class BlockFamilyDefinitionData implements AssetData {
         this.categories = Lists.newArrayList(other.categories);
     }
 
+    public boolean isValid() {
+        return familyFactory != null;
+    }
+
     public boolean isTemplate() {
-        return template || familyFactory == null;
+        return template;
     }
 
     public void setTemplate(boolean template) {
