@@ -47,14 +47,6 @@ public class UIScrollbar extends CoreWidget {
     private boolean dragging;
     private int mouseOffset;
 
-    public UIScrollbar() {
-        this(true);
-    }
-
-    public UIScrollbar(boolean vertical) {
-        this.vertical = vertical;
-    }
-
     private InteractionListener handleListener = new BaseInteractionListener() {
 
         @Override
@@ -90,16 +82,16 @@ public class UIScrollbar extends CoreWidget {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
+                mouseOffset = (sliderSize > handleSize) ? (handleSize / 2) : 0;
                 if (vertical) {
                     updatePosition(pos.y - mouseOffset);
 
-                    setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
+                    setValue(TeraMath.clamp(pos.y - mouseOffset, 0, sliderSize) * getRange() / sliderSize);
                 } else {
                     updatePosition(pos.x - mouseOffset);
 
-                    setValue(TeraMath.clamp(pos.x - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
+                    setValue(TeraMath.clamp(pos.x - mouseOffset, 0, sliderSize) * getRange() / sliderSize);
                 }
-                mouseOffset = handleSize / 2;
                 dragging = true;
                 return true;
             }
@@ -121,6 +113,14 @@ public class UIScrollbar extends CoreWidget {
         }
     };
 
+    public UIScrollbar() {
+        this(true);
+    }
+
+    public UIScrollbar(boolean vertical) {
+        this.vertical = vertical;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         if (vertical) {
@@ -138,7 +138,7 @@ public class UIScrollbar extends CoreWidget {
             sliderSize = canvas.size().x - canvas.getCurrentStyle().getFixedWidth();
         }
 
-        if (sliderSize > 0) {
+        if (sliderSize > handleSize) {
             int drawLocation = pixelOffsetFor(getValue());
             Rect2i handleRegion;
             if (vertical) {
@@ -168,7 +168,8 @@ public class UIScrollbar extends CoreWidget {
     }
 
     private int pixelOffsetFor(int newValue) {
-        return sliderSize * newValue / getRange();
+        final int r = getRange();
+        return (r > 0) ? (sliderSize * newValue / r) : 0;
     }
 
     @Override
@@ -219,7 +220,7 @@ public class UIScrollbar extends CoreWidget {
 
     private void updatePosition(int pixelPos) {
         int newPosition = TeraMath.clamp(pixelPos, 0, sliderSize);
-        setValue(newPosition * getRange() / sliderSize);
+        setValue((sliderSize > 0) ? (newPosition * getRange() / sliderSize) : 0);
     }
 
 }
