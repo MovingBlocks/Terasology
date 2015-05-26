@@ -21,6 +21,8 @@ import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * BenchmarkResult records the results and the errors of the execution of one particular benchmark.
  * It also maintains a list of columns which are very useful for pretty printing the results.
@@ -43,23 +45,14 @@ public abstract class BenchmarkResult {
         LEFT {
             @Override
             public String pad(String value, int size) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(value == null ? "" : value);
-                while (builder.length() < size) {
-                    builder.append(" ");
-                }
-                return builder.toString();
+            	return StringUtils.leftPad(value, size);
             }
         },
 
         RIGHT {
             @Override
             public String pad(String value, int size) {
-                String result = (value == null ? "" : value);
-                while (result.length() < size) {
-                    result = " " + result;
-                }
-                return result;
+                return StringUtils.rightPad(value, size);
             }
         };
 

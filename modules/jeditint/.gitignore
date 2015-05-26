@@ -1,0 +1,10 @@
+# IntelliJ
+*.iml
+
+# Eclipse
+.checkstyle
+.classpath
+.project
+.settings
+bin/
+build/
