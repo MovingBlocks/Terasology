@@ -312,9 +312,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.generateLightShafts();                // into lightShafts buffer
 
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        postProcessor.initialPostProcessing();              // into sceneOpaque buffer
+        postProcessor.initialPostProcessing();              // into initialPost buffer
 
-        // Post-Processing proper: tone mapping, bloom and blur passes
+        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
         postProcessor.downsampleSceneAndUpdateExposure();   // downSampledScene buffer used only to update exposure value
         postProcessor.generateToneMappedScene();            // into sceneToneMapped buffer
         postProcessor.generateBloomPasses();                // into sceneHighPass and sceneBloom[0-2]

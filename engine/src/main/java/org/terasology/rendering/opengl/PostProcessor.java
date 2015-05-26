@@ -39,8 +39,41 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * TODO: write javadoc
+ * The term "Post Processing" is in analogy to what occurs in the world of Photography:
+ * first a number of shots are taken on location or in a studio. The resulting images
+ * are then post-processed to achieve specific aesthetic or technical goals.
+ *
+ * In the context of Terasology, the WorldRenderer takes care of "taking the shots
+ * on location" (a world of 3D data such as vertices, uv coordinates and so on)
+ * while the PostProcessor starts from the resulting 2D buffers (which in most
+ * cases can be thought as images) and through a series of steps it generates the
+ * image seen on screen or saved in a screenshot.
+ *
+ * Most PostProcessor methods represent a single step of the process. I.e the
+ * method generateLightShafts() only adds light shafts to the image.
+ *
+ * Also, most methods follow a typical pattern of operations:
+ * 1) enable a material (a shader bundled with its control parameters)
+ * 2) bind zero or more 2D buffers to sample from
+ * 3) bind and configure an FBO to output to
+ * 4) render a quad, usually covering the whole buffer area, but sometimes less
+ *
+ * Finally, post-processing can be thought as a part of the rendering pipeline,
+ * the set of conceptually atomic steps (sometimes called "passes") that eventually
+ * leads to the final image. In practice however these steps are not really arranged
+ * in a "line" where a given step takes the output of the previous step and provides
+ * an input to the next one. Some steps have no dependencies on previous steps and
+ * only provide the basis for further processing. Other steps have instead one or
+ * more inputs and in turn become the input to one or more further passes.
+ *
+ * The rendering pipeline the methods of the PostProcessor contribute to is therefore
+ * better thought as a Directed Acyclic Graph (DAG) in which each step is a node
+ * that might or might not have previous nodes in input but will always have at least
+ * an output, with the final writing to the default framebuffer (the display) or
+ * to a screenshot file.
  */
+// TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
+// TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
 public class PostProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
@@ -80,11 +113,31 @@ public class PostProcessor {
     private RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
 
+    /**
+     * Returns a PostProcessor instance. On instantiation the returned instance is not
+     * yet usable. It lacks references to Material assets and Frame Buffer Objects (FBOs)
+     * it needs to function.
+     *
+     * Method initializeMaterials() must be called to initialize the Materials references.
+     * Method obtainStaticFBOs() must be called to initialize unchanging FBOs references.
+     * Method refreshDynamicFBOs() must be called at least once to initialize all other FBOs references.
+     *
+     * @param renderingProcess An LwjglRenderingProcess instance, required to obtain FBO references.
+     * @param graphicState A GraphicState instance, providing opengl state-changing methods.
+     */
+    // TODO: update javadoc when the rendering process becomes the FrameBuffersManager
     public PostProcessor(LwjglRenderingProcess renderingProcess, GraphicState graphicState) {
         this.renderingProcess = renderingProcess;
         this.graphicState = graphicState;
     }
 
+    /**
+     * Initializes the internal references to Materials assets.
+     *
+     * Must be called at least once before the PostProcessor instance is in use. Failure to do so will result
+     * in NullPointerExceptions. Calling it additional times shouldn't hurt but shouldn't be necessary either:
+     * the asset system refreshes the assets behind the scenes if necessary.
+     */
     public void initializeMaterials() {
         // initial renderings
         materials.lightBufferPass = Assets.getMaterial("engine:prog.lightBufferPass");
@@ -109,6 +162,19 @@ public class PostProcessor {
         materials.debug        = Assets.getMaterial("engine:prog.debug");
     }
 
+    /**
+     * Fetches a number of static FBOs from the RenderingProcess instance and initializes a number of
+     * internal references with them. They are called "static" as they do not change over the lifetime
+     * of a PostProcessor instance.
+     *
+     * This method must to be called at least once for the PostProcessor instance to function, but does
+     * not need to be called additional times.
+     *
+     * Failure to call this method -may- result in a NullPointerException. This is due to the
+     * downsampleSceneAndUpdateExposure() method relying on these FBOs. But this method is fully executed
+     * only if eye adaptation is enabled: an NPE would be thrown only in that case.
+     */
+    // TODO: update javadoc when the rendering process becomes the FrameBuffersManager
     public void obtainStaticFBOs() {
         buffers.downSampledScene[4] = renderingProcess.getFBO("scene16");
         buffers.downSampledScene[3] = renderingProcess.getFBO("scene8");
@@ -117,6 +183,18 @@ public class PostProcessor {
         buffers.downSampledScene[0] = renderingProcess.getFBO("scene1");
     }
 
+    /**
+     * Fetches a number of FBOs from the RenderingProcess instance and initializes or refreshes
+     * a number of internal references with them. These FBOs may become obsolete over the lifetime
+     * of a PostProcessor instance and refreshing the internal references might be needed.
+     * These FBOs are therefore referred to as "dynamic" FBOs.
+     *
+     * This method must be called at least once for the PostProcessor instance to function.
+     * Failure to do so will result in NullPointerExceptions. It will then need to be called
+     * every time the dynamic FBOs become obsolete and the internal references need to be
+     * refreshed with new FBOs.
+     */
+    // TODO: update javadoc when the rendering process becomes the FrameBuffersManager
     public void refreshDynamicFBOs() {
         // initial renderings
         buffers.sceneOpaque         = renderingProcess.getFBO("sceneOpaque");
@@ -154,17 +232,36 @@ public class PostProcessor {
         fullScale = buffers.sceneOpaque.dimensions();
     }
 
+    /**
+     * In a number of occasions the rendering loop swaps two important FBOs.
+     * This method is used to trigger the PostProcessor instance into
+     * refreshing the internal references to these FBOs.
+     */
     public void refreshSceneOpaqueFBOs() {
         buffers.sceneOpaque         = renderingProcess.getFBO("sceneOpaque");
         buffers.sceneOpaquePingPong = renderingProcess.getFBO("sceneOpaquePingPong");
     }
 
+    /**
+     * Disposes of the PostProcessor instance.
+     */
+    // Not strictly necessary given the simplicity of the objects being nulled,
+    // it is probably a good habit to have a dispose() method. It both properly
+    // dispose support objects and it clearly marks the end of a PostProcessor
+    // instance's lifecycle.
     public void dispose() {
         renderingProcess = null;
         graphicState = null;
         fullScale = null;
     }
 
+    /**
+     * Generates SkyBands and stores them into their specific FBOs
+     * if inscattering is enabled in the rendering config.
+     *
+     * SkyBands visually fade the far landscape and its entities into the color of
+     * the sky, effectively constituting a form of depth cue.
+     */
     public void generateSkyBands() {
         if (renderingConfig.isInscattering()) {
             generateSkyBand(buffers.sceneSkyBand0);
@@ -172,7 +269,7 @@ public class PostProcessor {
         }
     }
 
-    public void generateSkyBand(FBO skyBand) {
+    private void generateSkyBand(FBO skyBand) {
         materials.blur.enable();
         materials.blur.setFloat("radius", 8.0f, true);
         materials.blur.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
@@ -187,14 +284,20 @@ public class PostProcessor {
         graphicState.setRenderBufferMask(skyBand, true, false, false);
 
         setViewportTo(skyBand.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
+    /**
+     * Part of the deferred lighting technique, this method applies lighting through screen-space
+     * calculations to the previously flat-lit world rendering stored in the primary FBO.   // TODO: rename sceneOpaque* FBOs to primaryA/B
+     *
+     * See http://en.wikipedia.org/wiki/Deferred_shading as a starting point.
+     */
     public void applyLightBufferPass() {
 
         int texId = 0;
@@ -213,39 +316,58 @@ public class PostProcessor {
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindLightBufferTexture();
-        materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId++, true);
+        materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
         buffers.sceneOpaquePingPong.bind();
         graphicState.setRenderBufferMask(buffers.sceneOpaquePingPong, true, true, true);
 
         setViewportTo(buffers.sceneOpaquePingPong.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         renderingProcess.swapSceneOpaqueFBOs();
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
+    /**
+     * Enabled by the "outline" option in the render settings, this method generates
+     * landscape/objects outlines and stores them into a buffer in its own FBO. The
+     * stored image is eventually combined with others.
+     *
+     * The outlines visually separate a given object (including the landscape) or parts of it
+     * from sufficiently distant objects it overlaps. It is effectively a depth-based edge
+     * detection technique and internally uses a Sobel operator.
+     *
+     * For further information see: http://en.wikipedia.org/wiki/Sobel_operator
+     */
     public void generateOutline() {
         if (renderingConfig.isOutline()) {
             materials.outline.enable();
 
+            // TODO: verify inputs: shouldn't there be a texture binding here?
             buffers.outline.bind();
 
             setViewportTo(buffers.outline.dimensions());
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
             renderFullscreenQuad();
 
-            graphicState.bindDisplay();
-            setViewportToWholeDisplay();
+            graphicState.bindDisplay();  // TODO: verify this is necessary
+            setViewportToWholeDisplay(); // TODO: verify this is necessary
         }
     }
 
+    /**
+     * If Ambient Occlusion is enabled in the render settings, this method generates and
+     * stores the necessary images into their own FBOs. The stored images are eventually
+     * combined with others.
+     *
+     * For further information on Ambient Occlusion see: http://en.wikipedia.org/wiki/Ambient_occlusion
+     */
     public void generateAmbientOcclusionPasses() {
         if (renderingConfig.isSsao()) {
             generateSSAO();
@@ -258,84 +380,98 @@ public class PostProcessor {
         materials.ssao.setFloat2("texelSize", 1.0f / buffers.ssao.width(), 1.0f / buffers.ssao.height(), true);
         materials.ssao.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
 
+        // TODO: verify if some textures should be bound here
         buffers.ssao.bind();
 
         setViewportTo(buffers.ssao.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
     private void generateBlurredSSAO() {
         materials.ssaoBlurred.enable();
         materials.ssaoBlurred.setFloat2("texelSize", 1.0f / buffers.ssaoBlurred.width(), 1.0f / buffers.ssaoBlurred.height(), true);
 
-        buffers.ssao.bindTexture();
+        buffers.ssao.bindTexture(); // TODO: verify this is the only input
 
         buffers.ssaoBlurred.bind();
 
         setViewportTo(buffers.ssaoBlurred.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
+    /**
+     * Adds outlines and ambient occlusion to the rendering obtained so far stored in the primary FBO.
+     * Stores the resulting output back into the primary buffer.
+     */
     public void generatePrePostComposite() {
         materials.prePostComposite.enable();
 
+        // TODO: verify if there should be bound textures here.
         buffers.sceneOpaquePingPong.bind();
 
         setViewportTo(buffers.sceneOpaquePingPong.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         renderingProcess.swapSceneOpaqueFBOs();
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
+    /**
+     * Generates light shafts and stores them in their own FBO.
+     */
     public void generateLightShafts() {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("Rendering light shafts");
 
             materials.lightShafts.enable();
-
+            // TODO: verify what the inputs are
             buffers.lightShafts.bind();
 
             setViewportTo(buffers.lightShafts.dimensions());
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
             renderFullscreenQuad();
 
-            graphicState.bindDisplay();
-            setViewportToWholeDisplay();
+            graphicState.bindDisplay();     // TODO: verify this is necessary
+            setViewportToWholeDisplay();    // TODO: verify this is necessary
 
             PerformanceMonitor.endActivity();
         }
     }
 
+    /**
+     * Adds chromatic aberration, light shafts, 1/8th resolution bloom, vignette onto the rendering achieved so far.
+     * Stores the result into its own buffer to be used at a later stage.
+     */
     public void initialPostProcessing() {
         PerformanceMonitor.startActivity("Initial Post-Processing");
         materials.initialPost.enable();
 
-        buffers.initialPost.bind();
+        // TODO: verify what the inputs are
+        buffers.initialPost.bind(); // TODO: see if we could write this straight into sceneOpaque
 
         setViewportTo(buffers.initialPost.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }
@@ -356,6 +492,7 @@ public class PostProcessor {
             setViewportTo(downSampledFBO.dimensions());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            // TODO: move this block above, for consistency
             if (i == 4) {
                 buffers.initialPost.bindTexture();
             } else {
@@ -367,11 +504,16 @@ public class PostProcessor {
             graphicState.bindDisplay(); // TODO: probably can be removed or moved out of the loop
         }
 
-        setViewportToWholeDisplay();
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }
 
+    /**
+     * First downsamples the rendering obtained so far, after the initial post processing, into a 1x1 pixel buffer.
+     * Then calculate its pixel's luma to update the exposure value. This is used later, during tone mapping.
+     */
+    // TODO: verify if this can be achieved entirely in the GPU, during tone mapping perhaps?
     public void downsampleSceneAndUpdateExposure() {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("Updating exposure");
@@ -389,6 +531,7 @@ public class PostProcessor {
                 return;
             }
 
+            // TODO: make this line more readable by breaking it in smaller pieces
             currentSceneLuminance = 0.2126f * (pixels.get(2) & 0xFF) / 255.f + 0.7152f * (pixels.get(1) & 0xFF) / 255.f + 0.0722f * (pixels.get(0) & 0xFF) / 255.f;
 
             float targetExposure = hdrMaxExposure;
@@ -399,7 +542,7 @@ public class PostProcessor {
 
             float maxExposure = hdrMaxExposure;
 
-            if (CoreRegistry.get(BackdropProvider.class).getDaylight() == 0.0) {
+            if (CoreRegistry.get(BackdropProvider.class).getDaylight() == 0.0) {    // TODO: fetch the backdropProvider earlier and only once
                 maxExposure = hdrMaxExposureNight;
             }
 
@@ -409,7 +552,7 @@ public class PostProcessor {
                 targetExposure = hdrMinExposure;
             }
 
-            currentExposure = (float) TeraMath.lerp(currentExposure, targetExposure, hdrExposureAdjustmentSpeed);
+            currentExposure = TeraMath.lerp(currentExposure, targetExposure, hdrExposureAdjustmentSpeed);
 
         } else {
             if (CoreRegistry.get(BackdropProvider.class).getDaylight() == 0.0) {
@@ -421,6 +564,13 @@ public class PostProcessor {
         PerformanceMonitor.endActivity();
     }
 
+    /**
+     * // TODO: write javadoc
+     */
+    // TODO: Tone mapping usually maps colors from HDR to a more limited range,
+    // TODO: i.e. the 24 bit a monitor can display. This method however maps from an HDR buffer
+    // TODO: to another HDR buffer and this puzzles me. Will need to dig deep in the shader to
+    // TODO: see what it does.
     public void generateToneMappedScene() {
         PerformanceMonitor.startActivity("Tone mapping");
 
@@ -429,16 +579,25 @@ public class PostProcessor {
         buffers.sceneToneMapped.bind();
 
         setViewportTo(buffers.sceneToneMapped.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }
 
+    /**
+     * If bloom is enabled via the rendering settings, this method generates the images needed
+     * for the bloom shader effect and stores them in their own frame buffers.
+     *
+     * This effects renders adds fringes (or "feathers") of light to areas of intense brightness.
+     * This in turn give the impression of those areas partially overwhelming the camera or the eye.
+     *
+     * For more information see: http://en.wikipedia.org/wiki/Bloom_(shader_effect)
+     */
     public void generateBloomPasses() {
         if (renderingConfig.isBloom()) {
             PerformanceMonitor.startActivity("Generating Bloom Passes");
@@ -457,7 +616,7 @@ public class PostProcessor {
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindTexture();
-        materials.highPass.setInt("tex", texId++);
+        materials.highPass.setInt("tex", texId);
 
 //        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
 //        buffers.sceneOpaque.bindDepthTexture();
@@ -489,15 +648,22 @@ public class PostProcessor {
 
         sceneBloom.bind();
 
-        graphicState.setViewportToSizeOf(sceneBloom);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        setViewportTo(sceneBloom.dimensions());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
-        setViewportToWholeDisplay();
+        graphicState.bindDisplay();     // TODO: verify this is necessary
+        setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
+    /**
+     * If blur is enabled through the rendering settings, this method generates the images used
+     * by the Blur effect when underwater and for the Depth of Field effect when above water.
+     *
+     * For more information on blur: http://en.wikipedia.org/wiki/Defocus_aberration
+     * For more information on DoF: http://en.wikipedia.org/wiki/Depth_of_field
+     */
     public void generateBlurPasses() {
         if (renderingConfig.getBlurIntensity() != 0) {
             PerformanceMonitor.startActivity("Generating Blur Passes");
@@ -520,7 +686,7 @@ public class PostProcessor {
 
         sceneBlur.bind();
 
-        graphicState.setViewportToSizeOf(sceneBlur);
+        setViewportTo(sceneBlur.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -529,6 +695,25 @@ public class PostProcessor {
         setViewportToWholeDisplay();
     }
 
+    // Final Post-Processing: depth-of-field blur, motion blur, film grain, grading, OculusVR distortion
+
+    /**
+     * If each is enabled through the rendering settings, this method
+     * adds depth-of-field blur, motion blur and film grain to the rendering
+     * obtained so far. If OculusVR support is enabled, it composes (over two
+     * calls) the images for each eye into a single image, and applies a distortion
+     * pattern to each, to match the optics in the OculusVR headset.
+     *
+     * Finally, it either sends the image to the display or, when taking a screenshot,
+     * instructs the rendering process to save it to a file. // TODO: update this sentence when the FrameBuffersManager becomes available.
+     *
+     * @param renderingStage Can be MONO, LEFT_EYE or RIGHT_EYE, and communicates to the method weather
+     *                       it is dealing with a standard display or an OculusVR setup, and in the
+     *                       latter case, which eye is currently being rendered. Notice that if the
+     *                       OculusVR support is enabled, the image is sent to screen or saved to
+     *                       file only when the value passed in is RIGHT_EYE, as the processing for
+     *                       the LEFT_EYE comes first and leads to an incomplete image.
+     */
     public void finalPostProcessing(WorldRenderer.WorldRenderingStage renderingStage) {
         PerformanceMonitor.startActivity("Rendering final scene");
 
@@ -651,6 +836,9 @@ public class PostProcessor {
         materials.ocDistortion.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
     }
 
+    /**
+     * Renders a quad filling the whole currently set viewport.
+     */
     public void renderFullscreenQuad() {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -668,24 +856,18 @@ public class PostProcessor {
         glPopMatrix();
     }
 
+    /**
+     * First sets a viewport and then renders a quad filling it.
+     *
+     * @param x an integer representing the x coordinate (in pixels) of the origin of the viewport.
+     * @param y an integer representing the y coordinate (in pixels) of the origin of the viewport.
+     * @param viewportWidth an integer representing the width (in pixels) the viewport.
+     * @param viewportHeight an integer representing the height (in pixels) the viewport.
+     */
+    // TODO: perhaps remove this method and make sure the viewport is set explicitely.
     public void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
         glViewport(x, y, viewportWidth, viewportHeight);
-        // TODO: replace what follows with renderFullscreenQuad()
-
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-
-        renderQuad();
-
-        glPopMatrix();
-
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
+        renderFullscreenQuad();
     }
 
     // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
@@ -726,6 +908,11 @@ public class PostProcessor {
         glViewport(0, 0, dimensions.width(), dimensions.height());
     }
 
+    /**
+     * Returns the current exposure value (set in downsampleSceneAndUpdateExposure()).
+     *
+     * @return a float representing the current exposure value.
+     */
     public float getExposure() {
         return currentExposure;
     }
