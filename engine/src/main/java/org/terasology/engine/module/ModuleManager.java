@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.module;
 
+import com.google.common.collect.Sets;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,7 +48,8 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 
-import com.google.common.collect.Sets;
+
+import java.io.File;
 
 /**
  * @author Immortius
@@ -162,8 +164,17 @@ public class ModuleManager {
 
         moduleSecurityManager.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         moduleSecurityManager.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
+
+        
         moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("<<ALL FILES>>","execute"));//For calling Runtime.execute into the new modules
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/out.xml", "write"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/booleanRule.xml", "write"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/In.java", "read"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/booleanRule.xml", "read"));
+        moduleSecurityManager.getBasePermissionSet().grantPermission(new FilePermission("./modules/CheckStyle/PruebasCheckStyle/cyclomaticRule.xml", "read"));
+
         moduleSecurityManager.getBasePermissionSet().grantPermission(new PropertyPermission("os.name", "read"));//For known the OS to build the console command
+
         
         moduleSecurityManager.getBasePermissionSet().addAPIClass(java.nio.ByteBuffer.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(java.nio.IntBuffer.class);

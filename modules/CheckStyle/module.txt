@@ -1,0 +1,9 @@
+{
+    "id" : "CheckStyle",
+    "version" : "0.1.0",
+    "author" : "",
+    "displayName" : "CheckStyle",
+    "description" : "",
+    "dependencies" : [],
+    "isServerSideOnly" : false
+}

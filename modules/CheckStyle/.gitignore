@@ -1,0 +1,16 @@
+# Modules get a copy of build.gradle as they are not allowed to have their own (for build security / sandboxing)
+build.gradle
+
+# IntelliJ
+*.iml
+
+# Eclipse
+.checkstyle
+.classpath
+.project
+.settings
+bin/
+build/
+
+# Ignorar archivo de salida del proceso de CheckStyle
+PruebasCheckStyle/

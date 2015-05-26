@@ -50,44 +50,59 @@ public class ClimateSimulator {
         humidity = distanceFrom("water", 5);
 
     }
+    private float[][] initDistWater(){
+    	float[][] distArr = new float[size][size];
+        for (int width = 0; width < size; width++) {
+            for (int height = 0; height < size; height++) {
+                float heightFactor = heightmap[height][width] - 1;
+                
+                if (heightFactor < 0) {  // sea
+                    distArr[height][width] = 0;
+                } else {  // land
+                    distArr[height][width] = size;
+                }
+            }
+        }
+        return distArr;
+    }
+    
+    private float[][] initDistPoles(){
+    	float[][] distArr = new float[size][size];
+        for (int width = 0; width < size; width++) {
+            for (int height = 0; height < size; height++) {
+                if (height == 0) {  // topOfTheMap
+                    distArr[height][width] = 0;
+                } else {
+                    distArr[height][width] = size;
+                }
+            }
+        }
+        return distArr;
+    }
+    
+    private float[][] initDistEquator(){
+        float[][] distArr = new float[size][size];
+        for (int width = 0; width < size; width++) {
+            for (int height = 0; height < size; height++) {
+
+                if (height == size / 2) {  // topOfTheMap
+                    distArr[height][width] = 0;
+                } else {
+                    distArr[height][width] = size;
+                }
+            }
+        }
+        return distArr;
+    }
 
     private float[][] initDist(String fromWhat) {
-
         float[][] distArr = new float[size][size];
         if (fromWhat.equals("water")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
-                    float heightFactor = heightmap[height][width] - 1;
-
-                    if (heightFactor < 0) {  // sea
-                        distArr[height][width] = 0;
-                    } else {  // land
-                        distArr[height][width] = size;
-                    }
-                }
-            }
+        	distArr = initDistWater();
         } else if (fromWhat.equals("poles")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
-
-                    if (height == 0) {  // topOfTheMap
-                        distArr[height][width] = 0;
-                    } else {
-                        distArr[height][width] = size;
-                    }
-                }
-            }
+        	distArr = initDistPoles();
         } else if (fromWhat.equals("equator")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
-
-                    if (height == size / 2) {  // topOfTheMap
-                        distArr[height][width] = 0;
-                    } else {
-                        distArr[height][width] = size;
-                    }
-                }
-            }
+        	distArr = initDistEquator();
         }
         return distArr;
     }
@@ -127,30 +142,41 @@ public class ClimateSimulator {
             }
             currentDistance++;
         }
-
+        float max = getMax(distArr);
         //normalize Array
-        float max = 0;
+        normalize(distArr,max);
+
+        //invert if necessary
+        if (fromWhat.equals("equator")) {
+        	invert(distArr);
+        }
+        return distArr;
+    }
+    
+    private float getMax(float[][] distArr){
+    	float max=0;
         for (int width = 0; width < size; width++) {
             for (int height = 0; height < size; height++) {
                 max = distArr[width][height] > max ? distArr[width][height] : max;
             }
         }
+        return max;
+    }
+    
+    private void normalize(float[][] distArr, float max){
         for (int width = 0; width < size; width++) {
             for (int height = 0; height < size; height++) {
                 distArr[width][height] /= max;
             }
         }
-
-        //invert if necessary
-        if (fromWhat.equals("equator")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
-                    distArr[width][height] = 1 - distArr[width][height];
-                }
+    }
+    
+    private void invert(float[][] distArr){
+    	for (int width = 0; width < size; width++) {
+    		for (int height = 0; height < size; height++) {
+    			distArr[width][height] = 1 - distArr[width][height];
             }
-        }
-
-        return distArr;
+    	}
     }
 
     private void overlayHeight(int strength, int locationInfluence) {

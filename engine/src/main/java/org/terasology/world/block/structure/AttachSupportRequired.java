@@ -48,13 +48,7 @@ public class AttachSupportRequired implements BlockStructuralSupport {
 
     private boolean hasRequiredSupportOnSideForBlock(Vector3i location, Side sideChanged, Block block) {
         final BlockMeshPart part = block.getPrimaryAppearance().getPart(BlockPart.fromSide(sideChanged));
-        if (part != null) {
-            // This block has mesh on this side, therefore it requires a support on that side
-            if (!hasSupportFromBlockOnSide(location, sideChanged, Collections.<Vector3i, Block>emptyMap())) {
-                return false;
-            }
-        }
-        return true;
+        return part == null || hasSupportFromBlockOnSide(location, sideChanged, Collections.<Vector3i, Block>emptyMap());
     }
 
     @Override
@@ -91,10 +85,8 @@ public class AttachSupportRequired implements BlockStructuralSupport {
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {
         final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition);
-        if (!getWorldProvider().isBlockRelevant(sideBlockPosition)) {
-            return true;
-        }
-        return getBlockWithOverrides(sideBlockPosition, blockOverrides).canAttachTo(side.reverse());
+        return !getWorldProvider().isBlockRelevant(sideBlockPosition) || 
+		    	getBlockWithOverrides(sideBlockPosition, blockOverrides).canAttachTo(side.reverse());
     }
 
     private Block getBlockWithOverrides(Vector3i location, Map<Vector3i, Block> blockOverrides) {
