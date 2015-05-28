@@ -135,7 +135,7 @@ public class WorldBuilder {
     private void ensureBorderCalculatedForFacet(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains,
                                                 Map<Class<? extends WorldFacet>, Border3D> borders) {
         //For already calculated facets
-        if (!borders.containsKey(facet))
+        if (borders.containsKey(facet))
             return;
 
         Border3D border = new Border3D(0, 0, 0);
