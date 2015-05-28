@@ -41,17 +41,6 @@ public enum MovementMode {
 	public float maxSpeed;
 	public boolean applyInertiaToVertical;
 
-	private MovementMode(float scaleGravity, float scaleInertia, boolean useCollision, boolean canBeGrounded,
-			boolean respondToEnvironment, float maxSpeed, boolean applyInertiaToVertical) {
-		this.scaleGravity = scaleGravity;
-		this.scaleInertia = scaleInertia;
-		this.useCollision = useCollision;
-		this.canBeGrounded = canBeGrounded;
-		this.respondToEnvironment = respondToEnvironment;
-		this.maxSpeed = maxSpeed;
-		this.applyInertiaToVertical = applyInertiaToVertical;
-	}
-
 	public void updateEntity(EntityRef entity, Block block) {
 		switch (this){
 		case WALKING:
@@ -65,4 +54,16 @@ public enum MovementMode {
 			break;
 		}
 	}
+
+    private MovementMode(float scaleGravity, float scaleInertia, boolean useCollision, boolean canBeGrounded,
+                         boolean respondToEnvironment, float maxSpeed, boolean applyInertiaToVertical) {
+        this.scaleGravity = scaleGravity;
+        this.scaleInertia = scaleInertia;
+        this.useCollision = useCollision;
+        this.canBeGrounded = canBeGrounded;
+        this.respondToEnvironment = respondToEnvironment;
+        this.maxSpeed = maxSpeed;
+        this.applyInertiaToVertical = applyInertiaToVertical;
+    }
+
 }

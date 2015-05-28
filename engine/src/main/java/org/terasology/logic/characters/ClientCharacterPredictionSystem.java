@@ -44,7 +44,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author Immortius
+ * Class that handles the behaviour of the prediction system of a Character
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class ClientCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -69,11 +69,20 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
     private CharacterStateEvent predictedState;
     private CharacterStateEvent authoritiveState;
 
+    /* (non-Javadoc)
+     * @see org.terasology.entitySystem.systems.BaseComponentSystem#initialise()
+     * Initialize the new Character move
+     */
     @Override
     public void initialise() {
         characterMover = new KinematicCharacterMover(worldProvider, physics);
     }
 
+    /**
+     * @param event Instance of ActivatedComponent event
+     * @param entity Instance of EntityRef
+     * Places te Initial state and put them into the entity
+     */
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
         physics.getCharacterCollider(entity);
@@ -82,6 +91,11 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
         playerStates.put(entity, stateBuffer);
     }
 
+    /**
+     * @param event Instace of BeforeDeactivateComponent event
+     * @param entity Instance of EntityRef
+     * Removes the CharacterCollider and the player states of the entity
+     */
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class, LocationComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
@@ -95,33 +109,55 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
         playerStates.remove(entity);
     }
 
+    /**
+     * @param state CharacterStateEvent received
+     * @param entity Instance of EntityRef
+     * Adds the new state received to the current Entity
+     */
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onCharacterStateReceived(CharacterStateEvent state, EntityRef entity) {
         if (entity.equals(localPlayer.getCharacterEntity())) {
             logger.trace("Received new state, sequence number: {}, buffered input size {}", state.getSequenceNumber(), inputs.size());
-
             playerStates.remove(entity);
             authoritiveState = state;
             Iterator<CharacterMoveInputEvent> inputIterator = inputs.iterator();
             CharacterStateEvent newState = authoritiveState;
-            while (inputIterator.hasNext()) {
-                CharacterMoveInputEvent input = inputIterator.next();
-                if (input.getSequenceNumber() <= state.getSequenceNumber()) {
-                    inputIterator.remove();
-                } else {
-                    newState = stepState(input, newState, entity);
-                }
-            }
-            logger.trace("Resultant input size {}", inputs.size());
-            CharacterStateEvent.setToState(entity, newState);
-            // TODO: soft correct predicted state
-            predictedState = newState;
+            iterateAndSetPredicted(state, entity, inputIterator, newState);
         } else {
             playerStates.get(entity).add(state);
         }
     }
 
+	/**
+	 * @param state Instance of CharacterStateEvent
+	 * @param entity Instance of EntityRef
+	 * @param inputIterator An interator over all the CharacterMoveInput events
+	 * @param newState The new state that will be set to the predicted state
+	 * Helper method that iterates over all the input Character move events, and sets the new predicted state
+	 */
+	private void iterateAndSetPredicted(CharacterStateEvent state,
+			EntityRef entity, Iterator<CharacterMoveInputEvent> inputIterator,
+			CharacterStateEvent newState) {
+		while (inputIterator.hasNext()) {
+		    CharacterMoveInputEvent input = inputIterator.next();
+		    if (input.getSequenceNumber() <= state.getSequenceNumber()) {
+		        inputIterator.remove();
+		    } else {
+		        newState = stepState(input, newState, entity);
+		    }
+		}
+		logger.trace("Resultant input size {}", inputs.size());
+		CharacterStateEvent.setToState(entity, newState);
+		// TODO: soft correct predicted state
+		predictedState = newState;
+	}
 
+
+    /**
+     * @param input CharacterMovementComponent instance
+     * @param entity Instance of the EntityRef
+     * Handle the input event given by a player
+     */ 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
         if (predictedState == null) {
@@ -137,15 +173,29 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
         CharacterStateEvent.setToState(entity, newState);
     }
 
+    /**
+     * @param entity Instance of EntityRef
+     * @return Create a new instance of a character state (Initial one) with the parameters given
+     */
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
+    /**
+     * @param input Character event of Move Input instance
+     * @param lastState Last state of the character event
+     * @param entity Instance of EntityRef
+     * @return New state according to the last state, and the new input of the Entity
+     */
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
         return characterMover.step(lastState, input, entity);
     }
 
+    /* (non-Javadoc)
+     * @see org.terasology.entitySystem.systems.UpdateSubscriberSystem#update(float)
+     * Update the dates acording to a renderTime, setting a new state to the previous or next character state event.
+     */
     @Override
     public void update(float delta) {
         long renderTime = time.getGameTimeInMs() - ServerCharacterPredictionSystem.RENDER_DELAY;
@@ -160,13 +210,25 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
                     break;
                 }
             }
-            if (previous != null) {
-                if (next != null) {
-                    CharacterStateEvent.setToInterpolateState(entry.getKey(), previous, next, renderTime);
-                } else {
-                    CharacterStateEvent.setToExtrapolateState(entry.getKey(), previous, renderTime);
-                }
-            }
+            settingState(renderTime, entry, previous, next);
         }
     }
+
+	/**
+	 * @param renderTime Render time used to compare the actual situation and set the proper State.
+	 * @param entry A Map containing the EntityRef and the Buffer with the character state events.
+	 * @param previous Character state event *previous*
+	 * @param next Character state event *next*
+	 */
+	private void settingState(long renderTime,
+			Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry,
+			CharacterStateEvent previous, CharacterStateEvent next) {
+		if (previous != null) {
+		    if (next != null) {
+		        CharacterStateEvent.setToInterpolateState(entry.getKey(), previous, next, renderTime);
+		    } else {
+		        CharacterStateEvent.setToExtrapolateState(entry.getKey(), previous, renderTime);
+		    }
+		}
+	}
 }

@@ -46,8 +46,8 @@ import org.terasology.world.block.Block;
 
 import java.util.List;
 
-/**
- * @author Immortius, Limeth
+/*
+ * Class that sends the PlaySound event and saves the SoundComponent to the entity
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {
@@ -67,6 +67,13 @@ public class CharacterSoundSystem extends BaseComponentSystem {
     @In
     private WorldProvider worldProvider;
 
+    /**
+     * @param event Instance of *FootstepEvent* event
+     * @param entity Instance of EntityRef
+     * @param locationComponent Component related to the location of the character
+     * @param characterSounds Component related to the sound of the character
+     * Checks the block below the character and set the proper *Step sound* into the game
+     */
     @ReceiveEvent
     public void onFootstep(FootstepEvent event, EntityRef entity, LocationComponent locationComponent, CharacterSoundComponent characterSounds) {
 
@@ -76,7 +83,20 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition());
         blockPos.y--; // The block *below* the character's feet is interesting to us
         Block block = worldProvider.getBlock(blockPos);
-        if (block != null && !block.getSounds().getStepSounds().isEmpty()) {
+        handleFootstepSoundBlock(entity, characterSounds, footstepSounds, block);
+    }
+
+	/**
+	 * @param entity Instance of EntityRef
+	 * @param characterSounds Component related to the sound of the character
+	 * @param footstepSounds List of *StaticSound*, containing footstepSounds
+	 * @param block The block that's below the character's feet
+	 * Helper method of *onFootstep*. Sends the new event and save the sound into the character
+	 */
+	private void handleFootstepSoundBlock(EntityRef entity,
+			CharacterSoundComponent characterSounds,
+			List<StaticSound> footstepSounds, Block block) {
+		if (block != null && !block.getSounds().getStepSounds().isEmpty()) {
             footstepSounds = block.getSounds().getStepSounds();
         }
 
@@ -86,8 +106,14 @@ public class CharacterSoundSystem extends BaseComponentSystem {
             characterSounds.lastSoundTime = time.getGameTimeInMs();
             entity.saveComponent(characterSounds);
         }
-    }
+	}
 
+    /**
+     * @param event Instance of the JumpEvent
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component of the character sounds
+     * Receives the jump event, plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onJump(JumpEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
@@ -105,6 +131,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event Instance of a vertical collision event
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component of the character sounds
+     * Receives the landed event (*VerticalCollisionEvent*), plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onLanded(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         Vector3f velocity = event.getVelocity();
@@ -118,7 +150,18 @@ public class CharacterSoundSystem extends BaseComponentSystem {
             soundVolumeModifier = LANDING_VOLUME_MAX;
         }
 
-        if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+        handleOnLandedSound(entity, characterSounds, soundVolumeModifier);
+    }
+
+	/**
+	 * @param entity Instance of EntityRef
+	 * @param characterSounds Component of the sounds of the character
+	 * @param soundVolumeModifier The current volume of the sound
+	 * Helper method of *onLanded*. Sends the new event and saves the new sound into the character.
+	 */
+	private void handleOnLandedSound(EntityRef entity,
+			CharacterSoundComponent characterSounds, float soundVolumeModifier) {
+		if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             StaticSound sound = null;
             if (characterSounds.landingSounds.size() > 0) {
                 sound = random.nextItem(characterSounds.landingSounds);
@@ -131,8 +174,15 @@ public class CharacterSoundSystem extends BaseComponentSystem {
                 entity.saveComponent(characterSounds);
             }
         }
-    }
+	}
 
+    /**
+     * @param event Instance of a crash (*HorizontalCollisionEvent*) event
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component that contains the character sound
+     * @param healthComponent Component that contains the health of the character
+     * Receives the crash event (*HorizontalCollisionEvent*), plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onCrash(HorizontalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds, HealthComponent healthComponent) {
         Vector3f horizVelocity = new Vector3f(event.getVelocity());
@@ -151,6 +201,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event Instance of Damage event
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component that contains the character sound
+     * Receives the damaged event, plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
@@ -170,6 +226,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event Instance of Death event
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component that contains the character sound
+     * Receives the death event, plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onDeath(DestroyEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.deathSounds.size() > 0) {
@@ -178,6 +240,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event Instace of Respawn event
+     * @param character Instance of EntityRef
+     * @param characterSounds Component that contains the character sound
+     * Receives the respawn event, plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onRespawn(OnPlayerSpawnedEvent event, EntityRef character, CharacterSoundComponent characterSounds) {
         if (characterSounds.respawnSounds.size() > 0) {
@@ -186,6 +254,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event Instance of Swimming event
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component that contains the character sound
+     * Receives the swimming event, plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onSwimStroke(SwimStrokeEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.swimSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
@@ -196,6 +270,12 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event Instance of entering into a block
+     * @param entity Instance of EntityRef
+     * @param characterSounds Component that contains the character sound
+     * Receives the event of entering into a water block, plays the proper sound, and save it into the character sounds.
+     */
     @ReceiveEvent
     public void onEnterBlock(OnEnterBlockEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         // only play this sound if the feet hit the water
@@ -203,18 +283,33 @@ public class CharacterSoundSystem extends BaseComponentSystem {
             boolean oldBlockIsLiquid = event.getOldBlock().isLiquid();
             boolean newBlockIsLiquid = event.getNewBlock().isLiquid();
             StaticSound sound = null;
-            if (!oldBlockIsLiquid && newBlockIsLiquid) {
-                sound = random.nextItem(characterSounds.enterWaterSounds);
-            } else if (oldBlockIsLiquid && !newBlockIsLiquid) {
-                sound = random.nextItem(characterSounds.leaveWaterSounds);
-            }
-            if (sound != null) {
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
-                characterSounds.lastSoundTime = time.getGameTimeInMs();
-                entity.saveComponent(characterSounds);
-            }
+            handleOnEnterBlockSound(entity, characterSounds, oldBlockIsLiquid,
+					newBlockIsLiquid, sound);
         }
     }
+
+	/**
+	 * @param entity Instance of EntityRef
+	 * @param characterSounds Component that contains the character sound
+	 * @param oldBlockIsLiquid Boolean that tells if the last block was a liquid one
+	 * @param newBlockIsLiquid Boolean that tells if the new block is a liquid one
+	 * @param sound Instance of StaticSound 
+	 * Helper method of *onEnterBlock*. Check the block conditions, send the sound and save it into the character.
+	 */
+	private void handleOnEnterBlockSound(EntityRef entity,
+			CharacterSoundComponent characterSounds, boolean oldBlockIsLiquid,
+			boolean newBlockIsLiquid, StaticSound sound) {
+		if (!oldBlockIsLiquid && newBlockIsLiquid) {
+		    sound = random.nextItem(characterSounds.enterWaterSounds);
+		} else if (oldBlockIsLiquid && !newBlockIsLiquid) {
+		    sound = random.nextItem(characterSounds.leaveWaterSounds);
+		}
+		if (sound != null) {
+		    entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
+		    characterSounds.lastSoundTime = time.getGameTimeInMs();
+		    entity.saveComponent(characterSounds);
+		}
+	}
 
 
 }

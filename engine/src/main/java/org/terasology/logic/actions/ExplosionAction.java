@@ -36,7 +36,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 /**
- * @author Immortius
+ * Class that handle the event of Explosions in the game
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ExplosionAction extends BaseComponentSystem {
@@ -52,6 +52,12 @@ public class ExplosionAction extends BaseComponentSystem {
 
     private Random random = new FastRandom();
 
+    /**
+     * @param event An instance of a event
+     * @param entity A reference to a game entity
+     * @param explosionComp A component bounded to the explosion 
+     * Method that receive the event and reply with the explosion action
+     */
     @ReceiveEvent
     public void onActivate(ActivateEvent event, EntityRef entity, ExplosionActionComponent explosionComp) {
         Vector3f origin = null;
@@ -79,7 +85,16 @@ public class ExplosionAction extends BaseComponentSystem {
         builder.build();
 
         Vector3i blockPos = new Vector3i();
-        for (int i = 0; i < 64; i++) {
+        handleExplosionEvent(origin, blockPos);
+    }
+
+	/**
+	 * @param origin Vector with the coordenates of the origin of the explosion
+	 * @param blockPos The current block position
+	 * Helper method for the explosion event. Spread the effect of the explotions to the close blocks.
+	 */
+	private void handleExplosionEvent(Vector3f origin, Vector3i blockPos) {
+		for (int i = 0; i < 64; i++) {
             Vector3f direction = random.nextVector3f(1.0f);
             Vector3f impulse = new Vector3f(direction);
             impulse.scale(150);
@@ -93,11 +108,11 @@ public class ExplosionAction extends BaseComponentSystem {
                 blockPos.set((int) target.x, (int) target.y, (int) target.z);
                 Block currentBlock = worldProvider.getBlock(blockPos);
 
-                /* PHYSICS */
+                /* Send a damage event to the destructible blocks */
                 if (currentBlock.isDestructible()) {
                     blockEntityRegistry.getEntityAt(blockPos).send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get()));
                 }
             }
         }
-    }
+	}
 }
