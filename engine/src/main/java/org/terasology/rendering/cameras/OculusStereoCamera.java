@@ -194,14 +194,26 @@ public class OculusStereoCamera extends Camera {
     }
 
     public void updateMatrices(float fov) {
-        prevViewProjectionMatrix.set(viewProjectionMatrix);
-
+    	
+        updatePrevViewProjectionMatrix();
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
                 && cachedZFar == zFar && cachedZNear == zNear) {
             return;
         }
-
+        updateProjectionMatrix();        
+        updateViewMatrix();
+        updateReflectionMatrix();        
+        updateViewTranslation();
+        updateViewMatrixEyes();
+        updateViewMatrixReflected();
+        updateViewProjectionMatrix();
+        updateInverseMatrices();
+        forDirtyChecks();
+        updateFrustum();
+    }
+    
+    private void updateProjectionMatrix(){
         projectionMatrix = MatrixUtils.createPerspectiveProjectionMatrix(OculusVrHelper.getyFov(), OculusVrHelper.getAspectRatio(), zNear, zFar);
 
         projTranslationLeftEye.setIdentity();
@@ -213,9 +225,13 @@ public class OculusStereoCamera extends Camera {
         projectionMatrixLeftEye.mul(projTranslationLeftEye, projectionMatrix);
         projectionMatrixRightEye.mul(projTranslationRightEye, projectionMatrix);
 
+    }
+    
+    private void updateViewMatrix(){
         viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
-
+    }
+    private void updateReflectionMatrix(){
         reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
         reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
         reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -224,36 +240,40 @@ public class OculusStereoCamera extends Camera {
 
         reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
         normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
-
-        final float halfIPD = OculusVrHelper.getInterpupillaryDistance() * 0.5f;
-
-        viewTranslationLeftEye.setIdentity();
-        viewTranslationLeftEye.setTranslation(new Vector3f(halfIPD, 0.0f, 0.0f));
-
-        viewTranslationRightEye.setIdentity();
+    }
+    
+    private void updateViewTranslation(){
+    	final float halfIPD = OculusVrHelper.getInterpupillaryDistance() * 0.5f;
+    	
+    	viewTranslationRightEye.setIdentity();
         viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
-
-        viewMatrixLeftEye.mul(viewMatrix, viewTranslationLeftEye);
+    }
+    private void updateViewMatrixEyes(){
+    	viewMatrixLeftEye.mul(viewMatrix, viewTranslationLeftEye);
         viewMatrixRightEye.mul(viewMatrix, viewTranslationRightEye);
-
-        viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
+    }
+    
+    private void updateViewMatrixReflected(){
+    	viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
         viewMatrixReflectedRightEye.mul(viewMatrixReflected, viewTranslationRightEye);
-
+    }
+    
+    private void updateViewProjectionMatrix(){
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
-
+    }
+    
+    private void updateInverseMatrices(){
         inverseViewProjectionMatrixLeftEye.invert(viewProjectionMatrixLeftEye);
         inverseViewProjectionMatrixRightEye.invert(viewProjectionMatrixRightEye);
-
+        
         inverseProjectionMatrixLeftEye.invert(projectionMatrixLeftEye);
         inverseProjectionMatrixRightEye.invert(projectionMatrixRightEye);
-
-        // Used for dirty checks
+    }
+    private void forDirtyChecks(){
         cachedPosition.set(getPosition());
         cachedViewigDirection.set(getViewingDirection());
         cachedZFar = zFar;
         cachedZNear = zNear;
-
-        updateFrustum();
     }
 }
