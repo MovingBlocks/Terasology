@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -38,6 +39,7 @@ import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockExplorer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
@@ -63,6 +65,9 @@ public class BlockCommands extends BaseComponentSystem {
     private WorldRenderer renderer;
 
     @In
+    private AssetManager assetManager;
+
+    @In
     private BlockManager blockManager;
 
     @In
@@ -81,10 +86,12 @@ public class BlockCommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     private BlockItemFactory blockItemFactory;
+    private BlockExplorer blockExplorer;
 
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
+        blockExplorer = new BlockExplorer(assetManager);
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)",
@@ -110,87 +117,69 @@ public class BlockCommands extends BaseComponentSystem {
         return items.toString();
     }
 
-    //
-//    @Command(shortDescription = "List all available blocks", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-//    public String listBlocks() {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append("Used Blocks");
-//        stringBuilder.append(Message.NEW_LINE);
-//        stringBuilder.append("-----------");
-//        stringBuilder.append(Message.NEW_LINE);
-//        List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
-//        for (BlockUri blockUri : registeredBlocks) {
-//            stringBuilder.append(blockUri.toString());
-//            stringBuilder.append(Message.NEW_LINE);
-//        }
-//        stringBuilder.append(Message.NEW_LINE);
-//
-//        stringBuilder.append("Available Blocks");
-//        stringBuilder.append(Message.NEW_LINE);
-//        stringBuilder.append("----------------");
-//        stringBuilder.append(Message.NEW_LINE);
-//        List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
-//        for (BlockUri blockUri : availableBlocks) {
-//            stringBuilder.append(blockUri.toString());
-//            stringBuilder.append(Message.NEW_LINE);
-//        }
-//
-//        return stringBuilder.toString();
-//    }
-//
-//    @Command(shortDescription = "Lists all blocks by category", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-//    public String listBlocksByCategory() {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for (String category : blockManager.getBlockCategories()) {
-//            stringBuilder.append(category);
-//            stringBuilder.append(Message.NEW_LINE);
-//            stringBuilder.append("-----------");
-//            stringBuilder.append(Message.NEW_LINE);
-//            List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
-//            for (BlockUri uri : categoryBlocks) {
-//                stringBuilder.append(uri.toString());
-//                stringBuilder.append(Message.NEW_LINE);
-//            }
-//            stringBuilder.append(Message.NEW_LINE);
-//        }
-//        return stringBuilder.toString();
-//    }
-//
-//    @Command(shortDescription = "Lists all available shapes",
-//            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-//    public String listShapes() {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append("Shapes");
-//        stringBuilder.append(Message.NEW_LINE);
-//        stringBuilder.append("-----------");
-//        stringBuilder.append(Message.NEW_LINE);
-//        List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
-//        for (ResourceUrn uri : sortedUris) {
-//            stringBuilder.append(uri.toString());
-//            stringBuilder.append(Message.NEW_LINE);
-//        }
-//
-//        return stringBuilder.toString();
-//    }
-//
-//    @Command(shortDescription = "Lists available free shape blocks",
-//            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.",
-//            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-//    public String listFreeShapeBlocks() {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append("Free Shape Blocks");
-//        stringBuilder.append(Message.NEW_LINE);
-//        stringBuilder.append("-----------------");
-//        stringBuilder.append(Message.NEW_LINE);
-//        List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
-//        for (BlockUri uri : sortedUris) {
-//            stringBuilder.append(uri.toString());
-//            stringBuilder.append(Message.NEW_LINE);
-//        }
-//
-//        return stringBuilder.toString();
-//    }
-//
+
+    @Command(shortDescription = "List all available blocks", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String listBlocks() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Used Blocks");
+        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append("-----------");
+        stringBuilder.append(Message.NEW_LINE);
+        List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
+        for (BlockUri blockUri : registeredBlocks) {
+            stringBuilder.append(blockUri.toString());
+            stringBuilder.append(Message.NEW_LINE);
+        }
+        stringBuilder.append(Message.NEW_LINE);
+
+        stringBuilder.append("Available Blocks");
+        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append("----------------");
+        stringBuilder.append(Message.NEW_LINE);
+        List<BlockUri> availableBlocks = sortItems(blockExplorer.getAvailableBlockFamilies());
+        for (BlockUri blockUri : availableBlocks) {
+            stringBuilder.append(blockUri.toString());
+            stringBuilder.append(Message.NEW_LINE);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    @Command(shortDescription = "Lists all available shapes",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String listShapes() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Shapes");
+        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append("-----------");
+        stringBuilder.append(Message.NEW_LINE);
+        List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
+        for (ResourceUrn uri : sortedUris) {
+            stringBuilder.append(uri.toString());
+            stringBuilder.append(Message.NEW_LINE);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    @Command(shortDescription = "Lists available free shape blocks",
+            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String listFreeShapeBlocks() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Free Shape Blocks");
+        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append("-----------------");
+        stringBuilder.append(Message.NEW_LINE);
+        List<BlockUri> sortedUris = sortItems(blockExplorer.getFreeformBlockFamilies());
+        for (BlockUri uri : sortedUris) {
+            stringBuilder.append(uri.toString());
+            stringBuilder.append(Message.NEW_LINE);
+        }
+
+        return stringBuilder.toString();
+    }
+
     @Command(shortDescription = "Adds a block to your inventory",
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)

@@ -44,10 +44,10 @@ public class WorldBuilder {
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private int seaLevel = 32;
 
-    private Context context;
+    private WorldGeneratorPluginLibrary pluginLibrary;
 
-    public WorldBuilder(Context context) {
-        this.context = context;
+    public WorldBuilder(WorldGeneratorPluginLibrary pluginLibrary) {
+        this.pluginLibrary = pluginLibrary;
     }
 
     public WorldBuilder addProvider(FacetProvider provider) {
@@ -61,14 +61,8 @@ public class WorldBuilder {
     }
 
     public WorldBuilder addPlugins() {
-        WorldGeneratorPluginLibrary pluginLibrary = context.get(WorldGeneratorPluginLibrary.class);
-        for (FacetProvider facetProvider : pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class)) {
-            addProvider(facetProvider);
-        }
-
-        for (WorldRasterizer worldRasterizer : pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class)) {
-            addRasterizer(worldRasterizer);
-        }
+        pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
+        pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
 
         return this;
     }

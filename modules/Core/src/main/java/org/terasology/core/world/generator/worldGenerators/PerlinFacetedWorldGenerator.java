@@ -37,6 +37,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
  * @author Immortius
@@ -50,7 +51,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     @Override
     protected WorldBuilder createWorld() {
-        return new WorldBuilder(CoreRegistry.get(Context.class))
+        return new WorldBuilder(CoreRegistry.get(WorldGeneratorPluginLibrary.class))
                 .addProvider(new World2dPreviewProvider())
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new PerlinHumidityProvider())

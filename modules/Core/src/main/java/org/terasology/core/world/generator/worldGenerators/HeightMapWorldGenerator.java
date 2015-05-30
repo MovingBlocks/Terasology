@@ -32,6 +32,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
  * @author Immortius
@@ -44,7 +45,7 @@ public class HeightMapWorldGenerator extends BaseFacetedWorldGenerator {
 
     @Override
     protected WorldBuilder createWorld() {
-        return new WorldBuilder(CoreRegistry.get(Context.class))
+        return new WorldBuilder(CoreRegistry.get(WorldGeneratorPluginLibrary.class))
                 .setSeaLevel(16)
                 .addProvider(new SeaLevelProvider(16))
                 .addProvider(new HeightMapSurfaceHeightProvider())

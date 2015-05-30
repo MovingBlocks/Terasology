@@ -32,6 +32,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 @RegisterWorldGenerator(id = "flat", displayName = "Flat")
 public class FlatWorldGenerator extends BaseFacetedWorldGenerator {
@@ -42,7 +43,7 @@ public class FlatWorldGenerator extends BaseFacetedWorldGenerator {
 
     @Override
     protected WorldBuilder createWorld() {
-        return new WorldBuilder(CoreRegistry.get(Context.class))
+        return new WorldBuilder(CoreRegistry.get(WorldGeneratorPluginLibrary.class))
                 .addProvider(new SeaLevelProvider(32))
                         // height of 40 so that it is far enough from sea level so that it doesnt just create beachfront
                 .addProvider(new FlatSurfaceHeightProvider(40))
