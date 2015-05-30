@@ -1,0 +1,9 @@
+{
+    "id" : "Coloring",
+    "version" : "0.1.0",
+    "author" : "",
+    "displayName" : "Coloring",
+    "description" : "",
+    "dependencies" : [],
+    "isServerSideOnly" : false
+}
