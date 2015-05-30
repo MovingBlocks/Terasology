@@ -35,14 +35,14 @@ public class BlockExplorer {
     public Set<BlockUri> getAvailableBlockFamilies() {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
                 .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-                .filter(def -> def.isPresent() && !def.get().isFreeform())
+                .filter(def -> def.isPresent() && def.get().isLoadable() && !def.get().isFreeform())
                 .map(r -> new BlockUri(r.get().getUrn())).collect(Collectors.toSet());
     }
 
     public Set<BlockUri> getFreeformBlockFamilies() {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
                 .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-                .filter(def -> def.isPresent() && def.get().isFreeform())
+                .filter(def -> def.isPresent() && def.get().isLoadable() && def.get().isFreeform())
                 .map(r -> new BlockUri(r.get().getUrn())).collect(Collectors.toSet());
     }
 }
