@@ -25,5 +25,6 @@
     "hardness": 0,
     "displayName": "Air",
     "rotation": "symmetric",
-    "sounds": "none"
+    "sounds": "none",
+    "shape": "engine:none"
 }

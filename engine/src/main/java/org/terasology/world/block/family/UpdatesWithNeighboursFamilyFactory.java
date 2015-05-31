@@ -91,29 +91,16 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<>();
 
-        basicBlocks[0] = new TByteObjectHashMap<>();
-        basicBlocks[0].put(shapeMapping.get(NO_CONNECTIONS), NO_CONNECTIONS);
-
-        basicBlocks[1] = new TByteObjectHashMap<>();
-        basicBlocks[1].put(shapeMapping.get(ONE_CONNECTION), ONE_CONNECTION);
-
-        basicBlocks[2] = new TByteObjectHashMap<>();
-        basicBlocks[2].put(shapeMapping.get(TWO_CONNECTIONS_LINE), TWO_CONNECTIONS_LINE);
-        basicBlocks[2].put(shapeMapping.get(TWO_CONNECTIONS_CORNER), TWO_CONNECTIONS_CORNER);
-
-        basicBlocks[3] = new TByteObjectHashMap<>();
-        basicBlocks[3].put(shapeMapping.get(THREE_CONNECTIONS_CORNER), THREE_CONNECTIONS_CORNER);
-        basicBlocks[3].put(shapeMapping.get(THREE_CONNECTIONS_T), THREE_CONNECTIONS_T);
-
-        basicBlocks[4] = new TByteObjectHashMap<>();
-        basicBlocks[4].put(shapeMapping.get(FOUR_CONNECTIONS_CROSS), FOUR_CONNECTIONS_CROSS);
-        basicBlocks[4].put(shapeMapping.get(FOUR_CONNECTIONS_SIDE), FOUR_CONNECTIONS_SIDE);
-
-        basicBlocks[5] = new TByteObjectHashMap<>();
-        basicBlocks[5].put(shapeMapping.get(FIVE_CONNECTIONS), FIVE_CONNECTIONS);
-
-        basicBlocks[6] = new TByteObjectHashMap<>();
-        basicBlocks[6].put(shapeMapping.get(SIX_CONNECTIONS), SIX_CONNECTIONS);
+        addConnections(basicBlocks, 0, NO_CONNECTIONS);
+        addConnections(basicBlocks, 1, ONE_CONNECTION);
+        addConnections(basicBlocks, 2, TWO_CONNECTIONS_LINE);
+        addConnections(basicBlocks, 2, TWO_CONNECTIONS_CORNER);
+        addConnections(basicBlocks, 3, THREE_CONNECTIONS_CORNER);
+        addConnections(basicBlocks, 3, THREE_CONNECTIONS_T);
+        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_CROSS);
+        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_SIDE);
+        addConnections(basicBlocks, 5, FIVE_CONNECTIONS);
+        addConnections(basicBlocks, 6, SIX_CONNECTIONS);
 
         BlockUri blockUri = new BlockUri(definition.getUrn());
 
@@ -133,6 +120,16 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         final Block archetypeBlock = blocksForConnections.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
         return new UpdatesWithNeighboursFamily(connectionCondition, blockUri, definition.getCategories(),
                 archetypeBlock, blocksForConnections, connectionSides);
+    }
+
+    private void addConnections(TByteObjectMap<String>[] basicBlocks, int index, String connections) {
+        if (basicBlocks[index] == null) {
+            basicBlocks[index] = new TByteObjectHashMap<>();
+        }
+        Byte val = shapeMapping.get(connections);
+        if (val != null) {
+            basicBlocks[index].put(shapeMapping.get(connections), connections);
+        }
     }
 
     private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder,
