@@ -16,8 +16,9 @@
 
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.assets.Asset;
+import com.google.common.base.Strings;
 import org.terasology.asset.Assets;
+import org.terasology.assets.Asset;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 import java.util.Optional;
@@ -42,6 +43,9 @@ public class AssetTypeHandler<T extends Asset> extends StringRepresentationTypeH
 
     @Override
     public T getFromString(String representation) {
+        if (Strings.isNullOrEmpty(representation)) {
+            return null;
+        }
         Optional<T> asset = Assets.get(representation, assetClass);
         if (asset.isPresent()) {
             return assetClass.cast(asset.get());
