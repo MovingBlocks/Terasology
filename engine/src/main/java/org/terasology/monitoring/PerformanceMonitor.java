@@ -21,16 +21,14 @@ import org.terasology.monitoring.impl.PerformanceMonitorImpl;
 import org.terasology.monitoring.impl.PerformanceMonitorInternal;
 
 /**
- * Maintains a running average of time taken by different activities. Activities call to denote when they
- * start and stop.
+ * Maintains a running average of execution times and memory allocated by different activities.
+ * Activities call to denote when they start and stop.
  * <br><br>
- * Activities may be nested, and while a nested activity is running the out activities are paused and time passing
- * is not assigned to them.
+ * Activities may be nested, and while a nested activity is running the collection of data from outer activities
+ * is paused: time passing and allocated memory are not assigned to them.
  * <br><br>
  * Performance monitor is intended only for use by the main thread of Terasology, and does not handle
  * activities being started and ended on other threads at this time.
- *
- * @author Immortius
  */
 public final class PerformanceMonitor {
     private static PerformanceMonitorInternal instance;
@@ -43,13 +41,40 @@ public final class PerformanceMonitor {
     }
 
     /**
-     * Indicates the start of an activity. All started activities must be ended with endActivity(). Activities may
-     * be nested.
+     * Indicates the start of an activity. All started activities must either be ended with a call to endActivity()
+     * (see example 1) or take advantage of the autocloseable interface implemented by Activity (see example 2).
      *
-     * @param activity The name of the activity stating.
+     * Example 1 - explicitly ending an activity:
+     *
+     *      PerformanceMonitor.startActivity("myActivity")
+     *      doSomething();
+     *      PerformanceMonitor.endActivity()
+     *
+     * Example 2 - the end of the activity is handled internally:
+     *
+     *      try (Activity ignored = PerformanceMonitor.startActivity("myActivity") {
+     *          doSomething();
+     *      }
+     *
+     * The latter case is particularly useful whenever the activity's code has a number of possible exit paths,
+     * as it might be undesirable or simply non-trivial to add an endActivity() call at the end of each.
+     *
+     * Activities may be nested. Example:
+     *
+     *      PerformanceMonitor.startActivity("myActivity")
+     *      doSomething();
+     *
+     *          PerformanceMonitor.startActivity("myNestedActivity")
+     *          doSomethingNested();
+     *          PerformanceMonitor.endActivity()
+     *
+     *      doSomethingElse()
+     *      PerformanceMonitor.endActivity()
+     *
+     * @param activityName the name of the activity stating.
      */
-    public static Activity startActivity(String activity) {
-        return instance.startActivity(activity);
+    public static Activity startActivity(String activityName) {
+        return instance.startActivity(activityName);
     }
 
     /**
@@ -60,39 +85,60 @@ public final class PerformanceMonitor {
     }
 
     /**
-     * Should be called once per frame, drops old information and updates the metrics.
+     * Drops old information and updates the metrics. Should be called once per frame.
      */
     public static void rollCycle() {
         instance.rollCycle();
     }
 
     /**
-     * @return A mapping of activities to a running mean of time it has taken over a number of frames.
+     * Returns a mapping from the name of an activity to a running mean of its execution times, over a number of cycles.
+     *
+     * Activities may be nested, and while a nested activity is running the collection of data from outer activities
+     * is paused and time passing is not assigned to them.
+     *
+     * @return a mapping from activity name to running mean of execution times.
      */
     public static TObjectDoubleMap<String> getRunningMean() {
         return instance.getRunningMean();
     }
 
     /**
-     * @return A mapping of activities to the largest cost over recent frames, decayed by time.
+     * Returns a mapping from the name of an activity to the activity's largest execution time, decayed by time.
+     *
+     * Without decay this method would return the absolute largest execution time for each activity, since
+     * it was first started. Instead, this method returns the largest -most recent- execution time for
+     * each activity.
+     *
+     * @return a mapping from activity name to largest most recent execution time per cycle.
      */
     public static TObjectDoubleMap<String> getDecayingSpikes() {
         return instance.getDecayingSpikes();
     }
 
     /**
-     * @return A mapping of activities to a running mean of memory allocation
+     * Returns a mapping from the name of an activity to a running mean of allocated memory during
+     * the execution of the activity, over a number of cycles.
+     *
+     * Activities may be nested, and while a nested activity is running the collection of data from
+     * outer activities is paused and allocated memory is not assigned to them.
+     *
+     * No guarantee can be given that the memory allocated during the execution of an activity is
+     * entirely due to the activity. Other threads for example might increase or decrease the
+     * figure.
+     *
+     * @return a mapping from activity name to running mean of allocated memory.
      */
     public static TObjectDoubleMap<String> getAllocationMean() {
         return instance.getAllocationMean();
     }
 
     /**
-     * Allows the enabling/deactivation of the Performance Monitoring system.
-     * When disabled calls to startActivity()/endActivity() and rollCycle() are ignored
-     * and all data is purged.
+     * Enables or disables the Performance Monitoring system.
      *
-     * @param enabled Turns the performance monitoring system on or off.
+     * When disabled all data is purged and calls to startActivity()/endActivity() and rollCycle() are ignored.
+     *
+     * @param enabled True turns the Performance Monitoring system ON. False turns it OFF.
      */
     public static void setEnabled(boolean enabled) {
         if (enabled && !(instance instanceof PerformanceMonitorImpl)) {

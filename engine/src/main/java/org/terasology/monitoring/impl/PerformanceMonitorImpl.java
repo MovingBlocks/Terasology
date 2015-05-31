@@ -34,7 +34,6 @@ import java.util.List;
 /**
  * Active implementation of Performance Monitor
  *
- * @author Immortius
  *         TODO: Check to ensure activities are being started and stopped correctly
  *         TODO: Remove activities with 0 time
  */
@@ -50,94 +49,103 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private final Activity activityInstance = new ActivityInstance();
 
     private Deque<ActivityInfo> activityStack;
-    private List<TObjectLongMap<String>> metricData;
+    private List<TObjectLongMap<String>> executionData;
     private List<TObjectLongMap<String>> allocationData;
-    private TObjectLongMap<String> currentData;
-    private TObjectLongMap<String> currentMemData;
-    private TObjectLongMap<String> runningTotals;
-    private TObjectLongMap<String> runningAllocationTotals;
+    private      TObjectLongMap<String>  currentExecutionData;
+    private      TObjectLongMap<String>  currentAllocationData;
+    private      TObjectLongMap<String>  runningExecutionTotals;
+    private      TObjectLongMap<String>  runningAllocationTotals;
+    private    TObjectDoubleMap<String>  spikeData;
+
     private long timerTicksPerSecond;
-    private TObjectDoubleMap<String> spikeData;
     private double timeFactor;
 
     private Thread mainThread;
     private EngineTime timer;
 
     public PerformanceMonitorImpl() {
-        timer = (EngineTime) CoreRegistry.get(Time.class);
-        activityStack = Queues.newArrayDeque();
-        metricData = Lists.newLinkedList();
+        activityStack  = Queues.newArrayDeque();
+        executionData  = Lists.newLinkedList();
         allocationData = Lists.newLinkedList();
-        runningTotals = new TObjectLongHashMap<>();
+        currentExecutionData    = new TObjectLongHashMap<>();
+        currentAllocationData   = new TObjectLongHashMap<>();
+        runningExecutionTotals  = new TObjectLongHashMap<>();
         runningAllocationTotals = new TObjectLongHashMap<>();
-        timerTicksPerSecond = 1000;
-        currentData = new TObjectLongHashMap<>();
-        currentMemData = new TObjectLongHashMap<>();
-        spikeData = new TObjectDoubleHashMap<>();
-        timeFactor = 1000.0 / timerTicksPerSecond;
-        mainThread = Thread.currentThread();
+        spikeData               = new TObjectDoubleHashMap<>();
 
+        timerTicksPerSecond = 1000;
+        timeFactor = 1000.0 / timerTicksPerSecond;
+
+        timer = (EngineTime) CoreRegistry.get(Time.class);
+        mainThread = Thread.currentThread();
     }
 
     public void rollCycle() {
-        metricData.add(currentData);
-        allocationData.add(currentMemData);
+        executionData.add(currentExecutionData);
+        allocationData.add(currentAllocationData);
+
+        // decays all spikes
         spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
-            public boolean execute(String s, double v) {
-                spikeData.put(s, v * DECAY_RATE);
+            public boolean execute(String activityName, double executionTime) {
+                spikeData.put(activityName, executionTime * DECAY_RATE);
                 return true;
             }
         });
 
-        currentData.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long v) {
-                runningTotals.adjustOrPutValue(s, v, v);
-                double time = v * timeFactor;
-                double prev = spikeData.get(s);
-                if (time > prev) {
-                    spikeData.put(s, time);
+        // updates execution time totals and spike data
+        currentExecutionData.forEachEntry(new TObjectLongProcedure<String>() {
+            public boolean execute(String activityName, long executionTime) {
+                runningExecutionTotals.adjustOrPutValue(activityName, executionTime, executionTime);
+                double time = executionTime * timeFactor;
+                double latestSpike = spikeData.get(activityName);
+                if (time > latestSpike) {
+                    spikeData.put(activityName, time);
                 }
                 return true;
             }
         });
 
-        currentMemData.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long v) {
-                runningAllocationTotals.adjustOrPutValue(s, v, v);
+        // updates memory allocation totals
+        currentAllocationData.forEachEntry(new TObjectLongProcedure<String>() {
+            public boolean execute(String activityName, long allocationValue) {
+                runningAllocationTotals.adjustOrPutValue(activityName, allocationValue, allocationValue);
                 return true;
             }
         });
 
-        while (metricData.size() > RETAINED_CYCLES) {
-            metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
-                public boolean execute(String s, long v) {
-                    runningTotals.adjustValue(s, -v);
+        // remove old execution times data
+        while (executionData.size() > RETAINED_CYCLES) {
+            executionData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
+                public boolean execute(String activityName, long v) {
+                    runningExecutionTotals.adjustValue(activityName, -v);
                     return true;
                 }
             });
-            metricData.remove(0);
+            executionData.remove(0);
         }
+
+        // removes old memory allocation data
         while (allocationData.size() > RETAINED_CYCLES) {
             allocationData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
-                public boolean execute(String s, long v) {
-                    runningAllocationTotals.adjustValue(s, -v);
+                public boolean execute(String activityName, long v) {
+                    runningAllocationTotals.adjustValue(activityName, -v);
                     return true;
                 }
             });
             allocationData.remove(0);
         }
-        currentData = new TObjectLongHashMap<>();
-        currentMemData = new TObjectLongHashMap<>();
+
+        currentExecutionData = new TObjectLongHashMap<>();
+        currentAllocationData = new TObjectLongHashMap<>();
     }
 
-    public Activity startActivity(String activity) {
+    public Activity startActivity(String activityName) {
         if (Thread.currentThread() != mainThread) {
             return OFF_THREAD_ACTIVITY;
         }
-        ActivityInfo newActivity = new ActivityInfo();
-        newActivity.name = activity;
-        newActivity.startTime = timer.getRawTimeInMs();
-        newActivity.startMem = Runtime.getRuntime().freeMemory();
+
+        ActivityInfo newActivity = new ActivityInfo(activityName).initialize();
+
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
@@ -154,32 +162,34 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         }
 
         ActivityInfo oldActivity = activityStack.pop();
-        long time = timer.getRawTimeInMs();
-        long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
-        currentData.adjustOrPutValue(oldActivity.name, total, total);
+
+        long endTime = timer.getRawTimeInMs();
+        long totalTime = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + endTime - oldActivity.resumeTime : endTime - oldActivity.startTime;
+        currentExecutionData.adjustOrPutValue(oldActivity.name, totalTime, totalTime);
+        
         long endMem = Runtime.getRuntime().freeMemory();
         long totalMem = (oldActivity.startMem - endMem > 0) ? oldActivity.startMem - endMem + oldActivity.ownMem : oldActivity.ownMem;
-        currentMemData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
+        currentAllocationData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
 
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
-            currentActivity.resumeTime = time;
+            currentActivity.resumeTime = endTime;
             currentActivity.startMem = endMem;
         }
     }
 
     public TObjectDoubleMap<String> getRunningMean() {
-        final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
-        final double factor = timeFactor / metricData.size();
-        runningTotals.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long l) {
-                if (l > 0) {
-                    result.put(s, l * factor);
+        final TObjectDoubleMap<String> activityToMeanMap = new TObjectDoubleHashMap<>();
+        final double factor = timeFactor / executionData.size();
+        runningExecutionTotals.forEachEntry(new TObjectLongProcedure<String>() {
+            public boolean execute(String activityName, long executionTotal) {
+                if (executionTotal > 0) {
+                    activityToMeanMap.put(activityName, executionTotal * factor);
                 }
                 return true;
             }
         });
-        return result;
+        return activityToMeanMap;
     }
 
     public TObjectDoubleMap<String> getDecayingSpikes() {
@@ -188,26 +198,36 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     @Override
     public TObjectDoubleMap<String> getAllocationMean() {
-        final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
+        final TObjectDoubleMap<String> activityToAllocationMap = new TObjectDoubleHashMap<>();
         final double factor = 1.0 / allocationData.size();
         runningAllocationTotals.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long l) {
-                if (l > 0) {
-                    result.put(s, l * factor);
+            public boolean execute(String activityName, long allocationTotal) {
+                if (allocationTotal > 0) {
+                    activityToAllocationMap.put(activityName, allocationTotal * factor);
                 }
                 return true;
             }
         });
-        return result;
+        return activityToAllocationMap;
     }
 
-    private static class ActivityInfo {
+    private class ActivityInfo {
         public String name;
         public long startTime;
         public long resumeTime;
         public long ownTime;
         public long startMem;
         public long ownMem;
+
+        public ActivityInfo(String activityName) {
+            this.name = activityName;
+        }
+
+        public ActivityInfo initialize() {
+            this.startTime = timer.getRawTimeInMs();
+            this.startMem = Runtime.getRuntime().freeMemory();
+            return this;
+        }
     }
 
     private class ActivityInstance implements Activity {
