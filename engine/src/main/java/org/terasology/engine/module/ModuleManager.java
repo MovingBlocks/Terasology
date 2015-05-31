@@ -154,7 +154,10 @@ public class ModuleManager {
         moduleSecurityManager.getBasePermissionSet().addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(LoggerFactory.class);
         moduleSecurityManager.getBasePermissionSet().addAPIClass(Logger.class);
-
+                
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(org.terasology.rendering.world.WorldRenderer.class);//For accessing the worldRenderer from the Coloring module
+         
+          
         APIScanner apiScanner = new APIScanner(moduleSecurityManager);
         for (Module module : registry) {
             if (module.isOnClasspath()) {
