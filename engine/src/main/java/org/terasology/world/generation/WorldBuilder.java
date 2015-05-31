@@ -20,10 +20,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.ArrayList;
@@ -52,9 +50,6 @@ public class WorldBuilder {
     }
 
     public WorldBuilder addProvider(FacetProvider provider) {
-        if (seed != null) {
-            provider.setSeed(seed);
-        }
         providersList.add(provider);
         return this;
     }
@@ -81,15 +76,18 @@ public class WorldBuilder {
     }
 
     public void setSeed(long seed) {
-        for (FacetProvider provider : providersList) {
-            provider.setSeed(seed);
-        }
         this.seed = seed;
     }
 
     public World build() {
         // TODO: ensure the required providers are present
 
+        if (seed == null) {
+            throw new IllegalStateException("Seed has not been set");
+        }
+        for (FacetProvider provider : providersList) {
+            provider.setSeed(seed);
+        }
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
         return new WorldImpl(providerChains, rasterizers, determineBorders(providerChains), seaLevel);
     }
