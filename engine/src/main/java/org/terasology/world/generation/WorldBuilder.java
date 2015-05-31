@@ -43,6 +43,7 @@ public class WorldBuilder {
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private int seaLevel = 32;
+    private Long seed;
 
     private WorldGeneratorPluginLibrary pluginLibrary;
 
@@ -51,6 +52,9 @@ public class WorldBuilder {
     }
 
     public WorldBuilder addProvider(FacetProvider provider) {
+        if (seed != null) {
+            provider.setSeed(seed);
+        }
         providersList.add(provider);
         return this;
     }
@@ -80,6 +84,7 @@ public class WorldBuilder {
         for (FacetProvider provider : providersList) {
             provider.setSeed(seed);
         }
+        this.seed = seed;
     }
 
     public World build() {
