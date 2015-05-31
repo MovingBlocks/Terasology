@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
@@ -69,6 +72,12 @@ public final class ApplyModulesUtil {
         TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
         typeSerializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
         context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
+
+        // Entity System Library
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        context.put(EntitySystemLibrary.class, library);
+        context.put(ComponentLibrary.class, library.getComponentLibrary());
+        context.put(EventLibrary.class, library.getEventLibrary());
 
         BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());

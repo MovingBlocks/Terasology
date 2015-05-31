@@ -97,17 +97,13 @@ public final class EntitySystemSetupUtil {
         typeSerializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
 
-        // Entity System Library
-        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
-        context.put(EntitySystemLibrary.class, library);
-        entityManager.setComponentLibrary(library.getComponentLibrary());
-        context.put(ComponentLibrary.class, library.getComponentLibrary());
-        context.put(EventLibrary.class, library.getEventLibrary());
-
         // Prefab Manager
         PrefabManager prefabManager = new PojoPrefabManager();
         entityManager.setPrefabManager(prefabManager);
         context.put(PrefabManager.class, prefabManager);
+
+        EntitySystemLibrary library = context.get(EntitySystemLibrary.class);
+        entityManager.setComponentLibrary(library.getComponentLibrary());
 
         // Event System
         EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);

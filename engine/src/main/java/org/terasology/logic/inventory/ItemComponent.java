@@ -39,7 +39,7 @@ public final class ItemComponent implements Component {
      * Name of the icon this item should be rendered with
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public TextureRegionAsset icon;
+    public TextureRegionAsset<?> icon;
 
     /**
      * If this item is stackable, it should have a unique ID (so alike stacks can be merged)
