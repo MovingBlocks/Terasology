@@ -59,7 +59,12 @@ public final class EntitySystemSetupUtil {
         context.put(ReflectFactory.class, reflectFactory);
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
-        context.put(TypeSerializationLibrary.class, TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary));
+        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        context.put(EntitySystemLibrary.class, library);
+        context.put(ComponentLibrary.class, library.getComponentLibrary());
+        context.put(EventLibrary.class, library.getEventLibrary());
     }
 
 
