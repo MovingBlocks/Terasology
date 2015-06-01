@@ -7,8 +7,6 @@
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
     <resetJUL>true</resetJUL>
   </contextListener>
-  
-  <timestamp key="timestamp" datePattern="yyyy-MM-dd_HH-mm-ss"/>
 
   <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
     <!-- in the absence of the class attribute, it is assumed that the
@@ -20,13 +18,13 @@
     <timeout>30 seconds</timeout>
     <sift>
       <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logFileFolder}/${timestamp}/Terasology-${phase}.log</file>
+        <file>${logFileFolder}/Terasology-${phase}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
           <!-- daily rollover -->
-          <fileNamePattern>${logFileFolder}/${timestamp}/Terasology-${phase}-%d{yyyy-MM-dd}.log</fileNamePattern>
+          <fileNamePattern>${logFileFolder}/Terasology-${phase}-%d{yyyy-MM-dd}.log</fileNamePattern>
 
-          <!-- keep 10 days' worth of history -->
-          <maxHistory>10</maxHistory>
+          <!-- keep 3 days' worth of history -->
+          <maxHistory>3</maxHistory>
         </rollingPolicy>
         <encoder>
           <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
