@@ -4,6 +4,6 @@
     "author" : "",
     "displayName" : "Coloring",
     "description" : "",
-    "dependencies" : [],
+    "dependencies" : [{"id":"WorldCodecity","minVersion":"0.1.0"}],
     "isServerSideOnly" : false
 }
