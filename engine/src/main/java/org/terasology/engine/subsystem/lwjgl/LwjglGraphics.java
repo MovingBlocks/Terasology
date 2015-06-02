@@ -84,8 +84,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
         assetTypeManager.registerCoreAssetType(Font.class, FontImpl::new, "fonts");
         assetTypeManager.registerCoreAssetType(Texture.class, OpenGLTexture::new, "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(1).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(1).toString().equals("fonts")));
+        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
+        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
 
         assetTypeManager.registerCoreAssetType(Shader.class, GLSLShader::new, "shaders");
         assetTypeManager.registerCoreAssetType(Material.class, GLSLMaterial::new, "materials");

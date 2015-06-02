@@ -189,8 +189,8 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreAssetType(UIElement.class, UIElement::new, "ui");
         assetTypeManager.registerCoreAssetType(Font.class, FontImpl::new, "fonts");
         assetTypeManager.registerCoreAssetType(Texture.class, HeadlessTexture::new, "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(1).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(1).toString().equals("fonts")));
+        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
+        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
 
 
         assetTypeManager.registerCoreAssetType(Shader.class, HeadlessShader::new, "shaders");
