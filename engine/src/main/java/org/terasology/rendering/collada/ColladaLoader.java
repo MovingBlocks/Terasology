@@ -838,7 +838,7 @@ public class ColladaLoader {
                         float texCoordS = faceInput.texCoordSource.floatValues[index * texCoordStride + 0];
                         float texCoordT = faceInput.texCoordSource.floatValues[index * texCoordStride + 1];
 
-                        // For texture coordinates, COLLADA’s right-handed coordinate system applies;
+                        // For texture coordinates, COLLADA's right-handed coordinate system applies;
                         // therefore, an ST texture coordinate of [0,0] maps to the lower-left texel of a texture image
                         texCoord0Param.add(texCoordS);
                         texCoord0Param.add(1 - texCoordT);

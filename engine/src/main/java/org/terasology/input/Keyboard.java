@@ -265,7 +265,7 @@ public final class Keyboard {
         F19(KeyId.F19, "KEY_F19", "F19"),
         CONVERT(KeyId.CONVERT, "KEY_CONVERT", "Convert"), // Japanese Keyboard key (for converting Hiragana characters to Kanji?)
         NOCONVERT(KeyId.NOCONVERT, "KEY_NOCONVERT", "No Convert"), // Japanese Keyboard key
-        YEN(KeyId.YEN, "KEY_YEN", "¥"), // Japanese keyboard key for yen
+        YEN(KeyId.YEN, "KEY_YEN", "\u00A5"), // Japanese keyboard key for yen
         NUMPAD_EQUALS(KeyId.NUMPAD_EQUALS, "KEY_NUMPADEQUALS", "Numpad ="),
         CIRCUMFLEX(KeyId.CIRCUMFLEX, "KEY_CIRCUMFLEX", "^"), // Japanese keyboard
         AT(KeyId.AT, "KEY_AT", "@"), // (NEC PC98)
@@ -277,7 +277,7 @@ public final class Keyboard {
         UNLABELED(KeyId.UNLABELED, "KEY_UNLABELED", "Unlabelled"), // (J3100) (a mystery button?)
         NUMPAD_ENTER(KeyId.NUMPAD_ENTER, "KEY_NUMPADENTER", "Numpad Enter"),
         RIGHT_CTRL(KeyId.RIGHT_CTRL, "KEY_RCONTROL", "Right Ctrl"),
-        SECTION(KeyId.SECTION, "KEY_SECTION", "§"),
+        SECTION(KeyId.SECTION, "KEY_SECTION", "\u00A7"),
         NUMPAD_COMMA(KeyId.NUMPAD_COMMA, "KEY_NUMPADCOMMA", "Numpad ,"), // (NEC PC98)
         NUMPAD_DIVIDE(KeyId.NUMPAD_DIVIDE, "KEY_DIVIDE", "Numpad /"),
         PRINT_SCREEN(KeyId.PRINT_SCREEN, "KEY_SYSRQ", "Print Screen"),
