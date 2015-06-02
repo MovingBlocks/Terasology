@@ -11,6 +11,12 @@ apply plugin: 'findbugs'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+javadoc.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 // We use both Maven Central and our own Artifactory instance, which contains module builds, extra libs, and so on
 repositories {
     mavenCentral()
