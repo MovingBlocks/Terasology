@@ -33,10 +33,9 @@ import java.util.List;
 
 /**
  * Active implementation of Performance Monitor
- *
- *         TODO: Check to ensure activities are being started and stopped correctly
- *         TODO: Remove activities with 0 time
  */
+// TODO: Check to ensure activities are being started and stopped correctly
+// TODO: Remove activities with 0 time
 public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private static final int RETAINED_CYCLES = 60;
     private static final double DECAY_RATE = 0.98;
@@ -48,50 +47,53 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     private final Activity activityInstance = new ActivityInstance();
 
-    private Deque<ActivityInfo> activityStack;
-    private List<TObjectLongMap<String>> executionData;
-    private List<TObjectLongMap<String>> allocationData;
-    private      TObjectLongMap<String>  currentExecutionData;
-    private      TObjectLongMap<String>  currentAllocationData;
-    private      TObjectLongMap<String>  runningExecutionTotals;
-    private      TObjectLongMap<String>  runningAllocationTotals;
-    private    TObjectDoubleMap<String>  spikeData;
+    private final Deque<ActivityInfo> activityStack;
 
-    private TObjectDoubleProcedure<String> decayLargestExecutionTime;
-    private TObjectLongProcedure<String>   updateExecutionTimeTotalAndSpikeData;
-    private TObjectLongProcedure<String>   updateAllocatedMemoryTotal;
-    private TObjectLongProcedure<String>   removeExpiredExecutionTimeValueFromTotal;
-    private TObjectLongProcedure<String>   removeExpiredAllocatedMemoryValueFromTotal;
+    private final List<TObjectLongMap<String>> executionData;
+    private final List<TObjectLongMap<String>> allocationData;
 
-    private long timerTicksPerSecond;
-    private double timeFactor;
+    private TObjectLongMap<String> currentExecutionData;
+    private TObjectLongMap<String> currentAllocationData;
+    private final TObjectLongMap<String> runningExecutionTotals;
+    private final TObjectLongMap<String> runningAllocationTotals;
+    private final TObjectDoubleMap<String> spikeData;
 
-    private Thread mainThread;
-    private EngineTime timer;
+    private final TObjectDoubleProcedure<String> decayLargestExecutionTime;
+    private final TObjectLongProcedure<String> updateExecutionTimeTotalAndSpikeData;
+    private final TObjectLongProcedure<String> updateAllocatedMemoryTotal;
+    private final TObjectLongProcedure<String> removeExpiredExecutionTimeValueFromTotal;
+    private final TObjectLongProcedure<String> removeExpiredAllocatedMemoryValueFromTotal;
+
+    private final SetterOfActivityToRunningMeanMapEntry setExecutionTimeRunningMean;
+    private final SetterOfActivityToRunningMeanMapEntry setAllocatedMemoryRunningMean;
+
+    private final Thread mainThread;
+    private final EngineTime timer;
 
     public PerformanceMonitorImpl() {
         activityStack  = Queues.newArrayDeque();
         executionData  = Lists.newLinkedList();
         allocationData = Lists.newLinkedList();
-        currentExecutionData    = new TObjectLongHashMap<>();
-        currentAllocationData   = new TObjectLongHashMap<>();
-        runningExecutionTotals  = new TObjectLongHashMap<>();
+        currentExecutionData = new TObjectLongHashMap<>();
+        currentAllocationData = new TObjectLongHashMap<>();
+        runningExecutionTotals = new TObjectLongHashMap<>();
         runningAllocationTotals = new TObjectLongHashMap<>();
-        spikeData               = new TObjectDoubleHashMap<>();
+        spikeData = new TObjectDoubleHashMap<>();
 
-        decayLargestExecutionTime                  = new DecayerOfActivityLargestExecutionTime();
-        updateExecutionTimeTotalAndSpikeData       = new UpdaterOfActivityExecutionTimeTotalAndSpikeData();
-        updateAllocatedMemoryTotal                 = new UpdaterOfActivityAllocatedMemoryTotal();
-        removeExpiredExecutionTimeValueFromTotal   = new RemoverFromTotalOfActivityExpiredExecutionTimeValue();
+        decayLargestExecutionTime  = new DecayerOfActivityLargestExecutionTime();
+        updateExecutionTimeTotalAndSpikeData = new UpdaterOfActivityExecutionTimeTotalAndSpikeData();
+        updateAllocatedMemoryTotal = new UpdaterOfActivityAllocatedMemoryTotal();
+        removeExpiredExecutionTimeValueFromTotal  = new RemoverFromTotalOfActivityExpiredExecutionTimeValue();
         removeExpiredAllocatedMemoryValueFromTotal = new RemoverFromTotalOfActivityExpiredAllocatedMemoryValue();
 
-        timerTicksPerSecond = 1000;
-        timeFactor = 1000.0 / timerTicksPerSecond;
+        setExecutionTimeRunningMean = new SetterOfActivityToRunningMeanMapEntry();
+        setAllocatedMemoryRunningMean = new SetterOfActivityToRunningMeanMapEntry();
 
         timer = (EngineTime) CoreRegistry.get(Time.class);
         mainThread = Thread.currentThread();
     }
 
+    @Override
     public void rollCycle() {
         executionData.add(currentExecutionData);
         allocationData.add(currentAllocationData);
@@ -114,6 +116,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         currentAllocationData = new TObjectLongHashMap<>();
     }
 
+    @Override
     public Activity startActivity(String activityName) {
         if (Thread.currentThread() != mainThread) {
             return OFF_THREAD_ACTIVITY;
@@ -131,6 +134,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         return activityInstance;
     }
 
+    @Override
     public void endActivity() {
         if (Thread.currentThread() != mainThread || activityStack.isEmpty()) {
             return;
@@ -153,18 +157,18 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         }
     }
 
+    @Override
     public TObjectDoubleMap<String> getRunningMean() {
         TObjectDoubleMap<String> activityToMeanMap = new TObjectDoubleHashMap<>();
-        double factor = timeFactor / executionData.size();
-
-        // here we instantiate a new procedure every call in the hope that multiple thread calling this method won't interfere with each other
-        TObjectLongProcedure<String> setExecutionTimeRunningMean = new SetterOfActivityToRunningMeanMapEntry(activityToMeanMap, factor);
+        setExecutionTimeRunningMean.setActivityToMeanMap(activityToMeanMap);
+        setExecutionTimeRunningMean.setFactor(1.0 / executionData.size());
 
         runningExecutionTotals.forEachEntry(setExecutionTimeRunningMean);
 
         return activityToMeanMap;
     }
 
+    @Override
     public TObjectDoubleMap<String> getDecayingSpikes() {
         return spikeData;
     }
@@ -172,10 +176,8 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     @Override
     public TObjectDoubleMap<String> getAllocationMean() {
         TObjectDoubleMap<String> activityToMeanMap = new TObjectDoubleHashMap<>();
-        double factor = 1.0 / allocationData.size();
-
-        // here we instantiate a new procedure every call in the hope that multiple thread calling this method won't interfere with each other
-        TObjectLongProcedure<String> setAllocatedMemoryRunningMean = new SetterOfActivityToRunningMeanMapEntry(activityToMeanMap, factor);
+        setAllocatedMemoryRunningMean.setActivityToMeanMap(activityToMeanMap);
+        setAllocatedMemoryRunningMean.setFactor(1.0 / allocationData.size());
 
         runningAllocationTotals.forEachEntry(setAllocatedMemoryRunningMean);
 
@@ -217,15 +219,13 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     }
 
     private class UpdaterOfActivityExecutionTimeTotalAndSpikeData implements TObjectLongProcedure<String> {
-        double time;
         double latestSpike;
 
         public boolean execute(String activityName, long latestExecutionTime) {
             runningExecutionTotals.adjustOrPutValue(activityName, latestExecutionTime, latestExecutionTime);
-            time = latestExecutionTime * timeFactor;
             latestSpike = spikeData.get(activityName);
-            if (time > latestSpike) {
-                spikeData.put(activityName, time);
+            if (latestExecutionTime > latestSpike) {
+                spikeData.put(activityName, latestExecutionTime);
             }
             return true;
         }
@@ -257,9 +257,14 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         private TObjectDoubleMap<String> activityToMeanMap;
         private double factor;
 
-        public SetterOfActivityToRunningMeanMapEntry(TObjectDoubleMap<String> activityToMeanMap, double factor) {
-            this.activityToMeanMap = activityToMeanMap;
-            this.factor = factor;
+        public SetterOfActivityToRunningMeanMapEntry setActivityToMeanMap(TObjectDoubleMap<String> newActivityToMeanMap) {
+            this.activityToMeanMap = newActivityToMeanMap;
+            return this;
+        }
+
+        public SetterOfActivityToRunningMeanMapEntry setFactor(double newFactor) {
+            this.factor = newFactor;
+            return this;
         }
 
         public boolean execute(String activityName, long total) {
