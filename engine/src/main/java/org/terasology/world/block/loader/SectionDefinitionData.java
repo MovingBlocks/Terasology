@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.shapes.BlockShape;
@@ -30,6 +31,7 @@ import java.util.EnumMap;
 /**
  * @author Immortius
  */
+@API
 public class SectionDefinitionData {
     private String displayName = "";
     private boolean liquid;

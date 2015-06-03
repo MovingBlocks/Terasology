@@ -126,7 +126,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         ScrollableArea area = new ScrollableArea();
         area.setContent(mainLayout);
-        //area.setContentHeight(mainLayout.getRowCount() * 32);
 
         ColumnLayout footerGrid = new ColumnLayout("footer");
         footerGrid.setFamily("menu-options");

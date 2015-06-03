@@ -16,10 +16,12 @@
 package org.terasology.world.block.loader;
 
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.module.sandbox.API;
 
 /**
  * @author Immortius
  */
+@API
 public class EntityData {
     private Prefab prefab;
     private boolean keepActive;

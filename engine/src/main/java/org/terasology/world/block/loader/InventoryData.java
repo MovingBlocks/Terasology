@@ -15,9 +15,12 @@
  */
 package org.terasology.world.block.loader;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * @author Immortius
  */
+@API
 public class InventoryData {
     private boolean directPickup;
     private boolean stackable = true;

@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactory;
@@ -33,6 +34,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
+@API
 public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
 
     private BlockFamilyDefinitionData data;

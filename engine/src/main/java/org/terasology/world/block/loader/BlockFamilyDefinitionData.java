@@ -18,6 +18,7 @@ package org.terasology.world.block.loader;
 import com.google.api.client.util.Maps;
 import com.google.common.collect.Lists;
 import org.terasology.assets.AssetData;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.block.family.BlockFamilyFactory;
 
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
+@API
 public class BlockFamilyDefinitionData implements AssetData {
     private boolean template;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block.loader;
+package org.terasology.world.block.family;
 
 import com.google.common.collect.Lists;
 import org.terasology.world.block.BlockUri;
