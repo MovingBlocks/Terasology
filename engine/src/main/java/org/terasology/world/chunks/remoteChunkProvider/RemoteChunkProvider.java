@@ -75,6 +75,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
     public RemoteChunkProvider(BlockManager blockManager) {
+        this.blockManager = blockManager;
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
     }

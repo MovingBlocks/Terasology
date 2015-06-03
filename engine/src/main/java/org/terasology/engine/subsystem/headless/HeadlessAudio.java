@@ -37,7 +37,7 @@ public class HeadlessAudio implements EngineSubsystem {
     @Override
 
     public void initialise(Context context) {
-
+        initNoSound(context);
     }
 
     @Override
@@ -48,7 +48,6 @@ public class HeadlessAudio implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        initNoSound(context);
     }
 
     @Override

@@ -119,7 +119,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.BiomeChangeMessage> queuedOutgoingBiomeChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
-    private List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
+    private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
     private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
     private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
@@ -230,15 +230,17 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void sendRegisteredBlocks(NetData.NetMessage.Builder message) {
-        for (BlockFamily family : newlyRegisteredFamilies) {
-            NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
-            for (Block block : family.getBlocks()) {
-                blockRegMessage.addBlockUri(block.getURI().toString());
-                blockRegMessage.addBlockId(block.getId());
+        synchronized (newlyRegisteredFamilies) {
+            for (BlockFamily family : newlyRegisteredFamilies) {
+                NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
+                for (Block block : family.getBlocks()) {
+                    blockRegMessage.addBlockUri(block.getURI().toString());
+                    blockRegMessage.addBlockId(block.getId());
+                }
+                message.addBlockFamilyRegistered(blockRegMessage);
             }
-            message.addBlockFamilyRegistered(blockRegMessage);
+            newlyRegisteredFamilies.clear();
         }
-        newlyRegisteredFamilies.clear();
     }
 
     private void sendNewChunks(NetData.NetMessage.Builder message) {
@@ -554,6 +556,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     public void blockFamilyRegistered(BlockFamily family) {
-        newlyRegisteredFamilies.add(family);
+        synchronized (newlyRegisteredFamilies) {
+            newlyRegisteredFamilies.add(family);
+        }
     }
 }

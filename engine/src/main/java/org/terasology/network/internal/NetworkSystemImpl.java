@@ -536,7 +536,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         // TODO: Add network override types here (that use id lookup tables)
 
         eventSerializer = new EventSerializer(eventLibrary, typeSerializationLibrary);
-        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeSerializationLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
