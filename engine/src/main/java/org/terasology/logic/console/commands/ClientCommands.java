@@ -33,7 +33,6 @@ import org.terasology.world.WorldProvider;
 public class ClientCommands extends BaseComponentSystem {
     @In
     private CameraTargetSystem cameraTargetSystem;
-//hola mundo
     @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
         EntityRef cameraTarget = cameraTargetSystem.getTarget();
@@ -47,11 +46,5 @@ public class ClientCommands extends BaseComponentSystem {
         world.getTime().setDays(day);
 
         return "World time changed";
-    }
-	 @Command(shortDescription = "activate the GitHub metrics",
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String github() {
-        
-        return "this comand will execute the githubs metrics";
     }
 }
