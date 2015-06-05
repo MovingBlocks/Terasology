@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package org.terasology.utilities.concurrency;
+/** This package provides a system for scheduling and managing tasks in worker threads, allowing the management of CPU resources.
+  **/
+@API package org.terasology.scheduling;
 
-/**
- * @author Immortius
- */
-public abstract class AbstractTask implements Task {
-
-    @Override
-    public boolean isTerminateSignal() {
-        return false;
-    }
-}
+import org.terasology.module.sandbox.API;

@@ -26,13 +26,12 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.utilities.concurrency.TaskMaster;
+import org.terasology.scheduling.TaskMaster;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
 
 import java.util.Comparator;
 import java.util.List;
@@ -127,7 +126,7 @@ public final class ChunkMeshUpdateManager {
     }
 
     public void shutdown() {
-        chunkUpdater.shutdown(new ShutdownChunkTask(), false);
+        chunkUpdater.shutdown(false);
     }
 
 
@@ -153,11 +152,6 @@ public final class ChunkMeshUpdateManager {
         @Override
         public String getName() {
             return "Update chunk";
-        }
-
-        @Override
-        public boolean isTerminateSignal() {
-            return false;
         }
 
         @Override
@@ -187,9 +181,6 @@ public final class ChunkMeshUpdateManager {
         }
 
         private int score(ChunkTask task) {
-            if (task.isTerminateSignal()) {
-                return -1;
-            }
             return distFromRegion(task.getPosition(), new Vector3i(cameraChunkPosX, cameraChunkPosY, cameraChunkPosZ));
         }
 

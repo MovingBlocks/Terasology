@@ -14,32 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks.pipeline;
-
-import org.terasology.math.geom.Vector3i;
+package org.terasology.scheduling;
 
 /**
  * @author Immortius
  */
-public final class ShutdownChunkTask implements ChunkTask {
+public interface Task extends Runnable {
+    String getName();
 
-    @Override
-    public String getName() {
-        return "Shutdown";
-    }
-
-    @Override
-    public void run() {
-    }
-
-    @Override
-    public boolean isTerminateSignal() {
-        return true;
-    }
-
-    @Override
-    public Vector3i getPosition() {
-        return Vector3i.zero();
-    }
-
+    void run();
 }

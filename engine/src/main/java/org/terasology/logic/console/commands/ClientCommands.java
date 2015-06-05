@@ -24,6 +24,7 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.scheduling.TaskManager;
 import org.terasology.world.WorldProvider;
 
 /**
@@ -32,7 +33,24 @@ import org.terasology.world.WorldProvider;
 @RegisterSystem
 public class ClientCommands extends BaseComponentSystem {
     @In
+    private TaskManager taskManager;
+
+    @In
     private CameraTargetSystem cameraTargetSystem;
+
+    @Command(shortDescription = "Reports size of client work thread pool",
+            requiredPermission = PermissionManager.NO_PERMISSION)
+    public String getClientThreads() {
+        return String.format("Client is running %d work threads", taskManager.getPoolSize());
+    }
+
+    // TODO: Permission?  Particularly for combined (singleplayer) client/server execution....
+    @Command(shortDescription = "Sets size of client work thread pool",
+            requiredPermission = PermissionManager.NO_PERMISSION)
+    public String setClientThreads(@CommandParam("numThreads") int numThreads) {
+        taskManager.setPoolSize(numThreads);
+        return String.format("Client is running %d work threads", taskManager.getPoolSize());
+    }
 
     @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {

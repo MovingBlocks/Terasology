@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.TaskManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -32,10 +34,10 @@ import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,7 +48,7 @@ public class LightMerger<T> {
 
     private static Logger logger = LoggerFactory.getLogger(LightMerger.class);
 
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final TaskManager taskManager = CoreRegistry.get(TaskManager.class);
     private Future<T> resultFuture;
 
     private GeneratingChunkProvider chunkProvider;
@@ -60,7 +62,10 @@ public class LightMerger<T> {
     }
 
     public void beginMerge(final Chunk chunk, final T data) {
-        resultFuture = executorService.submit(new Callable<T>() {
+        if (resultFuture != null) {
+            resultFuture.cancel(false);
+        }
+        resultFuture = taskManager.getThreadPool().submit(new Callable<T>() {
             @Override
             public T call() throws Exception {
                 merge(chunk);
@@ -151,18 +156,24 @@ public class LightMerger<T> {
     }
 
     public void shutdown() {
-        running = false;
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.error("Failed to shutdown light merge thread in a timely manner");
+        if (resultFuture != null) {
+            resultFuture.cancel(false);
+            try {
+                resultFuture.get(10L, TimeUnit.SECONDS);
+            } catch (CancellationException cancelEx) {
+                /* NOP */
+            } catch (InterruptedException | TimeoutException ex) {
+                logger.error("Failed to shutdown light merge task in a timely manner");
+            } catch (ExecutionException err) {
+                logger.error("Error in lighting merge during task shutdown", err);
+            }
+            resultFuture = null;
         }
+        running = false;
     }
 
     public void restart() {
         if (!running) {
-            executorService = Executors.newSingleThreadExecutor();
             running = true;
         }
     }

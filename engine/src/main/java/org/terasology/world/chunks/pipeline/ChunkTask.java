@@ -17,7 +17,7 @@
 package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.geom.Vector3i;
-import org.terasology.utilities.concurrency.Task;
+import org.terasology.scheduling.Task;
 
 /**
  * @author Immortius

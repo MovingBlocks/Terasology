@@ -21,14 +21,18 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.DistanceComparator;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.scheduling.TaskManager;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This data structure takes Entities with a location in the world and sorts
@@ -51,9 +55,9 @@ public class NearestSortingList implements Iterable<EntityRef> {
     private List<EntityRef> entities = Lists.newLinkedList();
     private final List<Command> commands = Lists.newArrayList();
 
-    private Timer timer;
-    private SortTask sortingTask;
-    private Thread sortingThread;
+    private final TaskManager taskManager = CoreRegistry.get(TaskManager.class);
+    private SortTask          sortingTask;
+    private Future<?>         sortingFuture;
 
     /**
      * True while the background sorting process is active.
@@ -238,7 +242,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      *               given here at a lower index.
      */
     public synchronized void initialiseAndPause(Camera origin) {
-        if (sortingTask != null || timer != null) {
+        if (sortingTask != null || sortingFuture != null) {
             logger.error("Mis-usages of initialise detected! Initialising again"
                     + " before stopping the sorting process. Sorting is "
                     + "stopped now, but it should be done by the user of "
@@ -258,7 +262,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      *                     sorting runs can be set with the setSortDelayMS(long) method.
      */
     public synchronized void initialise(Camera origin, long period, long initialDelay) {
-        if (sortingTask != null || timer != null) {
+        if (sortingTask != null || sortingFuture != null) {
             logger.error("Mis-usages of initialise detected! Initialising again"
                     + " before stopping the sorting process. Sorting is "
                     + "stopped now, but it should be done by the user of "
@@ -266,9 +270,9 @@ public class NearestSortingList implements Iterable<EntityRef> {
             stop();
         }
         sortPeriod = period;
-        timer = new Timer();
         sortingTask = new SortTask(origin);
-        timer.scheduleAtFixedRate(sortingTask, initialDelay, sortPeriod);
+        final Runnable activity = taskManager.newActivity(sortingTask, "Render-Sorting", Thread.NORM_PRIORITY, "Render-Sorting");
+        sortingFuture = taskManager.getThreadPool().scheduleAtFixedRate(activity, initialDelay, sortPeriod, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -292,20 +296,19 @@ public class NearestSortingList implements Iterable<EntityRef> {
      * is an insignificant performance loss or win if.
      */
     public synchronized void stop() {
-        if (timer != null) {
-            //stopping a paused instance
-            timer.cancel();
-            timer.purge();
-            timer = null;
-        }
-        if (sortingThread != null) {
+        if (sortingFuture != null) {
+            sortingFuture.cancel(false);
             try {
-                sortingThread.join();
-            } catch (InterruptedException ex) {
-                logger.error("Joining of sorting thread was interrupted!");
+                sortingFuture.get();
+            } catch (CancellationException cancelEx) {
+                /* NOP */
+            } catch (InterruptedException intrEx) {
+                logger.error("Wait for sorting task interrupted");
+            } catch (ExecutionException ex) {
+                logger.error("Sorting task threw exception", ex);
             }
+            sortingFuture = null;
         }
-        sortingThread = null;
         sortingTask = null;
     }
 
@@ -398,9 +401,9 @@ public class NearestSortingList implements Iterable<EntityRef> {
     }
 
     /**
-     * The TimerTask that does the sorting work.
+     * The task that does the sorting work.
      */
-    private class SortTask extends TimerTask {
+    private class SortTask implements Runnable {
         private DistanceComparator comparator = new DistanceComparator();
         private Camera originCamera;
 
@@ -414,7 +417,6 @@ public class NearestSortingList implements Iterable<EntityRef> {
 
         @Override
         public void run() {
-            sortingThread = Thread.currentThread();
             try {
                 sort();
             } catch (Exception ex) {

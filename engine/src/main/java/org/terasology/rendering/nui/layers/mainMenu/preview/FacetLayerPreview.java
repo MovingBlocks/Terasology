@@ -31,9 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -45,12 +44,13 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.TaskManager;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.viewer.TileThreadFactory;
 import org.terasology.world.viewer.color.ColorModels;
 import org.terasology.world.viewer.layers.FacetLayer;
 import org.terasology.world.viewer.layers.FacetLayers;
@@ -75,9 +75,8 @@ public class FacetLayerPreview implements PreviewGenerator {
 
     private final List<FacetLayer> facetLayers;
 
-    private ExecutorService threadPool = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            new TileThreadFactory());
+    private final TaskManager   taskManager = CoreRegistry.get(TaskManager.class);
+    private final AtomicBoolean shutdown    = new AtomicBoolean(false);
 
     /**
      * @param environment
@@ -116,34 +115,56 @@ public class FacetLayerPreview implements PreviewGenerator {
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         Map<ImmutableVector2i, Future<BufferedImage>> imageFutures = new HashMap<>(tileCount);
-        for (int z = tileArea.minY(); z < tileArea.maxY(); z++) {
-            for (int x = tileArea.minX(); x < tileArea.maxX(); x++) {
-                ImmutableVector2i pos = new ImmutableVector2i(x, z);
-                imageFutures.put(pos, threadPool.submit(() -> {
-                    Region createRegion = createRegion(pos);
-                    BufferedImage image = rasterize(createRegion);
-                    if (progressListener != null) {
-                        progressListener.onProgress(tilesComplete.incrementAndGet() / (float) tileCount);
+        boolean shuttingDown = false;
+
+        if (!shuttingDown) {
+            START_TILES: for (int z = tileArea.minY(); z < tileArea.maxY(); z++) {
+                for (int x = tileArea.minX(); x < tileArea.maxX(); x++) {
+                    if (shutdown.get() || Thread.currentThread().interrupted()) {
+                        shuttingDown = true;
+                        break START_TILES;
                     }
-                    return image;
-                }));
+
+                    final ImmutableVector2i pos = new ImmutableVector2i(x, z);
+                    imageFutures.put(pos, taskManager.getThreadPool().submit(() -> {
+                        Region createRegion = createRegion(pos);
+                        BufferedImage image = rasterize(createRegion);
+                        if (progressListener != null) {
+                            progressListener.onProgress(tilesComplete.incrementAndGet() / (float) tileCount);
+                        }
+                        return image;
+                    }));
+                }
             }
         }
 
-        for (int z = tileArea.minY(); z < tileArea.maxY(); z++) {
-            for (int x = tileArea.minX(); x < tileArea.maxX(); x++) {
-                ImmutableVector2i pos = new ImmutableVector2i(x, z);
-                try {
-                    BufferedImage tileImage = imageFutures.get(pos).get();
-                    g.drawImage(tileImage, x * TILE_SIZE_X, z * TILE_SIZE_Y, null);
-                } catch (ExecutionException e) {
-                    logger.warn("Could not rasterize tile {}", pos, e);
-                }
+        if (!shuttingDown) {
+            GET_TILES: for (int z = tileArea.minY(); z < tileArea.maxY(); z++) {
+                for (int x = tileArea.minX(); x < tileArea.maxX(); x++) {
+                    if (shutdown.get() || Thread.currentThread().interrupted()) {
+                        shuttingDown = true;
+                        break GET_TILES;
+                    }
 
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException();
+                    ImmutableVector2i pos = new ImmutableVector2i(x, z);
+                    try {
+                        BufferedImage tileImage = imageFutures.get(pos).get();
+                        g.drawImage(tileImage, x * TILE_SIZE_X, z * TILE_SIZE_Y, null);
+                    } catch (ExecutionException e) {
+                        logger.warn("Could not rasterize tile {}", pos, e);
+                    } catch (InterruptedException intrEx) {
+                        shuttingDown = true;
+                        break GET_TILES;
+                    }
                 }
             }
+        }
+
+        if (shuttingDown) {
+            for (Future<?> f : imageFutures.values()) {
+                f.cancel(true);
+            }
+            throw new InterruptedException();
         }
 
         // draw coordinate lines through 0 / 0
@@ -162,7 +183,7 @@ public class FacetLayerPreview implements PreviewGenerator {
 
     @Override
     public void close() {
-        threadPool.shutdown();
+        shutdown.set(true);
     }
 
     private Region createRegion(ImmutableVector2i chunkPos) {

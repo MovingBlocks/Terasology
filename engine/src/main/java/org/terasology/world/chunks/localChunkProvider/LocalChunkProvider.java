@@ -39,7 +39,7 @@ import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.concurrency.TaskMaster;
+import org.terasology.scheduling.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
@@ -542,7 +542,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     @Override
     public void shutdown() {
         pipeline.shutdown();
-        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
+        unloadRequestTaskMaster.shutdown(true, true);
         lightMerger.shutdown();
     }
 
@@ -581,7 +581,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public void purgeWorld() {
         ChunkMonitor.fireChunkProviderDisposed(this);
         pipeline.shutdown();
-        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
+        unloadRequestTaskMaster.shutdown(true);
         lightMerger.shutdown();
 
         for (Chunk chunk : nearCache.values()) {
@@ -669,9 +669,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
 
         private int score(ChunkTask task) {
-            if (task.isTerminateSignal()) {
-                return -1;
-            }
             return score(task.getPosition());
         }
 

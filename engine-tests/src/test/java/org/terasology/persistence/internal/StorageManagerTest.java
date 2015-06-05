@@ -50,6 +50,8 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.TaskManager;
+import org.terasology.scheduling.TaskManagerImpl;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
@@ -86,6 +88,8 @@ import static org.mockito.Mockito.when;
  */
 public class StorageManagerTest {
 
+    private static final int INITIAL_WORKER_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 1, 1);
+
     public static final String PLAYER_ID = "someId";
     public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
 
@@ -116,6 +120,7 @@ public class StorageManagerTest {
         moduleManager = ModuleManagerFactory.create();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        context.put(TaskManager.class, new TaskManagerImpl(INITIAL_WORKER_THREADS));
         context.put(ModuleManager.class, moduleManager);
         context.put(Config.class, new Config());
         context.put(AssetManager.class, new AssetManagerImpl(moduleManager.getEnvironment()));

@@ -15,7 +15,7 @@
  */
 package org.terasology.world.chunks.localChunkProvider;
 
-import org.terasology.utilities.concurrency.Task;
+import org.terasology.scheduling.Task;
 import org.terasology.world.chunks.Chunk;
 
 /**
@@ -25,15 +25,10 @@ public class ChunkUnloadRequest implements Task {
 
     private Chunk chunk;
     private LocalChunkProvider chunkProvider;
-    private boolean shutdown;
 
     public ChunkUnloadRequest(Chunk chunk, LocalChunkProvider localChunkProvider) {
         this.chunk = chunk;
         this.chunkProvider = localChunkProvider;
-    }
-
-    public ChunkUnloadRequest() {
-        shutdown = true;
     }
 
     @Override
@@ -43,13 +38,6 @@ public class ChunkUnloadRequest implements Task {
 
     @Override
     public void run() {
-        if (!shutdown) {
-            chunkProvider.gatherBlockPositionsForDeactivate(chunk);
-        }
-    }
-
-    @Override
-    public boolean isTerminateSignal() {
-        return shutdown;
+        chunkProvider.gatherBlockPositionsForDeactivate(chunk);
     }
 }

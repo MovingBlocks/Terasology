@@ -47,10 +47,9 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.Task;
+import org.terasology.scheduling.TaskMaster;
 import org.terasology.utilities.FilesUtil;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
@@ -80,7 +79,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
-    private final TaskMaster<Task> saveThreadManager;
+    private final TaskMaster<Task> saveTaskMaster;
     private final SaveTransactionHelper saveTransactionHelper;
 
     /**
@@ -130,7 +129,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary());
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
-        this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
+        this.saveTaskMaster = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
                 .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(this));
@@ -151,7 +150,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     public void finishSavingAndShutdown() {
-        saveThreadManager.shutdown(new ShutdownTask(), true);
+        saveTaskMaster.shutdown(true);
         checkSaveTransactionAndClearUpIfItIsDone();
     }
 
@@ -222,7 +221,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             if (chunk.isReady()) {
                 // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
                 unloadedAndSavingChunkMap.remove(chunk.getPosition());
-                ChunkImpl chunkImpl = (ChunkImpl) chunk;// this storage manager can only work with ChunkImpls
+                ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
                 saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
             }
         }
@@ -245,8 +244,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private void waitForCompletionOfPreviousSave() {
         if (saveTransaction != null && saveTransaction.getResult() == null) {
-            saveThreadManager.shutdown(new ShutdownTask(), true);
-            saveThreadManager.restart();
+            saveTaskMaster.shutdown(true);
+            saveTaskMaster.restart();
         }
         checkSaveTransactionAndClearUpIfItIsDone();
     }
@@ -406,7 +405,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
         saveRequested = false;
         saveTransaction = createSaveTransaction();
-        saveThreadManager.offer(saveTransaction);
+        saveTaskMaster.offer(saveTransaction);
 
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.postSave();
