@@ -18,7 +18,7 @@ package org.terasology.world.chunks.pipeline;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.concurrency.TaskMaster;
+import org.terasology.scheduling.TaskMaster;
 
 import java.util.Comparator;
 
@@ -44,7 +44,7 @@ public class ChunkGenerationPipeline {
     }
 
     public void shutdown() {
-        chunkGenerator.shutdown(new ShutdownChunkTask(), false);
+        chunkGenerator.shutdown(false);
     }
 
     public void restart() {

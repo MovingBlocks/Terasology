@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks.pipeline;
-
-import org.terasology.math.geom.Vector3i;
-
 /**
- * @author Immortius
+ * This package provides a system for scheduling and managing tasks in worker threads, allowing the management of CPU resources.
  */
-public final class ShutdownChunkTask implements ChunkTask {
+@API package org.terasology.scheduling;
 
-    @Override
-    public String getName() {
-        return "Shutdown";
-    }
-
-    @Override
-    public void run() {
-    }
-
-    @Override
-    public boolean isTerminateSignal() {
-        return true;
-    }
-
-    @Override
-    public Vector3i getPosition() {
-        return Vector3i.zero();
-    }
-
-}
+import org.terasology.module.sandbox.API;

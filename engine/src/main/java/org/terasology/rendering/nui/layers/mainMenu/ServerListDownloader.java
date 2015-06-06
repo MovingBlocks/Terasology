@@ -30,6 +30,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ServerInfo;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.TaskManager;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -94,9 +96,12 @@ class ServerListDownloader {
 
     public ServerListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
-        Thread dlThread = new Thread(downloadTask);
-        dlThread.setName("ServerList Downloader");
-        dlThread.start();
+
+        final TaskManager taskManager = CoreRegistry.get(TaskManager.class);
+
+        final Runnable dlActivity =
+            taskManager.newActivity(downloadTask, "ServerList Downloader", Thread.NORM_PRIORITY, "ServerList-Download");
+        taskManager.getThreadPool().execute(dlActivity);
     }
 
     /**

@@ -19,7 +19,6 @@ package org.terasology.network;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -28,6 +27,8 @@ import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.TaskManager;
 
 /**
  * Performs temporary connections to one or more game servers.
@@ -37,10 +38,10 @@ public class ServerInfoService implements AutoCloseable {
 
     private final ClientBootstrap bootstrap;
     private final NioClientSocketChannelFactory factory;
-    private final ExecutorService pool;
+    private final TaskManager taskManager = CoreRegistry.get(TaskManager.class);
 
     public ServerInfoService() {
-        pool = Executors.newCachedThreadPool();
+        final ExecutorService pool = taskManager.getThreadPool();
         factory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
         bootstrap = new ClientBootstrap(factory);
         bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
@@ -49,7 +50,7 @@ public class ServerInfoService implements AutoCloseable {
     }
 
     public Future<ServerInfoMessage> requestInfo(final String address, final int port) {
-        return pool.submit(new Callable<ServerInfoMessage>() {
+        return taskManager.getThreadPool().submit(new Callable<ServerInfoMessage>() {
 
             @Override
             public ServerInfoMessage call() throws Exception {

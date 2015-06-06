@@ -116,5 +116,5 @@ public interface GameEngine extends AutoCloseable {
      * Creates a context that provides read access to the objects of the engine context and can
      * be populated with it's own private objects.
      */
-    public Context createChildContext();
+    Context createChildContext();
 }

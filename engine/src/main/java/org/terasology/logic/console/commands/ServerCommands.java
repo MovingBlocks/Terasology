@@ -39,6 +39,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.scheduling.TaskManager;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
@@ -50,6 +51,9 @@ import org.terasology.world.chunks.ChunkProvider;
 public class ServerCommands extends BaseComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerCommands.class);
+
+    @In
+    private TaskManager taskManager;
 
     @In
     private EntityManager entityManager;
@@ -74,6 +78,19 @@ public class ServerCommands extends BaseComponentSystem {
         CoreRegistry.get(GameEngine.class).shutdown();
 
         return "Server shutdown triggered";
+    }
+
+    @Command(shortDescription = "Reports size of server work thread pool", runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
+    public String getServerThreads() {
+        return String.format("Server is running %d work threads", taskManager.getPoolSize());
+    }
+
+    @Command(shortDescription = "Sets size of server work thread pool", runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
+    public String setServerThreads(@CommandParam("numThreads") int numThreads) {
+        taskManager.setPoolSize(numThreads);
+        return String.format("Server is running %d work threads", numThreads);
     }
 
     @Command(shortDescription = "Kick user by name", runOnServer = true,

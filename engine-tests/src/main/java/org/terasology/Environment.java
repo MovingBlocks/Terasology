@@ -55,6 +55,8 @@ public class Environment {
         this.context = new ContextImpl();
         CoreRegistry.setContext(context);
 
+        setupTaskManager();
+
         setupPathManager();
 
         setupConfig();
@@ -83,6 +85,10 @@ public class Environment {
     }
 
     protected void loadPrefabs() {
+        // empty
+    }
+
+    protected void setupTaskManager() {
         // empty
     }
 

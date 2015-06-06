@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -25,12 +25,14 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.scheduling.TaskManager;
 
 import com.google.common.base.Preconditions;
 
@@ -45,9 +47,8 @@ public class WaitPopup<T> extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(WaitPopup.class);
 
-    private FutureTask<T> parallelTask;
-
-    private Thread thread;
+    private final TaskManager taskManager = CoreRegistry.get(TaskManager.class);
+    private Future<T>         parallelTask;
 
     private Consumer<T> resultEvent;
 
@@ -85,10 +86,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
         }
 
         if (parallelTask.isCancelled()) {
-            // wait for the thread to die
-            if (!thread.isAlive()) {
-                getManager().popScreen();
-            }
+            getManager().popScreen();
             return;
         }
 
@@ -122,10 +120,8 @@ public class WaitPopup<T> extends CoreScreenLayer {
 
         cancelButton.setVisible(canBeCancelled);
 
-        parallelTask = new FutureTask<>(operation);
-
-        thread = new Thread(parallelTask, "Parallel Operation");
-        thread.start();
+        final Callable<T> activity = taskManager.newActivity(operation, "Parallel Operation", Thread.NORM_PRIORITY, "Popup-Operation");
+        parallelTask = taskManager.getThreadPool().submit(activity);
 
         WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override

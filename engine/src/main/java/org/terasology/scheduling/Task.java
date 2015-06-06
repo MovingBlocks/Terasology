@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.utilities.concurrency;
+package org.terasology.scheduling;
 
 /**
  * @author Immortius
  */
-public abstract class AbstractTask implements Task {
+public interface Task extends Runnable {
+    String getName();
 
-    @Override
-    public boolean isTerminateSignal() {
-        return false;
-    }
+    void run();
 }

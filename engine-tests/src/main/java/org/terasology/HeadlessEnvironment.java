@@ -52,6 +52,8 @@ import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
+import org.terasology.scheduling.TaskManager;
+import org.terasology.scheduling.TaskManagerImpl;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AttachedToSurfaceFamilyFactory;
@@ -79,6 +81,8 @@ import static org.mockito.Mockito.mock;
  */
 public class HeadlessEnvironment extends Environment {
 
+    private static final int INITIAL_WORKER_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 1, 1);
+
     private static final Logger logger = LoggerFactory.getLogger(HeadlessEnvironment.class);
 
     /**
@@ -87,6 +91,11 @@ public class HeadlessEnvironment extends Environment {
      */
     public HeadlessEnvironment(Name ... modules) {
         super(modules);
+    }
+
+    @Override
+    protected void setupTaskManager() {
+        context.put(TaskManager.class, new TaskManagerImpl(INITIAL_WORKER_THREADS));
     }
 
     @Override

@@ -32,7 +32,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
-import org.terasology.utilities.concurrency.AbstractTask;
+import org.terasology.scheduling.Task;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.BufferedOutputStream;
@@ -64,7 +64,7 @@ import java.util.concurrent.locks.Lock;
  *
  * @author Florian
  */
-public class SaveTransaction extends AbstractTask {
+public class SaveTransaction implements Task {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransaction.class);
 
     private static final ImmutableMap<String, String> CREATE_ZIP_OPTIONS = ImmutableMap.of("create", "true", "encoding", "UTF-8");
@@ -121,6 +121,7 @@ public class SaveTransaction extends AbstractTask {
         return "Saving";
     }
 
+    @Override
     public void run() {
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {

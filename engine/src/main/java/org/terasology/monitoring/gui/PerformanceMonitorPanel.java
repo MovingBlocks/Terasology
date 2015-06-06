@@ -21,8 +21,8 @@ import gnu.trove.procedure.TObjectDoubleProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.scheduling.TaskManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,8 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class PerformanceMonitorPanel extends JPanel {
@@ -181,26 +180,14 @@ public class PerformanceMonitorPanel extends JPanel {
 
         private final List<Entry> list = new ArrayList<Entry>();
         private final Map<String, Entry> map = new HashMap<String, Entry>();
-        private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
         private PerformanceListModel() {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    try {
-                        while (true) {
-                            Thread.sleep(1000);
-                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
-                                updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
-                            }
-                        }
-                    } catch (Exception e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Error executing performance monitor update", e);
-                    }
-                }
-            });
+            Runnable task = () -> updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
+
+            final TaskManager taskManager = CoreRegistry.get(TaskManager.class);
+            taskManager.getThreadPool().scheduleWithFixedDelay(
+                taskManager.newActivity(task, "Performance-Monitor", Thread.MIN_PRIORITY, "Poll"),
+                1000L, 1000L, TimeUnit.MILLISECONDS);
         }
 
         private void invokeIntervalAdded(final int a, final int b) {

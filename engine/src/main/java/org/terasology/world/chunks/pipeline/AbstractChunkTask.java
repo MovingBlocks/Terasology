@@ -32,9 +32,4 @@ public abstract class AbstractChunkTask implements ChunkTask {
     public Vector3i getPosition() {
         return position;
     }
-
-    @Override
-    public boolean isTerminateSignal() {
-        return false;
-    }
 }

@@ -53,8 +53,6 @@ import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -68,9 +66,10 @@ import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
+import org.terasology.scheduling.Task;
+import org.terasology.scheduling.TaskManager;
+import org.terasology.scheduling.TaskManagerImpl;
+import org.terasology.scheduling.TaskMaster;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
@@ -113,7 +112,7 @@ public class TerasologyEngine implements GameEngine {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
-    private static final int MAX_NUMBER_THREADS = 16;
+    private static final int INITIAL_WORKER_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 1, 1);
 
     private Config config;
     private RenderingConfig renderingConfig;
@@ -126,7 +125,8 @@ public class TerasologyEngine implements GameEngine {
     private enum EngineState { UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED }
     private EngineState engineState = EngineState.UNINITIALIZED;
 
-    private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", MAX_NUMBER_THREADS);
+    private TaskManager      taskManager;
+    private TaskMaster<Task> commonThreadPool;
 
     private boolean hibernationAllowed;
     private boolean gameFocused = true;
@@ -300,6 +300,9 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+        taskManager      = new TaskManagerImpl(INITIAL_WORKER_THREADS);
+        context.put(TaskManager.class, taskManager);
+        commonThreadPool = TaskMaster.createFIFOTaskMaster("Engine-Task-Pool-commmon", INITIAL_WORKER_THREADS, Thread.MIN_PRIORITY);
 
         SplashScreen.getInstance().post("Loading modules ...");
         ModuleManager moduleManager = new ModuleManagerImpl();
@@ -681,41 +684,28 @@ public class TerasologyEngine implements GameEngine {
     public void submitTask(final String name, final Runnable task) {
         try {
             commonThreadPool.put(new Task() {
-                @Override
-                public String getName() {
+                @Override public String getName() {
                     return name;
                 }
-
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    Thread.currentThread().setName("Engine-Task-Pool");
-                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
-                        task.run();
-                    } catch (RejectedExecutionException e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Thread submitted after shutdown requested: {}", name);
-                    } catch (Throwable e) {
-                        ThreadMonitor.addError(e);
-                    }
-                }
-
-                @Override
-                public boolean isTerminateSignal() {
-                    return false;
+                @Override public void run() {
+                    task.run();
                 }
             });
         } catch (InterruptedException e) {
             logger.error("Failed to submit task {}, running on main thread", name, e);
             task.run();
+        } catch (RejectedExecutionException intrEx) {
+            logger.error("Task couldn't be scheduled due to thread pool shutdown or queue overflow: {}", name);
         }
     }
 
     public void stopThreads() {
-        commonThreadPool.shutdown(new ShutdownTask(), false);
+        commonThreadPool.shutdown(false);
+        taskManager.shutdown();
     }
 
     public void restartThreads() {
+        taskManager.restart();
         commonThreadPool.restart();
     }
 
