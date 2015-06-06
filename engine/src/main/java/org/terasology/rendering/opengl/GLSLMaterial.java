@@ -29,9 +29,9 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.GameThread;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -124,6 +124,16 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
+    public boolean isRenderable() {
+        for (Texture texture : textureMap.valueCollection()) {
+            if (!texture.isLoaded()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public void recompile() {
         TIntIntIterator it = shaderPrograms.iterator();
         while (it.hasNext()) {
@@ -145,56 +155,68 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public final void doReload(MaterialData data) {
-        doDispose();
+        try {
+            GameThread.synch(() -> {
+                doDispose();
 
-        shader = (GLSLShader) data.getShader();
-        recompile();
+                shader = (GLSLShader) data.getShader();
+                recompile();
 
-        for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
-            setTexture(entry.getKey(), entry.getValue());
-        }
+                for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
+                    setTexture(entry.getKey(), entry.getValue());
+                }
 
-        for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
-            setFloat(entry.getKey(), entry.getValue());
-        }
+                for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
+                    setFloat(entry.getKey(), entry.getValue());
+                }
 
-        for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
-            setInt(entry.getKey(), entry.getValue());
-        }
+                for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
+                    setInt(entry.getKey(), entry.getValue());
+                }
 
-        for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
-            switch (entry.getValue().length) {
-                case 1:
-                    setFloat(entry.getKey(), entry.getValue()[0]);
-                    break;
-                case 2:
-                    setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
-                    break;
-                case 3:
-                    setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
-                    break;
-                case 4:
-                    setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
-                    break;
-                default:
-                    logger.error("MaterialData contains float array entry of size > 4");
-                    break;
-            }
+                for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
+                    switch (entry.getValue().length) {
+                        case 1:
+                            setFloat(entry.getKey(), entry.getValue()[0]);
+                            break;
+                        case 2:
+                            setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                            break;
+                        case 3:
+                            setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                            break;
+                        case 4:
+                            setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                            break;
+                        default:
+                            logger.error("MaterialData contains float array entry of size > 4");
+                            break;
+                    }
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
     }
 
 
     @Override
     protected void doDispose() {
-        logger.debug("Disposing material {}.", getUrn());
-        TIntIntIterator it = shaderPrograms.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            GL20.glDeleteProgram(it.value());
+        try {
+            GameThread.synch(() -> {
+                logger.debug("Disposing material {}.", getUrn());
+                TIntIntIterator it = shaderPrograms.iterator();
+                while (it.hasNext()) {
+                    it.advance();
+                    GL20.glDeleteProgram(it.value());
+                }
+                shaderPrograms.clear();
+                uniformLocationMap.clear();
+                shader = null;
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
         }
-        shaderPrograms.clear();
-        uniformLocationMap.clear();
-        shader = null;
     }
 
 

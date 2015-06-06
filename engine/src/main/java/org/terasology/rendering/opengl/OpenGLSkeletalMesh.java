@@ -19,9 +19,11 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.assets.Asset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -57,6 +59,8 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     private static final int STRIDE = 24;
     private static final int NORMAL_OFFSET = VECTOR3_SIZE * 4;
 
+    private static final Logger logger = LoggerFactory.getLogger(OpenGLSkeletalMesh.class);
+
     private SkeletalMeshData data;
 
     private int vboPosNormBuffer;
@@ -81,46 +85,58 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     @Override
     protected void doReload(SkeletalMeshData newData) {
-        this.data = newData;
+        try {
+            GameThread.synch(() -> {
+                this.data = newData;
 
-        if (vboPosNormBuffer == 0) {
-            vboPosNormBuffer = bufferPool.get(getUrn().toString());
-        }
+                if (vboPosNormBuffer == 0) {
+                    vboPosNormBuffer = bufferPool.get(getUrn().toString());
+                }
 
-        IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
-        indexBuffer.put(newData.getIndices().toArray());
-        indexBuffer.flip();
-        if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get(getUrn().toString());
-        }
-        VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+                IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
+                indexBuffer.put(newData.getIndices().toArray());
+                indexBuffer.flip();
+                if (vboIndexBuffer == 0) {
+                    vboIndexBuffer = bufferPool.get(getUrn().toString());
+                }
+                VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
-        FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
-        for (Vector2f uv : newData.getUVs()) {
-            uvBuffer.put(uv.x);
-            uvBuffer.put(uv.y);
-        }
-        uvBuffer.flip();
+                FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
+                for (Vector2f uv : newData.getUVs()) {
+                    uvBuffer.put(uv.x);
+                    uvBuffer.put(uv.y);
+                }
+                uvBuffer.flip();
 
-        if (vboUVBuffer == 0) {
-            vboUVBuffer = bufferPool.get(getUrn().toString());
+                if (vboUVBuffer == 0) {
+                    vboUVBuffer = bufferPool.get(getUrn().toString());
+                }
+                VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
-        VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
     }
 
     @Override
     protected void doDispose() {
-        if (vboIndexBuffer != 0) {
-            bufferPool.dispose(vboIndexBuffer);
-            vboIndexBuffer = 0;
-        }
-        if (vboPosNormBuffer != 0) {
-            bufferPool.dispose(vboPosNormBuffer);
-            vboPosNormBuffer = 0;
-        }
-        if (vboUVBuffer != 0) {
-            bufferPool.dispose(vboUVBuffer);
-            vboUVBuffer = 0;
+        try {
+            GameThread.synch(() -> {
+                if (vboIndexBuffer != 0) {
+                    bufferPool.dispose(vboIndexBuffer);
+                    vboIndexBuffer = 0;
+                }
+                if (vboPosNormBuffer != 0) {
+                    bufferPool.dispose(vboPosNormBuffer);
+                    vboPosNormBuffer = 0;
+                }
+                if (vboUVBuffer != 0) {
+                    bufferPool.dispose(vboUVBuffer);
+                    vboUVBuffer = 0;
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
         }
     }
 

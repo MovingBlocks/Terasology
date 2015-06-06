@@ -602,13 +602,15 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawMaterial(Material material, Rect2i region) {
-        Rect2i drawRegion = relativeToAbsolute(region);
-        if (!state.cropRegion.overlaps(drawRegion)) {
-            return;
+        if (material.isRenderable()) {
+            Rect2i drawRegion = relativeToAbsolute(region);
+            if (!state.cropRegion.overlaps(drawRegion)) {
+                return;
+            }
+            material.setFloat("alpha", state.getAlpha());
+            material.bindTextures();
+            renderer.drawMaterialAt(material, drawRegion);
         }
-        material.setFloat("alpha", state.getAlpha());
-        material.bindTextures();
-        renderer.drawMaterialAt(material, drawRegion);
     }
 
     @Override

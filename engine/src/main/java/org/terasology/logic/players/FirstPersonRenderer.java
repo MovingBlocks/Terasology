@@ -134,26 +134,29 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:prog.block").get();
-        shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        if (handTex.isLoaded()) {
+            Material shader = Assets.getMaterial("engine:prog.block").get();
+            shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
-        shader.enable();
-        shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
-        shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
-        glBindTexture(GL11.GL_TEXTURE_2D, handTex.getId());
+            shader.enable();
+            shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
+            shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
 
-        glPushMatrix();
-        glTranslatef(0.8f, -0.8f + bobOffset - handMovementAnimationOffset * 0.5f, -1.0f - handMovementAnimationOffset * 0.5f);
-        glRotatef(-45f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(35f, 0.0f, 1.0f, 0.0f);
-        glTranslatef(0f, 0.25f, 0f);
-        glScalef(0.3f, 0.6f, 0.3f);
+            glBindTexture(GL11.GL_TEXTURE_2D, handTex.getId());
 
-        handMesh.render();
+            glPushMatrix();
+            glTranslatef(0.8f, -0.8f + bobOffset - handMovementAnimationOffset * 0.5f, -1.0f - handMovementAnimationOffset * 0.5f);
+            glRotatef(-45f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+            glRotatef(35f, 0.0f, 1.0f, 0.0f);
+            glTranslatef(0f, 0.25f, 0f);
+            glScalef(0.3f, 0.6f, 0.3f);
 
-        glPopMatrix();
+            handMesh.render();
 
-        shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+            glPopMatrix();
+
+            shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        }
     }
 
     private void renderIcon(TextureRegion iconTexture, float bobOffset, float handMovementAnimationOffset) {

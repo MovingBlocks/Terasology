@@ -84,7 +84,7 @@ public class BlockSelectionRenderer {
     }
 
     public void beginRenderOverlay() {
-        if (effectsTexture == null) {
+        if (effectsTexture == null || !effectsTexture.isLoaded()) {
             return;
         }
 

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
 import org.terasology.rendering.VertexBufferObjectUtil;
@@ -90,23 +91,33 @@ public class OpenGLMesh extends Mesh {
 
     @Override
     protected void doReload(MeshData newData) {
-        buildMesh(newData);
+        try {
+            GameThread.synch(() -> buildMesh(newData));
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
+        }
     }
 
     @Override
     protected void doDispose() {
-        hasTexCoord0 = false;
-        hasTexCoord1 = false;
-        hasColor = false;
-        hasNormal = false;
-        indexCount = 0;
-        if (vboVertexBuffer != 0) {
-            bufferPool.dispose(vboVertexBuffer);
-            vboVertexBuffer = 0;
-        }
-        if (vboIndexBuffer != 0) {
-            bufferPool.dispose(vboIndexBuffer);
-            vboIndexBuffer = 0;
+        try {
+            GameThread.synch(() -> {
+                hasTexCoord0 = false;
+                hasTexCoord1 = false;
+                hasColor = false;
+                hasNormal = false;
+                indexCount = 0;
+                if (vboVertexBuffer != 0) {
+                    bufferPool.dispose(vboVertexBuffer);
+                    vboVertexBuffer = 0;
+                }
+                if (vboIndexBuffer != 0) {
+                    bufferPool.dispose(vboIndexBuffer);
+                    vboIndexBuffer = 0;
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
         }
     }
 

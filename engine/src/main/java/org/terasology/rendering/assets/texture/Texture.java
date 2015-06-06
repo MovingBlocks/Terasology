@@ -58,5 +58,7 @@ public abstract class Texture extends TextureRegionAsset<TextureData> {
 
     public abstract int getDepth();
 
+    public abstract boolean isLoaded();
+
 
 }

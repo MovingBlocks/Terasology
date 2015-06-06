@@ -254,15 +254,17 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
             if (particleEffect.texture == null) {
                 Texture terrainTex = Assets.getTexture("engine:terrain").get();
-                if (terrainTex == null) {
+                if (terrainTex == null || !terrainTex.isLoaded()) {
                     return;
                 }
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0);
                 glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
-            } else {
+            } else if (particleEffect.texture.isLoaded()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0);
                 glBindTexture(GL11.GL_TEXTURE_2D, particleEffect.texture.getId());
+            } else {
+                return;
             }
 
             if (particleEffect.blendMode == BlockParticleEffectComponent.ParticleBlendMode.ADD) {

@@ -47,6 +47,11 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
+    public boolean isRenderable() {
+        return true;
+    }
+
+    @Override
     public void recompile() {
         // Do nothing
     }

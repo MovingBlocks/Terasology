@@ -223,7 +223,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
-            if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null) {
+            if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
             skeletalMesh.material.enable();

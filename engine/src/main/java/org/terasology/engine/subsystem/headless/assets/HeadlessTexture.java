@@ -53,6 +53,15 @@ public class HeadlessTexture extends Texture {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
+    public boolean isLoaded() {
+        return isDisposed();
+    }
+
     @Override
     protected void doReload(TextureData data) {
         this.textureData = data;

@@ -16,13 +16,15 @@
 package org.terasology.audio.openAL.staticSound;
 
 import org.lwjgl.openal.AL10;
-import org.terasology.assets.Asset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.OpenALManager;
+import org.terasology.engine.GameThread;
 
 import static org.lwjgl.openal.AL10.AL_BITS;
 import static org.lwjgl.openal.AL10.AL_CHANNELS;
@@ -33,6 +35,8 @@ import static org.lwjgl.openal.AL10.alGenBuffers;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALSound extends StaticSound {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenALSound.class);
 
     protected float length;
     private final OpenALManager audioManager;
@@ -86,30 +90,42 @@ public final class OpenALSound extends StaticSound {
 
     @Override
     protected void doReload(StaticSoundData newData) {
-        if (bufferId == 0) {
-            bufferId = alGenBuffers();
-        } else {
-            audioManager.purgeSound(this);
+        try {
+            GameThread.synch(() -> {
+                if (bufferId == 0) {
+                    bufferId = alGenBuffers();
+                } else {
+                    audioManager.purgeSound(this);
+                }
+
+                AL10.alBufferData(bufferId, newData.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, newData.getData(), newData.getSampleRate());
+                OpenALException.checkState("Allocating sound buffer");
+
+                int bits = newData.getBufferBits();
+                int size = getBufferSize();
+                int channels = getChannels();
+                int frequency = getSamplingRate();
+                length = (float) size / channels / (bits / 8) / frequency;
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
-
-        AL10.alBufferData(bufferId, newData.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, newData.getData(), newData.getSampleRate());
-        OpenALException.checkState("Allocating sound buffer");
-
-        int bits = newData.getBufferBits();
-        int size = getBufferSize();
-        int channels = getChannels();
-        int frequency = getSamplingRate();
-        length = (float) size / channels / (bits / 8) / frequency;
     }
 
 
     @Override
     protected void doDispose() {
-        if (bufferId != 0) {
-            audioManager.purgeSound(this);
-            alDeleteBuffers(bufferId);
-            bufferId = 0;
-            OpenALException.checkState("Deleting buffer data");
+        try {
+            GameThread.synch(() -> {
+                if (bufferId != 0) {
+                    audioManager.purgeSound(this);
+                    alDeleteBuffers(bufferId);
+                    bufferId = 0;
+                    OpenALException.checkState("Deleting buffer data");
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
     }
 }

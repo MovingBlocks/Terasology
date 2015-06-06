@@ -82,7 +82,7 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
 
     @Override
     public void renderOverlay() {
-        if (effectsTexture == null) {
+        if (effectsTexture == null || !effectsTexture.isLoaded()) {
             return;
         }
 

@@ -30,6 +30,7 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.registry.CoreRegistry;
@@ -390,21 +391,31 @@ public class GLSLShader extends Shader {
 
     @Override
     protected void doReload(ShaderData data) {
-        logger.debug("Recompiling shader {}.", getUrn());
+        try {
+            GameThread.synch(() -> {
+                logger.debug("Recompiling shader {}.", getUrn());
 
-        doDispose();
-        shaderProgramBase = data;
-        parameters.clear();
-        for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
-            parameters.put(metadata.getName(), metadata);
+                doDispose();
+                shaderProgramBase = data;
+                parameters.clear();
+                for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
+                    parameters.put(metadata.getName(), metadata);
+                }
+                updateAvailableFeatures();
+                recompile();
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
-        updateAvailableFeatures();
-        recompile();
     }
 
     @Override
     protected void doDispose() {
         logger.debug("Disposing shader {}.", getUrn());
-        disposeData();
+        try {
+            GameThread.synch(this::disposeData);
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
+        }
     }
 }

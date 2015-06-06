@@ -39,6 +39,11 @@ public abstract class Material extends Asset<MaterialData> {
         super(urn, assetType);
     }
 
+    /**
+     * @return Whether this material is currently in a renderable state (all textures loaded)
+     */
+    public abstract boolean isRenderable();
+
     public abstract void recompile();
 
     /**

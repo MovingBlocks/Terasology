@@ -185,38 +185,40 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         for (EntityRef entity : entityRefs) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-            meshComp.material.enable();
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null) {
-                continue;
-            }
-            if (isHidden(entity, meshComp)) {
-                continue;
-            }
+            if (meshComp.material.isRenderable()) {
+                meshComp.material.enable();
+                LocationComponent location = entity.getComponent(LocationComponent.class);
+                if (location == null) {
+                    continue;
+                }
+                if (isHidden(entity, meshComp)) {
+                    continue;
+                }
 
-            Quat4f worldRot = location.getWorldRotation();
-            Vector3f worldPos = location.getWorldPosition();
-            float worldScale = location.getWorldScale();
-            AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
-            if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
-                Vector3f worldPositionCameraSpace = new Vector3f();
-                worldPositionCameraSpace.sub(worldPos, cameraPosition);
-                Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
-                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
-                MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+                Quat4f worldRot = location.getWorldRotation();
+                Vector3f worldPos = location.getWorldPosition();
+                float worldScale = location.getWorldScale();
+                AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
+                if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
+                    Vector3f worldPositionCameraSpace = new Vector3f();
+                    worldPositionCameraSpace.sub(worldPos, cameraPosition);
+                    Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
+                    Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                    MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
-                meshComp.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-                meshComp.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                    meshComp.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                    meshComp.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-                MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-                meshComp.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
-                meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
-                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
-                meshComp.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
+                    MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                    meshComp.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+                    meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
+                    meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
+                    meshComp.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
 
-                OpenGLMesh mesh = (OpenGLMesh) meshComp.mesh;
-                meshComp.material.bindTextures();
-                mesh.render();
+                    OpenGLMesh mesh = (OpenGLMesh) meshComp.mesh;
+                    meshComp.material.bindTextures();
+                    mesh.render();
+                }
             }
         }
     }
@@ -248,65 +250,67 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
         for (Material material : meshByMaterial.keySet()) {
-            OpenGLMesh lastMesh = null;
-            material.enable();
-            material.setFloat("sunlight", 1.0f);
-            material.setFloat("blockLight", 1.0f);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-            material.bindTextures();
+            if (material.isRenderable()) {
+                OpenGLMesh lastMesh = null;
+                material.enable();
+                material.setFloat("sunlight", 1.0f);
+                material.setFloat("blockLight", 1.0f);
+                material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                material.bindTextures();
 
-            Set<EntityRef> entities = meshByMaterial.get(material);
-            lastRendered = entities.size();
-            for (EntityRef entity : entities) {
-                MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-                LocationComponent location = entity.getComponent(LocationComponent.class);
+                Set<EntityRef> entities = meshByMaterial.get(material);
+                lastRendered = entities.size();
+                for (EntityRef entity : entities) {
+                    MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+                    LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null
-                        || !worldProvider.isBlockRelevant(location.getWorldPosition())) {
-                    continue;
-                }
-                if (meshComp.mesh.isDisposed()) {
-                    logger.error("Attempted to render disposed mesh");
-                    continue;
-                }
-
-                location.getWorldRotation(worldRot);
-                location.getWorldPosition(worldPos);
-                float worldScale = location.getWorldScale();
-
-                javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
-                transWorldSpace.set(matrixWorldSpace);
-
-                Vector3f worldPositionCameraSpace = new Vector3f();
-                worldPositionCameraSpace.sub(worldPos, cameraPosition);
-                Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
-
-                AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
-                if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
-                    if (meshComp.mesh != lastMesh) {
-                        if (lastMesh != null) {
-                            lastMesh.postRender();
-                        }
-                        lastMesh = (OpenGLMesh) meshComp.mesh;
-                        lastMesh.preRender();
+                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null
+                            || !worldProvider.isBlockRelevant(location.getWorldPosition())) {
+                        continue;
                     }
-                    Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
-                    MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+                    if (meshComp.mesh.isDisposed()) {
+                        logger.error("Attempted to render disposed mesh");
+                        continue;
+                    }
 
-                    material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                    location.getWorldRotation(worldRot);
+                    location.getWorldPosition(worldPos);
+                    float worldScale = location.getWorldScale();
 
-                    MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
-                    material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+                    javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
+                    transWorldSpace.set(matrixWorldSpace);
 
-                    material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
-                    material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
-                    material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
+                    Vector3f worldPositionCameraSpace = new Vector3f();
+                    worldPositionCameraSpace.sub(worldPos, cameraPosition);
+                    Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
-                    lastMesh.doRender();
+                    AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
+                    if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
+                        if (meshComp.mesh != lastMesh) {
+                            if (lastMesh != null) {
+                                lastMesh.postRender();
+                            }
+                            lastMesh = (OpenGLMesh) meshComp.mesh;
+                            lastMesh.preRender();
+                        }
+                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                        MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+
+                        material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+
+                        MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                        material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+
+                        material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
+                        material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
+                        material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
+
+                        lastMesh.doRender();
+                    }
                 }
-            }
-            if (lastMesh != null) {
-                lastMesh.postRender();
+                if (lastMesh != null) {
+                    lastMesh.postRender();
+                }
             }
         }
     }
