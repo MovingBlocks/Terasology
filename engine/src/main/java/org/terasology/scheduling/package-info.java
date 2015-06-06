@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-/** This package provides a system for scheduling and managing tasks in worker threads, allowing the management of CPU resources.
-  **/
+/**
+ * This package provides a system for scheduling and managing tasks in worker threads, allowing the management of CPU resources.
+ */
 @API package org.terasology.scheduling;
 
 import org.terasology.module.sandbox.API;

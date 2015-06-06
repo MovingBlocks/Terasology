@@ -39,16 +39,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
 
 
-/** Manages the submission of tasks for a specific purpose.  While this class is not directly responsible for the number of worker
-  * threads executing (see {@link TaskManager}), it does limit the number of concurrent tasks it submits to those workers, conserving
-  * resources and allowing its tasks to be prioritized relative to each other.
-  *
-  * @param T
-  *    The subclass of {@link Task} managed by the object.
-  **/
+/**
+ * Manages the submission of tasks for a specific purpose.  While this class is not directly responsible for the number of worker
+ * threads executing (see {@link TaskManager}), it does limit the number of concurrent tasks it submits to those workers, conserving
+ * resources and allowing its tasks to be prioritized relative to each other.
+ *
+ * @param T The subclass of {@link Task} managed by the object.
+ */
 public final class TaskMaster<T extends Task> {
-    /** The default amount of time (in milliseconds) to wait for tasks to complete on shutdown.
-      **/
+    /**
+     * The default amount of time (in milliseconds) to wait for tasks to complete on shutdown.
+     */
     public static final long DEFAULT_COMPLETION_WAIT_TIME_MS = 20_000L;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskMaster.class);
@@ -187,13 +188,12 @@ public final class TaskMaster<T extends Task> {
         }
     }
 
-    /** Orderly shutdown of submitted tasks.
-      *
-      * @param waitTimeInMs
-      *     If positive, waits this many milliseconds for tasks to finish executing.  Warns but completes normally on timeout.
-      * @param waitForScheduledOnly
-      *     If true, all submitted tasks not already scheduled in the thread pool are discarded.
-      **/
+    /**
+     * Orderly shutdown of submitted tasks.
+     *
+     * @param waitTimeInMs         If positive, waits this many milliseconds for tasks to finish executing.  Warns but completes normally on timeout.
+     * @param waitForScheduledOnly If true, all submitted tasks not already scheduled in the thread pool are discarded.
+     */
     public void shutdown(long waitTimeInMs, boolean waitForScheduledOnly) {
         long waitTimeInNs = TimeUnit.MILLISECONDS.toNanos(waitTimeInMs);
 
@@ -250,14 +250,16 @@ public final class TaskMaster<T extends Task> {
         }
     }
 
-    /** Equivalent to {@code shutdown(DEFAULT_COMPLETION_WAIT_TIME_MS, waitForScheduledOnly)}.
-      **/
+    /**
+     * Equivalent to {@code shutdown(DEFAULT_COMPLETION_WAIT_TIME_MS, waitForScheduledOnly)}.
+     */
     public void shutdown(boolean awaitComplete, boolean waitForScheduledOnly) {
         shutdown((awaitComplete) ? DEFAULT_COMPLETION_WAIT_TIME_MS : 0L, waitForScheduledOnly);
     }
 
-    /** Equivalent to {@code shutdown(waitComplete, false)}.
-      **/
+    /**
+     * Equivalent to {@code shutdown(waitComplete, false)}.
+     */
     public void shutdown(boolean awaitComplete) {
         shutdown((awaitComplete) ? DEFAULT_COMPLETION_WAIT_TIME_MS : 0L, false);
     }
@@ -287,13 +289,12 @@ public final class TaskMaster<T extends Task> {
         }
     }
 
-    /** Guaranteed scheduling of a task if one is already in the task queue.
-      * The lock must already be held.
-      *
-      * @param processorName
-      *    The thread (processor) name being recycled from a task that is just
-      *    completing, or null if there is none.
-      **/
+    /**
+     * Guaranteed scheduling of a task if one is already in the task queue.
+     * The lock must already be held.
+     *
+     * @param processorName The thread (processor) name being recycled from a task that is just completing, or null if there is none.
+     */
     private void scheduleNext(String processorName) {
         final ExecutorService threadPool = taskManager.getThreadPool();
         if (threadPool == null) {

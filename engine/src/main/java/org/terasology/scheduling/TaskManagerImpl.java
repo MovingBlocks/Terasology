@@ -34,6 +34,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
+/**
+ * Concrete TaskManager implementation.
+ */
 public class TaskManagerImpl implements TaskManager {
    private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
@@ -44,11 +47,11 @@ public class TaskManagerImpl implements TaskManager {
    private volatile ScheduledExecutorService    threadPool;
 
 
-   /** Constructs a task manager and starts its thread pool.
-     *
-     * @param poolSize
-     *    The (initial) number of worker threads in the thread pool.
-     **/
+   /**
+    * Constructs a task manager and starts its thread pool.
+    *
+    * @param poolSize The (initial) number of worker threads in the thread pool.
+    */
    public TaskManagerImpl(int poolSize) {
       Preconditions.checkArgument(poolSize > 0, "Non-positive pool size %s", poolSize);
 
@@ -58,46 +61,57 @@ public class TaskManagerImpl implements TaskManager {
    }
 
 
+   @Override
    public Runnable newActivity(Runnable runnable, String threadName, int threadPriority, String activityName) {
       return new RunnableActivity(runnable, new ActivityInfo(threadName, threadPriority, activityName));
    }
 
+   @Override
    public Runnable newActivity(Task task, String threadName, int threadPriority) {
       return new RunnableActivity(task, new ActivityInfo(threadName, threadPriority, task.getName()));
    }
 
+   @Override
    public <V> Callable<V> newActivity(Callable<V> callable, String threadName, int threadPriority, String activityName) {
       return new CallableActivity(callable, new ActivityInfo(threadName, threadPriority, activityName));
    }
 
+   @Override
    public <V> Callable<V> newActivity(Runnable runnable, V result, String threadName, int threadPriority, String activityName) {
       return new CallableActivity(Executors.callable(runnable, result), new ActivityInfo(threadName, threadPriority, activityName));
    }
 
+   @Override
    public Runnable newActivity(Runnable runnable, String activityName) {
       return newActivity(runnable, null, Thread.NORM_PRIORITY, activityName);
    }
 
+   @Override
    public Runnable newActivity(Task task) {
       return newActivity(task, null, Thread.NORM_PRIORITY);
    }
 
+   @Override
    public <V> Callable<V> newActivity(Callable<V> callable, String activityName) {
       return newActivity(callable, null, Thread.NORM_PRIORITY, activityName);
    }
 
+   @Override
    public <V> Callable<V> newActivity(Runnable runnable, V result, String activityName) {
       return newActivity(runnable, result, null, Thread.NORM_PRIORITY, activityName);
    }
 
+   @Override
    public ScheduledExecutorService getThreadPool() {
       return threadPool;
    }
 
+   @Override
    public int getPoolSize() {
       return poolSize;
    }
 
+   @Override
    public void setPoolSize(int value) {
       Preconditions.checkArgument(value > 0, "Non-positive pool size %s", value);
 
@@ -112,6 +126,7 @@ public class TaskManagerImpl implements TaskManager {
       }
    }
 
+   @Override
    public void shutdown(long gracefulWaitInMs, long extraWaitInMs) {
       ScheduledThreadPoolExecutor s;
 
@@ -149,11 +164,13 @@ public class TaskManagerImpl implements TaskManager {
       }
    }
 
+   @Override
    public void shutdown() {
       shutdown(DEFAULT_GRACEFUL_SHUTDOWN_TIME_MS,
                DEFAULT_EXTRA_SHUTDOWN_TIME_MS);
    }
 
+   @Override
    public void restart() {
       lock.lock();
       try {
@@ -177,8 +194,9 @@ public class TaskManagerImpl implements TaskManager {
    }
 
 
-   /** Keeps track of thread priority, thread name, and thread monitoring for future tasks.
-     **/
+   /**
+    * Keeps track of thread priority, thread name, and thread monitoring for future tasks.
+    */
    private static final class ActivityInfo {
       private final String threadName;
       private final int    threadPriority;
@@ -191,8 +209,9 @@ public class TaskManagerImpl implements TaskManager {
       }
    }
 
-   /** An RAAI class that sets priority and optionally sets thread name and thread monitoring while it is open.
-     **/
+   /**
+    * An RAAI class that sets priority and optionally sets thread name and thread monitoring while it is open.
+    */
    private static final class Activity implements AutoCloseable {
       private final   Thread         thread;
       private final   String         oldName;
@@ -200,15 +219,13 @@ public class TaskManagerImpl implements TaskManager {
       private final   ThreadActivity activity;
       private boolean                closed;
 
-      /** Constructs a new activity.
-        *
-        * @param threadName
-        *    The name to give the thread while the task runs, or null to keep the thread's default name.
-        * @param threadPriority
-        *    The priority to assign the thread while the task runs.
-        * @param activityName
-        *    The name of the activity for monitoring, or null if the task should not be monitored.
-        **/
+      /**
+       * Constructs a new activity.
+       *
+       * @param threadName     The name to give the thread while the task runs, or null to keep the thread's default name.
+       * @param threadPriority The priority to assign the thread while the task runs.
+       * @param activityName   The name of the activity for monitoring, or null if the task should not be monitored.
+       */
       Activity(ActivityInfo info) {
          final String tName = info.threadName;
          final String aName = info.activityName;
