@@ -89,5 +89,35 @@ public class PlaceBlockCommand extends BaseComponentSystem {
         }
         throw new IllegalArgumentException("Sorry, something went wrong!");
     }
+	
+	
+	@Command(shortDescription = "Create a building  of the color specified({Red,Blue,Green} implemented)")
+    public String placeColorBuilding(@CommandParam("colorBlock") String colorBlock,
+    		                         @CommandParam("X") int xpos,
+    		                         @CommandParam("Z") int zpos,
+    		                         @CommandParam("size") int size) {
+    	if(!isImplementedColor(colorBlock))
+    		return "Put an implemented color in {Red, Blue, Green}";
+    	WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
+    	Camera camera= renderer.getActiveCamera();
+    	
+    	Vector3f spawnPos = camera.getPosition();
+        Vector3f offset = camera.getViewingDirection();
+        offset.scale(3);
+        spawnPos.add(offset);
+
+        BlockFamily blockFamily;
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(colorBlock);
+        blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
+        WorldProvider world = CoreRegistry.get(WorldProvider.class);
+        if (world != null) {
+        	for(int y = 0; y< size; ++y)
+        		world.setBlock(new Vector3i(xpos, (12 + y), zpos), blockFamily.getArchetypeBlock());
+            return "Success";
+        }
+        throw new IllegalArgumentException("Sorry, something went wrong!");
+    }
+
 
 }
