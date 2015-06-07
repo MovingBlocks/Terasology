@@ -16,16 +16,22 @@
 package org.terasology.world.generation;
 
 import org.junit.Test;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.facets.base.BaseFacet3D;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import static org.junit.Assert.assertEquals;
 
 public class WorldBuilderTest {
+
+    private Context context = new ContextImpl();
+
     @Test
     public void borderCalculation() {
-        WorldBuilder worldBuilder = new WorldBuilder();
+        WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
@@ -43,7 +49,7 @@ public class WorldBuilderTest {
 
     @Test
     public void cumulativeBorderCalculation() {
-        WorldBuilder worldBuilder = new WorldBuilder();
+        WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());
@@ -65,7 +71,7 @@ public class WorldBuilderTest {
 
     @Test
     public void multiplePathsBorderCalculation() {
-        WorldBuilder worldBuilder = new WorldBuilder();
+        WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
         worldBuilder.addProvider(new Facet2Provider());

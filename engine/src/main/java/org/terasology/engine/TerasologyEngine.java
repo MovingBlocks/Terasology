@@ -21,11 +21,8 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetManagerImpl;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -40,7 +37,6 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
@@ -49,7 +45,6 @@ import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -64,17 +59,20 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.version.TerasologyVersion;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
+import org.terasology.world.block.sounds.BlockSounds;
+import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
@@ -88,25 +86,25 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Immortius
- *
- * This GameEngine implementation is the heart of Terasology.
- *
- * It first takes care of making a number of application-wide initializations (see init()
- * method). It then provides a main game loop (see run() method) characterized by a number
- * of mutually exclusive {@link GameState}s. The current GameState is updated each
- * frame, and a change of state (see changeState() method) can be requested at any time - the
- * switch will occur cleanly between frames. Interested parties can be notified of GameState
- * changes by using the subscribeToStateChange() method.
- *
- * At this stage the engine also provides a number of utility methods (see submitTask() and
- * hasMouseFocus() to name a few) but they might be moved elsewhere.
- *
- * Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem}
- * is a pluggable low-level component of the engine, that is processed every frame - like
- * rendering or audio. A list of EngineSubsystems is provided in input to the engine's
- * constructor. Different sets of Subsystems can significantly change the behaviour of
- * the engine, i.e. providing a "no-frills" server in one case or a full-graphics client
- * in another.
+ *         <p>
+ *         This GameEngine implementation is the heart of Terasology.
+ *         <p>
+ *         It first takes care of making a number of application-wide initializations (see init()
+ *         method). It then provides a main game loop (see run() method) characterized by a number
+ *         of mutually exclusive {@link GameState}s. The current GameState is updated each
+ *         frame, and a change of state (see changeState() method) can be requested at any time - the
+ *         switch will occur cleanly between frames. Interested parties can be notified of GameState
+ *         changes by using the subscribeToStateChange() method.
+ *         <p>
+ *         At this stage the engine also provides a number of utility methods (see submitTask() and
+ *         hasMouseFocus() to name a few) but they might be moved elsewhere.
+ *         <p>
+ *         Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem}
+ *         is a pluggable low-level component of the engine, that is processed every frame - like
+ *         rendering or audio. A list of EngineSubsystems is provided in input to the engine's
+ *         constructor. Different sets of Subsystems can significantly change the behaviour of
+ *         the engine, i.e. providing a "no-frills" server in one case or a full-graphics client
+ *         in another.
  */
 public class TerasologyEngine implements GameEngine {
 
@@ -123,7 +121,8 @@ public class TerasologyEngine implements GameEngine {
     private GameState pendingState;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
-    private enum EngineState { UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED }
+    private enum EngineState {UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED}
+
     private EngineState engineState = EngineState.UNINITIALIZED;
 
     private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", MAX_NUMBER_THREADS);
@@ -132,6 +131,7 @@ public class TerasologyEngine implements GameEngine {
     private boolean gameFocused = true;
 
     private Deque<EngineSubsystem> subsystems;
+    private ModuleAwareAssetTypeManager assetTypeManager;
 
     /**
      * Contains objects that life for the duration of this engine.
@@ -143,7 +143,7 @@ public class TerasologyEngine implements GameEngine {
      * subsystems and managers. It also verifies that some required systems
      * are up and running after they have been initialized.
      *
-     * @param subsystems  Typical subsystems lists contain graphics, timer,
+     * @param subsystems Typical subsystems lists contain graphics, timer,
      *                   audio and input subsystems.
      */
     public TerasologyEngine(Collection<EngineSubsystem> subsystems) {
@@ -177,7 +177,11 @@ public class TerasologyEngine implements GameEngine {
 
             GameThread.setToCurrentThread();
 
+            initSubsystems();
+
             initManagers();
+            initAssets();
+            ApplyModulesUtil.applyModules(context);
 
             SplashScreen.getInstance().post("Post-initialize subsystems ...");
 
@@ -189,7 +193,6 @@ public class TerasologyEngine implements GameEngine {
 
             SplashScreen.getInstance().post("Initialize assets ...");
 
-            initAssets();
 
             // TODO: Review - The advanced monitor shouldn't be hooked-in this way (see issue #692)
             initAdvancedMonitor();
@@ -278,6 +281,12 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
+    private void initSubsystems() {
+        for (EngineSubsystem subsystem : getSubsystems()) {
+            subsystem.initialise(context);
+        }
+    }
+
     /**
      * Gives a chance to subsystems to do something AFTER managers and Time are initialized.
      */
@@ -316,18 +325,15 @@ public class TerasologyEngine implements GameEngine {
                 copyStrategyLibrary));
 
         SplashScreen.getInstance().post("Loading assets ...");
-        AssetManager assetManager = new AssetManagerImpl(moduleManager.getEnvironment());
-        assetManager.setEnvironment(moduleManager.getEnvironment());
-        context.put(AssetManager.class, assetManager);
+        assetTypeManager = new ModuleAwareAssetTypeManager();
+        context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
+        context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(CollisionGroupManager.class, new CollisionGroupManager());
         context.put(WorldGeneratorManager.class, new WorldGeneratorManager(context));
         context.put(ComponentSystemManager.class, new ComponentSystemManager());
         context.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
         context.put(NetworkSystem.class, new NetworkSystemImpl(time, context));
         context.put(Game.class, new Game(this, time));
-
-        AssetType.registerAssetTypes(assetManager);
-        ApplyModulesUtil.applyModules(context);
     }
 
     /**
@@ -341,40 +347,21 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        AssetManager assetManager = context.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+        DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
+        context.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
 
-            @Override
-            public Prefab buildAsset(AssetUri uri, PrefabData data) {
-                return new PojoPrefab(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SHAPE, new AssetFactory<BlockShapeData, BlockShape>() {
-
-            @Override
-            public BlockShape buildAsset(AssetUri uri, BlockShapeData data) {
-                return new BlockShapeImpl(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.UI_SKIN, new AssetFactory<UISkinData, UISkin>() {
-            @Override
-            public UISkin buildAsset(AssetUri uri, UISkinData data) {
-                return new UISkin(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.BEHAVIOR, new AssetFactory<BehaviorTreeData, BehaviorTree>() {
-            @Override
-            public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
-                return new BehaviorTree(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.UI_ELEMENT, new AssetFactory<UIData, UIElement>() {
-            @Override
-            public UIElement buildAsset(AssetUri uri, UIData data) {
-                return new UIElement(uri, data);
-            }
-        });
-
+        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, false, "prefabs");
+        assetTypeManager.registerCoreAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
+        assetTypeManager.registerCoreAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
+        assetTypeManager.registerCoreAssetType(BlockTile.class, BlockTile::new, "blockTiles");
+        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
+        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class, new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), familyFactoryRegistry));
+        assetTypeManager.registerCoreAssetType(UISkin.class, UISkin::new, "skins");
+        assetTypeManager.registerCoreAssetType(BehaviorTree.class, BehaviorTree::new, false, "behaviors");
+        assetTypeManager.registerCoreAssetType(UIElement.class, UIElement::new, "ui");
+        for (EngineSubsystem subsystem : subsystems) {
+            subsystem.registerCoreAssetTypes(assetTypeManager);
+        }
     }
 
     /**
@@ -447,6 +434,8 @@ public class TerasologyEngine implements GameEngine {
                 time.setPaused(false);
                 continue;
             }
+
+            assetTypeManager.reloadChangedOnDisk();
 
             processPendingState();
 
@@ -556,12 +545,12 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
-     (each is a GameState). The change can be immediate, if there is no current game
-     state set, or scheduled, when a current state exists and the new state is stored as
-     pending. That been said, scheduled changes occurs in the main loop through the call
-     processStateChanges(). As such, from a user perspective in normal circumstances,
-     scheduled changes are likely to be perceived as immediate.
+     * Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
+     * (each is a GameState). The change can be immediate, if there is no current game
+     * state set, or scheduled, when a current state exists and the new state is stored as
+     * pending. That been said, scheduled changes occurs in the main loop through the call
+     * processStateChanges(). As such, from a user perspective in normal circumstances,
+     * scheduled changes are likely to be perceived as immediate.
      */
     @Override
     public void changeState(GameState newState) {

@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commandSystem;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -38,6 +37,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 

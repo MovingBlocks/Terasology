@@ -26,6 +26,8 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
+import java.util.Optional;
+
 /**
  * @author Immortius
  */
@@ -53,9 +55,9 @@ public class BlockItemFactory {
         }
 
         // Copy the components from block prefab into the block item
-        Prefab prefab = Assets.getPrefab(blockFamily.getArchetypeBlock().getPrefab());
-        if (prefab != null) {
-            for (Component component : prefab.iterateComponents()) {
+        Optional<Prefab> prefab = blockFamily.getArchetypeBlock().getPrefab();
+        if (prefab.isPresent()) {
+            for (Component component : prefab.get().iterateComponents()) {
                 if (component.getClass().getAnnotation(AddToBlockBasedItem.class) != null) {
                     builder.addComponent(entityManager.getComponentLibrary().copy(component));
                 }
@@ -100,6 +102,11 @@ public class BlockItemFactory {
             if (component.getClass().getAnnotation(AddToBlockBasedItem.class) != null) {
                 builder.addComponent(entityManager.getComponentLibrary().copy(component));
             }
+        }
+
+        DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
+        if (displayNameComponent != null) {
+            displayNameComponent.name = blockFamily.getDisplayName();
         }
 
         ItemComponent item = builder.getComponent(ItemComponent.class);

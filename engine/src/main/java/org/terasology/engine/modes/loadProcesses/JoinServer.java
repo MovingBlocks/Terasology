@@ -50,6 +50,8 @@ public class JoinServer implements LoadProcess {
     private GameManifest gameManifest;
     private JoinStatus joinStatus;
 
+    private Thread applyModuleThread;
+
     public JoinServer(Context context, GameManifest gameManifest, JoinStatus joinStatus) {
         this.context = context;
         this.networkSystem = context.get(NetworkSystem.class);
@@ -59,12 +61,18 @@ public class JoinServer implements LoadProcess {
 
     @Override
     public String getMessage() {
-        return joinStatus.getCurrentActivity();
+        if (applyModuleThread != null) {
+            return "Scanning for Assets...";
+        } else {
+            return joinStatus.getCurrentActivity();
+        }
     }
 
     @Override
     public boolean step() {
-        if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
+        if (applyModuleThread != null) {
+            return !applyModuleThread.isAlive();
+        } else if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
             ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             gameManifest.setTitle(serverInfo.getGameName());
             for (WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
@@ -112,9 +120,11 @@ public class JoinServer implements LoadProcess {
             moduleManager.loadEnvironment(moduleSet, true);
 
             context.get(Game.class).load(gameManifest);
-            ApplyModulesUtil.applyModules(context.get(Context.class));
 
-            return true;
+            applyModuleThread = new Thread(() -> ApplyModulesUtil.applyModules(context.get(Context.class)));
+            applyModuleThread.start();
+
+            return false;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             StateMainMenu mainMenu = new StateMainMenu("Failed to connect to server: " + joinStatus.getErrorMessage());
             context.get(GameEngine.class).changeState(mainMenu);

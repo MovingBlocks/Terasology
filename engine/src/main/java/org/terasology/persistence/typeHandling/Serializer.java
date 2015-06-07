@@ -92,9 +92,13 @@ public class Serializer {
      */
     public void deserializeOnto(Object target, FieldMetadata<?, ?> fieldMetadata, PersistedData data, DeserializationContext context) {
         TypeHandler<?> handler = getHandlerFor(fieldMetadata);
-        Object deserializedValue = handler.deserialize(data, context);
-        if (deserializedValue != null) {
-            fieldMetadata.setValue(target, deserializedValue);
+        if (handler == null) {
+            logger.error("No type handler for type {} used by {}::{}", fieldMetadata.getType(), target.getClass(), fieldMetadata);
+        } else {
+            Object deserializedValue = handler.deserialize(data, context);
+            if (deserializedValue != null) {
+                fieldMetadata.setValue(target, deserializedValue);
+            }
         }
     }
 

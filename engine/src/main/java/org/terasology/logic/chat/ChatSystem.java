@@ -18,8 +18,7 @@ package org.terasology.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -51,13 +50,13 @@ import org.terasology.rendering.nui.NUIManager;
 public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
 
-    private static final AssetUri CHAT_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:chat");
-    private static final AssetUri CONSOLE_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:console");
-    private static final AssetUri MINICHAT_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:minichatOverlay");
-    
+    private static final ResourceUrn CHAT_UI = new ResourceUrn("engine:chat");
+    private static final ResourceUrn CONSOLE_UI = new ResourceUrn("engine:console");
+    private static final ResourceUrn MINICHAT_UI = new ResourceUrn("engine:minichatOverlay");
+
     @In
     private Console console;
-    
+
     @In
     private EntityManager entityManager;
 

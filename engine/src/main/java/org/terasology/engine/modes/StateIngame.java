@@ -18,7 +18,7 @@ package org.terasology.engine.modes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
-import org.terasology.asset.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
@@ -153,9 +153,9 @@ public class StateIngame implements GameState {
             storageManager.finishSavingAndShutdown();
         }
         ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
-        CoreRegistry.get(AssetManager.class).setEnvironment(environment);
+
+        CoreRegistry.get(ModuleAwareAssetTypeManager.class).switchEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
-        BlockManager.getAir().setEntity(EntityRef.NULL);
         GameThread.clearWaitingProcesses();
 
         /*
@@ -186,7 +186,6 @@ public class StateIngame implements GameState {
 
         updateUserInterface(delta);
     }
-
 
 
     @Override

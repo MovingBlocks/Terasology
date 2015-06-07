@@ -19,8 +19,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -47,14 +47,14 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     private Vector2i size;
     private IntBuffer vp;
 
-    public LwjglFrameBufferObject(AssetUri uri, Vector2i size) {
+    public LwjglFrameBufferObject(ResourceUrn urn, Vector2i size) {
         this.size = size;
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);
         frame = fboId.get(0);
 
-        Texture texture = generateTexture(uri);
+        Texture texture = generateTexture(urn);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, texture.getId(), 0);
@@ -69,9 +69,9 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
-    private Texture generateTexture(AssetUri uri) {
+    private Texture generateTexture(ResourceUrn urn) {
         TextureData data = new TextureData(size.x, size.y, new ByteBuffer[]{}, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-        return Assets.generateAsset(uri, data, Texture.class);
+        return Assets.generateAsset(urn, data, Texture.class);
     }
 
     @Override

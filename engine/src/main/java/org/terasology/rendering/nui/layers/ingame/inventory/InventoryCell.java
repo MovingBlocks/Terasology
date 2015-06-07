@@ -49,10 +49,6 @@ public class InventoryCell extends ItemCell {
 
     private Binding<EntityRef> targetInventory = new DefaultBinding<>(EntityRef.NULL);
 
-    private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-    private InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
-    private EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-
     private InteractionListener interactionListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
@@ -125,21 +121,21 @@ public class InventoryCell extends ItemCell {
     }
 
     private void swapItem() {
-        inventoryManager.switchItem(getTransferEntity(), localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot());
+        CoreRegistry.get(InventoryManager.class).switchItem(getTransferEntity(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, getTargetInventory(), getTargetSlot());
     }
 
     private void giveAmount(int amount) {
-        inventoryManager.moveItem(getTargetInventory(), localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount);
+        CoreRegistry.get(InventoryManager.class).moveItem(getTargetInventory(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount);
     }
 
     private void takeAmount(int amount) {
-        inventoryManager.moveItem(getTransferEntity(), localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
+        CoreRegistry.get(InventoryManager.class).moveItem(getTransferEntity(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
     }
 
     private void moveItemSmartly() {
         EntityRef fromEntity = getTargetInventory();
         int fromSlot = getTargetSlot();
-        EntityRef playerEntity = localPlayer.getCharacterEntity();
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
         InventoryComponent playerInventory = playerEntity.getComponent(InventoryComponent.class);
         if (playerInventory == null) {
             return;
@@ -178,7 +174,7 @@ public class InventoryCell extends ItemCell {
             toSlots = numbersBetween(0, totalSlotCount);
         }
 
-        inventoryManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
+        CoreRegistry.get(InventoryManager.class).moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
     }
 
     private List<Integer> numbersBetween(int start, int exclusiveEnd) {
@@ -191,7 +187,7 @@ public class InventoryCell extends ItemCell {
 
 
     private EntityRef getTransferEntity() {
-        return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
+        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
 
     private EntityRef getTransferItem() {

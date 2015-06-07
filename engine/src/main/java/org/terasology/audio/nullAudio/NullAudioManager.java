@@ -16,8 +16,7 @@
 
 package org.terasology.audio.nullAudio;
 
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.AssetFactory;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
@@ -103,22 +102,12 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public AssetFactory<StaticSoundData, StaticSound> getStaticSoundFactory() {
-        return new AssetFactory<StaticSoundData, StaticSound>() {
-            @Override
-            public StaticSound buildAsset(AssetUri uri, StaticSoundData data) {
-                return new NullSound(uri, data);
-            }
-        };
+    public AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory() {
+        return NullSound::new;
     }
 
     @Override
-    public AssetFactory<StreamingSoundData, StreamingSound> getStreamingSoundFactory() {
-        return new AssetFactory<StreamingSoundData, StreamingSound>() {
-            @Override
-            public StreamingSound buildAsset(AssetUri uri, StreamingSoundData data) {
-                return new NullStreamingSound(uri, data);
-            }
-        };
+    public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
+        return NullStreamingSound::new;
     }
 }

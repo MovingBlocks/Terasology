@@ -15,23 +15,24 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
@@ -39,30 +40,18 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
-import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.shader.Shader;
-import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
-import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
-import org.terasology.rendering.assets.texture.NoiseTextureAssetResolver;
+import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
-import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.rendering.assets.texture.subtexture.SubtextureFromAtlasResolver;
-import org.terasology.rendering.iconmesh.IconMeshResolver;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
@@ -76,19 +65,52 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glTexParameterf;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
     private GLBufferPool bufferPool = new GLBufferPool(false);
+
+    private BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
+
+    @Override
+    public void initialise(Context context) {
+
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+        assetTypeManager.registerCoreAssetType(Font.class, FontImpl::new, "fonts");
+        assetTypeManager.registerCoreAssetType(Texture.class, (urn, assetType, data) -> (new OpenGLTexture(urn, assetType, data, this)), "textures", "fonts");
+        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
+        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
+
+        assetTypeManager.registerCoreAssetType(Shader.class, GLSLShader::new, "shaders");
+        assetTypeManager.registerCoreAssetType(Material.class, GLSLMaterial::new, "materials");
+        assetTypeManager.registerCoreAssetType(Mesh.class, (urn, assetType, data) -> new OpenGLMesh(urn, assetType, bufferPool, data), "mesh");
+        assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (urn, assetType, data) -> new OpenGLSkeletalMesh(urn, assetType, data, bufferPool), "skeletalMesh");
+        assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
+        assetTypeManager.registerCoreAssetType(Atlas.class, Atlas::new, "atlas");
+        assetTypeManager.registerCoreAssetType(Subtexture.class, Subtexture::new);
+    }
 
     @Override
     public void postInitialise(Context context) {
@@ -110,6 +132,12 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void postUpdate(GameState currentState, float delta) {
         Display.update();
+
+        if (!displayThreadActions.isEmpty()) {
+            List<Runnable> actions = Lists.newArrayListWithExpectedSize(displayThreadActions.size());
+            displayThreadActions.drainTo(actions);
+            actions.forEach(Runnable::run);
+        }
 
         int frameLimit = CoreRegistry.get(Config.class).getRendering().getFrameLimit();
         if (frameLimit > 0) {
@@ -188,65 +216,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
-        AssetManager assetManager = context.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
-            @Override
-            public Font buildAsset(AssetUri uri, FontData data) {
-                return new FontImpl(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
-            @Override
-            public Texture buildAsset(AssetUri uri, TextureData data) {
-                return new OpenGLTexture(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
-            @Override
-            public Shader buildAsset(AssetUri uri, ShaderData data) {
-                return new GLSLShader(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
-            @Override
-            public Material buildAsset(AssetUri uri, MaterialData data) {
-                return new GLSLMaterial(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
-            @Override
-            public Mesh buildAsset(AssetUri uri, MeshData data) {
-                return new OpenGLMesh(uri, data, bufferPool);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
-            @Override
-            public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
-                return new OpenGLSkeletalMesh(uri, data, bufferPool);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
-            @Override
-            public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
-                return new MeshAnimationImpl(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.ATLAS, new AssetFactory<AtlasData, Atlas>() {
-            @Override
-            public Atlas buildAsset(AssetUri uri, AtlasData data) {
-                return new Atlas(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SUBTEXTURE, new AssetFactory<SubtextureData, Subtexture>() {
-            @Override
-            public Subtexture buildAsset(AssetUri uri, SubtextureData data) {
-                return new Subtexture(uri, data);
-            }
-        });
-        assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
-        assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
-        assetManager.addResolver(AssetType.TEXTURE, new NoiseTextureAssetResolver());
-        assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         context.put(ShaderManager.class, new ShaderManagerLwjgl());
     }
 
@@ -263,13 +232,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().GL_ARB_half_float_pixel};   // http://en.wikipedia.org/wiki/OpenGL#OpenGL_3.0
 
         String[] capabilityNames = {"OpenGL12",
-                                    "OpenGL14",
-                                    "OpenGL15",
-                                    "OpenGL20",
-                                    "OpenGL21",
-                                    "GL_ARB_framebuffer_object",
-                                    "GL_ARB_texture_float",
-                                    "GL_ARB_half_float_pixel"};
+                "OpenGL14",
+                "OpenGL15",
+                "OpenGL20",
+                "OpenGL21",
+                "GL_ARB_framebuffer_object",
+                "GL_ARB_texture_float",
+                "GL_ARB_half_float_pixel"};
 
         boolean canRunTheGame = true;
         String missingCapabilitiesMessage = "";
@@ -314,4 +283,71 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
+    public void asynchToDisplayThread(Runnable action) {
+        if (GameThread.isCurrentThread()) {
+            action.run();
+        } else {
+            displayThreadActions.add(action);
+        }
+    }
+
+    public void createTexture3D(ByteBuffer alignedBuffer, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,
+                                int size, Consumer<Integer> idConsumer) {
+        asynchToDisplayThread(() -> {
+            int id = glGenTextures();
+            reloadTexture3D(id, alignedBuffer, wrapMode, filterMode, size);
+            idConsumer.accept(id);
+        });
+    }
+
+    public void reloadTexture3D(int id, ByteBuffer alignedBuffer, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, int size) {
+        asynchToDisplayThread(() -> {
+            glBindTexture(GL12.GL_TEXTURE_3D, id);
+
+            glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
+            glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
+            glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, LwjglGraphicsUtil.getGLMode(wrapMode));
+
+            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER, LwjglGraphicsUtil.getGlMinFilter(filterMode));
+            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER, LwjglGraphicsUtil.getGlMagFilter(filterMode));
+
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
+
+            GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, size, size, size, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, alignedBuffer);
+        });
+    }
+
+    public void createTexture2D(ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, int width, int height, Consumer<Integer> idConsumer) {
+        asynchToDisplayThread(() -> {
+            int id = glGenTextures();
+            reloadTexture2D(id, buffers, wrapMode, filterMode, width, height);
+            idConsumer.accept(id);
+        });
+    }
+
+    public void reloadTexture2D(int id, ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, int width, int height) {
+        asynchToDisplayThread(() -> {
+            glBindTexture(GL11.GL_TEXTURE_2D, id);
+
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, LwjglGraphicsUtil.getGlMinFilter(filterMode));
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, LwjglGraphicsUtil.getGlMagFilter(filterMode));
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, buffers.length - 1);
+
+            if (buffers.length > 0) {
+                for (int i = 0; i < buffers.length; i++) {
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffers[i]);
+                }
+            } else {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+            }
+        });
+    }
+
+    public void disposeTexture(int id) {
+        asynchToDisplayThread(() -> glDeleteTextures(id));
+    }
 }

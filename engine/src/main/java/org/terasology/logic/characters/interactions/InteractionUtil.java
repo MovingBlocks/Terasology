@@ -18,8 +18,7 @@ package org.terasology.logic.characters.interactions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.module.sandbox.API;
@@ -84,7 +83,7 @@ public final class InteractionUtil {
      * The method returns null if the player has no interaction screen open.
      * The method is only intended to be called for the own character.
      */
-    public static AssetUri getActiveInteractionScreenUri(EntityRef character) {
+    public static ResourceUrn getActiveInteractionScreenUri(EntityRef character) {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
             return null;
@@ -97,7 +96,7 @@ public final class InteractionUtil {
         if (screenComponent == null) {
             return null;
         }
-        return new AssetUri(AssetType.UI_ELEMENT, screenComponent.screen);
+        return new ResourceUrn(screenComponent.screen);
     }
 
 }

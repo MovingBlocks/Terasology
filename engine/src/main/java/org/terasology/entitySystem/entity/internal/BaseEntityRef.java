@@ -15,8 +15,6 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
@@ -91,17 +89,6 @@ public abstract class BaseEntityRef extends EntityRef {
     }
 
     @Override
-    public AssetUri getPrefabURI() {
-        if (exists()) {
-            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
-            if (info != null && info.parentPrefab.exists()) {
-                return new AssetUri(AssetType.PREFAB, info.parentPrefab.getName());
-            }
-        }
-        return null;
-    }
-
-    @Override
     public boolean isActive() {
         return exists() && entityManager.isActiveEntity(getId());
     }
@@ -166,7 +153,7 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public String toString() {
-        AssetUri prefabUri = getPrefabURI();
+        Prefab parent = getParentPrefab();
         StringBuilder builder = new StringBuilder();
         builder.append("EntityRef{id = ");
         builder.append(getId());
@@ -175,9 +162,9 @@ public abstract class BaseEntityRef extends EntityRef {
             builder.append(", netId = ");
             builder.append(networkComponent.getNetworkId());
         }
-        if (prefabUri != null) {
+        if (parent != null) {
             builder.append(", prefab = '");
-            builder.append(prefabUri.toSimpleString());
+            builder.append(parent.getUrn());
             builder.append("'");
         }
         builder.append("}");
@@ -198,7 +185,7 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public String toFullDescription() {
-        EntitySerializer serializer = new EntitySerializer((EngineEntityManager)entityManager);
+        EntitySerializer serializer = new EntitySerializer((EngineEntityManager) entityManager);
         serializer.setUsingFieldIds(false);
         return EntityDataJSONFormat.write(serializer.serialize(this));
     }

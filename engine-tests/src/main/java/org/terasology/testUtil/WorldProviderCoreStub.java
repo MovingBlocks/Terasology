@@ -30,6 +30,7 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
+import org.terasology.world.time.WorldTimeImpl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,10 +45,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     private Map<Vector3i, Biome> biomes = Maps.newHashMap();
     private Block air;
     private Biome defaultBiome;
-
-    public WorldProviderCoreStub() {
-        this(BlockManager.getAir(), BiomeManager.getUnknownBiome());
-    }
 
     public WorldProviderCoreStub(Block air, Biome defaultBiome) {
         this.air = air;
@@ -176,7 +173,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public WorldTime getTime() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new WorldTimeImpl();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

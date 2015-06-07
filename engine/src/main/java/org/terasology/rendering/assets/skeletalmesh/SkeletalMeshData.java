@@ -15,15 +15,13 @@
  */
 package org.terasology.rendering.assets.skeletalmesh;
 
-import org.terasology.math.QuaternionUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;

@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.nui.asset;
 
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -24,22 +25,22 @@ import org.terasology.rendering.nui.UIWidget;
  * @author Immortius
  */
 @API
-public class UIElement extends AbstractAsset<UIData> {
+public class UIElement extends Asset<UIData> {
 
     private UIWidget rootWidget;
 
-    public UIElement(AssetUri uri, UIData data) {
-        super(uri);
-        onReload(data);
+    public UIElement(ResourceUrn urn, AssetType<?, UIData> assetType, UIData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
-    protected void onReload(UIData data) {
+    protected void doReload(UIData data) {
         rootWidget = data.getRootWidget();
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         rootWidget = null;
     }
 

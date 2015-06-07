@@ -46,14 +46,17 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     private Vector3i chunkPower;
     private Vector3i chunkFilterSize;
 
+    private Block defaultBlock;
+
     private ThreadLocal<Boolean> locked = new ThreadLocal<>();
 
-    public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
+    public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset, Block defaultBlock) {
         locked.set(false);
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
         this.offset = offset;
         setChunkSize(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
+        this.defaultBlock = defaultBlock;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public Block getBlock(int blockX, int blockY, int blockZ) {
         if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
-            return BlockManager.getAir();
+            return defaultBlock;
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);

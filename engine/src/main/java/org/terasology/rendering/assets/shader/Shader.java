@@ -16,27 +16,33 @@
 
 package org.terasology.rendering.assets.shader;
 
-import org.terasology.asset.Asset;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 
 /**
  * @author Immortius
  */
-public interface Shader extends Asset<ShaderData> {
+public abstract class Shader extends Asset<ShaderData> {
+
+    protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType) {
+        super(urn, assetType);
+    }
 
     /**
      * Recompiles the shader
      */
-    void recompile();
+    public abstract void recompile();
 
     /**
      * @param desc
      * @return The desired shader param, or null if there isn't one with that name
      */
-    ShaderParameterMetadata getParameter(String desc);
+    public abstract ShaderParameterMetadata getParameter(String desc);
 
     /**
      * @return The list of parameters this shader has
      */
-    Iterable<ShaderParameterMetadata> listParameters();
+    public abstract Iterable<ShaderParameterMetadata> listParameters();
 
 }

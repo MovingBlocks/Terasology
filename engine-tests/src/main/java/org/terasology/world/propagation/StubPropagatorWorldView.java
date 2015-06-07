@@ -32,13 +32,15 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
     private TObjectByteMap<Vector3i> lightData = new TObjectByteHashMap<>();
     private Map<Vector3i, Block> blockData = Maps.newHashMap();
     private Region3i relevantRegion;
+    private Block defaultBlock;
 
-    public StubPropagatorWorldView(Region3i relevantRegion) {
+    public StubPropagatorWorldView(Region3i relevantRegion, Block defaultBlock) {
         this.relevantRegion = relevantRegion;
+        this.defaultBlock = defaultBlock;
     }
 
-    public StubPropagatorWorldView(Region3i relevantRegion, Map<Vector3i, Block> blockData) {
-        this(relevantRegion);
+    public StubPropagatorWorldView(Region3i relevantRegion, Block defaultBlock, Map<Vector3i, Block> blockData) {
+        this(relevantRegion, defaultBlock);
         this.blockData = blockData;
     }
 
@@ -66,7 +68,7 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
 
         Block result = blockData.get(pos);
         if (result == null) {
-            return BlockManager.getAir();
+            return defaultBlock;
         }
         return result;
     }

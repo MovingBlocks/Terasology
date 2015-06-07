@@ -23,7 +23,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.Component;
@@ -60,6 +59,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -237,19 +237,19 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
         BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
 
-        Prefab oldPrefab = Assets.getPrefab(oldType.getPrefab());
-        EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldPrefab);
+        Optional<Prefab> oldPrefab = oldType.getPrefab();
+        EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldPrefab.orElse(null));
         oldEntityBuilder.addComponent(new BlockComponent(oldType, new Vector3i(blockComponent.getPosition())));
-        BeforeEntityCreated oldEntityEvent = new BeforeEntityCreated(oldPrefab, oldEntityBuilder.iterateComponents());
+        BeforeEntityCreated oldEntityEvent = new BeforeEntityCreated(oldPrefab.orElse(null), oldEntityBuilder.iterateComponents());
         blockEntity.send(oldEntityEvent);
         for (Component comp : oldEntityEvent.getResultComponents()) {
             oldEntityBuilder.addComponent(comp);
         }
 
-        Prefab newPrefab = Assets.getPrefab(type.getPrefab());
-        EntityBuilder newEntityBuilder = entityManager.newBuilder(newPrefab);
+        Optional<Prefab> newPrefab = type.getPrefab();
+        EntityBuilder newEntityBuilder = entityManager.newBuilder(newPrefab.orElse(null));
         newEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
-        BeforeEntityCreated newEntityEvent = new BeforeEntityCreated(newPrefab, newEntityBuilder.iterateComponents());
+        BeforeEntityCreated newEntityEvent = new BeforeEntityCreated(newPrefab.orElse(null), newEntityBuilder.iterateComponents());
         blockEntity.send(newEntityEvent);
         for (Component comp : newEntityEvent.getResultComponents()) {
             newEntityBuilder.addComponent(comp);
@@ -313,7 +313,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
-        EntityBuilder builder = entityManager.newBuilder(block.getPrefab());
+        EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
         builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
         builder.addComponent(new BlockComponent(block, blockPosition));
         if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {

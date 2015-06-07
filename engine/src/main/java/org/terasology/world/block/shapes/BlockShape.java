@@ -16,8 +16,9 @@
 package org.terasology.world.block.shapes;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
-
-import org.terasology.asset.Asset;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
@@ -28,40 +29,44 @@ import org.terasology.world.block.BlockPart;
  *
  * @author Immortius
  */
-public interface BlockShape extends Asset<BlockShapeData> {
+public abstract class BlockShape extends Asset<BlockShapeData> {
+
+    public BlockShape(ResourceUrn urn, AssetType<?, BlockShapeData> assetType) {
+        super(urn, assetType);
+    }
 
     /**
      * @return The display name for the shape - used as a suffix for blocks automatically generated using the shape.
      */
-    String getDisplayName();
+    public abstract String getDisplayName();
 
     /**
      * @param part
      * @return The mesh part for the given part of the block, or null if it has none
      */
-    BlockMeshPart getMeshPart(BlockPart part);
+    public abstract BlockMeshPart getMeshPart(BlockPart part);
 
     /**
      * @param side
      * @return Whether the given side blocks
      */
-    boolean isBlockingSide(Side side);
+    public abstract boolean isBlockingSide(Side side);
 
     /**
      * @param rot
      * @return The collision shape for the given rotation
      */
-    CollisionShape getCollisionShape(Rotation rot);
+    public abstract CollisionShape getCollisionShape(Rotation rot);
 
     /**
      * @param rot
      * @return The collision offset for the given rotation
      */
-    Vector3f getCollisionOffset(Rotation rot);
+    public abstract Vector3f getCollisionOffset(Rotation rot);
 
 
     /**
      * @return Is this block shape's collision symmetric when altering yaw.
      */
-    boolean isCollisionYawSymmetric();
+    public abstract boolean isCollisionYawSymmetric();
 }

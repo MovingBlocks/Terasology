@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.math.IntMath;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.AssetData;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -29,7 +29,6 @@ public class TextureData implements AssetData {
 
     private int width;
     private int height;
-    private int depth;
     private Texture.WrapMode wrapMode = Texture.WrapMode.CLAMP;
     private Texture.FilterMode filterMode = Texture.FilterMode.NEAREST;
     private Texture.Type type = Texture.Type.TEXTURE2D;
@@ -42,41 +41,9 @@ public class TextureData implements AssetData {
         this.filterMode = filterMode;
     }
 
-    public TextureData(int width, int height, int depth, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
+    public TextureData(int width, int height, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, Texture.Type type) {
         this(width, height, wrapMode, filterMode);
-        this.depth = depth;
-        this.type = Texture.Type.TEXTURE3D;
-
-        this.data = Arrays.copyOf(mipmaps, mipmaps.length);
-
-        if (data.length > 0) {
-            if (width <= 0 || height <= 0 || depth <= 0) {
-                throw new IllegalArgumentException("Width, height and depth must be positive");
-            }
-            if (mipmaps.length == 0) {
-                throw new IllegalArgumentException("Must supply at least one mipmap");
-            }
-            if (mipmaps[0].limit() != width * height * depth * BYTES_PER_PIXEL) {
-                throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height * depth)");
-            }
-            if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height) && IntMath.isPowerOfTwo(depth))) {
-                throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
-            }
-            for (int i = 1; i < mipmaps.length; ++i) {
-                int mipWidth = width >> i;
-                int mipHeight = height >> i;
-                int mipDepth = depth >> i;
-                if (mipWidth * mipHeight * mipDepth * BYTES_PER_PIXEL != mipmaps[i].limit()) {
-                    throw new IllegalArgumentException("Mipmap has wrong dimensions");
-                }
-            }
-        }
-    }
-
-    public TextureData(int width, int height, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
-        this(width, height, wrapMode, filterMode);
-        this.depth = 1;
-        this.type = Texture.Type.TEXTURE2D;
+        this.type = type;
 
         this.data = Arrays.copyOf(mipmaps, mipmaps.length);
 
@@ -91,7 +58,7 @@ public class TextureData implements AssetData {
                 throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height)");
             }
             if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height))) {
-                throw new IllegalArgumentException("Texture width and height must be powers of 2 for mipmapping");
+                throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
             }
             for (int i = 1; i < mipmaps.length; ++i) {
                 int mipWidth = width >> i;
@@ -103,16 +70,25 @@ public class TextureData implements AssetData {
         }
     }
 
+    public TextureData(int width, int height, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
+        this(width, height, mipmaps, wrapMode, filterMode, Texture.Type.TEXTURE2D);
+    }
+
+    public TextureData(TextureData fromCopy) {
+        this(fromCopy.width, fromCopy.height, fromCopy.wrapMode, fromCopy.filterMode);
+        this.type = fromCopy.type;
+        this.data = new ByteBuffer[fromCopy.data.length];
+        for (int i = 0; i < fromCopy.data.length; ++i) {
+            data[i] = fromCopy.data[i].duplicate();
+        }
+    }
+
     public int getWidth() {
         return width;
     }
 
     public int getHeight() {
         return height;
-    }
-
-    public int getDepth() {
-        return depth;
     }
 
     public Texture.Type getType() {
@@ -128,6 +104,18 @@ public class TextureData implements AssetData {
     }
 
     public ByteBuffer[] getBuffers() {
-        return Arrays.copyOf(data, data.length);
+        return data;
+    }
+
+    public void setFilterMode(Texture.FilterMode filterMode) {
+        this.filterMode = filterMode;
+    }
+
+    public void setWrapMode(Texture.WrapMode wrapMode) {
+        this.wrapMode = wrapMode;
+    }
+
+    public void setType(Texture.Type type) {
+        this.type = type;
     }
 }

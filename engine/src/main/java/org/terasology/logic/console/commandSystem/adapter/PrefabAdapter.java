@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commandSystem.adapter;
 
-import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.prefab.Prefab;
 
@@ -25,11 +24,11 @@ import org.terasology.entitySystem.prefab.Prefab;
 public class PrefabAdapter implements ParameterAdapter<Prefab> {
     @Override
     public Prefab parse(String raw) {
-        return Assets.get(AssetType.PREFAB, raw, Prefab.class);
+        return Assets.get(raw, Prefab.class).orElse(null);
     }
 
     @Override
     public String convertToString(Prefab value) {
-        return value.getURI().toSimpleString();
+        return value.getUrn().toString();
     }
 }

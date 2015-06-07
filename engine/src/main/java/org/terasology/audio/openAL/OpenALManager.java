@@ -15,9 +15,7 @@
  */
 package org.terasology.audio.openAL;
 
-import org.terasology.math.QuaternionUtil;
 import com.google.common.collect.Maps;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
@@ -28,8 +26,7 @@ import org.lwjgl.openal.ALCcontext;
 import org.lwjgl.openal.ALCdevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetFactory;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.AssetFactory;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
@@ -43,6 +40,7 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -190,7 +188,7 @@ public class OpenALManager implements AudioManager {
             return;
         }
         SoundPool<StaticSound, ?> pool = (SoundPool<StaticSound, ?>) pools.get("sfx");
-                
+
         SoundSource<?> source = pool.getSource(sound, priority);
         if (source != null) {
             source.setAbsolute(position != null);
@@ -210,7 +208,7 @@ public class OpenALManager implements AudioManager {
     public void playMusic(StreamingSound music) {
         playMusic(music, 1.0f, null);
     }
-    
+
     @Override
     public void playMusic(StreamingSound music, AudioEndListener endListener) {
         playMusic(music, 1.0f, endListener);
@@ -287,23 +285,13 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public AssetFactory<StaticSoundData, StaticSound> getStaticSoundFactory() {
-        return new AssetFactory<StaticSoundData, StaticSound>() {
-            @Override
-            public StaticSound buildAsset(AssetUri uri, StaticSoundData data) {
-                return new OpenALSound(uri, data, OpenALManager.this);
-            }
-        };
+    public AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory() {
+        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data, OpenALManager.this);
     }
 
     @Override
-    public AssetFactory<StreamingSoundData, StreamingSound> getStreamingSoundFactory() {
-        return new AssetFactory<StreamingSoundData, StreamingSound>() {
-            @Override
-            public StreamingSound buildAsset(AssetUri uri, StreamingSoundData data) {
-                return new OpenALStreamingSound(uri, data, OpenALManager.this);
-            }
-        };
+    public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
+        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data, OpenALManager.this);
     }
 
     public void purgeSound(Sound<?> sound) {

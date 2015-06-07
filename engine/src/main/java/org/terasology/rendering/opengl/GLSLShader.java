@@ -19,19 +19,18 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
-
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.registry.CoreRegistry;
@@ -42,8 +41,9 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.ChunkVertexFlag;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.tiles.WorldAtlas;
 
+import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,16 +58,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
 /**
  * GLSL Shader Program Instance class.
- * <br><br>
+ * <p>
  * Provides actual shader compilation and manipulation support.
+ * </p>
  *
  * @author Benjamin Glatzel
  */
-public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
+public class GLSLShader extends Shader {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
 
@@ -100,9 +99,9 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     private ShaderData shaderProgramBase;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
 
-    public GLSLShader(AssetUri uri, ShaderData data) {
-        super(uri);
-        onReload(data);
+    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     public Set<ShaderProgramFeature> getAvailableFeatures() {
@@ -135,12 +134,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         return parameters.values();
     }
 
-    @Override
-    protected void onDispose() {
-        logger.debug("Disposing shader {}.", getURI());
-        disposeData();
-    }
-
     private void disposeData() {
         TIntIntIterator it = fragmentPrograms.iterator();
         while (it.hasNext()) {
@@ -156,20 +149,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
         vertexPrograms.clear();
         shaderProgramBase = null;
-    }
-
-    @Override
-    protected void onReload(ShaderData data) {
-        logger.debug("Recompiling shader {}.", getURI());
-
-        onDispose();
-        shaderProgramBase = data;
-        parameters.clear();
-        for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
-            parameters.put(metadata.getName(), metadata);
-        }
-        updateAvailableFeatures();
-        recompile();
     }
 
     private static StringBuilder createShaderBuilder() {
@@ -293,7 +272,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
             compileShaders(permutation);
             counter++;
         }
-        logger.debug("Compiled {} permutations for {}.", counter, getURI());
+        logger.debug("Compiled {} permutations for {}.", counter, getUrn());
     }
 
     private void compileShader(int type, Set<ShaderProgramFeature> features) {
@@ -335,7 +314,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         Config config = CoreRegistry.get(Config.class);
         if (config.getRendering().isDumpShaders()) {
             // Dump all final shader sources to the log directory
-            final String strippedTitle = getURI().toString().replace(":", "-");
+            final String strippedTitle = getUrn().toString().replace(":", "-");
 
             String fname = debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl";
             Path path = PathManager.getInstance().getShaderLogPath().resolve(fname);
@@ -383,7 +362,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
 
         if (!success) {
-            String errorMessage = debugShaderType + " Shader '" + getURI() + "' failed to compile. Terasology might not look quite as good as it should now...\n\n"
+            String errorMessage = debugShaderType + " Shader '" + getUrn() + "' failed to compile. Terasology might not look quite as good as it should now...\n\n"
                     + error + "\n\n" + errorLine;
 
             logger.error(errorMessage);
@@ -410,4 +389,33 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         return true;
     }
 
+    @Override
+    protected void doReload(ShaderData data) {
+        try {
+            GameThread.synch(() -> {
+                logger.debug("Recompiling shader {}.", getUrn());
+
+                doDispose();
+                shaderProgramBase = data;
+                parameters.clear();
+                for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
+                    parameters.put(metadata.getName(), metadata);
+                }
+                updateAvailableFeatures();
+                recompile();
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
+        }
+    }
+
+    @Override
+    protected void doDispose() {
+        logger.debug("Disposing shader {}.", getUrn());
+        try {
+            GameThread.synch(this::disposeData);
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
+        }
+    }
 }

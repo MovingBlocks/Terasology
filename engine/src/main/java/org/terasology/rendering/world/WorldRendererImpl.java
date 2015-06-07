@@ -156,10 +156,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initMaterials() {
-        chunkShader = Assets.getMaterial("engine:prog.chunk");
-        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass");
+        chunkShader = Assets.getMaterial("engine:prog.chunk").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
+        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
         //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
-        shadowMapShader = Assets.getMaterial("engine:prog.shadowMap");
+        shadowMapShader = Assets.getMaterial("engine:prog.shadowMap").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
     }
 
     @Override

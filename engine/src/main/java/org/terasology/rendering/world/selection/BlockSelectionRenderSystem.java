@@ -58,7 +58,7 @@ public class BlockSelectionRenderSystem extends BaseComponentSystem implements R
             if (blockSelectionComponent.shouldRender) {
                 Texture texture = blockSelectionComponent.texture;
                 if (null == texture) {
-                    texture = Assets.getTexture("engine:selection");
+                    texture = Assets.getTexture("engine:selection").get();
                 }
 
                 Vector2i textureDimensions = new Vector2i(texture.getWidth(), texture.getHeight());

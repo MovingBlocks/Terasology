@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.math.RoundingMode;
-import java.util.List;
-
-import org.terasology.asset.AssetUri;
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.math.DoubleMath;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -35,9 +35,8 @@ import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.math.DoubleMath;
+import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * @author Martin Steiger
@@ -113,8 +112,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         config.getPlayer().setColor(color);
 
-        AssetUri uri = TextureUtil.getTextureUriForColor(color);
-        Texture tex = (Texture) Assets.get(uri);
+        ResourceUrn uri = TextureUtil.getTextureUriForColor(color);
+        Texture tex = Assets.get(uri, Texture.class).get();
         img.setImage(tex);
     }
 

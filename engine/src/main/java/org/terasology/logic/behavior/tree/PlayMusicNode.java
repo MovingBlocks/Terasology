@@ -15,13 +15,15 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StreamingSound;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
+
+import java.util.Optional;
 
 /**
  * <b>Properties</b>: <b>music</b><br>
@@ -34,7 +36,7 @@ import org.terasology.rendering.nui.properties.OneOf;
  */
 public class PlayMusicNode extends Node {
     @OneOf.Provider(name = "music")
-    private AssetUri music;
+    private ResourceUrn music;
 
     @Override
     public Task createTask() {
@@ -55,11 +57,11 @@ public class PlayMusicNode extends Node {
 
         @Override
         public void onInitialize() {
-            AssetUri uri = getNode().music;
+            ResourceUrn uri = getNode().music;
             if (uri != null) {
-                StreamingSound asset = assetManager.loadAsset(uri, StreamingSound.class);
-                if (asset != null) {
-                    audioManager.playMusic(asset, this);
+                Optional<StreamingSound> asset = assetManager.getAsset(uri, StreamingSound.class);
+                if (asset.isPresent()) {
+                    audioManager.playMusic(asset.get(), this);
                     playing = true;
                 }
             }

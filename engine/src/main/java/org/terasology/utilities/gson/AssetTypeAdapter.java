@@ -19,9 +19,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
+import org.terasology.assets.Asset;
 
 import java.lang.reflect.Type;
 
@@ -30,14 +29,14 @@ import java.lang.reflect.Type;
  */
 public class AssetTypeAdapter<V extends Asset> implements JsonDeserializer<V> {
 
-    private AssetType type;
+    private Class<V> type;
 
-    public AssetTypeAdapter(AssetType type) {
+    public AssetTypeAdapter(Class<V> type) {
         this.type = type;
     }
 
     @Override
     public V deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return (V) Assets.get(type, json.getAsString());
+        return type.cast(Assets.get(json.getAsString(), type).orElse(null));
     }
 }

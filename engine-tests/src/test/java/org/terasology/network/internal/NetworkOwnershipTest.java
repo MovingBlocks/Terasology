@@ -29,6 +29,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -72,7 +73,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         when(client.getEntity()).thenReturn(clientEntity);
         when(client.getId()).thenReturn("dummyID");
         networkSystem.mockHost();
-        networkSystem.connectToEntitySystem(entityManager, context.get(EntitySystemLibrary.class), mock(BlockEntityRegistry.class));
+        networkSystem.connectToEntitySystem(entityManager, context.get(EventLibrary.class), mock(BlockEntityRegistry.class));
         networkSystem.registerNetworkEntity(clientEntity);
     }
 

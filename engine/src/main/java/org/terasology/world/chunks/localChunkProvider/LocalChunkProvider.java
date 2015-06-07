@@ -163,7 +163,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, region, offset);
+        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     public void setWorldEntity(EntityRef worldEntity) {

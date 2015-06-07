@@ -18,12 +18,10 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -41,9 +39,11 @@ import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
+import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Stores all information for a specific block type.
@@ -51,9 +51,7 @@ import java.util.Map;
  * @author Benjamin Glatzel
  * @author Rasmus 'Cervator' Praestholm
  */
-// TODO: Make this immutable, add a block builder class?
 public final class Block {
-    private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this
     private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
@@ -72,9 +70,10 @@ public final class Block {
     }
 
     private short id;
-    private String displayName = "Untitled block";
     private BlockUri uri;
+    private String displayName = "Untitled block";
     private BlockFamily family;
+    // TODO: Remove this and replace with the rotation applied to the block
     private Side direction = Side.FRONT;
 
     /* PROPERTIES */
@@ -86,7 +85,7 @@ public final class Block {
     private int hardness = 3;
     private boolean supportRequired;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
-    private BlockSounds sounds = BlockSounds.NULL;
+    private BlockSounds sounds;
 
     // Special rendering flags (TODO: clean this up)
     private boolean water;
@@ -115,7 +114,7 @@ public final class Block {
     private boolean debrisOnDestroy = true;
 
     // Entity integration
-    private String prefab = "";
+    private Prefab prefab;
     private boolean keepActive;
     private EntityRef entity = EntityRef.NULL;
     private boolean lifecycleEventsRequired;
@@ -391,12 +390,12 @@ public final class Block {
     /**
      * @return The entity prefab for this block
      */
-    public String getPrefab() {
-        return prefab;
+    public Optional<Prefab> getPrefab() {
+        return Optional.ofNullable(prefab);
     }
 
-    public void setPrefab(String value) {
-        prefab = (value == null) ? "" : value;
+    public void setPrefab(Prefab value) {
+        this.prefab = value;
     }
 
     public boolean isKeepActive() {
@@ -545,7 +544,7 @@ public final class Block {
         if (meshGenerator != null) {
             return meshGenerator.getStandaloneMesh();
         }
-        return new Tessellator().generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
+        return new Tessellator().generateMesh(new ResourceUrn("engine", "blockmesh", uri.toString()));
     }
 
     public BlockMeshPart getLoweredLiquidMesh(Side side) {
@@ -621,7 +620,7 @@ public final class Block {
             return;
         }
 
-        Material mat = Assets.getMaterial("engine:prog.block");
+        Material mat = Assets.getMaterial("engine:prog.block").orElseThrow(() -> new RuntimeException("Missing engine material"));
         mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         mat.enable();

@@ -140,12 +140,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary) {
         PojoEntityManager pojoEntityManager = new PojoEntityManager();
-        ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-        // TODO use CoreRegistry.get(CopyStrategyLibrary.class) ?
         pojoEntityManager.setComponentLibrary(componentLibrary);
-        pojoEntityManager.setTypeSerializerLibrary(
-                TypeSerializationLibrary.createDefaultLibrary(pojoEntityManager, reflectFactory, copyStrategyLibrary));
+        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
         return pojoEntityManager;
     }
 

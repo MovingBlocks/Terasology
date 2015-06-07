@@ -25,7 +25,11 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class BlockFamilyTypeHandler extends StringRepresentationTypeHandler<BlockFamily> {
 
-    private BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    private BlockManager blockManager;
+
+    public BlockFamilyTypeHandler(BlockManager blockManager) {
+        this.blockManager = blockManager;
+    }
 
     @Override
     public String getAsString(BlockFamily item) {

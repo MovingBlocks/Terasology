@@ -17,9 +17,9 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.audio.StaticSound;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -34,7 +34,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
@@ -50,6 +50,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Behavior tree system
@@ -78,15 +80,13 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     @Override
     public void initialise() {
-        List<AssetUri> uris = Lists.newArrayList();
-        for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
-            uris.add(uri);
-        }
-        for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
+        List<ResourceUrn> uris = Lists.newArrayList();
+        uris.addAll(assetManager.getAvailableAssets(StaticSound.class).stream().collect(Collectors.toList()));
+        for (ResourceUrn uri : assetManager.getAvailableAssets(BehaviorTree.class)) {
 
-            BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
-            if (asset != null) {
-                trees.add(asset);
+            Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
+            if (asset.isPresent()) {
+                trees.add(asset.get());
             }
         }
     }
@@ -118,7 +118,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     public BehaviorTree createTree(String name, Node root) {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(root);
-        BehaviorTree behaviorTree = new BehaviorTree(new AssetUri(AssetType.BEHAVIOR, BEHAVIORS, name.replaceAll("\\W+", "")), data);
+        BehaviorTree behaviorTree = assetManager.loadAsset(new ResourceUrn(BEHAVIORS, new Name(name.replaceAll("\\W+", ""))), data, BehaviorTree.class);
         trees.add(behaviorTree);
         save(behaviorTree);
         return behaviorTree;
@@ -126,17 +126,17 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     public void save(BehaviorTree tree) {
         Path savePath;
-        AssetUri uri = tree.getURI();
+        ResourceUrn uri = tree.getUrn();
         if (BEHAVIORS.equals(uri.getModuleName())) {
             savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("assets").resolve("behaviors");
         } else {
             Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("overrides");
             savePath = overridesPath.resolve(uri.getModuleName().toString()).resolve("behaviors");
         }
-        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        BehaviorTreeFormat loader = new BehaviorTreeFormat();
         try {
             Files.createDirectories(savePath);
-            Path file = savePath.resolve(uri.getAssetName() + ".behavior");
+            Path file = savePath.resolve(uri.getResourceName() + ".behavior");
             try (FileOutputStream fos = new FileOutputStream(file.toFile())) {
                 loader.save(fos, tree.getData());
             }

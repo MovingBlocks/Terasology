@@ -18,7 +18,6 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
@@ -26,12 +25,13 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.GameThread;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -71,14 +71,13 @@ public class GLSLMaterial extends BaseMaterial {
     private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
     private int activeFeaturesMask;
 
-    private ShaderManager shaderManager;
+    private final ShaderManager shaderManager;
     private ShaderParameters shaderParameters;
-    private boolean disposed;
 
-    public GLSLMaterial(AssetUri uri, MaterialData data) {
-        super(uri);
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
+        super(urn, assetType);
         shaderManager = CoreRegistry.get(ShaderManager.class);
-        onReload(data);
+        reload(data);
     }
 
     public ShaderParameters getShaderParameters() {
@@ -115,8 +114,23 @@ public class GLSLMaterial extends BaseMaterial {
 
         enable();
         for (int slot : textureMap.keys()) {
-            shaderManager.bindTexture(slot, textureMap.get(slot));
+            Texture texture = textureMap.get(slot);
+            if (texture.isDisposed()) {
+                logger.error("Attempted to bind disposed texture {}", texture);
+            } else {
+                shaderManager.bindTexture(slot, texture);
+            }
         }
+    }
+
+    @Override
+    public boolean isRenderable() {
+        for (Texture texture : textureMap.valueCollection()) {
+            if (!texture.isLoaded()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -140,61 +154,69 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public final void onReload(MaterialData data) {
-        disposeData();
+    public final void doReload(MaterialData data) {
+        try {
+            GameThread.synch(() -> {
+                doDispose();
 
-        shader = (GLSLShader) data.getShader();
-        recompile();
+                shader = (GLSLShader) data.getShader();
+                recompile();
 
-        for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
-            setTexture(entry.getKey(), entry.getValue());
-        }
+                for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
+                    setTexture(entry.getKey(), entry.getValue());
+                }
 
-        for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
-            setFloat(entry.getKey(), entry.getValue());
-        }
+                for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
+                    setFloat(entry.getKey(), entry.getValue());
+                }
 
-        for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
-            setInt(entry.getKey(), entry.getValue());
-        }
+                for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
+                    setInt(entry.getKey(), entry.getValue());
+                }
 
-        for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
-            switch (entry.getValue().length) {
-                case 1:
-                    setFloat(entry.getKey(), entry.getValue()[0]);
-                    break;
-                case 2:
-                    setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
-                    break;
-                case 3:
-                    setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
-                    break;
-                case 4:
-                    setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
-                    break;
-                default:
-                    logger.error("MaterialData contains float array entry of size > 4");
-                    break;
-            }
+                for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
+                    switch (entry.getValue().length) {
+                        case 1:
+                            setFloat(entry.getKey(), entry.getValue()[0]);
+                            break;
+                        case 2:
+                            setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                            break;
+                        case 3:
+                            setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                            break;
+                        case 4:
+                            setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                            break;
+                        default:
+                            logger.error("MaterialData contains float array entry of size > 4");
+                            break;
+                    }
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
     }
+
 
     @Override
-    protected void onDispose() {
-        logger.debug("Disposing material {}.", getURI());
-        disposeData();
-        disposed = true;
-    }
-
-    private void disposeData() {
-        TIntIntIterator it = shaderPrograms.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            GL20.glDeleteProgram(it.value());
+    protected void doDispose() {
+        try {
+            GameThread.synch(() -> {
+                logger.debug("Disposing material {}.", getUrn());
+                TIntIntIterator it = shaderPrograms.iterator();
+                while (it.hasNext()) {
+                    it.advance();
+                    GL20.glDeleteProgram(it.value());
+                }
+                shaderPrograms.clear();
+                uniformLocationMap.clear();
+                shader = null;
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
         }
-        shaderPrograms.clear();
-        uniformLocationMap.clear();
-        shader = null;
     }
 
 
@@ -231,7 +253,7 @@ public class GLSLMaterial extends BaseMaterial {
             activeFeaturesMask = ShaderProgramFeature.getBitset(activeFeatures);
             activeFeaturesChanged = true;
         } else {
-            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getURI(), shader.getURI());
+            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getUrn(), shader.getUrn());
         }
     }
 

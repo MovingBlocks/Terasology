@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.base.Preconditions;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -22,9 +23,7 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -32,16 +31,16 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import com.google.common.base.Preconditions;
 
 /**
  * A popup message that is shown while a long-term background operation is running.
  * Some of them can be cancelled.
+ *
  * @author Martin Steiger
  */
 public class WaitPopup<T> extends CoreScreenLayer {
 
-    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:waitPopup");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:waitPopup!instance");
 
     private static final Logger logger = LoggerFactory.getLogger(WaitPopup.class);
 
@@ -133,14 +132,6 @@ public class WaitPopup<T> extends CoreScreenLayer {
                 parallelTask.cancel(true);
             }
         });
-    }
-
-    @Override
-    public void onClosed() {
-        super.onClosed();
-
-        // don't save this asset in the cache -> don't persist changes to this class
-        Assets.dispose(Assets.get(WaitPopup.ASSET_URI));
     }
 
     public boolean canBeCancelled() {

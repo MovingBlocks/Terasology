@@ -21,6 +21,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.event.Event;
@@ -37,6 +38,7 @@ import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -45,7 +47,7 @@ import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 /**
  * Provides static methods that can be used to put entity system related objects into a {@link Context} instance.
  */
-public class EntitySystemSetupUtil {
+public final class EntitySystemSetupUtil {
 
 
     private EntitySystemSetupUtil() {
@@ -55,35 +57,40 @@ public class EntitySystemSetupUtil {
     public static void addReflectionBasedLibraries(Context context) {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         context.put(ReflectFactory.class, reflectFactory);
-        context.put(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
+        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
+        context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
+        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        context.put(EntitySystemLibrary.class, library);
+        context.put(ComponentLibrary.class, library.getComponentLibrary());
+        context.put(EventLibrary.class, library.getEventLibrary());
     }
 
 
     /**
      * Objects for the following classes must be available in the context:
      * <ul>
-     *     <li>{@link ModuleEnvironment}</li>
-     *     <li>{@link NetworkSystem}</li>
-     *     <li>{@link ReflectFactory}</li>
-     *     <li>{@link CopyStrategyLibrary}</li>
+     * <li>{@link ModuleEnvironment}</li>
+     * <li>{@link NetworkSystem}</li>
+     * <li>{@link ReflectFactory}</li>
+     * <li>{@link CopyStrategyLibrary}</li>
+     * <li>{@link org.terasology.persistence.typeHandling.TypeSerializationLibrary}</li>
      * </ul>
-     *
+     * <p>
      * The method will make objects for the following classes available in the context:
      * <ul>
-     *     <li>{@link EngineEntityManager}</li>
-     *     <li>{@link ComponentLibrary}</li>
-     *     <li>{@link EventLibrary}</li>
-     *     <li>{@link PrefabManager}</li>
-     *     <li>{@link EventSystem}</li>
-     *     <li>{@link NodesClassLibrary}</li>
+     * <li>{@link EngineEntityManager}</li>
+     * <li>{@link ComponentLibrary}</li>
+     * <li>{@link EventLibrary}</li>
+     * <li>{@link PrefabManager}</li>
+     * <li>{@link EventSystem}</li>
+     * <li>{@link NodesClassLibrary}</li>
      * </ul>
-     *
      */
     public static void addEntityManagementRelatedClasses(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         NetworkSystem networkSystem = context.get(NetworkSystem.class);
-        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
 
         // Entity Manager
         PojoEntityManager entityManager = new PojoEntityManager();
@@ -91,21 +98,17 @@ public class EntitySystemSetupUtil {
         context.put(EngineEntityManager.class, entityManager);
 
         // Standard serialization library
-        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(entityManager,
-                reflectFactory, copyStrategyLibrary);
+        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
+        typeSerializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
-
-        // Entity System Library
-        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
-        context.put(EntitySystemLibrary.class, library);
-        entityManager.setComponentLibrary(library.getComponentLibrary());
-        context.put(ComponentLibrary.class, library.getComponentLibrary());
-        context.put(EventLibrary.class, library.getEventLibrary());
 
         // Prefab Manager
         PrefabManager prefabManager = new PojoPrefabManager();
         entityManager.setPrefabManager(prefabManager);
         context.put(PrefabManager.class, prefabManager);
+
+        EntitySystemLibrary library = context.get(EntitySystemLibrary.class);
+        entityManager.setComponentLibrary(library.getComponentLibrary());
 
         // Event System
         EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);

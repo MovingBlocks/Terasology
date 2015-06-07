@@ -15,43 +15,58 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
-import org.terasology.asset.AssetUri;
+import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.loader.BlockDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
 
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 @RegisterBlockFamilyFactory("attachedToSurface")
 public class AttachedToSurfaceFamilyFactory implements BlockFamilyFactory {
 
-    private static final String TOP = "top";
-    private static final String SIDES = "sides";
-    private static final String BOTTOM = "bottom";
+    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of("front", "left", "right", "back", "top", "bottom");
+    private static final ImmutableList<MultiSection> MULTI_SECTIONS = ImmutableList.of(
+            new MultiSection("all", "front", "left", "right", "back", "top", "bottom"),
+            new MultiSection("topBottom", "top", "bottom"),
+            new MultiSection("sides", "front", "left", "right", "back"));
 
     @Override
-    public BlockFamily createBlockFamily(BlockBuilderHelper blockBuilder, AssetUri blockDefUri, BlockDefinition blockDefinition, JsonObject blockDefJson) {
+    public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        BlockDefinition topDef = blockBuilder.getBlockDefinitionForSection(blockDefJson, TOP);
-        if (topDef != null) {
-            Block block = blockBuilder.constructSimpleBlock(blockDefUri, topDef);
+        if (definition.getData().hasSection("top")) {
+            Block block = blockBuilder.constructSimpleBlock(definition, "top");
             block.setDirection(Side.TOP);
             blockMap.put(Side.TOP, block);
         }
-        BlockDefinition sideDef = blockBuilder.getBlockDefinitionForSection(blockDefJson, SIDES);
-        if (sideDef != null) {
-            blockMap.putAll(blockBuilder.constructHorizontalRotatedBlocks(blockDefUri, sideDef));
+        if (definition.getData().hasSection("front")) {
+            for (Rotation rot : Rotation.horizontalRotations()) {
+                Side side = rot.rotate(Side.FRONT);
+                blockMap.put(side, blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot));
+            }
         }
-        BlockDefinition bottomDef = blockBuilder.getBlockDefinitionForSection(blockDefJson, BOTTOM);
-        if (bottomDef != null) {
-            Block block = blockBuilder.constructSimpleBlock(blockDefUri, bottomDef);
+        if (definition.getData().hasSection("bottom")) {
+            Block block = blockBuilder.constructSimpleBlock(definition, "bottom");
             block.setDirection(Side.BOTTOM);
             blockMap.put(Side.BOTTOM, block);
         }
-        return new AttachedToSurfaceFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
+        return new AttachedToSurfaceFamily(new BlockUri(definition.getUrn()), blockMap, definition.getCategories());
     }
 
+    @Override
+    public Set<String> getSectionNames() {
+        return BLOCK_NAMES;
+    }
+
+    @Override
+    public ImmutableList<MultiSection> getMultiSections() {
+        return MULTI_SECTIONS;
+    }
 }

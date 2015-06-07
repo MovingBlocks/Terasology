@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -33,7 +32,7 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
  */
 public class SettingsMenuScreen extends CoreScreenLayer {
 
-    private static final AssetUri INPUT_SCREEN_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:inputScreen");
+    private static final ResourceUrn INPUT_SCREEN_URI = new ResourceUrn("engine:inputScreen");
 
     @In
     private Config config;

@@ -290,7 +290,7 @@ public class ComponentSerializer {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         boolean changed = false;
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
-            if (check.shouldSerializeField(field, delta)) {
+            if (check.shouldSerializeField(field, delta) && serializer.getHandlerFor(field) != null) {
                 Object origValue = field.getValue(base);
                 Object deltaValue = field.getValue(delta);
 

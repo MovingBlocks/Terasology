@@ -20,18 +20,21 @@ import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
-import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.propagation.light.LightPropagationRules;
 
@@ -58,56 +61,59 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     public void setup() throws Exception {
         super.setup();
         lightRules = new LightPropagationRules();
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(),
-                Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
+        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
         CoreRegistry.put(BlockManager.class, blockManager);
-        fullLight = new Block();
-        fullLight.setDisplayName("Torch");
-        fullLight.setUri(new BlockUri("engine:torch"));
-        fullLight.setId((short) 2);
-        fullLight.setLuminance(ChunkConstants.MAX_LIGHT);
-        blockManager.addBlockFamily(new SymmetricFamily(fullLight.getURI(), fullLight), true);
+        BlockFamilyDefinitionData fullLightData = new BlockFamilyDefinitionData();
+        fullLightData.getBaseSection().setDisplayName("Torch");
+        fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
+        fullLightData.getBaseSection().setTranslucent(true);
+        fullLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
+        fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
 
-        weakLight = new Block();
-        weakLight.setDisplayName("PartLight");
-        weakLight.setUri(new BlockUri("engine:weakLight"));
-        weakLight.setId((short) 3);
-        weakLight.setLuminance((byte) 2);
-        blockManager.addBlockFamily(new SymmetricFamily(weakLight.getURI(), weakLight), true);
+        BlockFamilyDefinitionData weakLightData = new BlockFamilyDefinitionData();
+        weakLightData.getBaseSection().setDisplayName("PartLight");
+        weakLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        weakLightData.getBaseSection().setLuminance((byte) 2);
+        weakLightData.getBaseSection().setTranslucent(true);
+        weakLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn("engine:weakLight"), weakLightData, BlockFamilyDefinition.class);
+        weakLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:weakLight")));
 
-        mediumLight = new Block();
-        mediumLight.setDisplayName("MediumLight");
-        mediumLight.setUri(new BlockUri("engine:mediumLight"));
-        mediumLight.setId((short) 4);
-        mediumLight.setLuminance((byte) 5);
-        blockManager.addBlockFamily(new SymmetricFamily(mediumLight.getURI(), mediumLight), true);
+        BlockFamilyDefinitionData mediumLightData = new BlockFamilyDefinitionData();
+        mediumLightData.getBaseSection().setDisplayName("MediumLight");
+        mediumLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        mediumLightData.getBaseSection().setLuminance((byte) 5);
+        mediumLightData.getBaseSection().setTranslucent(true);
+        mediumLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn("engine:mediumLight"), mediumLightData, BlockFamilyDefinition.class);
+        mediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:mediumLight")));
 
-        solid = new Block();
-        solid.setDisplayName("Solid");
-        solid.setUri(new BlockUri("engine:solid"));
-        solid.setId((short) 5);
-        for (Side side : Side.values()) {
-            solid.setFullSide(side, true);
-        }
-        blockManager.addBlockFamily(new SymmetricFamily(solid.getURI(), solid), true);
+        BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
+        solidData.getBaseSection().setDisplayName("Stone");
+        solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        solidData.getBaseSection().setTranslucent(false);
+        solidData.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
+        solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
-        solidMediumLight = new Block();
-        solidMediumLight.setDisplayName("SolidMediumLight");
-        solidMediumLight.setUri(new BlockUri("engine:solidMediumLight"));
-        solidMediumLight.setId((short) 6);
-        solidMediumLight.setLuminance((byte) 5);
-        for (Side side : Side.values()) {
-            solidMediumLight.setFullSide(side, true);
-        }
-        blockManager.addBlockFamily(new SymmetricFamily(solidMediumLight.getURI(), solidMediumLight), true);
+        BlockFamilyDefinitionData solidMediumLightData = new BlockFamilyDefinitionData();
+        solidMediumLightData.getBaseSection().setDisplayName("SolidMediumLight");
+        solidMediumLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
+        solidMediumLightData.getBaseSection().setTranslucent(false);
+        solidMediumLightData.getBaseSection().setLuminance((byte) 5);
+        solidMediumLightData.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        assetManager.loadAsset(new ResourceUrn("engine:solidMediumLight"), solidMediumLightData, BlockFamilyDefinition.class);
+        solidMediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:solidMediumLight")));
 
-
-        air = BlockManager.getAir();
+        air = blockManager.getBlock(BlockManager.AIR_ID);
     }
 
     @Test
     public void addLightInVacuum() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(Vector3i.zero(), fullLight);
 
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -125,7 +131,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void removeLightInVacuum() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(Vector3i.zero(), fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(Vector3i.zero(), air, fullLight));
@@ -143,7 +149,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void reduceLight() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(Vector3i.zero(), fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(Vector3i.zero(), air, fullLight));
@@ -164,7 +170,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     public void addOverlappingLights() {
         Vector3i lightPos = new Vector3i(5, 0, 0);
 
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, air);
         worldView.setBlockAt(Vector3i.zero(), fullLight);
         worldView.setBlockAt(lightPos, fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -182,7 +188,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     public void removeOverlappingLight() {
         Vector3i lightPos = new Vector3i(5, 0, 0);
 
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(Vector3i.zero(), fullLight);
         worldView.setBlockAt(lightPos, fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -203,7 +209,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     public void removeLightOverlappingAtEdge() {
         Vector3i lightPos = new Vector3i(2, 0, 0);
 
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(Vector3i.zero(), weakLight);
         worldView.setBlockAt(lightPos, weakLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -222,7 +228,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void addLightInLight() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(new Vector3i(2, 0, 0), mediumLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(new Vector3i(2, 0, 0), air, mediumLight));
@@ -240,7 +246,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void addAdjacentLights() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(new Vector3i(1, 0, 0), mediumLight);
         worldView.setBlockAt(new Vector3i(0, 0, 0), mediumLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -257,7 +263,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void addWeakLightNextToStrongLight() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(new Vector3i(0, 0, 0), fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(new Vector3i(0, 0, 0), air, fullLight));
@@ -269,7 +275,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void removeAdjacentLights() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(new Vector3i(1, 0, 0), mediumLight);
         worldView.setBlockAt(new Vector3i(0, 0, 0), mediumLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -289,7 +295,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void addSolidBlocksLight() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, air);
         worldView.setBlockAt(new Vector3i(0, 0, 0), mediumLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(new Vector3i(0, 0, 0), air, mediumLight));
@@ -303,7 +309,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void removeSolidAllowsLight() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(1, 0, 0), new Vector3i(0, 30, 30))) {
             worldView.setBlockAt(pos, solid);
         }
@@ -322,7 +328,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void removeSolidAndLight() {
-        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion);
+        StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(1, 0, 0), new Vector3i(0, 30, 30))) {
             worldView.setBlockAt(pos, solid);
         }

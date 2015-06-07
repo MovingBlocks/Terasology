@@ -15,18 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
@@ -35,6 +31,7 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -59,13 +56,17 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 /**
  * Shows a preview of the generated world and provides some
  * configuration options to tweak the generation process.
  */
 public class PreviewWorldScreen extends CoreScreenLayer {
 
-    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:previewWorldScreen");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:previewWorldScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
 
@@ -73,7 +74,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private ModuleManager moduleManager;
 
     @In
-    private AssetManager assetManager;
+    private ModuleAwareAssetTypeManager assetTypeManager;
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
@@ -94,20 +95,15 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private PreviewGenerator previewGen;
 
+
+    private Context subContext;
     private ModuleEnvironment environment;
 
-    private final Texture texture;
+    private Texture texture;
 
     private boolean triggerUpdate;
 
     public PreviewWorldScreen() {
-        int imgWidth = 384;
-        int imgHeight = 384;
-        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
-        ByteBuffer[] data = new ByteBuffer[]{buffer};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
-        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-        texture = Assets.generateAsset(uri, texData, Texture.class);
     }
 
     @Override
@@ -121,9 +117,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(moduleName);
             if (result.isSuccess()) {
+                subContext = new ContextImpl(context);
+                CoreRegistry.setContext(subContext);
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
-                context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-                assetManager.setEnvironment(environment);
+                subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
+                assetTypeManager.switchEnvironment(environment);
+                genTexture();
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
@@ -140,14 +139,27 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
+    private void genTexture() {
+        int imgWidth = 384;
+        int imgHeight = 384;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(imgWidth * imgHeight * Integer.BYTES);
+        ByteBuffer[] data = new ByteBuffer[]{buffer};
+        ResourceUrn uri = new ResourceUrn("engine:terrainPreview");
+        TextureData texData = new TextureData(imgWidth, imgHeight, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        texture = Assets.generateAsset(uri, texData, Texture.class);
+
+        previewImage = find("preview", UIImage.class);
+        previewImage.setImage(texture);
+    }
+
     @Override
     public void update(float delta) {
-         super.update(delta);
+        super.update(delta);
 
-         if (triggerUpdate) {
-             updatePreview();
-             triggerUpdate = false;
-         }
+        if (triggerUpdate) {
+            updatePreview();
+            triggerUpdate = false;
+        }
     }
 
     private void configureProperties() {
@@ -177,10 +189,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void onClosed() {
 
-        context.remove(WorldGeneratorPluginLibrary.class);
+        CoreRegistry.setContext(context);
 
         if (environment != null) {
-            assetManager.setEnvironment(moduleManager.getEnvironment());
+            assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
             environment.close();
             environment = null;
         }
@@ -219,9 +231,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             });
         }
 
-        previewImage = find("preview", UIImage.class);
-        previewImage.setImage(texture);
-
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
@@ -255,11 +264,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 worldGenerator.setWorldSeed(seed.getText());
             }
             int zoom = TeraMath.floorToInt(zoomSlider.getValue());
-            previewGen.render(texture.getData(), zoom, progressListener);
-            return texture.getData();
+            TextureData data = texture.getData();
+            previewGen.render(data, zoom, progressListener);
+
+            return data;
         };
 
-        popup.onSuccess(newData -> texture.reload(newData));
+        popup.onSuccess(texture::reload);
         popup.startOperation(operation, true);
     }
 }

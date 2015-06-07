@@ -19,6 +19,7 @@ tasks.withType(JavaCompile) {
 
 // We use both Maven Central and our own Artifactory instance, which contains module builds, extra libs, and so on
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         if (rootProject.hasProperty("alternativeResolutionRepo")) {

@@ -124,7 +124,7 @@ public final class HTMLLikeParser {
                             sb.setLength(0);
                         }
                         reader.read();
-                        font = Assets.getFont(readUntilCharacter(reader, '>'));
+                        font = Assets.getFont(readUntilCharacter(reader, '>')).get();
                     } else if (nextChar == 'c') {
                         if (sb.length() > 0) {
                             result.add(new TextFlowRenderable(sb.toString(), new DefaultTextRenderStyle(font, color), hyperlink));

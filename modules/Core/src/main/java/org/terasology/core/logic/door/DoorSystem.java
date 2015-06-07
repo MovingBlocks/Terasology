@@ -140,7 +140,7 @@ public class DoorSystem extends BaseComponentSystem {
             newDoorComp.isOpen = false;
             newDoor.saveComponent(newDoorComp);
             newDoor.removeComponent(ItemComponent.class);
-            audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
+            audioManager.playSound(Assets.getSound("engine:PlaceBlock").get(), 0.5f);
             logger.info("Closed Side: {}", newDoorComp.closedSide);
             logger.info("Open Side: {}", newDoorComp.openSide);
         }

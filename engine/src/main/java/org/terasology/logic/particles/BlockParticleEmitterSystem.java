@@ -48,7 +48,7 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.tiles.WorldAtlas;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -232,7 +232,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     private void render(Iterable<EntityRef> particleEntities) {
-        Assets.getMaterial("engine:prog.particle").enable();
+        Assets.getMaterial("engine:prog.particle").get().enable();
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -253,16 +253,18 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
 
             if (particleEffect.texture == null) {
-                Texture terrainTex = Assets.getTexture("engine:terrain");
-                if (terrainTex == null) {
+                Texture terrainTex = Assets.getTexture("engine:terrain").get();
+                if (terrainTex == null || !terrainTex.isLoaded()) {
                     return;
                 }
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0);
                 glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
-            } else {
+            } else if (particleEffect.texture.isLoaded()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0);
                 glBindTexture(GL11.GL_TEXTURE_2D, particleEffect.texture.getId());
+            } else {
+                return;
             }
 
             if (particleEffect.blendMode == BlockParticleEffectComponent.ParticleBlendMode.ADD) {
@@ -345,7 +347,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     protected void renderParticle(Particle particle, float light) {
-        Material mat = Assets.getMaterial("engine:prog.particle");
+        Material mat = Assets.getMaterial("engine:prog.particle").get();
 
         mat.setFloat4("colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w, true);
         mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
@@ -356,7 +358,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     protected void renderParticle(Particle particle, Block block, Biome biome, float light) {
-        Material mat = Assets.getMaterial("engine:prog.particle");
+        Material mat = Assets.getMaterial("engine:prog.particle").get();
 
         Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, biome);
         mat.setFloat4("colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);

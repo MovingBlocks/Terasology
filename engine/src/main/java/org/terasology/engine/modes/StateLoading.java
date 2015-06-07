@@ -47,7 +47,6 @@ import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
 import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
 import org.terasology.engine.modes.loadProcesses.RegisterBiomes;
-import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
 import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.engine.modes.loadProcesses.RegisterMods;
@@ -145,12 +144,11 @@ public class StateLoading implements GameState {
     private void initClient() {
         loadProcesses.add(new JoinServer(context, gameManifest, joinStatus));
         loadProcesses.add(new CacheTextures());
-        loadProcesses.add(new RegisterBlockFamilyFactories(context));
+        loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new RegisterBiomes(context, gameManifest));
-        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseGraphics(context));
-        loadProcesses.add(new InitialiseEntitySystem(context));
+        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new RegisterInputSystem(context));
@@ -170,12 +168,11 @@ public class StateLoading implements GameState {
     private void initHost() {
         loadProcesses.add(new RegisterMods(context, gameManifest));
         loadProcesses.add(new CacheTextures());
-        loadProcesses.add(new RegisterBlockFamilyFactories(context));
+        loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new RegisterBiomes(context, gameManifest));
-        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new InitialiseGraphics(context));
-        loadProcesses.add(new InitialiseEntitySystem(context));
+        loadProcesses.add(new CacheBlocks());
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new RegisterInputSystem(context));

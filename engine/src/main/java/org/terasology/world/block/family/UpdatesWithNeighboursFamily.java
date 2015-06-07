@@ -25,6 +25,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
 import java.util.List;
+import java.util.Locale;
 
 public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     private ConnectionCondition connectionCondition;
@@ -75,7 +76,7 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
-                byte connections = Byte.parseByte(blockUri.getIdentifier().toLowerCase());
+                byte connections = Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
                 return blocks.get(connections);
             } catch (IllegalArgumentException e) {
                 return null;

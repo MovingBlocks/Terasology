@@ -19,9 +19,10 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.OpenALException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
@@ -41,8 +42,19 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void postInitialise(Context context) {
+    public void initialise(Context context) {
         initOpenAL(context);
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+        assetTypeManager.registerCoreAssetType(StaticSound.class, audioManager.getStaticSoundFactory(), "sounds");
+        assetTypeManager.registerCoreAssetType(StreamingSound.class, audioManager.getStreamingSoundFactory(), "music");
+    }
+
+    @Override
+    public void postInitialise(Context context) {
+
     }
 
     @Override
@@ -66,21 +78,14 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     }
 
     private void initOpenAL(Context context) {
-        Config config = context.get(Config.class);
-        if (config.getAudio().isDisableSound()) {
+                Config config = context.get(Config.class);
+                try {
+            audioManager = new OpenALManager(config.getAudio());
+        } catch (LWJGLException | OpenALException e) {
+            logger.warn("Could not load OpenAL manager - sound is disabled", e);
             audioManager = new NullAudioManager();
-        } else {
-            try {
-                audioManager = new OpenALManager(config.getAudio());
-            } catch (LWJGLException | OpenALException e) {
-                logger.warn("Could not load OpenAL manager - sound is disabled", e);
-                audioManager = new NullAudioManager();
-            }
         }
         context.put(AudioManager.class, audioManager);
-        AssetManager assetManager = context.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
-        assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
     }
 
     @Override

@@ -16,10 +16,12 @@
 
 package org.terasology.world.block;
 
+import com.google.common.collect.ImmutableList;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 
 import java.util.EnumMap;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -33,8 +35,9 @@ public enum BlockPart {
     BOTTOM(Side.BOTTOM),
     CENTER;
 
-    private static EnumMap<Side, BlockPart> sideMap;
-    private static BlockPart[] sides;
+    private static final EnumMap<Side, BlockPart> SIDE_MAP;
+    private static final BlockPart[] SIDES;
+    private static final List<BlockPart> HORIZONTAL_SIDES;
 
     private Side side;
 
@@ -46,26 +49,35 @@ public enum BlockPart {
     }
 
     static {
-        sideMap = new EnumMap<Side, BlockPart>(Side.class);
-        sideMap.put(Side.BOTTOM, BOTTOM);
-        sideMap.put(Side.RIGHT, RIGHT);
-        sideMap.put(Side.LEFT, LEFT);
-        sideMap.put(Side.BACK, BACK);
-        sideMap.put(Side.FRONT, FRONT);
-        sideMap.put(Side.TOP, TOP);
+        SIDE_MAP = new EnumMap<>(Side.class);
+        SIDE_MAP.put(Side.BOTTOM, BOTTOM);
+        SIDE_MAP.put(Side.RIGHT, RIGHT);
+        SIDE_MAP.put(Side.LEFT, LEFT);
+        SIDE_MAP.put(Side.BACK, BACK);
+        SIDE_MAP.put(Side.FRONT, FRONT);
+        SIDE_MAP.put(Side.TOP, TOP);
 
-        sides = new BlockPart[]{TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM};
+        SIDES = new BlockPart[]{TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM};
+
+        HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
     }
 
     public static BlockPart fromSide(Side side) {
-        return sideMap.get(side);
+        return SIDE_MAP.get(side);
     }
 
     /**
-     * @return The horizontal sides, for iteration
+     * @return The block parts corresponding to sides (so not the center)
      */
     public static BlockPart[] sideValues() {
-        return sides;
+        return SIDES;
+    }
+
+    /**
+     * @return The horizontal sides
+     */
+    public static List<BlockPart> horizontalSides() {
+        return HORIZONTAL_SIDES;
     }
 
     public boolean isSide() {

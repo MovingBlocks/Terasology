@@ -44,7 +44,7 @@ public class UIStyle {
 
     private ScaleMode textureScaleMode = ScaleMode.STRETCH;
 
-    private Font font = Assets.getFont("engine:default");
+    private Font font = Assets.getFont("engine:default").get();
     private Color textColor = Color.WHITE;
     private Color textShadowColor = Color.BLACK;
     private HorizontalAlign textAlignmentH = HorizontalAlign.CENTER;
