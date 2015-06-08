@@ -3,6 +3,7 @@
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
+import groovy.json.JsonSlurper
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,12 +18,25 @@ sourceSets {
     }
 }
 
-// Base the engine tests on the same version number as the engine
-version = project(':engine').version
-println "ENGINE TESTS VERSION: $version"
+// Read the internal version out of the engine-tests module.txt
+def moduleFile = file('src/main/resources/module.txt')
+
+if (!moduleFile.exists()) {
+    println "Failed to find module.txt for engine-tests"
+    throw new GradleException("Failed to find module.txt for engine-tests")
+}
+
+println "Scanning for version in module.txt for engine-tests"
+def slurper = new JsonSlurper()
+def moduleConfig = slurper.parseText(moduleFile.text)
+
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
+version = moduleConfig.version
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
+
+println "Version for $project.name loaded as $version for group $group"
 
 // Primary dependencies definition
 dependencies {

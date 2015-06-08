@@ -3,15 +3,16 @@
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
-
 import groovy.json.JsonSlurper
-import org.ajoberstar.gradle.git.tasks.*
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
-import org.reflections.util.ConfigurationBuilder
+import java.text.SimpleDateFormat;
 
 // Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
+
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
@@ -41,7 +42,7 @@ ext {
 def moduleDepends = [];
 def moduleFile = file('module.txt')
 
-// Really the module file should always exist if the module was correctly created or cloned using Gradle
+// The module file should always exist if the module was correctly created or cloned using Gradle
 if (!moduleFile.exists()) {
     println "Y U NO EXIST MODULE.TXT!"
     throw new GradleException("Failed to find module.txt for " + project.name)
@@ -62,14 +63,7 @@ version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.modules'
 
-// Everything is considered a snapshot unless built by a Jenkins release job. Might as well just attach -SNAPSHOT here
-if (env.ReleaseScope == null) {
-    version += '-SNAPSHOT'
-    println "Sticking with default snapshot for $project.name: $version"
-} else {
-    // Do version stuff
-    println "Expecting running as Jenkins release job, need to increment version $version by scope: " + env.ReleaseScope
-}
+println "Version for $project.name loaded as $version for group $group"
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {
@@ -78,13 +72,6 @@ configurations.all {
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
-    testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3'
-
-    // For reading logback.groovy when running unit tests. Excessive just for a config file?
-    testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
-
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
     if (project.name != project(':').name) {
         println "\nProcessing module '$project.name' in a multi-project workspace"
@@ -152,7 +139,6 @@ dependencies {
         println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
 
         // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
-        // Tricky scenario: Building a module with a transitive dependency on engine-tests - that seems to be ignored
         // TODO: Look for a provided engine jar in the workspace and use that if present
         // TODO: Only use engine, engine-tests, and maybe core for compilation, but remove when publishing?
         compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
@@ -167,7 +153,6 @@ dependencies {
         }
 
         // TODO: parse and apply external lib dependencies if any are present
-
         // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any trouble (is only for logging)
         // This step resolves artifacts (both compile & testCompile) and prints out some interesting versions
         configurations.testCompile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
@@ -293,7 +278,7 @@ eclipse {
 }
 
 // Utility task to update the module (except Core) via Git - not tested with local changes present, may cause trouble
-task(updateModule, type: GitPull) {
+task (updateModule, type: GitPull)  {
     description = 'Updates source for the module from its home (most likely GitHub)'
 
     // Base whether the task executes on two things

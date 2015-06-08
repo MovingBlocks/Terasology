@@ -42,7 +42,7 @@ ext {
 def moduleDepends = [];
 def moduleFile = file('module.txt')
 
-// Really the module file should always exist if the module was correctly created or cloned using Gradle
+// The module file should always exist if the module was correctly created or cloned using Gradle
 if (!moduleFile.exists()) {
     println "Y U NO EXIST MODULE.TXT!"
     throw new GradleException("Failed to find module.txt for " + project.name)
@@ -63,14 +63,7 @@ version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.modules'
 
-// Everything is considered a snapshot unless built by a Jenkins release job. Might as well just attach -SNAPSHOT here
-if (env.ReleaseScope == null) {
-    version += '-SNAPSHOT'
-    println "Sticking with default snapshot for $project.name: $version"
-} else {
-    // Do version stuff
-    println "Expecting running as Jenkins release job, need to increment version $version by scope: " + env.ReleaseScope
-}
+println "Version for $project.name loaded as $version for group $group"
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {
