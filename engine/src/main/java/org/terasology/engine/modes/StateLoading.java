@@ -182,8 +182,8 @@ public class StateLoading implements GameState {
         loadProcesses.add(new EnsureSaveGameConsistency(context));
         loadProcesses.add(new InitialisePhysics(context));
         loadProcesses.add(new InitialiseSystems(context));
-        loadProcesses.add(new LoadEntities(context));
         loadProcesses.add(new PreBeginSystems(context));
+        loadProcesses.add(new LoadEntities(context));
         loadProcesses.add(new InitialiseBlockTypeEntities(context));
         loadProcesses.add(new CreateWorldEntity(context));
         loadProcesses.add(new InitialiseWorldGenerator(context));
