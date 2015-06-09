@@ -28,6 +28,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
+import org.terasology.entitySystem.stubs.MappedContainerComponent;
 import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkMode;
@@ -118,5 +119,17 @@ public class PrefabTest {
     public void prefabTransitiveInheritance() {
         Prefab prefab = prefabManager.getPrefab("unittest:multilevelInheritance");
         assertTrue(prefab.hasComponent(StringComponent.class));
+    }
+
+    @Test
+    public void prefabWithCollectionOfMappedContainers() {
+        Prefab prefab = prefabManager.getPrefab("unittest:withCollectionOfMappedContainers");
+        MappedContainerComponent mappedContainer = prefab.getComponent(MappedContainerComponent.class);
+        assertNotNull(mappedContainer);
+        assertNotNull(mappedContainer.containers);
+        assertEquals(1, mappedContainer.containers.size());
+        MappedContainerComponent.Cont cont = mappedContainer.containers.iterator().next();
+        assertNotNull(cont);
+        assertEquals("a", cont.value);
     }
 }

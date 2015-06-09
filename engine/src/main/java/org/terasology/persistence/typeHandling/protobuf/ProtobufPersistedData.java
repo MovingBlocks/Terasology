@@ -40,9 +40,11 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.protobuf.EntityData;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -389,6 +391,8 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
             for (int i = 0; i < data.getStringCount(); ++i) {
                 result.add(new PersistedString(data.getString(i)));
             }
+        } else if (data.getNameValueCount() > 0) {
+            result.add(new ProtobufPersistedData(data));
         } else if (data.hasBytes()) {
             throw new IllegalStateException("Data is not an array");
         }
