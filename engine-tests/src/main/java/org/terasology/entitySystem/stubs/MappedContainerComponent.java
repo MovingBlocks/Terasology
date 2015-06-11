@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block.family;
+package org.terasology.entitySystem.stubs;
 
-import org.terasology.math.Side;
-import org.terasology.world.block.Block;
+import org.terasology.entitySystem.Component;
+import org.terasology.reflection.MappedContainer;
 
-public interface SideDefinedBlockFamily extends BlockFamily {
-    /**
-     * Returns a block that is facing the specified side from this block family, if one exists.
-     *
-     * @param side
-     * @return
-     */
-    Block getBlockForSide(Side side);
+import java.util.Set;
 
-    /**
-     * Returns a side the specified block from this block family is facing.
-     *
-     * @param block
-     * @return
-     */
-    Side getSide(Block block);
+public class MappedContainerComponent implements Component {
+    public Set<Cont> containers;
+
+    @MappedContainer
+    public static class Cont {
+        public String value;
+    }
 }

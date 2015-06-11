@@ -71,4 +71,28 @@ public class RotationTest {
         Vector3f dir = QuaternionUtil.quatRotate(rot, Side.FRONT.toDirection().getVector3f(), new Vector3f());
         assertEquals(Direction.inDirection(dir).toSide(), rotation.rotate(Side.FRONT));
     }
+
+    @Test
+    public void allRotations() {
+        assertEquals(24, count(Rotation.values()));
+        assertEquals(64, count(Rotation.allValues()));
+    }
+
+    private int count(Iterable<?> iterable) {
+        int count = 0;
+        for (Object o : iterable) {
+            count++;
+        }
+        return count;
+    }
+
+    @Test
+    public void reverseRotation() {
+        for (Rotation rotation : Rotation.allValues()) {
+            Rotation reverseRotation = Rotation.findReverse(rotation);
+            for (Side side : Side.values()) {
+                assertEquals(side, reverseRotation.rotate(rotation.rotate(side)));
+            }
+        }
+    }
 }

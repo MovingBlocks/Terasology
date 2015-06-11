@@ -364,8 +364,8 @@ public final class EntityDataJSONFormat {
                 for (JsonElement element : jsonArray) {
                     if (element.isJsonArray()) {
                         value.addValue((EntityData.Value) context.deserialize(element, EntityData.Value.class));
-                    } else if (json.isJsonObject()) {
-                        extractMap(json, context, value);
+                    } else if (element.isJsonObject()) {
+                        extractMap(element, context, value);
                     } else if (element.isJsonPrimitive()) {
                         extractPrimitive(value, element);
                         if (element.getAsJsonPrimitive().isNumber()) {
