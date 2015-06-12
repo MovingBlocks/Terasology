@@ -152,9 +152,13 @@ public class StateIngame implements GameState {
         if (storageManager != null) {
             storageManager.finishSavingAndShutdown();
         }
+        ModuleEnvironment oldEnvironment = CoreRegistry.get(ModuleManager.class).getEnvironment();
         ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
 
         CoreRegistry.get(ModuleAwareAssetTypeManager.class).switchEnvironment(environment);
+        if (oldEnvironment != null) {
+            oldEnvironment.close();
+        }
         CoreRegistry.get(Console.class).dispose();
         GameThread.clearWaitingProcesses();
 

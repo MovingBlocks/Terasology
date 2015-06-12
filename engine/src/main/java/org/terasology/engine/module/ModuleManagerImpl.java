@@ -191,9 +191,6 @@ public class ModuleManagerImpl implements ModuleManager {
         }
         ModuleEnvironment newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.<BytecodeInjector>emptyList());
         if (asPrimary) {
-            if (environment != null) {
-                environment.close();
-            }
             environment = newEnvironment;
         }
         return newEnvironment;

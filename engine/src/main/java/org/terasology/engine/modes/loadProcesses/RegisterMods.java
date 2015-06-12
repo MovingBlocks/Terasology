@@ -44,6 +44,7 @@ public class RegisterMods extends SingleStepLoadProcess {
     private final Context context;
     private final GameManifest gameManifest;
     private Thread applyModulesThread;
+    private ModuleEnvironment oldEnvironment;
 
     public RegisterMods(Context context, GameManifest gameManifest) {
         this.context = context;
@@ -62,7 +63,13 @@ public class RegisterMods extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         if (applyModulesThread != null) {
-            return !applyModulesThread.isAlive();
+            if (!applyModulesThread.isAlive()) {
+                if (oldEnvironment != null) {
+                    oldEnvironment.close();
+                }
+                return true;
+            }
+            return false;
         } else {
             ModuleManager moduleManager = context.get(ModuleManager.class);
             List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
@@ -73,6 +80,7 @@ public class RegisterMods extends SingleStepLoadProcess {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(moduleIds);
             if (result.isSuccess()) {
+                oldEnvironment = moduleManager.getEnvironment();
                 ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
 
                 for (Module moduleInfo : env.getModulesOrderedByDependencies()) {

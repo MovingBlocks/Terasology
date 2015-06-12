@@ -227,6 +227,8 @@ idea {
     module.excludeDirs += file('terasology-server')
     module.excludeDirs += file('terasology-2ndclient')
 
+    module.downloadSources = true
+
     project {
         // Set JDK
         jdkName = '1.8'
