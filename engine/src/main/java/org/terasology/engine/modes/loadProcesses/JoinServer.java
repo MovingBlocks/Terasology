@@ -29,6 +29,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
@@ -51,6 +52,7 @@ public class JoinServer implements LoadProcess {
     private JoinStatus joinStatus;
 
     private Thread applyModuleThread;
+    private ModuleEnvironment oldEnvironment;
 
     public JoinServer(Context context, GameManifest gameManifest, JoinStatus joinStatus) {
         this.context = context;
@@ -71,7 +73,13 @@ public class JoinServer implements LoadProcess {
     @Override
     public boolean step() {
         if (applyModuleThread != null) {
-            return !applyModuleThread.isAlive();
+            if (!applyModuleThread.isAlive()) {
+                if (oldEnvironment != null) {
+                    oldEnvironment.close();
+                }
+                return true;
+            }
+            return false;
         } else if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
             ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             gameManifest.setTitle(serverInfo.getGameName());
@@ -117,6 +125,8 @@ public class JoinServer implements LoadProcess {
                     moduleSet.add(module);
                 }
             }
+
+            oldEnvironment = moduleManager.getEnvironment();
             moduleManager.loadEnvironment(moduleSet, true);
 
             context.get(Game.class).load(gameManifest);
