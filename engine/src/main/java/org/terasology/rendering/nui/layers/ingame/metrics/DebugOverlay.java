@@ -68,7 +68,8 @@ public class DebugOverlay extends CoreScreenLayer {
     private WorldProvider worldProvider;
 
     private List<MetricsMode> metricsModes = Lists.newArrayList(new NullMetricsMode(), new RunningMeansMode(), new SpikesMode(),
-            new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode(), new NetworkStatsMode());
+            new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode(), new NetworkStatsMode(),
+            new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
     private int currentMode;
     private UILabel metricsLabel;
 
