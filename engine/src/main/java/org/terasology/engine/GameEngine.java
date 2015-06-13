@@ -76,17 +76,6 @@ public interface GameEngine extends AutoCloseable {
      */
     void changeState(GameState newState);
 
-    // TODO: Move task system elsewhere? Need to support saving queued/unfinished tasks too, when the world
-    // shuts down
-
-    /**
-     * Submits a task to be run concurrent with the main thread
-     *
-     * @param name
-     * @param task
-     */
-    void submitTask(String name, Runnable task);
-
     boolean hasPendingState();
 
     boolean isHibernationAllowed();

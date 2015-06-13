@@ -25,6 +25,9 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.ThreadManager;
+import org.terasology.math.TeraMath;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO.Dimensions;
@@ -260,7 +263,7 @@ public class LwjglRenderingProcess {
             }
         };
 
-        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", task);
+        CoreRegistry.get(ThreadManager.class).submitTask("Write screenshot", task);
 
         isTakingScreenshot = false;
         overwriteRtWidth = 0;

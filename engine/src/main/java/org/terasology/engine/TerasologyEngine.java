@@ -38,6 +38,8 @@ import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
+import org.terasology.engine.subsystem.ThreadManager;
+import org.terasology.engine.subsystem.ThreadManagerSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -52,8 +54,6 @@ import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -67,9 +67,6 @@ import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -91,7 +88,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -121,7 +117,6 @@ public class TerasologyEngine implements GameEngine {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
-    private static final int MAX_NUMBER_THREADS = 16;
 
     private Config config;
     private RenderingConfig renderingConfig;
@@ -134,8 +129,6 @@ public class TerasologyEngine implements GameEngine {
     private enum EngineState {UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED}
 
     private EngineState engineState = EngineState.UNINITIALIZED;
-
-    private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", MAX_NUMBER_THREADS);
 
     private boolean hibernationAllowed;
     private boolean gameFocused = true;
@@ -168,6 +161,9 @@ public class TerasologyEngine implements GameEngine {
          */
         CoreRegistry.setContext(context);
         this.subsystems = Queues.newArrayDeque(subsystems);
+        ThreadManagerSubsystem threadManager = new ThreadManagerSubsystem();
+        subsystems.add(threadManager);
+        context.put(ThreadManager.class, threadManager);
 
         try {
             logger.info("Initializing Terasology...");
@@ -510,22 +506,16 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
 
-        try {
-            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-            while (iter.hasNext()) {
-                EngineSubsystem subsystem = iter.next();
-                subsystem.shutdown(config);
-            }
+        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+        while (iter.hasNext()) {
+            EngineSubsystem subsystem = iter.next();
+            subsystem.shutdown(config);
+        }
 
-            config.save();
-            if (currentState != null) {
-                currentState.dispose();
-                currentState = null;
-            }
-        } finally {
-            // Even if a graceful shutdown of the subsystems fails,
-            // the thread pool has to be shut down
-            stopThreads();
+        config.save();
+        if (currentState != null) {
+            currentState.dispose();
+            currentState = null;
         }
     }
 
@@ -685,49 +675,6 @@ public class TerasologyEngine implements GameEngine {
     public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
         stateChangeSubscribers.remove(subscriber);
     }
-
-    @Override
-    public void submitTask(final String name, final Runnable task) {
-        try {
-            commonThreadPool.put(new Task() {
-                @Override
-                public String getName() {
-                    return name;
-                }
-
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    Thread.currentThread().setName("Engine-Task-Pool");
-                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
-                        task.run();
-                    } catch (RejectedExecutionException e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Thread submitted after shutdown requested: {}", name);
-                    } catch (Throwable e) {
-                        ThreadMonitor.addError(e);
-                    }
-                }
-
-                @Override
-                public boolean isTerminateSignal() {
-                    return false;
-                }
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to submit task {}, running on main thread", name, e);
-            task.run();
-        }
-    }
-
-    public void stopThreads() {
-        commonThreadPool.shutdown(new ShutdownTask(), false);
-    }
-
-    public void restartThreads() {
-        commonThreadPool.restart();
-    }
-
 
     @Override
     public Context createChildContext() {

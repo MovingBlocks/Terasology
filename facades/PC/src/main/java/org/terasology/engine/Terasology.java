@@ -25,6 +25,7 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.ThreadManager;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -136,7 +137,7 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else {
                 if (loadLastGame) {
-                    engine.submitTask("loadGame", new Runnable() {
+                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", new Runnable() {
                         @Override
                         public void run() {
                             GameManifest gameManifest = getLatestGameManifest();
