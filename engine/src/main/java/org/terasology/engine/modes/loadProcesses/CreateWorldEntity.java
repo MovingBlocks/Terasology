@@ -16,7 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import com.google.common.base.Optional;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -30,6 +29,7 @@ import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Immortius
@@ -61,19 +61,14 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             // get the world generator config from the world entity
             // replace the world generator values from the components in the world entity
             WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-            Optional<WorldConfigurator> ocf = worldGenerator.getConfigurator();
-
-            if (ocf.isPresent()) {
-                Map<String, Component> params = ocf.get().getProperties();
-                for (Map.Entry<String, Component> entry : params.entrySet()) {
-                    Class<? extends Component> clazz = entry.getValue().getClass();
-                    Component comp = worldEntity.getComponent(clazz);
-                    if (comp != null) {
-                        entry.setValue(comp);
-                    }
+            WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
+            Map<String, Component> params = worldConfigurator.getProperties();
+            for (Map.Entry<String, Component> entry : params.entrySet()) {
+                Class<? extends Component> clazz = entry.getValue().getClass();
+                Component comp = worldEntity.getComponent(clazz);
+                if (comp != null) {
+                    worldConfigurator.setProperty(entry.getKey(), comp);
                 }
-                // save the world config back to the world generator
-                worldGenerator.setConfigurator(ocf.get());
             }
         } else {
             EntityRef worldEntity = entityManager.create();
@@ -82,32 +77,25 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
             // transfer all world generation parameters from Config to WorldEntity
             WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-            Optional<WorldConfigurator> ocf = worldGenerator.getConfigurator();
+            SimpleUri generatorUri = worldGenerator.getUri();
+            Config config = context.get(Config.class);
 
-            if (ocf.isPresent()) {
-                SimpleUri generatorUri = worldGenerator.getUri();
-                Config config = context.get(Config.class);
-
-                // get the map of properties from the world generator.  Replace its values with values from the config set by the UI.
-                // Also set all the components to the world entity.
-                Map<String, Component> params = ocf.get().getProperties();
-                for (Map.Entry<String, Component> entry : params.entrySet()) {
-                    Class<? extends Component> clazz = entry.getValue().getClass();
-                    Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
-                    if (comp != null) {
-                        worldEntity.addComponent(comp);
-                        entry.setValue(comp);
-                    } else {
-                        worldEntity.addComponent(entry.getValue());
-                    }
+            // get the map of properties from the world generator.
+            // Replace its values with values from the config set by the UI.
+            // Also set all the components to the world entity.
+            WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
+            Map<String, Component> params = worldConfigurator.getProperties();
+            for (Map.Entry<String, Component> entry : params.entrySet()) {
+                Class<? extends Component> clazz = entry.getValue().getClass();
+                Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
+                if (comp != null) {
+                    worldEntity.addComponent(comp);
+                    worldConfigurator.setProperty(entry.getKey(), comp);
+                } else {
+                    worldEntity.addComponent(entry.getValue());
                 }
-
-                // save the world config back to the world generator
-                worldGenerator.setConfigurator(ocf.get());
             }
-
         }
-
 
         return true;
     }

@@ -279,23 +279,12 @@ public class CreateGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                PreviewWorldScreen screen = getManager().pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
+                PreviewWorldScreen screen = getManager().pushScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
                 if (screen != null) {
                     screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
                 }
             }
         });
-
-        UIButton configButton = find("config", UIButton.class);
-        if (configButton != null) {
-            configButton.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    getManager().pushScreen("engine:configWorldGen");
-                }
-            });
-            configButton.bindEnabled(worldGeneratorSelected);
-        }
 
         WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override

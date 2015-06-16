@@ -16,13 +16,12 @@
 package org.terasology.entitySystem.prefab.internal;
 
 import com.google.common.collect.Sets;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.registry.CoreRegistry;
 
 import java.util.Collection;
 
@@ -41,7 +40,7 @@ public class PojoPrefabManager implements PrefabManager {
     @Override
     public Prefab getPrefab(String name) {
         if (!name.isEmpty()) {
-            return Assets.getPrefab(name);
+            return Assets.getPrefab(name).orElse(null);
         }
         return null;
 
@@ -60,7 +59,7 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public Iterable<Prefab> listPrefabs() {
-        return CoreRegistry.get(AssetManager.class).listLoadedAssets(AssetType.PREFAB, Prefab.class);
+        return CoreRegistry.get(AssetManager.class).getLoadedAssets(Prefab.class);
     }
 
     /**
@@ -70,7 +69,7 @@ public class PojoPrefabManager implements PrefabManager {
     public Collection<Prefab> listPrefabs(Class<? extends Component> comp) {
         Collection<Prefab> prefabs = Sets.newHashSet();
 
-        for (Prefab p : CoreRegistry.get(AssetManager.class).listLoadedAssets(AssetType.PREFAB, Prefab.class)) {
+        for (Prefab p : CoreRegistry.get(AssetManager.class).getLoadedAssets(Prefab.class)) {
             if (p.getComponent(comp) != null) {
                 prefabs.add(p);
             }

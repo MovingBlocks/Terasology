@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.assets.material;
 
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector2f;
@@ -28,15 +28,11 @@ import org.terasology.rendering.cameras.Camera;
 
 import java.nio.FloatBuffer;
 
-public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {
+public abstract class BaseMaterial extends Material {
 
-    public BaseMaterial(AssetUri uri) {
-        super(uri);
+    protected BaseMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType) {
+        super(urn, assetType);
     }
-
-    protected abstract void onReload(MaterialData data);
-
-    protected abstract void onDispose();
 
     public abstract void recompile();
 

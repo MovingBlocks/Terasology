@@ -15,75 +15,23 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.naming.Name;
-import org.terasology.world.BlockSoundsRegistry;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.SymmetricFamily;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public abstract class BlockManager implements BlockSoundsRegistry {
+public abstract class BlockManager {
 
-    private static final Name AIR_ID = new Name("air");
-    private static final Block AIR;
-    private static final BlockFamily AIR_FAMILY;
-
-    static {
-        AIR = new Block();
-        AIR.setTranslucent(true);
-        AIR.setInvisible(true);
-        AIR.setTargetable(false);
-        AIR.setPenetrable(true);
-        AIR.setReplacementAllowed(true);
-        AIR.setShadowCasting(false);
-        AIR.setAttachmentAllowed(false);
-        AIR.setHardness((byte) 0);
-        AIR.setId((short) 0);
-        AIR.setDisplayName("Air");
-        AIR.setUri(new BlockUri(TerasologyConstants.ENGINE_MODULE, AIR_ID));
-        AIR_FAMILY = new SymmetricFamily(AIR.getURI(), AIR);
-    }
-
-    public static Block getAir() {
-        return AIR;
-    }
-
-    public static BlockFamily getAirFamily() {
-        return AIR_FAMILY;
-    }
-
-    /**
-     * Retrieve all {@code BlockUri}s that match the given string.
-     * <br><br>
-     * In order to resolve the {@code BlockUri}s, every package is searched for the given uri pattern.
-     *
-     * @param uri the uri pattern to match
-     * @return a list of matching block uris
-     */
-    public abstract List<BlockUri> resolveAllBlockFamilyUri(String uri);
-
-    public abstract BlockUri resolveBlockFamilyUri(String name);
+    public static final BlockUri AIR_ID = new BlockUri(new ResourceUrn("engine:air"));
 
     /**
      * @return A map of the mapping between Block Uris and Ids
      */
     public abstract Map<String, Short> getBlockIdMap();
-
-    /**
-     * @param category
-     * @return Iterable over all block families with the given category
-     */
-    public abstract Iterable<BlockUri> getBlockFamiliesWithCategory(String category);
-
-    /**
-     * @return Iterable over all block categories
-     */
-    public abstract Iterable<String> getBlockCategories();
 
     /**
      * @param uri
@@ -116,55 +64,23 @@ public abstract class BlockManager implements BlockSoundsRegistry {
     public abstract Block getBlock(short id);
 
     /**
-     * @return An iterable over the list of registered (in use) block uris
+     * @return A collection of registered (in use) block uris
      */
-    public abstract Iterable<BlockUri> listRegisteredBlockUris();
+    public abstract Collection<BlockUri> listRegisteredBlockUris();
 
     /**
-     * @return An iterable over the list of registered (in use) block families
+     * @return A collection of registered (in use) block families
      */
-    public abstract Iterable<BlockFamily> listRegisteredBlockFamilies();
+    public abstract Collection<BlockFamily> listRegisteredBlockFamilies();
 
     /**
-     * @return A list of freeform block uris
-     */
-    public abstract Iterable<BlockUri> listFreeformBlockUris();
-
-    /**
-     * @param familyUri
-     * @return Whether the given block family is freeform (can be created with any shape)
-     */
-    public abstract boolean isFreeformFamily(BlockUri familyUri);
-
-    /**
-     * @return A list of available block families
-     */
-    public abstract Iterable<BlockFamily> listAvailableBlockFamilies();
-
-    /**
-     * Retrieves a block family without registering
-     *
-     * @param uri
-     * @return The block family with the given uri, if available
-     */
-    public abstract BlockFamily getAvailableBlockFamily(BlockUri uri);
-
-    /**
-     * @return A list of the block uris of available blocks.
-     */
-    public abstract Iterable<BlockUri> listAvailableBlockUris();
-
-    /**
-     * @return The number of block families
+     * @return The count of registered block families
      */
     public abstract int getBlockFamilyCount();
 
     /**
-     * @param uri
-     * @return Whether the uri corresponds to a block family.
+     * @return A collection of registered blocks
      */
-    public abstract boolean hasBlockFamily(BlockUri uri);
-
-    public abstract Iterable<Block> listRegisteredBlocks();
+    public abstract Collection<Block> listRegisteredBlocks();
 
 }

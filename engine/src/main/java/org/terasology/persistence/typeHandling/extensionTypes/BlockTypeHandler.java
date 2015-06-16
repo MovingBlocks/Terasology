@@ -25,7 +25,11 @@ import org.terasology.world.block.BlockManager;
  */
 public class BlockTypeHandler extends StringRepresentationTypeHandler<Block> {
 
-    private BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+    private BlockManager blockManager;
+
+    public BlockTypeHandler(BlockManager blockManager) {
+        this.blockManager = blockManager;
+    }
 
     @Override
     public String getAsString(Block item) {

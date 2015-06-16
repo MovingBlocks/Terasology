@@ -19,10 +19,11 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
+
+import java.util.Optional;
 
 /**
  * @author Immortius
@@ -30,12 +31,10 @@ import org.terasology.world.block.family.BlockFamily;
 public class BlockPrefabManager implements BlockRegistrationListener {
 
     private EntityManager entityManager;
-    private PrefabManager prefabManager;
     private BlockManager blockManager;
 
     public BlockPrefabManager(EntityManager entityManager, BlockManager blockManager) {
         this.entityManager = entityManager;
-        this.prefabManager = entityManager.getPrefabManager();
         this.blockManager = blockManager;
 
         updateExistingBlocks();
@@ -57,12 +56,11 @@ public class BlockPrefabManager implements BlockRegistrationListener {
     }
 
     private void updateBlock(Block block) {
-        String prefab = block.getPrefab();
+        Optional<Prefab> prefab = block.getPrefab();
         boolean keepActive = block.isKeepActive();
         boolean requiresLifecycleEvents = false;
-        if (!prefab.isEmpty()) {
-            Prefab blockPrefab = prefabManager.getPrefab(prefab);
-            for (Component comp : blockPrefab.iterateComponents()) {
+        if (prefab.isPresent()) {
+            for (Component comp : prefab.get().iterateComponents()) {
                 ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
                 if (metadata.isForceBlockActive()) {
                     keepActive = true;

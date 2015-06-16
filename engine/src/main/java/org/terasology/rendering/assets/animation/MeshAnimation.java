@@ -16,23 +16,29 @@
 
 package org.terasology.rendering.assets.animation;
 
-import org.terasology.asset.Asset;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 /**
  * @author Immortius
  */
-public interface MeshAnimation extends Asset<MeshAnimationData> {
+public abstract class MeshAnimation extends Asset<MeshAnimationData> {
 
-    boolean isValidAnimationFor(SkeletalMesh mesh);
+    protected MeshAnimation(ResourceUrn urn, AssetType<?, MeshAnimationData> assetType) {
+        super(urn, assetType);
+    }
 
-    int getBoneCount();
+    public abstract boolean isValidAnimationFor(SkeletalMesh mesh);
 
-    int getFrameCount();
+    public abstract int getBoneCount();
 
-    MeshAnimationFrame getFrame(int frame);
+    public abstract int getFrameCount();
 
-    String getBoneName(int index);
+    public abstract MeshAnimationFrame getFrame(int frame);
 
-    float getTimePerFrame();
+    public abstract String getBoneName(int index);
+
+    public abstract float getTimePerFrame();
 }

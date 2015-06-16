@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.console.commandSystem;
 
-import com.google.common.base.Optional;
 import org.terasology.entitySystem.entity.EntityRef;
+
+import java.util.Optional;
 
 /**
  * @author Immortius, Limeth
@@ -25,7 +26,7 @@ public enum MarkerParameters implements Parameter {
     /**
      * Marks a parameter which is invalid - there is no information on how it should be provided.
      */
-    INVALID(Optional.<Class<?>>absent()),
+    INVALID(Optional.<Class<?>>empty()),
 
     /**
      * Marks a parameter which should be populated

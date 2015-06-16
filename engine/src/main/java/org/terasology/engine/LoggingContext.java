@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,14 +60,18 @@ public final class LoggingContext {
     /**
      * The format of the log folder timestamps
      */
-    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+    private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+
+    private static Path loggingPath = Paths.get(".");
 
     private LoggingContext() {
         // no instances
     }
 
     public static void initialize(Path logFileFolder) {
-        String pathString = logFileFolder.normalize().toString();
+        String timestamp = TIMESTAMP_FORMAT.format(new Date());
+        loggingPath = logFileFolder.resolve(timestamp).normalize();
+        String pathString = loggingPath.toString();
         System.setProperty(LOG_FILE_FOLDER, pathString);
 
         try {
@@ -94,6 +100,10 @@ public final class LoggingContext {
 //        }
     }
 
+    public static Path getLoggingPath() {
+        return loggingPath;
+    }
+
     private static void deleteLogFiles(final Path rootPath, final int maxAgeInSecs) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 
@@ -106,9 +116,8 @@ public final class LoggingContext {
                 // compare only the first subfolder
                 String relPath = rootPath.relativize(path).getName(0).toString();
 
-                SimpleDateFormat sdf = new SimpleDateFormat(TIMESTAMP_FORMAT);
                 try {
-                    Date folderDate = sdf.parse(relPath);
+                    Date folderDate = TIMESTAMP_FORMAT.parse(relPath);
                     // JAVA8: long ageInSecs = folderDate.toInstant().until(Instant.now(), ChronoUnit.SECONDS);
                     long ageInSecs = (new Date().getTime() - folderDate.getTime()) / 1000;
 

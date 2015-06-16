@@ -15,11 +15,17 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetData;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 
 /**
  * @author Immortius
  */
-public interface TextureRegionAsset<T extends AssetData> extends TextureRegion, Asset<T> {
+public abstract class TextureRegionAsset<T extends AssetData> extends Asset<T> implements TextureRegion {
+
+    protected TextureRegionAsset(ResourceUrn urn, AssetType<?, T> assetType) {
+        super(urn, assetType);
+    }
 }

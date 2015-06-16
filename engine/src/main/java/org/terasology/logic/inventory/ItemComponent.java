@@ -18,10 +18,10 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.internal.NullPrefab;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
 
 /**
  * Item data is stored using this component
@@ -39,7 +39,7 @@ public final class ItemComponent implements Component {
      * Name of the icon this item should be rendered with
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public TextureRegion icon;
+    public TextureRegionAsset<?> icon;
 
     /**
      * If this item is stackable, it should have a unique ID (so alike stacks can be merged)
@@ -83,8 +83,8 @@ public final class ItemComponent implements Component {
      */
     public int baseDamage = 1;
 
-    public Prefab damageType = new NullPrefab();
+    public Prefab damageType;
 
-    public Prefab pickupPrefab = new NullPrefab();
+    public Prefab pickupPrefab;
 
 }

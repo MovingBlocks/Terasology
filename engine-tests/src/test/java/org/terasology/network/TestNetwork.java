@@ -26,6 +26,7 @@ import org.terasology.engine.EngineTime;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -65,7 +66,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         EngineTime time = mock(EngineTime.class);
         NetworkSystem server = new NetworkSystemImpl(time, context);
         netSystems.add(server);
-        server.connectToEntitySystem(entityManager, context.get(EntitySystemLibrary.class), null);
+        server.connectToEntitySystem(entityManager, context.get(EventLibrary.class), null);
         server.host(7777, true);
 
         Thread.sleep(500);
@@ -90,7 +91,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         EngineTime time = mock(EngineTime.class);
         NetworkSystem server = new NetworkSystemImpl(time, context);
         netSystems.add(server);
-        server.connectToEntitySystem(entityManager, context.get(EntitySystemLibrary.class), null);
+        server.connectToEntitySystem(entityManager, context.get(EventLibrary.class), null);
         server.host(7777, true);
 
         assertFalse(122 == entity.getComponent(NetworkComponent.class).getNetworkId());

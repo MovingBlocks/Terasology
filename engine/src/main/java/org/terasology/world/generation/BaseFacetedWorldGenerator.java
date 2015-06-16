@@ -15,9 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
@@ -29,19 +27,23 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
 
     private final SimpleUri uri;
 
     private String worldSeed;
-    private WorldBuilder worldBuilder;
+    private final WorldBuilder worldBuilder;
     private World world;
+
+    private final FacetedWorldConfigurator worldConfigurator;
 
     public BaseFacetedWorldGenerator(SimpleUri uri) {
         this.uri = uri;
+        this.worldBuilder = createWorld();
+        this.worldConfigurator = worldBuilder.createConfigurator();
     }
 
     @Override
@@ -57,12 +59,13 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-        worldBuilder = createWorld(worldSeed.hashCode());
+        worldBuilder.setSeed(seed.hashCode());
+
         // reset the world to lazy load it again later
         world = null;
     }
 
-    protected abstract WorldBuilder createWorld(long seed);
+    protected abstract WorldBuilder createWorld();
 
     @Override
     public void initialize() {
@@ -75,22 +78,9 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     }
 
     @Override
-    public Optional<WorldConfigurator> getConfigurator() {
-        FacetedWorldConfigurator worldConfigurator = worldBuilder.createConfigurator();
-        addConfiguration(worldConfigurator);
-        return Optional.of((WorldConfigurator) worldConfigurator);
+    public WorldConfigurator getConfigurator() {
+        return worldConfigurator;
     }
-
-    protected void addConfiguration(FacetedWorldConfigurator worldConfigurator) {
-    }
-
-    @Override
-    public void setConfigurator(WorldConfigurator newConfigurator) {
-        if (newConfigurator instanceof FacetedWorldConfigurator) {
-            worldBuilder.setConfigurator((FacetedWorldConfigurator) newConfigurator);
-        }
-    }
-
 
     @Override
     public World getWorld() {

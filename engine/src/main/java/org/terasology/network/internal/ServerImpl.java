@@ -57,6 +57,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkSerializer;
@@ -340,12 +341,16 @@ public class ServerImpl implements Server {
             } else if (blockFamily.getBlockUriCount() == 0) {
                 logger.error("Received empty block registration");
             } else {
-                BlockUri family = new BlockUri(blockFamily.getBlockUri(0)).getFamilyUri();
-                Map<String, Integer> registrationMap = Maps.newHashMap();
-                for (int i = 0; i < blockFamily.getBlockIdCount(); ++i) {
-                    registrationMap.put(blockFamily.getBlockUri(i), blockFamily.getBlockId(i));
+                try {
+                    BlockUri family = new BlockUri(blockFamily.getBlockUri(0)).getFamilyUri();
+                    Map<String, Integer> registrationMap = Maps.newHashMap();
+                    for (int i = 0; i < blockFamily.getBlockIdCount(); ++i) {
+                        registrationMap.put(blockFamily.getBlockUri(i), blockFamily.getBlockId(i));
+                    }
+                    blockManager.receiveFamilyRegistration(family, registrationMap);
+                } catch (BlockUriParseException e) {
+                    logger.error("Received invalid block uri", blockFamily.getBlockUri(0));
                 }
-                blockManager.receiveFamilyRegistration(family, registrationMap);
             }
         }
     }

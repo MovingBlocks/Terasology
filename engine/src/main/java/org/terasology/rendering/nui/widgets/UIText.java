@@ -110,12 +110,12 @@ public class UIText extends CoreWidget {
     };
 
     public UIText() {
-        cursorTexture = Assets.getTexture("engine:white");
+        cursorTexture = Assets.getTexture("engine:white").get();
     }
 
     public UIText(String id) {
         super(id);
-        cursorTexture = Assets.getTexture("engine:white");
+        cursorTexture = Assets.getTexture("engine:white").get();
     }
 
     @Override

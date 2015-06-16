@@ -17,7 +17,7 @@ package org.terasology.logic.characters.interactions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -36,10 +36,8 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 
 /**
- *
  * @author Immortius
  * @author Florian
- *
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class InteractionSystem extends BaseComponentSystem {
@@ -112,7 +110,7 @@ public class InteractionSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {InteractionScreenComponent.class})
     public void onInteractionStartPredicted(InteractionStartPredicted event, EntityRef container,
-                                   InteractionScreenComponent interactionScreenComponent) {
+                                            InteractionScreenComponent interactionScreenComponent) {
         EntityRef investigator = event.getInstigator();
         CharacterComponent characterComponent = investigator.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
@@ -127,13 +125,13 @@ public class InteractionSystem extends BaseComponentSystem {
 
     /**
      * The method listens for the event that the user closes the screen of the current interaction target.
-     *
+     * <p>
      * When it happens then it cancels the interaction.
      */
     @ReceiveEvent(components = {ClientComponent.class})
     public void onScreenLayerClosed(ScreenLayerClosedEvent event, EntityRef container, ClientComponent clientComponent) {
         EntityRef character = clientComponent.character;
-        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
+        ResourceUrn activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
 
         if ((activeInteractionScreenUri != null) && (activeInteractionScreenUri.equals(event.getClosedScreenUri()))) {
             InteractionUtil.cancelInteractionAsClient(clientComponent.character);
@@ -154,7 +152,7 @@ public class InteractionSystem extends BaseComponentSystem {
         }
 
         EntityRef character = clientComponent.character;
-        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
+        ResourceUrn activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
             InteractionUtil.cancelInteractionAsClient(character);
             // do not consume the event, so that the inventory will still open

@@ -37,16 +37,14 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
+import org.terasology.logic.players.event.SelectedItemChangedEvent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.SpiralIterable;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
@@ -59,8 +57,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.generation.World;
 import org.terasology.world.generator.WorldGenerator;
 
 import com.google.common.collect.Lists;
@@ -72,8 +68,6 @@ import com.google.common.collect.Lists;
 public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerSystem.class);
-
-    private final float playerHeight = 1.5f;
 
     @In
     private EntityManager entityManager;
@@ -113,76 +107,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 i.remove();
             }
         }
-    }
-
-    private void spawnPlayer(EntityRef clientEntity) {
-
-        LocationComponent location = clientEntity.getComponent(LocationComponent.class);
-
-        Vector3f spawnPosition = findSpawnPos(location.getWorldPosition());
-        location.setWorldPosition(spawnPosition);
-        clientEntity.saveComponent(location);
-
-        logger.debug("Spawing player at: {}", spawnPosition);
-
-        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
-
-        PlayerFactory playerFactory = new PlayerFactory(entityManager);
-        EntityRef playerCharacter = playerFactory.newInstance(spawnPosition, clientEntity);
-        Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
-
-        Client clientListener = networkSystem.getOwner(clientEntity);
-        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
-        updateRelevanceEntity(clientEntity, distance);
-        client.character = playerCharacter;
-        clientEntity.saveComponent(client);
-        playerCharacter.send(new OnPlayerSpawnedEvent());
-    }
-
-    private Vector3f findSpawnPos(Vector3f targetPos) {
-        int targetBlockX = TeraMath.floorToInt(targetPos.x);
-        int targetBlockY = TeraMath.floorToInt(targetPos.y);
-        int targetBlockZ = TeraMath.floorToInt(targetPos.z);
-        Vector2i center = new Vector2i(targetBlockX, targetBlockZ);
-        for (BaseVector2i pos : SpiralIterable.clockwise(center).maxRadius(3).scale(2).build()) {
-
-            Vector3i testPos = new Vector3i(pos.getX(), targetBlockY, pos.getY());
-            Vector3i spawnPos = findOpenVerticalPosition(testPos, playerHeight);
-            if (spawnPos != null) {
-                return new Vector3f(spawnPos.getX(), spawnPos.getY() + playerHeight, spawnPos.getZ());
-            }
-        }
-        return null;
-    }
-
-    /**
-     * find a spot above the surface that is big enough for this character
-     * @param spawnPos the position to check
-     * @param height the height of the entity to spawn
-     * @return the found spot or <code>null</code> if none was found
-     */
-    private Vector3i findOpenVerticalPosition(Vector3i spawnPos, float height) {
-        int consecutiveAirBlocks = 0;
-        Vector3i newSpawnPos = new Vector3i(spawnPos);
-
-        // TODO: also start looking downwards if initial spawn pos is in the air
-        for (int i = 1; i < 20; i++) {
-            if (worldProvider.isBlockRelevant(newSpawnPos)) {
-                if (worldProvider.getBlock(newSpawnPos) == BlockManager.getAir()) {
-                    consecutiveAirBlocks++;
-                } else {
-                    consecutiveAirBlocks = 0;
-                }
-
-                if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.subY(consecutiveAirBlocks - 1);
-                    return newSpawnPos;
-                }
-                newSpawnPos.add(0, 1, 0);
-            }
-        }
-
-        return null;
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -318,6 +242,23 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
         return "Teleported to " + x + " " + y + " " + z;
     }
+
+    private void spawnPlayer(EntityRef clientEntity) {
+
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+
+        PlayerFactory playerFactory = new PlayerFactory(entityManager, worldProvider);
+        EntityRef playerCharacter = playerFactory.newInstance(clientEntity);
+
+        Client clientListener = networkSystem.getOwner(clientEntity);
+        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
+        updateRelevanceEntity(clientEntity, distance);
+        client.character = playerCharacter;
+        clientEntity.saveComponent(client);
+        playerCharacter.send(new SelectedItemChangedEvent(EntityRef.NULL, InventoryUtils.getItemAt(playerCharacter, 0)));
+        playerCharacter.send(new OnPlayerSpawnedEvent());
+    }
+
 
     private static class SpawningClientInfo {
         public EntityRef clientEntity;

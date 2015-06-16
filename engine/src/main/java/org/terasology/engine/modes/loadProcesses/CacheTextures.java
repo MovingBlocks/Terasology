@@ -16,18 +16,18 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import com.google.common.collect.Lists;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author Immortius
  */
 public class CacheTextures extends StepBasedLoadProcess {
-    private Iterator<AssetUri> uris;
+    private Iterator<ResourceUrn> urns;
 
     @Override
     public String getMessage() {
@@ -36,16 +36,17 @@ public class CacheTextures extends StepBasedLoadProcess {
 
     @Override
     public void begin() {
-        uris = Assets.list(AssetType.TEXTURE).iterator();
-        setTotalSteps(Lists.newArrayList(Assets.list(AssetType.TEXTURE)).size());
+        Set<ResourceUrn> list = Assets.list(Texture.class);
+        urns = list.iterator();
+        setTotalSteps(list.size());
     }
 
     @Override
     public boolean step() {
-        AssetUri textureURI = uris.next();
-        Assets.get(textureURI);
+        ResourceUrn textureUrn = urns.next();
+        Assets.get(textureUrn, Texture.class);
         stepDone();
-        return !uris.hasNext();
+        return !urns.hasNext();
     }
 
     @Override

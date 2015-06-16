@@ -60,7 +60,7 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
         Vector3f position = localPlayer.getPosition();
         position.x += xOffset;
         position.z += zOffset;
-        audioManager.playSound(Assets.getSound("engine:dig"), position);
+        audioManager.playSound(Assets.getSound("engine:dig").get(), position);
     }
 
     @ReceiveEvent

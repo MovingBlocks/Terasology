@@ -70,10 +70,10 @@ public class ShaderParametersSky extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky90").getId());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky90").get().getId());
         program.setInt("texSky90", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky180").getId());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky180").get().getId());
         program.setInt("texSky180", texId++, true);
 
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);

@@ -19,11 +19,13 @@ import com.google.common.collect.Maps;
 import org.terasology.math.Direction;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.naming.Name;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -55,7 +57,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
             }
             this.blocks.put(side, block);
             block.setBlockFamily(this);
-            block.setUri(new BlockUri(uri, side.name()));
+            block.setUri(new BlockUri(uri, new Name(side.name())));
         }
     }
 
@@ -80,7 +82,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
-                Side side = Side.valueOf(blockUri.getIdentifier().toUpperCase());
+                Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
                 return blocks.get(side);
             } catch (IllegalArgumentException e) {
                 return null;
@@ -97,5 +99,15 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
     @Override
     public Block getBlockForSide(Side side) {
         return blocks.get(side);
+    }
+
+    @Override
+    public Side getSide(Block block) {
+        for (Map.Entry<Side, Block> sideBlockEntry : blocks.entrySet()) {
+            if (block == sideBlockEntry.getValue()) {
+                return sideBlockEntry.getKey();
+            }
+        }
+        return null;
     }
 }

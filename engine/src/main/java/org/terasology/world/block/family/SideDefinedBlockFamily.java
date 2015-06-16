@@ -19,5 +19,19 @@ import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 
 public interface SideDefinedBlockFamily extends BlockFamily {
+    /**
+     * Returns a block that is facing the specified side from this block family, if one exists.
+     *
+     * @param side
+     * @return
+     */
     Block getBlockForSide(Side side);
+
+    /**
+     * Returns a side the specified block from this block family is facing.
+     *
+     * @param block
+     * @return
+     */
+    Side getSide(Block block);
 }

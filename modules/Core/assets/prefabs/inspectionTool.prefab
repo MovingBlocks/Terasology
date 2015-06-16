@@ -4,7 +4,7 @@
         "name" : "Inspection Tool"
     },
     "Item" : {
-        "icon" : "engine:items.whiteRecipe"
+        "icon" : "engine:items#whiteRecipe"
     },
     "InspectionTool" : {},
     "InteractionTarget": {},

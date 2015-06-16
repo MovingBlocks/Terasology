@@ -35,7 +35,7 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
      *  ==============
      *
      *  dense chunk  : 4 + 12 + (65536 * 2)                                                   = 131088
-     *  sparse chunk : (4 + 12 + (256 * 2)) + (4 + 12 + (256 × 4)) + ((12 + (256 * 2)) × 256) = 135712
+     *  sparse chunk : (4 + 12 + (256 * 2)) + (4 + 12 + (256 x 4)) + ((12 + (256 * 2)) x 256) = 135712
      *  difference   : 135712 - 131088                                                        =   4624
      *  min. deflate : 4624 / (12 + (256 * 2))                                                =      8.8
      *
@@ -44,7 +44,7 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
      *  =============
      *
      *  dense chunk  : 4 + 12 + 65536                                                   = 65552
-     *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + 256) × 256)       = 69920
+     *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 x 4)) + ((12 + 256) x 256)       = 69920
      *  difference   : 69920 - 65552                                                    =  4368
      *  min. deflate : 4368 / (12 + 256)                                                =    16.3
      *
@@ -53,7 +53,7 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
      *  =============
      *
      *  dense chunk  : 4 + 12 + (65536 / 2)                                             = 32784
-     *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + (256 / 2)) × 256) = 37152
+     *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 x 4)) + ((12 + (256 / 2)) x 256) = 37152
      *  difference   : 37152 - 32784                                                    =  4368
      *  min. deflate : 4368 / (12 + (256 / 2))                                          =    31.2
      *

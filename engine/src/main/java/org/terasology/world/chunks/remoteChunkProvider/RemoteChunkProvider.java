@@ -32,6 +32,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -67,11 +68,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
 
+    private BlockManager blockManager;
+
     private ChunkGenerationPipeline pipeline;
 
     private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
-    public RemoteChunkProvider() {
+    public RemoteChunkProvider(BlockManager blockManager) {
+        this.blockManager = blockManager;
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
@@ -233,7 +237,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, region, offset);
+        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @Override

@@ -18,12 +18,18 @@ package org.terasology.rendering.nui.layers.mainMenu.preview;
 
 import java.nio.ByteBuffer;
 
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
 
 /**
- * Creates 2D images based on game worlds.  
+ * Creates 2D images based on game worlds.
  */
 public interface PreviewGenerator {
 
-    ByteBuffer create(int width, int height, int scale, ProgressListener progressListener) throws InterruptedException;
+    ByteBuffer render(TextureData texData, int scale, ProgressListener progressListener) throws InterruptedException;
+
+    /**
+     * Dispose all resources
+     */
+    void close();
 }

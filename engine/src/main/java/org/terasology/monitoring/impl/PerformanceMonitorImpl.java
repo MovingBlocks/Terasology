@@ -33,11 +33,9 @@ import java.util.List;
 
 /**
  * Active implementation of Performance Monitor
- *
- * @author Immortius
- *         TODO: Check to ensure activities are being started and stopped correctly
- *         TODO: Remove activities with 0 time
  */
+// TODO: Check to ensure activities are being started and stopped correctly
+// TODO: Remove activities with 0 time
 public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private static final int RETAINED_CYCLES = 60;
     private static final double DECAY_RATE = 0.98;
@@ -49,95 +47,83 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     private final Activity activityInstance = new ActivityInstance();
 
-    private Deque<ActivityInfo> activityStack;
-    private List<TObjectLongMap<String>> metricData;
-    private List<TObjectLongMap<String>> allocationData;
-    private TObjectLongMap<String> currentData;
-    private TObjectLongMap<String> currentMemData;
-    private TObjectLongMap<String> runningTotals;
-    private TObjectLongMap<String> runningAllocationTotals;
-    private long timerTicksPerSecond;
-    private TObjectDoubleMap<String> spikeData;
-    private double timeFactor;
+    private final Deque<ActivityInfo> activityStack;
 
-    private Thread mainThread;
-    private EngineTime timer;
+    private final List<TObjectLongMap<String>> executionData;
+    private final List<TObjectLongMap<String>> allocationData;
+
+    private TObjectLongMap<String> currentExecutionData;
+    private TObjectLongMap<String> currentAllocationData;
+    private final TObjectLongMap<String> runningExecutionTotals;
+    private final TObjectLongMap<String> runningAllocationTotals;
+    private final TObjectDoubleMap<String> spikeData;
+
+    private final TObjectDoubleProcedure<String> decayLargestExecutionTime;
+    private final TObjectLongProcedure<String> updateExecutionTimeTotalAndSpikeData;
+    private final TObjectLongProcedure<String> updateAllocatedMemoryTotal;
+    private final TObjectLongProcedure<String> removeExpiredExecutionTimeValueFromTotal;
+    private final TObjectLongProcedure<String> removeExpiredAllocatedMemoryValueFromTotal;
+
+    private final SetterOfActivityToRunningMeanMapEntry setExecutionTimeRunningMean;
+    private final SetterOfActivityToRunningMeanMapEntry setAllocatedMemoryRunningMean;
+
+    private final Thread mainThread;
+    private final EngineTime timer;
 
     public PerformanceMonitorImpl() {
-        timer = (EngineTime) CoreRegistry.get(Time.class);
-        activityStack = Queues.newArrayDeque();
-        metricData = Lists.newLinkedList();
+        activityStack  = Queues.newArrayDeque();
+        executionData  = Lists.newLinkedList();
         allocationData = Lists.newLinkedList();
-        runningTotals = new TObjectLongHashMap<>();
+        currentExecutionData = new TObjectLongHashMap<>();
+        currentAllocationData = new TObjectLongHashMap<>();
+        runningExecutionTotals = new TObjectLongHashMap<>();
         runningAllocationTotals = new TObjectLongHashMap<>();
-        timerTicksPerSecond = 1000;
-        currentData = new TObjectLongHashMap<>();
-        currentMemData = new TObjectLongHashMap<>();
         spikeData = new TObjectDoubleHashMap<>();
-        timeFactor = 1000.0 / timerTicksPerSecond;
-        mainThread = Thread.currentThread();
 
+        decayLargestExecutionTime  = new DecayerOfActivityLargestExecutionTime();
+        updateExecutionTimeTotalAndSpikeData = new UpdaterOfActivityExecutionTimeTotalAndSpikeData();
+        updateAllocatedMemoryTotal = new UpdaterOfActivityAllocatedMemoryTotal();
+        removeExpiredExecutionTimeValueFromTotal  = new RemoverFromTotalOfActivityExpiredExecutionTimeValue();
+        removeExpiredAllocatedMemoryValueFromTotal = new RemoverFromTotalOfActivityExpiredAllocatedMemoryValue();
+
+        setExecutionTimeRunningMean = new SetterOfActivityToRunningMeanMapEntry();
+        setAllocatedMemoryRunningMean = new SetterOfActivityToRunningMeanMapEntry();
+
+        timer = (EngineTime) CoreRegistry.get(Time.class);
+        mainThread = Thread.currentThread();
     }
 
+    @Override
     public void rollCycle() {
-        metricData.add(currentData);
-        allocationData.add(currentMemData);
-        spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
-            public boolean execute(String s, double v) {
-                spikeData.put(s, v * DECAY_RATE);
-                return true;
-            }
-        });
+        executionData.add(currentExecutionData);
+        allocationData.add(currentAllocationData);
 
-        currentData.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long v) {
-                runningTotals.adjustOrPutValue(s, v, v);
-                double time = v * timeFactor;
-                double prev = spikeData.get(s);
-                if (time > prev) {
-                    spikeData.put(s, time);
-                }
-                return true;
-            }
-        });
+        spikeData.forEachEntry(decayLargestExecutionTime);
+        currentExecutionData.forEachEntry(updateExecutionTimeTotalAndSpikeData);
+        currentAllocationData.forEachEntry(updateAllocatedMemoryTotal);
 
-        currentMemData.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long v) {
-                runningAllocationTotals.adjustOrPutValue(s, v, v);
-                return true;
-            }
-        });
-
-        while (metricData.size() > RETAINED_CYCLES) {
-            metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
-                public boolean execute(String s, long v) {
-                    runningTotals.adjustValue(s, -v);
-                    return true;
-                }
-            });
-            metricData.remove(0);
+        while (executionData.size() > RETAINED_CYCLES) {
+            executionData.get(0).forEachEntry(removeExpiredExecutionTimeValueFromTotal);
+            executionData.remove(0);
         }
+
         while (allocationData.size() > RETAINED_CYCLES) {
-            allocationData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
-                public boolean execute(String s, long v) {
-                    runningAllocationTotals.adjustValue(s, -v);
-                    return true;
-                }
-            });
+            allocationData.get(0).forEachEntry(removeExpiredAllocatedMemoryValueFromTotal);
             allocationData.remove(0);
         }
-        currentData = new TObjectLongHashMap<>();
-        currentMemData = new TObjectLongHashMap<>();
+
+        currentExecutionData = new TObjectLongHashMap<>();
+        currentAllocationData = new TObjectLongHashMap<>();
     }
 
-    public Activity startActivity(String activity) {
+    @Override
+    public Activity startActivity(String activityName) {
         if (Thread.currentThread() != mainThread) {
             return OFF_THREAD_ACTIVITY;
         }
-        ActivityInfo newActivity = new ActivityInfo();
-        newActivity.name = activity;
-        newActivity.startTime = timer.getRawTimeInMs();
-        newActivity.startMem = Runtime.getRuntime().freeMemory();
+
+        ActivityInfo newActivity = new ActivityInfo(activityName).initialize();
+
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
@@ -148,66 +134,73 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         return activityInstance;
     }
 
+    @Override
     public void endActivity() {
         if (Thread.currentThread() != mainThread || activityStack.isEmpty()) {
             return;
         }
 
         ActivityInfo oldActivity = activityStack.pop();
-        long time = timer.getRawTimeInMs();
-        long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
-        currentData.adjustOrPutValue(oldActivity.name, total, total);
+
+        long endTime = timer.getRawTimeInMs();
+        long totalTime = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + endTime - oldActivity.resumeTime : endTime - oldActivity.startTime;
+        currentExecutionData.adjustOrPutValue(oldActivity.name, totalTime, totalTime);
+        
         long endMem = Runtime.getRuntime().freeMemory();
         long totalMem = (oldActivity.startMem - endMem > 0) ? oldActivity.startMem - endMem + oldActivity.ownMem : oldActivity.ownMem;
-        currentMemData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
+        currentAllocationData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
 
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
-            currentActivity.resumeTime = time;
+            currentActivity.resumeTime = endTime;
             currentActivity.startMem = endMem;
         }
     }
 
+    @Override
     public TObjectDoubleMap<String> getRunningMean() {
-        final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
-        final double factor = timeFactor / metricData.size();
-        runningTotals.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long l) {
-                if (l > 0) {
-                    result.put(s, l * factor);
-                }
-                return true;
-            }
-        });
-        return result;
+        TObjectDoubleMap<String> activityToMeanMap = new TObjectDoubleHashMap<>();
+        setExecutionTimeRunningMean.setActivityToMeanMap(activityToMeanMap);
+        setExecutionTimeRunningMean.setFactor(1.0 / executionData.size());
+
+        runningExecutionTotals.forEachEntry(setExecutionTimeRunningMean);
+
+        return activityToMeanMap;
     }
 
+    @Override
     public TObjectDoubleMap<String> getDecayingSpikes() {
         return spikeData;
     }
 
     @Override
     public TObjectDoubleMap<String> getAllocationMean() {
-        final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
-        final double factor = 1.0 / allocationData.size();
-        runningAllocationTotals.forEachEntry(new TObjectLongProcedure<String>() {
-            public boolean execute(String s, long l) {
-                if (l > 0) {
-                    result.put(s, l * factor);
-                }
-                return true;
-            }
-        });
-        return result;
+        TObjectDoubleMap<String> activityToMeanMap = new TObjectDoubleHashMap<>();
+        setAllocatedMemoryRunningMean.setActivityToMeanMap(activityToMeanMap);
+        setAllocatedMemoryRunningMean.setFactor(1.0 / allocationData.size());
+
+        runningAllocationTotals.forEachEntry(setAllocatedMemoryRunningMean);
+
+        return activityToMeanMap;
     }
 
-    private static class ActivityInfo {
+    private class ActivityInfo {
         public String name;
         public long startTime;
         public long resumeTime;
         public long ownTime;
         public long startMem;
         public long ownMem;
+
+        public ActivityInfo(String activityName) {
+            this.name = activityName;
+        }
+
+        public ActivityInfo initialize() {
+            this.startTime = timer.getRawTimeInMs();
+            this.startMem = Runtime.getRuntime().freeMemory();
+            return this;
+        }
     }
 
     private class ActivityInstance implements Activity {
@@ -217,4 +210,69 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             endActivity();
         }
     }
+
+    private class DecayerOfActivityLargestExecutionTime implements TObjectDoubleProcedure<String> {
+        public boolean execute(String activityName, double executionTime) {
+            spikeData.put(activityName, executionTime * DECAY_RATE);
+            return true;
+        }
+    }
+
+    private class UpdaterOfActivityExecutionTimeTotalAndSpikeData implements TObjectLongProcedure<String> {
+        double latestSpike;
+
+        public boolean execute(String activityName, long latestExecutionTime) {
+            runningExecutionTotals.adjustOrPutValue(activityName, latestExecutionTime, latestExecutionTime);
+            latestSpike = spikeData.get(activityName);
+            if (latestExecutionTime > latestSpike) {
+                spikeData.put(activityName, latestExecutionTime);
+            }
+            return true;
+        }
+    }
+
+    private class UpdaterOfActivityAllocatedMemoryTotal implements TObjectLongProcedure<String> {
+        public boolean execute(String activityName, long latestAllocatedMemory) {
+            runningAllocationTotals.adjustOrPutValue(activityName, latestAllocatedMemory, latestAllocatedMemory);
+            return true;
+        }
+    }
+
+    private class RemoverFromTotalOfActivityExpiredExecutionTimeValue implements TObjectLongProcedure<String> {
+        public boolean execute(String activityName, long expiredExecutionTime) {
+            runningExecutionTotals.adjustValue(activityName, -expiredExecutionTime);
+            return true;
+        }
+    }
+
+
+    private class RemoverFromTotalOfActivityExpiredAllocatedMemoryValue implements TObjectLongProcedure<String> {
+        public boolean execute(String activityName, long expiredAllocatedMemory) {
+            runningAllocationTotals.adjustValue(activityName, -expiredAllocatedMemory);
+            return true;
+        }
+    }
+
+    private class SetterOfActivityToRunningMeanMapEntry implements TObjectLongProcedure<String> {
+        private TObjectDoubleMap<String> activityToMeanMap;
+        private double factor;
+
+        public SetterOfActivityToRunningMeanMapEntry setActivityToMeanMap(TObjectDoubleMap<String> newActivityToMeanMap) {
+            this.activityToMeanMap = newActivityToMeanMap;
+            return this;
+        }
+
+        public SetterOfActivityToRunningMeanMapEntry setFactor(double newFactor) {
+            this.factor = newFactor;
+            return this;
+        }
+
+        public boolean execute(String activityName, long total) {
+            if (total > 0) {
+                activityToMeanMap.put(activityName, total * factor);
+            }
+            return true;
+        }
+    }
+
 }

@@ -43,6 +43,8 @@ public class RegisterMods extends SingleStepLoadProcess {
 
     private final Context context;
     private final GameManifest gameManifest;
+    private Thread applyModulesThread;
+    private ModuleEnvironment oldEnvironment;
 
     public RegisterMods(Context context, GameManifest gameManifest) {
         this.context = context;
@@ -51,32 +53,50 @@ public class RegisterMods extends SingleStepLoadProcess {
 
     @Override
     public String getMessage() {
-        return "Registering Mods...";
+        if (applyModulesThread != null) {
+            return "Scanning for Assets...";
+        } else {
+            return "Registering Mods...";
+        }
     }
 
     @Override
     public boolean step() {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
-        for (NameVersion moduleInfo : gameManifest.getModules()) {
-            moduleIds.add(moduleInfo.getName());
-        }
-
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        ResolutionResult result = resolver.resolve(moduleIds);
-        if (result.isSuccess()) {
-            ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
-
-            for (Module moduleInfo : env.getModulesOrderedByDependencies()) {
-                logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
+        if (applyModulesThread != null) {
+            if (!applyModulesThread.isAlive()) {
+                if (oldEnvironment != null) {
+                    oldEnvironment.close();
+                }
+                return true;
+            }
+            return false;
+        } else {
+            ModuleManager moduleManager = context.get(ModuleManager.class);
+            List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
+            for (NameVersion moduleInfo : gameManifest.getModules()) {
+                moduleIds.add(moduleInfo.getName());
             }
 
-            ApplyModulesUtil.applyModules(context.get(Context.class));
-        } else {
-            logger.warn("Missing at least one required module or dependency: {}", moduleIds);
-            context.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
+            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+            ResolutionResult result = resolver.resolve(moduleIds);
+            if (result.isSuccess()) {
+                oldEnvironment = moduleManager.getEnvironment();
+                ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
+
+                for (Module moduleInfo : env.getModulesOrderedByDependencies()) {
+                    logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
+                }
+
+                applyModulesThread = new Thread(() -> ApplyModulesUtil.applyModules(context.get(Context.class)));
+                applyModulesThread.start();
+                return false;
+            } else {
+                logger.warn("Missing at least one required module or dependency: {}", moduleIds);
+                context.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
+                return true;
+            }
         }
-        return true;
+
     }
 
     @Override

@@ -15,12 +15,13 @@
  */
 package org.terasology.logic.behavior;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.asset.AssetManager;
+import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.logic.behavior.nui.Port;
 import org.terasology.logic.behavior.nui.PortList;
 import org.terasology.logic.behavior.nui.RenderableNode;
@@ -35,14 +36,7 @@ import static org.mockito.Mockito.mock;
 /**
  * @author synopia
  */
-public class PortTest {
-    @Before
-    public void setup() {
-        AssetManager assetManager = mock(AssetManager.class);
-        Context context = new ContextImpl();
-        context.put(AssetManager.class, assetManager);
-        CoreRegistry.setContext(context);
-    }
+public class PortTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testConnectDecorator() {

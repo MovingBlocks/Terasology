@@ -44,6 +44,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
@@ -84,6 +85,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
+        BlockManager blockManager = context.get(BlockManager.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         context.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment, context));
@@ -128,7 +130,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(StorageManager.class, storageManager);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(
+                new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.AIR_ID)));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         context.put(WorldProvider.class, worldProvider);
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);

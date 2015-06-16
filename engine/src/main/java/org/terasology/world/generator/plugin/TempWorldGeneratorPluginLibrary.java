@@ -15,45 +15,17 @@
  */
 package org.terasology.world.generator.plugin;
 
-import com.google.common.collect.Sets;
-import org.terasology.asset.AssetManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
-
-import java.util.Set;
 
 /**
  * A fake environment so that plugins can be loaded for configuration.
+ *
  * @author Immortius
  */
 public class TempWorldGeneratorPluginLibrary extends DefaultWorldGeneratorPluginLibrary {
 
-    public TempWorldGeneratorPluginLibrary(Context context) {
-        super(getEnv(context), context);
-    }
-
-    private static ModuleEnvironment getEnv(Context context) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        AssetManager assetManager = context.get(AssetManager.class);
-        Config config = context.get(Config.class);
-
-        Set<Module> selectedModules = Sets.newHashSet();
-        for (Name moduleName : config.getDefaultModSelection().listModules()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-            if (module != null) {
-                selectedModules.add(module);
-                for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-                    selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfo.getId()));
-                }
-            }
-        }
-        ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
-        assetManager.setEnvironment(environment);
-        return environment;
+    public TempWorldGeneratorPluginLibrary(ModuleEnvironment environment, Context context) {
+        super(environment, context);
     }
 }

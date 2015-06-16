@@ -19,8 +19,11 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -49,12 +52,14 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
 /**
  * @author Immortius
  */
-public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
+public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private static final int TEX_COORD_SIZE = 2;
     private static final int VECTOR3_SIZE = 3;
     private static final int STRIDE = 24;
     private static final int NORMAL_OFFSET = VECTOR3_SIZE * 4;
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenGLSkeletalMesh.class);
 
     private SkeletalMeshData data;
 
@@ -67,10 +72,10 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     private Vector3f scale;
     private Vector3f translate;
 
-    public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
-        super(uri);
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data, GLBufferPool bufferPool) {
+        super(urn, assetType);
         this.bufferPool = bufferPool;
-        onReload(data);
+        reload(data);
     }
 
     public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
@@ -79,47 +84,59 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    protected void onReload(SkeletalMeshData newData) {
-        this.data = newData;
+    protected void doReload(SkeletalMeshData newData) {
+        try {
+            GameThread.synch(() -> {
+                this.data = newData;
 
-        if (vboPosNormBuffer == 0) {
-            vboPosNormBuffer = bufferPool.get(getURI().toSimpleString());
-        }
+                if (vboPosNormBuffer == 0) {
+                    vboPosNormBuffer = bufferPool.get(getUrn().toString());
+                }
 
-        IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
-        indexBuffer.put(newData.getIndices().toArray());
-        indexBuffer.flip();
-        if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
-        }
-        VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+                IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
+                indexBuffer.put(newData.getIndices().toArray());
+                indexBuffer.flip();
+                if (vboIndexBuffer == 0) {
+                    vboIndexBuffer = bufferPool.get(getUrn().toString());
+                }
+                VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
-        FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
-        for (Vector2f uv : newData.getUVs()) {
-            uvBuffer.put(uv.x);
-            uvBuffer.put(uv.y);
-        }
-        uvBuffer.flip();
+                FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
+                for (Vector2f uv : newData.getUVs()) {
+                    uvBuffer.put(uv.x);
+                    uvBuffer.put(uv.y);
+                }
+                uvBuffer.flip();
 
-        if (vboUVBuffer == 0) {
-            vboUVBuffer = bufferPool.get(getURI().toSimpleString());
+                if (vboUVBuffer == 0) {
+                    vboUVBuffer = bufferPool.get(getUrn().toString());
+                }
+                VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to reload {}", getUrn(), e);
         }
-        VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
     }
 
     @Override
-    protected void onDispose() {
-        if (vboIndexBuffer != 0) {
-            bufferPool.dispose(vboIndexBuffer);
-            vboIndexBuffer = 0;
-        }
-        if (vboPosNormBuffer != 0) {
-            bufferPool.dispose(vboPosNormBuffer);
-            vboPosNormBuffer = 0;
-        }
-        if (vboUVBuffer != 0) {
-            bufferPool.dispose(vboUVBuffer);
-            vboUVBuffer = 0;
+    protected void doDispose() {
+        try {
+            GameThread.synch(() -> {
+                if (vboIndexBuffer != 0) {
+                    bufferPool.dispose(vboIndexBuffer);
+                    vboIndexBuffer = 0;
+                }
+                if (vboPosNormBuffer != 0) {
+                    bufferPool.dispose(vboPosNormBuffer);
+                    vboPosNormBuffer = 0;
+                }
+                if (vboUVBuffer != 0) {
+                    bufferPool.dispose(vboUVBuffer);
+                    vboUVBuffer = 0;
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to dispose {}", getUrn(), e);
         }
     }
 

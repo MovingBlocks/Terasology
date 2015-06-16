@@ -4,7 +4,7 @@
         "name": "Door"
     },
     "Item": {
-        "icon": "engine:items.door",
+        "icon": "engine:items#door",
         "renderWithIcon": true,
         "stackId": "door",
         "consumedOnUse": true,

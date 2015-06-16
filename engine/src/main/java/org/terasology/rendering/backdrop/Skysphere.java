@@ -65,7 +65,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer{
             glCullFace(GL_FRONT);
         }
 
-        Material shader = Assets.getMaterial("engine:prog.sky");
+        Material shader = Assets.getMaterial("engine:prog.sky").get();
         shader.enable();
 
         // Draw the skysphere

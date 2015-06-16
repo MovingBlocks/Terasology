@@ -17,13 +17,12 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
@@ -102,15 +101,15 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Rect2i requestedCropRegion;
     private Rect2i currentTextureCropRegion;
 
-    private Map<AssetUri, FrameBufferObject> fboMap = Maps.newHashMap();
+    private Map<ResourceUrn, FrameBufferObject> fboMap = Maps.newHashMap();
 
 
     public LwjglCanvasRenderer(Context context) {
-        AssetManager assetManager = context.get(AssetManager.class);
-        this.textureMat = assetManager.resolveAndLoad(AssetType.MATERIAL, "engine:UITexture", Material.class);
-        this.billboard = assetManager.resolveAndLoad(AssetType.MESH, "engine:UIBillboard", Mesh.class);
+        // TODO use context to get assets instead of static methods
+        this.textureMat = Assets.getMaterial("engine:UITexture").get();
+        this.billboard = Assets.getMesh("engine:UIBillboard").get();
+        // failure to load these can be due to failing shaders or missing resources
     }
-
 
     @Override
     public void preRender() {
@@ -146,7 +145,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
             if (!usedText.contains(entry.getKey())) {
                 for (Mesh mesh : entry.getValue().values()) {
-                    Assets.dispose(mesh);
+                    mesh.dispose();
                 }
                 textIterator.remove();
             }
@@ -157,7 +156,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         while (textureIterator.hasNext()) {
             Map.Entry<TextureCacheKey, Mesh> entry = textureIterator.next();
             if (!usedTextures.contains(entry.getKey())) {
-                Assets.dispose(entry.getValue());
+                entry.getValue().dispose();
                 textureIterator.remove();
             }
         }
@@ -174,6 +173,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     @Override
     public void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha) {
+        if (!material.isRenderable()) {
+            return;
+        }
+
         AABB meshAABB = mesh.getAABB();
         Vector3f meshExtents = meshAABB.getExtents();
         float fitScale = 0.35f * Math.min(drawRegion.width(), drawRegion.height()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
@@ -242,17 +245,21 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     }
 
     @Override
-    public FrameBufferObject getFBO(AssetUri uri, Vector2i size) {
-        FrameBufferObject frameBufferObject = fboMap.get(uri);
+    public FrameBufferObject getFBO(ResourceUrn urn, Vector2i size) {
+        FrameBufferObject frameBufferObject = fboMap.get(urn);
         if (frameBufferObject == null) {
-            frameBufferObject = new LwjglFrameBufferObject(uri, size);
-            fboMap.put(uri, frameBufferObject);
+            frameBufferObject = new LwjglFrameBufferObject(urn, size);
+            fboMap.put(urn, frameBufferObject);
         }
         return frameBufferObject;
     }
 
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                             float ux, float uy, float uw, float uh, float alpha) {
+        if (!texture.getTexture().isLoaded()) {
+            return;
+        }
+
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
             textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
@@ -337,17 +344,23 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         offset.y += vAlign.getOffset(lines.size() * font.getLineHeight(), absoluteRegion.height());
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
-            entry.getKey().bindTextures();
-            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
-            entry.getKey().setFloat2("offset", offset.x, offset.y);
-            entry.getKey().setFloat("alpha", alpha);
-            entry.getValue().render();
+            if (entry.getKey().isRenderable()) {
+                entry.getKey().bindTextures();
+                entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                        requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+                entry.getKey().setFloat2("offset", offset.x, offset.y);
+                entry.getKey().setFloat("alpha", alpha);
+                entry.getValue().render();
+            }
         }
     }
 
     @Override
     public void drawTextureBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
+        if (!texture.getTexture().isLoaded()) {
+            return;
+        }
+
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.encompasses(region) && requestedCropRegion.encompasses(region))) {
             textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,

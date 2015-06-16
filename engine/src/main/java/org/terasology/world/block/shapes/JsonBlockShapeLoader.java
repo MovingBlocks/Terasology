@@ -33,38 +33,37 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
-
-import org.terasology.asset.AssetLoader;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.format.AbstractAssetFileFormat;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.module.Module;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * @author Immortius
  */
-public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
+@RegisterAssetFileFormat
+public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData> {
     private static final BoxShape CUBE_SHAPE = new BoxShape(new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
     private Gson gson;
 
     public JsonBlockShapeLoader() {
+        super("shape");
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
@@ -75,9 +74,12 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
     }
 
     @Override
-    public BlockShapeData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
-        return gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), BlockShapeData.class);
+    public BlockShapeData load(ResourceUrn resourceUrn, List<AssetDataFile> inputs) throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8)) {
+            return gson.fromJson(reader, BlockShapeData.class);
+        }
     }
+
 
     private static class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
 

@@ -389,6 +389,8 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
             for (int i = 0; i < data.getStringCount(); ++i) {
                 result.add(new PersistedString(data.getString(i)));
             }
+        } else if (data.getNameValueCount() > 0) {
+            result.add(new ProtobufPersistedData(data));
         } else if (data.hasBytes()) {
             throw new IllegalStateException("Data is not an array");
         }

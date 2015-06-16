@@ -15,35 +15,47 @@
  */
 package org.terasology.audio;
 
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetData;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetData;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 
-public interface Sound<T extends AssetData> extends Asset<T> {
+public abstract class Sound<T extends AssetData> extends Asset<T> {
+
+    /**
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     *
+     * @param urn       The urn identifying the asset.
+     * @param assetType The asset type this asset belongs to.
+     */
+    protected Sound(ResourceUrn urn, AssetType<?, T> assetType) {
+        super(urn, assetType);
+    }
 
     /**
      * @return channels amount of sound (1 - mono, 2 - stereo)
      */
-    int getChannels();
+    public abstract int getChannels();
 
     /**
      * @return sampling rate of sound (example 44100)
      */
-    int getSamplingRate();
+    public abstract int getSamplingRate();
 
     /**
      * @return the size of the sound buffer
      */
-    int getBufferSize();
+    public abstract int getBufferSize();
 
     /**
      * Plays the sound at full volume.
      */
-    void play();
+    public abstract void play();
 
     /**
      * Plays the sound at the given volume.
      * @param volume
      */
-    void play(float volume);
+    public abstract void play(float volume);
 
 }

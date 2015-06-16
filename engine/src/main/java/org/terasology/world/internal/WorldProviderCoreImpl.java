@@ -35,7 +35,6 @@ import org.terasology.world.WorldComponent;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
@@ -83,11 +82,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Map<Vector3i, BiomeChange> biomeChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider) {
+    private Block defaultBlock;
+
+    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider, Block defaultBlock) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
+        this.defaultBlock = defaultBlock;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
 
         this.worldTime = new WorldTimeImpl();
@@ -102,8 +104,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider);
+    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block defaultBlock) {
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider, defaultBlock);
     }
 
     @Override
@@ -268,7 +270,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             return chunk.getBlock(blockPos);
         }
         logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", x, y, z);
-        return BlockManager.getAir();
+        return defaultBlock;
     }
 
     @Override

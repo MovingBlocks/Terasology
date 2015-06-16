@@ -48,7 +48,7 @@ public class UIButton extends CoreWidget {
     private Binding<String> text = new DefaultBinding<>("");
 
     @LayoutConfig
-    private Binding<StaticSound> clickSound = new DefaultBinding<StaticSound>(Assets.getSound("engine:click"));
+    private Binding<StaticSound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click").get());
 
     @LayoutConfig
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);

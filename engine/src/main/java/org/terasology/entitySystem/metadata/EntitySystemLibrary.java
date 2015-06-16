@@ -34,6 +34,7 @@ public class EntitySystemLibrary {
         this.typeSerializationLibrary = typeSerializationLibrary;
         this.componentLibrary = new ComponentLibrary(context);
         this.eventLibrary = new EventLibrary(context);
+
     }
 
     /**

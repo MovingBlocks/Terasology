@@ -296,15 +296,7 @@ public final class Terasology {
     }
 
     private static void reportException(Throwable throwable) {
-        Path logPath = Paths.get(".");
-        try {
-            Path gameLogPath = PathManager.getInstance().getLogPath();
-            if (gameLogPath != null) {
-                logPath = gameLogPath;
-            }
-        } catch (Exception pathManagerConstructorFailure) {
-            throwable.addSuppressed(pathManagerConstructorFailure);
-        }
+        Path logPath = LoggingContext.getLoggingPath();
 
         if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
             CrashReporter.report(throwable, logPath);

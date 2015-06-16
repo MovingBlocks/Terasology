@@ -10,7 +10,7 @@
             }
         },
         "UICrosshair" : {
-            "background" : "engine:gui.crosshair",
+            "background" : "engine:gui#crosshair",
             "fixed-width" : 40,
             "fixed-height" : 40
         }
@@ -21,7 +21,7 @@
                 "UIIconBar" : {
                     "parts" : {
                         "icon" : {
-                            "background" : "engine:icons.darkHeartOutline"
+                            "background" : "engine:icons#darkHeartOutline"
                         }
                     }
                 }

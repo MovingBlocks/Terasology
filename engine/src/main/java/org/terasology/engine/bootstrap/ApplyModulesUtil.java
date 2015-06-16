@@ -17,13 +17,32 @@ package org.terasology.engine.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetManager;
 import org.terasology.context.Context;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.world.block.family.BlockFamilyFactory;
+import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 
 /**
  * @author Immortius
@@ -55,7 +74,54 @@ public final class ApplyModulesUtil {
             }
         }
 
-        AssetManager assetManager = context.get(AssetManager.class);
-        assetManager.setEnvironment(moduleManager.getEnvironment());
+        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
+        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+        typeSerializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
+
+        // Entity System Library
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        context.put(EntitySystemLibrary.class, library);
+        context.put(ComponentLibrary.class, library.getComponentLibrary());
+        context.put(EventLibrary.class, library.getEventLibrary());
+
+        registerComponents(library.getComponentLibrary(), moduleManager.getEnvironment());
+
+        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
+        loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
+
+        ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+
+    }
+
+    private static void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, ModuleEnvironment environment) {
+        registry.clear();
+        for (Class<?> blockFamilyFactory : environment.getTypesAnnotatedWith(RegisterBlockFamilyFactory.class)) {
+            if (!BlockFamilyFactory.class.isAssignableFrom(blockFamilyFactory)) {
+                logger.error("Cannot load {}, must be a subclass of BlockFamilyFactory", blockFamilyFactory.getSimpleName());
+                continue;
+            }
+
+            RegisterBlockFamilyFactory registerInfo = blockFamilyFactory.getAnnotation(RegisterBlockFamilyFactory.class);
+            String id = registerInfo.value();
+            logger.debug("Registering blockFamilyFactory {}", id);
+            try {
+                BlockFamilyFactory newBlockFamilyFactory = (BlockFamilyFactory) blockFamilyFactory.newInstance();
+                registry.setBlockFamilyFactory(id, newBlockFamilyFactory);
+                logger.debug("Loaded blockFamilyFactory {}", id);
+            } catch (InstantiationException | IllegalAccessException e) {
+                logger.error("Failed to load blockFamilyFactory {}", id, e);
+            }
+        }
+    }
+
+    private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
+        for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+                String componentName = MetadataUtil.getComponentClassName(componentType);
+                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+            }
+        }
     }
 }

@@ -17,18 +17,18 @@
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
-
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.math.Rect2i;
+import org.terasology.naming.Name;
 import org.terasology.rendering.nui.Color;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 public final class TextureUtil {
-    public static final String GENERATED_COLOR_NAME_PREFIX = "color";
-    public static final String GENERATED_NOISE_NAME_PREFIX = "noise";
+    public static final Name COLOR_RESOURCE_NAME = new Name("Color");
+    public static final Name NOISE_RESOURCE_NAME = new Name("Noise");
 
     private TextureUtil() {
     }
@@ -39,13 +39,8 @@ public final class TextureUtil {
      * @param color including alpha, of the texture to represent.
      * @return an asset Uri for the texture
      */
-    public static AssetUri getTextureUriForColor(Color color) {
-        StringBuilder sb = new StringBuilder(GENERATED_COLOR_NAME_PREFIX);
-        sb.append(".");
-
-        appendColorName(sb, color);
-
-        return new AssetUri(AssetType.TEXTURE, "engine", sb.toString());
+    public static ResourceUrn getTextureUriForColor(Color color) {
+        return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, COLOR_RESOURCE_NAME, new Name(getColorName(color)));
     }
 
     /**
@@ -53,16 +48,21 @@ public final class TextureUtil {
      *
      * @param size the size of the texture (both width and height)
      * @param seed the seed value for the noise generator
-     * @param min the minimum noise value (can be lower than 0 and will be clamped then)
-     * @param max the minimum noise value (can be larger than 255 and will be clamped then)
+     * @param min  the minimum noise value (can be lower than 0 and will be clamped then)
+     * @param max  the minimum noise value (can be larger than 255 and will be clamped then)
      * @return an asset Uri for the texture
      */
-    public static AssetUri getTextureUriForWhiteNoise(int size, long seed, int min, int max) {
+    public static ResourceUrn getTextureUriForWhiteNoise(int size, long seed, int min, int max) {
 
-        String name = String.format("%s.%s.%d.%d.%d.%d",
-                GENERATED_NOISE_NAME_PREFIX, "white", size, seed, min, max);
+        String name = String.format("%s.%d.%d.%d.%d", "white", size, seed, min, max);
 
-        return new AssetUri(AssetType.TEXTURE, "engine", name);
+        return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, NOISE_RESOURCE_NAME, new Name(name));
+    }
+
+    private static String getColorName(Color color) {
+        StringBuilder builder = new StringBuilder();
+        appendColorName(builder, color);
+        return builder.toString();
     }
 
     /**
@@ -154,6 +154,7 @@ public final class TextureUtil {
     /**
      * Converts a BufferedImage into a ByteBuffer based on 32-bit values
      * in RGBA byte order
+     *
      * @param image any type of BufferedImage
      * @return a ByteBuffer that contains the data in RGBA byte order
      */

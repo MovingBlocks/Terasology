@@ -35,6 +35,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.identity.PublicIdentityCertificate;
@@ -89,7 +90,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private Channel channel;
     private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
-    private EntitySystemLibrary entitySystemLibrary;
+    private EventLibrary eventLibrary;
     private NetMetricSource metricSource;
     private BiomeManager biomeManager;
 
@@ -118,7 +119,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.BiomeChangeMessage> queuedOutgoingBiomeChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
-    private List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
+    private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
     private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
     private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
@@ -229,15 +230,17 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void sendRegisteredBlocks(NetData.NetMessage.Builder message) {
-        for (BlockFamily family : newlyRegisteredFamilies) {
-            NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
-            for (Block block : family.getBlocks()) {
-                blockRegMessage.addBlockUri(block.getURI().toString());
-                blockRegMessage.addBlockId(block.getId());
+        synchronized (newlyRegisteredFamilies) {
+            for (BlockFamily family : newlyRegisteredFamilies) {
+                NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
+                for (Block block : family.getBlocks()) {
+                    blockRegMessage.addBlockUri(block.getURI().toString());
+                    blockRegMessage.addBlockId(block.getId());
+                }
+                message.addBlockFamilyRegistered(blockRegMessage);
             }
-            message.addBlockFamilyRegistered(blockRegMessage);
+            newlyRegisteredFamilies.clear();
         }
-        newlyRegisteredFamilies.clear();
     }
 
     private void sendNewChunks(NetData.NetMessage.Builder message) {
@@ -324,10 +327,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     public void connected(EntityManager entityManager, NetworkEntitySerializer newEntitySerializer,
-                          EventSerializer newEventSerializer, EntitySystemLibrary newSystemLibrary) {
+                          EventSerializer newEventSerializer, EventLibrary newEventLibrary) {
         this.entitySerializer = newEntitySerializer;
         this.eventSerializer = newEventSerializer;
-        this.entitySystemLibrary = newSystemLibrary;
+        this.eventLibrary = newEventLibrary;
 
         createEntity(preferredName, color, entityManager);
     }
@@ -504,7 +507,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         for (NetData.EventMessage eventMessage : message.getEventList()) {
             try {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());
-                EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(event.getClass());
+                EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
                 if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
                     logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
                     continue;
@@ -553,6 +556,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     public void blockFamilyRegistered(BlockFamily family) {
-        newlyRegisteredFamilies.add(family);
+        synchronized (newlyRegisteredFamilies) {
+            newlyRegisteredFamilies.add(family);
+        }
     }
 }

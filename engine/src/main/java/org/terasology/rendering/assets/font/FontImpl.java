@@ -15,23 +15,24 @@
  */
 package org.terasology.rendering.assets.font;
 
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
+import org.terasology.assets.Asset;
+import org.terasology.assets.AssetType;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Vector2i;
 
 import java.util.List;
 
-public final class FontImpl extends AbstractAsset<FontData> implements Font {
+public final class FontImpl extends Font {
 
     protected FontData data;
 
-    public FontImpl(AssetUri uri, FontData data) {
-        super(uri);
-        onReload(data);
+    public FontImpl(ResourceUrn urn, AssetType<?, FontData> assetType, FontData data) {
+        super(urn, assetType);
+        reload(data);
     }
 
     @Override
-    protected void onReload(FontData fontData) {
+    protected void doReload(FontData fontData) {
         this.data = fontData;
     }
 
@@ -99,12 +100,12 @@ public final class FontImpl extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    protected void onDispose() {
+    protected void doDispose() {
         this.data = null;
     }
 
     @Override
     public String toString() {
-        return getURI().toString();
+        return getUrn().toString();
     }
 }

@@ -27,6 +27,8 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
+import java.util.Optional;
+
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
@@ -74,11 +76,11 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
             program.setInt("texLightShafts", texId++, true);
         }
 
-        Texture vignetteTexture = Assets.getTexture("engine:vignette");
+        Optional<? extends Texture> vignetteTexture = Assets.getTexture("engine:vignette");
 
-        if (vignetteTexture != null) {
+        if (vignetteTexture.isPresent()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
+            glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.get().getId());
             program.setInt("texVignette", texId++, true);
         }
     }

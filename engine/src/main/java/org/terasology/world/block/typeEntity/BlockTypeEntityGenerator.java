@@ -27,6 +27,8 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.internal.BlockRegistrationListener;
 
+import java.util.Optional;
+
 /**
  * @author Immortius
  */
@@ -79,9 +81,9 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
         EntityBuilder builder = entityManager.newBuilder(blockTypePrefab);
         builder.getComponent(BlockTypeComponent.class).block = block;
         // TODO: Copy across settings as necessary
-        Prefab prefab = (!block.getPrefab().isEmpty()) ? prefabManager.getPrefab(block.getPrefab()) : null;
-        if (prefab != null) {
-            for (Component comp : prefab.iterateComponents()) {
+        Optional<Prefab> prefab = block.getPrefab();
+        if (prefab.isPresent()) {
+            for (Component comp : prefab.get().iterateComponents()) {
                 if (!(comp instanceof NetworkComponent)) {
                     builder.addComponent(entityManager.getComponentLibrary().copy(comp));
                 }

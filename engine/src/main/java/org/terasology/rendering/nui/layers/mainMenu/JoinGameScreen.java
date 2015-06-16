@@ -56,7 +56,6 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
 /**
@@ -146,17 +145,12 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
-        popup.onSuccess(new Function<JoinStatus, Void>() {
-
-            @Override
-            public Void apply(JoinStatus result) {
-                if (result.getStatus() != JoinStatus.Status.FAILED) {
-                    engine.changeState(new StateLoading(result));
-                } else {
-                    MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
-                }
-                return null;
+        popup.onSuccess(result -> {
+            if (result.getStatus() != JoinStatus.Status.FAILED) {
+                engine.changeState(new StateLoading(result));
+            } else {
+                MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
             }
         });
         popup.startOperation(operation, true);

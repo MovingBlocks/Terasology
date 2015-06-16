@@ -196,7 +196,7 @@ public class ComponentSerializer {
             }
             if (fieldInfo != null) {
                 dataMap.put(fieldInfo, new ProtobufPersistedData(field.getValue()));
-            } else if (field.hasNameIndex()) {
+            } else if (field.hasName()) {
                 logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getUri());
             }
         }
@@ -290,7 +290,7 @@ public class ComponentSerializer {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         boolean changed = false;
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
-            if (check.shouldSerializeField(field, delta)) {
+            if (check.shouldSerializeField(field, delta) && serializer.getHandlerFor(field) != null) {
                 Object origValue = field.getValue(base);
                 Object deltaValue = field.getValue(delta);
 

@@ -20,7 +20,7 @@ import java.util.Map;
 import org.terasology.entitySystem.Component;
 
 /**
- * Allows for configuration
+ * Allows for configuration of world generators.
  * @author Martin Steiger
  */
 public interface WorldConfigurator  {
@@ -30,4 +30,10 @@ public interface WorldConfigurator  {
      * @return a map (label to object)
      */
     Map<String, Component> getProperties();
+
+    /**
+     * @param key the name of the configuration
+     * @param comp the configuration component
+     */
+    void setProperty(String key, Component comp);
 }

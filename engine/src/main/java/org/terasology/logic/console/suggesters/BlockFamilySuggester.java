@@ -16,21 +16,22 @@
 package org.terasology.logic.console.suggesters;
 
 import com.google.common.collect.Sets;
+import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.util.Set;
 
 /**
  * @author Limeth
  */
-public class BlockFamilySuggester implements CommandParameterSuggester<BlockFamily> {
+public class BlockFamilySuggester implements CommandParameterSuggester<ResourceUrn> {
     @Override
-    public Set<BlockFamily> suggest(EntityRef sender, Object... resolvedParameters) {
-        Iterable<BlockFamily> iterable = CoreRegistry.get(BlockManager.class).listAvailableBlockFamilies();
+    public Set<ResourceUrn> suggest(EntityRef sender, Object... resolvedParameters) {
+        Iterable<ResourceUrn> iterable = Assets.list(BlockFamilyDefinition.class);
 
         return Sets.newHashSet(iterable);
     }

@@ -29,6 +29,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
@@ -50,6 +51,9 @@ public class JoinServer implements LoadProcess {
     private GameManifest gameManifest;
     private JoinStatus joinStatus;
 
+    private Thread applyModuleThread;
+    private ModuleEnvironment oldEnvironment;
+
     public JoinServer(Context context, GameManifest gameManifest, JoinStatus joinStatus) {
         this.context = context;
         this.networkSystem = context.get(NetworkSystem.class);
@@ -59,12 +63,24 @@ public class JoinServer implements LoadProcess {
 
     @Override
     public String getMessage() {
-        return joinStatus.getCurrentActivity();
+        if (applyModuleThread != null) {
+            return "Scanning for Assets...";
+        } else {
+            return joinStatus.getCurrentActivity();
+        }
     }
 
     @Override
     public boolean step() {
-        if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
+        if (applyModuleThread != null) {
+            if (!applyModuleThread.isAlive()) {
+                if (oldEnvironment != null) {
+                    oldEnvironment.close();
+                }
+                return true;
+            }
+            return false;
+        } else if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
             ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             gameManifest.setTitle(serverInfo.getGameName());
             for (WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
@@ -109,12 +125,16 @@ public class JoinServer implements LoadProcess {
                     moduleSet.add(module);
                 }
             }
+
+            oldEnvironment = moduleManager.getEnvironment();
             moduleManager.loadEnvironment(moduleSet, true);
 
             context.get(Game.class).load(gameManifest);
-            ApplyModulesUtil.applyModules(context.get(Context.class));
 
-            return true;
+            applyModuleThread = new Thread(() -> ApplyModulesUtil.applyModules(context.get(Context.class)));
+            applyModuleThread.start();
+
+            return false;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             StateMainMenu mainMenu = new StateMainMenu("Failed to connect to server: " + joinStatus.getErrorMessage());
             context.get(GameEngine.class).changeState(mainMenu);

@@ -121,8 +121,8 @@ dependencies {
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // Our developed libs
-    compile group: 'org.terasology', name: 'gestalt-module', version: '2.3.0-RC1'
-    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '2.3.0-RC1'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '4.0.2'
+    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '4.0.2'
     compile group: 'org.terasology', name: 'TeraMath', version: '+', changing: true
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
 
@@ -194,14 +194,7 @@ version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
 
-// Everything is considered a snapshot unless built by a Jenkins release job. Might as well just attach -SNAPSHOT here
-if (env.ReleaseScope == null) {
-    version += '-SNAPSHOT'
-    println "Sticking with default snapshot for $project.name: $version"
-} else {
-    // Do version stuff
-    println "Expecting running as Jenkins release job, need to increment version $version by scope: " + env.ReleaseScope
-}
+println "Version for $project.name loaded as $version for group $group"
 
 // This version info file actually goes inside the built jar and can be used at runtime
 task createVersionInfoFile {

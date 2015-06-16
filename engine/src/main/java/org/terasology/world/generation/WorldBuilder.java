@@ -20,13 +20,11 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,18 +37,19 @@ public class WorldBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);
 
-    private final long seed;
     private final List<FacetProvider> providersList = Lists.newArrayList();
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private int seaLevel = 32;
+    private Long seed;
 
-    public WorldBuilder(long seed) {
-        this.seed = seed;
+    private WorldGeneratorPluginLibrary pluginLibrary;
+
+    public WorldBuilder(WorldGeneratorPluginLibrary pluginLibrary) {
+        this.pluginLibrary = pluginLibrary;
     }
 
     public WorldBuilder addProvider(FacetProvider provider) {
-        provider.setSeed(seed);
         providersList.add(provider);
         return this;
     }
@@ -61,14 +60,8 @@ public class WorldBuilder {
     }
 
     public WorldBuilder addPlugins() {
-        WorldGeneratorPluginLibrary pluginLibrary = CoreRegistry.get(WorldGeneratorPluginLibrary.class);
-        for (FacetProvider facetProvider : pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class)) {
-            addProvider(facetProvider);
-        }
-
-        for (WorldRasterizer worldRasterizer : pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class)) {
-            addRasterizer(worldRasterizer);
-        }
+        pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
+        pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
 
         return this;
     }
@@ -82,9 +75,19 @@ public class WorldBuilder {
         return this;
     }
 
+    public void setSeed(long seed) {
+        this.seed = seed;
+    }
+
     public World build() {
         // TODO: ensure the required providers are present
 
+        if (seed == null) {
+            throw new IllegalStateException("Seed has not been set");
+        }
+        for (FacetProvider provider : providersList) {
+            provider.setSeed(seed);
+        }
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
         return new WorldImpl(providerChains, rasterizers, determineBorders(providerChains), seaLevel);
     }
@@ -209,26 +212,13 @@ public class WorldBuilder {
     }
 
     public FacetedWorldConfigurator createConfigurator() {
-        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator();
+        List<ConfigurableFacetProvider> configurables = new ArrayList<>();
         for (FacetProvider facetProvider : providersList) {
             if (facetProvider instanceof ConfigurableFacetProvider) {
-                ConfigurableFacetProvider configurableFacetProvider = (ConfigurableFacetProvider) facetProvider;
-                worldConfigurator.addProperty(configurableFacetProvider.getConfigurationName(), configurableFacetProvider.getConfiguration());
+                configurables.add((ConfigurableFacetProvider) facetProvider);
             }
         }
+        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator(configurables);
         return worldConfigurator;
-    }
-
-    public void setConfigurator(FacetedWorldConfigurator worldConfigurator) {
-        Map<String, Component> configurationMap = worldConfigurator.getProperties();
-        for (FacetProvider facetProvider : providersList) {
-            if (facetProvider instanceof ConfigurableFacetProvider) {
-                ConfigurableFacetProvider configurableFacetProvider = (ConfigurableFacetProvider) facetProvider;
-                Component configuration = configurationMap.get(configurableFacetProvider.getConfigurationName());
-                if (configuration != null) {
-                    configurableFacetProvider.setConfiguration(configuration);
-                }
-            }
-        }
     }
 }
