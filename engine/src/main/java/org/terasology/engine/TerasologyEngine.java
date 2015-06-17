@@ -359,7 +359,7 @@ public class TerasologyEngine implements GameEngine {
     private void initAssets() {
         DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
         context.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
-        assetTypeManager.registerCoreAssetType(Prefab.class, (AssetFactory<PojoPrefab, PrefabData>) PojoPrefab::new, false, "prefabs");
+        assetTypeManager.registerCoreAssetType(Prefab.class, (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, false, "prefabs");
         assetTypeManager.registerCoreAssetType(BlockShape.class, (AssetFactory<BlockShape, BlockShapeData>) BlockShapeImpl::new, "shapes");
         assetTypeManager.registerCoreAssetType(BlockSounds.class, (AssetFactory<BlockSounds, BlockSoundsData>) BlockSounds::new, "blockSounds");
         assetTypeManager.registerCoreAssetType(BlockTile.class, (AssetFactory<BlockTile, TileData>) BlockTile::new, "blockTiles");
