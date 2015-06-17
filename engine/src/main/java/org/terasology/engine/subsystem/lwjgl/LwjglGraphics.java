@@ -17,6 +17,7 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
@@ -27,6 +28,7 @@ import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.AssetFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -40,18 +42,27 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
+import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
@@ -98,18 +109,20 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        assetTypeManager.registerCoreAssetType(Font.class, FontImpl::new, "fonts");
-        assetTypeManager.registerCoreAssetType(Texture.class, (urn, assetType, data) -> (new OpenGLTexture(urn, assetType, data, this)), "textures", "fonts");
+        assetTypeManager.registerCoreAssetType(Font.class, (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
+        assetTypeManager.registerCoreAssetType(Texture.class, (AssetFactory<Texture, TextureData>)
+                (urn, assetType, data) -> (new OpenGLTexture(urn, assetType, data, this)), "textures", "fonts");
         assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
         assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
-
-        assetTypeManager.registerCoreAssetType(Shader.class, GLSLShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class, GLSLMaterial::new, "materials");
-        assetTypeManager.registerCoreAssetType(Mesh.class, (urn, assetType, data) -> new OpenGLMesh(urn, assetType, bufferPool, data), "mesh");
-        assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (urn, assetType, data) -> new OpenGLSkeletalMesh(urn, assetType, data, bufferPool), "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
-        assetTypeManager.registerCoreAssetType(Atlas.class, Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class, Subtexture::new);
+        assetTypeManager.registerCoreAssetType(Shader.class, (AssetFactory<Shader, ShaderData>) GLSLShader::new, "shaders");
+        assetTypeManager.registerCoreAssetType(Material.class, (AssetFactory<Material, MaterialData>) GLSLMaterial::new, "materials");
+        assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>)
+                (urn, assetType, data) -> new OpenGLMesh(urn, assetType, bufferPool, data), "mesh");
+        assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
+                (urn, assetType, data) -> new OpenGLSkeletalMesh(urn, assetType, data, bufferPool), "skeletalMesh");
+        assetTypeManager.registerCoreAssetType(MeshAnimation.class, (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations");
+        assetTypeManager.registerCoreAssetType(Atlas.class, (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
+        assetTypeManager.registerCoreAssetType(Subtexture.class, (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
     }
 
     @Override
