@@ -35,6 +35,7 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -140,26 +141,30 @@ public class PostProcessor {
      */
     public void initializeMaterials() {
         // initial renderings
-        materials.lightBufferPass = Assets.getMaterial("engine:prog.lightBufferPass");
+        materials.lightBufferPass = getMaterial("engine:prog.lightBufferPass");
 
         // pre-post composite
-        materials.outline          = Assets.getMaterial("engine:prog.sobel");
-        materials.ssao             = Assets.getMaterial("engine:prog.ssao");
-        materials.ssaoBlurred      = Assets.getMaterial("engine:prog.ssaoBlur");
-        materials.prePostComposite = Assets.getMaterial("engine:prog.combine");
+        materials.outline = getMaterial("engine:prog.sobel");
+        materials.ssao = getMaterial("engine:prog.ssao");
+        materials.ssaoBlurred = getMaterial("engine:prog.ssaoBlur");
+        materials.prePostComposite = getMaterial("engine:prog.combine");
 
         // initial post-processing
-        materials.lightShafts = Assets.getMaterial("engine:prog.lightshaft");   // TODO: rename shader to lightShafts
-        materials.initialPost = Assets.getMaterial("engine:prog.prePost");      // TODO: rename shader to initialPost
-        materials.downSampler = Assets.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        materials.highPass    = Assets.getMaterial("engine:prog.highp");        // TODO: rename shader to highPass
-        materials.blur        = Assets.getMaterial("engine:prog.blur");
-        materials.toneMapping = Assets.getMaterial("engine:prog.hdr");          // TODO: rename shader to toneMapping
+        materials.lightShafts = getMaterial("engine:prog.lightshaft");   // TODO: rename shader to lightShafts
+        materials.initialPost = getMaterial("engine:prog.prePost");      // TODO: rename shader to initialPost
+        materials.downSampler = getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
+        materials.highPass = getMaterial("engine:prog.highp");           // TODO: rename shader to highPass
+        materials.blur = getMaterial("engine:prog.blur");
+        materials.toneMapping = getMaterial("engine:prog.hdr");          // TODO: rename shader to toneMapping
 
         // final post-processing
-        materials.ocDistortion = Assets.getMaterial("engine:prog.ocDistortion");
-        materials.finalPost    = Assets.getMaterial("engine:prog.post");        // TODO: rename shader to finalPost
-        materials.debug        = Assets.getMaterial("engine:prog.debug");
+        materials.ocDistortion = getMaterial("engine:prog.ocDistortion");
+        materials.finalPost = getMaterial("engine:prog.post");           // TODO: rename shader to finalPost
+        materials.debug = getMaterial("engine:prog.debug");
+    }
+
+    private Material getMaterial(String assetId) {
+        return Assets.getMaterial(assetId).orElseThrow(() -> new RuntimeException("Failed to resolve required asset: '" + assetId +"'"));
     }
 
     /**

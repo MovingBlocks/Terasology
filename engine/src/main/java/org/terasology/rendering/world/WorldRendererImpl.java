@@ -166,10 +166,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initMaterials() {
-        chunkShader = Assets.getMaterial("engine:prog.chunk").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
-        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
-        //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
-        shadowMapShader = Assets.getMaterial("engine:prog.shadowMap").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
+        chunkShader = getMaterial("engine:prog.chunk");
+        lightGeometryShader = getMaterial("engine:prog.lightGeometryPass");
+        //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
+        shadowMapShader = getMaterial("engine:prog.shadowMap");
+    }
+
+    private Material getMaterial(String assetId) {
+        return Assets.getMaterial(assetId).orElseThrow(() -> new RuntimeException("Failed to resolve required asset: '" + assetId +"'"));
     }
 
     @Override
