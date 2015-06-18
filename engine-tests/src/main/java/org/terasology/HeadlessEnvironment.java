@@ -21,6 +21,7 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
@@ -37,7 +38,6 @@ import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessShader;
@@ -45,8 +45,10 @@ import org.terasology.engine.subsystem.headless.assets.HeadlessSkeletalMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
@@ -63,19 +65,30 @@ import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupType
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
+import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
+import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -85,12 +98,16 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.block.sounds.BlockSounds;
+import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.NullWorldAtlas;
+import org.terasology.world.block.tiles.TileData;
 import org.terasology.world.block.tiles.WorldAtlas;
 
 import java.io.IOException;
@@ -171,11 +188,17 @@ public class HeadlessEnvironment extends Environment {
     protected AssetManager setupAssetManager() {
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
 
-        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, false, "prefabs");
-        assetTypeManager.registerCoreAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
-        assetTypeManager.registerCoreAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
-        assetTypeManager.registerCoreAssetType(BlockTile.class, BlockTile::new, "blockTiles");
-        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
+        // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
+        assetTypeManager.registerCoreAssetType(Prefab.class,
+                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, false, "prefabs");
+        assetTypeManager.registerCoreAssetType(BlockShape.class,
+                (AssetFactory<BlockShape, BlockShapeData>) BlockShapeImpl::new, "shapes");
+        assetTypeManager.registerCoreAssetType(BlockSounds.class,
+                (AssetFactory<BlockSounds, BlockSoundsData>) BlockSounds::new, "blockSounds");
+        assetTypeManager.registerCoreAssetType(BlockTile.class,
+                (AssetFactory<BlockTile, TileData>) BlockTile::new, "blockTiles");
+        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
+                (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
 
         assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
         assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
@@ -183,24 +206,39 @@ public class HeadlessEnvironment extends Environment {
         DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
         blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
         blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AttachedToSurfaceFamilyFactory());
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class, new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), blockFamilyFactoryRegistry));
-        assetTypeManager.registerCoreAssetType(UISkin.class, UISkin::new, "skins");
-        assetTypeManager.registerCoreAssetType(BehaviorTree.class, BehaviorTree::new, false, "behaviors");
-        assetTypeManager.registerCoreAssetType(UIElement.class, UIElement::new, "ui");
-        assetTypeManager.registerCoreAssetType(Font.class, FontImpl::new, "fonts");
-        assetTypeManager.registerCoreAssetType(Texture.class, HeadlessTexture::new, "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
+        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), blockFamilyFactoryRegistry));
 
+        assetTypeManager.registerCoreAssetType(UISkin.class,
+                (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
+        assetTypeManager.registerCoreAssetType(BehaviorTree.class,
+                (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
+        assetTypeManager.registerCoreAssetType(UIElement.class,
+                (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.registerCoreAssetType(Font.class,
+                (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
+        assetTypeManager.registerCoreAssetType(Texture.class,
+                (AssetFactory<Texture, TextureData>) HeadlessTexture::new, "textures", "fonts");
+        assetTypeManager.registerCoreFormat(Texture.class,
+                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
+        assetTypeManager.registerCoreFormat(Texture.class,
+                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
 
-        assetTypeManager.registerCoreAssetType(Shader.class, HeadlessShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class, HeadlessMaterial::new, "materials");
-        assetTypeManager.registerCoreAssetType(Mesh.class, HeadlessMesh::new, "mesh");
-        assetTypeManager.registerCoreAssetType(SkeletalMesh.class, HeadlessSkeletalMesh::new, "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
+        assetTypeManager.registerCoreAssetType(Shader.class,
+                (AssetFactory<Shader, ShaderData>) HeadlessShader::new, "shaders");
+        assetTypeManager.registerCoreAssetType(Material.class,
+                (AssetFactory<Material, MaterialData>) HeadlessMaterial::new, "materials");
+        assetTypeManager.registerCoreAssetType(Mesh.class,
+                (AssetFactory<Mesh, MeshData>) HeadlessMesh::new, "mesh");
+        assetTypeManager.registerCoreAssetType(SkeletalMesh.class,
+                (AssetFactory<SkeletalMesh, SkeletalMeshData>) HeadlessSkeletalMesh::new, "skeletalMesh");
+        assetTypeManager.registerCoreAssetType(MeshAnimation.class,
+                (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations");
 
-        assetTypeManager.registerCoreAssetType(Atlas.class, Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class, Subtexture::new);
+        assetTypeManager.registerCoreAssetType(Atlas.class,
+                (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
+        assetTypeManager.registerCoreAssetType(Subtexture.class,
+                (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
 
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 

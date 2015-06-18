@@ -16,10 +16,12 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.Assets;
+import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -71,7 +73,8 @@ public class EntitySerializerTest {
         context.put(ModuleManager.class, moduleManager);
 
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class, PojoPrefab::new, "prefabs");
+        assetTypeManager.registerCoreAssetType(Prefab.class,
+                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
     }

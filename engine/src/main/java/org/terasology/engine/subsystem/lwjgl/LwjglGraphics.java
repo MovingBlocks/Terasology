@@ -109,20 +109,30 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        assetTypeManager.registerCoreAssetType(Font.class, (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
+
+        // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
+        assetTypeManager.registerCoreAssetType(Font.class,
+                (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
         assetTypeManager.registerCoreAssetType(Texture.class, (AssetFactory<Texture, TextureData>)
                 (urn, assetType, data) -> (new OpenGLTexture(urn, assetType, data, this)), "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
-        assetTypeManager.registerCoreAssetType(Shader.class, (AssetFactory<Shader, ShaderData>) GLSLShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class, (AssetFactory<Material, MaterialData>) GLSLMaterial::new, "materials");
+        assetTypeManager.registerCoreFormat(Texture.class,
+                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
+        assetTypeManager.registerCoreFormat(Texture.class,
+                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
+        assetTypeManager.registerCoreAssetType(Shader.class,
+                (AssetFactory<Shader, ShaderData>) GLSLShader::new, "shaders");
+        assetTypeManager.registerCoreAssetType(Material.class,
+                (AssetFactory<Material, MaterialData>) GLSLMaterial::new, "materials");
         assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>)
                 (urn, assetType, data) -> new OpenGLMesh(urn, assetType, bufferPool, data), "mesh");
         assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
                 (urn, assetType, data) -> new OpenGLSkeletalMesh(urn, assetType, data, bufferPool), "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class, (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations");
-        assetTypeManager.registerCoreAssetType(Atlas.class, (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class, (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
+        assetTypeManager.registerCoreAssetType(MeshAnimation.class,
+                (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations");
+        assetTypeManager.registerCoreAssetType(Atlas.class,
+                (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
+        assetTypeManager.registerCoreAssetType(Subtexture.class,
+                (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
     }
 
     @Override
