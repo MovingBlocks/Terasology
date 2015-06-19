@@ -43,10 +43,4 @@ public interface Context {
      */
     <T, U extends T> void put(Class<T> type, U object);
 
-
-    /**
-     * Removes the object of the given type from this context. Future get calls may however still return
-     * an object from the parent context for that type.
-     */
-    void remove(Class<?> type);
 }

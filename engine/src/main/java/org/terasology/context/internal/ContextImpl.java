@@ -62,9 +62,4 @@ public class ContextImpl implements Context {
         map.put(type, object);
     }
 
-
-    @Override
-    public void remove(Class<?> type) {
-        map.remove(type);
-    }
 }

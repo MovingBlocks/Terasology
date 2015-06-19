@@ -290,7 +290,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupComponentManager() {
-        ComponentSystemManager componentSystemManager = new ComponentSystemManager();
+        ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         componentSystemManager.initialise();
         context.put(ComponentSystemManager.class, componentSystemManager);
     }
