@@ -42,11 +42,12 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
-import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.nui.layouts.CardLayout;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
 import org.terasology.rendering.nui.widgets.ItemSelectEventListener;
@@ -81,17 +82,54 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private ServerListDownloader downloader;
 
-    private List<ServerInfo> servers = new ArrayList<ServerInfo>();
+    private UIList<ServerInfo> visibleList;
 
     @Override
     public void initialise() {
 
         downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
 
-        UIList<ServerInfo> serverList = find("serverList", UIList.class);
-        if (serverList != null) {
-            configureScreen(serverList);
+        CardLayout cards = find("cards", CardLayout.class);
+
+        List<ServerInfo> customServers = config.getNetwork().getServers();
+        UIList<ServerInfo> customServerList = find("customServerList", UIList.class);
+        if (customServerList != null) {
+            configureServerList(customServerList, customServers);
         }
+
+        List<ServerInfo> onlineServers = downloader.getServers();
+        UIList<ServerInfo> onlineServerList = find("onlineServerList", UIList.class);
+        if (onlineServerList != null) {
+            configureServerList(onlineServerList, onlineServers);
+        }
+
+        ActivateEventListener activateCustom = e -> {
+            cards.setDisplayedCard("customServerListScrollArea");
+            find("customButton", UIButton.class).setFamily("highlight");
+            find("onlineButton", UIButton.class).setFamily("default");
+            visibleList = customServerList;
+        };
+
+        WidgetUtil.trySubscribe(this, "customButton", activateCustom);
+
+        ActivateEventListener activateOnline = e -> {
+            cards.setDisplayedCard("onlineServerListScrollArea");
+            find("customButton", UIButton.class).setFamily("default");
+            find("onlineButton", UIButton.class).setFamily("highlight");
+            visibleList = onlineServerList;
+        };
+        WidgetUtil.trySubscribe(this, "onlineButton", activateOnline);
+
+        Binding<Boolean> customSelectedBinding = new ReadOnlyBinding<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                return visibleList == customServerList;
+            }
+        };
+
+        bindCustomButtons(customSelectedBinding);
+        bindInfoLabels();
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -100,6 +138,8 @@ public class JoinGameScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
+
+        activateCustom.onActivated(null);
     }
 
     @Override
@@ -119,18 +159,6 @@ public class JoinGameScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-
-        List<ServerInfo> onlineServers = downloader.getServers();
-        List<ServerInfo> localServers = config.getNetwork().getServers();
-
-        servers.clear();
-        servers.addAll(localServers);
-        servers.addAll(onlineServers);
     }
 
     private void join(final String address, final int port) {
@@ -157,23 +185,9 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     }
 
-    private void configureScreen(final UIList<ServerInfo> serverList) {
-
-        final List<ServerInfo> locals = config.getNetwork().getServers();
+    private void configureServerList(final UIList<ServerInfo> serverList, List<ServerInfo> servers) {
 
         serverList.bindList(new DefaultBinding<List<ServerInfo>>(servers));
-        serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
-            @Override
-            public String getString(ServerInfo value) {
-                String name = value.getName();
-
-                if (locals.contains(value)) {
-                    name = "(custom) " + name;
-                }
-
-                return name;
-            }
-        });
         serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
             @Override
             public void onItemActivated(UIWidget widget, ServerInfo item) {
@@ -190,7 +204,23 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
         });
 
-        final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
+        serverList.setItemRenderer(new StringTextRenderer<ServerInfo>() {
+            @Override
+            public String getString(ServerInfo value) {
+                return value.getName();
+            }
+        });
+    }
+
+    private void bindInfoLabels() {
+
+        final ReadOnlyBinding<ServerInfo> infoBinding = new ReadOnlyBinding<ServerInfo>() {
+
+            @Override
+            public ServerInfo get() {
+                return visibleList.getSelection();
+            }
+        };
 
         UILabel name = find("name", UILabel.class);
         if (name != null) {
@@ -207,57 +237,37 @@ public class JoinGameScreen extends CoreScreenLayer {
             port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
         }
 
-        ReadOnlyBinding<Boolean> localSelectedServerOnly = new ReadOnlyBinding<Boolean>() {
+        UILabel modules = find("modules", UILabel.class);
+        modules.bindText(new ReadOnlyBinding<String>() {
             @Override
-            public Boolean get() {
-                if (infoBinding.get() == null) {
-                    return false;
+            public String get() {
+                Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
+                if (info != null) {
+                    if (info.isDone()) {
+                        return getModulesText(info, 9);
+                    } else {
+                        return "requested";
+                    }
                 }
-
-                return locals.contains(infoBinding.get());
-            }
-        };
-
-        WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-                // select the entry if added successfully
-                popup.onSuccess(item -> serverList.setSelection(item));
+                return null;
             }
         });
 
-        UIButton edit = find("edit", UIButton.class);
-        if (edit != null) {
-            edit.bindEnabled(localSelectedServerOnly);
-            edit.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                  AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-                  ServerInfo info = infoBinding.get();
-                  popup.setServerInfo(info);
-
-                  // editing invalidates the currently known info, so query it again
-                  popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
-                }
-            });
-        }
-
-        UIButton removeButton = find("remove", UIButton.class);
-        if (removeButton != null) {
-            removeButton.bindEnabled(localSelectedServerOnly);
-            removeButton.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    ServerInfo info = serverList.getSelection();
-                    if (info != null) {
-                        config.getNetwork().remove(info);
-                        extInfo.remove(info);
-                        serverList.setSelection(null);
+        UILabel worlds = find("worlds", UILabel.class);
+        worlds.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
+                if (info != null) {
+                    if (info.isDone()) {
+                        return getWorldText(info);
+                    } else {
+                        return "requested";
                     }
                 }
-            });
-        }
+                return null;
+            }
+        });
 
         UIButton joinButton = find("join", UIButton.class);
         if (joinButton != null) {
@@ -272,7 +282,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 @Override
                 public void onActivated(UIWidget button) {
                     config.save();
-                    ServerInfo item = serverList.getSelection();
+                    ServerInfo item = infoBinding.get();
                     if (item != null) {
                         join(item.getAddress(), item.getPort());
                     }
@@ -280,37 +290,45 @@ public class JoinGameScreen extends CoreScreenLayer {
             });
         }
 
-        UILabel modules = find("modules", UILabel.class);
-        modules.bindText(new ReadOnlyBinding<String>() {
-            @Override
-            public String get() {
-                Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
-                if (info != null) {
-                    if (info.isDone()) {
-                        return getModulesText(info);
-                    } else {
-                        return "requested";
-                    }
-                }
-                return null;
-            }
-        });
+    }
 
-        UILabel worlds = find("worlds", UILabel.class);
-        worlds.bindText(new ReadOnlyBinding<String>() {
-            @Override
-            public String get() {
-                Future<ServerInfoMessage> info = extInfo.get(serverList.getSelection());
+    private void bindCustomButtons(Binding<Boolean> customSelectedBinding) {
+
+        UIButton add = find("add", UIButton.class);
+        if (add != null) {
+            add.bindEnabled(customSelectedBinding);
+            add.subscribe(button -> {
+                AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                // select the entry if added successfully
+                popup.onSuccess(item -> visibleList.setSelection(item));
+            });
+        }
+
+        UIButton edit = find("edit", UIButton.class);
+        if (edit != null) {
+            edit.bindEnabled(customSelectedBinding);
+            edit.subscribe(button -> {
+              AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+              ServerInfo info = visibleList.getSelection();
+              popup.setServerInfo(info);
+
+              // editing invalidates the currently known info, so query it again
+              popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
+            });
+        }
+
+        UIButton removeButton = find("remove", UIButton.class);
+        if (removeButton != null) {
+            removeButton.bindEnabled(customSelectedBinding);
+            removeButton.subscribe(button -> {
+                ServerInfo info = visibleList.getSelection();
                 if (info != null) {
-                    if (info.isDone()) {
-                        return getWorldText(info);
-                    } else {
-                        return "requested";
-                    }
+                    config.getNetwork().remove(info);
+                    extInfo.remove(info);
+                    visibleList.setSelection(null);
                 }
-                return null;
-            }
-        });
+            });
+        }
 
         UILabel downloadLabel = find("download", UILabel.class);
         if (downloadLabel != null) {
@@ -336,8 +354,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
     }
 
-    private String getModulesText(Future<ServerInfoMessage> info) {
-        int maxElements = 9;
+    private String getModulesText(Future<ServerInfoMessage> info, int maxElements) {
         try {
             ServerInfoMessage serverInfoMessage = info.get();
 
@@ -348,11 +365,11 @@ public class JoinGameScreen extends CoreScreenLayer {
                 Color color = isInstalled ? Color.GREEN : Color.RED;
                 codedModInfo.add(FontColor.getColored(entry.toString(), color));
             }
+            Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
             if (codedModInfo.size() > maxElements) {
                 codedModInfo = codedModInfo.subList(0, maxElements - 1);
                 codedModInfo.add("...");
             }
-            Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
             return Joiner.on('\n').join(codedModInfo);
         } catch (ExecutionException | InterruptedException e) {
             return FontColor.getColored("Connection Failed!", Color.RED);

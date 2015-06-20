@@ -22,7 +22,7 @@ import org.terasology.rendering.nui.widgets.UIList;
  */
 public class ListSelectionBinding<T> implements Binding<T> {
 
-    UIList<T> list;
+    private final UIList<T> list;
 
     public ListSelectionBinding(UIList<T> list) {
         this.list = list;

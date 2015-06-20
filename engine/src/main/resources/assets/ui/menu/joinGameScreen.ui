@@ -74,15 +74,58 @@
                             "type" : "RelativeLayout",
                             "contents" : [
                                 {
-                                    "type" : "ScrollableArea",
-                                    "content" : {
-                                        "type" : "UIList",
-                                        "id" : "serverList",
-                                        "family" : "module-list"
+                                    "type": "RowLayout",
+                                    "id": "serverTypeRow",
+                                    "contents" : [
+                                    {
+                                        "type": "UIButton",
+                                        "id": "customButton",
+                                        "text": "Custom",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.5
+                                        }
                                     },
+                                    {
+                                        "type" : "UIButton",
+                                        "id" : "onlineButton",
+                                        "text": "Online"
+                                    }
+                                    ],
                                     "layoutInfo" : {
+                                        "use-content-height" : true,
                                         "position-top" : {
                                             "target" : "TOP"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "CardLayout",
+                                    "id": "cards",
+                                    "defaultCard": "customServerListScrollArea",
+                                    "contents": [
+                                        {
+                                            "type" : "ScrollableArea",
+                                            "id" : "customServerListScrollArea",
+                                            "content" : {
+                                                "type" : "UIList",
+                                                "id" : "customServerList",
+                                                "family" : "module-list"
+                                            }
+                                        },
+                                        {
+                                            "type" : "ScrollableArea",
+                                            "id" : "onlineServerListScrollArea",
+                                            "content" : {
+                                                "type" : "UIList",
+                                                "id" : "onlineServerList",
+                                                "family" : "module-list"
+                                            }
+                                        }
+                                    ],
+                                    "layoutInfo" : {
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "serverTypeRow"
                                         },
                                         "position-bottom" : {
                                             "target" : "TOP",
