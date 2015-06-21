@@ -234,20 +234,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 });
             }
 
-            UIButton enableAll = find("enableAll", UIButton.class);
-            if (enableAll != null) {
-                enableAll.subscribe(new ActivateEventListener() {
-                    @Override
-                    public void onActivated(UIWidget button) {
-                        for (ModuleSelectionInfo info : sortedModules) {
-                            if (!info.isExplicitSelection() && info.isValidToSelect()) {
-                                select(info);
-                            }
-                        }
-                    }
-                });
-            }
-
             UIButton disableAll = find("disableAll", UIButton.class);
             if (disableAll != null) {
                 disableAll.subscribe(new ActivateEventListener() {

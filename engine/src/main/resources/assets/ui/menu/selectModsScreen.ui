@@ -100,11 +100,6 @@
                                     "contents" : [
                                         {
                                             "type" : "UIButton",
-                                            "id" : "enableAll",
-                                            "text" : "Enable All"
-                                        },
-                                        {
-                                            "type" : "UIButton",
                                             "id" : "disableAll",
                                             "text" : "Disable All"
                                         }
