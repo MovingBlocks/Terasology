@@ -104,22 +104,107 @@
                                     "defaultCard": "customServerListScrollArea",
                                     "contents": [
                                         {
-                                            "type" : "ScrollableArea",
+                                            "type" : "RelativeLayout",
                                             "id" : "customServerListScrollArea",
-                                            "content" : {
-                                                "type" : "UIList",
-                                                "id" : "customServerList",
-                                                "family" : "module-list"
+                                            "contents" : [
+                                            {
+                                                "type" : "ScrollableArea",
+                                                "content" : {
+                                                    "type" : "UIList",
+                                                    "id" : "customServerList",
+                                                    "family" : "module-list"
+                                                },
+                                                "layoutInfo" : {
+                                                    "position-top" : {
+                                                        "target" : "TOP"
+                                                    },
+                                                    "position-bottom" : {
+                                                        "target" : "TOP",
+                                                        "widget" : "edit",
+                                                        "offset" : 8
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type" : "UIButton",
+                                                "id" : "edit",
+                                                "text" : "Edit",
+                                                "layoutInfo" : {
+                                                    "use-content-height" : true,
+                                                    "width" : 135,
+                                                    "position-bottom" : {
+                                                        "target" : "TOP",
+                                                        "widget" : "add",
+                                                        "offset" : 8
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type" : "UIButton",
+                                                "id" : "remove",
+                                                "text" : "Remove",
+                                                "layoutInfo" : {
+                                                    "use-content-height" : true,
+                                                    "position-left" : {
+                                                        "target" : "RIGHT",
+                                                        "widget" : "edit",
+                                                        "offset" : 8
+                                                    },
+                                                    "position-bottom" : {
+                                                        "target" : "TOP",
+                                                        "widget" : "add",
+                                                        "offset" : 8
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type" : "UIButton",
+                                                "id" : "add",
+                                                "text" : "Add New",
+                                                "layoutInfo" : {
+                                                    "use-content-height" : true,
+                                                    "position-bottom" : {
+                                                        "target" : "BOTTOM"
+                                                    }
+                                                }
                                             }
+                                            ]
                                         },
                                         {
-                                            "type" : "ScrollableArea",
+                                            "type" : "RelativeLayout",
                                             "id" : "onlineServerListScrollArea",
-                                            "content" : {
-                                                "type" : "UIList",
-                                                "id" : "onlineServerList",
-                                                "family" : "module-list"
+                                            "contents" : [
+                                            {
+                                                "type" : "ScrollableArea",
+                                                "content" : {
+                                                    "type" : "UIList",
+                                                    "id" : "onlineServerList",
+                                                    "family" : "module-list"
+                                                },
+                                                "layoutInfo" : {
+                                                    "position-top" : {
+                                                        "target" : "TOP"
+                                                    },
+                                                    "position-bottom" : {
+                                                        "target" : "TOP",
+                                                        "widget" : "download",
+                                                        "offset" : 4
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type" : "UILabel",
+                                                "id" : "download",
+                                                "text" : "<download info text>",
+                                                "layoutInfo" : {
+                                                    "use-content-height" : true,
+                                                    "position-bottom" : {
+                                                        "target" : "BOTTOM",
+                                                        "offset" : 4
+                                                    }
+                                                }
                                             }
+                                            ]
                                         }
                                     ],
                                     "layoutInfo" : {
@@ -127,63 +212,6 @@
                                             "target" : "BOTTOM",
                                             "widget" : "serverTypeRow"
                                         },
-                                        "position-bottom" : {
-                                            "target" : "TOP",
-                                            "widget" : "download"
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UILabel",
-                                    "id" : "download",
-                                    "text" : "<download info text>",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-bottom" : {
-                                            "target" : "TOP",
-                                            "widget" : "edit",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "id" : "edit",
-                                    "text" : "Edit",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "width" : 135,
-                                        "position-bottom" : {
-                                            "target" : "TOP",
-                                            "widget" : "add",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "id" : "remove",
-                                    "text" : "Remove",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-left" : {
-                                            "target" : "RIGHT",
-                                            "widget" : "edit",
-                                            "offset" : 8
-                                        },
-                                        "position-bottom" : {
-                                            "target" : "TOP",
-                                            "widget" : "add",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "id" : "add",
-                                    "text" : "Add New",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
                                         "position-bottom" : {
                                             "target" : "BOTTOM"
                                         }

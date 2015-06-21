@@ -42,7 +42,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -120,15 +119,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         };
         WidgetUtil.trySubscribe(this, "onlineButton", activateOnline);
 
-        Binding<Boolean> customSelectedBinding = new ReadOnlyBinding<Boolean>() {
-
-            @Override
-            public Boolean get() {
-                return visibleList == customServerList;
-            }
-        };
-
-        bindCustomButtons(customSelectedBinding);
+        bindCustomButtons();
         bindInfoLabels();
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
@@ -292,11 +283,10 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     }
 
-    private void bindCustomButtons(Binding<Boolean> customSelectedBinding) {
+    private void bindCustomButtons() {
 
         UIButton add = find("add", UIButton.class);
         if (add != null) {
-            add.bindEnabled(customSelectedBinding);
             add.subscribe(button -> {
                 AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
                 // select the entry if added successfully
@@ -306,7 +296,6 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         UIButton edit = find("edit", UIButton.class);
         if (edit != null) {
-            edit.bindEnabled(customSelectedBinding);
             edit.subscribe(button -> {
               AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
               ServerInfo info = visibleList.getSelection();
@@ -319,7 +308,6 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         UIButton removeButton = find("remove", UIButton.class);
         if (removeButton != null) {
-            removeButton.bindEnabled(customSelectedBinding);
             removeButton.subscribe(button -> {
                 ServerInfo info = visibleList.getSelection();
                 if (info != null) {
