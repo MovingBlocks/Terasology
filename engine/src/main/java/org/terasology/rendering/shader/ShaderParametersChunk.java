@@ -112,10 +112,10 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.get().getId());
         program.setInt("textureEffects", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboTexture("sceneReflected");
+        renderingProcess.bindFboColorTexture("sceneReflected");
         program.setInt("textureWaterReflection", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboTexture("sceneOpaque");
+        renderingProcess.bindFboColorTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {

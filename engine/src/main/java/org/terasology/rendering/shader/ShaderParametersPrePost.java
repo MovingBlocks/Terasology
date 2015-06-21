@@ -57,12 +57,12 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboTexture("sceneOpaque");
+        renderingProcess.bindFboColorTexture("sceneOpaque");
         program.setInt("texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboTexture("sceneBloom2");
+            renderingProcess.bindFboColorTexture("sceneBloom2");
             program.setInt("texBloom", texId++, true);
 
             program.setFloat("bloomFactor", bloomFactor, true);
@@ -72,7 +72,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboTexture("lightShafts");
+            renderingProcess.bindFboColorTexture("lightShafts");
             program.setInt("texLightShafts", texId++, true);
         }
 

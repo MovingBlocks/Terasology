@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.world;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -48,6 +50,7 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.WorldProvider;
@@ -59,6 +62,8 @@ import org.terasology.world.chunks.RenderableChunk;
  * @author Benjamin Glatzel
  */
 public final class WorldRendererImpl implements WorldRenderer {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
@@ -107,6 +112,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private LwjglRenderingProcess renderingProcess;
     private GraphicState graphicState;
+    private PostProcessor postProcessor;
 
     public WorldRendererImpl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
                              WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
@@ -147,19 +153,27 @@ public final class WorldRendererImpl implements WorldRenderer {
         CoreRegistry.put(LwjglRenderingProcess.class, renderingProcess);
 
         graphicState = new GraphicState(renderingProcess);
+        postProcessor = new PostProcessor(renderingProcess, graphicState);
+        CoreRegistry.put(PostProcessor.class, postProcessor);
 
         renderingProcess.setGraphicState(graphicState);
+        renderingProcess.setPostProcessor(postProcessor);
         renderingProcess.initialize();
 
         CoreRegistry.get(ShaderManager.class).initShaders();
+        postProcessor.initializeMaterials();
         initMaterials();
     }
 
     private void initMaterials() {
-        chunkShader = Assets.getMaterial("engine:prog.chunk").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
-        lightGeometryShader = Assets.getMaterial("engine:prog.lightGeometryPass").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
-        //simpleShader        = Assets.getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
-        shadowMapShader = Assets.getMaterial("engine:prog.shadowMap").orElseThrow(() -> new RuntimeException("Failed to resolve required engine material"));
+        chunkShader = getMaterial("engine:prog.chunk");
+        lightGeometryShader = getMaterial("engine:prog.lightGeometryPass");
+        //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
+        shadowMapShader = getMaterial("engine:prog.shadowMap");
+    }
+
+    private Material getMaterial(String assetId) {
+        return Assets.getMaterial(assetId).orElseThrow(() -> new RuntimeException("Failed to resolve required asset: '" + assetId +"'"));
     }
 
     @Override
@@ -224,6 +238,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void preRenderUpdate(WorldRenderingStage renderingStage) {
+        resetStats();
 
         currentRenderingStage = renderingStage;
         if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.LEFT_EYE) {
@@ -260,37 +275,58 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Override
     public void render(WorldRenderingStage renderingStage) {
-        resetStats();
         preRenderUpdate(renderingStage);
 
-        renderShadowMap();
-        renderWorldReflection();
+        renderShadowMap();          // into shadowMap buffer
+        renderWorldReflection();    // into sceneReflect buffer
 
         graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
         graphicState.initialClearing();
 
         graphicState.preRenderSetupSceneOpaque();
-        renderSky();
+        renderBackdrop();   // into sceneOpaque and skyBands[0-1] buffers
 
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
-            renderObjectsOpaque();
-            renderChunksOpaque();
-            renderChunksAlphaReject();
-            renderOverlays();
-            renderFirstPersonView();
+            renderObjectsOpaque();      //
+            renderChunksOpaque();       //
+            renderChunksAlphaReject();  //  all into sceneOpaque buffer
+            renderOverlays();           //
+            renderFirstPersonView();    //
 
             graphicState.postRenderCleanupSceneOpaque();
 
-            renderLightGeometry();
-            renderChunksRefractiveReflective();
+            renderLightGeometry();              // into sceneOpaque buffer
+            renderChunksRefractiveReflective(); // into sceneReflectiveRefractive buffer
         }
 
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
-        combineRefractiveReflectiveAndOpaquePasses();
-        renderSimpleBlendMaterialsIntoCombinedPass();
+        PerformanceMonitor.startActivity("Pre-post composite");
+        renderingProcess.createOrUpdateFullscreenFbos();
 
-        renderFinalPostProcessedScene();
+
+        postProcessor.generateOutline();                      // into outline buffer
+        postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
+        postProcessor.generatePrePostComposite();              // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
+        PerformanceMonitor.endActivity();
+
+        renderSimpleBlendMaterials();                       // into sceneOpaque buffer
+
+        PerformanceMonitor.startActivity("Post-Processing");
+        postProcessor.generateLightShafts();                // into lightShafts buffer
+
+        // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
+        postProcessor.initialPostProcessing();              // into initialPost buffer
+
+        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
+        postProcessor.downsampleSceneAndUpdateExposure();   // downSampledScene buffer used only to update exposure value
+        postProcessor.generateToneMappedScene();            // into sceneToneMapped buffer
+        postProcessor.generateBloomPasses();                // into sceneHighPass and sceneBloom[0-2]
+        postProcessor.generateBlurPasses();                 // into sceneBlur[0-1]
+
+        // Final Post-Processing: depth-of-field blur, motion blur, film grain, grading, OculusVR distortion
+        postProcessor.finalPostProcessing(renderingStage);  // to screen normally, to a buffer if a screenshot is being taken
+        PerformanceMonitor.endActivity();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
@@ -343,18 +379,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderSky() {
+    private void renderBackdrop() {
         PerformanceMonitor.startActivity("Render Sky");
         playerCamera.lookThroughNormalized();
         graphicState.preRenderSetupBackdrop();
 
         backdropRenderer.render(playerCamera);
         graphicState.midRenderChangesBackdrop();
-
-        if (renderingConfig.isInscattering()) {
-            renderingProcess.generateSkyBand(0);
-            renderingProcess.generateSkyBand(1);
-        }
+        postProcessor.generateSkyBands();
 
         graphicState.postRenderCleanupBackdrop();
 
@@ -455,7 +487,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         graphicState.postRenderCleanupDirectionalLights();
 
-        renderingProcess.applyLightBufferPass("sceneOpaque");
+        postProcessor.applyLightBufferPass();
         PerformanceMonitor.endActivity();
     }
 
@@ -513,7 +545,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             LightGeometryHelper.renderSphereGeometry();
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
             // Directional lights cover all pixels on the screen
-            renderingProcess.renderFullscreenQuad();
+            postProcessor.renderFullscreenQuad();
         }
 
         if (!geometryOnly) {
@@ -541,13 +573,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void combineRefractiveReflectiveAndOpaquePasses() {
-        PerformanceMonitor.startActivity("Render Combined Scene");
-        renderingProcess.renderPreCombinedScene();
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderSimpleBlendMaterialsIntoCombinedPass() {
+    private void renderSimpleBlendMaterials() {
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
         graphicState.preRenderSetupSimpleBlendMaterials();
 
@@ -556,12 +582,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
 
         graphicState.postRenderCleanupSimpleBlendMaterials();
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderFinalPostProcessedScene() {
-        PerformanceMonitor.startActivity("Render Post-Processing");
-        renderingProcess.renderPost(currentRenderingStage);
         PerformanceMonitor.endActivity();
     }
 
@@ -637,6 +657,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.dispose();
         worldProvider.dispose();
         graphicState.dispose();
+        postProcessor.dispose();
     }
 
     /**

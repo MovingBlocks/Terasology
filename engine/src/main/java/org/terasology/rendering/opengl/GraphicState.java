@@ -109,6 +109,10 @@ public class GraphicState {
         fullScale = buffers.sceneOpaque.dimensions();
     }
 
+    public void setSceneOpaqueFBO(FBO newSceneOpaque) {
+        buffers.sceneOpaque = newSceneOpaque;
+    }
+
     /**
      * Used to initialize and update the internal reference to the Shadow Map FBO.
      *

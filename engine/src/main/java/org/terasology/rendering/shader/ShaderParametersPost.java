@@ -57,7 +57,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboTexture("sceneToneMapped");
+        renderingProcess.bindFboColorTexture("sceneToneMapped");
         program.setInt("texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
