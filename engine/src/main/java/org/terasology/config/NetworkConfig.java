@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
  */
 public class NetworkConfig {
 
-    private List<ServerInfo> servers = Lists.newArrayList(new ServerInfo("localhost", "localhost", 25777));
+    private List<ServerInfo> servers = Lists.newArrayList(new ServerInfo("localhost", "localhost", TerasologyConstants.DEFAULT_PORT));
 
     /**
      * Available upstream bandwidth in kilobits per second
@@ -42,7 +42,7 @@ public class NetworkConfig {
     /**
      * The master server URL
      */
-    private String masterServer = "https://master-server.herokuapp.com/servers/list";
+    private String masterServer = "master-server.terasology.org";
 
     public void clear() {
         servers.clear();

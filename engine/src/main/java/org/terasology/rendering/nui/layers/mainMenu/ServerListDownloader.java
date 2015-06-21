@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.NetworkConfig;
 import org.terasology.config.ServerInfo;
 
 import com.google.common.reflect.TypeToken;
@@ -45,46 +46,9 @@ class ServerListDownloader {
 
     private static final Gson GSON = new GsonBuilder().create();
 
-    private final Runnable downloadTask = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                status = "Downloading server list ..";
-
-                @SuppressWarnings("serial")
-                Type entryListType = new TypeToken<List<ServerInfo>>() { /**/ }.getType();
-                URL url = new URL(serverAddress);
-
-                try (Reader reader = new InputStreamReader(url.openStream(), cs)) {
-
-                    status = "Parsing content ..";
-
-                    List<ServerInfo> onlineServers = GSON.fromJson(reader, entryListType);
-                    if (onlineServers == null) {
-                        throw new IOException("Invalid server list file content!");
-                    }
-
-                    for (ServerInfo entry : onlineServers) {
-                        logger.debug("Retrieved online game server {}", entry);
-                    }
-
-                    int count = onlineServers.size();
-                    status = String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries");
-
-                    servers.addAll(onlineServers);
-                }
-            } catch (Exception e) {
-                status = "Error: " + e.getLocalizedMessage();
-                // we catch Exception here to make sure that it's being logged
-                // alternative: re-throw as RuntimeException and use Thread.setUncaughtExceptionHandler()
-                logger.error("Error downloading online server list!", e);
-            }
-        }
-    };
-
     private final List<ServerInfo> servers = new CopyOnWriteArrayList<>();
 
-    private final Charset cs = StandardCharsets.UTF_8;
+    private final Charset charset = StandardCharsets.UTF_8;
     private final String serverAddress;
 
     /**
@@ -94,7 +58,7 @@ class ServerListDownloader {
 
     public ServerListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
-        Thread dlThread = new Thread(downloadTask);
+        Thread dlThread = new Thread(this::download);
         dlThread.setName("ServerList Downloader");
         dlThread.start();
     }
@@ -111,5 +75,55 @@ class ServerListDownloader {
      */
     public String getStatus() {
         return status;
+    }
+
+    // this is run on a parallel thread
+    private void download() {
+        try {
+            try {
+                download(serverAddress);
+            } catch (Exception e) {
+                String defaultAddress = new NetworkConfig().getMasterServer();
+                if (!defaultAddress.equals(serverAddress)) {
+                    logger.warn("Download server list from {} failed. Trying default ..", serverAddress);
+                    download(defaultAddress);
+                } else {
+                    throw e;
+                }
+            }
+        } catch (Exception e) {
+            status = "Error: " + e.toString();
+            // we catch Exception here to make sure that it's being logged
+            // alternative: re-throw as RuntimeException and use
+            // Thread.setUncaughtExceptionHandler()
+            logger.error("Error downloading online server list!", e.toString());
+        }
+    }
+
+    private void download(String address) throws IOException {
+        status = "Downloading server list ..";
+
+        @SuppressWarnings("serial")
+        Type entryListType = new TypeToken<List<ServerInfo>>() { /**/ }.getType();
+
+        URL url = new URL("http", address, "/servers/list");
+        try (Reader reader = new InputStreamReader(url.openStream(), charset)) {
+
+            status = "Parsing content ..";
+
+            List<ServerInfo> onlineServers = GSON.fromJson(reader, entryListType);
+            if (onlineServers == null) {
+                throw new IOException("Invalid server list file content!");
+            }
+
+            for (ServerInfo entry : onlineServers) {
+                logger.debug("Retrieved online game server {}", entry);
+            }
+
+            int count = onlineServers.size();
+            status = String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries");
+
+            servers.addAll(onlineServers);
+        }
     }
 }
