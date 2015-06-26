@@ -83,7 +83,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new AssetTypeAdapterFactory(assetManager))
-                .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler(blockFamilyFactoryRegistry))
+                .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler())
                 .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
                 .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
                 .registerTypeAdapter(BlockFamilyFactory.class, new BlockFamilyFactoryHandler(blockFamilyFactoryRegistry))
@@ -133,11 +133,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         private Type listOfStringType = new TypeToken<List<String>>() {
         }.getType();
 
-        private BlockFamilyFactoryRegistry factoryRegistry;
-
-        public BlockFamilyDefinitionDataHandler(BlockFamilyFactoryRegistry factoryRegistry) {
-            this.factoryRegistry = factoryRegistry;
-        }
 
         @Override
         public BlockFamilyDefinitionData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -314,7 +309,11 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             if (basedOn != null && !basedOn.getAsString().isEmpty()) {
                 Optional<BlockFamilyDefinition> baseDef = assetManager.getAsset(basedOn.getAsString(), BlockFamilyDefinition.class);
                 if (baseDef.isPresent()) {
-                    return baseDef.get().getData();
+                    BlockFamilyDefinitionData data = baseDef.get().getData();
+                    if (data.getFamilyFactory() instanceof FreeformBlockFamilyFactory) {
+                        data.setFamilyFactory(null);
+                    }
+                    return data;
                 } else {
                     throw new JsonParseException("Unable to resolve based block definition '" + basedOn.getAsString() + "'");
                 }
