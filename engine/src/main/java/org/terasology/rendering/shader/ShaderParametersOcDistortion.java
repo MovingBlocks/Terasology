@@ -18,7 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * Shader parameters for the Combine shader program.
@@ -32,7 +32,7 @@ public class ShaderParametersOcDistortion extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        CoreRegistry.get(LwjglRenderingProcess.class).bindFboColorTexture("sceneFinal");
+        CoreRegistry.get(FrameBuffersManager.class).bindFboColorTexture("sceneFinal");
         program.setInt("texSceneFinal", texId++, true);
     }
 

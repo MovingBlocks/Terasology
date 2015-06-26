@@ -45,12 +45,11 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 
 /**
- * The Default Rendering Process class.
- *
+ * TODO: write javadoc
  */
-public class LwjglRenderingProcess {
+public class FrameBuffersManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(LwjglRenderingProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrameBuffersManager.class);
 
     private PBO readBackPBOFront;
     private PBO readBackPBOBack;
@@ -70,7 +69,10 @@ public class LwjglRenderingProcess {
     private int overwriteRtWidth;
     private int overwriteRtHeight;
 
-    /* VARIOUS */
+    private String currentlyBoundFboName = "";
+    private FBO currentlyBoundFbo;
+    //private int currentlyBoundTextureId = -1;
+
     private boolean isTakingScreenshot;
 
     // Note: this assumes that the settings in the configs might change at runtime,
@@ -83,8 +85,9 @@ public class LwjglRenderingProcess {
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
-    public LwjglRenderingProcess() {
-
+    public FrameBuffersManager() {
+        // nothing to do here, everything happens at initialization time,
+        // after GraphicState and PostProcessors have been set.
     }
 
     public void initialize() {

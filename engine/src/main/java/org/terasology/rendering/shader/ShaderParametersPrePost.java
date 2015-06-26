@@ -24,7 +24,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.Optional;
@@ -49,19 +49,19 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
 
         Vector3f tint = CoreRegistry.get(WorldRenderer.class).getTint();
         program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboColorTexture("sceneOpaque");
+        buffersManager.bindFboColorTexture("sceneOpaque");
         program.setInt("texScene", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboColorTexture("sceneBloom2");
+            buffersManager.bindFboColorTexture("sceneBloom2");
             program.setInt("texBloom", texId++, true);
 
             program.setFloat("bloomFactor", bloomFactor, true);
@@ -71,7 +71,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            renderingProcess.bindFboColorTexture("lightShafts");
+            buffersManager.bindFboColorTexture("lightShafts");
             program.setInt("texLightShafts", texId++, true);
         }
 

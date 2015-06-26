@@ -22,7 +22,7 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.modes.StateIngame;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 import java.util.List;
 
@@ -56,7 +56,8 @@ public class SceneProperties implements PropertyProvider {
         if (backdropRenderer != null) {
             result.addAll(new ReflectionProvider(backdropRenderer, ingameContext).getProperties());
         }
-        LwjglRenderingProcess renderingProcess = ingameContext.get(LwjglRenderingProcess.class);
+
+        FrameBuffersManager renderingProcess = ingameContext.get(FrameBuffersManager.class);
         if (renderingProcess != null) {
             result.addAll(new ReflectionProvider(renderingProcess, ingameContext).getProperties());
         }
