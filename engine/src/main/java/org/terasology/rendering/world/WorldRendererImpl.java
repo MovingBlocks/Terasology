@@ -48,7 +48,7 @@ import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.GraphicState;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
@@ -109,7 +109,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
 
-    private LwjglRenderingProcess renderingProcess;
+    private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
@@ -155,16 +155,16 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        renderingProcess = new LwjglRenderingProcess();
-        context.put(LwjglRenderingProcess.class, renderingProcess);
+        buffersManager = new FrameBuffersManager();
+        context.put(FrameBuffersManager.class, buffersManager);
 
-        graphicState = new GraphicState(renderingProcess);
-        postProcessor = new PostProcessor(renderingProcess, graphicState);
+        graphicState = new GraphicState(buffersManager);
+        postProcessor = new PostProcessor(buffersManager, graphicState);
         context.put(PostProcessor.class, postProcessor);
 
-        renderingProcess.setGraphicState(graphicState);
-        renderingProcess.setPostProcessor(postProcessor);
-        renderingProcess.initialize();
+        buffersManager.setGraphicState(graphicState);
+        buffersManager.setPostProcessor(postProcessor);
+        buffersManager.initialize();
 
         context.get(ShaderManager.class).initShaders();
         postProcessor.initializeMaterials();
@@ -309,7 +309,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
-        renderingProcess.createOrUpdateFullscreenFbos();
+        buffersManager.createOrUpdateFullscreenFbos();
 
 
         postProcessor.generateOutline();                      // into outline buffer

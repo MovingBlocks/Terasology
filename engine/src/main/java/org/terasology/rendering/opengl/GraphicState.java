@@ -45,17 +45,16 @@ import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
  * method changes an unspecified default state while the second method reinstates it.
  *
  * A number of FBO references are kept up to date through the refreshDynamicFBOs() and
- * setSceneShadowMap() methods. At this stage the LwjglRenderingProcess class is tasked
+ * setSceneShadowMap() methods. At this stage the FrameBuffersManager class is tasked
  * with running these methods whenever its FBOs change.
  */
-// TODO: update comment when the BuffersManager comes online.
 public class GraphicState {
     // As this class pretty much always deals with OpenGL states, it did occur to me
     // that it might be better called OpenGLState or something along that line. I
     // eventually decided for GraphicState as it resides in the rendering.opengl
     // package anyway and rendering.opengl.OpenGLState felt cumbersome. --emanuele3d
 
-    private LwjglRenderingProcess renderingProcess;
+    private FrameBuffersManager buffersManager;
     private Dimensions fullScale;
     private Buffers buffers  = new Buffers();
 
@@ -68,14 +67,13 @@ public class GraphicState {
      * available) refreshDynamicFBOs() and setSceneShadowMap() are called and the associated internal
      * FBO references are initialized.
      *
-     * @param renderingProcess An instance of the LwjglRenderingProcess class, used to obtain references to its FBOs.
+     * @param buffersManager An instance of the FrameBuffersManager class, used to obtain references to its FBOs.
      */
-    public GraphicState(LwjglRenderingProcess renderingProcess) {
-        // a reference to the renderingProcess is not strictly necessary, as it is used only
+    public GraphicState(FrameBuffersManager buffersManager) {
+        // a reference to the frameBuffersManager is not strictly necessary, as it is used only
         // in refreshDynamicFBOs() and it could be passed as argument to it. We do it this
-        // way however to maintain similarity with the way the PostProcessor will work.
-        // TODO: update the comment above when the PostProcessor is in place.
-        this.renderingProcess = renderingProcess;
+        // way however to maintain similarity with the way the PostProcessor works.
+        this.buffersManager = buffersManager;
     }
 
     /**
@@ -87,25 +85,25 @@ public class GraphicState {
      * useful.
      */
     public void dispose() {
-        renderingProcess = null;
+        buffersManager = null;
         fullScale = null;
         buffers = null;
     }
 
     /**
      * Used to initialize and eventually refresh the internal references to FBOs primarily
-     * held by the LwjglRenderingProcess instance.
+     * held by the FrameBuffersManager instance.
      *
      * Instances of the GraphicState class cannot operate unless this method has been called
      * at least once, the FBOs retrieved through it not null. It then needs to be called again
-     * every time the LwjglRenderingProcess instance changes its FBOs. This occurs whenever
+     * every time the FrameBuffersManager instance changes its FBOs. This occurs whenever
      * the display resolution changes or when a screenshot is taken with a resolution that
      * is different from that of the display.
      */
     public void refreshDynamicFBOs() {
-        buffers.sceneOpaque               = renderingProcess.getFBO("sceneOpaque");
-        buffers.sceneReflectiveRefractive = renderingProcess.getFBO("sceneReflectiveRefractive");
-        buffers.sceneReflected            = renderingProcess.getFBO("sceneReflected");
+        buffers.sceneOpaque               = buffersManager.getFBO("sceneOpaque");
+        buffers.sceneReflectiveRefractive = buffersManager.getFBO("sceneReflectiveRefractive");
+        buffers.sceneReflected            = buffersManager.getFBO("sceneReflected");
         fullScale = buffers.sceneOpaque.dimensions();
     }
 
@@ -116,11 +114,11 @@ public class GraphicState {
     /**
      * Used to initialize and update the internal reference to the Shadow Map FBO.
      *
-     * Gets called every time the LwjglRenderingProcess instance changes the ShadowMap FBO.
+     * Gets called every time the FrameBuffersManager instance changes the ShadowMap FBO.
      * This will occur whenever the ShadowMap resolution is changed, i.e. via the rendering
      * settings.
      *
-     * @param newShadowMap
+     * @param newShadowMap the FBO containing the new shadow map buffer
      */
     public void setSceneShadowMap(FBO newShadowMap) {
         buffers.sceneShadowMap = newShadowMap;

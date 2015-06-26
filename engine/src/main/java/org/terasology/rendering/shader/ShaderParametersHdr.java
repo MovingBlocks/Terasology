@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 
 /**
@@ -37,11 +37,11 @@ public class ShaderParametersHdr extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
         PostProcessor postProcessor = CoreRegistry.get(PostProcessor.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        renderingProcess.bindFboColorTexture("initialPost");
+        buffersManager.bindFboColorTexture("initialPost");
 
         program.setInt("texScene", 0, true);
         program.setFloat("exposure", postProcessor.getExposure() * exposureBias, true);

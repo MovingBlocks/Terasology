@@ -105,7 +105,7 @@ public class PostProcessor {
     private int displayListQuad = -1;
     private FBO.Dimensions fullScale;
 
-    private LwjglRenderingProcess renderingProcess;
+    private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private Materials materials = new Materials();
     private Buffers buffers = new Buffers();
@@ -122,12 +122,11 @@ public class PostProcessor {
      * Method obtainStaticFBOs() must be called to initialize unchanging FBOs references.
      * Method refreshDynamicFBOs() must be called at least once to initialize all other FBOs references.
      *
-     * @param renderingProcess An LwjglRenderingProcess instance, required to obtain FBO references.
+     * @param buffersManager An FrameBuffersManager instance, required to obtain FBO references.
      * @param graphicState A GraphicState instance, providing opengl state-changing methods.
      */
-    // TODO: update javadoc when the rendering process becomes the FrameBuffersManager
-    public PostProcessor(LwjglRenderingProcess renderingProcess, GraphicState graphicState) {
-        this.renderingProcess = renderingProcess;
+    public PostProcessor(FrameBuffersManager buffersManager, GraphicState graphicState) {
+        this.buffersManager = buffersManager;
         this.graphicState = graphicState;
     }
 
@@ -168,7 +167,7 @@ public class PostProcessor {
     }
 
     /**
-     * Fetches a number of static FBOs from the RenderingProcess instance and initializes a number of
+     * Fetches a number of static FBOs from the FrameBuffersManager instance and initializes a number of
      * internal references with them. They are called "static" as they do not change over the lifetime
      * of a PostProcessor instance.
      *
@@ -179,17 +178,16 @@ public class PostProcessor {
      * downsampleSceneAndUpdateExposure() method relying on these FBOs. But this method is fully executed
      * only if eye adaptation is enabled: an NPE would be thrown only in that case.
      */
-    // TODO: update javadoc when the rendering process becomes the FrameBuffersManager
     public void obtainStaticFBOs() {
-        buffers.downSampledScene[4] = renderingProcess.getFBO("scene16");
-        buffers.downSampledScene[3] = renderingProcess.getFBO("scene8");
-        buffers.downSampledScene[2] = renderingProcess.getFBO("scene4");
-        buffers.downSampledScene[1] = renderingProcess.getFBO("scene2");
-        buffers.downSampledScene[0] = renderingProcess.getFBO("scene1");
+        buffers.downSampledScene[4] = buffersManager.getFBO("scene16");
+        buffers.downSampledScene[3] = buffersManager.getFBO("scene8");
+        buffers.downSampledScene[2] = buffersManager.getFBO("scene4");
+        buffers.downSampledScene[1] = buffersManager.getFBO("scene2");
+        buffers.downSampledScene[0] = buffersManager.getFBO("scene1");
     }
 
     /**
-     * Fetches a number of FBOs from the RenderingProcess instance and initializes or refreshes
+     * Fetches a number of FBOs from the FrameBuffersManager instance and initializes or refreshes
      * a number of internal references with them. These FBOs may become obsolete over the lifetime
      * of a PostProcessor instance and refreshing the internal references might be needed.
      * These FBOs are therefore referred to as "dynamic" FBOs.
@@ -199,39 +197,38 @@ public class PostProcessor {
      * every time the dynamic FBOs become obsolete and the internal references need to be
      * refreshed with new FBOs.
      */
-    // TODO: update javadoc when the rendering process becomes the FrameBuffersManager
     public void refreshDynamicFBOs() {
         // initial renderings
-        buffers.sceneOpaque         = renderingProcess.getFBO("sceneOpaque");
-        buffers.sceneOpaquePingPong = renderingProcess.getFBO("sceneOpaquePingPong");
+        buffers.sceneOpaque         = buffersManager.getFBO("sceneOpaque");
+        buffers.sceneOpaquePingPong = buffersManager.getFBO("sceneOpaquePingPong");
 
-        buffers.sceneSkyBand0   = renderingProcess.getFBO("sceneSkyBand0");
-        buffers.sceneSkyBand1   = renderingProcess.getFBO("sceneSkyBand1");
+        buffers.sceneSkyBand0   = buffersManager.getFBO("sceneSkyBand0");
+        buffers.sceneSkyBand1   = buffersManager.getFBO("sceneSkyBand1");
 
-        buffers.sceneReflectiveRefractive   = renderingProcess.getFBO("sceneReflectiveRefractive");
+        buffers.sceneReflectiveRefractive   = buffersManager.getFBO("sceneReflectiveRefractive");
         // sceneReflected, in case one wonders, is not used by the post-processor.
 
         // pre-post composite
-        buffers.outline         = renderingProcess.getFBO("outline");
-        buffers.ssao            = renderingProcess.getFBO("ssao");
-        buffers.ssaoBlurred     = renderingProcess.getFBO("ssaoBlurred");
+        buffers.outline         = buffersManager.getFBO("outline");
+        buffers.ssao            = buffersManager.getFBO("ssao");
+        buffers.ssaoBlurred     = buffersManager.getFBO("ssaoBlurred");
 
         // initial post-processing
-        buffers.lightShafts     = renderingProcess.getFBO("lightShafts");
-        buffers.initialPost     = renderingProcess.getFBO("initialPost");
-        buffers.sceneToneMapped = renderingProcess.getFBO("sceneToneMapped");
+        buffers.lightShafts     = buffersManager.getFBO("lightShafts");
+        buffers.initialPost     = buffersManager.getFBO("initialPost");
+        buffers.sceneToneMapped = buffersManager.getFBO("sceneToneMapped");
 
-        buffers.sceneHighPass   = renderingProcess.getFBO("sceneHighPass");
-        buffers.sceneBloom0     = renderingProcess.getFBO("sceneBloom0");
-        buffers.sceneBloom1     = renderingProcess.getFBO("sceneBloom1");
-        buffers.sceneBloom2     = renderingProcess.getFBO("sceneBloom2");
+        buffers.sceneHighPass   = buffersManager.getFBO("sceneHighPass");
+        buffers.sceneBloom0     = buffersManager.getFBO("sceneBloom0");
+        buffers.sceneBloom1     = buffersManager.getFBO("sceneBloom1");
+        buffers.sceneBloom2     = buffersManager.getFBO("sceneBloom2");
 
-        buffers.sceneBlur0     = renderingProcess.getFBO("sceneBlur0");
-        buffers.sceneBlur1     = renderingProcess.getFBO("sceneBlur1");
+        buffers.sceneBlur0     = buffersManager.getFBO("sceneBlur0");
+        buffers.sceneBlur1     = buffersManager.getFBO("sceneBlur1");
 
         // final post-processing
-        buffers.ocUndistorted   = renderingProcess.getFBO("ocUndistorted");
-        buffers.sceneFinal      = renderingProcess.getFBO("sceneFinal");
+        buffers.ocUndistorted   = buffersManager.getFBO("ocUndistorted");
+        buffers.sceneFinal      = buffersManager.getFBO("sceneFinal");
 
         fullScale = buffers.sceneOpaque.dimensions();
     }
@@ -242,8 +239,8 @@ public class PostProcessor {
      * refreshing the internal references to these FBOs.
      */
     public void refreshSceneOpaqueFBOs() {
-        buffers.sceneOpaque         = renderingProcess.getFBO("sceneOpaque");
-        buffers.sceneOpaquePingPong = renderingProcess.getFBO("sceneOpaquePingPong");
+        buffers.sceneOpaque         = buffersManager.getFBO("sceneOpaque");
+        buffers.sceneOpaquePingPong = buffersManager.getFBO("sceneOpaquePingPong");
     }
 
     /**
@@ -254,7 +251,7 @@ public class PostProcessor {
     // dispose support objects and it clearly marks the end of a PostProcessor
     // instance's lifecycle.
     public void dispose() {
-        renderingProcess = null;
+        buffersManager = null;
         graphicState = null;
         fullScale = null;
     }
@@ -333,7 +330,7 @@ public class PostProcessor {
         graphicState.bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
 
-        renderingProcess.swapSceneOpaqueFBOs();
+        buffersManager.swapSceneOpaqueFBOs();
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
@@ -431,7 +428,7 @@ public class PostProcessor {
         graphicState.bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
 
-        renderingProcess.swapSceneOpaqueFBOs();
+        buffersManager.swapSceneOpaqueFBOs();
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
@@ -524,11 +521,11 @@ public class PostProcessor {
 
             downsampleSceneInto1x1pixelsBuffer();
 
-            renderingProcess.getCurrentReadbackPBO().copyFromFBO(buffers.downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            buffersManager.getCurrentReadbackPBO().copyFromFBO(buffers.downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
-            renderingProcess.swapReadbackPBOs();
+            buffersManager.swapReadbackPBOs();
 
-            ByteBuffer pixels = renderingProcess.getCurrentReadbackPBO().readBackPixels();
+            ByteBuffer pixels = buffersManager.getCurrentReadbackPBO().readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -709,7 +706,7 @@ public class PostProcessor {
      * pattern to each, to match the optics in the OculusVR headset.
      *
      * Finally, it either sends the image to the display or, when taking a screenshot,
-     * instructs the rendering process to save it to a file. // TODO: update this sentence when the FrameBuffersManager becomes available.
+     * instructs the FrameBuffersManager to save it to a file.
      *
      * @param renderingStage Can be MONO, LEFT_EYE or RIGHT_EYE, and communicates to the method weather
      *                       it is dealing with a standard display or an OculusVR setup, and in the
@@ -738,7 +735,7 @@ public class PostProcessor {
 
     private void renderFinalMonoImage() {
 
-        if (renderingProcess.isNotTakingScreenshot()) {
+        if (buffersManager.isNotTakingScreenshot()) {
             graphicState.bindDisplay();
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
@@ -748,7 +745,7 @@ public class PostProcessor {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
 
-            renderingProcess.saveScreenshot();
+            buffersManager.saveScreenshot();
             // when saving a screenshot we do not send the image to screen,
             // to avoid the brief one-frame flicker of the screenshot
 
@@ -761,7 +758,7 @@ public class PostProcessor {
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(WorldRenderer.WorldRenderingStage renderingStage) {
-        if (renderingProcess.isNotTakingScreenshot()) {
+        if (buffersManager.isNotTakingScreenshot()) {
             buffers.sceneFinal.bind();
         } else {
             buffers.ocUndistorted.bind();
@@ -778,14 +775,14 @@ public class PostProcessor {
                 // no glClear() here: the rendering for the second eye is being added besides the first eye's rendering
                 renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
 
-                if (renderingProcess.isNotTakingScreenshot()) {
+                if (buffersManager.isNotTakingScreenshot()) {
                     graphicState.bindDisplay();
                     applyOculusDistortion(buffers.sceneFinal);
 
                 } else {
                     buffers.sceneFinal.bind();
                     applyOculusDistortion(buffers.ocUndistorted);
-                    renderingProcess.saveScreenshot();
+                    buffersManager.saveScreenshot();
                     // when saving a screenshot we do NOT send the image to screen,
                     // to avoid the brief flicker of the screenshot for one frame
                 }
@@ -804,7 +801,7 @@ public class PostProcessor {
         inputBuffer.bindTexture();
         materials.ocDistortion.setInt("texInputBuffer", texId, true);
 
-        if (renderingProcess.isNotTakingScreenshot()) {
+        if (buffersManager.isNotTakingScreenshot()) {
             updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
             updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
