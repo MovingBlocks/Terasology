@@ -119,7 +119,7 @@ public class ThreadManagerSubsystem implements EngineSubsystem, ThreadManager {
 
     @Override
     public void dispose() {
-
+        commonThreadPool.shutdown(new ShutdownTask(), true);
     }
 
     @Override

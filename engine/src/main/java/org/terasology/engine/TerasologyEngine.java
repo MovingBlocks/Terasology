@@ -167,7 +167,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.setContext(context);
         this.subsystems = Queues.newArrayDeque(subsystems);
         ThreadManagerSubsystem threadManager = new ThreadManagerSubsystem();
-        subsystems.add(threadManager);
+        this.subsystems.add(threadManager);
         context.put(ThreadManager.class, threadManager);
     }
 

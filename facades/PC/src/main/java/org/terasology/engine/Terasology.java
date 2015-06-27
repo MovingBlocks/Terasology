@@ -122,7 +122,13 @@ public final class Terasology {
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
 
-            engine.subscribe(newStatus -> SplashScreen.getInstance().post(newStatus.getDefaultDescription()));
+            engine.subscribe(newStatus -> {
+                if (newStatus == StandardGameStatus.RUNNING) {
+                    SplashScreen.getInstance().close();
+                } else {
+                    SplashScreen.getInstance().post(newStatus.getDefaultDescription());
+                }
+            });
             Config config = engine.getFromEngineContext(Config.class);
 
             if (!writeSaveGamesEnabled) {
@@ -149,7 +155,6 @@ public final class Terasology {
                     });
                 }
 
-                SplashScreen.getInstance().close();
                 engine.run(new StateMainMenu());
             }
         } catch (Throwable e) {
