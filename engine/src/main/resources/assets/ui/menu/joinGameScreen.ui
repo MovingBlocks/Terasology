@@ -228,6 +228,7 @@
                                     "id" : "simpleItems",
                                     "columns" : 2,
                                     "column-widths" : [0.25, 0.75],
+                                    "extendLast" : true,
                                     "verticalSpacing" : 8,
                                     "contents" : [
                                         {
@@ -280,16 +281,23 @@
                                             "text" : "Modules: "
                                         },
                                         {
-                                            "type" : "UILabel",
-                                            "id" : "modules",
-                                            "text" : "Module Info Goes Here"
+                                            "type" : "ScrollableArea",
+                                            "content" : {
+                                                "type" : "UILabel",
+                                                "id" : "modules",
+                                                "text" : "Module Info Goes Here"
+                                            }
                                         }
                                     ],
                                     "layoutInfo" : {
-                                        "use-content-height" : true,
                                         "position-horizontal-center" : {},
                                         "position-top" : {
                                             "target" : "TOP",
+                                            "offset" : 8
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "join",
                                             "offset" : 8
                                         }
                                     }

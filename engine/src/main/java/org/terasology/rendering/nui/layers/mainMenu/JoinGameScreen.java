@@ -264,7 +264,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
                 if (info != null) {
                     if (info.isDone()) {
-                        return getModulesText(info, 9);
+                        return getModulesText(info);
                     } else {
                         return "requested";
                     }
@@ -371,7 +371,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
     }
 
-    private String getModulesText(Future<ServerInfoMessage> info, int maxElements) {
+    private String getModulesText(Future<ServerInfoMessage> info) {
         try {
             ServerInfoMessage serverInfoMessage = info.get();
 
@@ -383,10 +383,6 @@ public class JoinGameScreen extends CoreScreenLayer {
                 codedModInfo.add(FontColor.getColored(entry.toString(), color));
             }
             Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
-            if (codedModInfo.size() > maxElements) {
-                codedModInfo = codedModInfo.subList(0, maxElements - 1);
-                codedModInfo.add("...");
-            }
             return Joiner.on('\n').join(codedModInfo);
         } catch (ExecutionException | InterruptedException e) {
             return FontColor.getColored("Connection Failed!", Color.RED);
