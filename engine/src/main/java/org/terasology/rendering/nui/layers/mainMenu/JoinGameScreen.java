@@ -57,6 +57,8 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * @author Immortius
@@ -83,6 +85,11 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private UIList<ServerInfo> visibleList;
 
+    private List<ServerInfo> listedServers = new ArrayList<>();
+    private List<ServerInfo> customServers = new ArrayList<>();
+
+    private boolean updateComplete = false;
+
     @Override
     public void initialise() {
 
@@ -90,16 +97,14 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         CardLayout cards = find("cards", CardLayout.class);
 
-        List<ServerInfo> customServers = config.getNetwork().getServers();
         UIList<ServerInfo> customServerList = find("customServerList", UIList.class);
         if (customServerList != null) {
             configureServerList(customServerList, customServers);
         }
 
-        List<ServerInfo> onlineServers = downloader.getServers();
         UIList<ServerInfo> onlineServerList = find("onlineServerList", UIList.class);
         if (onlineServerList != null) {
-            configureServerList(onlineServerList, onlineServers);
+            configureServerList(onlineServerList, listedServers);
         }
 
         ActivateEventListener activateCustom = e -> {
@@ -138,6 +143,25 @@ public class JoinGameScreen extends CoreScreenLayer {
         super.onOpened();
 
         infoService = new ServerInfoService();
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        if (!updateComplete) {
+            if (downloader.isDone()) {
+                updateComplete = true;
+            }
+
+            Predicate<ServerInfo> onlyActive = server -> server.isActive();
+
+            customServers.clear();
+            customServers.addAll(Collections2.filter(config.getNetwork().getServers(), onlyActive));
+
+            listedServers.clear();
+            listedServers.addAll(Collections2.filter(downloader.getServers(), onlyActive));
+        }
     }
 
     @Override
@@ -216,6 +240,11 @@ public class JoinGameScreen extends CoreScreenLayer {
         UILabel name = find("name", UILabel.class);
         if (name != null) {
             name.bindText(BindHelper.bindBoundBeanProperty("name", infoBinding, ServerInfo.class, String.class));
+        }
+
+        UILabel owner = find("owner", UILabel.class);
+        if (owner != null) {
+            owner.bindText(BindHelper.bindBoundBeanProperty("owner", infoBinding, ServerInfo.class, String.class));
         }
 
         UILabel address = find("address", UILabel.class);

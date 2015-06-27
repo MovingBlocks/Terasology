@@ -40,6 +40,7 @@ public class AddServerPopup extends CoreScreenLayer {
     @In
     private Config config;
     private UIText nameText;
+    private UIText ownerText;
     private UIText addressText;
     private UIText portText;
     private UIButton okButton;
@@ -51,6 +52,7 @@ public class AddServerPopup extends CoreScreenLayer {
     @Override
     public void initialise() {
         nameText = find("name", UIText.class);
+        ownerText = find("owner", UIText.class);
         addressText = find("address", UIText.class);
         portText = find("port", UIText.class);
         okButton = find("ok", UIButton.class);
@@ -61,6 +63,7 @@ public class AddServerPopup extends CoreScreenLayer {
             public void onActivated(UIWidget button) {
 
                 String name = nameText.getText();
+                String owner = ownerText.getText();
                 String address = addressText.getText();
                 Integer portBoxed = Ints.tryParse(portText.getText());
                 int port = (portBoxed != null) ? portBoxed.intValue() : TerasologyConstants.DEFAULT_PORT;
@@ -68,6 +71,7 @@ public class AddServerPopup extends CoreScreenLayer {
                 if (serverInfo == null) {
                     // create new
                     serverInfo = new ServerInfo(name, address, port);
+                    serverInfo.setOwner(owner);
 
                     config.getNetwork().add(serverInfo);
                 } else {
@@ -75,6 +79,7 @@ public class AddServerPopup extends CoreScreenLayer {
                     serverInfo.setName(name);
                     serverInfo.setAddress(address);
                     serverInfo.setPort(port);
+                    serverInfo.setOwner(owner);
                 }
 
                 if (successFunc != null) {
@@ -131,8 +136,9 @@ public class AddServerPopup extends CoreScreenLayer {
 
         serverInfo = null;
         successFunc = null;
-        nameText.setText("");
-        addressText.setText("");
+        ownerText.setText(null);
+        nameText.setText(null);
+        addressText.setText(null);
 
         portText.setText(Integer.toString(TerasologyConstants.DEFAULT_PORT));
         portText.setCursorPosition(portText.getText().length());
@@ -150,6 +156,9 @@ public class AddServerPopup extends CoreScreenLayer {
 
         nameText.setText(serverInfo.getName());
         nameText.setCursorPosition(nameText.getText().length());
+
+        ownerText.setText(serverInfo.getOwner());
+        ownerText.setCursorPosition(ownerText.getText().length());
 
         addressText.setText(serverInfo.getAddress());
         addressText.setCursorPosition(addressText.getText().length());
