@@ -42,7 +42,7 @@ public class NetworkConfig {
     /**
      * The master server URL
      */
-    private String masterServer = "master-server.terasology.org";
+    private String masterServer = "meta.terasology.org";
 
     public void clear() {
         servers.clear();
