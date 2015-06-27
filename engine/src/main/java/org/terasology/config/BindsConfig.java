@@ -49,7 +49,6 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -126,8 +125,8 @@ public final class BindsConfig {
     /**
      * @return A new BindsConfig, with inputs set from the DefaultBinding annotations on bind classes
      */
-    public static BindsConfig createDefault() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+    public static BindsConfig createDefault(Context context) {
+        ModuleManager moduleManager = context.get(ModuleManager.class);
         BindsConfig config = new BindsConfig();
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {

@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindButtonEvent;
@@ -74,6 +75,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @In
     private InputSystem inputSystem;
 
+    @In
+    private Context context;
 
     @Override
     public void initialise() {
@@ -202,7 +205,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         find("reset", UIButton.class).subscribe(new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                config.getInput().reset();
+                config.getInput().reset(context);
             }
         });
         find("close", UIButton.class).subscribe(new ActivateEventListener() {
