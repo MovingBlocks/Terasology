@@ -130,7 +130,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
         });
 
-        activateCustom.onActivated(null);
+        activateOnline.onActivated(null);
     }
 
     @Override

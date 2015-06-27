@@ -78,17 +78,17 @@
                                     "id": "serverTypeRow",
                                     "contents" : [
                                     {
-                                        "type": "UIButton",
-                                        "id": "customButton",
-                                        "text": "Custom",
+                                        "type" : "UIButton",
+                                        "id" : "onlineButton",
+                                        "text": "Listed",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.5
                                         }
                                     },
                                     {
-                                        "type" : "UIButton",
-                                        "id" : "onlineButton",
-                                        "text": "Online"
+                                        "type": "UIButton",
+                                        "id": "customButton",
+                                        "text": "Custom"
                                     }
                                     ],
                                     "layoutInfo" : {
@@ -101,7 +101,7 @@
                                 {
                                     "type": "CardLayout",
                                     "id": "cards",
-                                    "defaultCard": "customServerListScrollArea",
+                                    "defaultCard": "onlineServerListScrollArea",
                                     "contents": [
                                         {
                                             "type" : "RelativeLayout",
