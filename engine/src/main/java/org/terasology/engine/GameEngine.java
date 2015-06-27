@@ -28,6 +28,23 @@ import org.terasology.engine.modes.GameState;
 public interface GameEngine extends AutoCloseable {
 
     /**
+     * @return The current, fine-grained status of the engine.
+     */
+    EngineStatus getStatus();
+
+    /**
+     * Subscribe for notification of engine status changes
+     * @param subscriber
+     */
+    void subscribe(EngineStatusSubscriber subscriber);
+
+    /**
+     * Unsubscribe to notifications of engine status changes.
+     * @param subscriber
+     */
+    void unsubscribe(EngineStatusSubscriber subscriber);
+
+    /**
      * Runs the engine, which will block the thread.
      * Invalid for a disposed engine
      */
@@ -45,19 +62,14 @@ public interface GameEngine extends AutoCloseable {
     void close();
 
     /**
-     * @return Whether the engine has been uninitialized
-     */
-    boolean isUninitialized();
-
-    /**
-     * @return Whether the engine has been initialized
-     */
-    boolean isInitialized();
-
-    /**
-     * @return Whether the engine is running
+     * @return Whether the engine is running - this is true from the point run() is called to the point shutdown is complete
      */
     boolean isRunning();
+
+    /**
+     * @return Whether the engine is shutting down
+     */
+    boolean isShuttingDown();
 
     /**
      * @return Whether the engine has been disposed

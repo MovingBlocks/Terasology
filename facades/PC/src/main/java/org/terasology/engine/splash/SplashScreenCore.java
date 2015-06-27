@@ -16,6 +16,8 @@
 
 package org.terasology.engine.splash;
 
+import org.terasology.engine.EngineStatusSubscriber;
+
 /**
  * The basic interface for all splash screen implementations.
  * @author Martin Steiger

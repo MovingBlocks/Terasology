@@ -122,6 +122,7 @@ public final class Terasology {
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
 
+            engine.subscribe(newStatus -> SplashScreen.getInstance().post(newStatus.getDefaultDescription()));
             Config config = engine.getFromEngineContext(Config.class);
 
             if (!writeSaveGamesEnabled) {
