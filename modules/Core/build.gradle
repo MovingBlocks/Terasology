@@ -28,9 +28,6 @@ buildscript {
 
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
-
-        // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.9-RC1'
     }
 }
 
@@ -211,10 +208,9 @@ task cacheReflections {
     doFirst {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
         dirToReflect.mkdirs()
-        Reflections reflections = new ConfigurationBuilder()
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .addUrls(dirToReflect.toURI().toURL())
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
-                .build()
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
         reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     }
 }
