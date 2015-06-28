@@ -78,17 +78,17 @@
                                     "id": "serverTypeRow",
                                     "contents" : [
                                     {
-                                        "type": "UIButton",
-                                        "id": "customButton",
-                                        "text": "Custom",
+                                        "type" : "UIButton",
+                                        "id" : "onlineButton",
+                                        "text": "Listed",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.5
                                         }
                                     },
                                     {
-                                        "type" : "UIButton",
-                                        "id" : "onlineButton",
-                                        "text": "Online"
+                                        "type": "UIButton",
+                                        "id": "customButton",
+                                        "text": "Custom"
                                     }
                                     ],
                                     "layoutInfo" : {
@@ -101,7 +101,7 @@
                                 {
                                     "type": "CardLayout",
                                     "id": "cards",
-                                    "defaultCard": "customServerListScrollArea",
+                                    "defaultCard": "onlineServerListScrollArea",
                                     "contents": [
                                         {
                                             "type" : "RelativeLayout",
@@ -228,6 +228,7 @@
                                     "id" : "simpleItems",
                                     "columns" : 2,
                                     "column-widths" : [0.25, 0.75],
+                                    "extendLast" : true,
                                     "verticalSpacing" : 8,
                                     "contents" : [
                                         {
@@ -238,6 +239,15 @@
                                             "type" : "UILabel",
                                             "id" : "name",
                                             "text" : "Server Name Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Owner: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "owner",
+                                            "text" : "Server Owner Goes Here"
                                         },
                                         {
                                             "type" : "UILabel",
@@ -271,16 +281,23 @@
                                             "text" : "Modules: "
                                         },
                                         {
-                                            "type" : "UILabel",
-                                            "id" : "modules",
-                                            "text" : "Module Info Goes Here"
+                                            "type" : "ScrollableArea",
+                                            "content" : {
+                                                "type" : "UILabel",
+                                                "id" : "modules",
+                                                "text" : "Module Info Goes Here"
+                                            }
                                         }
                                     ],
                                     "layoutInfo" : {
-                                        "use-content-height" : true,
                                         "position-horizontal-center" : {},
                                         "position-top" : {
                                             "target" : "TOP",
+                                            "offset" : 8
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "join",
                                             "offset" : 8
                                         }
                                     }

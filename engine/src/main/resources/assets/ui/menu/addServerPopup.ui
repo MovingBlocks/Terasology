@@ -48,6 +48,23 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
+                                        "text" : "Owner: ",
+                                        "family" : "option-grid",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.3
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIText",
+                                        "id" : "owner"
+                                    }
+                                ]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
                                         "text" : "Address: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
@@ -76,11 +93,11 @@
                                         "id" : "port"
                                     }
                                 ]
-                            },                            
+                            },
                             {
                                "type" : "UILabel",
                                 "text" : "You can press ENTER to copy the name to the address field"
-                            },                            
+                            },
                             {
                                 "type" : "UISpace",
                                 "size" : [1, 16]

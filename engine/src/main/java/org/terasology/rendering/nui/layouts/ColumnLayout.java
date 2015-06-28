@@ -47,6 +47,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     private boolean autoSizeColumns;
     @LayoutConfig
     private boolean fillVerticalSpace = true;
+    @LayoutConfig
+    private boolean extendLast;
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
@@ -153,14 +155,21 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             }
             usedHeight += (rowInfos.size() - 1) * verticalSpacing;
 
+            int excessHeight = canvas.size().y - usedHeight;
             if (fillVerticalSpace) {
-                int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
+                if (extendLast && numRows > 0) {
+                    // give all the extra space to the last entry
+                    rowInfos.get(numRows - 1).height += excessHeight;
+                } else {
+                    // distribute extra height equally
+                    int extraSpacePerRow = excessHeight / rowInfos.size();
 
-                for (RowInfo row : rowInfos) {
-                    row.height += extraSpacePerRow;
+                    for (RowInfo row : rowInfos) {
+                        row.height += extraSpacePerRow;
+                    }
                 }
             } else {
-                rowOffsetY = (canvas.size().y - usedHeight) / 2;
+                rowOffsetY = excessHeight / 2;
             }
             for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
                 List<UIWidget> row = rows.get(rowIndex);

@@ -19,7 +19,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -32,9 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.NetworkConfig;
 import org.terasology.config.ServerInfo;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
 
 /**
  * Downloads a list of servers from a given URL.
@@ -56,9 +56,11 @@ class ServerListDownloader {
      */
     private volatile String status;
 
+    private final Thread dlThread;
+
     public ServerListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
-        Thread dlThread = new Thread(this::download);
+        dlThread = new Thread(this::download);
         dlThread.setName("ServerList Downloader");
         dlThread.start();
     }
@@ -68,6 +70,10 @@ class ServerListDownloader {
      */
     public List<ServerInfo> getServers() {
         return Collections.unmodifiableList(servers);
+    }
+
+    public boolean isDone() {
+        return !dlThread.isAlive();
     }
 
     /**
@@ -92,38 +98,43 @@ class ServerListDownloader {
                 }
             }
         } catch (Exception e) {
-            status = "Error: " + e.toString();
+            status = "Error downloading server list!";
             // we catch Exception here to make sure that it's being logged
             // alternative: re-throw as RuntimeException and use
             // Thread.setUncaughtExceptionHandler()
-            logger.error("Error downloading online server list!", e.toString());
+            logger.error("Error downloading online server list!", e);
         }
     }
 
     private void download(String address) throws IOException {
         status = "Downloading server list ..";
 
-        @SuppressWarnings("serial")
-        Type entryListType = new TypeToken<List<ServerInfo>>() { /**/ }.getType();
-
         URL url = new URL("http", address, "/servers/list");
-        try (Reader reader = new InputStreamReader(url.openStream(), charset)) {
+        try (Reader reader = new InputStreamReader(url.openStream(), charset);
+                JsonReader jsonReader = new JsonReader(reader)) {
 
             status = "Parsing content ..";
 
-            List<ServerInfo> onlineServers = GSON.fromJson(reader, entryListType);
-            if (onlineServers == null) {
-                throw new IOException("Invalid server list file content!");
+            jsonReader.beginArray();
+
+            TypeAdapter<ServerInfo> adapter = GSON.getAdapter(ServerInfo.class);
+
+            while (jsonReader.hasNext()) {
+                ServerInfo entry = adapter.read(jsonReader);
+                servers.add(entry);
+
+                logger.info("Retrieved game server {}", entry);
+
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    // ignore - this is just to create an animation anyway
+                }
             }
 
-            for (ServerInfo entry : onlineServers) {
-                logger.debug("Retrieved online game server {}", entry);
-            }
+            jsonReader.endArray();
 
-            int count = onlineServers.size();
-            status = String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries");
-
-            servers.addAll(onlineServers);
+            status = String.format("Server list complete");
         }
     }
 }
