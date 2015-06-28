@@ -8,6 +8,9 @@ apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'findbugs'
 
+// Computes code coverage of (unit) tests
+apply plugin: 'jacoco'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -61,11 +64,30 @@ test {
     testLogging.showStandardStreams = true
 
     // Arguments to include while running tests
-    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+    jvmArgs '-Xms512m', '-Xmx1024m'
 
     // Make sure the natives have been extracted, but only for multi-workspace setups (not for solo module builds)
     if (project.name != project(':').name) {
         dependsOn rootProject.extractNatives
+    }
+
+    jacoco {
+        append = false
+        excludes = ["org.terasology.protobuf.*"]
+    }
+}
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+jacocoTestReport {
+    dependsOn test // Despite doc saying this should be automatic we need to explicitly add it anyway :-(
+    reports {
+        // We only use the .exec report for display in Jenkins and such. More could be enabled if desired.
+        xml.enabled false
+        csv.enabled false
+        html.enabled false
     }
 }
 
