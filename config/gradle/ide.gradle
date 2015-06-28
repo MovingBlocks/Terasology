@@ -403,6 +403,31 @@ ext {
             </configuration>
         '''))
 
+        // Run config for engine tests with JaCoCo set for code coverage
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="engine-tests with JaCoCo" type="JUnit" factoryName="JUnit">
+              <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="jacoco" />
+              <module name="engine-tests" />
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+              <option name="ALTERNATIVE_JRE_PATH" value="" />
+              <option name="PACKAGE_NAME" value="" />
+              <option name="MAIN_CLASS_NAME" value="" />
+              <option name="METHOD_NAME" value="" />
+              <option name="TEST_OBJECT" value="package" />
+              <option name="VM_PARAMETERS" value="" />
+              <option name="PARAMETERS" value="" />
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+              <option name="ENV_VARIABLES" />
+              <option name="PASS_PARENT_ENVS" value="true" />
+              <option name="TEST_SEARCH_SCOPE">
+                <value defaultName="moduleWithDependencies" />
+              </option>
+              <envs />
+              <patterns />
+              <method />
+            </configuration>
+        '''))
+
         // This part puts the added run config into the actual "Run" drop-down
         runManager.append(new XmlParser().parseText('''
         <list size="2">
