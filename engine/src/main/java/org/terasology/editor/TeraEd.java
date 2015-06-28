@@ -66,17 +66,16 @@ public final class TeraEd extends JWindow {
             // If Nimbus is not available, you can set the GUI to another look and feel.
             logger.warn("Failed to set look and feel to Nimbus", e);
         }
-
-        LwjglCustomViewPort lwjglCustomViewPort = new LwjglCustomViewPort();
-        Collection<EngineSubsystem> subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
-                lwjglCustomViewPort);
-
-        engine = new TerasologyEngine(subsystemList);
-        mainWindow = new MainWindow(this);
-        lwjglCustomViewPort.setCustomViewport(mainWindow.getViewport());
-
         try {
+            LwjglCustomViewPort lwjglCustomViewPort = new LwjglCustomViewPort();
+            Collection<EngineSubsystem> subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
+                    lwjglCustomViewPort);
+
             PathManager.getInstance().useDefaultHomePath();
+
+            engine = new TerasologyEngine(subsystemList);
+            mainWindow = new MainWindow(this);
+            lwjglCustomViewPort.setCustomViewport(mainWindow.getViewport());
 
             engine.setHibernationAllowed(false);
             engine.subscribeToStateChange(mainWindow);
