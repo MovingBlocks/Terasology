@@ -38,7 +38,6 @@ import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -102,6 +101,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
 
+    private Context context;
+
     @Override
     public void initialise(Context context) {
 
@@ -137,6 +138,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Context context) {
+        this.context = context;
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
         LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice(context);
@@ -162,7 +164,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             actions.forEach(Runnable::run);
         }
 
-        int frameLimit = CoreRegistry.get(Config.class).getRendering().getFrameLimit();
+        int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
         if (frameLimit > 0) {
             Display.sync(frameLimit);
         }

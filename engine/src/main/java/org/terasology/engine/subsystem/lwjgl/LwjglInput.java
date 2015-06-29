@@ -29,13 +29,13 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglInput.class);
     private boolean mouseGrabbed;
+    private Context context;
 
     @Override
     public void preInitialise(Context context) {
@@ -53,15 +53,16 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        initControls(context);
-        updateInputConfig(context);
+        this.context = context;
+        initControls();
+        updateInputConfig();
         Mouse.setGrabbed(false);
     }
 
     @Override
     public void preUpdate(GameState currentState, float delta) {
-        NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
-        GameEngine engine = CoreRegistry.get(GameEngine.class);
+        NUIManager nuiManager = context.get(NUIManager.class);
+        GameEngine engine = context.get(GameEngine.class);
 
         // TODO: this originally occurred before GameThread.processWaitingProcesses();
         boolean newGrabbed = engine.hasMouseFocus() && !(nuiManager.isReleasingMouse());
@@ -86,7 +87,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
         Keyboard.destroy();
     }
 
-    private void initControls(Context context) {
+    private void initControls() {
         try {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
@@ -100,7 +101,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
         }
     }
 
-    private void updateInputConfig(Context context) {
+    private void updateInputConfig() {
         Config config = context.get(Config.class);
         config.getInput().getBinds().updateForChangedMods(context);
         config.save();
