@@ -244,7 +244,7 @@ public class StateLoading implements GameState {
         if (current == null) {
             nuiManager.closeScreen(loadingScreen);
             nuiManager.setHUDVisible(true);
-            context.get(GameEngine.class).changeState(new StateIngame(gameManifest));
+            context.get(GameEngine.class).changeState(new StateIngame(gameManifest, context));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);

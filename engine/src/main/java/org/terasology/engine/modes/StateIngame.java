@@ -21,13 +21,12 @@ import org.terasology.TeraOVR;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -42,13 +41,11 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.WorldRenderingStage;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.Collections;
@@ -72,6 +69,7 @@ public class StateIngame implements GameState {
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
     private NetworkSystem networkSystem;
+    private Context context;
 
     /* GAME LOOP */
     private boolean pauseGame;
@@ -80,25 +78,26 @@ public class StateIngame implements GameState {
 
     private GameManifest gameManifest;
 
-    public StateIngame(GameManifest gameManifest) {
+    public StateIngame(GameManifest gameManifest, Context context) {
         this.gameManifest = gameManifest;
+        this.context = context;
     }
 
     @Override
     public void init(GameEngine engine) {
         // context from loading state gets used.
-        nuiManager = CoreRegistry.get(NUIManager.class);
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        eventSystem = CoreRegistry.get(EventSystem.class);
-        componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
-        inputSystem = CoreRegistry.get(InputSystem.class);
+        nuiManager = context.get(NUIManager.class);
+        worldRenderer = context.get(WorldRenderer.class);
+        eventSystem = context.get(EventSystem.class);
+        componentSystemManager = context.get(ComponentSystemManager.class);
+        entityManager = context.get(EngineEntityManager.class);
+        cameraTargetSystem = context.get(CameraTargetSystem.class);
+        inputSystem = context.get(InputSystem.class);
         eventSystem.registerEventHandler(nuiManager);
-        networkSystem = CoreRegistry.get(NetworkSystem.class);
-        storageManager = CoreRegistry.get(StorageManager.class);
+        networkSystem = context.get(NetworkSystem.class);
+        storageManager = context.get(StorageManager.class);
 
-        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
+        if (context.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
 
             logger.info("Trying to initialize Oculus SDK...");
@@ -111,19 +110,19 @@ public class StateIngame implements GameState {
         nuiManager.getHUD().bindVisible(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
-                return !CoreRegistry.get(Config.class).getRendering().getDebug().isHudHidden();
+                return !context.get(Config.class).getRendering().getDebug().isHudHidden();
             }
         });
     }
 
     @Override
     public void dispose() {
-        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport() && OculusVrHelper.isNativeLibraryLoaded()) {
+        if (context.get(Config.class).getRendering().isOculusVrSupport() && OculusVrHelper.isNativeLibraryLoaded()) {
             logger.info("Shutting down Oculus SDK...");
             TeraOVR.clear();
         }
 
-        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 
         boolean save = networkSystem.getMode().isAuthority();
@@ -137,7 +136,7 @@ public class StateIngame implements GameState {
         GameThread.processWaitingProcesses();
         nuiManager.clear();
 
-        CoreRegistry.get(AudioManager.class).stopAllSounds();
+        context.get(AudioManager.class).stopAllSounds();
 
         if (worldRenderer != null) {
             worldRenderer.dispose();
@@ -145,21 +144,21 @@ public class StateIngame implements GameState {
         }
         componentSystemManager.shutdown();
 
-        CoreRegistry.get(PhysicsEngine.class).dispose();
+        context.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
 
         if (storageManager != null) {
             storageManager.finishSavingAndShutdown();
         }
-        ModuleEnvironment oldEnvironment = CoreRegistry.get(ModuleManager.class).getEnvironment();
-        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
+        ModuleEnvironment environment = context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
 
-        CoreRegistry.get(ModuleAwareAssetTypeManager.class).switchEnvironment(environment);
+        context.get(ModuleAwareAssetTypeManager.class).switchEnvironment(environment);
         if (oldEnvironment != null) {
             oldEnvironment.close();
         }
-        CoreRegistry.get(Console.class).dispose();
+        context.get(Console.class).dispose();
         GameThread.clearWaitingProcesses();
 
         /*
@@ -204,11 +203,11 @@ public class StateIngame implements GameState {
 
     @Override
     public void render() {
-        DisplayDevice displayDevice = CoreRegistry.get(DisplayDevice.class);
+        DisplayDevice displayDevice = context.get(DisplayDevice.class);
         displayDevice.prepareToRender();
 
         if (worldRenderer != null) {
-            if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+            if (!context.get(Config.class).getRendering().isOculusVrSupport()) {
                 worldRenderer.render(WorldRenderingStage.MONO);
             } else {
                 worldRenderer.render(WorldRenderingStage.LEFT_EYE);
