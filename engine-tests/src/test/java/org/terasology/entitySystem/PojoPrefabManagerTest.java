@@ -69,7 +69,6 @@ public class PojoPrefabManagerTest {
         lib.add(Quat4f.class, new Quat4fTypeHandler());
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
-        prefabManager = new PojoPrefabManager();
 
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
         assetTypeManager.registerCoreAssetType(Prefab.class,
@@ -77,6 +76,8 @@ public class PojoPrefabManagerTest {
 
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
+
+        prefabManager = new PojoPrefabManager(context);
     }
 
     @Test

@@ -76,7 +76,7 @@ public class PrefabTest {
         context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        prefabManager = new PojoPrefabManager();
+        prefabManager = new PojoPrefabManager(context);
     }
 
     @Test

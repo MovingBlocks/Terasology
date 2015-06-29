@@ -103,7 +103,7 @@ public final class EntitySystemSetupUtil {
         entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
 
         // Prefab Manager
-        PrefabManager prefabManager = new PojoPrefabManager();
+        PrefabManager prefabManager = new PojoPrefabManager(context);
         entityManager.setPrefabManager(prefabManager);
         context.put(PrefabManager.class, prefabManager);
 
