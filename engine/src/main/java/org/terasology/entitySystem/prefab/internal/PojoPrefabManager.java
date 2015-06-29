@@ -61,7 +61,7 @@ public class PojoPrefabManager implements PrefabManager {
     @Override
     public boolean exists(String name) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-        return assetManager.getAsset(name, Prefab.class) != null;
+        return assetManager.getAsset(name, Prefab.class).isPresent();
     }
 
     /**
