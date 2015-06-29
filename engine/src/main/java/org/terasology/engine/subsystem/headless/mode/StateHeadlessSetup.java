@@ -64,23 +64,24 @@ public class StateHeadlessSetup implements GameState {
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
+    private Context context;
 
     public StateHeadlessSetup() {
     }
 
     @Override
     public void init(GameEngine gameEngine) {
-        Context context = gameEngine.createChildContext();
+        context = gameEngine.createChildContext();
         CoreRegistry.setContext(context);
 
         // let's get the entity event system running
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = context.get(EngineEntityManager.class);
 
-        eventSystem = CoreRegistry.get(EventSystem.class);
+        eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl());
 
-        NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        NUIManager nuiManager = context.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 
         componentSystemManager = new ComponentSystemManager(context);
@@ -109,8 +110,8 @@ public class StateHeadlessSetup implements GameState {
     private GameManifest createGameManifest() {
         GameManifest gameManifest = new GameManifest();
 
-        Config config = CoreRegistry.get(Config.class);
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        Config config = context.get(Config.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
