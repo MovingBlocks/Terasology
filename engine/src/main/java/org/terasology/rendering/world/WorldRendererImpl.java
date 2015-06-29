@@ -21,6 +21,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -106,19 +107,21 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
 
-    private Config config = CoreRegistry.get(Config.class);
-    private RenderingConfig renderingConfig = config.getRendering();
-    private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
+    private final Config config;
+    private final RenderingConfig renderingConfig;
+    private final RenderingDebugConfig renderingDebugConfig;
 
     private LwjglRenderingProcess renderingProcess;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
-    public WorldRendererImpl(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
-                             WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
-        this.worldProvider = worldProvider;
-        this.backdropProvider = backdropProvider;
-        this.backdropRenderer = backdropRenderer;
+    public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
+        this.worldProvider = context.get(WorldProvider.class);
+        this.backdropProvider = context.get(BackdropProvider.class);
+        this.backdropRenderer = context.get(BackdropRenderer.class);
+        this.config = context.get(Config.class);
+        this.renderingConfig = config.getRendering();
+        this.renderingDebugConfig = renderingConfig.getDebug();
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         if (renderingConfig.isOculusVrSupport()) {
@@ -129,9 +132,12 @@ public final class WorldRendererImpl implements WorldRenderer {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
             currentRenderingStage = WorldRenderingStage.MONO;
         }
+        LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
         initMainDirectionalLight();
+
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
 
         renderableWorld = new RenderableWorldImpl(worldProvider, chunkProvider, bufferPool, playerCamera, shadowMapCamera);
         renderQueues = renderableWorld.getRenderQueues();

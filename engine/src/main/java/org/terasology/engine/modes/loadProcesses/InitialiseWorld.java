@@ -31,7 +31,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
@@ -149,8 +148,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(BackdropRenderer.class, backdropRenderer);
 
         RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
-        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(backdropProvider, backdropRenderer,
-                                                                                 worldProvider, chunkProvider, context.get(LocalPlayerSystem.class));
+        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
         context.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer

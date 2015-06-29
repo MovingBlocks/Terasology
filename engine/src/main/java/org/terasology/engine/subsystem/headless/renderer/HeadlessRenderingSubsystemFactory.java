@@ -15,19 +15,16 @@
  */
 package org.terasology.engine.subsystem.headless.renderer;
 
+import org.terasology.context.Context;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkProvider;
 
 public class HeadlessRenderingSubsystemFactory implements RenderingSubsystemFactory {
 
     @Override
-    public WorldRenderer createWorldRenderer(BackdropProvider backdropProvider, BackdropRenderer backdropRenderer,
-                                             WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
-        return new HeadlessWorldRenderer(worldProvider, chunkProvider, localPlayerSystem);
+    public WorldRenderer createWorldRenderer(Context context) {
+        return new HeadlessWorldRenderer(context);
     }
+
+
 }
