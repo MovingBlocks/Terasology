@@ -261,4 +261,7 @@ public class StateIngame implements GameState {
         return pauseGame;
     }
 
+    public Context getContext() {
+        return context;
+    }
 }

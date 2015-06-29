@@ -16,7 +16,10 @@
 package org.terasology.editor.properties;
 
 import com.google.common.collect.Lists;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
+import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.modes.GameState;
+import org.terasology.engine.modes.StateIngame;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
@@ -27,18 +30,33 @@ import java.util.List;
  * @author Benjamin Glatzel
  */
 public class SceneProperties implements PropertyProvider {
+
+    private final TerasologyEngine engine;
+
+    public SceneProperties(TerasologyEngine engine) {
+        this.engine = engine;
+    }
+
     @Override
     public List<Property<?>> getProperties() {
         List<Property<?>> result = Lists.newArrayList();
-        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
+
+        GameState gameState = engine.getState();
+        if (!(gameState instanceof StateIngame)) {
+            return result;
+        }
+        StateIngame ingameState = (StateIngame) gameState;
+        Context ingameContext = ingameState.getContext();
+
+        BackdropProvider backdropProvider = ingameContext.get(BackdropProvider.class);
         if (backdropProvider != null) {
             result.addAll(new ReflectionProvider(backdropProvider).getProperties());
         }
-        BackdropRenderer backdropRenderer = CoreRegistry.get(BackdropRenderer.class);
+        BackdropRenderer backdropRenderer = ingameContext.get(BackdropRenderer.class);
         if (backdropRenderer != null) {
             result.addAll(new ReflectionProvider(backdropRenderer).getProperties());
         }
-        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        LwjglRenderingProcess renderingProcess = ingameContext.get(LwjglRenderingProcess.class);
         if (renderingProcess != null) {
             result.addAll(new ReflectionProvider(renderingProcess).getProperties());
         }
