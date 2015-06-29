@@ -143,7 +143,8 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
             for (Material material : assetManager.getLoadedAssets(Material.class)) {
                 GLSLMaterial finalMat = (GLSLMaterial) material;
                 if (finalMat.getShaderParameters() != null) {
-                    final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters());
+                    final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters(),
+                            ingameContext);
                     if (!provider.getProperties().isEmpty()) {
                         final String programName = material.getUrn().toString();
                         JMenuItem menuItem = new JMenuItem(programName);

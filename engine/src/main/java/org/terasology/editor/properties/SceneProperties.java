@@ -50,15 +50,15 @@ public class SceneProperties implements PropertyProvider {
 
         BackdropProvider backdropProvider = ingameContext.get(BackdropProvider.class);
         if (backdropProvider != null) {
-            result.addAll(new ReflectionProvider(backdropProvider).getProperties());
+            result.addAll(new ReflectionProvider(backdropProvider, ingameContext).getProperties());
         }
         BackdropRenderer backdropRenderer = ingameContext.get(BackdropRenderer.class);
         if (backdropRenderer != null) {
-            result.addAll(new ReflectionProvider(backdropRenderer).getProperties());
+            result.addAll(new ReflectionProvider(backdropRenderer, ingameContext).getProperties());
         }
         LwjglRenderingProcess renderingProcess = ingameContext.get(LwjglRenderingProcess.class);
         if (renderingProcess != null) {
-            result.addAll(new ReflectionProvider(renderingProcess).getProperties());
+            result.addAll(new ReflectionProvider(renderingProcess, ingameContext).getProperties());
         }
         return result;
     }
