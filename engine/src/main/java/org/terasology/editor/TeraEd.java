@@ -82,7 +82,6 @@ public final class TeraEd extends JWindow {
             engine.subscribeToStateChange(mainWindow);
 
             engine.run(new StateMainMenu());
-            engine.close();
         } catch (Throwable t) {
             logger.error("Uncaught Exception", t);
         }

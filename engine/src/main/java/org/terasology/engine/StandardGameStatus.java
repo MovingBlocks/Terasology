@@ -32,7 +32,7 @@ public enum StandardGameStatus implements EngineStatus {
     }
 
     @Override
-    public String getDefaultDescription() {
+    public String getDescription() {
         return defaultDescription;
     }
 

@@ -18,15 +18,13 @@ package org.terasology.engine;
 /**
  * Engine Status provides the current status of the engine - what it is doing, at a higher granularity than just running. This can be used by external and internal observers
  * to report on the state of the engine, such as splash screens/loading screens.
- *
- * @author Immortius
  */
 public interface EngineStatus {
 
     /**
      * @return The description of the status
      */
-    String getDefaultDescription();
+    String getDescription();
 
     /**
      * @return Whether this is a status that "progresses" such as loading, with a known completion point

@@ -41,7 +41,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -120,13 +120,13 @@ public final class Terasology {
 
         setupLogging();
 
-        try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
-
+        try {
+            TerasologyEngine engine = new TerasologyEngine(createSubsystemList());
             engine.subscribe(newStatus -> {
                 if (newStatus == StandardGameStatus.RUNNING) {
                     SplashScreen.getInstance().close();
                 } else {
-                    SplashScreen.getInstance().post(newStatus.getDefaultDescription());
+                    SplashScreen.getInstance().post(newStatus.getDescription());
                 }
             });
             Config config = engine.getFromEngineContext(Config.class);

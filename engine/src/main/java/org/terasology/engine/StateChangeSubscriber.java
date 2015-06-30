@@ -16,7 +16,7 @@
 package org.terasology.engine;
 
 /**
- * @author Immortius
+ * An interface for subscribers to engine state changes
  */
 public interface StateChangeSubscriber {
 

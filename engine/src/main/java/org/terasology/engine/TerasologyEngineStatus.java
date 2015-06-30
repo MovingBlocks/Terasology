@@ -16,16 +16,16 @@
 package org.terasology.engine;
 
 /**
- * @author Immortius
+ * An enum for describing the status of the engine, to be used in addition to the StandardGameStatuses
  */
 public enum TerasologyEngineStatus implements EngineStatus {
 
     LOADING_CONFIG("Loading config..."),
-    PREPPING_SUBSYSTEMS("Preparing Subsystems..."),
+    PREPARING_SUBSYSTEMS("Preparing Subsystems..."),
     INITIALIZING_ASSET_MANAGEMENT("Initializing Asset Management..."),
     INITIALIZING_SUBSYSTEMS("Initializing Subsystems..."),
     INITIALIZING_MODULE_MANAGER("Initializing Module Management..."),
-    INITIALIZING_REFLECTION("Initializing high performance reflection..."),
+    INITIALIZING_ACCESSOR_CODE_GEN("Initializing accessor code generation..."),
     INITIALIZING_ASSET_TYPES("Initializing asset types...");
 
     private final String defaultDescription;
@@ -35,7 +35,7 @@ public enum TerasologyEngineStatus implements EngineStatus {
     }
 
     @Override
-    public String getDefaultDescription() {
+    public String getDescription() {
         return defaultDescription;
     }
 

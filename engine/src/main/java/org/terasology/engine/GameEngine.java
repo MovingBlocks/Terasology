@@ -25,7 +25,7 @@ import org.terasology.engine.modes.GameState;
  *
  * @author Immortius
  */
-public interface GameEngine extends AutoCloseable {
+public interface GameEngine {
 
     /**
      * @return The current, fine-grained status of the engine.
@@ -56,25 +56,9 @@ public interface GameEngine extends AutoCloseable {
     void shutdown();
 
     /**
-     * Cleans up the engine. Can only be called after shutdown.
-     * This method should not throw exceptions.
-     */
-    void close();
-
-    /**
      * @return Whether the engine is running - this is true from the point run() is called to the point shutdown is complete
      */
     boolean isRunning();
-
-    /**
-     * @return Whether the engine is shutting down
-     */
-    boolean isShuttingDown();
-
-    /**
-     * @return Whether the engine has been disposed
-     */
-    boolean isDisposed();
 
     /**
      * @return The current state of the engine
