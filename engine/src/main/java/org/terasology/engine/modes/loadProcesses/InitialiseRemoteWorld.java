@@ -22,7 +22,6 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
@@ -87,8 +86,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         context.put(BackdropRenderer.class, backdropRenderer);
 
         RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
-        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(backdropProvider, backdropRenderer,
-                worldProvider, chunkProvider, context.get(LocalPlayerSystem.class));
+        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
         float reflectionHeight = context.get(NetworkSystem.class).getServer().getInfo().getReflectionHeight();
         worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
         context.put(WorldRenderer.class, worldRenderer);

@@ -298,7 +298,7 @@ public class HeadlessEnvironment extends Environment {
     @Override
     protected void loadPrefabs() {
 
-        LoadPrefabs prefabLoadStep = new LoadPrefabs();
+        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
 
         boolean complete = false;
         prefabLoadStep.begin();

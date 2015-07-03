@@ -18,6 +18,7 @@ package org.terasology.logic.players;
 
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -63,6 +64,9 @@ public class DebugControlSystem extends BaseComponentSystem {
     private Config config;
 
     @In
+    private Context context;
+
+    @In
     private NUIManager nuiManager;
 
     private DebugOverlay overlay;
@@ -93,7 +97,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         int maxViewDistance = ViewDistance.values().length - 1;
 
         if (viewDistance != maxViewDistance) {
-            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1)));
+            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1)), context);
         }
         button.consume();
     }
@@ -104,7 +108,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         int minViewDistance = 0;
 
         if (viewDistance != minViewDistance) {
-            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() - 1)));
+            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() - 1)), context);
         }
         button.consume();
     }

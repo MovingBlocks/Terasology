@@ -149,8 +149,8 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new RegisterBiomes(context, gameManifest));
         loadProcesses.add(new InitialiseGraphics(context));
-        loadProcesses.add(new CacheBlocks());
-        loadProcesses.add(new LoadPrefabs());
+        loadProcesses.add(new CacheBlocks(context));
+        loadProcesses.add(new LoadPrefabs(context));
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new InitialiseComponentSystemManager(context));
         loadProcesses.add(new RegisterInputSystem(context));
@@ -174,8 +174,8 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new RegisterBiomes(context, gameManifest));
         loadProcesses.add(new InitialiseGraphics(context));
-        loadProcesses.add(new CacheBlocks());
-        loadProcesses.add(new LoadPrefabs());
+        loadProcesses.add(new CacheBlocks(context));
+        loadProcesses.add(new LoadPrefabs(context));
         loadProcesses.add(new ProcessBlockPrefabs(context));
         loadProcesses.add(new InitialiseComponentSystemManager(context));
         loadProcesses.add(new RegisterInputSystem(context));
@@ -244,7 +244,7 @@ public class StateLoading implements GameState {
         if (current == null) {
             nuiManager.closeScreen(loadingScreen);
             nuiManager.setHUDVisible(true);
-            context.get(GameEngine.class).changeState(new StateIngame(gameManifest));
+            context.get(GameEngine.class).changeState(new StateIngame(gameManifest, context));
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);

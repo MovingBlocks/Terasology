@@ -16,7 +16,6 @@
 
 package org.terasology;
 
-import com.google.common.collect.Lists;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -31,17 +30,12 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.module.ClasspathModule;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.TableModuleRegistry;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -52,7 +46,6 @@ import org.terasology.world.block.BlockManager;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 import static org.mockito.Mockito.mock;
 
@@ -115,7 +108,7 @@ public abstract class TerasologyTestingEnvironment {
 
         componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
-        LoadPrefabs prefabLoadStep = new LoadPrefabs();
+        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
 
         boolean complete = false;
         prefabLoadStep.begin();

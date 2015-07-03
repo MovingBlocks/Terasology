@@ -17,6 +17,7 @@ package org.terasology.engine.subsystem.headless.mode;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.StateChangeSubscriber;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.registry.CoreRegistry;
@@ -27,9 +28,14 @@ import org.terasology.registry.CoreRegistry;
  */
 public class HeadlessStateChangeListener implements StateChangeSubscriber {
 
+    private final TerasologyEngine engine;
+
+    public HeadlessStateChangeListener(TerasologyEngine engine) {
+        this.engine = engine;
+    }
+
     @Override
     public void onStateChange() {
-        GameEngine engine = CoreRegistry.get(GameEngine.class);
         GameState state = engine.getState();
         if (state instanceof StateMainMenu) {
             engine.shutdown();

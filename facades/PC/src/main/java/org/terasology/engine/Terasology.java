@@ -140,7 +140,7 @@ public final class Terasology {
             }
 
             if (isHeadless) {
-                engine.subscribeToStateChange(new HeadlessStateChangeListener());
+                engine.subscribeToStateChange(new HeadlessStateChangeListener(engine));
                 engine.run(new StateHeadlessSetup());
             } else {
                 if (loadLastGame) {

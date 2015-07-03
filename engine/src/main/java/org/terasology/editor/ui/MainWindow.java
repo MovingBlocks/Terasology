@@ -18,16 +18,26 @@ package org.terasology.editor.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.context.Context;
 import org.terasology.editor.TeraEd;
 import org.terasology.editor.properties.PropertyProvider;
 import org.terasology.editor.properties.ReflectionProvider;
 import org.terasology.engine.StateChangeSubscriber;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.modes.GameState;
+import org.terasology.engine.modes.StateIngame;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.GLSLMaterial;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.ScrollPaneConstants;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -45,6 +55,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     private static final Logger logger = LoggerFactory.getLogger(MainWindow.class);
 
     private TeraEd teraEd;
+    private TerasologyEngine engine;
 
     private BorderLayout borderLayout;
     private Viewport viewport;
@@ -65,9 +76,10 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
     private JScrollPane propertyPanelScrollPane;
 
-    public MainWindow(TeraEd teraEd) {
+    public MainWindow(TeraEd teraEd, TerasologyEngine engine) {
         this.teraEd = teraEd;
         this.addWindowListener(this);
+        this.engine = engine;
 
         viewport = new Viewport();
 
@@ -123,23 +135,31 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     public void onStateChange() {
         shaderPropertyMenuEntries.clear();
         shaderPropertiesMenu.removeAll();
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        for (Material material : assetManager.getLoadedAssets(Material.class)) {
-            GLSLMaterial finalMat = (GLSLMaterial) material;
-            if (finalMat.getShaderParameters() != null) {
-                final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters());
-                if (!provider.getProperties().isEmpty()) {
-                    final String programName = material.getUrn().toString();
-                    JMenuItem menuItem = new JMenuItem(programName);
-                    menuItem.addActionListener(e -> {
-                        propertyPanel.setActivePropertyProvider(provider);
-                        propertyPanel.setTitle(programName);
-                    });
-                    shaderPropertyMenuEntries.add(menuItem);
-                    shaderPropertiesMenu.add(menuItem);
+        GameState gameState = engine.getState();
+        if (gameState instanceof StateIngame) {
+            StateIngame stateIngame = (StateIngame) gameState;
+            Context ingameContext = stateIngame.getContext();
+            AssetManager assetManager = ingameContext.get(AssetManager.class);
+            for (Material material : assetManager.getLoadedAssets(Material.class)) {
+                GLSLMaterial finalMat = (GLSLMaterial) material;
+                if (finalMat.getShaderParameters() != null) {
+                    final PropertyProvider provider = new ReflectionProvider(finalMat.getShaderParameters(),
+                            ingameContext);
+                    if (!provider.getProperties().isEmpty()) {
+                        final String programName = material.getUrn().toString();
+                        JMenuItem menuItem = new JMenuItem(programName);
+                        menuItem.addActionListener(e -> {
+                            propertyPanel.setActivePropertyProvider(provider);
+                            propertyPanel.setTitle(programName);
+                        });
+                        shaderPropertyMenuEntries.add(menuItem);
+                        shaderPropertiesMenu.add(menuItem);
+                    }
                 }
             }
         }
+
+
     }
 
     @Override

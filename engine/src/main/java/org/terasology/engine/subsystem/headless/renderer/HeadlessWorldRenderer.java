@@ -17,13 +17,13 @@ package org.terasology.engine.subsystem.headless.renderer;
 
 import com.google.common.collect.Lists;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
@@ -53,12 +53,12 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     private Config config;
 
-    public HeadlessWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
-        this.worldProvider = worldProvider;
-        this.chunkProvider = chunkProvider;
-
+    public HeadlessWorldRenderer(Context context) {
+        this.worldProvider = context.get(WorldProvider.class);
+        this.chunkProvider = context.get(ChunkProvider.class);
+        LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(noCamera);
-        config = CoreRegistry.get(Config.class);
+        config = context.get(Config.class);
     }
 
     @Override
@@ -274,17 +274,17 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z));
     }
 
-    private static float distanceToCamera(RenderableChunk chunk) {
+    private float distanceToCamera(RenderableChunk chunk) {
         Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * ChunkConstants.SIZE_X, 0, (chunk.getPosition().z + 0.5f) * ChunkConstants.SIZE_Z);
 
-        Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cameraPos = getActiveCamera().getPosition();
         result.x -= cameraPos.x;
         result.z -= cameraPos.z;
 
         return result.length();
     }
 
-    private static class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
+    private class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
 
         @Override
         public int compare(RenderableChunk o1, RenderableChunk o2) {

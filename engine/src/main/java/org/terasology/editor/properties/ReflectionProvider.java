@@ -18,14 +18,14 @@ package org.terasology.editor.properties;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.editor.EditorRange;
+import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.editor.EditorRange;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -45,10 +45,10 @@ public class ReflectionProvider<T> implements PropertyProvider<T> {
 
     private List<Property<T>> properties = Lists.newArrayList();
 
-    public ReflectionProvider(T target) {
+    public ReflectionProvider(T target, Context context) {
         try {
-            ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
-            CopyStrategyLibrary copyStrategies = CoreRegistry.get(CopyStrategyLibrary.class);
+            ReflectFactory reflectFactory = context.get(ReflectFactory.class);
+            CopyStrategyLibrary copyStrategies = context.get(CopyStrategyLibrary.class);
             ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), (Class<T>) target.getClass(), reflectFactory, copyStrategies);
             for (Field field : getAllFields(target.getClass(), and(withAnnotation(EditorRange.class), or(withType(Float.TYPE), withType(Float.class))))) {
                 EditorRange range = field.getAnnotation(EditorRange.class);
