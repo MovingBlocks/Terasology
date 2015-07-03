@@ -16,10 +16,10 @@
 
 package org.terasology.engine;
 
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -34,10 +34,11 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
+import org.terasology.engine.subsystem.ThreadManager;
+import org.terasology.engine.subsystem.ThreadManagerSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -52,8 +53,6 @@ import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -67,9 +66,6 @@ import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -90,8 +86,9 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -121,7 +118,6 @@ public class TerasologyEngine implements GameEngine {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
-    private static final int MAX_NUMBER_THREADS = 16;
 
     private Config config;
     private RenderingConfig renderingConfig;
@@ -131,11 +127,11 @@ public class TerasologyEngine implements GameEngine {
     private GameState pendingState;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
-    private enum EngineState {UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED}
+    private EngineStatus status = StandardGameStatus.UNSTARTED;
+    private final List<EngineStatusSubscriber> statusSubscriberList = new CopyOnWriteArrayList<>();
 
-    private EngineState engineState = EngineState.UNINITIALIZED;
-
-    private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", MAX_NUMBER_THREADS);
+    private volatile boolean shutdownRequested;
+    private volatile boolean running;
 
     private boolean hibernationAllowed;
     private boolean gameFocused = true;
@@ -158,8 +154,6 @@ public class TerasologyEngine implements GameEngine {
      */
     public TerasologyEngine(Collection<EngineSubsystem> subsystems) {
 
-        Stopwatch totalInitTime = Stopwatch.createStarted();
-
         this.context = new ContextImpl();
         /*
          * We can't load the engine without core registry yet.
@@ -168,17 +162,21 @@ public class TerasologyEngine implements GameEngine {
          */
         CoreRegistry.setContext(context);
         this.subsystems = Queues.newArrayDeque(subsystems);
+        ThreadManagerSubsystem threadManager = new ThreadManagerSubsystem();
+        this.subsystems.add(threadManager);
+        context.put(ThreadManager.class, threadManager);
+    }
 
+    private void initialize() {
+        Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
             logger.info("Initializing Terasology...");
             logEnvironmentInfo();
 
-            SplashScreen.getInstance().post("Loading config file ...");
-
+            changeStatus(TerasologyEngineStatus.LOADING_CONFIG);
             initConfig();
 
-            SplashScreen.getInstance().post("Pre-initialize subsystems ...");
-
+            changeStatus(TerasologyEngineStatus.PREPARING_SUBSYSTEMS);
             preInitSubsystems();
 
             // time must be set here as it is required by some of the managers.
@@ -187,13 +185,14 @@ public class TerasologyEngine implements GameEngine {
 
             GameThread.setToCurrentThread();
 
+            changeStatus(TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS);
             initSubsystems();
 
             initManagers();
+
+            changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
             initAssets();
             ApplyModulesUtil.applyModules(context);
-
-            SplashScreen.getInstance().post("Post-initialize subsystems ...");
 
             postInitSubsystems();
 
@@ -201,13 +200,10 @@ public class TerasologyEngine implements GameEngine {
             verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
             verifyRequiredSystemIsRegistered(InputSystem.class);
 
-            SplashScreen.getInstance().post("Initialize assets ...");
-
 
             // TODO: Review - The advanced monitor shouldn't be hooked-in this way (see issue #692)
             initAdvancedMonitor();
 
-            engineState = EngineState.INITIALIZED;
             /**
              * Prevent objects being put in engine context after init phase. Engine states should use/create a
              * child context.
@@ -320,12 +316,11 @@ public class TerasologyEngine implements GameEngine {
 
     private void initManagers() {
 
-        SplashScreen.getInstance().post("Loading modules ...");
+        changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
         ModuleManager moduleManager = new ModuleManagerImpl();
         context.put(ModuleManager.class, moduleManager);
 
-        SplashScreen.getInstance().post("Loading reflections ...");
-
+        changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         context.put(ReflectFactory.class, reflectFactory);
 
@@ -334,7 +329,7 @@ public class TerasologyEngine implements GameEngine {
         context.put(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory,
                 copyStrategyLibrary));
 
-        SplashScreen.getInstance().post("Loading assets ...");
+        changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new ModuleAwareAssetTypeManager();
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
@@ -384,6 +379,28 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
+    @Override
+    public EngineStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void subscribe(EngineStatusSubscriber subscriber) {
+        statusSubscriberList.add(subscriber);
+    }
+
+    @Override
+    public void unsubscribe(EngineStatusSubscriber subscriber) {
+        statusSubscriberList.remove(subscriber);
+    }
+
+    private void changeStatus(EngineStatus newStatus) {
+        status = newStatus;
+        for (EngineStatusSubscriber subscriber : statusSubscriberList) {
+            subscriber.onEngineStatusChanged(newStatus);
+        }
+    }
+
     /**
      * Runs the engine, including its main loop. This method is called only once per
      * application startup, which is the reason the GameState provided is the -initial-
@@ -394,28 +411,30 @@ public class TerasologyEngine implements GameEngine {
      *                     the application has or hasn't been started headless.
      */
     @Override
-    public void run(GameState initialState) {
+    public synchronized void run(GameState initialState) {
+        Preconditions.checkState(!running);
+        running = true;
+        initialize();
+        changeStatus(StandardGameStatus.RUNNING);
+
         try {
             context.put(GameEngine.class, this);
             changeState(initialState);
-            engineState = EngineState.RUNNING;
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
-            cleanup();
-
         } catch (RuntimeException e) {
             logger.error("Uncaught exception, attempting clean game shutdown", e);
+            throw e;
+        } finally {
             try {
                 cleanup();
-            } catch (Throwable t) {
+            } catch (RuntimeException t) {
                 logger.error("Clean game shutdown after an uncaught exception failed", t);
-                logger.error("Rethrowing original exception");
             }
-            throw e;
-        } catch (Throwable t) {
-            logger.error("Uncaught throwable", t);
-            throw t;
+            running = false;
+            shutdownRequested = false;
+            changeStatus(StandardGameStatus.UNSTARTED);
         }
     }
 
@@ -431,7 +450,7 @@ public class TerasologyEngine implements GameEngine {
 
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (engineState == EngineState.RUNNING && !display.isCloseRequested()) {
+        while (!shutdownRequested && !display.isCloseRequested()) {
 
             long totalDelta;
             float updateDelta;
@@ -500,32 +519,32 @@ public class TerasologyEngine implements GameEngine {
             PerformanceMonitor.startActivity("Other");
         }
         PerformanceMonitor.endActivity();
-
-        // This becomes important only if display.isCloseRequested() is true.
-        // In all other circumstances the EngineState is already set to
-        // INITIALIZED by the time the flow gets here.
-        engineState = EngineState.INITIALIZED;
     }
 
     private void cleanup() {
         logger.info("Shutting down Terasology...");
+        changeStatus(StandardGameStatus.SHUTTING_DOWN);
 
-        try {
-            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-            while (iter.hasNext()) {
-                EngineSubsystem subsystem = iter.next();
-                subsystem.shutdown(config);
-            }
+        Iterator<EngineSubsystem> shutdownIter = subsystems.descendingIterator();
+        while (shutdownIter.hasNext()) {
+            EngineSubsystem subsystem = shutdownIter.next();
+            subsystem.shutdown(config);
+        }
 
-            config.save();
-            if (currentState != null) {
-                currentState.dispose();
-                currentState = null;
+        config.save();
+        if (currentState != null) {
+            currentState.dispose();
+            currentState = null;
+        }
+
+        Iterator<EngineSubsystem> disposeIter = subsystems.descendingIterator();
+        while (disposeIter.hasNext()) {
+            EngineSubsystem subsystem = disposeIter.next();
+            try {
+                subsystem.dispose();
+            } catch (RuntimeException t) {
+                logger.error("Unable to dispose subsystem {}", subsystem, t);
             }
-        } finally {
-            // Even if a graceful shutdown of the subsystems fails,
-            // the thread pool has to be shut down
-            stopThreads();
         }
     }
 
@@ -535,33 +554,7 @@ public class TerasologyEngine implements GameEngine {
      */
     @Override
     public void shutdown() {
-        engineState = EngineState.INITIALIZED;
-    }
-
-    /**
-     * Disposes of the engine by disposing of its subsystems. Originally this method
-     * was called dispose(), but to improve Exception handling in the PC Facade the
-     * GameEngine interface implemented by this class was made to extend AutoCloseable.
-     * This in turn requires a close() method.
-     */
-    @Override
-    public void close() {
-        /*
-         * The engine is shutdown even when in RUNNING state. This way terasology gets properly disposed also in
-         * case of a crash: The mouse must be made visible again for the crash reporter and the main window needs to
-         * be closed.
-         */
-        engineState = EngineState.DISPOSED;
-        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-        while (iter.hasNext()) {
-            EngineSubsystem subsystem = iter.next();
-            try {
-                subsystem.dispose();
-            } catch (Throwable t) {
-                logger.error("Unable to dispose subsystem {}", subsystem, t);
-            }
-        }
-
+        shutdownRequested = true;
     }
 
     /**
@@ -615,23 +608,8 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public boolean isUninitialized() {
-        return engineState == EngineState.UNINITIALIZED;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return engineState == EngineState.INITIALIZED;
-    }
-
-    @Override
     public boolean isRunning() {
-        return engineState == EngineState.RUNNING;
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return engineState == EngineState.DISPOSED;
+        return running;
     }
 
     public Iterable<EngineSubsystem> getSubsystems() {
@@ -685,49 +663,6 @@ public class TerasologyEngine implements GameEngine {
     public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
         stateChangeSubscribers.remove(subscriber);
     }
-
-    @Override
-    public void submitTask(final String name, final Runnable task) {
-        try {
-            commonThreadPool.put(new Task() {
-                @Override
-                public String getName() {
-                    return name;
-                }
-
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    Thread.currentThread().setName("Engine-Task-Pool");
-                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
-                        task.run();
-                    } catch (RejectedExecutionException e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Thread submitted after shutdown requested: {}", name);
-                    } catch (Throwable e) {
-                        ThreadMonitor.addError(e);
-                    }
-                }
-
-                @Override
-                public boolean isTerminateSignal() {
-                    return false;
-                }
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to submit task {}, running on main thread", name, e);
-            task.run();
-        }
-    }
-
-    public void stopThreads() {
-        commonThreadPool.shutdown(new ShutdownTask(), false);
-    }
-
-    public void restartThreads() {
-        commonThreadPool.restart();
-    }
-
 
     @Override
     public Context createChildContext() {

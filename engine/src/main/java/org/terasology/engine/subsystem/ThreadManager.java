@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine;
+package org.terasology.engine.subsystem;
+
+import org.terasology.module.sandbox.API;
 
 /**
- * An interface for subscribers to engine state changes
+ * @author Immortius
  */
-public interface StateChangeSubscriber {
+@API
+public interface ThreadManager {
 
-    void onStateChange();
+    void submitTask(String name, Runnable task);
 }

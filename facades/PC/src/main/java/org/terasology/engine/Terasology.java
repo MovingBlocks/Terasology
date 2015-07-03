@@ -25,6 +25,7 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.ThreadManager;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -40,7 +41,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -119,8 +120,15 @@ public final class Terasology {
 
         setupLogging();
 
-        try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
-
+        try {
+            TerasologyEngine engine = new TerasologyEngine(createSubsystemList());
+            engine.subscribe(newStatus -> {
+                if (newStatus == StandardGameStatus.RUNNING) {
+                    SplashScreen.getInstance().close();
+                } else {
+                    SplashScreen.getInstance().post(newStatus.getDescription());
+                }
+            });
             Config config = engine.getFromEngineContext(Config.class);
 
             if (!writeSaveGamesEnabled) {
@@ -136,7 +144,7 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else {
                 if (loadLastGame) {
-                    engine.submitTask("loadGame", new Runnable() {
+                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", new Runnable() {
                         @Override
                         public void run() {
                             GameManifest gameManifest = getLatestGameManifest();
@@ -147,7 +155,6 @@ public final class Terasology {
                     });
                 }
 
-                SplashScreen.getInstance().close();
                 engine.run(new StateMainMenu());
             }
         } catch (Throwable e) {

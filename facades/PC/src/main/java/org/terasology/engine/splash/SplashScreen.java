@@ -16,6 +16,9 @@
 
 package org.terasology.engine.splash;
 
+import org.terasology.engine.EngineStatus;
+import org.terasology.engine.EngineStatusSubscriber;
+
 /**
  * Provides access to a {@link SplashScreenCore} implementation.
  * @author Martin Steiger
@@ -37,4 +40,5 @@ public final class SplashScreen {
     public static SplashScreenCore getInstance() {
         return INSTANCE;
     }
+
 }

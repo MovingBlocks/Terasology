@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,15 @@
 package org.terasology.engine;
 
 /**
- * An interface for subscribers to engine state changes
+ * Interface for subscribing to notification of engine status changes.
+ * @author Immortius
  */
-public interface StateChangeSubscriber {
+@FunctionalInterface
+public interface EngineStatusSubscriber {
 
-    void onStateChange();
+    /**
+     * Called when the status of the engine changes
+     * @param newStatus The new status of the engine
+     */
+    void onEngineStatusChanged(EngineStatus newStatus);
 }
