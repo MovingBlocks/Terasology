@@ -27,6 +27,14 @@ import org.terasology.math.geom.Vector2f;
 public class NullWorldAtlas implements WorldAtlas {
 
     @Override
+    public void update() {
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    @Override
     public int getTileSize() {
         return 0;
     }

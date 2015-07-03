@@ -17,13 +17,12 @@ package org.terasology.world.block.tiles;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import com.google.common.math.IntMath;
-
+import de.matthiasmann.twl.utils.PNGDecoder;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectIntProcedure;
-
-import de.matthiasmann.twl.utils.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -42,7 +41,6 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import javax.imageio.ImageIO;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -55,6 +53,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.function.Consumer;
 
 /**
  * @author Immortius
@@ -76,8 +76,9 @@ public class WorldAtlasImpl implements WorldAtlas {
     private List<BlockTile> tilesNormal = Lists.newArrayList();
     private List<BlockTile> tilesHeight = Lists.newArrayList();
 
-    private BlockTile defaultNormal;
-    private BlockTile defaultHeight;
+    private BlockingQueue<BlockTile> reloadQueue = Queues.newLinkedBlockingQueue();
+
+    private Consumer<BlockTile> tileReloadListener = reloadQueue::add;
 
     /**
      * @param maxAtlasSize The maximum dimensions of the atlas (both width and height, in pixels)
@@ -127,6 +128,22 @@ public class WorldAtlasImpl implements WorldAtlas {
         return getTexCoords(getTileIndex(uri, warnOnError));
     }
 
+    public void update() {
+        if (!reloadQueue.isEmpty()) {
+            List<BlockTile> reloadList = Lists.newArrayListWithExpectedSize(reloadQueue.size());
+            reloadQueue.drainTo(reloadList);
+            // TODO: does this need to be more efficient? could just reload individual block tile locations.
+            buildAtlas();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        for (BlockTile tile : tiles) {
+            tile.unsubscribe(tileReloadListener);
+        }
+    }
+
     private Vector2f getTexCoords(int id) {
         int tilesPerDim = atlasSize / tileSize;
         return new Vector2f((id % tilesPerDim) * getRelativeTileSize(), (id / tilesPerDim) * getRelativeTileSize());
@@ -155,6 +172,7 @@ public class WorldAtlasImpl implements WorldAtlas {
                 addNormal(uri);
                 addHeightMap(uri);
                 tileIndexes.put(uri, index);
+                tile.get().subscribe(tileReloadListener);
                 return index;
             } else {
                 logger.error("Invalid tile {}, must be a square with power-of-two sides.", uri);
@@ -174,8 +192,6 @@ public class WorldAtlasImpl implements WorldAtlas {
         Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
         if (tile.isPresent()) {
             tilesNormal.add(tile.get());
-        } else {
-            tilesNormal.add(defaultNormal);
         }
     }
 
@@ -184,8 +200,6 @@ public class WorldAtlasImpl implements WorldAtlas {
         Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
         if (tile.isPresent()) {
             tilesHeight.add(tile.get());
-        } else {
-            tilesHeight.add(defaultHeight);
         }
     }
 

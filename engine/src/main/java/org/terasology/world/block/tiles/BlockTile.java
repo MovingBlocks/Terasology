@@ -15,11 +15,15 @@
  */
 package org.terasology.world.block.tiles;
 
+import com.google.common.collect.Lists;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 
 import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author Immortius
@@ -27,6 +31,7 @@ import java.awt.image.BufferedImage;
 public class BlockTile extends Asset<TileData> {
     private BufferedImage image;
     private boolean autoBlock;
+    private List<Consumer<BlockTile>> reloadListeners = Collections.synchronizedList(Lists.newArrayList());
 
     public BlockTile(ResourceUrn urn, AssetType<?, TileData> assetType, TileData data) {
         super(urn, assetType);
@@ -41,10 +46,21 @@ public class BlockTile extends Asset<TileData> {
         return autoBlock;
     }
 
+    public synchronized void subscribe(Consumer<BlockTile> reloadListener) {
+        this.reloadListeners.add(reloadListener);
+    }
+
+    public synchronized void unsubscribe(Consumer<BlockTile> reloadListener) {
+        this.reloadListeners.remove(reloadListener);
+    }
+
     @Override
     protected void doReload(TileData tileData) {
         this.image = tileData.getImage();
         this.autoBlock = tileData.isAutoBlock();
+        for (Consumer<BlockTile> listener : reloadListeners) {
+            listener.accept(this);
+        }
     }
 
     @Override
