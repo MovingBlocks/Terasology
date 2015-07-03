@@ -25,7 +25,7 @@ public enum TerasologyEngineStatus implements EngineStatus {
     INITIALIZING_ASSET_MANAGEMENT("Initializing Asset Management..."),
     INITIALIZING_SUBSYSTEMS("Initializing Subsystems..."),
     INITIALIZING_MODULE_MANAGER("Initializing Module Management..."),
-    INITIALIZING_ACCESSOR_CODE_GEN("Initializing accessor code generation..."),
+    INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION("Initializing low-level object manipulators..."),
     INITIALIZING_ASSET_TYPES("Initializing asset types...");
 
     private final String defaultDescription;

@@ -320,7 +320,7 @@ public class TerasologyEngine implements GameEngine {
         ModuleManager moduleManager = new ModuleManagerImpl();
         context.put(ModuleManager.class, moduleManager);
 
-        changeStatus(TerasologyEngineStatus.INITIALIZING_ACCESSOR_CODE_GEN);
+        changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         context.put(ReflectFactory.class, reflectFactory);
 
