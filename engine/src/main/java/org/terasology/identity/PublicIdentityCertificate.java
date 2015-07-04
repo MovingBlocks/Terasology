@@ -37,6 +37,8 @@ import java.util.Objects;
  * The public certificate, that can be freely shared to declare identity. Able to encrypt data and verify signatures.
  */
 public class PublicIdentityCertificate {
+    private static final int SIGNATURE_LENGTH = 256;
+
     private String id;
     private BigInteger modulus;
     private BigInteger exponent;
@@ -63,6 +65,20 @@ public class PublicIdentityCertificate {
 
     public BigInteger getSignature() {
         return signature;
+    }
+
+    public byte[] getSignatureBytes() {
+        return toBytes(signature, SIGNATURE_LENGTH);
+    }
+
+    private byte[] toBytes(BigInteger value, int length) {
+        byte[] rawResult = value.toByteArray();
+        if (rawResult.length < length) {
+            byte[] result = new byte[length];
+            System.arraycopy(rawResult, 0, result, result.length - rawResult.length, rawResult.length);
+            return result;
+        }
+        return rawResult;
     }
 
     @Override
@@ -136,7 +152,7 @@ public class PublicIdentityCertificate {
             signatureVerifier.update(id.getBytes(Charsets.UTF_8));
             signatureVerifier.update(modulus.toByteArray());
             signatureVerifier.update(exponent.toByteArray());
-            return signatureVerifier.verify(signature.toByteArray());
+            return signatureVerifier.verify(getSignatureBytes());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
         } catch (InvalidKeySpecException e) {

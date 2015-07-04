@@ -45,7 +45,7 @@ public final class NetMessageUtil {
                 .setId(data.getId())
                 .setModulus(ByteString.copyFrom(data.getModulus().toByteArray()))
                 .setExponent(ByteString.copyFrom(data.getExponent().toByteArray()))
-                .setSignature(ByteString.copyFrom(data.getSignature().toByteArray())).build();
+                .setSignature(ByteString.copyFrom(data.getSignatureBytes())).build();
     }
 
     public static PublicIdentityCertificate convert(NetData.Certificate data) {
