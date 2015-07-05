@@ -17,9 +17,12 @@ package org.terasology.input;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.Time;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -68,10 +71,16 @@ public class InputSystem extends BaseComponentSystem {
     private GameEngine engine;
 
     @In
+    private Time time;
+
+    @In
     private LocalPlayer localPlayer;
 
     @In
     private CameraTargetSystem targetSystem;
+
+    @In
+    private ModuleManager moduleManager;
 
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
@@ -108,8 +117,14 @@ public class InputSystem extends BaseComponentSystem {
         return registerBindButton(bindId, displayName, new BindButtonEvent());
     }
 
+    @Override
+    public void initialise() {
+        BindsConfig bindsConfig = config.getInput().getBinds();
+        bindsConfig.applyBinds(this, moduleManager);
+    }
+
     public BindableButton registerBindButton(SimpleUri bindId, String displayName, BindButtonEvent event) {
-        BindableButtonImpl bind = new BindableButtonImpl(bindId, displayName, event);
+        BindableButtonImpl bind = new BindableButtonImpl(bindId, displayName, event, time);
         buttonLookup.put(bindId, bind);
         buttonBinds.add(bind);
         return bind;
