@@ -48,7 +48,6 @@ import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
 import java.util.List;
@@ -68,6 +67,12 @@ public class InputSystem extends BaseComponentSystem {
     @In
     private GameEngine engine;
 
+    @In
+    private LocalPlayer localPlayer;
+
+    @In
+    private CameraTargetSystem targetSystem;
+
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
 
@@ -82,21 +87,6 @@ public class InputSystem extends BaseComponentSystem {
     private Map<MouseInput, BindableButtonImpl> mouseButtonBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
-
-    private LocalPlayer localPlayer;
-    private CameraTargetSystem targetSystem;
-
-    @Override
-    public void initialise() {
-        localPlayer = CoreRegistry.get(LocalPlayer.class);
-        targetSystem = CoreRegistry.get(CameraTargetSystem.class);
-    }
-
-    @Override
-    public void shutdown() {
-        localPlayer = null;
-        targetSystem = null;
-    }
 
     public void setMouseDevice(MouseDevice mouseDevice) {
         this.mouse = mouseDevice;
