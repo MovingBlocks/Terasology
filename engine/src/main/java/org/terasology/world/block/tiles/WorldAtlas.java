@@ -26,6 +26,10 @@ import org.terasology.module.sandbox.API;
 @API
 public interface WorldAtlas {
 
+    void update();
+
+    void dispose();
+
     int getTileSize();
 
     int getAtlasSize();
