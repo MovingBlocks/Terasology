@@ -22,7 +22,6 @@ import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.persistence.StorageManager;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
 
