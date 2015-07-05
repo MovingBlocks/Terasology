@@ -25,16 +25,19 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
+import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.stubs.MappedContainerComponent;
 import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
@@ -65,17 +68,23 @@ public class PrefabTest {
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
 
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
+
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
         assetTypeManager.registerCoreAssetType(Prefab.class,
                 (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
+        ComponentLibrary componentLibrary = context.get(ComponentLibrary.class);
+        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
+        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+
         prefabManager = new PojoPrefabManager(context);
     }
 

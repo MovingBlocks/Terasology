@@ -28,6 +28,7 @@ import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.internal.PrefabDeltaFormat;
+import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -94,12 +95,14 @@ public final class ApplyModulesUtil {
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
         /*
-         * The registring of the assset delta formats is done in this method, because it needs to be done before
+         * The registring of the prefab formats is done in this method, because it needs to be done before
          * the environment switch. It can't be done before this method gets called because the ComponentLibrary isn't
          * existing then yet.
          *
          * This method is propably something that should be refactored in future.
          */
+        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
         PrefabDeltaFormat prefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
         assetTypeManager.registerCoreDeltaFormat(Prefab.class, prefabDeltaFormat);
 

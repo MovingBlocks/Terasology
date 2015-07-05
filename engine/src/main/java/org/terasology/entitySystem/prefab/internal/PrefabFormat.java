@@ -19,15 +19,12 @@ import com.google.common.base.Charsets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,11 +34,15 @@ import java.util.List;
 /**
  * @author Immortius
  */
-@RegisterAssetFileFormat
 public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
 
-    public PrefabFormat() {
+    private ComponentLibrary componentLibrary;
+    private TypeSerializationLibrary typeSerializationLibrary;
+
+    public PrefabFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         super("prefab");
+        this.componentLibrary = componentLibrary;
+        this.typeSerializationLibrary = typeSerializationLibrary;
     }
 
     @Override
@@ -49,8 +50,6 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
             if (prefabData != null) {
-                ComponentLibrary componentLibrary = CoreRegistry.get(ComponentLibrary.class);
-                TypeSerializationLibrary typeSerializationLibrary = CoreRegistry.get(TypeSerializationLibrary.class);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
                 return serializer.deserialize(prefabData);
             } else {
