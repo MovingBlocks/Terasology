@@ -16,7 +16,6 @@
 package org.terasology.entitySystem.prefab.internal;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
@@ -47,12 +46,10 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public Prefab getPrefab(String name) {
-        if (!name.isEmpty()) {
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-            return assetManager.getAsset(name, Prefab.class).orElse(null);
+        if (Strings.isNullOrEmpty(name)) {
+            return null;
         }
-        return null;
-
+        return assetManager.getAsset(name, Prefab.class).orElse(null);
     }
 
     /**
@@ -60,7 +57,9 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public boolean exists(String name) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
+        if (Strings.isNullOrEmpty(name)) {
+            return false;
+        }
         return assetManager.getAsset(name, Prefab.class).isPresent();
     }
 
