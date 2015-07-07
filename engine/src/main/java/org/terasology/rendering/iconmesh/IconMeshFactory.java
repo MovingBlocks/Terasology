@@ -92,7 +92,7 @@ public final class IconMeshFactory {
 
                 if (a > alphaLimit) {
                     Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
-                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f, 2f / textureSize * x - 0.5f, 2f / textureSize * (15 - y) - 1f, 0f);
+                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f, 2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f, 0f);
 
                     if (withContour) {
                         int newX = 0;

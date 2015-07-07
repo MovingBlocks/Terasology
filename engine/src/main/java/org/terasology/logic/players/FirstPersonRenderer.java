@@ -173,14 +173,12 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
 
             glPushMatrix();
 
-            float textureScale = Math.max(iconTexture.getWidth(), iconTexture.getHeight()) / 16f;
-
-            glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, (-1.5f - handMovementAnimationOffset * 0.5f) * (float) Math.pow(textureScale, 0.5));
+            glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, 0.25f + (-1.5f - handMovementAnimationOffset * 0.5f));
             glRotatef(-handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
             glRotatef(-20f, 1.0f, 0.0f, 0.0f);
             glRotatef(-80f, 0.0f, 1.0f, 0.0f);
             glRotatef(45f, 0.0f, 0.0f, 1.0f);
-            float scale = 0.75f * (float) Math.pow(textureScale, 0.5);
+            float scale = 0.75f;
             glScalef(scale, scale, scale);
 
             if (iconTexture instanceof Asset<?>) {
