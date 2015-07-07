@@ -15,13 +15,13 @@
  */
 package org.terasology.entitySystem.prefab.internal;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import org.terasology.asset.Assets;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Collection;
 
@@ -34,16 +34,22 @@ import java.util.Collection;
  */
 public class PojoPrefabManager implements PrefabManager {
 
+    private final AssetManager assetManager;
+
+    public PojoPrefabManager(Context context) {
+        this.assetManager = context.get(AssetManager.class);
+    }
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Prefab getPrefab(String name) {
-        if (!name.isEmpty()) {
-            return Assets.getPrefab(name).orElse(null);
+        if (Strings.isNullOrEmpty(name)) {
+            return null;
         }
-        return null;
-
+        return assetManager.getAsset(name, Prefab.class).orElse(null);
     }
 
     /**
@@ -51,7 +57,10 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public boolean exists(String name) {
-        return Assets.getPrefab(name) != null;
+        if (Strings.isNullOrEmpty(name)) {
+            return false;
+        }
+        return assetManager.getAsset(name, Prefab.class).isPresent();
     }
 
     /**
@@ -59,7 +68,7 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public Iterable<Prefab> listPrefabs() {
-        return CoreRegistry.get(AssetManager.class).getLoadedAssets(Prefab.class);
+        return assetManager.getLoadedAssets(Prefab.class);
     }
 
     /**
@@ -69,7 +78,7 @@ public class PojoPrefabManager implements PrefabManager {
     public Collection<Prefab> listPrefabs(Class<? extends Component> comp) {
         Collection<Prefab> prefabs = Sets.newHashSet();
 
-        for (Prefab p : CoreRegistry.get(AssetManager.class).getLoadedAssets(Prefab.class)) {
+        for (Prefab p : assetManager.getLoadedAssets(Prefab.class)) {
             if (p.getComponent(comp) != null) {
                 prefabs.add(p);
             }

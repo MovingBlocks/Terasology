@@ -17,17 +17,18 @@ package org.terasology.engine.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.internal.PrefabDeltaFormat;
+import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -82,15 +83,29 @@ public final class ApplyModulesUtil {
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
         context.put(EntitySystemLibrary.class, library);
-        context.put(ComponentLibrary.class, library.getComponentLibrary());
+        ComponentLibrary componentLibrary = library.getComponentLibrary();
+        context.put(ComponentLibrary.class, componentLibrary);
         context.put(EventLibrary.class, library.getEventLibrary());
 
-        registerComponents(library.getComponentLibrary(), moduleManager.getEnvironment());
+        registerComponents(componentLibrary, moduleManager.getEnvironment());
 
         BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+
+        /*
+         * The registring of the prefab formats is done in this method, because it needs to be done before
+         * the environment switch. It can't be done before this method gets called because the ComponentLibrary isn't
+         * existing then yet.
+         *
+         * This method is propably something that should be refactored in future.
+         */
+        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
+        PrefabDeltaFormat prefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
+        assetTypeManager.registerCoreDeltaFormat(Prefab.class, prefabDeltaFormat);
+
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
 
     }

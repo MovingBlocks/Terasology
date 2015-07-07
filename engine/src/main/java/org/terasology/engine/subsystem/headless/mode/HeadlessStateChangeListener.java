@@ -20,7 +20,6 @@ import org.terasology.engine.StateChangeSubscriber;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.registry.CoreRegistry;
 
 /**
  * This listener checks whether the engine goes back to the main menu, which for a headless server signals the server

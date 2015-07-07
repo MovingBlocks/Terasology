@@ -28,7 +28,6 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 import java.util.Set;
@@ -54,7 +53,6 @@ public class BindableButtonImpl implements BindableButton {
     private long lastActivateTime;
 
     private boolean consumedActivation;
-
     private Time time;
 
     /**
@@ -63,11 +61,11 @@ public class BindableButtonImpl implements BindableButton {
      * @param id
      * @param event
      */
-    public BindableButtonImpl(SimpleUri id, String displayName, BindButtonEvent event) {
+    public BindableButtonImpl(SimpleUri id, String displayName, BindButtonEvent event, Time time) {
         this.id = id;
         this.displayName = displayName;
         this.buttonEvent = event;
-        time = CoreRegistry.get(Time.class);
+        this.time = time;
     }
 
     @Override

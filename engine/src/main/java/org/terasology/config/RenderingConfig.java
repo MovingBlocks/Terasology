@@ -21,7 +21,6 @@ import org.lwjgl.opengl.PixelFormat;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.events.ChangeViewRangeRequest;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;

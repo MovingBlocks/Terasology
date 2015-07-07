@@ -18,14 +18,12 @@ package org.terasology.entitySystem.prefab.internal;
 import com.google.common.base.Charsets;
 import org.terasology.assets.format.AbstractAssetAlterationFileFormat;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetDeltaFileFormat;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,11 +32,15 @@ import java.io.InputStreamReader;
 /**
  * @author Immortius
  */
-@RegisterAssetDeltaFileFormat
 public class PrefabDeltaFormat extends AbstractAssetAlterationFileFormat<PrefabData> {
 
-    public PrefabDeltaFormat() {
+    private final ComponentLibrary componentLibrary;
+    private final TypeSerializationLibrary typeSerializationLibrary;
+
+    public PrefabDeltaFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         super("prefab");
+        this.componentLibrary = componentLibrary;
+        this.typeSerializationLibrary = typeSerializationLibrary;
     }
 
     @Override
@@ -46,8 +48,6 @@ public class PrefabDeltaFormat extends AbstractAssetAlterationFileFormat<PrefabD
 
         try (BufferedReader deltaReader = new BufferedReader(new InputStreamReader(assetDataFile.openStream(), Charsets.UTF_8))) {
             EntityData.Prefab delta = EntityDataJSONFormat.readPrefab(deltaReader);
-            ComponentLibrary componentLibrary = CoreRegistry.get(ComponentLibrary.class);
-            TypeSerializationLibrary typeSerializationLibrary = CoreRegistry.get(TypeSerializationLibrary.class);
             PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
             serializer.deserializeDeltaOnto(delta, assetData);
         }
