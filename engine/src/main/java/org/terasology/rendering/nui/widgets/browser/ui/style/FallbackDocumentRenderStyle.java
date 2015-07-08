@@ -37,37 +37,37 @@ public class FallbackDocumentRenderStyle extends FallbackParagraphRenderStyle im
     }
 
     @Override
-    public Integer getDocumentIndentTop() {
-        Integer documentIndentTop = style.getDocumentIndentTop();
+    public ContainerInteger getDocumentMarginTop() {
+        ContainerInteger documentIndentTop = style.getDocumentMarginTop();
         if (documentIndentTop == null) {
-            documentIndentTop = fallback.getDocumentIndentTop();
+            documentIndentTop = fallback.getDocumentMarginTop();
         }
         return documentIndentTop;
     }
 
     @Override
-    public Integer getDocumentIndentBottom() {
-        Integer documentIndentBottom = style.getDocumentIndentBottom();
+    public ContainerInteger getDocumentMarginBottom() {
+        ContainerInteger documentIndentBottom = style.getDocumentMarginBottom();
         if (documentIndentBottom == null) {
-            documentIndentBottom = fallback.getDocumentIndentBottom();
+            documentIndentBottom = fallback.getDocumentMarginBottom();
         }
         return documentIndentBottom;
     }
 
     @Override
-    public Integer getDocumentIndentLeft() {
-        Integer documentIndentLeft = style.getDocumentIndentLeft();
+    public ContainerInteger getDocumentMarginLeft() {
+        ContainerInteger documentIndentLeft = style.getDocumentMarginLeft();
         if (documentIndentLeft == null) {
-            documentIndentLeft = fallback.getDocumentIndentLeft();
+            documentIndentLeft = fallback.getDocumentMarginLeft();
         }
         return documentIndentLeft;
     }
 
     @Override
-    public Integer getDocumentIndentRight() {
-        Integer documentIndentRight = style.getDocumentIndentRight();
+    public ContainerInteger getDocumentMarginRight() {
+        ContainerInteger documentIndentRight = style.getDocumentMarginRight();
         if (documentIndentRight == null) {
-            documentIndentRight = fallback.getDocumentIndentRight();
+            documentIndentRight = fallback.getDocumentMarginRight();
         }
         return documentIndentRight;
     }

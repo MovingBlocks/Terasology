@@ -13,28 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.ui.style;
 
-import org.terasology.rendering.nui.Color;
+/**
+ * This package contains a collection of basic UIWidgets
+ */
+@API package org.terasology.rendering.nui.widgets.browser.data.html.basic.list;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
-    }
-}
+import org.terasology.module.sandbox.API;

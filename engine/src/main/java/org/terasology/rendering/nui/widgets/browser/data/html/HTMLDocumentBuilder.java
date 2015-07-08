@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.ui.style;
+package org.terasology.rendering.nui.widgets.browser.data.html;
 
-import org.terasology.rendering.nui.Color;
+import org.xml.sax.Attributes;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
-    }
+public interface HTMLDocumentBuilder {
+    /**
+     * Signifies that a start tag has been encountered. Returns a HTMLParagraphBuilder that should be receiving all
+     * events.
+     *
+     * @param tag
+     * @param attributes
+     * @return
+     * @throws HTMLParseException
+     */
+    HTMLBlockBuilder startTag(String tag, Attributes attributes) throws HTMLParseException;
 
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
-    }
+    HTMLDocument createDocument();
 }

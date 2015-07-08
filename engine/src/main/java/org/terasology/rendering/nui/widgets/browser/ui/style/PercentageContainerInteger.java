@@ -15,26 +15,15 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
-import org.terasology.rendering.nui.Color;
+public class PercentageContainerInteger implements ContainerInteger {
+    private int percentage;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
+    public PercentageContainerInteger(int percentage) {
+        this.percentage = percentage;
     }
 
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
+    @Override
+    public int getValue(int containerWidth) {
+        return containerWidth * percentage / 100;
     }
 }

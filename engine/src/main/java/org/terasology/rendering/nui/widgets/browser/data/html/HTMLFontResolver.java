@@ -13,28 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.ui.style;
+package org.terasology.rendering.nui.widgets.browser.data.html;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.assets.font.Font;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
-    }
+public interface HTMLFontResolver {
+    Font getFont(String name, boolean bold, boolean italic);
 }

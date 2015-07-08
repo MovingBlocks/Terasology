@@ -13,28 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.ui.style;
+package org.terasology.rendering.nui.widgets.browser.data.html.basic;
 
+import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
+import org.xml.sax.Attributes;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
-    }
+import java.util.Collection;
 
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
-    }
+public interface FlowRenderableFactory {
+    Collection<FlowRenderable> create(Attributes attributes, Font font, Color color, String hyperlink);
 }

@@ -26,14 +26,15 @@ public final class FlowLineBuilder {
     private FlowLineBuilder() {
     }
 
-    public static <T extends FlowRenderable<T>> Iterable<LaidFlowLine<T>> getLines(Collection<T> flowRenderables, TextRenderStyle defaultRenderStyle, RenderSpace renderSpace) {
+    public static <T extends FlowRenderable<T>> Iterable<LaidFlowLine<T>> getLines(Collection<T> flowRenderables, TextRenderStyle defaultRenderStyle,
+                                                                                   int yStart, ContainerRenderSpace containerRenderSpace) {
         // Take into account a minimum width
         int minWidth = determineMinWidth(flowRenderables, defaultRenderStyle);
 
         int x = 0;
-        int y = 0;
+        int y = yStart;
 
-        int availableWidth = Math.max(minWidth, renderSpace.getWidthForVerticalPosition(y));
+        int availableWidth = Math.max(minWidth, containerRenderSpace.getWidthForVerticalPosition(y));
 
         List<LaidFlowLine<T>> result = new LinkedList<>();
 
@@ -50,7 +51,7 @@ public final class FlowLineBuilder {
                 renderablesInLine = new LinkedList<>();
                 x = 0;
                 y += maxHeightInLine;
-                availableWidth = Math.max(minWidth, renderSpace.getWidthForVerticalPosition(y));
+                availableWidth = Math.max(minWidth, containerRenderSpace.getWidthForVerticalPosition(y));
                 maxHeightInLine = 0;
                 renderablesQueue.addFirst(splitResult.rest);
             } else {
@@ -67,7 +68,7 @@ public final class FlowLineBuilder {
                     renderablesInLine = new LinkedList<>();
                     x = 0;
                     y += maxHeightInLine;
-                    availableWidth = Math.max(minWidth, renderSpace.getWidthForVerticalPosition(y));
+                    availableWidth = Math.max(minWidth, containerRenderSpace.getWidthForVerticalPosition(y));
                     maxHeightInLine = 0;
                     renderablesQueue.addFirst(splitResult.rest);
                 }

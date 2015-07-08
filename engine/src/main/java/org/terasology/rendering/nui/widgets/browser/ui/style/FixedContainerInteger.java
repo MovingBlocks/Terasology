@@ -15,26 +15,15 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
-import org.terasology.rendering.nui.Color;
+public class FixedContainerInteger implements ContainerInteger {
+    private int value;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
+    public FixedContainerInteger(int value) {
+        this.value = value;
     }
 
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
+    @Override
+    public int getValue(int containerWidth) {
+        return value;
     }
 }

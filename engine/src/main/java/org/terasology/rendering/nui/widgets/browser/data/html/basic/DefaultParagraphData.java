@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.data.basic;
+package org.terasology.rendering.nui.widgets.browser.data.html.basic;
 
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
 import org.terasology.rendering.nui.widgets.browser.ui.ParagraphRenderable;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-public class FlowParagraphData implements ParagraphData {
-    private List<FlowRenderable> data = new LinkedList<>();
-
+public class DefaultParagraphData implements ParagraphData {
     private ParagraphRenderStyle paragraphRenderStyle;
+    private ParagraphRenderable paragraphRenderable;
 
-    public FlowParagraphData(ParagraphRenderStyle paragraphRenderStyle) {
+    public DefaultParagraphData(ParagraphRenderStyle paragraphRenderStyle, ParagraphRenderable paragraphRenderable) {
         this.paragraphRenderStyle = paragraphRenderStyle;
+        this.paragraphRenderable = paragraphRenderable;
     }
 
     @Override
@@ -41,14 +35,6 @@ public class FlowParagraphData implements ParagraphData {
 
     @Override
     public ParagraphRenderable getParagraphContents() {
-        return new FlowParagraphRenderable(Collections.unmodifiableList(data));
-    }
-
-    public void append(FlowRenderable flowRenderable) {
-        data.add(flowRenderable);
-    }
-
-    public void append(Collection<FlowRenderable> flowRenderable) {
-        data.addAll(flowRenderable);
+        return paragraphRenderable;
     }
 }

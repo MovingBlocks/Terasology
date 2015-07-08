@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.ui.style;
+package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.math.Rect2i;
+import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
-    }
+public interface ContainerRenderSpace {
+    int getContainerWidth();
 
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
+    int getNextWidthChange(int y);
 
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
+    Rect2i addLeftFloat(int y, int width, int height);
 
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
+    Rect2i addRightFloat(int y, int width, int height);
 
-    default Color getBackgroundColor() {
-        return null;
-    }
+    int getNextClearYPosition(ParagraphRenderStyle.ClearStyle clearStyle);
+
+    int getWidthForVerticalPosition(int y);
+
+    int getAdvanceForVerticalPosition(int y);
 }

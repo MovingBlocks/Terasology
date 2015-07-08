@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-public interface RenderSpace {
-    public int getWidthForVerticalPosition(int y);
-}
+/**
+ * This package contains a collection of basic UIWidgets
+ */
+@API package org.terasology.rendering.nui.widgets.browser.data.html;
+
+import org.terasology.module.sandbox.API;
