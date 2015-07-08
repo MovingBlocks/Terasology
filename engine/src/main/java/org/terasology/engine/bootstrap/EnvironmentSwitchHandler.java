@@ -46,15 +46,18 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.RegisterBlockFamilyFactory;
 
 /**
- * @author Immortius
+ * Handles an environment switch by updating the asset manager, component library, and other context objects.
  */
-public final class ApplyModulesUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ApplyModulesUtil.class);
+public final class EnvironmentSwitchHandler {
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentSwitchHandler.class);
 
-    private ApplyModulesUtil() {
+    private PrefabFormat registeredPrefabFormat;
+    private PrefabDeltaFormat registeredPrefabDeltaFormat;
+
+    public EnvironmentSwitchHandler() {
     }
 
-    public static void applyModules(Context context) {
+    public void handleSwitchToGameEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
@@ -96,18 +99,60 @@ public final class ApplyModulesUtil {
 
         /*
          * The registring of the prefab formats is done in this method, because it needs to be done before
-         * the environment switch. It can't be done before this method gets called because the ComponentLibrary isn't
-         * existing then yet.
+         * the environment of the asset manager gets changed.
          *
-         * This method is propably something that should be refactored in future.
+         * It can't be done before this method gets called because the ComponentLibrary isn't
+         * existing then yet.
          */
-        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
-        assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
-        PrefabDeltaFormat prefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
-        assetTypeManager.registerCoreDeltaFormat(Prefab.class, prefabDeltaFormat);
+        unregisterPrefabFormats(assetTypeManager);
+        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
+        registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
+        assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
 
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
 
+    }
+
+    /**
+     * Switches the environment of the asset manager to the specified one. It does not register the prefab formats
+     * as they require a proper ComponentLibrary.
+     *
+     * The existence of this method call is questionable. It has only be introduced to make sure that
+     * the asset type manager has never prefab formats that reference an old ComponentLibrary.
+     *
+     */
+    private void cheapAssetManagerUpdate(Context context, ModuleEnvironment environment) {
+        ModuleAwareAssetTypeManager moduleAwareAssetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        unregisterPrefabFormats(moduleAwareAssetTypeManager);
+        moduleAwareAssetTypeManager.switchEnvironment(environment);
+    }
+
+
+    public void handleSwitchToPreviewEnivronment(Context context, ModuleEnvironment environment) {
+        cheapAssetManagerUpdate(context, environment);
+    }
+
+    public void handleSwitchBackFromPreviewEnivronment(Context context) {
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        cheapAssetManagerUpdate(context, environment);
+    }
+
+
+    public void handleSwitchToEmptyEnivronment(Context context) {
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        cheapAssetManagerUpdate(context, environment);
+    }
+
+    private void unregisterPrefabFormats(ModuleAwareAssetTypeManager assetTypeManager) {
+        if (registeredPrefabFormat != null) {
+            assetTypeManager.removeCoreFormat(Prefab.class, registeredPrefabFormat);
+            registeredPrefabFormat =null;
+        }
+        if (registeredPrefabDeltaFormat != null) {
+            assetTypeManager.removeCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
+            registeredPrefabDeltaFormat = null;
+        }
     }
 
     private static void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, ModuleEnvironment environment) {

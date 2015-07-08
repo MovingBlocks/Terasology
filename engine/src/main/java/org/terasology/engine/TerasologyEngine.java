@@ -29,7 +29,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.ApplyModulesUtil;
+import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
@@ -192,7 +192,10 @@ public class TerasologyEngine implements GameEngine {
 
             changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
             initAssets();
-            ApplyModulesUtil.applyModules(context);
+            EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
+            context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
+
+            environmentSwitcher.handleSwitchToGameEnvironment(context);
 
             postInitSubsystems();
 

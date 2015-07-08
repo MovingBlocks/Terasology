@@ -18,13 +18,13 @@ package org.terasology.engine.modes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -151,10 +151,10 @@ public class StateIngame implements GameState {
         if (storageManager != null) {
             storageManager.finishSavingAndShutdown();
         }
-        ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
-        ModuleEnvironment environment = context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
 
-        context.get(ModuleAwareAssetTypeManager.class).switchEnvironment(environment);
+        ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
+        context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        context.get(EnvironmentSwitchHandler.class).handleSwitchToEmptyEnivronment(context);
         if (oldEnvironment != null) {
             oldEnvironment.close();
         }

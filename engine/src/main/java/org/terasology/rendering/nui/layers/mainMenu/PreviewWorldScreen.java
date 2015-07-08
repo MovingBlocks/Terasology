@@ -24,6 +24,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
@@ -123,7 +124,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 CoreRegistry.setContext(subContext);
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
                 subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
-                assetTypeManager.switchEnvironment(environment);
+                EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+                environmentSwitchHandler.handleSwitchToPreviewEnivronment(context, environment);
                 genTexture();
                 worldGenerator = worldGeneratorManager.searchForWorldGenerator(worldGenUri, environment);
                 worldGenerator.setWorldSeed(seed.getText());
@@ -197,7 +199,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         CoreRegistry.setContext(context);
 
         if (environment != null) {
-            assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+            environmentSwitchHandler.handleSwitchBackFromPreviewEnivronment(context);
             environment.close();
             environment = null;
         }

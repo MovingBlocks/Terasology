@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.bootstrap.ApplyModulesUtil;
+import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
@@ -131,7 +131,8 @@ public class JoinServer implements LoadProcess {
 
             context.get(Game.class).load(gameManifest);
 
-            applyModuleThread = new Thread(() -> ApplyModulesUtil.applyModules(context.get(Context.class)));
+            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+            applyModuleThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
             applyModuleThread.start();
 
             return false;
