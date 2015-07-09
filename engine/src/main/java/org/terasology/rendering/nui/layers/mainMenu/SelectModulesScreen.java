@@ -306,7 +306,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 moduleConfig.addModule(info.getMetadata().getId());
             }
         }
-        if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
+        if (!modulesLookup.get(config.getWorldGeneration().getDefaultGenerator().getModuleName()).isSelected()) {
             config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
         }
         config.save();
