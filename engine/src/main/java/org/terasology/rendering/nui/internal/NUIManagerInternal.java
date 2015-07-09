@@ -84,7 +84,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         refreshWidgetsLibrary();
     }
 
-    private void refreshWidgetsLibrary() {
+    public void refreshWidgetsLibrary() {
         widgetsLibrary = new WidgetLibrary(context);
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
