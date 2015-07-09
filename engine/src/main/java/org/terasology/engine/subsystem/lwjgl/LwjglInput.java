@@ -24,17 +24,14 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
-import org.terasology.rendering.nui.NUIManager;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglInput.class);
-    private boolean mouseGrabbed;
     private Context context;
 
     @Override
@@ -61,16 +58,9 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     @Override
     public void preUpdate(GameState currentState, float delta) {
-        NUIManager nuiManager = context.get(NUIManager.class);
-        GameEngine engine = context.get(GameEngine.class);
-
-        // TODO: this originally occurred before GameThread.processWaitingProcesses();
-        boolean newGrabbed = engine.hasMouseFocus() && !(nuiManager.isReleasingMouse());
-        if (newGrabbed != mouseGrabbed) {
-            Mouse.setGrabbed(newGrabbed);
-            mouseGrabbed = newGrabbed;
-        }
     }
+
+
 
     @Override
     public void postUpdate(GameState currentState, float delta) {

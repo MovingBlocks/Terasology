@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,6 +33,7 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.KeyEvent;
@@ -382,6 +384,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         for (ControlWidget widget : overlays.values()) {
             widget.update(delta);
         }
+        InputSystem inputSystem = context.get(InputSystem.class);
+        GameEngine engine = context.get(GameEngine.class);
+        inputSystem.getMouseDevice().setGrabbed(engine.hasMouseFocus() && !(this.isReleasingMouse()));
+
     }
 
     @Override

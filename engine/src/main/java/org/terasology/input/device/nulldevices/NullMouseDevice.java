@@ -50,4 +50,8 @@ public class NullMouseDevice implements MouseDevice {
     public Queue<InputAction> getInputQueue() {
         return Queues.newArrayDeque();
     }
+
+    @Override
+    public void setGrabbed(boolean grabbed) {
+    }
 }
