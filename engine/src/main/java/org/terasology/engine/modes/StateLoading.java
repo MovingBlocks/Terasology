@@ -61,6 +61,8 @@ import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 
 import java.util.Queue;
@@ -115,7 +117,8 @@ public class StateLoading implements GameState {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
 
-        this.nuiManager = context.get(NUIManager.class);
+        this.nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
+        context.put(NUIManager.class, nuiManager);
 
         EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(true);

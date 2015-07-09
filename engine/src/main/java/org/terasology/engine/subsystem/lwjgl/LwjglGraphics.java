@@ -17,7 +17,6 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
@@ -62,9 +61,8 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
-import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLMesh;
@@ -147,7 +145,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         initDisplay(context.get(Config.class), lwjglDisplay);
         initOpenGL(context);
 
-        context.put(NUIManager.class, new NUIManagerInternal(new LwjglCanvasRenderer(context), context));
+        context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
     }
 
     @Override

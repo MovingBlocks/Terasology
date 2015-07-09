@@ -22,6 +22,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -44,9 +45,6 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        NUIManager nuiManager = context.get(NUIManager.class);
-        ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
-
         // TODO: This should be elsewhere
         // Create gelatinousCubeMesh
         Tessellator tessellator = new Tessellator();

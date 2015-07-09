@@ -81,9 +81,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.hudScreenLayer = new HUDScreenLayer();
         InjectionHelper.inject(hudScreenLayer, context);
         this.canvas = new CanvasImpl(this, context, renderer);
+        refreshWidgetsLibrary();
     }
 
-    public void refreshWidgetsLibrary() {
+    private void refreshWidgetsLibrary() {
         widgetsLibrary = new WidgetLibrary(context);
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
