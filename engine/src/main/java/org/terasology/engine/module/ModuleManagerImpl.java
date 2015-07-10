@@ -111,6 +111,7 @@ public class ModuleManagerImpl implements ModuleManager {
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent.locks");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.function");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.regex");
+        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.stream");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt.geom");
         permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt.image");
