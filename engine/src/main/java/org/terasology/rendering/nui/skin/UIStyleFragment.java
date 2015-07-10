@@ -72,6 +72,8 @@ public class UIStyleFragment {
     private VerticalAlign textAlignmentV;
     @SerializedName("text-shadowed")
     private Boolean textShadowed;
+    @SerializedName("text-underlined")
+    private Boolean textUnderlined;
 
 
     public void applyTo(UIStyle style) {
@@ -107,6 +109,9 @@ public class UIStyleFragment {
         }
         if (textShadowed != null) {
             style.setTextShadowed(textShadowed);
+        }
+        if (textUnderlined != null) {
+            style.setTextUnderlined(textUnderlined);
         }
         if (fixedWidth != null) {
             style.setFixedWidth(fixedWidth);
@@ -220,6 +225,14 @@ public class UIStyleFragment {
 
     public void setTextShadowed(Boolean textShadowed) {
         this.textShadowed = textShadowed;
+    }
+
+    public Boolean getTextUnderlined() {
+        return textUnderlined;
+    }
+
+    public void setTextUnderlined(Boolean textUnderlined) {
+        this.textUnderlined = textUnderlined;
     }
 
     public Integer getFixedWidth() {

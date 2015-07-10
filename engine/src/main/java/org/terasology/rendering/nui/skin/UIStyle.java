@@ -50,6 +50,7 @@ public class UIStyle {
     private HorizontalAlign textAlignmentH = HorizontalAlign.CENTER;
     private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
     private boolean textShadowed;
+    private boolean textUnderlined;
 
     public UIStyle() {
     }
@@ -78,6 +79,7 @@ public class UIStyle {
         this.textShadowed = other.textShadowed;
         this.textAlignmentH = other.textAlignmentH;
         this.textAlignmentV = other.textAlignmentV;
+        this.textUnderlined = other.textUnderlined;
     }
 
     /**
@@ -210,6 +212,17 @@ public class UIStyle {
 
     public void setTextShadowed(boolean textShadowed) {
         this.textShadowed = textShadowed;
+    }
+
+    /**
+     * @return Whether drawn text should be underlined
+     */
+    public boolean isTextUnderlined() {
+        return textUnderlined;
+    }
+
+    public void setTextUnderlined(boolean textUnderlined) {
+        this.textUnderlined = textUnderlined;
     }
 
     public void setFixedWidth(int fixedWidth) {

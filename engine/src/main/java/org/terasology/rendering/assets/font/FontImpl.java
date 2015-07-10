@@ -80,6 +80,11 @@ public final class FontImpl extends Font {
     }
 
     @Override
+    public int getBaseHeight() {
+        return data.getBaseHeight();
+    }
+
+    @Override
     public Vector2i getSize(List<String> lines) {
         int height = getLineHeight() * lines.size();
         int width = 0;

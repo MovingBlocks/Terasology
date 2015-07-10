@@ -17,12 +17,12 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
@@ -89,6 +89,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Line line = new Line();
 
     private Material textureMat;
+    private Material underlineMaterial;
+
+    private final FontMeshBuilder fontMeshBuilder;
 
     // Text mesh caching
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
@@ -108,6 +111,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         // TODO use context to get assets instead of static methods
         this.textureMat = Assets.getMaterial("engine:UITexture").get();
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
+        this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline", Material.class).get());
         // failure to load these can be due to failing shaders or missing resources
     }
 
@@ -321,8 +325,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     }
 
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
-                         Color color, Color shadowColor, float alpha) {
-        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor);
+                         Color color, Color shadowColor, float alpha, boolean underlined) {
+        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor, underlined);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
         List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
@@ -335,8 +339,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             }
         }
         if (fontMesh == null) {
-            FontMeshBuilder meshBuilder = new FontMeshBuilder(font);
-            fontMesh = meshBuilder.createTextMesh(lines, absoluteRegion.width(), hAlign, color, shadowColor);
+            fontMesh = fontMeshBuilder.createTextMesh(font, lines, absoluteRegion.width(), hAlign, color, shadowColor, underlined);
             cachedText.put(key, fontMesh);
         }
 
@@ -508,20 +511,22 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
      * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
      */
     private static class TextCacheKey {
-        private String text;
-        private Font font;
-        private int width;
-        private HorizontalAlign alignment;
-        private Color baseColor;
-        private Color shadowColor;
+        private final String text;
+        private final Font font;
+        private final int width;
+        private final HorizontalAlign alignment;
+        private final Color baseColor;
+        private final Color shadowColor;
+        private final boolean underlined;
 
-        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Color baseColor, Color shadowColor) {
+        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean underlined) {
             this.text = text;
             this.font = font;
             this.width = maxWidth;
             this.alignment = alignment;
             this.baseColor = baseColor;
             this.shadowColor = shadowColor;
+            this.underlined = underlined;
         }
 
         @Override
@@ -533,14 +538,15 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                 TextCacheKey other = (TextCacheKey) obj;
                 return Objects.equals(text, other.text) && Objects.equals(font, other.font)
                         && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment)
-                        && Objects.equals(baseColor, other.baseColor) && Objects.equals(shadowColor, other.shadowColor);
+                        && Objects.equals(baseColor, other.baseColor) && Objects.equals(shadowColor, other.shadowColor)
+                        && Objects.equals(underlined, other.underlined);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(text, font, width, alignment, baseColor, shadowColor);
+            return Objects.hash(text, font, width, alignment, baseColor, shadowColor, underlined);
         }
     }
 

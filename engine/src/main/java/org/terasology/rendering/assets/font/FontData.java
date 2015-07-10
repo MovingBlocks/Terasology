@@ -25,16 +25,20 @@ import java.util.Map;
  */
 public class FontData implements AssetData {
     private int lineHeight;
+    private int baseHeight;
     private Map<Integer, FontCharacter> characters;
 
-    public FontData(int lineHeight, Map<Integer, FontCharacter> characters) {
+    public FontData(int lineHeight, int baseHeight, Map<Integer, FontCharacter> characters) {
         this.lineHeight = lineHeight;
+        this.baseHeight = baseHeight;
         this.characters = ImmutableMap.copyOf(characters);
     }
 
     public int getLineHeight() {
         return lineHeight;
     }
+
+    public int getBaseHeight() { return baseHeight; }
 
     public Iterable<Map.Entry<Integer, FontCharacter>> getCharacters() {
         return characters.entrySet();
