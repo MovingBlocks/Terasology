@@ -35,7 +35,10 @@ public class TextFlowRenderable implements FlowRenderable<TextFlowRenderable> {
     @Override
     public void render(Canvas canvas, Rect2i bounds, TextRenderStyle defaultRenderStyle) {
         TextRenderStyle safeRenderStyle = getTextRenderStyle(defaultRenderStyle);
-        canvas.drawTextRaw(text, safeRenderStyle.getFont(hyperlink != null), safeRenderStyle.getColor(hyperlink != null), bounds);
+        Font font = safeRenderStyle.getFont(hyperlink != null);
+        int lineHeight = font.getLineHeight();
+        Rect2i bottomBounds = Rect2i.createFromMinAndSize(bounds.minX(), bounds.maxY() - lineHeight, bounds.sizeX(), lineHeight);
+        canvas.drawTextRaw(text, font, safeRenderStyle.getColor(hyperlink != null), bottomBounds);
     }
 
     @Override

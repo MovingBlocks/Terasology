@@ -42,9 +42,7 @@ public class BrowserWidget extends CoreWidget {
     public void onDraw(Canvas canvas) {
         hyperlinkBoxes.clear();
         if (displayedPage != null) {
-            Rect2i region = canvas.getRegion();
-
-            DocumentRenderer.drawDocumentInRegion(displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), region, register);
+            DocumentRenderer.drawDocumentInRegion(displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), canvas.size(), register);
         }
         canvas.addInteractionRegion(
                 new BaseInteractionListener() {
@@ -66,11 +64,11 @@ public class BrowserWidget extends CoreWidget {
     }
 
 
-
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (displayedPage != null) {
-            return DocumentRenderer.getDocumentPreferredSize(displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), canvas.getRegion().sizeX());
+            return DocumentRenderer.getDocumentPreferredSize(displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
+                    canvas.getRegion().sizeX());
         } else {
             return new Vector2i(0, 0);
         }

@@ -29,73 +29,73 @@ public class FallbackParagraphRenderStyle extends FallbackTextRenderStyle implem
     }
 
     @Override
-    public Integer getParagraphIndentTop(boolean firstParagraph) {
-        Integer indentAbove = style.getParagraphIndentTop(firstParagraph);
+    public ContainerInteger getParagraphMarginTop() {
+        ContainerInteger indentAbove = style.getParagraphMarginTop();
         if (indentAbove == null) {
-            indentAbove = fallback.getParagraphIndentTop(firstParagraph);
+            indentAbove = fallback.getParagraphMarginTop();
         }
         return indentAbove;
     }
 
     @Override
-    public Integer getParagraphIndentBottom(boolean lastParagraph) {
-        Integer indentBelow = style.getParagraphIndentBottom(lastParagraph);
+    public ContainerInteger getParagraphMarginBottom() {
+        ContainerInteger indentBelow = style.getParagraphMarginBottom();
         if (indentBelow == null) {
-            indentBelow = fallback.getParagraphIndentBottom(lastParagraph);
+            indentBelow = fallback.getParagraphMarginBottom();
         }
         return indentBelow;
     }
 
     @Override
-    public Integer getParagraphIndentLeft() {
-        Integer indentLeft = style.getParagraphIndentLeft();
+    public ContainerInteger getParagraphMarginLeft() {
+        ContainerInteger indentLeft = style.getParagraphMarginLeft();
         if (indentLeft == null) {
-            indentLeft = fallback.getParagraphIndentLeft();
+            indentLeft = fallback.getParagraphMarginLeft();
         }
         return indentLeft;
     }
 
     @Override
-    public Integer getParagraphIndentRight() {
-        Integer indentRight = style.getParagraphIndentRight();
+    public ContainerInteger getParagraphMarginRight() {
+        ContainerInteger indentRight = style.getParagraphMarginRight();
         if (indentRight == null) {
-            indentRight = fallback.getParagraphIndentRight();
+            indentRight = fallback.getParagraphMarginRight();
         }
         return indentRight;
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentTop() {
-        Integer paragraphBackgroundIndentTop = style.getParagraphBackgroundIndentTop();
+    public ContainerInteger getParagraphPaddingTop() {
+        ContainerInteger paragraphBackgroundIndentTop = style.getParagraphPaddingTop();
         if (paragraphBackgroundIndentTop == null) {
-            paragraphBackgroundIndentTop = fallback.getParagraphBackgroundIndentTop();
+            paragraphBackgroundIndentTop = fallback.getParagraphPaddingTop();
         }
         return paragraphBackgroundIndentTop;
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentBottom() {
-        Integer paragraphBackgroundIndentBottom = style.getParagraphBackgroundIndentBottom();
+    public ContainerInteger getParagraphPaddingBottom() {
+        ContainerInteger paragraphBackgroundIndentBottom = style.getParagraphPaddingBottom();
         if (paragraphBackgroundIndentBottom == null) {
-            paragraphBackgroundIndentBottom = fallback.getParagraphBackgroundIndentBottom();
+            paragraphBackgroundIndentBottom = fallback.getParagraphPaddingBottom();
         }
         return paragraphBackgroundIndentBottom;
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentLeft() {
-        Integer paragraphBackgroundIndentLeft = style.getParagraphBackgroundIndentLeft();
+    public ContainerInteger getParagraphPaddingLeft() {
+        ContainerInteger paragraphBackgroundIndentLeft = style.getParagraphPaddingLeft();
         if (paragraphBackgroundIndentLeft == null) {
-            paragraphBackgroundIndentLeft = fallback.getParagraphBackgroundIndentLeft();
+            paragraphBackgroundIndentLeft = fallback.getParagraphPaddingLeft();
         }
         return paragraphBackgroundIndentLeft;
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentRight() {
-        Integer paragraphBackgroundIndentRight = style.getParagraphBackgroundIndentRight();
+    public ContainerInteger getParagraphPaddingRight() {
+        ContainerInteger paragraphBackgroundIndentRight = style.getParagraphPaddingRight();
         if (paragraphBackgroundIndentRight == null) {
-            paragraphBackgroundIndentRight = fallback.getParagraphBackgroundIndentRight();
+            paragraphBackgroundIndentRight = fallback.getParagraphPaddingRight();
         }
         return paragraphBackgroundIndentRight;
     }
@@ -110,8 +110,8 @@ public class FallbackParagraphRenderStyle extends FallbackTextRenderStyle implem
     }
 
     @Override
-    public Integer getParagraphMinimumWidth() {
-        Integer paragraphMinimumWidth = style.getParagraphMinimumWidth();
+    public ContainerInteger getParagraphMinimumWidth() {
+        ContainerInteger paragraphMinimumWidth = style.getParagraphMinimumWidth();
         if (paragraphMinimumWidth == null) {
             paragraphMinimumWidth = fallback.getParagraphMinimumWidth();
         }
@@ -125,5 +125,23 @@ public class FallbackParagraphRenderStyle extends FallbackTextRenderStyle implem
             horizontalAlignment = fallback.getHorizontalAlignment();
         }
         return horizontalAlignment;
+    }
+
+    @Override
+    public FloatStyle getFloatStyle() {
+        FloatStyle floatStyle = style.getFloatStyle();
+        if (floatStyle == null) {
+            floatStyle = fallback.getFloatStyle();
+        }
+        return floatStyle;
+    }
+
+    @Override
+    public ClearStyle getClearStyle() {
+        ClearStyle clearStyle = style.getClearStyle();
+        if (clearStyle == null) {
+            clearStyle = fallback.getClearStyle();
+        }
+        return clearStyle;
     }
 }

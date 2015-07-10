@@ -31,7 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class HTMLLikeParser {
-    private HTMLLikeParser() { }
+    private HTMLLikeParser() {
+    }
 
     public static String encodeHTMLLike(String text) {
         StringBuilder result = new StringBuilder();

@@ -19,78 +19,48 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.HorizontalAlign;
-import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
+import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowLineBuilder;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.LaidFlowLine;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.RenderSpace;
-import org.terasology.rendering.nui.widgets.browser.ui.DocumentRenderer;
 import org.terasology.rendering.nui.widgets.browser.ui.ParagraphRenderable;
-import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
+import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
 import java.util.Collection;
 
 public class FlowParagraphRenderable implements ParagraphRenderable {
-    private DocumentData insetDocument;
-    private int insetWidth;
-    private boolean left;
-
     private Collection<FlowRenderable> flowParagraphData;
 
-    private LineBuilderCache lineBuilderCache;
-
-    public FlowParagraphRenderable(DocumentData insetDocument, boolean left, int insetWidth, Collection<FlowRenderable> flowParagraphData) {
-        this.insetDocument = insetDocument;
-        this.left = left;
-        this.insetWidth = insetWidth;
+    public FlowParagraphRenderable(Collection<FlowRenderable> flowParagraphData) {
         this.flowParagraphData = flowParagraphData;
     }
 
     @Override
-    public int getMinWidth(TextRenderStyle defaultStyle) {
+    public int getContentsMinWidth(ParagraphRenderStyle defaultStyle) {
         int minWidth = 0;
 
         for (FlowRenderable element : flowParagraphData) {
             minWidth = Math.max(minWidth, element.getMinWidth(defaultStyle));
         }
 
-        minWidth += this.insetWidth;
-
         return minWidth;
     }
 
     @Override
-    public void render(Canvas canvas, Rect2i region, TextRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister) {
-        int y = 0;
+    public void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace, int leftIndent, int rightIndent,
+                               ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister) {
+        int y = startPos.y;
 
-        int width = region.width();
-
-        int insetHeight = getInsetHeight(defaultStyle);
-
-        if (insetDocument != null) {
-            Rect2i insetRegion;
-            if (left) {
-                insetRegion = Rect2i.createFromMinAndSize(region.minX(), region.minY(), insetWidth, insetHeight);
-            } else {
-                insetRegion = Rect2i.createFromMinAndSize(region.maxX() - insetWidth, region.minY(), insetWidth, insetHeight);
-            }
-
-            DocumentRenderer.drawDocumentInRegion(insetDocument, canvas, defaultStyle.getFont(false), defaultStyle.getColor(false),
-                    insetRegion, hyperlinkRegister);
-        }
-
-        updateCacheIfNeeded(defaultStyle, width, insetHeight);
-        for (LaidFlowLine<FlowRenderable> line : lineBuilderCache.laidLines) {
+        for (LaidFlowLine<FlowRenderable> line : updateCacheIfNeeded(defaultStyle, startPos.y, containerRenderSpace)) {
             int x = 0;
 
-            int insetXAdvance;
-            int availableWidth;
-            if (left && y < insetHeight) {
-                insetXAdvance = insetWidth;
-                availableWidth = width - insetWidth;
-            } else {
-                insetXAdvance = 0;
-                availableWidth = width;
+            int insetXAdvance = containerRenderSpace.getAdvanceForVerticalPosition(y);
+            int availableWidth = containerRenderSpace.getWidthForVerticalPosition(y);
+            if (horizontalAlign == HorizontalAlign.LEFT || horizontalAlign == HorizontalAlign.CENTER) {
+                availableWidth -= leftIndent;
+            }
+            if (horizontalAlign == HorizontalAlign.RIGHT || horizontalAlign == HorizontalAlign.CENTER) {
+                availableWidth -= rightIndent;
             }
 
             int lineHeight = line.getHeight();
@@ -100,13 +70,12 @@ public class FlowParagraphRenderable implements ParagraphRenderable {
 
             for (FlowRenderable flowRenderable : line.getFlowRenderables()) {
                 int elementWidth = flowRenderable.getWidth(defaultStyle);
-                Rect2i renderableRegion = Rect2i.createFromMinAndSize(insetXAdvance + alignOffset + region.minX() + x, region.minY() + y, elementWidth, lineHeight);
+                Rect2i renderableRegion = Rect2i.createFromMinAndSize(insetXAdvance + leftIndent + alignOffset + startPos.x + x, y, elementWidth, lineHeight);
                 String hyperlink = flowRenderable.getAction();
                 if (hyperlink != null) {
                     hyperlinkRegister.registerHyperlink(renderableRegion, hyperlink);
                 }
-                flowRenderable.render(canvas, renderableRegion,
-                        defaultStyle);
+                flowRenderable.render(canvas, renderableRegion, defaultStyle);
                 x += elementWidth;
             }
 
@@ -115,56 +84,27 @@ public class FlowParagraphRenderable implements ParagraphRenderable {
     }
 
     @Override
-    public int getPreferredHeight(TextRenderStyle defaultStyle, int width) {
+    public int getPreferredContentsHeight(ParagraphRenderStyle defaultStyle, int yStart, ContainerRenderSpace containerRenderSpace, int sideIndents) {
         int height = 0;
 
-        int insetHeight = getInsetHeight(defaultStyle);
-
-        updateCacheIfNeeded(defaultStyle, width, insetHeight);
-        for (LaidFlowLine<FlowRenderable> element : lineBuilderCache.laidLines) {
+        for (LaidFlowLine<FlowRenderable> element : updateCacheIfNeeded(defaultStyle, yStart, containerRenderSpace)) {
             height += element.getHeight();
         }
-        return Math.max(height, insetHeight);
+        return height;
     }
 
-    private int getInsetHeight(TextRenderStyle defaultStyle) {
-        int insetHeight = 0;
-        if (insetDocument != null) {
-            Vector2i documentPreferredSize = DocumentRenderer.getDocumentPreferredSize(insetDocument, defaultStyle.getFont(false), defaultStyle.getColor(false), insetWidth);
-            insetHeight = documentPreferredSize.y;
-        }
-        return insetHeight;
+    private Iterable<LaidFlowLine<FlowRenderable>> updateCacheIfNeeded(ParagraphRenderStyle defaultStyle, int yStart, ContainerRenderSpace containerRenderSpace) {
+        // TODO introduce cache, once the RenderSpace gets stabilized and allows comparing
+        return FlowLineBuilder.getLines(flowParagraphData, defaultStyle, yStart, containerRenderSpace);
     }
-
-    private void updateCacheIfNeeded(TextRenderStyle defaultStyle, int width, int insetHeight) {
-        if (lineBuilderCache == null || width != lineBuilderCache.width || insetWidth != lineBuilderCache.insetWidth
-                || insetHeight != lineBuilderCache.insetHeight) {
-            lineBuilderCache = new LineBuilderCache(width, insetWidth, insetHeight,
-                    FlowLineBuilder.getLines(flowParagraphData, defaultStyle,
-                            new RenderSpace() {
-                                @Override
-                                public int getWidthForVerticalPosition(int y) {
-                                    if (y >= insetHeight) {
-                                        return width;
-                                    } else {
-                                        return width - insetWidth;
-                                    }
-                                }
-                            }));
-        }
-    }
-
-    private static final class LineBuilderCache {
-        public final int width;
-        public final int insetWidth;
-        public final int insetHeight;
-        public final Iterable<LaidFlowLine<FlowRenderable>> laidLines;
-
-        private LineBuilderCache(int width, int insetWidth, int insetHeight, Iterable<LaidFlowLine<FlowRenderable>> laidLines) {
-            this.width = width;
-            this.insetWidth = insetWidth;
-            this.insetHeight = insetHeight;
-            this.laidLines = laidLines;
-        }
-    }
+//
+//    private static final class LineBuilderCache {
+//        public final RenderSpace renderSpace;
+//        public final Iterable<LaidFlowLine<FlowRenderable>> laidLines;
+//
+//        private LineBuilderCache(RenderSpace renderSpace, Iterable<LaidFlowLine<FlowRenderable>> laidLines) {
+//            this.renderSpace = renderSpace;
+//            this.laidLines = laidLines;
+//        }
+//    }
 }

@@ -19,35 +19,43 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 
 public interface ParagraphRenderStyle extends TextRenderStyle {
-    default Integer getParagraphIndentTop(boolean firstParagraph) {
+    public enum FloatStyle {
+        LEFT, RIGHT, NONE
+    }
+
+    public enum ClearStyle {
+        LEFT, RIGHT, BOTH, NONE
+    }
+
+    default ContainerInteger getParagraphMarginTop() {
         return null;
     }
 
-    default Integer getParagraphIndentBottom(boolean lastParagraph) {
+    default ContainerInteger getParagraphMarginBottom() {
         return null;
     }
 
-    default Integer getParagraphIndentLeft() {
+    default ContainerInteger getParagraphMarginLeft() {
         return null;
     }
 
-    default Integer getParagraphIndentRight() {
+    default ContainerInteger getParagraphMarginRight() {
         return null;
     }
 
-    default Integer getParagraphBackgroundIndentTop() {
+    default ContainerInteger getParagraphPaddingTop() {
         return null;
     }
 
-    default Integer getParagraphBackgroundIndentBottom() {
+    default ContainerInteger getParagraphPaddingBottom() {
         return null;
     }
 
-    default Integer getParagraphBackgroundIndentLeft() {
+    default ContainerInteger getParagraphPaddingLeft() {
         return null;
     }
 
-    default Integer getParagraphBackgroundIndentRight() {
+    default ContainerInteger getParagraphPaddingRight() {
         return null;
     }
 
@@ -55,9 +63,19 @@ public interface ParagraphRenderStyle extends TextRenderStyle {
         return null;
     }
 
-    default Integer getParagraphMinimumWidth() {
+    default ContainerInteger getParagraphMinimumWidth() {
         return null;
     }
 
-    default HorizontalAlign getHorizontalAlignment() { return null; }
+    default HorizontalAlign getHorizontalAlignment() {
+        return null;
+    }
+
+    default FloatStyle getFloatStyle() {
+        return null;
+    }
+
+    default ClearStyle getClearStyle() {
+        return null;
+    }
 }

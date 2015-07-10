@@ -29,68 +29,68 @@ public class DefaultDocumentRenderStyle implements DocumentRenderStyle {
     }
 
     @Override
-    public Integer getDocumentIndentTop() {
-        return 3;
+    public ContainerInteger getDocumentMarginTop() {
+        return new FixedContainerInteger(3);
     }
 
     @Override
-    public Integer getDocumentIndentBottom() {
-        return 3;
+    public ContainerInteger getDocumentMarginBottom() {
+        return new FixedContainerInteger(3);
     }
 
     @Override
-    public Integer getDocumentIndentLeft() {
-        return 3;
+    public ContainerInteger getDocumentMarginLeft() {
+        return new FixedContainerInteger(3);
     }
 
     @Override
-    public Integer getDocumentIndentRight() {
-        return 3;
+    public ContainerInteger getDocumentMarginRight() {
+        return new FixedContainerInteger(3);
     }
 
     @Override
-    public Integer getParagraphIndentTop(boolean firstParagraph) {
-        return 0;
+    public ContainerInteger getParagraphMarginTop() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphIndentBottom(boolean lastParagraph) {
-        return 0;
+    public ContainerInteger getParagraphMarginBottom() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphIndentLeft() {
-        return 0;
+    public ContainerInteger getParagraphMarginLeft() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphIndentRight() {
-        return 0;
+    public ContainerInteger getParagraphMarginRight() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentTop() {
-        return 0;
+    public ContainerInteger getParagraphPaddingTop() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentBottom() {
-        return 0;
+    public ContainerInteger getParagraphPaddingBottom() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentLeft() {
-        return 0;
+    public ContainerInteger getParagraphPaddingLeft() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphBackgroundIndentRight() {
-        return 0;
+    public ContainerInteger getParagraphPaddingRight() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
-    public Integer getParagraphMinimumWidth() {
-        return 0;
+    public ContainerInteger getParagraphMinimumWidth() {
+        return new FixedContainerInteger(0);
     }
 
     @Override
@@ -120,5 +120,15 @@ public class DefaultDocumentRenderStyle implements DocumentRenderStyle {
     @Override
     public HorizontalAlign getHorizontalAlignment() {
         return HorizontalAlign.LEFT;
+    }
+
+    @Override
+    public FloatStyle getFloatStyle() {
+        return FloatStyle.NONE;
+    }
+
+    @Override
+    public ClearStyle getClearStyle() {
+        return ClearStyle.NONE;
     }
 }

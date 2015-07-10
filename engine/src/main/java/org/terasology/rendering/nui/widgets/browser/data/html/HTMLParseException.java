@@ -13,28 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.browser.ui.style;
+package org.terasology.rendering.nui.widgets.browser.data.html;
 
-import org.terasology.rendering.nui.Color;
-
-public interface DocumentRenderStyle extends ParagraphRenderStyle {
-    default ContainerInteger getDocumentMarginTop() {
-        return null;
+public class HTMLParseException extends RuntimeException {
+    public HTMLParseException(String message) {
+        super(message);
     }
 
-    default ContainerInteger getDocumentMarginBottom() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginLeft() {
-        return null;
-    }
-
-    default ContainerInteger getDocumentMarginRight() {
-        return null;
-    }
-
-    default Color getBackgroundColor() {
-        return null;
+    public HTMLParseException(Throwable cause) {
+        super(cause);
     }
 }
