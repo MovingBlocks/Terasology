@@ -36,6 +36,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
@@ -78,8 +79,9 @@ public class StateMainMenu implements GameState {
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl());
 
-        nuiManager = context.get(NUIManager.class);
-        ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
+        nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
+        context.put(NUIManager.class, nuiManager);
+
         eventSystem.registerEventHandler(nuiManager);
 
         componentSystemManager = new ComponentSystemManager(context);

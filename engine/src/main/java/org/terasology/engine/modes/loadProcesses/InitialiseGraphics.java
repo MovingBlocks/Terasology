@@ -44,6 +44,7 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
+        // Refresh widget library after modules got laoded:
         NUIManager nuiManager = context.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 

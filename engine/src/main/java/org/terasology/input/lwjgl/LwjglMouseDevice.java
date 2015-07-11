@@ -30,6 +30,7 @@ import java.util.Queue;
  * @author Immortius
  */
 public class LwjglMouseDevice implements MouseDevice {
+    private boolean mouseGrabbed;
 
     @Override
     public Vector2i getPosition() {
@@ -52,6 +53,14 @@ public class LwjglMouseDevice implements MouseDevice {
     }
 
     @Override
+    public void setGrabbed(boolean newGrabbed) {
+        if (newGrabbed != mouseGrabbed) {
+            mouseGrabbed = newGrabbed;
+            Mouse.setGrabbed(newGrabbed);
+        }
+    }
+
+    @Override
     public Queue<InputAction> getInputQueue() {
         Queue<InputAction> result = Queues.newArrayDeque();
 
@@ -68,4 +77,5 @@ public class LwjglMouseDevice implements MouseDevice {
 
         return result;
     }
+
 }

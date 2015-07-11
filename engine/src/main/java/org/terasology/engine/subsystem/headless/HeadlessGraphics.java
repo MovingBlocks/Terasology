@@ -55,8 +55,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.internal.CanvasRenderer;
 
 public class HeadlessGraphics implements EngineSubsystem {
 
@@ -92,7 +91,7 @@ public class HeadlessGraphics implements EngineSubsystem {
         context.put(DisplayDevice.class, headlessDisplay);
         initHeadless(context);
 
-        context.put(NUIManager.class, new NUIManagerInternal(new HeadlessCanvasRenderer(), context));
+        context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
     }
 
     @Override

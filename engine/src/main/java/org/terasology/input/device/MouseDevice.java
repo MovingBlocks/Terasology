@@ -42,4 +42,9 @@ public interface MouseDevice extends InputDevice {
      * @return Whether the mouse cursor is visible
      */
     boolean isVisible();
+
+    /**
+     * Specifies if the mouse is grabbed and there is thus no mouse cursor that can get to a border.
+     */
+    void setGrabbed(boolean grabbed);
 }
