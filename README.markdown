@@ -200,6 +200,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
 * [CustomOreGen](https://github.com/Terasology/CustomOreGen) - library containing an ore distribution algorithm based on [JRoush's CustomOreGen](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1282294-1-4-6-v2-custom-ore-generation-updated-jan-5th)
 * [Durability](https://github.com/Terasology/Durability) - library module to support destructible items (wear and tear eventually breaks them)
+* [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system.
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FluidComputerIntegration](https://github.com/Terasology/FluidComputerIntegration) - allows for interactions with fluids via computers
@@ -207,6 +208,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Genome](https://github.com/Terasology/Genome) - genetics WOO! Complete with DNA letters and mutating plants. Part of the Wood & Stone line-up
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
+* [InGameHelp](https://github.com/Terasology/InGameHelp) - system for showing help in-game
 * [IRLCorp](https://github.com/Terasology/IRLCorp) - Industrialized Reduction of Labor Corporation - Helping workmen everywhere
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
@@ -217,7 +219,8 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Machines](https://github.com/Terasology/Machines) - machine infrastructure library module
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
-* [ManualLabor](https://github.com/Terasology/ManualLabor) - tools and logic for manual labor (digging, chopping, etc)
+* [ManualLaborEventualSkills](https://github.com/Terasology/ManualLaborEventualSkills) - bridge module for adding EventualSkills to ManualLabor
+* [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system.
 * [MarcinScIncubator](https://github.com/Terasology/MarcinScIncubator) - parking lot for tools used in @MarcinSc's many modules without a more explicit home yet
 * [MarkovChains](https://github.com/Terasology/MarkovChains) - Library module with some pseudo random math stuff
 * [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key 'O'
