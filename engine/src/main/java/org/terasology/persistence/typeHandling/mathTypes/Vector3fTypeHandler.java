@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TFloatList;
-
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
@@ -31,7 +30,11 @@ public class Vector3fTypeHandler extends SimpleTypeHandler<Vector3f> {
 
     @Override
     public PersistedData serialize(Vector3f value, SerializationContext context) {
-        return context.create(value.x, value.y, value.z);
+        if (value == null) {
+            return context.createNull();
+        } else {
+            return context.create(value.x, value.y, value.z);
+        }
     }
 
     @Override

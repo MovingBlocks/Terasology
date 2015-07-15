@@ -16,12 +16,12 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.Border;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
-import org.terasology.math.Border;
 
 import java.util.Map;
 
@@ -36,17 +36,24 @@ public class BorderTypeHandler extends SimpleTypeHandler<Border> {
 
     @Override
     public PersistedData serialize(Border value, SerializationContext context) {
-        Map<String, PersistedData> map = Maps.newLinkedHashMap();
-        map.put(LEFT_FIELD, context.create(value.getLeft()));
-        map.put(RIGHT_FIELD, context.create(value.getRight()));
-        map.put(TOP_FIELD, context.create(value.getTop()));
-        map.put(BOTTOM_FIELD, context.create(value.getBottom()));
-        return context.create(map);
+        if (value != null) {
+            Map<String, PersistedData> map = Maps.newLinkedHashMap();
+            map.put(LEFT_FIELD, context.create(value.getLeft()));
+            map.put(RIGHT_FIELD, context.create(value.getRight()));
+            map.put(TOP_FIELD, context.create(value.getTop()));
+            map.put(BOTTOM_FIELD, context.create(value.getBottom()));
+            return context.create(map);
+        }
+
+        return context.createNull();
     }
 
     @Override
     public Border deserialize(PersistedData data, DeserializationContext context) {
-        PersistedDataMap map = data.getAsValueMap();
-        return new Border(map.getAsInteger(LEFT_FIELD), map.getAsInteger(RIGHT_FIELD), map.getAsInteger(TOP_FIELD), map.getAsInteger(BOTTOM_FIELD));
+        if (data.isValueMap()) {
+            PersistedDataMap map = data.getAsValueMap();
+            return new Border(map.getAsInteger(LEFT_FIELD), map.getAsInteger(RIGHT_FIELD), map.getAsInteger(TOP_FIELD), map.getAsInteger(BOTTOM_FIELD));
+        }
+        return null;
     }
 }

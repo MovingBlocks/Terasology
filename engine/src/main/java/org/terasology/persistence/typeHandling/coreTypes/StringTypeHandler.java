@@ -31,22 +31,31 @@ public class StringTypeHandler implements TypeHandler<String> {
 
     @Override
     public PersistedData serialize(String value, SerializationContext context) {
-        return context.create(value);
+        if (value == null) {
+            return context.createNull();
+        } else {
+            return context.create(value);
+        }
     }
 
     @Override
     public String deserialize(PersistedData data, DeserializationContext context) {
-        return data.getAsString();
+        if (data.isString()) {
+            return data.getAsString();
+        }
+        return null;
     }
 
     @Override
     public PersistedData serializeCollection(Collection<String> value, SerializationContext context) {
         return context.createStrings(value);
-
     }
 
     @Override
     public List<String> deserializeCollection(PersistedData data, DeserializationContext context) {
-        return Lists.newArrayList(data.getAsArray().getAsStringArray());
+        if (data.isArray()) {
+            return Lists.newArrayList(data.getAsArray().getAsStringArray());
+        }
+        return Lists.newArrayList();
     }
 }

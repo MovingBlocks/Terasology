@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -33,6 +32,9 @@ public class BlockFamilyTypeHandler extends StringRepresentationTypeHandler<Bloc
 
     @Override
     public String getAsString(BlockFamily item) {
+        if (item == null) {
+            return "";
+        }
         return item.getURI().toString();
     }
 

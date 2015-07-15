@@ -16,7 +16,6 @@
 
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
@@ -34,6 +33,9 @@ public class CollisionGroupTypeHandler extends StringRepresentationTypeHandler<C
 
     @Override
     public String getAsString(CollisionGroup item) {
+        if (item == null) {
+            return "";
+        }
         return item.getName();
     }
 

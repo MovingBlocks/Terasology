@@ -18,11 +18,13 @@ package org.terasology.persistence.typeHandling.mathTypes;
 import org.terasology.math.IntegerRange;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
-import java.util.Iterator;
-
 public class IntegerRangeHandler extends StringRepresentationTypeHandler<IntegerRange> {
     @Override
     public String getAsString(IntegerRange item) {
+        if (item == null) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
 
         Integer currentRangeStart = null;
