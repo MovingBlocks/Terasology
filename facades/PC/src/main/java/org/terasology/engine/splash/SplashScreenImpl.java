@@ -78,6 +78,7 @@ final class SplashScreenImpl implements SplashScreenCore {
 
     @Override
     public void post(String message) {
+        messageQueue.clear();
         messageQueue.add(message);
     }
 

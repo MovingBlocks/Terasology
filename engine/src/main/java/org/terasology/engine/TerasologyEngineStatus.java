@@ -20,7 +20,6 @@ package org.terasology.engine;
  */
 public enum TerasologyEngineStatus implements EngineStatus {
 
-    LOADING_CONFIG("Loading config..."),
     PREPARING_SUBSYSTEMS("Preparing Subsystems..."),
     INITIALIZING_ASSET_MANAGEMENT("Initializing Asset Management..."),
     INITIALIZING_SUBSYSTEMS("Initializing Subsystems..."),

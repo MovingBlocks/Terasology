@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem;
+package org.terasology.engine.subsystem.common;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.subsystem.EngineSubsystem;
 
 /**
- * @author Immortius
+ *
  */
-@API
-public interface ThreadManager {
+public interface TimeSubsystem extends EngineSubsystem {
 
-    void submitTask(String name, Runnable task);
+    EngineTime getEngineTime();
 }

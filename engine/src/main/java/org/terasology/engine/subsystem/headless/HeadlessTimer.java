@@ -16,59 +16,36 @@
 package org.terasology.engine.subsystem.headless;
 
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.headless.device.TimeSystem;
 
-public class HeadlessTimer implements EngineSubsystem {
+public class HeadlessTimer implements TimeSubsystem {
+
+    private EngineTime time;
+
+    @Override
+    public String getName() {
+        return "Time";
+    }
 
     @Override
     public void preInitialise(Context context) {
         initTimer(context);
     }
 
-    @Override
-    public void initialise(Context context) {
-
-    }
-
-    @Override
-    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-    }
-
-    @Override
-    public void postInitialise(Context context) {
-
-    }
-
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void postUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void shutdown(Config config) {
-    }
-
-    @Override
-    public void dispose() {
-    }
-
     private void initTimer(Context context) {
-        EngineTime time = new TimeSystem();
+        time = new TimeSystem();
         context.put(Time.class, time);
     }
 
     @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
+    public EngineTime getEngineTime() {
+        return time;
     }
-
 }

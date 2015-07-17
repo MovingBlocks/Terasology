@@ -22,13 +22,14 @@ import org.terasology.editor.properties.SceneProperties;
 import org.terasology.editor.ui.MainWindow;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.TerasologyEngineBuilder;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
-import org.terasology.engine.subsystem.lwjgl.LwjglCustomViewPort;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
+import org.terasology.engine.subsystem.lwjgl.LwjglPortlet;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
@@ -67,16 +68,19 @@ public final class TeraEd extends JWindow {
             logger.warn("Failed to set look and feel to Nimbus", e);
         }
         try {
-            LwjglCustomViewPort lwjglCustomViewPort = new LwjglCustomViewPort();
-            Collection<EngineSubsystem> subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
-                    lwjglCustomViewPort);
+            LwjglPortlet lwjglPortlet = new LwjglPortlet();
 
             PathManager.getInstance().useDefaultHomePath();
 
-            engine = new TerasologyEngine(subsystemList);
+            engine = new TerasologyEngineBuilder()
+                    .add(new LwjglGraphics())
+                    .add(new LwjglTimer())
+                    .add(new LwjglAudio())
+                    .add(new LwjglInput())
+                    .add(lwjglPortlet).build();
             sceneProperties = new SceneProperties(engine);
             mainWindow = new MainWindow(this, engine);
-            lwjglCustomViewPort.setCustomViewport(mainWindow.getViewport());
+            lwjglPortlet.setCustomViewport(mainWindow.getViewport());
 
             engine.setHibernationAllowed(false);
             engine.subscribeToStateChange(mainWindow);

@@ -17,7 +17,6 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -25,7 +24,7 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.engine.subsystem.ThreadManager;
+import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -45,7 +44,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -121,7 +119,9 @@ public final class Terasology {
         setupLogging();
 
         try {
-            TerasologyEngine engine = new TerasologyEngine(createSubsystemList());
+            TerasologyEngineBuilder builder = new TerasologyEngineBuilder();
+            populateSubsystems(builder);
+            TerasologyEngine engine = builder.build();
             engine.subscribe(newStatus -> {
                 if (newStatus == StandardGameStatus.RUNNING) {
                     SplashScreen.getInstance().close();
@@ -293,12 +293,18 @@ public final class Terasology {
     }
 
 
-    private static Collection<EngineSubsystem> createSubsystemList() {
+    private static void populateSubsystems(TerasologyEngineBuilder builder) {
         if (isHeadless) {
-            return Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
+            builder.add(new HeadlessGraphics())
+                    .add(new HeadlessTimer())
+                    .add(new HeadlessAudio())
+                    .add(new HeadlessInput());
         } else {
             EngineSubsystem audio = soundEnabled ? new LwjglAudio() : new HeadlessAudio();
-            return Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), audio, new LwjglInput());
+            builder.add(audio)
+                    .add(new LwjglGraphics())
+                    .add(new LwjglTimer())
+                    .add(new LwjglInput());
         }
     }
 

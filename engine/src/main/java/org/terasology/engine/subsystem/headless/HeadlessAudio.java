@@ -20,7 +20,6 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.nullAudio.NullAudioManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
@@ -31,11 +30,11 @@ public class HeadlessAudio implements EngineSubsystem {
     private AudioManager audioManager;
 
     @Override
-    public void preInitialise(Context context) {
+    public String getName() {
+        return "Audio";
     }
 
     @Override
-
     public void initialise(Context context) {
         initNoSound(context);
     }
@@ -47,34 +46,18 @@ public class HeadlessAudio implements EngineSubsystem {
     }
 
     @Override
-    public void postInitialise(Context context) {
-    }
-
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
     public void postUpdate(GameState currentState, float delta) {
         audioManager.update(delta);
     }
 
     @Override
-    public void shutdown(Config config) {
-    }
-
-    @Override
-    public void dispose() {
+    public void shutdown() {
         audioManager.dispose();
     }
 
     private void initNoSound(Context context) {
         audioManager = new NullAudioManager();
         context.put(AudioManager.class, audioManager);
-    }
-
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

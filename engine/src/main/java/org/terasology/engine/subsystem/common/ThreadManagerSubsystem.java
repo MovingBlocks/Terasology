@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem;
+package org.terasology.engine.subsystem.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.utilities.concurrency.ShutdownTask;
@@ -83,48 +83,19 @@ public class ThreadManagerSubsystem implements EngineSubsystem, ThreadManager {
     }
 
     @Override
-    public void preInitialise(Context context) {
-
+    public String getName() {
+        return "Thread Management";
     }
 
     @Override
-    public void initialise(Context context) {
-
+    public void preInitialise(Context rootContext) {
+        rootContext.put(ThreadManager.class, this);
     }
 
     @Override
-    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-
-    }
-
-    @Override
-    public void postInitialise(Context context) {
-
-    }
-
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-
-    }
-
-    @Override
-    public void postUpdate(GameState currentState, float delta) {
-
-    }
-
-    @Override
-    public void shutdown(Config config) {
-        stopThreads();
-    }
-
-    @Override
-    public void dispose() {
+    public void shutdown() {
         commonThreadPool.shutdown(new ShutdownTask(), true);
     }
 
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
-
-    }
 
 }

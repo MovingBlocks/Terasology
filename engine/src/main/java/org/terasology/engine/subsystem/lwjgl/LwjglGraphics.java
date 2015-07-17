@@ -100,10 +100,17 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
 
     private Context context;
+    private RenderingConfig config;
 
     @Override
-    public void initialise(Context newContext) {
-           this.context = newContext;
+    public String getName() {
+        return "Graphics";
+    }
+
+    @Override
+    public void initialise(Context rootContext) {
+        this.context = rootContext;
+        this.config = context.get(Config.class).getRendering();
     }
 
     @Override
@@ -135,21 +142,16 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void postInitialise(Context newContext) {
-        this.context = newContext;
+    public void postInitialise(Context rootContext) {
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
         LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice(context);
         context.put(DisplayDevice.class, lwjglDisplay);
 
-        initDisplay(context.get(Config.class), lwjglDisplay);
+        initDisplay(lwjglDisplay);
         initOpenGL(context);
 
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
-    }
-
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
     }
 
     @Override
@@ -171,27 +173,28 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         if (Display.wasResized()) {
             glViewport(0, 0, Display.getWidth(), Display.getHeight());
         }
+
+
     }
 
     @Override
-    public void shutdown(Config config) {
+    public void preShutdown() {
         if (Display.isCreated() && !Display.isFullscreen() && Display.isVisible()) {
-            config.getRendering().setWindowPosX(Display.getX());
-            config.getRendering().setWindowPosY(Display.getY());
+            config.setWindowPosX(Display.getX());
+            config.setWindowPosY(Display.getY());
         }
     }
 
     @Override
-    public void dispose() {
+    public void shutdown() {
         Display.destroy();
     }
 
-    private void initDisplay(Config config, LwjglDisplayDevice lwjglDisplay) {
+    private void initDisplay(LwjglDisplayDevice lwjglDisplay) {
         try {
-            lwjglDisplay.setFullscreen(config.getRendering().isFullscreen(), false);
+            lwjglDisplay.setFullscreen(config.isFullscreen(), false);
 
-            RenderingConfig rc = config.getRendering();
-            Display.setLocation(rc.getWindowPosX(), rc.getWindowPosY());
+            Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             try {
 
@@ -214,22 +217,22 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 logger.warn("Could not set icon", e);
             }
 
-            if (config.getRendering().getDebug().isEnabled()) {
+            if (config.getDebug().isEnabled()) {
                 try {
                     ContextAttribs ctxAttribs = new ContextAttribs().withDebug(true);
-                    Display.create(config.getRendering().getPixelFormat(), ctxAttribs);
+                    Display.create(config.getPixelFormat(), ctxAttribs);
 
                     GL43.glDebugMessageCallback(new KHRDebugCallback(new DebugCallback()));
                 } catch (LWJGLException e) {
                     logger.warn("Unable to create an OpenGL debug context. Maybe your graphics card does not support it.", e);
-                    Display.create(rc.getPixelFormat()); // Create a normal context instead
+                    Display.create(config.getPixelFormat()); // Create a normal context instead
                 }
 
             } else {
-                Display.create(rc.getPixelFormat());
+                Display.create(config.getPixelFormat());
             }
 
-            Display.setVSyncEnabled(rc.isVSync());
+            Display.setVSyncEnabled(config.isVSync());
         } catch (LWJGLException e) {
             throw new RuntimeException("Can not initialize graphics device.", e);
         }
@@ -300,10 +303,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_NORMALIZE);
         glDepthFunc(GL_LEQUAL);
-    }
-
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
     public void asynchToDisplayThread(Runnable action) {

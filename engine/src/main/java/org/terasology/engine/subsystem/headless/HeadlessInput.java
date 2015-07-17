@@ -16,7 +16,6 @@
 package org.terasology.engine.subsystem.headless;
 
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
@@ -26,16 +25,8 @@ import org.terasology.input.InputSystem;
 public class HeadlessInput implements EngineSubsystem {
 
     @Override
-    public void preInitialise(Context context) {
-    }
-
-    @Override
-    public void initialise(Context context) {
-
-    }
-
-    @Override
-    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+    public String getName() {
+        return "Input";
     }
 
     @Override
@@ -43,29 +34,9 @@ public class HeadlessInput implements EngineSubsystem {
         initControls(context);
     }
 
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void postUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void shutdown(Config config) {
-    }
-
-    @Override
-    public void dispose() {
-    }
-
     private void initControls(Context context) {
         InputSystem inputSystem = new InputSystem();
         context.put(InputSystem.class, inputSystem);
-    }
-
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

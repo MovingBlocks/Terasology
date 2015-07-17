@@ -43,6 +43,11 @@ public class HeadlessDisplayDevice implements DisplayDevice {
     }
 
     @Override
+    public boolean isFullscreen() {
+        return false;
+    }
+
+    @Override
     public void processMessages() {
     }
 

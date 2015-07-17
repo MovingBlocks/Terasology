@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
@@ -37,23 +35,20 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.engine.subsystem.ThreadManager;
-import org.terasology.engine.subsystem.ThreadManagerSubsystem;
+import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
+import org.terasology.engine.subsystem.common.MonitoringSubsystem;
+import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
+import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.game.Game;
-import org.terasology.identity.CertificateGenerator;
-import org.terasology.identity.CertificatePair;
-import org.terasology.identity.PrivateIdentityCertificate;
-import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.gui.AdvancedMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -81,8 +76,6 @@ import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -119,10 +112,6 @@ public class TerasologyEngine implements GameEngine {
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
 
-    private Config config;
-    private RenderingConfig renderingConfig;
-    private EngineTime time;
-
     private GameState currentState;
     private GameState pendingState;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
@@ -135,13 +124,14 @@ public class TerasologyEngine implements GameEngine {
 
     private boolean hibernationAllowed;
 
-    private Deque<EngineSubsystem> subsystems;
+    private TimeSubsystem timeSubsystem;
+    private Deque<EngineSubsystem> allSubsystems;
     private ModuleAwareAssetTypeManager assetTypeManager;
 
     /**
      * Contains objects that life for the duration of this engine.
      */
-    private Context context;
+    private Context rootContext;
 
     /**
      * This constructor initializes the engine by initializing its systems,
@@ -151,19 +141,24 @@ public class TerasologyEngine implements GameEngine {
      * @param subsystems Typical subsystems lists contain graphics, timer,
      *                   audio and input subsystems.
      */
-    public TerasologyEngine(Collection<EngineSubsystem> subsystems) {
+    public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
 
-        this.context = new ContextImpl();
+        this.rootContext = new ContextImpl();
+        this.timeSubsystem = timeSubsystem;
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
          * And the engine loads assets while it gets created.
          */
-        CoreRegistry.setContext(context);
-        this.subsystems = Queues.newArrayDeque(subsystems);
-        ThreadManagerSubsystem threadManager = new ThreadManagerSubsystem();
-        this.subsystems.add(threadManager);
-        context.put(ThreadManager.class, threadManager);
+        // TODO: Remove
+        CoreRegistry.setContext(rootContext);
+
+        this.allSubsystems = Queues.newArrayDeque();
+        this.allSubsystems.add(new ConfigurationSubsystem());
+        this.allSubsystems.add(timeSubsystem);
+        this.allSubsystems.addAll(subsystems);
+        this.allSubsystems.add(new ThreadManagerSubsystem());
+        this.allSubsystems.add(new MonitoringSubsystem());
     }
 
     private void initialize() {
@@ -172,19 +167,10 @@ public class TerasologyEngine implements GameEngine {
             logger.info("Initializing Terasology...");
             logEnvironmentInfo();
 
-            changeStatus(TerasologyEngineStatus.LOADING_CONFIG);
-            initConfig();
-
-            changeStatus(TerasologyEngineStatus.PREPARING_SUBSYSTEMS);
-            preInitSubsystems();
-
-            // time must be set here as it is required by some of the managers.
-            verifyRequiredSystemIsRegistered(Time.class);
-            time = (EngineTime) context.get(Time.class);
-
+            // TODO: Need to get everything thread safe and get rid of the concept of "GameThread" as much as possible.
             GameThread.setToCurrentThread();
 
-            changeStatus(TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS);
+            preInitSubsystems();
             initSubsystems();
 
             initManagers();
@@ -192,19 +178,16 @@ public class TerasologyEngine implements GameEngine {
             changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
             initAssets();
             EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
-            context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
+            rootContext.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
-            environmentSwitcher.handleSwitchToGameEnvironment(context);
+            environmentSwitcher.handleSwitchToGameEnvironment(rootContext);
 
             postInitSubsystems();
 
+            verifyRequiredSystemIsRegistered(Time.class);
             verifyRequiredSystemIsRegistered(DisplayDevice.class);
             verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
             verifyRequiredSystemIsRegistered(InputSystem.class);
-
-
-            // TODO: Review - The advanced monitor shouldn't be hooked-in this way (see issue #692)
-            initAdvancedMonitor();
 
             /**
              * Prevent objects being put in engine context after init phase. Engine states should use/create a
@@ -236,62 +219,20 @@ public class TerasologyEngine implements GameEngine {
         logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
     }
 
-    private void initConfig() {
-        if (Files.isRegularFile(Config.getConfigFile())) {
-            try {
-                config = Config.load(Config.getConfigFile());
-            } catch (IOException e) {
-                logger.error("Failed to load config", e);
-                config = new Config();
-            }
-        } else {
-            config = new Config();
-        }
-        if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_GAMEPLAY_MODULE)) {
-            config.getDefaultModSelection().addModule(TerasologyConstants.CORE_GAMEPLAY_MODULE);
-        }
-
-        if (!validateServerIdentity()) {
-            CertificateGenerator generator = new CertificateGenerator();
-            CertificatePair serverIdentity = generator.generateSelfSigned();
-            config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
-            config.save();
-        }
-
-        renderingConfig = config.getRendering();
-        logger.info("Video Settings: " + renderingConfig.toString());
-        context.put(Config.class, config);
-    }
-
-    private boolean validateServerIdentity() {
-        PrivateIdentityCertificate privateCert = config.getSecurity().getServerPrivateCertificate();
-        PublicIdentityCertificate publicCert = config.getSecurity().getServerPublicCertificate();
-
-        if (privateCert == null || publicCert == null) {
-            return false;
-        }
-
-        // Validate the signature
-        if (!publicCert.verifySelfSigned()) {
-            logger.error("Server signature is not self signed! Generating new server identity.");
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * Gives a chance to subsystems to do something BEFORE managers and Time are initialized.
      */
     private void preInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
-            subsystem.preInitialise(context);
+            changeStatus(() -> "Pre-initialising " + subsystem.getName() + " subsystem");
+            subsystem.preInitialise(rootContext);
         }
     }
 
     private void initSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
-            subsystem.initialise(context);
+            changeStatus(() -> "Initialising " + subsystem.getName() + " subsystem");
+            subsystem.initialise(rootContext);
         }
     }
 
@@ -300,7 +241,7 @@ public class TerasologyEngine implements GameEngine {
      */
     private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
-            subsystem.postInitialise(context);
+            subsystem.postInitialise(rootContext);
         }
     }
 
@@ -311,7 +252,7 @@ public class TerasologyEngine implements GameEngine {
      * @throws IllegalStateException Details the required system that has not been registered.
      */
     private void verifyRequiredSystemIsRegistered(Class<?> clazz) {
-        if (context.get(clazz) == null) {
+        if (rootContext.get(clazz) == null) {
             throw new IllegalStateException(clazz.getSimpleName() + " not registered as a core system.");
         }
     }
@@ -320,41 +261,31 @@ public class TerasologyEngine implements GameEngine {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
         ModuleManager moduleManager = new ModuleManagerImpl();
-        context.put(ModuleManager.class, moduleManager);
+        rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        context.put(ReflectFactory.class, reflectFactory);
+        rootContext.put(ReflectFactory.class, reflectFactory);
 
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-        context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
-        context.put(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory,
+        rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
+        rootContext.put(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory,
                 copyStrategyLibrary));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new ModuleAwareAssetTypeManager();
-        context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
-        context.put(AssetManager.class, assetTypeManager.getAssetManager());
-        context.put(CollisionGroupManager.class, new CollisionGroupManager());
-        context.put(WorldGeneratorManager.class, new WorldGeneratorManager(context));
-        context.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
-        context.put(NetworkSystem.class, new NetworkSystemImpl(time, context));
-        context.put(Game.class, new Game(this, time));
-    }
-
-    /**
-     * The Advanced Monitor is a display opening in a separate window
-     * allowing for monitoring of Threads, Chunks and Performance.
-     */
-    private void initAdvancedMonitor() {
-        if (config.getSystem().isMonitoringEnabled()) {
-            new AdvancedMonitor().setVisible(true);
-        }
+        rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
+        rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
+        rootContext.put(CollisionGroupManager.class, new CollisionGroupManager());
+        rootContext.put(WorldGeneratorManager.class, new WorldGeneratorManager(rootContext));
+        rootContext.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
+        rootContext.put(NetworkSystem.class, new NetworkSystemImpl(timeSubsystem.getEngineTime(), rootContext));
+        rootContext.put(Game.class, new Game(this, timeSubsystem.getEngineTime()));
     }
 
     private void initAssets() {
         DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
-        context.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
+        rootContext.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,
@@ -376,7 +307,7 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
 
-        for (EngineSubsystem subsystem : subsystems) {
+        for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);
         }
     }
@@ -420,7 +351,7 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(StandardGameStatus.RUNNING);
 
         try {
-            context.put(GameEngine.class, this);
+            rootContext.put(GameEngine.class, this);
             changeState(initialState);
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
@@ -446,9 +377,9 @@ public class TerasologyEngine implements GameEngine {
      * and disposal occur afterwards.
      */
     private void mainLoop() {
-        NetworkSystem networkSystem = context.get(NetworkSystem.class);
+        NetworkSystem networkSystem = rootContext.get(NetworkSystem.class);
 
-        DisplayDevice display = context.get(DisplayDevice.class);
+        DisplayDevice display = rootContext.get(DisplayDevice.class);
 
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
@@ -460,8 +391,8 @@ public class TerasologyEngine implements GameEngine {
 
             // Only process rendering and updating once a second
             if (!display.hasFocus() && isHibernationAllowed()) {
-                time.setPaused(true);
-                Iterator<Float> updateCycles = time.tick();
+                timeSubsystem.getEngineTime().setPaused(true);
+                Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
                 while (updateCycles.hasNext()) {
                     updateCycles.next();
                 }
@@ -472,7 +403,7 @@ public class TerasologyEngine implements GameEngine {
                 }
 
                 display.processMessages();
-                time.setPaused(false);
+                timeSubsystem.getEngineTime().setPaused(false);
                 continue;
             }
 
@@ -485,7 +416,7 @@ public class TerasologyEngine implements GameEngine {
                 break;
             }
 
-            Iterator<Float> updateCycles = time.tick();
+            Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
 
             try (Activity ignored = PerformanceMonitor.startActivity("Network Update")) {
                 networkSystem.update();
@@ -494,7 +425,7 @@ public class TerasologyEngine implements GameEngine {
             totalDelta = 0;
             while (updateCycles.hasNext()) {
                 updateDelta = updateCycles.next(); // gameTime gets updated here!
-                totalDelta += time.getDeltaInMs();
+                totalDelta += timeSubsystem.getEngineTime().getDeltaInMs();
                 try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
                     currentState.update(updateDelta);
                 }
@@ -527,25 +458,28 @@ public class TerasologyEngine implements GameEngine {
         logger.info("Shutting down Terasology...");
         changeStatus(StandardGameStatus.SHUTTING_DOWN);
 
-        Iterator<EngineSubsystem> shutdownIter = subsystems.descendingIterator();
-        while (shutdownIter.hasNext()) {
-            EngineSubsystem subsystem = shutdownIter.next();
-            subsystem.shutdown(config);
-        }
-
-        config.save();
         if (currentState != null) {
             currentState.dispose();
             currentState = null;
         }
 
-        Iterator<EngineSubsystem> disposeIter = subsystems.descendingIterator();
-        while (disposeIter.hasNext()) {
-            EngineSubsystem subsystem = disposeIter.next();
+        Iterator<EngineSubsystem> preshutdownIter = allSubsystems.descendingIterator();
+        while (preshutdownIter.hasNext()) {
+            EngineSubsystem subsystem = preshutdownIter.next();
             try {
-                subsystem.dispose();
-            } catch (RuntimeException t) {
-                logger.error("Unable to dispose subsystem {}", subsystem, t);
+                subsystem.preShutdown();
+            } catch (RuntimeException e) {
+                logger.error("Error preparing to shutdown {} subsystem", subsystem.getName(), e);
+            }
+        }
+
+        Iterator<EngineSubsystem> shutdownIter = allSubsystems.descendingIterator();
+        while (shutdownIter.hasNext()) {
+            EngineSubsystem subsystem = shutdownIter.next();
+            try {
+                subsystem.shutdown();
+            } catch (RuntimeException e) {
+                logger.error("Error shutting down {} subsystem", subsystem.getName(), e);
             }
         }
     }
@@ -594,7 +528,7 @@ public class TerasologyEngine implements GameEngine {
             subscriber.onStateChange();
         }
         // drain input queues
-        InputSystem inputSystem = context.get(InputSystem.class);
+        InputSystem inputSystem = rootContext.get(InputSystem.class);
         inputSystem.getMouseDevice().getInputQueue();
         inputSystem.getKeyboard().getInputQueue();
     }
@@ -615,19 +549,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public Iterable<EngineSubsystem> getSubsystems() {
-        return subsystems;
-    }
-
-    public boolean isFullscreen() {
-        return renderingConfig.isFullscreen();
-    }
-
-    public void setFullscreen(boolean state) {
-        if (renderingConfig.isFullscreen() != state) {
-            renderingConfig.setFullscreen(state);
-            DisplayDevice display = context.get(DisplayDevice.class);
-            display.setFullscreen(state);
-        }
+        return allSubsystems;
     }
 
     @Override
@@ -652,7 +574,7 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public Context createChildContext() {
-        return new ContextImpl(context);
+        return new ContextImpl(rootContext);
     }
 
     /**
@@ -664,6 +586,6 @@ public class TerasologyEngine implements GameEngine {
      * @return a object directly from the context of the game engine
      */
     public <T> T getFromEngineContext(Class<? extends T> type) {
-        return context.get(type);
+        return rootContext.get(type);
     }
 }

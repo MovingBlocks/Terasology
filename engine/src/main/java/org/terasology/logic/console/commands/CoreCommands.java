@@ -23,6 +23,7 @@ import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -120,11 +121,11 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
     public String fullscreen() {
-        TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
 
-        te.setFullscreen(!te.isFullscreen());
+        display.setFullscreen(!display.isFullscreen());
 
-        if (te.isFullscreen()) {
+        if (display.isFullscreen()) {
             return "Switched to fullscreen mode";
         } else {
             return "Switched to windowed mode";
