@@ -386,8 +386,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             widget.update(delta);
         }
         InputSystem inputSystem = context.get(InputSystem.class);
-        GameEngine engine = context.get(GameEngine.class);
-        inputSystem.getMouseDevice().setGrabbed(engine.hasMouseFocus() && !(this.isReleasingMouse()));
+        inputSystem.getMouseDevice().setGrabbed(inputSystem.isCapturingMouse() && !(this.isReleasingMouse()));
 
     }
 

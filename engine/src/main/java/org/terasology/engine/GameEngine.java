@@ -72,34 +72,19 @@ public interface GameEngine {
      */
     void changeState(GameState newState);
 
+    void subscribeToStateChange(StateChangeSubscriber subscriber);
+
+    void unsubscribeToStateChange(StateChangeSubscriber subscriber);
+
     boolean hasPendingState();
 
     boolean isHibernationAllowed();
 
     void setHibernationAllowed(boolean allowed);
 
-    // TODO: This probably should be elsewhere?
-
-    /**
-     * @return Whether the game window currently has focus
-     */
-    boolean hasFocus();
-
-    /**
-     * @return Whether the game window controls if the mouse is captured.
-     */
-    boolean hasMouseFocus();
-
-    void setFocus(boolean focused);
-
-    void subscribeToStateChange(StateChangeSubscriber subscriber);
-
-    void unsubscribeToStateChange(StateChangeSubscriber subscriber);
-
-
     /**
      * Creates a context that provides read access to the objects of the engine context and can
      * be populated with it's own private objects.
      */
-    public Context createChildContext();
+    Context createChildContext();
 }

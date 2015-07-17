@@ -203,8 +203,8 @@ public class StateIngame implements GameState {
 
     @Override
     public void render() {
-        DisplayDevice displayDevice = context.get(DisplayDevice.class);
-        displayDevice.prepareToRender();
+        DisplayDevice display = context.get(DisplayDevice.class);
+        display.prepareToRender();
 
         if (worldRenderer != null) {
             if (!context.get(Config.class).getRendering().isOculusVrSupport()) {

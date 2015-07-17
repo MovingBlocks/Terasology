@@ -102,8 +102,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private Context context;
 
     @Override
-    public void initialise(Context context) {
-
+    public void initialise(Context newContext) {
+           this.context = newContext;
     }
 
     @Override
@@ -135,8 +135,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void postInitialise(Context context) {
-        this.context = context;
+    public void postInitialise(Context newContext) {
+        this.context = newContext;
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
         LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice(context);
@@ -235,11 +235,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
     }
 
-    private void initOpenGL(Context context) {
+    private void initOpenGL(Context currentContext) {
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
-        context.put(ShaderManager.class, new ShaderManagerLwjgl());
+        currentContext.put(ShaderManager.class, new ShaderManagerLwjgl());
     }
 
     private void checkOpenGL() {

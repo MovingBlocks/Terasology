@@ -39,7 +39,7 @@ public class LwjglDisplayDevice implements DisplayDevice {
     }
 
     @Override
-    public boolean isActive() {
+    public boolean hasFocus() {
         return Display.isActive();
     }
 

@@ -16,7 +16,8 @@
 package org.terasology.engine.subsystem;
 
 public interface DisplayDevice {
-    boolean isActive();
+
+    boolean hasFocus();
 
     boolean isCloseRequested();
 

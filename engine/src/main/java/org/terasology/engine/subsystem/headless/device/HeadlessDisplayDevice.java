@@ -28,7 +28,7 @@ public class HeadlessDisplayDevice implements DisplayDevice {
     }
 
     @Override
-    public boolean isActive() {
+    public boolean hasFocus() {
 
         return true;
     }

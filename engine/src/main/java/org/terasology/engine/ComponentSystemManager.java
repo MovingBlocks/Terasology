@@ -73,8 +73,8 @@ public class ComponentSystemManager {
     }
 
     public void loadSystems(ModuleEnvironment environment, NetworkMode netMode) {
-        DisplayDevice displayDevice = context.get(DisplayDevice.class);
-        boolean isHeadless = displayDevice.isHeadless();
+        DisplayDevice display = context.get(DisplayDevice.class);
+        boolean isHeadless = display.isHeadless();
 
         ListMultimap<Name, Class<?>> systemsByModule = ArrayListMultimap.create();
         for (Class<?> type : environment.getTypesAnnotatedWith(RegisterSystem.class)) {

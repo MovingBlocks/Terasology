@@ -19,10 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -68,7 +68,7 @@ public class InputSystem extends BaseComponentSystem {
     private Config config;
 
     @In
-    private GameEngine engine;
+    private DisplayDevice display;
 
     @In
     private Time time;
@@ -96,6 +96,8 @@ public class InputSystem extends BaseComponentSystem {
     private Map<MouseInput, BindableButtonImpl> mouseButtonBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
+
+    private boolean capturingMouse = true;
 
     public void setMouseDevice(MouseDevice mouseDevice) {
         this.mouse = mouseDevice;
@@ -212,8 +214,16 @@ public class InputSystem extends BaseComponentSystem {
         processBindAxis(delta);
     }
 
+    public boolean isCapturingMouse() {
+        return capturingMouse && display.hasFocus();
+    }
+
+    public void setCapturingMouse(boolean capturingMouse) {
+        this.capturingMouse = capturingMouse;
+    }
+
     private void processMouseInput(float delta) {
-        if (!engine.hasFocus()) {
+        if (!isCapturingMouse()) {
             return;
         }
 

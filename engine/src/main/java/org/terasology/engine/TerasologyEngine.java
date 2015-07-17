@@ -134,7 +134,6 @@ public class TerasologyEngine implements GameEngine {
     private volatile boolean running;
 
     private boolean hibernationAllowed;
-    private boolean gameFocused = true;
 
     private Deque<EngineSubsystem> subsystems;
     private ModuleAwareAssetTypeManager assetTypeManager;
@@ -460,7 +459,7 @@ public class TerasologyEngine implements GameEngine {
             float subsystemsDelta;
 
             // Only process rendering and updating once a second
-            if (!display.isActive() && isHibernationAllowed()) {
+            if (!display.hasFocus() && isHibernationAllowed()) {
                 time.setPaused(true);
                 Iterator<Float> updateCycles = time.tick();
                 while (updateCycles.hasNext()) {
@@ -639,22 +638,6 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void setHibernationAllowed(boolean allowed) {
         this.hibernationAllowed = allowed;
-    }
-
-    @Override
-    public boolean hasFocus() {
-        DisplayDevice display = context.get(DisplayDevice.class);
-        return gameFocused && display.isActive();
-    }
-
-    @Override
-    public boolean hasMouseFocus() {
-        return gameFocused;
-    }
-
-    @Override
-    public void setFocus(boolean focused) {
-        gameFocused = focused;
     }
 
     @Override
