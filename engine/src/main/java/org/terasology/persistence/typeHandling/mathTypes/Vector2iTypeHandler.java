@@ -30,7 +30,11 @@ public class Vector2iTypeHandler extends SimpleTypeHandler<Vector2i> {
 
     @Override
     public PersistedData serialize(Vector2i value, SerializationContext context) {
-        return context.create(value.x, value.y);
+        if (value == null) {
+            return context.createNull();
+        } else {
+            return context.create(value.x, value.y);
+        }
     }
 
     @Override

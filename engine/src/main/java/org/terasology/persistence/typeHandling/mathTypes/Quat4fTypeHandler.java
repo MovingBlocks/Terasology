@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TFloatList;
-
 import org.terasology.math.geom.Quat4f;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
@@ -31,7 +30,12 @@ public class Quat4fTypeHandler extends SimpleTypeHandler<Quat4f> {
 
     @Override
     public PersistedData serialize(Quat4f value, SerializationContext context) {
-        return context.create(value.x, value.y, value.z, value.w);
+        if (value == null) {
+            return context.createNull();
+        } else {
+            return context.create(value.x, value.y, value.z, value.w);
+        }
+
     }
 
     @Override

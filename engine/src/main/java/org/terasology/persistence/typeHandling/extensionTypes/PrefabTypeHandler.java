@@ -30,6 +30,9 @@ public class PrefabTypeHandler extends StringRepresentationTypeHandler<Prefab> {
 
     @Override
     public String getAsString(Prefab item) {
+        if (item == null) {
+            return "";
+        }
         return item.getName();
     }
 
