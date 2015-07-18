@@ -16,6 +16,7 @@
 package org.terasology.logic.console.ui;
 
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -52,7 +53,7 @@ public class ChatScreen extends CoreScreenLayer {
 
     private InteractionListener screenListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT && commandLine != null) {
                 getManager().setFocus(commandLine);
             }

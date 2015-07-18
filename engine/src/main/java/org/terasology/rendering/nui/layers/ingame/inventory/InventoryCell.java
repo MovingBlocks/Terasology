@@ -18,10 +18,10 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -51,7 +51,7 @@ public class InventoryCell extends ItemCell {
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (MouseInput.MOUSE_LEFT == button) {
                 if (Keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
                     moveItemSmartly();
@@ -68,7 +68,7 @@ public class InventoryCell extends ItemCell {
         }
 
         @Override
-        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
             int amount = (Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || Keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL)) ? 2 : 1;
 
             //move item to the transfer slot

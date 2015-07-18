@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -50,7 +51,7 @@ public class UIScrollbar extends CoreWidget {
     private InteractionListener handleListener = new BaseInteractionListener() {
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 dragging = true;
                 if (vertical) {
@@ -64,12 +65,12 @@ public class UIScrollbar extends CoreWidget {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             dragging = false;
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             if (vertical) {
                 updatePosition(pos.y - mouseOffset);
             } else {
@@ -80,7 +81,7 @@ public class UIScrollbar extends CoreWidget {
 
     private InteractionListener sliderListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 mouseOffset = (sliderSize > handleSize) ? (handleSize / 2) : 0;
                 if (vertical) {
@@ -99,7 +100,7 @@ public class UIScrollbar extends CoreWidget {
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             if (vertical) {
                 updatePosition(pos.y - mouseOffset);
             } else {
@@ -108,7 +109,7 @@ public class UIScrollbar extends CoreWidget {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             dragging = false;
         }
     };

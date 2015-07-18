@@ -23,6 +23,7 @@ import org.terasology.asset.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -85,7 +86,7 @@ public class UIText extends CoreWidget {
         boolean dragging;
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 moveCursor(pos, false);
                 dragging = true;
@@ -95,14 +96,14 @@ public class UIText extends CoreWidget {
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             if (dragging) {
                 moveCursor(pos, true);
             }
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 dragging = false;
             }

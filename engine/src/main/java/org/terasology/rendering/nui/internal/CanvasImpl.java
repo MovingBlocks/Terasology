@@ -25,7 +25,9 @@ import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
+import org.terasology.input.InputSystem;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -80,6 +82,7 @@ public class CanvasImpl implements CanvasControl {
 
     private final NUIManager nuiManager;
     private final Time time;
+    private final KeyboardDevice keyboard;
 
     private CanvasState state;
 
@@ -111,6 +114,7 @@ public class CanvasImpl implements CanvasControl {
         this.renderer = renderer;
         this.nuiManager = nuiManager;
         this.time = context.get(Time.class);
+        this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.meshMat = Assets.getMaterial("engine:UILitMesh").get();
         this.whiteTexture = Assets.getTexture("engine:white").get();
     }
@@ -150,7 +154,7 @@ public class CanvasImpl implements CanvasControl {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(position);
             relPos.sub(clickedRegion.offset);
-            clickedRegion.listener.onMouseDrag(relPos);
+            clickedRegion.listener.onMouseDrag(relPos, keyboard);
         }
 
         Set<InteractionRegion> newMouseOverRegions = Sets.newLinkedHashSet();
@@ -160,7 +164,7 @@ public class CanvasImpl implements CanvasControl {
             if (next.region.contains(position)) {
                 Vector2i relPos = new Vector2i(position);
                 relPos.sub(next.offset);
-                next.listener.onMouseOver(relPos, newMouseOverRegions.isEmpty());
+                next.listener.onMouseOver(relPos, newMouseOverRegions.isEmpty(), keyboard);
                 newMouseOverRegions.add(next);
             }
         }
@@ -207,11 +211,11 @@ public class CanvasImpl implements CanvasControl {
                 Vector2i relPos = new Vector2i(pos);
                 relPos.sub(next.offset);
                 if (possibleDoubleClick && nuiManager.getFocus() == next.element) {
-                    if (next.listener.onMouseDoubleClick(button, relPos)) {
+                    if (next.listener.onMouseDoubleClick(button, relPos, keyboard)) {
                         clickedRegion = next;
                         return true;
                     }
-                } else if (next.listener.onMouseClick(button, relPos)) {
+                } else if (next.listener.onMouseClick(button, relPos, keyboard)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
                     return true;
@@ -226,7 +230,7 @@ public class CanvasImpl implements CanvasControl {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(pos);
             relPos.sub(clickedRegion.region.min());
-            clickedRegion.listener.onMouseRelease(button, relPos);
+            clickedRegion.listener.onMouseRelease(button, relPos, keyboard);
             clickedRegion = null;
             return true;
         }
@@ -239,7 +243,7 @@ public class CanvasImpl implements CanvasControl {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos);
                 relPos.sub(next.region.min());
-                if (next.listener.onMouseWheel(wheelTurns, relPos)) {
+                if (next.listener.onMouseWheel(wheelTurns, relPos, keyboard)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
                     return true;

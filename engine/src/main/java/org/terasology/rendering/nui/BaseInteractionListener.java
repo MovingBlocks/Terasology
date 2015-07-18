@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Vector2i;
 
 /**
@@ -32,7 +33,7 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public void onMouseOver(Vector2i pos, boolean topMostElement) {
+    public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
         this.mouseOver = topMostElement;
     }
 
@@ -42,26 +43,26 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public boolean onMouseClick(MouseInput button, Vector2i pos) {
+    public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
         return false;
     }
 
     @Override
-    public boolean onMouseDoubleClick(MouseInput button, Vector2i pos) {
-        return onMouseClick(button, pos);
+    public boolean onMouseDoubleClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
+        return onMouseClick(button, pos, keyboard);
     }
 
     @Override
-    public void onMouseDrag(Vector2i pos) {
+    public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
 
     }
 
     @Override
-    public void onMouseRelease(MouseInput button, Vector2i pos) {
+    public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
     }
 
     @Override
-    public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+    public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
         return false;
     }
 

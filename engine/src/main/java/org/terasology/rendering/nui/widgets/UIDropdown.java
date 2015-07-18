@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -44,7 +45,7 @@ public class UIDropdown<T> extends CoreWidget {
     private Binding<T> selection = new DefaultBinding<>();
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             opened = !opened;
             optionListeners.clear();
             if (opened) {
@@ -168,7 +169,7 @@ public class UIDropdown<T> extends CoreWidget {
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             setSelection(getOptions().get(index));
             opened = false;
             return true;

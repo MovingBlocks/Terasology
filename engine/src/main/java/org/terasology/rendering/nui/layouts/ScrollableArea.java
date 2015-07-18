@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layouts;
 
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -55,7 +56,7 @@ public class ScrollableArea extends CoreLayout {
 
     private InteractionListener scrollListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
             // If there are two scrollbars, we assume vertical has priority
             if (verticalScrollbar) {
                 verticalBar.setValue(verticalBar.getValue() + wheelTurns * SCROLL_MULTIPLIER);

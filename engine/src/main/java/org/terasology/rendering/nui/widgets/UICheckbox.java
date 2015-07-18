@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -35,7 +36,7 @@ public class UICheckbox extends CoreWidget {
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 active.set(!active.get());
                 return true;

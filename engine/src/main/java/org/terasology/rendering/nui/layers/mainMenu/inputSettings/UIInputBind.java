@@ -20,6 +20,7 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -51,15 +52,15 @@ public class UIInputBind extends CoreWidget {
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement) {
-            super.onMouseOver(pos, topMostElement);
+        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
+            super.onMouseOver(pos, topMostElement, keyboard);
             if (topMostElement) {
                 focusManager.setFocus(UIInputBind.this);
             }
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 if (getClickSound() != null) {
                     getClickSound().play(getClickVolume());

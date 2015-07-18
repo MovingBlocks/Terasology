@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -40,7 +41,7 @@ public class UIDoubleSlider extends CoreWidget {
         private Vector2i offset = new Vector2i();
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 active = true;
                 offset.set(pos);
@@ -51,12 +52,12 @@ public class UIDoubleSlider extends CoreWidget {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             active = false;
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             if (sliderWidth > 0) {
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
@@ -72,7 +73,7 @@ public class UIDoubleSlider extends CoreWidget {
         private Vector2i offset = new Vector2i();
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
                 active = true;
                 offset.set(pos);
@@ -83,12 +84,12 @@ public class UIDoubleSlider extends CoreWidget {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             active = false;
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             if (sliderWidth > 0) {
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;

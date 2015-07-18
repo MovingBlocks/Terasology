@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -50,17 +51,17 @@ public class ZoomableLayout extends CoreLayout {
 
     private InteractionListener dragListener = new BaseInteractionListener() {
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement) {
+        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
             last = new Vector2i(pos);
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             return true;
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             Vector2f p = screenToWorld(last);
             p.sub(screenToWorld(pos));
             p.add(windowPosition);
@@ -69,7 +70,7 @@ public class ZoomableLayout extends CoreLayout {
         }
 
         @Override
-        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
             if (Keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
                 float scale = 1 + wheelTurns * 0.05f;
                 zoom(scale, scale, pos);

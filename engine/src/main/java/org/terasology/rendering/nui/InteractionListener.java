@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Vector2i;
 
 /**
@@ -27,11 +28,11 @@ public interface InteractionListener {
 
     /**
      * Called every frame the mouse is over the interaction region
-     *
      * @param pos            The relative position of the mouse
      * @param topMostElement Whether this element is the top-most element the mouse is over
+     * @param keyboard
      */
-    void onMouseOver(Vector2i pos, boolean topMostElement);
+    void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard);
 
     /**
      * Called if the mouse ceases to be over the interaction region
@@ -43,9 +44,10 @@ public interface InteractionListener {
      *
      * @param button The mouse button that was clicked
      * @param pos    The relative position of the mouse
+     * @param keyboard
      * @return Whether the mouse input should be consumed, and thus not propagated to other interaction regions
      */
-    boolean onMouseClick(MouseInput button, Vector2i pos);
+    boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard);
 
     /**
      * Called when the mouse is double-clicked over an interaction region associated with this listener.
@@ -53,33 +55,35 @@ public interface InteractionListener {
      *
      * @param button The mouse button that was double clicked
      * @param pos    The relative position of the mouse
+     * @param keyboard
      * @return Whether the input should be consumed, and thus not propagated to other interaction regions
      */
-    boolean onMouseDoubleClick(MouseInput button, Vector2i pos);
+    boolean onMouseDoubleClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard);
 
     /**
      * Called when the mouse is moved after clicking on the interaction region
-     *
-     * @param pos The relative position of the mouse
+     *  @param pos The relative position of the mouse
+     * @param keyboard
      */
-    void onMouseDrag(Vector2i pos);
+    void onMouseDrag(Vector2i pos, KeyboardDevice keyboard);
 
     /**
      * Called when the mouse is wheeled while over the interaction region
      *
      * @param wheelTurns
      * @param pos
+     * @param keyboard
      * @return Whether the mouse input should be consumed, and thus not propagated to other interaction regions
      */
-    boolean onMouseWheel(int wheelTurns, Vector2i pos);
+    boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard);
 
     /**
      * Called when the mouse is released after clicking on the interaction region
-     *
      * @param button The mouse button that was clicked
      * @param pos    The relative position of the mouse
+     * @param keyboard
      */
-    void onMouseRelease(MouseInput button, Vector2i pos);
+    void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard);
 
     /**
      * @return True if the mouse was over the interaction region last frame

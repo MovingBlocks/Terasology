@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
@@ -57,12 +58,12 @@ public class BehaviorEditor extends ZoomableLayout {
 
     private final InteractionListener moveOver = new BaseInteractionListener() {
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement) {
+        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
             mousePos = screenToWorld(pos);
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (newNode != null) {
                 newNode.setPosition(screenToWorld(pos));
                 addNode(newNode);
@@ -72,7 +73,7 @@ public class BehaviorEditor extends ZoomableLayout {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             newNode = null;
         }
     };

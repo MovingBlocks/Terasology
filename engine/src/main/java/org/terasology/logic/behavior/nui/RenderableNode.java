@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.tree.Node;
@@ -63,11 +64,11 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement) {
+        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             last = pos;
             dragged = false;
             copyMode = button == MouseInput.MOUSE_LEFT && (Keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT));
@@ -78,7 +79,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
+        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (!dragged) {
                 if (button == MouseInput.MOUSE_RIGHT) {
                     collapsed = !collapsed;
@@ -93,7 +94,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos) {
+        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             Vector2f diff = editor.screenToWorld(pos);
             diff.sub(editor.screenToWorld(last));
             if (diff.lengthSquared() != 0) {

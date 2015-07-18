@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -32,12 +33,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             return true;
         }
 
         @Override
-        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
             return true;
         }
     };

@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.nui;
 
 import org.terasology.asset.Assets;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
@@ -45,7 +46,7 @@ public abstract class Port extends CoreWidget {
 
     private InteractionListener connectListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             node.getEditor().portClicked(Port.this);
             return true;
         }

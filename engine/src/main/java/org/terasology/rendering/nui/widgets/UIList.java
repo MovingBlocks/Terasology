@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -195,7 +196,7 @@ public class UIList<T> extends CoreWidget {
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT && isSelectable()) {
                 select(index);
                 return true;
@@ -204,7 +205,7 @@ public class UIList<T> extends CoreWidget {
         }
 
         @Override
-        public boolean onMouseDoubleClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseDoubleClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT && isSelectable()) {
                 activate(index);
                 return true;
