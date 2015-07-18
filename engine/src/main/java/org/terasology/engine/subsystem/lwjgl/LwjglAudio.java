@@ -27,7 +27,6 @@ import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
@@ -37,13 +36,20 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     private AudioManager audioManager;
 
     @Override
-    public synchronized void preInitialise(Context context) {
-        super.preInitialise(context);
+    public String getName() {
+        return "Audio";
     }
 
     @Override
-    public void initialise(Context context) {
-        initOpenAL(context);
+    public void initialise(Context rootContext) {
+        Config config = rootContext.get(Config.class);
+        try {
+            audioManager = new OpenALManager(config.getAudio());
+        } catch (LWJGLException | OpenALException e) {
+            logger.warn("Could not load OpenAL manager - sound is disabled", e);
+            audioManager = new NullAudioManager();
+        }
+        rootContext.put(AudioManager.class, audioManager);
     }
 
     @Override
@@ -53,43 +59,14 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void postInitialise(Context context) {
-
-    }
-
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
     public void postUpdate(GameState currentState, float delta) {
         audioManager.update(delta);
     }
 
     @Override
-    public void shutdown(Config config) {
-    }
-
-    @Override
-    public void dispose() {
+    public void shutdown() {
         if (audioManager != null) {
             audioManager.dispose();
         }
     }
-
-    private void initOpenAL(Context context) {
-                Config config = context.get(Config.class);
-                try {
-            audioManager = new OpenALManager(config.getAudio());
-        } catch (LWJGLException | OpenALException e) {
-            logger.warn("Could not load OpenAL manager - sound is disabled", e);
-            audioManager = new NullAudioManager();
-        }
-        context.put(AudioManager.class, audioManager);
-    }
-
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
-    }
-
 }

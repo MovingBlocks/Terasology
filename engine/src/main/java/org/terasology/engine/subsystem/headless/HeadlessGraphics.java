@@ -17,7 +17,6 @@ package org.terasology.engine.subsystem.headless;
 
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
@@ -58,6 +57,11 @@ import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 
 public class HeadlessGraphics implements EngineSubsystem {
+
+    @Override
+    public String getName() {
+        return "Graphics";
+    }
 
     @Override
     public void preInitialise(Context context) {
@@ -103,13 +107,8 @@ public class HeadlessGraphics implements EngineSubsystem {
     }
 
     @Override
-    public void shutdown(Config config) {
+    public void shutdown() {
     }
-
-    @Override
-    public void dispose() {
-    }
-
 
     private void initHeadless(Context context) {
         context.put(ShaderManager.class, new ShaderManagerHeadless());

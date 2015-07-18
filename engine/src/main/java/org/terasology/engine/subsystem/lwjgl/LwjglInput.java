@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
@@ -35,13 +34,8 @@ public class LwjglInput extends BaseLwjglSubsystem {
     private Context context;
 
     @Override
-    public void preInitialise(Context context) {
-        super.preInitialise(context);
-    }
-
-    @Override
-    public void initialise(Context context) {
-
+    public String getName() {
+        return "Input";
     }
 
     @Override
@@ -49,8 +43,8 @@ public class LwjglInput extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void postInitialise(Context context) {
-        this.context = context;
+    public void postInitialise(Context rootContext) {
+        this.context = rootContext;
         initControls();
         updateInputConfig();
         Mouse.setGrabbed(false);
@@ -61,18 +55,13 @@ public class LwjglInput extends BaseLwjglSubsystem {
     }
 
 
-
     @Override
     public void postUpdate(GameState currentState, float delta) {
         currentState.handleInput(delta);
     }
 
     @Override
-    public void shutdown(Config config) {
-    }
-
-    @Override
-    public void dispose() {
+    public void shutdown() {
         Mouse.destroy();
         Keyboard.destroy();
     }
@@ -96,9 +85,4 @@ public class LwjglInput extends BaseLwjglSubsystem {
         config.getInput().getBinds().updateForChangedMods(context);
         config.save();
     }
-
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
-    }
-
 }
