@@ -121,7 +121,7 @@ public class UIInputBind extends CoreWidget {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
         if (event.isDown()) {
             if (capturingInput) {
                 setInput(InputType.KEY.getInput(event.getKey().getId()));

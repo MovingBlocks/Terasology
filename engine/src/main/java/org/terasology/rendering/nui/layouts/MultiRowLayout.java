@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -283,7 +284,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
     }
 
     @Override

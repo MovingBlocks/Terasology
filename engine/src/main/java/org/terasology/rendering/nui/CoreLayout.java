@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -41,7 +42,7 @@ public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget im
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
     }
 
     @Override

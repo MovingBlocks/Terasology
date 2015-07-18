@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -36,6 +35,7 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -70,6 +70,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private CanvasControl canvas;
     private WidgetLibrary widgetsLibrary;
     private UIWidget focus;
+    private KeyboardDevice keyboard;
 
     private boolean forceReleaseMouse;
 
@@ -81,6 +82,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.hudScreenLayer = new HUDScreenLayer();
         InjectionHelper.inject(hudScreenLayer, context);
         this.canvas = new CanvasImpl(this, context, renderer);
+        this.keyboard = context.get(InputSystem.class).getKeyboard();
         refreshWidgetsLibrary();
     }
 
@@ -499,7 +501,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
-            focus.onKeyEvent(event);
+            focus.onKeyEvent(event, keyboard);
         }
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
             for (UIScreenLayer screen : screens) {

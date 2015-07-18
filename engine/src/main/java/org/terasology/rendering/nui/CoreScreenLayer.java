@@ -142,7 +142,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
     }
 
     @Override

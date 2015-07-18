@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -79,7 +80,7 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     void onMouseWheelEvent(MouseWheelEvent event);
 
-    void onKeyEvent(KeyEvent event);
+    void onKeyEvent(KeyEvent event, KeyboardDevice keyboard);
 
     void onBindEvent(BindButtonEvent event);
 

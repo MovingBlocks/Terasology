@@ -231,7 +231,7 @@ public class UIText extends CoreWidget {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
         correctCursor();
         if (event.isDown() && lastFont != null) {
             String fullText = text.get();

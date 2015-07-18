@@ -17,6 +17,7 @@ package org.terasology.logic.console.ui;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -48,7 +49,7 @@ public class UICommandEntry extends UIText {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
         if (event.isDown()) {
             int id = event.getKey().getId();
             
@@ -87,12 +88,12 @@ public class UICommandEntry extends UIText {
                     }
                     break;
                 case Keyboard.KeyId.ENTER:
-                    super.onKeyEvent(event);
+                    super.onKeyEvent(event, keyboard);
                     setText("");
                     index = getCommandHistory().size();
                     break;
                 default:
-                    super.onKeyEvent(event);
+                    super.onKeyEvent(event, keyboard);
             }
         }
     }
