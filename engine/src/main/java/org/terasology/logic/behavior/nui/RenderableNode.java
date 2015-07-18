@@ -71,7 +71,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             last = pos;
             dragged = false;
-            copyMode = button == MouseInput.MOUSE_LEFT && (Keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT));
+            copyMode = button == MouseInput.MOUSE_LEFT && (keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT));
             if (copyMode) {
                 editor.copyNode(RenderableNode.this);
             }

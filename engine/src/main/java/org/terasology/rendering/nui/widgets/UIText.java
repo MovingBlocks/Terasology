@@ -88,7 +88,7 @@ public class UIText extends CoreWidget {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (button == MouseInput.MOUSE_LEFT) {
-                moveCursor(pos, false);
+                moveCursor(pos, false, keyboard);
                 dragging = true;
                 return true;
             }
@@ -98,7 +98,7 @@ public class UIText extends CoreWidget {
         @Override
         public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
             if (dragging) {
-                moveCursor(pos, true);
+                moveCursor(pos, true, keyboard);
             }
         }
 
@@ -238,36 +238,36 @@ public class UIText extends CoreWidget {
 
             switch (event.getKey().getId()) {
                 case KeyId.LEFT: {
-                    if (hasSelection() && !isSelectionModifierActive()) {
+                    if (hasSelection() && !isSelectionModifierActive(keyboard)) {
                         setCursorPosition(Math.min(getCursorPosition(), selectionStart));
                     } else if (getCursorPosition() > 0) {
-                        decreaseCursorPosition(1, !isSelectionModifierActive());
+                        decreaseCursorPosition(1, !isSelectionModifierActive(keyboard));
                     }
                     event.consume();
                     break;
                 }
                 case KeyId.RIGHT: {
-                    if (hasSelection() && !isSelectionModifierActive()) {
+                    if (hasSelection() && !isSelectionModifierActive(keyboard)) {
                         setCursorPosition(Math.max(getCursorPosition(), selectionStart));
                     } else if (getCursorPosition() < fullText.length()) {
-                        increaseCursorPosition(1, !isSelectionModifierActive());
+                        increaseCursorPosition(1, !isSelectionModifierActive(keyboard));
                     }
                     event.consume();
                     break;
                 }
                 case KeyId.HOME: {
-                    setCursorPosition(0, !isSelectionModifierActive());
+                    setCursorPosition(0, !isSelectionModifierActive(keyboard));
                     offset = 0;
                     event.consume();
                     break;
                 }
                 case KeyId.END: {
-                    setCursorPosition(fullText.length(), !isSelectionModifierActive());
+                    setCursorPosition(fullText.length(), !isSelectionModifierActive(keyboard));
                     event.consume();
                     break;
                 }
                 default: {
-                    if (Keyboard.isKeyDown(KeyId.LEFT_CTRL) || Keyboard.isKeyDown(KeyId.RIGHT_CTRL)) {
+                    if (keyboard.isKeyDown(KeyId.LEFT_CTRL) || keyboard.isKeyDown(KeyId.RIGHT_CTRL)) {
                         if (event.getKey() == Keyboard.Key.C) {
                             copySelection();
                             event.consume();
@@ -314,7 +314,7 @@ public class UIText extends CoreWidget {
                         break;
                     }
                     default: {
-                        if (Keyboard.isKeyDown(KeyId.LEFT_CTRL) || Keyboard.isKeyDown(KeyId.RIGHT_CTRL)) {
+                        if (keyboard.isKeyDown(KeyId.LEFT_CTRL) || keyboard.isKeyDown(KeyId.RIGHT_CTRL)) {
                             if (event.getKey() == Keyboard.Key.V) {
                                 removeSelection();
                                 paste();
@@ -355,8 +355,8 @@ public class UIText extends CoreWidget {
         }
     }
 
-    private boolean isSelectionModifierActive() {
-        return Keyboard.isKeyDown(KeyId.LEFT_SHIFT) || Keyboard.isKeyDown(KeyId.RIGHT_SHIFT);
+    private boolean isSelectionModifierActive(KeyboardDevice keyboard) {
+        return keyboard.isKeyDown(KeyId.LEFT_SHIFT) || keyboard.isKeyDown(KeyId.RIGHT_SHIFT);
     }
 
     private boolean hasSelection() {
@@ -407,7 +407,7 @@ public class UIText extends CoreWidget {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(str), null);
     }
 
-    private void moveCursor(Vector2i pos, boolean selecting) {
+    private void moveCursor(Vector2i pos, boolean selecting, KeyboardDevice keyboard) {
         if (lastFont != null) {
             pos.x += offset;
             String rawText = getText();
@@ -447,7 +447,7 @@ public class UIText extends CoreWidget {
                 }
             }
 
-            setCursorPosition(Math.min(newCursorPos, rawText.length()), !isSelectionModifierActive() && !selecting);
+            setCursorPosition(Math.min(newCursorPos, rawText.length()), !isSelectionModifierActive(keyboard) && !selecting);
             updateOffset();
         }
     }

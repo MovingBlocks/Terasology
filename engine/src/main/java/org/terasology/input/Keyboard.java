@@ -18,7 +18,6 @@ package org.terasology.input;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Locale;
 import java.util.Map;
@@ -28,10 +27,6 @@ import java.util.Map;
  */
 public final class Keyboard {
     private Keyboard() {
-    }
-
-    public static boolean isKeyDown(int key) {
-        return CoreRegistry.get(InputSystem.class).getKeyboard().isKeyDown(key);
     }
 
     public static class KeyId {

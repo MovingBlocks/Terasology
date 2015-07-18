@@ -71,7 +71,7 @@ public class ZoomableLayout extends CoreLayout {
 
         @Override
         public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
-            if (Keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
+            if (keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
                 float scale = 1 + wheelTurns * 0.05f;
                 zoom(scale, scale, pos);
             }

@@ -53,7 +53,7 @@ public class InventoryCell extends ItemCell {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
             if (MouseInput.MOUSE_LEFT == button) {
-                if (Keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
+                if (keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
                     moveItemSmartly();
                 } else {
                     swapItem();
@@ -69,7 +69,7 @@ public class InventoryCell extends ItemCell {
 
         @Override
         public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
-            int amount = (Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || Keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL)) ? 2 : 1;
+            int amount = (keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL)) ? 2 : 1;
 
             //move item to the transfer slot
             if (wheelTurns > 0) {
