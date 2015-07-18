@@ -146,6 +146,6 @@ public class ComponentSerializerTest {
         EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value")).build();
         StringComponent original = new StringComponent("test");
         componentSerializer.deserializeOnto(original, compData);
-        assertEquals("test", original.value);
+        assertEquals(null, original.value);
     }
 }
