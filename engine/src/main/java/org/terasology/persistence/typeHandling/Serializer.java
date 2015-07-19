@@ -17,9 +17,9 @@ package org.terasology.persistence.typeHandling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.persistence.serializers.DeserializeFieldCheck;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.persistence.serializers.DeserializeFieldCheck;
 
 import java.util.Map;
 
@@ -96,9 +96,7 @@ public class Serializer {
             logger.error("No type handler for type {} used by {}::{}", fieldMetadata.getType(), target.getClass(), fieldMetadata);
         } else {
             Object deserializedValue = handler.deserialize(data, context);
-            if (deserializedValue != null) {
-                fieldMetadata.setValue(target, deserializedValue);
-            }
+            fieldMetadata.setValue(target, deserializedValue);
         }
     }
 
