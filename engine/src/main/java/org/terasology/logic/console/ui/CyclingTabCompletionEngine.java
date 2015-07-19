@@ -28,7 +28,6 @@ import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.CamelCaseMatcher;
 
@@ -50,9 +49,11 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     private Message previousMessage;
     private Collection<String> commandNames;
     private String query;
+    private LocalPlayer localPlayer;
 
-    public CyclingTabCompletionEngine(Console console) {
+    public CyclingTabCompletionEngine(Console console, LocalPlayer localPlayer) {
         this.console = console;
+        this.localPlayer = localPlayer;
     }
 
     private boolean updateCommandNamesIfNecessary() {
@@ -87,7 +88,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         }
 
         String currentValue = commandParameters.size() >= suggestedIndex ? commandParameters.get(suggestedIndex - 1) : null;
-        EntityRef sender = CoreRegistry.get(LocalPlayer.class).getClientEntity();
+        EntityRef sender = localPlayer.getClientEntity();
 
         try {
             return command.suggest(currentValue, finishedParameters, sender);
