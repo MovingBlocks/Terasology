@@ -32,6 +32,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.game.GameManifest;
+import org.terasology.input.InputSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.logic.console.ConsoleSystem;
@@ -90,6 +91,7 @@ public class StateHeadlessSetup implements GameState {
 
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
+        componentSystemManager.register(context.get(InputSystem.class), "engine:InputSystem");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();
