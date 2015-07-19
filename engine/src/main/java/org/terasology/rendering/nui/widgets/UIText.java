@@ -41,6 +41,9 @@ import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDragEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -86,9 +89,9 @@ public class UIText extends CoreWidget {
         boolean dragging;
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            if (button == MouseInput.MOUSE_LEFT) {
-                moveCursor(pos, false, keyboard);
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                moveCursor(event.getRelativeMousePosition(), false, event.getKeyboard());
                 dragging = true;
                 return true;
             }
@@ -96,15 +99,15 @@ public class UIText extends CoreWidget {
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
+        public void onMouseDrag(NUIMouseDragEvent event) {
             if (dragging) {
-                moveCursor(pos, true, keyboard);
+                moveCursor(event.getRelativeMousePosition(), true, event.getKeyboard());
             }
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            if (button == MouseInput.MOUSE_LEFT) {
+        public void onMouseRelease(NUIMouseReleaseEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 dragging = false;
             }
         }

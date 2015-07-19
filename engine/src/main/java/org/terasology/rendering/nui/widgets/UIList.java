@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
-import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -25,6 +24,8 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
@@ -196,8 +197,8 @@ public class UIList<T> extends CoreWidget {
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            if (button == MouseInput.MOUSE_LEFT && isSelectable()) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
                 select(index);
                 return true;
             }
@@ -205,8 +206,8 @@ public class UIList<T> extends CoreWidget {
         }
 
         @Override
-        public boolean onMouseDoubleClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            if (button == MouseInput.MOUSE_LEFT && isSelectable()) {
+        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
                 activate(index);
                 return true;
             }

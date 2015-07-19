@@ -15,9 +15,12 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.input.MouseInput;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDragEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 
 /**
  * @author Immortius
@@ -33,8 +36,8 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
-        this.mouseOver = topMostElement;
+    public void onMouseOver(NUIMouseOverEvent event) {
+        this.mouseOver = event.isTopMostElement();
     }
 
     @Override
@@ -43,26 +46,26 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
+    public boolean onMouseClick(NUIMouseClickEvent event) {
         return false;
     }
 
     @Override
-    public boolean onMouseDoubleClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-        return onMouseClick(button, pos, keyboard);
+    public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
+        return onMouseClick(event);
     }
 
     @Override
-    public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
+    public void onMouseDrag(NUIMouseDragEvent event) {
 
     }
 
     @Override
-    public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
+    public void onMouseRelease(NUIMouseReleaseEvent event) {
     }
 
     @Override
-    public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
+    public boolean onMouseWheel(NUIMouseWheelEvent event) {
         return false;
     }
 

@@ -18,8 +18,6 @@ package org.terasology.logic.behavior.nui;
 import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.input.MouseInput;
-import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
@@ -38,6 +36,9 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
 import java.io.ByteArrayInputStream;
@@ -58,14 +59,14 @@ public class BehaviorEditor extends ZoomableLayout {
 
     private final InteractionListener moveOver = new BaseInteractionListener() {
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
-            mousePos = screenToWorld(pos);
+        public void onMouseOver(NUIMouseOverEvent event) {
+            mousePos = screenToWorld(event.getRelativeMousePosition());
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
             if (newNode != null) {
-                newNode.setPosition(screenToWorld(pos));
+                newNode.setPosition(screenToWorld(event.getRelativeMousePosition()));
                 addNode(newNode);
                 return true;
             }
@@ -73,7 +74,7 @@ public class BehaviorEditor extends ZoomableLayout {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
+        public void onMouseRelease(NUIMouseReleaseEvent event) {
             newNode = null;
         }
     };

@@ -34,6 +34,10 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDragEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
 import java.util.List;
@@ -64,12 +68,14 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
+        public void onMouseOver(NUIMouseOverEvent event) {
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            last = pos;
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            last = event.getRelativeMousePosition();
+            MouseInput button = event.getMouseButton();
+            KeyboardDevice keyboard = event.getKeyboard();
             dragged = false;
             copyMode = button == MouseInput.MOUSE_LEFT && (keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT));
             if (copyMode) {
@@ -79,9 +85,9 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
+        public void onMouseRelease(NUIMouseReleaseEvent event) {
             if (!dragged) {
-                if (button == MouseInput.MOUSE_RIGHT) {
+                if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
                     collapsed = !collapsed;
                     for (RenderableNode child : children) {
                         child.setVisible(!collapsed);
@@ -94,15 +100,15 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
 
         @Override
-        public void onMouseDrag(Vector2i pos, KeyboardDevice keyboard) {
-            Vector2f diff = editor.screenToWorld(pos);
+        public void onMouseDrag(NUIMouseDragEvent event) {
+            Vector2f diff = editor.screenToWorld(event.getRelativeMousePosition());
             diff.sub(editor.screenToWorld(last));
             if (diff.lengthSquared() != 0) {
                 dragged = true;
             }
             move(diff);
 
-            last = pos;
+            last = event.getRelativeMousePosition();
         }
     };
 

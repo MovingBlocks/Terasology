@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -26,6 +25,7 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.widgets.UIScrollbar;
 
 import java.util.Arrays;
@@ -56,12 +56,12 @@ public class ScrollableArea extends CoreLayout {
 
     private InteractionListener scrollListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
+        public boolean onMouseWheel(NUIMouseWheelEvent event) {
             // If there are two scrollbars, we assume vertical has priority
             if (verticalScrollbar) {
-                verticalBar.setValue(verticalBar.getValue() + wheelTurns * SCROLL_MULTIPLIER);
+                verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * SCROLL_MULTIPLIER);
             } else if (horizontalScrollbar) {
-                horizontalBar.setValue(horizontalBar.getValue() + wheelTurns * SCROLL_MULTIPLIER);
+                horizontalBar.setValue(horizontalBar.getValue() + event.getWheelTurns() * SCROLL_MULTIPLIER);
             }
             return true;
         }

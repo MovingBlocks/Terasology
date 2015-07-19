@@ -27,7 +27,6 @@ import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -35,6 +34,8 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,14 +52,15 @@ public class InventoryCell extends ItemCell {
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            if (MouseInput.MOUSE_LEFT == button) {
-                if (keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            MouseInput mouseButton = event.getMouseButton();
+            if (mouseButton == MouseInput.MOUSE_LEFT) {
+                if (event.getKeyboard().isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
                     moveItemSmartly();
                 } else {
                     swapItem();
                 }
-            } else if (MouseInput.MOUSE_RIGHT == button) {
+            } else if (mouseButton == MouseInput.MOUSE_RIGHT) {
                 int stackSize = InventoryUtils.getStackCount(getTargetItem());
                 if (stackSize > 0) {
                     giveAmount((stackSize + 1) / 2);
@@ -68,11 +70,12 @@ public class InventoryCell extends ItemCell {
         }
 
         @Override
-        public boolean onMouseWheel(int wheelTurns, Vector2i pos, KeyboardDevice keyboard) {
+        public boolean onMouseWheel(NUIMouseWheelEvent event) {
+            KeyboardDevice keyboard = event.getKeyboard();
             int amount = (keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL)) ? 2 : 1;
 
             //move item to the transfer slot
-            if (wheelTurns > 0) {
+            if (event.getWheelTurns() > 0) {
                 giveAmount(amount);
             } else {
                 //get item from transfer slot

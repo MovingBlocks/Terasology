@@ -33,6 +33,8 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 
 import java.util.List;
 
@@ -52,16 +54,16 @@ public class UIInputBind extends CoreWidget {
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement, KeyboardDevice keyboard) {
-            super.onMouseOver(pos, topMostElement, keyboard);
-            if (topMostElement) {
+        public void onMouseOver(NUIMouseOverEvent event) {
+            super.onMouseOver(event);
+            if (event.isTopMostElement()) {
                 focusManager.setFocus(UIInputBind.this);
             }
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos, KeyboardDevice keyboard) {
-            if (button == MouseInput.MOUSE_LEFT) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (getClickSound() != null) {
                     getClickSound().play(getClickVolume());
                 }
