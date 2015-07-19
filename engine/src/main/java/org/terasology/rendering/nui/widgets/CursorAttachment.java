@@ -15,10 +15,12 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.input.Mouse;
+import org.terasology.input.InputSystem;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
@@ -49,29 +51,32 @@ public class CursorAttachment extends CoreWidget {
         Vector2i attachmentSize = canvas.calculatePreferredSize(attachment);
         attachmentSize.add(style.getMargin().getTotals());
 
+        // TODO get rid of CoreRegistry. e.g. by updatin a mousePos field with an InteractionListener
+        MouseDevice mouse = CoreRegistry.get(InputSystem.class).getMouseDevice();
+
         int top;
         switch (style.getVerticalAlignment()) {
             case TOP:
-                top = Mouse.getPosition().y - attachmentSize.y;
+                top = mouse.getPosition().y - attachmentSize.y;
                 break;
             case MIDDLE:
-                top = Mouse.getPosition().y - attachmentSize.y / 2;
+                top = mouse.getPosition().y - attachmentSize.y / 2;
                 break;
             default:
-                top = Mouse.getPosition().y + MOUSE_CURSOR_HEIGHT;
+                top = mouse.getPosition().y + MOUSE_CURSOR_HEIGHT;
                 break;
         }
         top = TeraMath.clamp(top, 0, canvas.size().y - attachmentSize.y);
         int left;
         switch (style.getHorizontalAlignment()) {
             case RIGHT:
-                left = Mouse.getPosition().x - attachmentSize.x;
+                left = mouse.getPosition().x - attachmentSize.x;
                 break;
             case CENTER:
-                left = Mouse.getPosition().x - attachmentSize.x / 2;
+                left = mouse.getPosition().x - attachmentSize.x / 2;
                 break;
             default:
-                left = Mouse.getPosition().x;
+                left = mouse.getPosition().x;
                 break;
         }
         left = TeraMath.clamp(left, 0, canvas.size().x - attachmentSize.x);
@@ -95,6 +100,8 @@ public class CursorAttachment extends CoreWidget {
 
     @Override
     public boolean isVisible() {
-        return super.isVisible() && Mouse.isVisible() && getAttachment() != null && getAttachment().isVisible();
+        // TODO get rid of CoreRegistry. e.g. by updatin a mouseVisibility field with an enhanced InteractionListener
+        MouseDevice mouse = CoreRegistry.get(InputSystem.class).getMouseDevice();
+        return super.isVisible() && mouse.isVisible() && getAttachment() != null && getAttachment().isVisible();
     }
 }

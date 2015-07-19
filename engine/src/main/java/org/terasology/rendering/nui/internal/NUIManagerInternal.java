@@ -34,8 +34,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
-import org.terasology.input.Mouse;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -71,6 +71,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private WidgetLibrary widgetsLibrary;
     private UIWidget focus;
     private KeyboardDevice keyboard;
+    private MouseDevice mouse;
 
     private boolean forceReleaseMouse;
 
@@ -83,6 +84,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         InjectionHelper.inject(hudScreenLayer, context);
         this.canvas = new CanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
+        this.mouse = context.get(InputSystem.class).getMouseDevice();
         refreshWidgetsLibrary();
     }
 
@@ -378,7 +380,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        canvas.processMousePosition(Mouse.getPosition());
+        canvas.processMousePosition(mouse.getPosition());
 
         for (UIScreenLayer screen : screens) {
             screen.update(delta);
@@ -453,7 +455,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse button events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
-        if (!Mouse.isVisible()) {
+        if (!mouse.isVisible()) {
             return;
         }
         if (focus != null) {
@@ -479,7 +481,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse wheel events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
-        if (!Mouse.isVisible()) {
+        if (!mouse.isVisible()) {
             return;
         }
 
@@ -489,7 +491,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 return;
             }
         }
-        if (canvas.processMouseWheel(event.getWheelTurns(), Mouse.getPosition())) {
+        if (canvas.processMouseWheel(event.getWheelTurns(), mouse.getPosition())) {
             event.consume();
         }
         if (isReleasingMouse()) {
