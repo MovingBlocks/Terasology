@@ -31,7 +31,6 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -48,11 +47,17 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
 
     @In
     private WorldProvider worldProvider;
+
     @In
     private EntityManager entityManager;
+
     private Random random = new FastRandom();
     @In
     private Time time;
+
+    @In
+    private LocalPlayer localPlayer;
+
     private boolean idling;
 
     // TODO add way to recognize if attacked
@@ -87,13 +92,13 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                       Vector3f worldPos) {
         HierarchicalAIComponent ai = entity
                 .getComponent(HierarchicalAIComponent.class);
-        long tempTime = CoreRegistry.get(Time.class).getGameTimeInMs();
+        long tempTime = time.getGameTimeInMs();
         //TODO remove next
         long lastAttack = 0;
 
         // skip update if set to skip them
         if (tempTime - ai.lastProgressedUpdateAt < ai.updateFrequency) {
-            ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
+            ai.lastProgressedUpdateAt = time
                     .getGameTimeInMs();
             return;
         }
@@ -109,7 +114,6 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         // find player position
         // TODO: shouldn't use local player, need some way to find nearest
         // player
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         if (localPlayer != null) {
             Vector3f dist = new Vector3f(worldPos);
             dist.sub(localPlayer.getPosition());
@@ -130,7 +134,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                     if (tempTime - lastAttack > ai.damageFrequency) {
                         localPlayer.getCharacterEntity().send(
                                 new DoDamageEvent(ai.damage, EngineDamageTypes.PHYSICAL.get(), entity));
-                        lastAttack = CoreRegistry.get(Time.class).getGameTimeInMs();
+                        lastAttack = time.getGameTimeInMs();
                     }
                 }
             }
@@ -179,8 +183,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                         ai.inDanger = true;
                     }
                 }
-                ai.lastChangeOfDangerAt = CoreRegistry.get(Time.class)
-                        .getGameTimeInMs();
+                ai.lastChangeOfDangerAt = time.getGameTimeInMs();
             }
         }
 
@@ -201,12 +204,10 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                     idleChangeTime = (long) (ai.idlingUpdateTime * random.nextDouble() * ai.hectic);
                     idling = false;
                     // mark idling state changed
-                    ai.lastChangeOfidlingtAt = CoreRegistry.get(Time.class)
-                            .getGameTimeInMs();
+                    ai.lastChangeOfidlingtAt = time.getGameTimeInMs();
                 }
                 entity.saveComponent(location);
-                ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
-                        .getGameTimeInMs();
+                ai.lastProgressedUpdateAt = time.getGameTimeInMs();
                 return;
 
             }
@@ -219,10 +220,8 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                 entity.saveComponent(location);
 
                 // mark start idling
-                ai.lastChangeOfMovementAt = CoreRegistry.get(Time.class)
-                        .getGameTimeInMs();
-                ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class)
-                        .getGameTimeInMs();
+                ai.lastChangeOfMovementAt = time.getGameTimeInMs();
+                ai.lastProgressedUpdateAt = time.getGameTimeInMs();
                 return;
             }
 
@@ -264,7 +263,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");
 
-        ai.lastProgressedUpdateAt = CoreRegistry.get(Time.class).getGameTimeInMs();
+        ai.lastProgressedUpdateAt = time.getGameTimeInMs();
     }
 
     private boolean foodInFront() {
