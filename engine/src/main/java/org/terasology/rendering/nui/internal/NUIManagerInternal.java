@@ -52,6 +52,7 @@ import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.Deque;
@@ -503,7 +504,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
-            focus.onKeyEvent(event, keyboard);
+            focus.onKeyEvent(new NUIKeyEvent(mouse, keyboard, event.getKey(), event.getKeyCharacter(),
+                    event.getState()));
         }
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
             for (UIScreenLayer screen : screens) {

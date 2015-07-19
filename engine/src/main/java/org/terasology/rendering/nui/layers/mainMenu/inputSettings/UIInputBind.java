@@ -20,8 +20,6 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
@@ -33,6 +31,7 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 
@@ -123,17 +122,18 @@ public class UIInputBind extends CoreWidget {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
+    public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
             if (capturingInput) {
                 setInput(InputType.KEY.getInput(event.getKey().getId()));
                 capturingInput = false;
-                event.consume();
+                return true;
             } else if (event.getKey() == Keyboard.Key.DELETE || event.getKey() == Keyboard.Key.BACKSPACE) {
                 setInput(null);
-                event.consume();
+                return true;
             }
         }
+        return false;
     }
 
     @Override

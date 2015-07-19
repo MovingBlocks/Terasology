@@ -17,10 +17,9 @@ package org.terasology.logic.console.ui;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.widgets.CursorUpdateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -49,7 +48,7 @@ public class UICommandEntry extends UIText {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
+    public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
             int id = event.getKey().getId();
             
@@ -66,8 +65,7 @@ public class UICommandEntry extends UIText {
                         }
                         setCursorPosition(getText().length());
                     }
-                    event.consume();
-                    break;
+                    return true;
                 case Keyboard.KeyId.DOWN:
                     if (index < getCommandHistory().size()) {
                         index++;
@@ -78,24 +76,24 @@ public class UICommandEntry extends UIText {
                             setCursorPosition(getText().length());
                         }
                     }
-                    event.consume();
-                    break;
+                    return true;
                 case Keyboard.KeyId.TAB:
                     if (tabCompletionEngine != null) {
                         setText(tabCompletionEngine.complete(getText()));
                         setCursorPosition(getText().length(), true, false);
-                        event.consume();
+                        return true;
                     }
                     break;
                 case Keyboard.KeyId.ENTER:
-                    super.onKeyEvent(event, keyboard);
+                    super.onKeyEvent(event);
                     setText("");
                     index = getCommandHistory().size();
                     break;
                 default:
-                    super.onKeyEvent(event, keyboard);
+                    super.onKeyEvent(event);
             }
         }
+        return false;
     }
 
     public void bindCommandHistory(Binding<List<String>> binding) {

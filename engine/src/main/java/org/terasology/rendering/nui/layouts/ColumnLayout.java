@@ -17,8 +17,6 @@ package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Rect2i;
@@ -29,6 +27,7 @@ import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -304,7 +303,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event, KeyboardDevice keyboard) {
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        return false;
     }
 
     @Override
