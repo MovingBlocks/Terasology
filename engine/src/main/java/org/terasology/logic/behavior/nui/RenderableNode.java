@@ -16,19 +16,16 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.asset.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
-import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.TreeAccessor;
 import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -135,7 +132,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         canvas.drawText(text);
 
         if (editor != null) {
-            canvas.addInteractionRegion(moveListener, CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponent(node).description);
+            canvas.addInteractionRegion(moveListener, data.description);
         }
         portList.onDraw(canvas);
     }
