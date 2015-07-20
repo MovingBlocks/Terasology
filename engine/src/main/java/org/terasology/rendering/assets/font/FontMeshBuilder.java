@@ -38,7 +38,6 @@ public class FontMeshBuilder {
     private static final float SHADOW_DEPTH = -2;
     private static final int SHADOW_HORIZONTAL_OFFSET = 1;
     private static final int SHADOW_VERTICAL_OFFSET = 1;
-    private static final int UNDERLINE_OFFSET = 2;
     private static final int UNKNOWN = -1;
 
     private final Material underlineMaterial;
@@ -161,9 +160,9 @@ public class FontMeshBuilder {
                 MeshBuilder builder = getBuilderFor(underlineMaterial);
                 if (shadowColor.a() != 0) {
                     addUnderline(builder, underlineStart + SHADOW_HORIZONTAL_OFFSET, underlineEnd + SHADOW_HORIZONTAL_OFFSET,
-                            y + font.getBaseHeight() + SHADOW_VERTICAL_OFFSET + UNDERLINE_OFFSET, shadowColor, SHADOW_DEPTH);
+                            y + font.getBaseHeight() + SHADOW_VERTICAL_OFFSET + font.getUnderlineOffset(), font.getUnderlineThickness(), shadowColor, SHADOW_DEPTH);
                 }
-                addUnderline(builder, underlineStart, underlineEnd, y + font.getBaseHeight() + UNDERLINE_OFFSET, currentColor, 0);
+                addUnderline(builder, underlineStart, underlineEnd, y + font.getBaseHeight() + font.getUnderlineOffset(), font.getUnderlineThickness(), currentColor, 0);
             }
             underlineStart = UNKNOWN;
             underlineEnd = UNKNOWN;
@@ -178,8 +177,8 @@ public class FontMeshBuilder {
             }
         }
 
-        private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, Color color, float depth) {
-            float bottom = (float) underlineTop + 1;
+        private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, int underlineThickness, Color color, float depth) {
+            float bottom = (float) underlineTop + underlineThickness;
 
             Vector3f v1 = new Vector3f((float) xStart, (float) underlineTop, depth);
             Vector3f v2 = new Vector3f((float) xEnd, (float) underlineTop, depth);

@@ -47,4 +47,8 @@ public abstract class Font extends Asset<FontData> {
     public abstract boolean hasCharacter(Character c);
 
     public abstract FontCharacter getCharacterData(Character c);
+
+    public abstract int getUnderlineOffset();
+
+    public abstract int getUnderlineThickness();
 }

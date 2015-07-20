@@ -105,6 +105,16 @@ public final class FontImpl extends Font {
     }
 
     @Override
+    public int getUnderlineOffset() {
+        return data.getUnderlineOffset();
+    }
+
+    @Override
+    public int getUnderlineThickness() {
+        return data.getUnderlineThickness();
+    }
+
+    @Override
     protected void doDispose() {
         this.data = null;
     }
