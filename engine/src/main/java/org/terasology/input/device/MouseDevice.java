@@ -16,10 +16,12 @@
 package org.terasology.input.device;
 
 import org.terasology.math.Vector2i;
+import org.terasology.module.sandbox.API;
 
 /**
  * @author Immortius
  */
+@API
 public interface MouseDevice extends InputDevice {
 
     /**
