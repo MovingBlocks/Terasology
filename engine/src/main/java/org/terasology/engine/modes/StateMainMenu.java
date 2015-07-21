@@ -77,7 +77,7 @@ public class StateMainMenu implements GameState {
         entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = context.get(EventSystem.class);
-        context.put(Console.class, new ConsoleImpl());
+        context.put(Console.class, new ConsoleImpl(context));
 
         nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);

@@ -38,7 +38,7 @@ public class InitialiseCommandSystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        context.put(Console.class, new ConsoleImpl());
+        context.put(Console.class, new ConsoleImpl(context));
         return true;
     }
 
