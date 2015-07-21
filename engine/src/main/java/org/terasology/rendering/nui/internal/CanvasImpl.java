@@ -401,10 +401,10 @@ public class CanvasImpl implements CanvasControl {
     public void drawText(String text, Rect2i region) {
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
-            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), region, style.getHorizontalTextAlignment(),
+            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(),
                     style.getVerticalTextAlignment());
         } else {
-            drawTextRaw(text, style.getFont(), style.getTextColor(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
+            drawTextRaw(text, style.getFont(), style.getTextColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }
     }
 
@@ -512,6 +512,11 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
+    public void drawTextRaw(String text, Font font, Color color, boolean underlined, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign) {
+        drawTextRawShadowed(text, font, color, Color.TRANSPARENT, underlined, region, hAlign, vAlign);
+    }
+
+    @Override
     public void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor) {
         drawTextRawShadowed(text, font, color, shadowColor, state.drawRegion);
     }
@@ -523,13 +528,18 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign) {
+        drawTextRawShadowed(text, font, color, shadowColor, false, region, hAlign, vAlign);
+    }
+
+    @Override
+    public void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor, boolean underline, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign) {
         Rect2i absoluteRegion = relativeToAbsolute(region);
         Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
         if (!cropRegion.isEmpty()) {
             if (state.drawOnTop) {
-                drawOnTopOperations.add(new DrawTextOperation(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha()));
+                drawOnTopOperations.add(new DrawTextOperation(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha(), underline));
             } else {
-                renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, state.getAlpha());
+                renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, state.getAlpha(), underline);
             }
         }
     }
@@ -947,18 +957,19 @@ public class CanvasImpl implements CanvasControl {
     }
 
     private final class DrawTextOperation implements DrawOperation {
-        private String text;
-        private Font font;
-        private Rect2i absoluteRegion;
-        private HorizontalAlign hAlign;
-        private VerticalAlign vAlign;
-        private Rect2i cropRegion;
-        private Color shadowColor;
-        private Color color;
-        private float alpha;
+        private final String text;
+        private final Font font;
+        private final Rect2i absoluteRegion;
+        private final HorizontalAlign hAlign;
+        private final VerticalAlign vAlign;
+        private final Rect2i cropRegion;
+        private final Color shadowColor;
+        private final Color color;
+        private final float alpha;
+        private final boolean underline;
 
         private DrawTextOperation(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
-                                  Color color, Color shadowColor, float alpha) {
+                                  Color color, Color shadowColor, float alpha, boolean underline) {
             this.text = text;
             this.font = font;
             this.absoluteRegion = absoluteRegion;
@@ -968,12 +979,13 @@ public class CanvasImpl implements CanvasControl {
             this.shadowColor = shadowColor;
             this.color = color;
             this.alpha = alpha;
+            this.underline = underline;
         }
 
         @Override
         public void draw() {
             renderer.crop(cropRegion);
-            renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, alpha);
+            renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, alpha, underline);
             renderer.crop(state.cropRegion);
         }
     }

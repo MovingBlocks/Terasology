@@ -40,9 +40,15 @@ public abstract class Font extends Asset<FontData> {
 
     public abstract int getLineHeight();
 
+    public abstract int getBaseHeight();
+
     public abstract Vector2i getSize(List<String> lines);
 
     public abstract boolean hasCharacter(Character c);
 
     public abstract FontCharacter getCharacterData(Character c);
+
+    public abstract int getUnderlineOffset();
+
+    public abstract int getUnderlineThickness();
 }

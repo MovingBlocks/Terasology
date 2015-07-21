@@ -28,6 +28,7 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.FontColor;
+import org.terasology.rendering.FontUnderline;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -181,7 +182,7 @@ public class UIText extends CoreWidget {
                     Rect2i region = Rect2i.createFromMinAndSize(selectionTopLeft.x, selectionTopLeft.y, selectionWidth, font.getLineHeight());
 
                     canvas.drawTexture(cursorTexture, region, textColor);
-                    canvas.drawTextRaw(FontColor.stripColor(selectionString), font, textColor.inverse(), region);
+                    canvas.drawTextRaw(FontUnderline.strip(FontColor.stripColor(selectionString)), font, textColor.inverse(), region);
                 }
                 currentChar += innerLine.length();
                 lineOffset++;
@@ -375,7 +376,7 @@ public class UIText extends CoreWidget {
         if (hasSelection()) {
             String fullText = getText();
             String selection = fullText.substring(Math.min(selectionStart, getCursorPosition()), Math.max(selectionStart, getCursorPosition()));
-            setClipboardContents(FontColor.stripColor(selection));
+            setClipboardContents(FontUnderline.strip(FontColor.stripColor(selection)));
         }
     }
 

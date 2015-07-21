@@ -181,6 +181,11 @@ public class UISkinBuilder {
         return this;
     }
 
+    public UISkinBuilder setTextUnderlined(boolean underlined) {
+        currentStyle.setTextUnderlined(underlined);
+        return this;
+    }
+
     public UISkinBuilder setStyleFragment(UIStyleFragment fragment) {
         currentStyle = fragment;
         return this;

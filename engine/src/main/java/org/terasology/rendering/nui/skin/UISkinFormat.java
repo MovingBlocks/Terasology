@@ -22,6 +22,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,8 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         try (JsonReader reader = new JsonReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UISkinData.class);
+        } catch (JsonParseException e) {
+            throw new IOException("Failed to load skin '" + urn + "'", e);
         }
     }
 

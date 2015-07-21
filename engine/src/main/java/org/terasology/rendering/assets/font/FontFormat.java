@@ -46,6 +46,7 @@ public class FontFormat extends AbstractAssetFileFormat<FontData> {
 
     // Common patterns
     private Pattern lineHeightPattern = Pattern.compile("lineHeight=" + INTEGER_PATTERN);
+    private Pattern baseHeightPattern = Pattern.compile("base=" + INTEGER_PATTERN);
     private Pattern pagesPattern = Pattern.compile("pages=" + INTEGER_PATTERN);
 
     private Pattern pagePattern = Pattern.compile("page id=" + INTEGER_PATTERN + " file=\"(.*)\"");
@@ -150,6 +151,7 @@ public class FontFormat extends AbstractAssetFileFormat<FontData> {
             throw new IOException("Failed to load font - missing common line");
         }
         builder.setLineHeight(findInteger(lineHeightPattern, commonLine));
+        builder.setBaseHeight(findInteger(baseHeightPattern, commonLine));
         return findInteger(pagesPattern, commonLine);
     }
 

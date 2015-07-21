@@ -36,6 +36,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
+import org.terasology.rendering.FontUnderline;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.util.Arrays;
@@ -120,7 +121,7 @@ public class ConsoleImpl implements Console {
      */
     @Override
     public void addMessage(Message message) {
-        String uncoloredText = FontColor.stripColor(message.getMessage());
+        String uncoloredText = FontUnderline.strip(FontColor.stripColor(message.getMessage()));
         logger.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {

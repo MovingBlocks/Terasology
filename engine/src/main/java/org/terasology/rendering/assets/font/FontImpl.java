@@ -80,6 +80,11 @@ public final class FontImpl extends Font {
     }
 
     @Override
+    public int getBaseHeight() {
+        return data.getBaseHeight();
+    }
+
+    @Override
     public Vector2i getSize(List<String> lines) {
         int height = getLineHeight() * lines.size();
         int width = 0;
@@ -97,6 +102,16 @@ public final class FontImpl extends Font {
     @Override
     public FontCharacter getCharacterData(Character c) {
         return data.getCharacter(c);
+    }
+
+    @Override
+    public int getUnderlineOffset() {
+        return data.getUnderlineOffset();
+    }
+
+    @Override
+    public int getUnderlineThickness() {
+        return data.getUnderlineThickness();
     }
 
     @Override

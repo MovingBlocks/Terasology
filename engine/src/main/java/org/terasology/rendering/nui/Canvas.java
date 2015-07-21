@@ -292,6 +292,21 @@ public interface Canvas {
     void drawTextRaw(String text, Font font, Color color, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign);
 
     /**
+     * Draws text without using the current style, aligned within the drawWidth.  Text may include new lines.
+     * Additionally new lines will be added to prevent any given line exceeding drawWidth.
+     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     *
+     * @param text       The text to draw
+     * @param font       The font to use to draw text
+     * @param color      The color of to draw the text
+     * @param underlined Whether the text should be underlined
+     * @param region     The region within which to of the text. The text will be wrapped to multiple lines if it exceeds this width
+     * @param hAlign     The horizontal alignment or justification of the text
+     * @param vAlign     The vertical alignment of the text
+     */
+    void drawTextRaw(String text, Font font, Color color, boolean underlined, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign);
+
+    /**
      * Draws shadowed text without using the current style. Text may include new lines. This text will always be left-aligned.
      *
      * @param text        The text to draw
@@ -314,7 +329,7 @@ public interface Canvas {
     void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region);
 
     /**
-     * raws shadowed text without using the current style. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
+     * Draws shadowed text without using the current style. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
      * If an individual word is longer than the drawWidth, it will be split mid-word.
      *
      * @param text        The text to draw
@@ -326,6 +341,21 @@ public interface Canvas {
      * @param vAlign      The vertical alignment of the text
      */
     void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign);
+
+    /**
+     * Draws shadowed text without using the current style. Text may include new lines. Additionally new lines will be added to prevent any given line exceeding drawWidth.
+     * If an individual word is longer than the drawWidth, it will be split mid-word.
+     *
+     * @param text        The text to draw
+     * @param font        The font to use to draw text
+     * @param color       The color of to draw the text
+     * @param shadowColor The color to draw the shadow
+     * @param underline   Whether the text should be underlined (by default, underlines may also be added by underline unicode)
+     * @param region      The region within which to draw this text. The text will be wrapped to new lines if it exceeds this width.
+     * @param hAlign      The horizontal alignment or justification of the text
+     * @param vAlign      The vertical alignment of the text
+     */
+    void drawTextRawShadowed(String text, Font font, Color color, Color shadowColor, boolean underline, Rect2i region, HorizontalAlign hAlign, VerticalAlign vAlign);
 
     /**
      * Draws a texture to the given area without using the current style. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
