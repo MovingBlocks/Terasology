@@ -77,11 +77,13 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     private Map<EntityRef, CircularBuffer<CharacterStateEvent>> characterStates = Maps.newHashMap();
     private Map<EntityRef, CharacterMoveInputEvent> lastInputEvent = Maps.newHashMap();
     private long nextSendState;
+    private CharacterMovementSystemUtility characterMovementSystemUtility;
 
     @Override
     public void initialise() {
         characterMover = new KinematicCharacterMover(worldProvider, physics);
         nextSendState = time.getGameTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
+        characterMovementSystemUtility = new CharacterMovementSystemUtility(physics);
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
@@ -111,7 +113,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             newState.setMode(MovementMode.WALKING);
         }
         stateBuffer.add(newState);
-        CharacterStateEvent.setToState(character, newState);
+        characterMovementSystemUtility.setToState(character, newState);
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
@@ -127,7 +129,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
 
-            CharacterStateEvent.setToState(entity, newState);
+            characterMovementSystemUtility.setToState(entity, newState);
             lastInputEvent.put(entity, input);
         } else {
             logger.warn("Received too much input from {}, dropping input.", entity);
@@ -188,9 +190,9 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         if (previous != null) {
             if (next != null) {
-                CharacterStateEvent.setToInterpolateState(entity, previous, next, renderTime);
+                characterMovementSystemUtility.setToInterpolateState(entity, previous, next, renderTime);
             } else {
-                CharacterStateEvent.setToExtrapolateState(entity, previous, renderTime);
+                characterMovementSystemUtility.setToExtrapolateState(entity, previous, renderTime);
             }
         }
     }
@@ -199,7 +201,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     public void lagCompensate(EntityRef client, long timeMs) {
         for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
             if (networkSystem.getOwnerEntity(entry.getKey()).equals(client)) {
-                CharacterStateEvent.setToState(entry.getKey(), entry.getValue().getLast());
+                characterMovementSystemUtility.setToState(entry.getKey(), entry.getValue().getLast());
             } else {
                 setToTime(timeMs - RENDER_DELAY, entry.getKey(), entry.getValue());
             }
