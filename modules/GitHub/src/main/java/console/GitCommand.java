@@ -16,6 +16,16 @@
 package console;
 
 
+import java.io.File;
+import java.io.IOException;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -27,11 +37,19 @@ import org.terasology.logic.permission.PermissionManager;
 @RegisterSystem
 public class GitCommand extends BaseComponentSystem{
 
-
     @Command(shortDescription = "activate the GitHub metrics",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String github() {
-        
-        return "this comand will execute the githubs metrics";
+    public String github() throws IOException, NoHeadException, GitAPIException {
+    	
+    	FileRepositoryBuilder builder = new FileRepositoryBuilder();
+        Repository repository = builder.setGitDir(new File("C:/Users/RicardoMatias/Desktop/Ejemplo"))
+        		.readEnvironment().findGitDir().build();
+    	RevWalk walk = new RevWalk(repository);
+    	for(RevCommit commit : walk){
+    		String men = commit.getFullMessage();
+    		System.out.println(men);
+    	}
+    	walk.dispose();
+    	return "this comand will execute the githubs metrics";
     }
 }
