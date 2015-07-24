@@ -44,6 +44,7 @@ import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.QuaternionUtil;
@@ -161,6 +162,18 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
         updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
+    }
+
+    @ReceiveEvent
+    public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
+        if (character.equals(localPlayer.getCharacterEntity())) {
+
+            // Trigger updating the player camera position as soon as the local player is spawned.
+            // This is not done while the game is still loading, since systems are not updated.
+            // RenderableWorldImpl pre-generates chunks around the player camera and therefore needs
+            // the correct location.
+            update(0);
+        }
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
