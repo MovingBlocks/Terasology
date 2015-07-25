@@ -74,7 +74,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         context.put(BlockEntityRegistry.class, entityWorldProvider);
         context.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel());
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
         context.put(CelestialSystem.class, celestialSystem);
         context.get(ComponentSystemManager.class).register(celestialSystem);
 
