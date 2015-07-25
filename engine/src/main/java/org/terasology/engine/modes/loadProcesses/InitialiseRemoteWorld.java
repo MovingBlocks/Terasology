@@ -61,10 +61,11 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(LocalPlayer.class, new LocalPlayer());
+        LocalPlayer localPlayer = new LocalPlayer();
+        context.put(LocalPlayer.class, localPlayer);
         BlockManager blockManager = context.get(BlockManager.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager);
+        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer);
 
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
                 blockManager.getBlock(BlockManager.AIR_ID), context);
