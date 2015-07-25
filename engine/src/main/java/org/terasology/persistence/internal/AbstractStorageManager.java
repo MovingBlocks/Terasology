@@ -32,6 +32,8 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.BufferedInputStream;
@@ -59,6 +61,8 @@ public abstract class AbstractStorageManager implements StorageManager {
     private static final Logger logger = LoggerFactory.getLogger(AbstractStorageManager.class);
 
     private final StoragePathProvider storagePathProvider;
+    private final BlockManager blockManager;
+    private final BiomeManager biomeManager;
 
     private final ModuleEnvironment environment;
     private final EngineEntityManager entityManager;
@@ -67,11 +71,14 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     private boolean storeChunksInZips = true;
 
-    public AbstractStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
+    public AbstractStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
+                                  BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
         this.environment = environment;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
+        this.blockManager = blockManager;
+        this.biomeManager = biomeManager;
 
         this.storagePathProvider = new StoragePathProvider(savePath);
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
@@ -106,7 +113,7 @@ public abstract class AbstractStorageManager implements StorageManager {
             ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
             try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
                 EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, this, entityManager);
+                store = new ChunkStoreInternal(storeData, this, entityManager, blockManager, biomeManager);
             } catch (IOException e) {
                 logger.error("Failed to read existing saved chunk {}", chunkPos);
             }

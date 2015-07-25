@@ -21,6 +21,8 @@ import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.blockdata.TeraArray;
@@ -45,7 +47,7 @@ public final class ChunkSerializer {
         return b;
     }
 
-    public static Chunk decode(EntityData.ChunkStore message) {
+    public static Chunk decode(EntityData.ChunkStore message, BlockManager blockManager, BiomeManager biomeManager) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
         if (!message.hasX() || !message.hasY() || !message.hasZ()) {
             throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
@@ -61,7 +63,7 @@ public final class ChunkSerializer {
         final TeraArray blockData = runLengthDecode(message.getBlockData());
         final TeraArray liquidData = runLengthDecode(message.getLiquidData());
         final TeraArray biomeData = runLengthDecode(message.getBiomeData());
-        return new ChunkImpl(pos, blockData, liquidData, biomeData);
+        return new ChunkImpl(pos, blockData, liquidData, biomeData, blockManager, biomeManager);
     }
 
     private static EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {

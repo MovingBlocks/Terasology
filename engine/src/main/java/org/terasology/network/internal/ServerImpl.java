@@ -329,7 +329,7 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks(NetData.NetMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            Chunk chunk = ChunkSerializer.decode(chunkInfo);
+            Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, biomeManager);
             chunkQueue.offer(chunk);
         }
     }

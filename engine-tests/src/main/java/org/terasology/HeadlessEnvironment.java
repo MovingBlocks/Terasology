@@ -90,6 +90,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AttachedToSurfaceFamilyFactory;
@@ -140,9 +141,12 @@ public class HeadlessEnvironment extends Environment {
     protected void setupStorageManager() throws IOException {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
+        BlockManager blockManager = context.get(BlockManager.class);
+        BiomeManager biomeManager = context.get(BiomeManager.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
 
-        context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
+        context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
+                engineEntityManager, blockManager, biomeManager));
     }
 
     @Override

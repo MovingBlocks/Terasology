@@ -40,6 +40,7 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -109,16 +110,18 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
     private BlockManager blockManager;
+    private BiomeManager biomeManager;
     private BlockEntityRegistry registry;
 
     private LightMerger<ReadyChunkInfo> lightMerger = new LightMerger<>(this);
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager) {
+                              BlockManager blockManager, BiomeManager biomeManager) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
         this.blockManager = blockManager;
+        this.biomeManager = biomeManager;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -627,7 +630,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                     Chunk chunk;
                     if (chunkStore == null) {
-                        chunk = new ChunkImpl(getPosition());
+                        chunk = new ChunkImpl(getPosition(), blockManager, biomeManager);
                         generator.createChunk(chunk);
                     } else {
                         chunk = chunkStore.getChunk();

@@ -44,9 +44,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
@@ -118,12 +115,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) throws IOException {
-        this(savePath, environment, entityManager, true);
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
+                                   BlockManager blockManager, BiomeManager biomeManager) throws IOException {
+        this(savePath, environment, entityManager, blockManager, biomeManager, true);
     }
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) throws IOException {
-        super(savePath, environment, entityManager, storeChunksInZips);
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
+                                   BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips) throws IOException {
+        super(savePath, environment, entityManager, blockManager, biomeManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
         entityManager.subscribeForChanges(this);

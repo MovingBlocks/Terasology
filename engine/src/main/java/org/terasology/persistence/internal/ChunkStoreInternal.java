@@ -20,6 +20,8 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
+import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkSerializer;
 
@@ -35,19 +37,13 @@ final class ChunkStoreInternal implements ChunkStore {
     private EngineEntityManager entityManager;
     private EntityData.EntityStore entityStore;
 
-    public ChunkStoreInternal(Chunk chunk, StorageManager storageManager, EngineEntityManager entityManager) {
-        this.chunk = chunk;
-        this.chunkPosition = new Vector3i(chunk.getPosition());
-        this.storageManager = storageManager;
-        this.entityManager = entityManager;
-    }
-
-    public ChunkStoreInternal(EntityData.ChunkStore chunkData, StorageManager storageManager, EngineEntityManager entityManager) {
+    public ChunkStoreInternal(EntityData.ChunkStore chunkData, StorageManager storageManager,
+                              EngineEntityManager entityManager, BlockManager blockManager, BiomeManager biomeManager) {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
 
-        this.chunk = ChunkSerializer.decode(chunkData);
+        this.chunk = ChunkSerializer.decode(chunkData, blockManager, biomeManager);
         this.entityStore = chunkData.getStore();
     }
 

@@ -43,6 +43,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
@@ -85,6 +86,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManager blockManager = context.get(BlockManager.class);
+        BiomeManager biomeManager = context.get(BiomeManager.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         context.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment, context));
@@ -119,8 +121,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(savePath, environment, entityManager)
-                    : new ReadOnlyStorageManager(savePath, environment, entityManager);
+                    ? new ReadWriteStorageManager(savePath, environment, entityManager, blockManager, biomeManager)
+                    : new ReadOnlyStorageManager(savePath, environment, entityManager, blockManager, biomeManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
@@ -128,7 +130,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         }
         context.put(StorageManager.class, storageManager);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
-                blockManager);
+                blockManager, biomeManager);
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(
                 new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.AIR_ID), context)

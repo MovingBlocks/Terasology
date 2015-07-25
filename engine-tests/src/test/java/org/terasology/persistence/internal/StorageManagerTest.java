@@ -29,7 +29,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -90,6 +89,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private ModuleEnvironment moduleEnvironment;
     private ReadWriteStorageManager esm;
     private EngineEntityManager entityManager;
+    private BlockManager blockManager;
+    private BiomeManager biomeManager;
     private Block testBlock;
     private Block testBlock2;
     private EntityRef character;
@@ -107,8 +108,11 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = context.get(ModuleEnvironment.class);
+        blockManager = context.get(BlockManager.class);
+        biomeManager = context.get(BiomeManager.class);
 
-        esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, false);
+        esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, blockManager, biomeManager,
+                false);
         context.put(StorageManager.class, esm);
 
         this.character = entityManager.create();
@@ -209,7 +213,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
 
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
+                biomeManager, false);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -229,7 +234,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,  blockManager,
+                biomeManager,false);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -244,7 +250,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void storeAndRestoreChunkStore() {
-        Chunk chunk = new ChunkImpl(CHUNK_POS);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, biomeManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -263,7 +269,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void chunkSurvivesStorageSaveAndRestore() throws Exception {
-        Chunk chunk = new ChunkImpl(CHUNK_POS);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, biomeManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
         chunk.markReady();
@@ -280,8 +286,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,
-                storeChunkInZips);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
+                biomeManager, storeChunkInZips);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -294,7 +300,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void entitySurvivesStorageInChunkStore() throws Exception {
-        Chunk chunk = new ChunkImpl(CHUNK_POS);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, biomeManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -315,7 +321,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,  blockManager,
+                biomeManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);

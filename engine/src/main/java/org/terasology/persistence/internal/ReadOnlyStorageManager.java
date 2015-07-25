@@ -16,16 +16,18 @@
 
 package org.terasology.persistence.internal;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collection;
-
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
 
 /**
  * A {@link org.terasology.persistence.StorageManager} that performs reading only.
@@ -33,12 +35,14 @@ import org.terasology.world.chunks.Chunk;
  */
 public final class ReadOnlyStorageManager extends AbstractStorageManager {
 
-    public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) {
-        this(savePath, environment, entityManager, true);
+    public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
+                                  BlockManager blockManager, BiomeManager biomeManager) {
+        this(savePath, environment, entityManager, blockManager, biomeManager, true);
     }
 
-    public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
-        super(savePath, environment, entityManager, storeChunksInZips);
+    public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
+                                  BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips) {
+        super(savePath, environment, entityManager, blockManager, biomeManager, storeChunksInZips);
     }
 
     @Override

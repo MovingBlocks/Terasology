@@ -25,7 +25,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
@@ -95,17 +94,19 @@ public class ChunkImpl implements Chunk {
     private ChunkMesh pendingMesh;
     private boolean adjacentChunksReady;
 
-    public ChunkImpl(int x, int y, int z) {
-        this(new Vector3i(x, y, z));
+    public ChunkImpl(int x, int y, int z, BlockManager blockManager, BiomeManager biomeManager) {
+        this(new Vector3i(x, y, z), blockManager, biomeManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos) {
+    public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, BiomeManager biomeManager) {
         this(chunkPos, new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
+                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
+                blockManager, biomeManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid, TeraArray biome) {
+    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid, TeraArray biome, BlockManager blockManager,
+                     BiomeManager biomeManager) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.extraData = Preconditions.checkNotNull(liquid);
@@ -114,8 +115,8 @@ public class ChunkImpl implements Chunk {
         sunlightRegenData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
-        blockManager = CoreRegistry.get(BlockManager.class);
-        biomeManager = CoreRegistry.get(BiomeManager.class);
+        this.blockManager = blockManager;
+        this.biomeManager = biomeManager;
         region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
                 ChunkConstants.CHUNK_SIZE);
         ChunkMonitor.fireChunkCreated(this);

@@ -18,12 +18,14 @@ package org.terasology.world;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -50,13 +52,17 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     Block airBlock;
     Block solidBlock;
+    private BlockManager blockManager;
+    private BiomeManager biomeManager;
 
     @Before
     public void setup() throws IOException {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        BlockManagerImpl blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
+
+        biomeManager = Mockito.mock(BiomeManager.class);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
@@ -69,7 +75,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void simpleWorldView() {
-        Chunk chunk = new ChunkImpl(new Vector3i());
+        Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
         ChunkViewCore chunkView = new ChunkViewCoreImpl(new Chunk[]{chunk}, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), new Vector3i(), airBlock);
@@ -78,12 +84,12 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void offsetWorldView() {
-        Chunk chunk = new ChunkImpl(new Vector3i());
+        Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new ChunkImpl(new Vector3i(-1, 0, -1)), new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
-                new ChunkImpl(new Vector3i(-1, 0, 0)), chunk, new ChunkImpl(new Vector3i(1, 0, 0)),
-                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), new ChunkImpl(new Vector3i(1, 0, 1))};
+        Chunk[] chunks = new Chunk[]{createChunk(-1, 0, -1), createChunk(0, 0, -1), createChunk(1, 0, -1),
+                createChunk(-1, 0, 0), chunk, createChunk(1, 0, 0),
+                createChunk(-1, 0, 1), createChunk(0, 0, 1), createChunk(1, 0, 1)};
 
         ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks,
                 Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 0, 1), airBlock);
@@ -92,12 +98,12 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void offsetWorldViewBeforeMainChunk() {
-        Chunk chunk = new ChunkImpl(new Vector3i());
+        Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(ChunkConstants.SIZE_X - 1, 0, ChunkConstants.SIZE_Z - 1), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{chunk, new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
-                new ChunkImpl(new Vector3i(-1, 0, 0)), new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)),
-                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), new ChunkImpl(new Vector3i(1, 0, 1))};
+        Chunk[] chunks = new Chunk[]{chunk, createChunk(0, 0, -1), createChunk(1, 0, -1),
+                createChunk(-1, 0, 0), createChunk(0, 0, 0), createChunk(1, 0, 0),
+                createChunk(-1, 0, 1), createChunk(0, 0, 1), createChunk(1, 0, 1)};
 
         ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks,
                 Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 0, 1), airBlock);
@@ -106,12 +112,12 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void offsetWorldViewAfterMainChunk() {
-        Chunk chunk = new ChunkImpl(new Vector3i());
+        Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new ChunkImpl(-1, 0, -1), new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
-                new ChunkImpl(new Vector3i(-1, 0, 0)), new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)),
-                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), chunk};
+        Chunk[] chunks = new Chunk[]{createChunk(-1, 0, -1), createChunk(0, 0, -1), createChunk(1, 0, -1),
+                createChunk(-1, 0, 0), createChunk(0, 0, 0), createChunk(1, 0, 0),
+                createChunk(-1, 0, 1), createChunk(0, 0, 1), chunk};
 
         ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks,
                 Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 0, 1), airBlock);
@@ -120,12 +126,12 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void offsetChunksWorldView() {
-        Chunk chunk = new ChunkImpl(new Vector3i(1, 0, 1));
+        Chunk chunk = createChunk(1, 0, 1);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)), new ChunkImpl(new Vector3i(2, 0, 0)),
-                new ChunkImpl(new Vector3i(0, 0, 1)), chunk, new ChunkImpl(new Vector3i(2, 0, 1)),
-                new ChunkImpl(new Vector3i(0, 0, 2)), new ChunkImpl(new Vector3i(1, 0, 2)), new ChunkImpl(new Vector3i(2, 0, 2))};
+        Chunk[] chunks = new Chunk[]{createChunk(0, 0, 0), createChunk(1, 0, 0), createChunk(2, 0, 0),
+                createChunk(0, 0, 1), chunk, createChunk(2, 0, 1),
+                createChunk(0, 0, 2), createChunk(1, 0, 2), createChunk(2, 0, 2)};
 
         ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks,
                 Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1, 0, 1)), new Vector3i(1, 0, 1), airBlock);
@@ -134,15 +140,19 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void localToWorld() {
-        Chunk chunk = new ChunkImpl(new Vector3i(1, 0, 1));
+        Chunk chunk = createChunk(1, 0, 1);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)), new ChunkImpl(new Vector3i(2, 0, 0)),
-                new ChunkImpl(new Vector3i(0, 0, 1)), chunk, new ChunkImpl(new Vector3i(2, 0, 1)),
-                new ChunkImpl(new Vector3i(0, 0, 2)), new ChunkImpl(new Vector3i(1, 0, 2)), new ChunkImpl(new Vector3i(2, 0, 2))};
+        Chunk[] chunks = new Chunk[]{createChunk(0, 0, 0), createChunk(1, 0, 0), createChunk(2, 0, 0),
+                createChunk(0, 0, 1), chunk, createChunk(2, 0, 1),
+                createChunk(0, 0, 2), createChunk(1, 0, 2), createChunk(2, 0, 2)};
 
         ChunkViewCoreImpl chunkView = new ChunkViewCoreImpl(chunks,
                 Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1), airBlock);
         assertEquals(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), chunkView.toWorldPos(Vector3i.zero()));
+    }
+
+    private Chunk createChunk(int x, int y, int z) {
+        return new ChunkImpl(new Vector3i(x, y, z), blockManager, biomeManager);
     }
 }
