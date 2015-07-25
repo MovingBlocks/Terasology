@@ -35,15 +35,13 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     private final SimpleUri uri;
 
     private String worldSeed;
-    private final WorldBuilder worldBuilder;
+    private WorldBuilder worldBuilder;
     private World world;
 
-    private final FacetedWorldConfigurator worldConfigurator;
+    private FacetedWorldConfigurator configurator;
 
     public BaseFacetedWorldGenerator(SimpleUri uri) {
         this.uri = uri;
-        this.worldBuilder = createWorld();
-        this.worldConfigurator = worldBuilder.createConfigurator();
     }
 
     @Override
@@ -59,7 +57,7 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-        worldBuilder.setSeed(seed.hashCode());
+        getWorldBuilder().setSeed(seed.hashCode());
 
         // reset the world to lazy load it again later
         world = null;
@@ -79,17 +77,29 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
 
     @Override
     public WorldConfigurator getConfigurator() {
-        return worldConfigurator;
+        if (configurator == null) {
+            configurator = getWorldBuilder().createConfigurator();
+        }
+        return configurator;
     }
 
     @Override
     public World getWorld() {
         // build the world as late as possible so that we can do configuration and 2d previews
         if (world == null) {
-            world = worldBuilder.build();
+            world = getWorldBuilder().build();
         }
         return world;
     }
+
+    private WorldBuilder getWorldBuilder() {
+        if (worldBuilder == null) {
+            worldBuilder = createWorld();
+        }
+        return worldBuilder;
+    }
+
+
 
     @Override
     public Color get(String layerName, Rect2i area) {
