@@ -33,6 +33,7 @@ import java.nio.file.Files;
  * The configuration subsystem manages Terasology's configuration
  */
 public class ConfigurationSubsystem implements EngineSubsystem {
+    public static final String SERVER_PORT_PROPERTY = "org.terasology.serverPort";
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSubsystem.class);
     private Config config;
 
@@ -45,6 +46,16 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     public void preInitialise(Context rootContext) {
         config = new Config();
         config.load();
+
+        String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
+        if (serverPortProperty != null) {
+            try {
+                config.getNetwork().setServerPort(Integer.parseInt(serverPortProperty));
+            } catch (NumberFormatException e) {
+                logger.error("Failed to set server port to invalid value: {}", serverPortProperty);
+            }
+        }
+
         if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_GAMEPLAY_MODULE)) {
             config.getDefaultModSelection().addModule(TerasologyConstants.CORE_GAMEPLAY_MODULE);
         }

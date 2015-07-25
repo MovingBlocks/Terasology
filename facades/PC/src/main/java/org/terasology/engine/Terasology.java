@@ -17,7 +17,6 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -25,6 +24,7 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
@@ -258,7 +258,7 @@ public final class Terasology {
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
-                System.setProperty(Config.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
+                System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
             } else {
                 recognized = false;
             }

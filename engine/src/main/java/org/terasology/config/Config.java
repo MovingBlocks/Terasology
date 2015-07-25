@@ -66,9 +66,7 @@ import java.util.Set;
  * @author Immortius
  */
 public final class Config {
-    public static final String SERVER_PORT_PROPERTY = "org.terasology.serverPort";
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
-
 
     private RootConfig config;
 
@@ -130,39 +128,42 @@ public final class Config {
         }
     }
 
-    public void load() {
-        Gson gson = createGson();
-        JsonParser parser = new JsonParser();
+    public void loadDefaults() {
+        JsonObject jsonConfig = loadDefaultToJson();
+        config = createGson().fromJson(jsonConfig, RootConfig.class);
+    }
 
-        JsonObject jsonConfig;
+    public void load() {
+        JsonObject jsonConfig = loadDefaultToJson();
+        Optional<JsonObject> userConfig = loadFileToJson();
+        if (userConfig.isPresent()) {
+            merge(jsonConfig, userConfig.get());
+        }
+
+        config = createGson().fromJson(jsonConfig, RootConfig.class);
+    }
+
+    public JsonObject loadDefaultToJson() {
         try (Reader baseReader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/default.cfg")))) {
-            jsonConfig = parser.parse(baseReader).getAsJsonObject();
+            return new JsonParser().parse(baseReader).getAsJsonObject();
         } catch (IOException e) {
             throw new RuntimeException("Missing default configuration file");
         }
+    }
 
+    public Optional<JsonObject> loadFileToJson() {
         Path configPath = getConfigFile();
         if (Files.isRegularFile(configPath)) {
             try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
-                JsonElement userConfig = parser.parse(reader);
+                JsonElement userConfig = new JsonParser().parse(reader);
                 if (userConfig.isJsonObject()) {
-                    merge(jsonConfig, userConfig.getAsJsonObject());
+                    return Optional.of(userConfig.getAsJsonObject());
                 }
             } catch (IOException e) {
                 logger.error("Failed to load config file {}, falling back on default config");
             }
         }
-
-        config = gson.fromJson(jsonConfig, RootConfig.class);
-
-        String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
-        if (serverPortProperty != null) {
-            try {
-                config.getNetwork().setServerPort(Integer.parseInt(serverPortProperty));
-            } catch (NumberFormatException e) {
-                logger.error("Failed to set server port to invalid value: {}", serverPortProperty);
-            }
-        }
+        return Optional.empty();
     }
 
     /**
