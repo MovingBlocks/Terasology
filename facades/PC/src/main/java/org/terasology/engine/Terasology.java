@@ -17,13 +17,14 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
@@ -94,10 +95,8 @@ public final class Terasology {
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
-    private static boolean writeSaveGamesEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean loadLastGame;
-    private static String serverPort = null;
 
     private Terasology() {
     }
@@ -129,28 +128,16 @@ public final class Terasology {
                     SplashScreen.getInstance().post(newStatus.getDescription());
                 }
             });
-            Config config = engine.getFromEngineContext(Config.class);
-
-            if (!writeSaveGamesEnabled) {
-                config.getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
-            }
-
-            if (serverPort != null) {
-                config.getTransients().setServerPort(Integer.parseInt(serverPort));
-            }
 
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener(engine));
                 engine.run(new StateHeadlessSetup());
             } else {
                 if (loadLastGame) {
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", new Runnable() {
-                        @Override
-                        public void run() {
-                            GameManifest gameManifest = getLatestGameManifest();
-                            if (gameManifest != null) {
-                                engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
-                            }
+                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                        GameManifest gameManifest = getLatestGameManifest();
+                        if (gameManifest != null) {
+                            engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
                     });
                 }
@@ -200,7 +187,7 @@ public final class Terasology {
         StringBuilder optText = new StringBuilder();
 
         for (String opt : opts) {
-            optText.append(" [" + opt + "]");
+            optText.append(" [").append(opt).append("]");
         }
 
         System.out.println("Usage:");
@@ -263,7 +250,7 @@ public final class Terasology {
                 isHeadless = true;
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SAVE_GAMES)) {
-                writeSaveGamesEnabled = false;
+                System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SOUND)) {
@@ -271,7 +258,7 @@ public final class Terasology {
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
-                serverPort = arg.substring(SERVER_PORT.length());
+                System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
             } else {
                 recognized = false;
             }

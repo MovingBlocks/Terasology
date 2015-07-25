@@ -17,12 +17,9 @@ package org.terasology.engine.subsystem.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -36,6 +33,7 @@ import java.nio.file.Files;
  * The configuration subsystem manages Terasology's configuration
  */
 public class ConfigurationSubsystem implements EngineSubsystem {
+    public static final String SERVER_PORT_PROPERTY = "org.terasology.serverPort";
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSubsystem.class);
     private Config config;
 
@@ -46,16 +44,18 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-        if (Files.isRegularFile(Config.getConfigFile())) {
+        config = new Config();
+        config.load();
+
+        String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
+        if (serverPortProperty != null) {
             try {
-                config = Config.load(Config.getConfigFile());
-            } catch (IOException e) {
-                logger.error("Failed to load config", e);
-                config = new Config();
+                config.getNetwork().setServerPort(Integer.parseInt(serverPortProperty));
+            } catch (NumberFormatException e) {
+                logger.error("Failed to set server port to invalid value: {}", serverPortProperty);
             }
-        } else {
-            config = new Config();
         }
+
         if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_GAMEPLAY_MODULE)) {
             config.getDefaultModSelection().addModule(TerasologyConstants.CORE_GAMEPLAY_MODULE);
         }
@@ -63,7 +63,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         checkServerIdentity();
 
         // TODO: Move to display subsystem
-        logger.info("Video Settings: " + config.getRendering().toString());
+        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
         rootContext.put(Config.class, config);
     }
 

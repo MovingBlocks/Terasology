@@ -16,11 +16,11 @@
 
 package org.terasology.config;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.engine.TerasologyConstants;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Immortius
@@ -32,12 +32,12 @@ public class NetworkConfig {
     /**
      * Available upstream bandwidth in kilobits per second
      */
-    private int upstreamBandwidth = 1024;
+    private int upstreamBandwidth;
 
     /**
      * The port that is used for hosting
      */
-    private int serverPort = TerasologyConstants.DEFAULT_PORT;
+    private int serverPort;
 
     /**
      * The master server URL

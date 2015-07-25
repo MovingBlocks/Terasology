@@ -215,25 +215,16 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         WidgetUtil.tryBindCheckbox(this, "vignette", BindHelper.bindBeanProperty("vignette", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "flickeringLight", BindHelper.bindBeanProperty("flickeringLight", config.getRendering(), Boolean.TYPE));
 
-        WidgetUtil.trySubscribe(this, "fovReset", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget widget) {
-                CameraSettingBinding cam;
-                fovSlider.setValue(100.0f);
-            }
-        });
+        if (fovSlider != null) {
+            WidgetUtil.trySubscribe(this, "fovReset", widget -> fovSlider.setValue(100.0f));
+        }
 
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
     }
 
     @Override
     public void onClosed() {
-        logger.info("Video Settings: " + config.getRendering().toString());
+        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
         CoreRegistry.get(ShaderManager.class).recompileAllShaders();
     }
 

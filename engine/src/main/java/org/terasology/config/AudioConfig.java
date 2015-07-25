@@ -26,8 +26,8 @@ public class AudioConfig {
     public static final String SOUND_VOLUME = "soundVolume";
     public static final String MUSIC_VOLUME = "musicVolume";
 
-    private float soundVolume = 1.0f;
-    private float musicVolume = 0.1f;
+    private float soundVolume;
+    private float musicVolume;
     private boolean disableSound;
 
     private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);

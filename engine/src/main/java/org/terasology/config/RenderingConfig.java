@@ -31,51 +31,51 @@ import org.terasology.rendering.world.WorldRenderer;
  * @author Immortius
  */
 public class RenderingConfig {
-    private PixelFormat pixelFormat = new PixelFormat().withDepthBits(24);
-    private int windowPosX = -1;
-    private int windowPosY = -1;
-    private int windowWidth = 1152;
-    private int windowHeight = 720;
+    private PixelFormat pixelFormat;
+    private int windowPosX;
+    private int windowPosY;
+    private int windowWidth;
+    private int windowHeight;
     private boolean fullscreen;
-    private ViewDistance viewDistance = ViewDistance.MODERATE;
-    private boolean flickeringLight = true;
-    private boolean animateGrass = true;
+    private ViewDistance viewDistance;
+    private boolean flickeringLight;
+    private boolean animateGrass;
     private boolean animateWater;
-    private float fieldOfView = 90;
-    private boolean cameraBobbing = true;
-    private boolean renderPlacingBox = true;
-    private int blurIntensity = 2;
+    private float fieldOfView;
+    private boolean cameraBobbing;
+    private boolean renderPlacingBox;
+    private int blurIntensity;
     private boolean reflectiveWater;
-    private boolean vignette = true;
-    private boolean motionBlur = true;
+    private boolean vignette;
+    private boolean motionBlur;
     private boolean ssao;
-    private boolean filmGrain = true;
-    private boolean outline = true;
-    private boolean lightShafts = true;
-    private boolean eyeAdaptation = true;
-    private boolean bloom = true;
-    private boolean dynamicShadows = true;
+    private boolean filmGrain;
+    private boolean outline;
+    private boolean lightShafts;
+    private boolean eyeAdaptation;
+    private boolean bloom;
+    private boolean dynamicShadows;
     private boolean oculusVrSupport;
-    private int maxTextureAtlasResolution = 4096;
-    private int maxChunksUsedForShadowMapping = 1024;
-    private int shadowMapResolution = 1024;
+    private int maxTextureAtlasResolution;
+    private int maxChunksUsedForShadowMapping;
+    private int shadowMapResolution;
     private boolean normalMapping;
     private boolean parallaxMapping;
     private boolean dynamicShadowsPcfFiltering;
-    private boolean cloudShadows = true;
-    private boolean renderNearest = true;
-    private int particleEffectLimit = 10;
-    private int frameLimit = 60;
-    private int meshLimit = 400;
-    private boolean inscattering = true;
+    private boolean cloudShadows;
+    private boolean renderNearest;
+    private int particleEffectLimit;
+    private int frameLimit;
+    private int meshLimit;
+    private boolean inscattering;
     private boolean localReflections;
     private boolean vSync;
     private boolean clampLighting;
-    private int fboScale = 100;
+    private int fboScale;
     private boolean dumpShaders;
-    private ScreenshotSize screenshotSize = ScreenshotSize.NORMAL_SIZE;
-    private String screenshotFormat = "jpg";
-    private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
+    private ScreenshotSize screenshotSize;
+    private String screenshotFormat;
+    private PerspectiveCameraSettings cameraSettings;
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
@@ -139,8 +139,8 @@ public class RenderingConfig {
         return viewDistance;
     }
 
-    public void setViewDistance(ViewDistance viewDistance, Context context) {
-        this.viewDistance = viewDistance;
+    public void setViewDistance(ViewDistance newViewDistance, Context context) {
+        this.viewDistance = newViewDistance;
 
         // TODO: Remove this, switch to a property change listener
         WorldRenderer worldRenderer = context.get(WorldRenderer.class);
@@ -457,8 +457,4 @@ public class RenderingConfig {
         this.dumpShaders = dumpShaders;
     }
 
-    @Override
-    public String toString() {
-        return Config.createGson().toJsonTree(this).toString();
-    }
 }

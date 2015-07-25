@@ -159,7 +159,7 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Invalidates the specified chunk and recreates it (requires storage manager disabled)", runOnServer = true)
     public String reloadChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
         Vector3i pos = new Vector3i(x, y, z);
-        if (CoreRegistry.get(Config.class).getTransients().isWriteSaveGamesEnabled()) {
+        if (CoreRegistry.get(Config.class).getSystem().isWriteSaveGamesEnabled()) {
             return "Writing save games is enabled! Invalidating chunk has no effect";
         }
         boolean success = chunkProvider.reloadChunk(pos);
