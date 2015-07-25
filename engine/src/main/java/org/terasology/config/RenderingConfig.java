@@ -18,14 +18,9 @@ package org.terasology.config;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.terasology.context.Context;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
-import org.terasology.rendering.world.ViewDistance;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 /**
  * @author Immortius
@@ -139,18 +134,8 @@ public class RenderingConfig {
         return viewDistance;
     }
 
-    public void setViewDistance(ViewDistance newViewDistance, Context context) {
-        this.viewDistance = newViewDistance;
-
-        // TODO: Remove this, switch to a property change listener
-        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
-        LocalPlayer player = context.get(LocalPlayer.class);
-        if (player != null) {
-            player.getClientEntity().send(new ChangeViewRangeRequest(viewDistance));
-        }
-        if (worldRenderer != null) {
-            worldRenderer.changeViewDistance(viewDistance);
-        }
+    public void setViewDistance(ViewDistance viewDistance) {
+        this.viewDistance = viewDistance;
     }
 
     public boolean isFlickeringLight() {

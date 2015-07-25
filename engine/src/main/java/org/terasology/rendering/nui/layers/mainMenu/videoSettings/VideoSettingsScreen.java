@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
@@ -34,7 +35,8 @@ import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.world.ViewDistance;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.rendering.world.viewDistance.ViewDistanceChangeRequest;
 
 import javax.imageio.ImageIO;
 import java.util.Arrays;
@@ -53,6 +55,9 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
     @In
     private DisplayDevice displayDevice;
+
+    @In
+    private LocalPlayer localPlayer;
 
     public VideoSettingsScreen() {
     }
@@ -75,7 +80,17 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         UIDropdown<ViewDistance> viewDistance = find("viewDistance", UIDropdown.class);
         if (viewDistance != null) {
             viewDistance.setOptions(Arrays.asList(ViewDistance.values()));
-            viewDistance.bindSelection(BindHelper.bindBeanProperty("viewDistance", config.getRendering(), ViewDistance.class));
+            viewDistance.bindSelection(new Binding<ViewDistance>() {
+                @Override
+                public ViewDistance get() {
+                    return config.getRendering().getViewDistance();
+                }
+
+                @Override
+                public void set(ViewDistance value) {
+                    localPlayer.getClientEntity().send(new ViewDistanceChangeRequest(value));
+                }
+            });
         }
 
         UIDropdown<WaterReflection> waterReflection = find("reflections", UIDropdown.class);
