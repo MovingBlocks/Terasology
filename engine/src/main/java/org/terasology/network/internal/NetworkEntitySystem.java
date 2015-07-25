@@ -26,10 +26,7 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -78,15 +75,6 @@ public class NetworkEntitySystem extends BaseComponentSystem {
     @ReceiveEvent(components = NetworkComponent.class)
     public void onDeactivateNetworkComponent(BeforeDeactivateComponent event, EntityRef entity) {
         networkSystem.unregisterNetworkEntity(entity);
-    }
-
-    @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
-    public void onChangeViewRequest(ChangeViewRangeRequest request, EntityRef entity) {
-        Client client = networkSystem.getOwner(entity);
-        if (client != null) {
-            client.setViewDistanceMode(request.getNewViewRange());
-            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, client.getViewDistance().getChunkDistance());
-        }
     }
 
 }

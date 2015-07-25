@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package org.terasology.network.events;
+package org.terasology.rendering.world.viewDistance;
 
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
-import org.terasology.rendering.world.ViewDistance;
 
 /**
- * A request for a change of view range - should be sent against the player's client entity.
+ * Notifies the server that the clients view distance changed.
  *
- * @author Immortius
+ * If you want to change the view distance send {@link ViewDistanceChangeRequest} to the local player's client entity.
+ *
  */
 @ServerEvent
-public class ChangeViewRangeRequest implements Event {
+public class ViewDistanceChangedEvent implements Event {
 
     private ViewDistance newViewRange;
 
-    protected ChangeViewRangeRequest() {
+    protected ViewDistanceChangedEvent() {
     }
 
     /**
      * @param viewDistance The view range mode (not distance)
      */
-    public ChangeViewRangeRequest(ViewDistance viewDistance) {
+    public ViewDistanceChangedEvent(ViewDistance viewDistance) {
         newViewRange = viewDistance;
     }
 

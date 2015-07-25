@@ -54,7 +54,7 @@ import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.registry.In;
-import org.terasology.rendering.world.ViewDistance;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.generator.WorldGenerator;

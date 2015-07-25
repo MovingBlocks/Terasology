@@ -31,6 +31,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;

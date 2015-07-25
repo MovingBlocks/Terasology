@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.world;
+package org.terasology.rendering.world.viewDistance;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * @author Immortius
+ * The possible view distance options, that can be selected by the user.
  */
 public enum ViewDistance {
 

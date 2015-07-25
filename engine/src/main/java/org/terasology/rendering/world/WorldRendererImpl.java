@@ -54,6 +54,7 @@ import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;

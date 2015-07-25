@@ -40,8 +40,9 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
-import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.rendering.world.viewDistance.ViewDistanceChangeRequest;
 import org.terasology.world.WorldProvider;
 
 /**
@@ -65,6 +66,9 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private Context context;
+
+    @In
+    private LocalPlayer localPlayer;
 
     @In
     private NUIManager nuiManager;
@@ -97,7 +101,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         int maxViewDistance = ViewDistance.values().length - 1;
 
         if (viewDistance != maxViewDistance) {
-            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1)), context);
+            changeViewDistanceTo(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1)));
         }
         button.consume();
     }
@@ -108,9 +112,13 @@ public class DebugControlSystem extends BaseComponentSystem {
         int minViewDistance = 0;
 
         if (viewDistance != minViewDistance) {
-            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() - 1)), context);
+            changeViewDistanceTo(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() - 1)));
         }
         button.consume();
+    }
+
+    private void changeViewDistanceTo(ViewDistance viewDistance) {
+        localPlayer.getClientEntity().send(new ViewDistanceChangeRequest(viewDistance));
     }
 
     @ReceiveEvent(components = ClientComponent.class)
