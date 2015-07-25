@@ -23,13 +23,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.biomes.Biome;
@@ -75,6 +75,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private GeneratingChunkProvider chunkProvider;
     private WorldTime worldTime;
+    private EntityManager entityManager;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
@@ -84,13 +85,15 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private Block defaultBlock;
 
-    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider, Block defaultBlock) {
+    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator,
+                                 GeneratingChunkProvider chunkProvider, Block defaultBlock, Context context) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
         this.defaultBlock = defaultBlock;
-        CoreRegistry.put(ChunkProvider.class, chunkProvider);
+        this.entityManager = context.get(EntityManager.class);
+        context.put(ChunkProvider.class, chunkProvider);
 
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -104,13 +107,15 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block defaultBlock) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider, defaultBlock);
+    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block defaultBlock,
+                                 Context context) {
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider, defaultBlock,
+                context);
     }
 
     @Override
     public EntityRef getWorldEntity() {
-        Iterator<EntityRef> iterator = CoreRegistry.get(EntityManager.class).getEntitiesWith(WorldComponent.class).iterator();
+        Iterator<EntityRef> iterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         if (iterator.hasNext()) {
             return iterator.next();
         }
