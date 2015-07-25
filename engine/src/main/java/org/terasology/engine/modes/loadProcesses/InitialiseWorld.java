@@ -127,7 +127,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             return true; // We need to return true, otherwise the loading state will just call us again immediately
         }
         context.put(StorageManager.class, storageManager);
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
+                blockManager);
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(
                 new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.AIR_ID), context)
