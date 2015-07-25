@@ -56,7 +56,7 @@ public class RenderingDebugConfig {
     }
 
     private boolean enabled;
-    private DebugRenderingStage stage = DebugRenderingStage.OPAQUE_COLOR;
+    private DebugRenderingStage stage;
     private boolean firstPersonElementsHidden;
     private boolean hudHidden;
     private boolean wireframe;
@@ -121,10 +121,5 @@ public class RenderingDebugConfig {
 
     public void setRenderSkeletons(boolean renderSkeletons) {
         this.renderSkeletons = renderSkeletons;
-    }
-
-    @Override
-    public String toString() {
-        return Config.createGson().toJsonTree(this).toString();
     }
 }

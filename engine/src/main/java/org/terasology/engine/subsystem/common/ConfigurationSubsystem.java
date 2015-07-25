@@ -17,12 +17,9 @@ package org.terasology.engine.subsystem.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -46,16 +43,8 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-        if (Files.isRegularFile(Config.getConfigFile())) {
-            try {
-                config = Config.load(Config.getConfigFile());
-            } catch (IOException e) {
-                logger.error("Failed to load config", e);
-                config = new Config();
-            }
-        } else {
-            config = new Config();
-        }
+        config = new Config();
+        config.load();
         if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_GAMEPLAY_MODULE)) {
             config.getDefaultModSelection().addModule(TerasologyConstants.CORE_GAMEPLAY_MODULE);
         }
@@ -63,7 +52,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         checkServerIdentity();
 
         // TODO: Move to display subsystem
-        logger.info("Video Settings: " + config.getRendering().toString());
+        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
         rootContext.put(Config.class, config);
     }
 

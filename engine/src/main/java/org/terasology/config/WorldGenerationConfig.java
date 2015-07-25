@@ -22,8 +22,8 @@ import org.terasology.engine.SimpleUri;
  * @author Immortius
  */
 public class WorldGenerationConfig {
-    private String worldTitle = "New World";
-    private String defaultSeed = "blockmania";
+    private String worldTitle;
+    private String defaultSeed;
 
     private SimpleUri defaultGenerator = new SimpleUri();
 

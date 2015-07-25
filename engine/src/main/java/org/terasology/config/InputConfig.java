@@ -23,7 +23,7 @@ import org.terasology.context.Context;
 public class InputConfig {
 
     private BindsConfig binds = new BindsConfig();
-    private float mouseSensitivity = 0.075f;
+    private float mouseSensitivity;
     private boolean mouseYAxisInverted;
 
     public BindsConfig getBinds() {

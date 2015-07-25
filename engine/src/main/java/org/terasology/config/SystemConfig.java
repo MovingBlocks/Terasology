@@ -16,16 +16,21 @@
 
 package org.terasology.config;
 
+import java.util.Optional;
+
 /**
  * @author Immortius
  */
 public class SystemConfig {
-    private long dayNightLengthInMs = 1800000;
-    private int maxThreads = 2;
-    private int maxSecondsBetweenSaves = 60;
-    private int maxUnloadedChunksPercentageTillSave = 40;
+    public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";
+
+    private long dayNightLengthInMs;
+    private int maxThreads;
+    private int maxSecondsBetweenSaves;
+    private int maxUnloadedChunksPercentageTillSave;
     private boolean debugEnabled;
     private boolean monitoringEnabled;
+    private boolean writeSaveGamesEnabled;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;
@@ -74,4 +79,17 @@ public class SystemConfig {
     public void setMonitoringEnabled(boolean monitoringEnabled) {
         this.monitoringEnabled = monitoringEnabled;
     }
+
+    public boolean isWriteSaveGamesEnabled() {
+        String property = System.getProperty(SAVED_GAMES_ENABLED_PROPERTY);
+        if (property != null) {
+            return Boolean.parseBoolean(property);
+        }
+        return writeSaveGamesEnabled;
+    }
+
+    public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
+        this.writeSaveGamesEnabled = writeSaveGamesEnabled;
+    }
+
 }

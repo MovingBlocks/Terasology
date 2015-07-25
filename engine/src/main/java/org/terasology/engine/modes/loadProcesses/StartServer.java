@@ -48,7 +48,7 @@ public class StartServer extends SingleStepLoadProcess {
     public boolean step() {
         try {
             Config config = context.get(Config.class);
-            int port = config.getTransients().getServerPort();
+            int port = config.getNetwork().getServerPort();
             context.get(NetworkSystem.class).host(port, dedicated);
         } catch (HostingFailedException e) {
             context.get(NUIManager.class).pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
