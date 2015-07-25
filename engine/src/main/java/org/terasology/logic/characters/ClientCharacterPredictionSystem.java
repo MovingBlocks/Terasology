@@ -68,10 +68,12 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
     private Deque<CharacterMoveInputEvent> inputs = Queues.newArrayDeque();
     private CharacterStateEvent predictedState;
     private CharacterStateEvent authoritiveState;
+    private CharacterMovementSystemUtility characterMovementSystemUtility;
 
     @Override
     public void initialise() {
         characterMover = new KinematicCharacterMover(worldProvider, physics);
+        characterMovementSystemUtility = new CharacterMovementSystemUtility(physics);
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
@@ -113,7 +115,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
                 }
             }
             logger.trace("Resultant input size {}", inputs.size());
-            CharacterStateEvent.setToState(entity, newState);
+            characterMovementSystemUtility.setToState(entity, newState);
             // TODO: soft correct predicted state
             predictedState = newState;
         } else {
@@ -134,7 +136,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
         CharacterStateEvent newState = stepState(input, predictedState, entity);
         predictedState = newState;
 
-        CharacterStateEvent.setToState(entity, newState);
+        characterMovementSystemUtility.setToState(entity, newState);
     }
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
@@ -162,9 +164,9 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
             }
             if (previous != null) {
                 if (next != null) {
-                    CharacterStateEvent.setToInterpolateState(entry.getKey(), previous, next, renderTime);
+                    characterMovementSystemUtility.setToInterpolateState(entry.getKey(), previous, next, renderTime);
                 } else {
-                    CharacterStateEvent.setToExtrapolateState(entry.getKey(), previous, renderTime);
+                    characterMovementSystemUtility.setToExtrapolateState(entry.getKey(), previous, renderTime);
                 }
             }
         }
