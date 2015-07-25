@@ -26,7 +26,6 @@ import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
-import org.terasology.registry.CoreRegistry;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
@@ -49,23 +48,23 @@ public class BehaviorTreeData implements AssetData {
         this.renderableRoot = renderableRoot;
     }
 
-    public RenderableNode createNode(Node node) {
-        BehaviorNodeComponent nodeComponent = CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponent(node);
+    public RenderableNode createNode(Node node, BehaviorNodeFactory factory) {
+        BehaviorNodeComponent nodeComponent = factory.getNodeComponent(node);
         RenderableNode self = new RenderableNode(nodeComponent);
         self.setNode(node);
         renderableNodes.put(node, self);
         return self;
     }
 
-    public void createRenderable() {
-        renderableRoot = createRenderable(root);
+    public void createRenderable(BehaviorNodeFactory factory) {
+        renderableRoot = createRenderable(root, factory);
     }
 
-    public RenderableNode createRenderable(Node node) {
+    public RenderableNode createRenderable(Node node, BehaviorNodeFactory factory) {
         return node.visit(null, new Node.Visitor<RenderableNode>() {
             @Override
             public RenderableNode visit(RenderableNode parent, Node node) {
-                RenderableNode self = createNode(node);
+                RenderableNode self = createNode(node, factory);
                 if (parent != null) {
                     parent.withoutModel().insertChild(-1, self);
                 }

@@ -76,7 +76,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        debugger = new BehaviorDebugger();
+        debugger = new BehaviorDebugger(nodeFactory);
         entityProperties = find("entity_properties", PropertyLayout.class);
         behaviorEditor = find("tree", BehaviorEditor.class);
         properties = find("properties", PropertyLayout.class);
