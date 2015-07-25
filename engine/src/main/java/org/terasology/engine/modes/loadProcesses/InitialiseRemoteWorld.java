@@ -69,7 +69,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
 
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
                 blockManager.getBlock(BlockManager.AIR_ID), context);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         context.put(WorldProvider.class, worldProvider);
         context.put(BlockEntityRegistry.class, entityWorldProvider);

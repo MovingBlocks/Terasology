@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.Component;
@@ -48,7 +49,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
@@ -83,15 +83,10 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
-    public EntityAwareWorldProvider(WorldProviderCore base) {
+    public EntityAwareWorldProvider(WorldProviderCore base, Context context) {
         super(base);
-        entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        CoreRegistry.get(ComponentSystemManager.class).register(getTime());
-    }
-
-    public EntityAwareWorldProvider(WorldProviderCore base, EngineEntityManager entityManager) {
-        this(base);
-        this.entityManager = entityManager;
+        entityManager = (EngineEntityManager) context.get(EntityManager.class);
+        context.get(ComponentSystemManager.class).register(getTime());
     }
 
     @Override
