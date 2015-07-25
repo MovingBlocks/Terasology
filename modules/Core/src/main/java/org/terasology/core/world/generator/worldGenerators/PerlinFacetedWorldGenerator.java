@@ -15,9 +15,9 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
-import org.terasology.context.Context;
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
+import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
 import org.terasology.core.world.generator.facetProviders.EnsureSpawnableChunkZeroProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinBaseSurfaceProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHillsAndMountainsProvider;
@@ -27,13 +27,12 @@ import org.terasology.core.world.generator.facetProviders.PerlinRiverProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
 import org.terasology.core.world.generator.facetProviders.World2dPreviewProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
@@ -49,9 +48,13 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
         super(uri);
     }
 
+
+    @In
+    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
+
     @Override
     protected WorldBuilder createWorld() {
-        return new WorldBuilder(CoreRegistry.get(WorldGeneratorPluginLibrary.class))
+        return new WorldBuilder(worldGeneratorPluginLibrary)
                 .addProvider(new World2dPreviewProvider())
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new PerlinHumidityProvider())

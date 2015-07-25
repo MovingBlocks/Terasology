@@ -28,6 +28,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
@@ -99,10 +100,11 @@ public class WorldGeneratorManager {
     }
 
     /**
-     * @param uri
+     * @param uri uri of the world generator to create.
+     * @param context objects from this context will be injected into the
      * @return The instantiated world generator.
      */
-    public WorldGenerator createGenerator(SimpleUri uri) throws UnresolvedWorldGeneratorException {
+    public WorldGenerator createGenerator(SimpleUri uri, Context context) throws UnresolvedWorldGeneratorException {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         Module module = moduleManager.getEnvironment().get(uri.getModuleName());
         if (module == null) {
@@ -116,19 +118,27 @@ public class WorldGeneratorManager {
                 }
             }
             try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                return searchForWorldGenerator(uri, environment);
+                return createWorldGenerator(uri, context, environment);
             }
         } else {
-            return searchForWorldGenerator(uri, moduleManager.getEnvironment());
+            return createWorldGenerator(uri, context, moduleManager.getEnvironment());
         }
     }
 
-    public WorldGenerator searchForWorldGenerator(SimpleUri uri, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
+    /**
+     * @param uri uri of the world generator to create.
+     * @param context that will be used to inject teh world generator.
+     * @param environment to be searched for the world generator class.
+     * @return a new world generator with the specified uri.
+     */
+    public WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
             SimpleUri generatorUri = new SimpleUri(environment.getModuleProviding(generatorClass), annotation.id());
             if (generatorUri.equals(uri)) {
-                return loadGenerator(generatorClass, generatorUri);
+                WorldGenerator worldGenerator = loadGenerator(generatorClass, generatorUri);
+                InjectionHelper.inject(worldGenerator, context);
+                return worldGenerator;
             }
         }
         throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");

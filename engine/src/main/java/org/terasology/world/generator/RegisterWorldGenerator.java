@@ -15,13 +15,15 @@
  */
 package org.terasology.world.generator;
 
+import org.terasology.registry.In;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Immortius
+ * Marks a class as world generator. Field annotated with {@link In} will be injected after construction.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
