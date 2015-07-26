@@ -22,6 +22,7 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryCache;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -39,16 +40,17 @@ public class Ejemplo {
 	    Hashtable<String, Boolean> table = new Hashtable<String, Boolean>();
 	    /*------Setting Parameters-------------------------------*/
 	    
-		localPath="C:/Users/RicardoMatias/Desktop/temp/"+projectName;
+		localPath="C:/Users/I/Desktop/temp/"+projectName;
 		remotePath= "https://github.com/mperalta92/Ejemplo.git";
 		localRepo = new FileRepository(localPath + "/.git");
         git = new Git(localRepo);
         /*---------clone remote repository---------------------*/
         //preguntar si existe el repositorio en el folder del localpath, si existe hacer pull , si no clone
-        if( RepositoryCache.FileKey.isGitRepository(new File(localPath), FS.DETECTED)){
-        	if( hasAtLeastOneReference(localRepo)){
-        		gitPull(git, remotePath);
-        	}
+      
+       // if( RepositoryCache.FileKey.isGitRepository(new File(localPath), FS.DETECTED)){
+        if( hasAtLeastOneReference(localRepo)){
+        	gitPull(git, remotePath);
+        //	}
         }else{
         	gitGlone(localPath, remotePath);
         }
@@ -60,8 +62,9 @@ public class Ejemplo {
 	private static boolean hasAtLeastOneReference(Repository repo) {
 
 	    for (Ref ref : repo.getAllRefs().values()) {
-	        if (ref.getObjectId() == null)
-	            continue;
+	        if (ref.getObjectId() == null) {
+	        	continue;
+	        }
 	        return true;
 	    }
 
@@ -70,7 +73,7 @@ public class Ejemplo {
 
 	private static void gitPull(Git git, String remotePath) throws WrongRepositoryStateException, InvalidConfigurationException, DetachedHeadException, InvalidRemoteException, CanceledException, RefNotFoundException, RefNotAdvertisedException, NoHeadException, TransportException, GitAPIException {
 		// This method execute a pull from remote repository
-		git.pull().setRemote(remotePath).call();
+		//git.pull().setRemote(remotePath).call();
 	}
 
 
@@ -82,10 +85,12 @@ public class Ejemplo {
         Iterable<RevCommit> log = git.log()
         		.call();
         for(RevCommit commit : log){
-        	com=commit.getFullMessage();
+        	com = commit.getFullMessage();
+        	if (!com.equals(null)){
         	System.out.println(com);
-        	System.out.println(getName(com));
+        	//System.out.println(getName(com));
         	System.out.println(hasBug(com));
+        	}
         }
 	}
 
