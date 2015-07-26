@@ -86,11 +86,9 @@ public class Ejemplo {
         		.call();
         for(RevCommit commit : log){
         	com = commit.getFullMessage();
-        	if (!com.equals(null)){
         	System.out.println(com);
         	//System.out.println(getName(com));
         	System.out.println(hasBug(com));
-        	}
         }
 	}
 
@@ -108,15 +106,19 @@ public class Ejemplo {
 	}
 	
 
-	public static boolean hasBug(String menssage){
+	public static boolean hasBug(String message){
 		String aux;
-		for(int i=0;i<(menssage.length()-3);++i){
-			aux=menssage.substring(i, i+3);
+		boolean bugged = false;
+		for(int i=0;i<(message.length()-5);++i){
+			aux=message.substring(i, i+5);
 			aux.toLowerCase();
-			if(aux.equals("bug"))
-				return true;
+			if(aux.substring(0,3).equals("bug")) bugged = true;
+			if(aux.equals("fixed")) {
+				bugged = false;
+				break;
+			}
 		}
-		return false;
+		return bugged;
 	}
 
 }
