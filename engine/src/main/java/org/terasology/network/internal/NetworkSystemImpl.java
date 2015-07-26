@@ -42,8 +42,8 @@ import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.EngineTime;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.entitySystem.Component;
@@ -131,7 +131,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private ChannelFactory factory;
     private TIntLongMap netIdToEntityId = new TIntLongHashMap();
 
-    private EngineTime time;
+    private Time time;
     private long nextNetworkTick;
 
 
@@ -150,7 +150,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     // Client only
     private ServerImpl server;
 
-    public NetworkSystemImpl(EngineTime time, Context context) {
+    public NetworkSystemImpl(Time time, Context context) {
         this.time = time;
         this.config = context.get(Config.class).getNetwork();
     }
@@ -187,7 +187,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     }
                 }
 
-                nextNetworkTick = time.getRawTimeInMs();
+                nextNetworkTick = time.getRealTimeInMs();
             } catch (SocketException e) {
                 throw new HostingFailedException("Could not identify network interfaces", e);
             } catch (ChannelException e) {
@@ -226,7 +226,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             } else {
                 allChannels.add(connectCheck.getChannel());
                 mode = NetworkMode.CLIENT;
-                nextNetworkTick = time.getRawTimeInMs();
+                nextNetworkTick = time.getRealTimeInMs();
                 logger.info("Connected to server");
                 ClientConnectionHandler connectionHandler = connectCheck.getChannel().getPipeline().get(ClientConnectionHandler.class);
                 if (connectionHandler == null) {
@@ -296,7 +296,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (entityManager != null) {
                 processPendingConnections();
                 processPendingDisconnects();
-                long currentTimer = time.getRawTimeInMs();
+                long currentTimer = time.getRealTimeInMs();
                 boolean netTick = false;
                 if (currentTimer > nextNetworkTick) {
                     nextNetworkTick += NET_TICK_RATE;

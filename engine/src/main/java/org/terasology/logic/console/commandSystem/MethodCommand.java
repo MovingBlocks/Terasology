@@ -93,7 +93,7 @@ public final class MethodCommand extends AbstractCommand {
                 MethodCommand command = referringTo(specificMethod);
                 console.registerCommand(command);
                 logger.debug("Registered command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
-            } catch (Throwable t) {
+            } catch (RuntimeException t) {
                 logger.error("Failed to load command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
             }
         }

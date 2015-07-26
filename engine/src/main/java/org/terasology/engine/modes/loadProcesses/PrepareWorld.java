@@ -49,7 +49,7 @@ public class PrepareWorld implements LoadProcess {
             return true;
         }
         EngineTime time = (EngineTime) context.get(Time.class);
-        long totalTime = time.getRawTimeInMs() - startTime;
+        long totalTime = time.getRealTimeInMs() - startTime;
         return totalTime > 5000;
     }
 
@@ -57,7 +57,7 @@ public class PrepareWorld implements LoadProcess {
     public void begin() {
         worldRenderer = context.get(WorldRenderer.class);
         EngineTime time = (EngineTime) context.get(Time.class);
-        startTime = time.getRawTimeInMs();
+        startTime = time.getRealTimeInMs();
     }
 
     @Override

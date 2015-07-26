@@ -33,6 +33,7 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.naming.Name;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
@@ -238,8 +239,14 @@ public abstract class AbstractCommand implements ConsoleCommand {
             Object result = executionMethod.getAccessibleObject().invoke(executionMethod.getTarget(), processedParameters);
 
             return result != null ? String.valueOf(result) : null;
-        } catch (Throwable t) {
-            throw new CommandExecutionException(t.getCause()); //Skip InvocationTargetException
+        } catch (InvocationTargetException t) {
+            if (t.getCause() != null) {
+                throw new CommandExecutionException(t.getCause()); //Skip InvocationTargetException
+            } else {
+                throw new CommandExecutionException(t);
+            }
+        } catch (IllegalAccessException | RuntimeException t) {
+            throw new CommandExecutionException(t);
         }
     }
 
@@ -282,11 +289,8 @@ public abstract class AbstractCommand implements ConsoleCommand {
 
         Set<Object> result = null;
 
-        try {
-            result = suggestedParameter.suggest(sender, processedParameters);
-        } catch (Throwable t) {
-            throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
-        }
+        result = suggestedParameter.suggest(sender, processedParameters);
+
 
         if (result == null) {
             return Sets.newHashSet();

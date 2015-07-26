@@ -55,7 +55,7 @@ final class TaskProcessor<T extends Task> implements Runnable {
             } catch (InterruptedException e) {
                 ThreadMonitor.addError(e);
                 logger.error("Thread interrupted", e);
-            } catch (Throwable e) {
+            } catch (RuntimeException e) {
                 ThreadMonitor.addError(e);
                 logger.error("Error in thread {}", Thread.currentThread().getName(), e);
             }

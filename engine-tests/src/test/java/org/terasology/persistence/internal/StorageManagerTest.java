@@ -127,9 +127,6 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));
-        Game game = mock(Game.class);
-        when(game.getTime()).thenReturn(mock(EngineTime.class));
-        context.put(Game.class, game);
         BiomeManager biomeManager = mock(BiomeManager.class);
         when(biomeManager.getBiomes()).thenReturn(Collections.<Biome>emptyList());
         context.put(BiomeManager.class, biomeManager);

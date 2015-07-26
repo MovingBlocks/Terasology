@@ -73,7 +73,7 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
     @Override
     public void update(float delta) {
-        long deltaMs = time.getDeltaInMs();
+        long deltaMs = time.getGameDeltaInMs();
         if (deltaMs > 0) {
             deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
             long startTime = worldTime.getAndAdd(deltaMs);

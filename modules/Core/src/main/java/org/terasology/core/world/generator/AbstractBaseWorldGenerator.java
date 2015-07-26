@@ -96,7 +96,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
         for (final ChunkGenerationPass generator : generationPasses) {
             try {
                 generator.generateChunk(chunk);
-            } catch (Throwable e) {
+            } catch (RuntimeException e) {
                 logger.error("Error during generation pass {}", generator, e);
             }
         }

@@ -142,7 +142,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         ActivityInfo oldActivity = activityStack.pop();
 
-        long endTime = timer.getRawTimeInMs();
+        long endTime = timer.getRealTimeInMs();
         long totalTime = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + endTime - oldActivity.resumeTime : endTime - oldActivity.startTime;
         currentExecutionData.adjustOrPutValue(oldActivity.name, totalTime, totalTime);
         
@@ -197,7 +197,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         }
 
         public ActivityInfo initialize() {
-            this.startTime = timer.getRawTimeInMs();
+            this.startTime = timer.getRealTimeInMs();
             this.startMem = Runtime.getRuntime().freeMemory();
             return this;
         }

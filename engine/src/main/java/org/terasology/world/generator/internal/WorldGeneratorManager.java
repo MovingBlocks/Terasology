@@ -165,7 +165,7 @@ public class WorldGeneratorManager {
             }
             return false;
             // Being generous in catching here, because if the module is broken due to code changes or missing classes the world generator is invalid
-        } catch (Throwable e) {
+        } catch (NoSuchMethodException | RuntimeException e) {
             return false;
         }
     }

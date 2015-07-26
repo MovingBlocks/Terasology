@@ -38,23 +38,11 @@ public interface EngineTime extends Time {
     void setGameTime(long time);
 
     /**
-     * @return Access to the raw timer
-     */
-    long getRawTimeInMs();
-
-    /**
      * Updates the timer with the desired time from the server. The game time won't immediately be updated - instead
      * the update will be applied over a number of ticks to smooth the resynchronization.
      *
      * @param targetTime
      */
     void updateTimeFromServer(long targetTime);
-
-    /**
-     * @param pause
-     */
-    void setPaused(boolean pause);
-
-    boolean isPaused();
 
 }

@@ -191,7 +191,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                         } else {
                             field.setValue(element, context.deserialize(jsonObject.get(field.getSerializationName()), field.getType()));
                         }
-                    } catch (Throwable e) {
+                    } catch (RuntimeException e) {
                         logger.error("Failed to deserialize field {} of {}", field.getName(), type, e);
                     }
                 }
