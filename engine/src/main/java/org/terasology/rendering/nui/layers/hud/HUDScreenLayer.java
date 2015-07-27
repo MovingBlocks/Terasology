@@ -21,7 +21,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;

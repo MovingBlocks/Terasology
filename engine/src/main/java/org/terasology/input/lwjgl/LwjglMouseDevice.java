@@ -22,7 +22,7 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.device.InputAction;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 
 import java.util.Queue;
 

@@ -26,7 +26,7 @@ import net.miginfocom.layout.Grid;
 import net.miginfocom.layout.LC;
 import net.miginfocom.layout.LayoutCallback;
 import org.terasology.math.Rect2i;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreLayout;

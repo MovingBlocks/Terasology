@@ -26,7 +26,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.FontUnderline;
 import org.terasology.rendering.assets.font.Font;

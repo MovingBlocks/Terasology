@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.internal;
+package org.terasology.input;
 
-import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
  */
-public interface CanvasControl extends Canvas {
+public final class Mouse {
 
-    void preRender();
+    private Mouse() {
+    }
 
-    void postRender();
+    public static Vector2i getPosition() {
+        return CoreRegistry.get(InputSystem.class).getMouseDevice().getPosition();
+    }
 
-    void processMousePosition(Vector2i position);
+    public static boolean getButtonState(int button) {
+        return CoreRegistry.get(InputSystem.class).getMouseDevice().isButtonDown(button);
+    }
 
-    boolean processMouseClick(MouseInput button, Vector2i pos);
-
-    boolean processMouseRelease(MouseInput button, Vector2i pos);
-
-    boolean processMouseWheel(int wheelTurns, Vector2i pos);
+    public static boolean isVisible() {
+        return CoreRegistry.get(InputSystem.class).getMouseDevice().isVisible();
+    }
 }

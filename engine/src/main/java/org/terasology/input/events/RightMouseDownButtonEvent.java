@@ -17,7 +17,7 @@ package org.terasology.input.events;
 
 
 import org.terasology.input.MouseInput;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 
 public final class RightMouseDownButtonEvent extends MouseDownButtonEvent {
 

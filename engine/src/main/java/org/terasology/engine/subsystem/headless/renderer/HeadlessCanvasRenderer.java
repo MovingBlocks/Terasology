@@ -18,7 +18,7 @@ package org.terasology.engine.subsystem.headless.renderer;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;

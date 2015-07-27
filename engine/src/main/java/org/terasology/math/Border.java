@@ -93,7 +93,7 @@ public class Border {
                 region.width() - getTotalWidth(), region.height() - getTotalHeight());
     }
 
-    public Vector2i shrink(Vector2i size) {
+    public Vector2i shrink(org.terasology.math.geom.Vector2i size) {
         return new Vector2i(size.x - getTotalWidth(), size.y - getTotalHeight());
     }
 
@@ -101,7 +101,7 @@ public class Border {
         return new Vector2i(getTotalWidth(), getTotalHeight());
     }
 
-    public Vector2i grow(Vector2i size) {
+    public Vector2i grow(org.terasology.math.geom.Vector2i size) {
         // Note protection against overflow
         return new Vector2i(TeraMath.addClampAtMax(size.x, getTotalWidth()), TeraMath.addClampAtMax(size.y, getTotalHeight()));
     }

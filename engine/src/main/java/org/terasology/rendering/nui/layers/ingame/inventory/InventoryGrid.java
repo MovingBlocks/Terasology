@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.math.Rect2i;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
@@ -158,7 +158,7 @@ public class InventoryGrid extends CoreWidget {
     public void setMaxCellCount(int val) {
         maxCellCount.set(val);
     }
-    
+
     public int getNumSlots() {
         return Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
     }
