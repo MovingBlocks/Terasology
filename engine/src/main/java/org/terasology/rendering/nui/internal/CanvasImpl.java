@@ -25,7 +25,10 @@ import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
+import org.terasology.input.InputSystem;
 import org.terasology.input.MouseInput;
+import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -45,6 +48,12 @@ import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDragEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -80,6 +89,8 @@ public class CanvasImpl implements CanvasControl {
 
     private final NUIManager nuiManager;
     private final Time time;
+    private final KeyboardDevice keyboard;
+    private final MouseDevice mouse;
 
     private CanvasState state;
 
@@ -111,6 +122,8 @@ public class CanvasImpl implements CanvasControl {
         this.renderer = renderer;
         this.nuiManager = nuiManager;
         this.time = context.get(Time.class);
+        this.keyboard = context.get(InputSystem.class).getKeyboard();
+        this.mouse = context.get(InputSystem.class).getMouseDevice();
         this.meshMat = Assets.getMaterial("engine:UILitMesh").get();
         this.whiteTexture = Assets.getTexture("engine:white").get();
     }
@@ -150,7 +163,7 @@ public class CanvasImpl implements CanvasControl {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(position);
             relPos.sub(clickedRegion.offset);
-            clickedRegion.listener.onMouseDrag(relPos);
+            clickedRegion.listener.onMouseDrag(new NUIMouseDragEvent(mouse, keyboard, relPos));
         }
 
         Set<InteractionRegion> newMouseOverRegions = Sets.newLinkedHashSet();
@@ -160,7 +173,8 @@ public class CanvasImpl implements CanvasControl {
             if (next.region.contains(position)) {
                 Vector2i relPos = new Vector2i(position);
                 relPos.sub(next.offset);
-                next.listener.onMouseOver(relPos, newMouseOverRegions.isEmpty());
+                boolean isTopMostElement = newMouseOverRegions.isEmpty();
+                next.listener.onMouseOver(new NUIMouseOverEvent(mouse, keyboard, relPos, isTopMostElement));
                 newMouseOverRegions.add(next);
             }
         }
@@ -207,11 +221,11 @@ public class CanvasImpl implements CanvasControl {
                 Vector2i relPos = new Vector2i(pos);
                 relPos.sub(next.offset);
                 if (possibleDoubleClick && nuiManager.getFocus() == next.element) {
-                    if (next.listener.onMouseDoubleClick(button, relPos)) {
+                    if (next.listener.onMouseDoubleClick(createDoubleClickEvent(button, relPos))) {
                         clickedRegion = next;
                         return true;
                     }
-                } else if (next.listener.onMouseClick(button, relPos)) {
+                } else if (next.listener.onMouseClick(createClickEvent(button, relPos))) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
                     return true;
@@ -221,12 +235,20 @@ public class CanvasImpl implements CanvasControl {
         return false;
     }
 
+    private NUIMouseClickEvent createClickEvent(MouseInput button, Vector2i relPos) {
+        return new NUIMouseClickEvent(mouse, keyboard, relPos, button);
+    }
+
+    private NUIMouseDoubleClickEvent createDoubleClickEvent(MouseInput button, Vector2i relPos) {
+        return new NUIMouseDoubleClickEvent(mouse, keyboard, relPos, button);
+    }
+
     @Override
     public boolean processMouseRelease(MouseInput button, Vector2i pos) {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(pos);
             relPos.sub(clickedRegion.region.min());
-            clickedRegion.listener.onMouseRelease(button, relPos);
+            clickedRegion.listener.onMouseRelease(new NUIMouseReleaseEvent(mouse, keyboard, relPos, button));
             clickedRegion = null;
             return true;
         }
@@ -239,7 +261,7 @@ public class CanvasImpl implements CanvasControl {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos);
                 relPos.sub(next.region.min());
-                if (next.listener.onMouseWheel(wheelTurns, relPos)) {
+                if (next.listener.onMouseWheel(new NUIMouseWheelEvent(mouse, keyboard, relPos, wheelTurns))) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
                     return true;

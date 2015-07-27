@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -35,7 +34,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
-import org.terasology.input.Mouse;
+import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -52,6 +52,7 @@ import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.Deque;
@@ -70,6 +71,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private CanvasControl canvas;
     private WidgetLibrary widgetsLibrary;
     private UIWidget focus;
+    private KeyboardDevice keyboard;
+    private MouseDevice mouse;
 
     private boolean forceReleaseMouse;
 
@@ -81,6 +84,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.hudScreenLayer = new HUDScreenLayer();
         InjectionHelper.inject(hudScreenLayer, context);
         this.canvas = new CanvasImpl(this, context, renderer);
+        this.keyboard = context.get(InputSystem.class).getKeyboard();
+        this.mouse = context.get(InputSystem.class).getMouseDevice();
         refreshWidgetsLibrary();
     }
 
@@ -376,7 +381,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        canvas.processMousePosition(Mouse.getPosition());
+        canvas.processMousePosition(mouse.getPosition());
 
         for (UIScreenLayer screen : screens) {
             screen.update(delta);
@@ -451,7 +456,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse button events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
-        if (!Mouse.isVisible()) {
+        if (!mouse.isVisible()) {
             return;
         }
         if (focus != null) {
@@ -477,7 +482,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse wheel events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
-        if (!Mouse.isVisible()) {
+        if (!mouse.isVisible()) {
             return;
         }
 
@@ -487,7 +492,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 return;
             }
         }
-        if (canvas.processMouseWheel(event.getWheelTurns(), Mouse.getPosition())) {
+        if (canvas.processMouseWheel(event.getWheelTurns(), mouse.getPosition())) {
             event.consume();
         }
         if (isReleasingMouse()) {
@@ -499,7 +504,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
-            focus.onKeyEvent(event);
+            focus.onKeyEvent(new NUIKeyEvent(mouse, keyboard, event.getKey(), event.getKeyCharacter(),
+                    event.getState()));
         }
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
             for (UIScreenLayer screen : screens) {

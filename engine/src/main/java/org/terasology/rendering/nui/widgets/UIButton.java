@@ -31,6 +31,8 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 import java.util.List;
 
@@ -63,8 +65,8 @@ public class UIButton extends CoreWidget {
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
-            if (button == MouseInput.MOUSE_LEFT) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 down = true;
                 return true;
             }
@@ -72,8 +74,8 @@ public class UIButton extends CoreWidget {
         }
 
         @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
-            if (button == MouseInput.MOUSE_LEFT) {
+        public void onMouseRelease(NUIMouseReleaseEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (isMouseOver()) {
                     if (getClickSound() != null) {
                         getClickSound().play(getClickVolume());

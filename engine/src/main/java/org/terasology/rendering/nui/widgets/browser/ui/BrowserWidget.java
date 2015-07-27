@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 
 import java.util.LinkedList;
@@ -47,9 +47,9 @@ public class BrowserWidget extends CoreWidget {
         canvas.addInteractionRegion(
                 new BaseInteractionListener() {
                     @Override
-                    public boolean onMouseClick(MouseInput button, Vector2i pos) {
+                    public boolean onMouseClick(NUIMouseClickEvent event) {
                         for (HyperlinkBox hyperlinkBox : hyperlinkBoxes) {
-                            if (hyperlinkBox.box.contains(pos)) {
+                            if (hyperlinkBox.box.contains(event.getRelativeMousePosition())) {
                                 for (BrowserHyperlinkListener browserHyperlinkListener : listenerList) {
                                     browserHyperlinkListener.hyperlinkClicked(hyperlinkBox.hyperlink);
                                 }

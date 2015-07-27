@@ -16,10 +16,10 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.input.BindButtonEvent;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -50,7 +50,8 @@ public abstract class CoreWidget extends AbstractWidget {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        return false;
     }
 
     @Override

@@ -16,9 +16,9 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.input.BindButtonEvent;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 /**
  * @author Immortius
@@ -41,7 +41,8 @@ public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget im
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        return false;
     }
 
     @Override

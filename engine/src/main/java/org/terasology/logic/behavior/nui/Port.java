@@ -16,7 +16,6 @@
 package org.terasology.logic.behavior.nui;
 
 import org.terasology.asset.Assets;
-import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
@@ -25,6 +24,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
 /**
  * Represents a port at a RenderableNode. There are several types of ports:
@@ -45,7 +45,7 @@ public abstract class Port extends CoreWidget {
 
     private InteractionListener connectListener = new BaseInteractionListener() {
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
             node.getEditor().portClicked(Port.this);
             return true;
         }

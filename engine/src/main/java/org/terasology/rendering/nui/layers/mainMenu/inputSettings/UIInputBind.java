@@ -20,7 +20,6 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
@@ -32,6 +31,9 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 
 import java.util.List;
 
@@ -51,16 +53,16 @@ public class UIInputBind extends CoreWidget {
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
-        public void onMouseOver(Vector2i pos, boolean topMostElement) {
-            super.onMouseOver(pos, topMostElement);
-            if (topMostElement) {
+        public void onMouseOver(NUIMouseOverEvent event) {
+            super.onMouseOver(event);
+            if (event.isTopMostElement()) {
                 focusManager.setFocus(UIInputBind.this);
             }
         }
 
         @Override
-        public boolean onMouseClick(MouseInput button, Vector2i pos) {
-            if (button == MouseInput.MOUSE_LEFT) {
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (getClickSound() != null) {
                     getClickSound().play(getClickVolume());
                 }
@@ -120,17 +122,18 @@ public class UIInputBind extends CoreWidget {
     }
 
     @Override
-    public void onKeyEvent(KeyEvent event) {
+    public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
             if (capturingInput) {
                 setInput(InputType.KEY.getInput(event.getKey().getId()));
                 capturingInput = false;
-                event.consume();
+                return true;
             } else if (event.getKey() == Keyboard.Key.DELETE || event.getKey() == Keyboard.Key.BACKSPACE) {
                 setInput(null);
-                event.consume();
+                return true;
             }
         }
+        return false;
     }
 
     @Override
