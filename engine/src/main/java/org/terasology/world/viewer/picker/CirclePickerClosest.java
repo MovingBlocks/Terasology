@@ -21,22 +21,35 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.terasology.math.geom.BaseVector2f;
+import org.terasology.math.geom.ImmutableVector2f;
 
 /**
- * Retrieves the closest (circular) object.
+ * Retrieves the closest (circular) object from a collection of tested elements.
  * @param <T> the object type
- * @author Martin Steiger
  */
 public class CirclePickerClosest<T> implements CirclePicker<T> {
 
     private final BaseVector2f cursor;
     private final Function<? super T, ? extends Number> radiusFunc;
 
-    private double minDistSq = Double.MAX_VALUE;
+    private double minDistSq = Double.POSITIVE_INFINITY;
     private T closest;
 
-    public CirclePickerClosest(BaseVector2f cursor, Function<? super T, ? extends Number> radiusFunc) {
-        this.cursor = cursor;
+    /**
+     * No minimum distance to the target is required
+     * @param target the target location
+     */
+    public CirclePickerClosest(BaseVector2f target) {
+        this(target, ignored -> Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * Matches all elements that lie within a given radius
+     * @param target the target location
+     * @param radiusFunc the radius function for each of the tested elements
+     */
+    public CirclePickerClosest(BaseVector2f target, Function<? super T, ? extends Number> radiusFunc) {
+        this.cursor = ImmutableVector2f.createOrUse(target);
         this.radiusFunc = radiusFunc;
     }
 
@@ -55,6 +68,9 @@ public class CirclePickerClosest<T> implements CirclePicker<T> {
         }
     }
 
+    /**
+     * @return the closest element, or <code>null</code>.
+     */
     public T getClosest() {
         return closest;
     }
