@@ -80,7 +80,7 @@ public class SolidRasterizer implements WorldRasterizer {
                 chunk.setBlock(pos, stone);
             } else if (density >= 0) {
                 int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - posY;
-                Block block = getSurfaceBlock(depth, posY, biome);
+                Block block = getSurfaceBlock(depth, posY, biome, seaLevel);
                 chunk.setBlock(pos, block);
             } else {
                 // fill up terrain up to sealevel height with water or ice
@@ -94,15 +94,15 @@ public class SolidRasterizer implements WorldRasterizer {
         }
     }
 
-    private Block getSurfaceBlock(int depth, int height, CoreBiome type) {
+    private Block getSurfaceBlock(int depth, int height, CoreBiome type, int seaLevel) {
         switch (type) {
             case FOREST:
             case PLAINS:
             case MOUNTAINS:
                 // Beach
-                if (depth == 0 && height > 32 && height < 128) {
+                if (depth == 0 && height > seaLevel && height < seaLevel + 96) {
                     return grass;
-                } else if (depth == 0 && height >= 128) {
+                } else if (depth == 0 && height >= seaLevel + 96) {
                     return snow;
                 } else if (depth > 32) {
                     return stone;
@@ -110,7 +110,7 @@ public class SolidRasterizer implements WorldRasterizer {
                     return dirt;
                 }
             case SNOW:
-                if (depth == 0 && height > 32) {
+                if (depth == 0 && height > seaLevel) {
                     // Snow on top
                     return snow;
                 } else if (depth > 32) {
