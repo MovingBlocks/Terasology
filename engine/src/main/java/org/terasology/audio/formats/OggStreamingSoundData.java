@@ -23,6 +23,9 @@ import org.terasology.audio.StreamingSoundData;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 /**
  *
@@ -36,7 +39,7 @@ public class OggStreamingSoundData implements StreamingSoundData {
 
     public OggStreamingSoundData(AssetDataFile stream) throws IOException {
         this.stream = stream;
-        reader = new OggReader(stream.openStream());
+        reset();
     }
 
     @Override
@@ -71,8 +74,8 @@ public class OggStreamingSoundData implements StreamingSoundData {
             dispose();
         }
         try {
-            reader = new OggReader(stream.openStream());
-        } catch (IOException e) {
+           reader = AccessController.doPrivileged((PrivilegedExceptionAction<OggReader>) () -> new OggReader(stream.openStream()));
+        } catch (PrivilegedActionException e) {
             throw new RuntimeException("Failed to reset ogg stream", e);
         }
     }
