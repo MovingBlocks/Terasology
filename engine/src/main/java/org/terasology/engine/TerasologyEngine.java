@@ -37,11 +37,13 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.engine.subsystem.common.CommandSubsystem;
 import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
+import org.terasology.engine.subsystem.common.GameSubsystem;
 import org.terasology.engine.subsystem.common.MonitoringSubsystem;
 import org.terasology.engine.subsystem.common.NetworkSubsystem;
 import org.terasology.engine.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
+import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -165,9 +167,12 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new PhysicsSubsystem());
         this.allSubsystems.add(new CommandSubsystem());
         this.allSubsystems.add(new NetworkSubsystem());
+        this.allSubsystems.add(new WorldGenerationSubsystem());
+        this.allSubsystems.add(new GameSubsystem());
     }
 
     private void initialize() {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
             logger.info("Initializing Terasology...");
@@ -190,10 +195,7 @@ public class TerasologyEngine implements GameEngine {
 
             postInitSubsystems();
 
-            verifyRequiredSystemIsRegistered(Time.class);
-            verifyRequiredSystemIsRegistered(DisplayDevice.class);
-            verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
-            verifyRequiredSystemIsRegistered(InputSystem.class);
+            verifyInitialisation();
 
             /**
              * Prevent objects being put in engine context after init phase. Engine states should use/create a
@@ -209,6 +211,13 @@ public class TerasologyEngine implements GameEngine {
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
+    }
+
+    private void verifyInitialisation() {
+        verifyRequiredSystemIsRegistered(Time.class);
+        verifyRequiredSystemIsRegistered(DisplayDevice.class);
+        verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
+        verifyRequiredSystemIsRegistered(InputSystem.class);
     }
 
     /**
@@ -282,10 +291,6 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager = new ModuleAwareAssetTypeManager();
         rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
-
-        rootContext.put(WorldGeneratorManager.class, new WorldGeneratorManager(rootContext));
-
-        rootContext.put(Game.class, new Game());
     }
 
     private void initAssets() {
@@ -358,7 +363,6 @@ public class TerasologyEngine implements GameEngine {
         try {
             rootContext.put(GameEngine.class, this);
             changeState(initialState);
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
         } catch (RuntimeException e) {
@@ -389,11 +393,6 @@ public class TerasologyEngine implements GameEngine {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
         while (!shutdownRequested && !display.isCloseRequested()) {
-
-            long totalDelta;
-            float updateDelta;
-            float subsystemsDelta;
-
             // Only process rendering and updating once a second
             if (!display.hasFocus() && isHibernationAllowed()) {
                 timeSubsystem.getEngineTime().setPaused(true);
@@ -427,16 +426,16 @@ public class TerasologyEngine implements GameEngine {
                 networkSystem.update();
             }
 
-            totalDelta = 0;
+            long totalDelta = 0;
             while (updateCycles.hasNext()) {
-                updateDelta = updateCycles.next(); // gameTime gets updated here!
+                float updateDelta = updateCycles.next(); // gameTime gets updated here!
                 totalDelta += timeSubsystem.getEngineTime().getGameDeltaInMs();
                 try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
                     currentState.update(updateDelta);
                 }
             }
 
-            subsystemsDelta = totalDelta / 1000f;
+            float subsystemsDelta = totalDelta / 1000f;
 
             for (EngineSubsystem subsystem : getSubsystems()) {
                 try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
