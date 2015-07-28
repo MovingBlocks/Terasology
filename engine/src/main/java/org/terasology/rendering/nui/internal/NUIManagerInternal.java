@@ -504,8 +504,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
-            focus.onKeyEvent(new NUIKeyEvent(mouse, keyboard, event.getKey(), event.getKeyCharacter(),
-                    event.getState()));
+            if (focus.onKeyEvent(new NUIKeyEvent(mouse, keyboard, event.getKey(), event.getKeyCharacter(), event.getState()))) {
+                event.consume();
+            }
         }
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
             for (UIScreenLayer screen : screens) {

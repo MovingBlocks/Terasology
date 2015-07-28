@@ -592,6 +592,11 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         if (oldComponent != null) {
             logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
         }
+        if (oldComponent == null) {
+            notifyComponentAdded(getEntity(entityId), component.getClass());
+        } else {
+            notifyComponentChanged(getEntity(entityId), component.getClass());
+        }
         if (eventSystem != null) {
             EntityRef entityRef = createEntityRef(entityId);
             if (oldComponent == null) {
@@ -600,11 +605,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
             } else {
                 eventSystem.send(entityRef, OnChangedComponent.newInstance(), component);
             }
-        }
-        if (oldComponent == null) {
-            notifyComponentAdded(getEntity(entityId), component.getClass());
-        } else {
-            notifyComponentChanged(getEntity(entityId), component.getClass());
         }
         return component;
     }

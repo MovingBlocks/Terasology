@@ -85,12 +85,12 @@ public class UICommandEntry extends UIText {
                     }
                     break;
                 case Keyboard.KeyId.ENTER:
-                    super.onKeyEvent(event);
+                    boolean consumed = super.onKeyEvent(event);
                     setText("");
                     index = getCommandHistory().size();
-                    break;
+                    return consumed;
                 default:
-                    super.onKeyEvent(event);
+                    return super.onKeyEvent(event);
             }
         }
         return false;
