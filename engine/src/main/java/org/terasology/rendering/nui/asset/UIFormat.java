@@ -26,61 +26,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StreamingSound;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.Border;
-import org.terasology.math.Rect2f;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
-import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
 import org.terasology.persistence.typeHandling.mathTypes.BorderTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Rect2fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.assets.texture.TextureRegionAsset;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -89,14 +50,15 @@ import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * The UILoader handles loading UI widgets from json format files.
@@ -108,6 +70,8 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
     public static final String CONTENTS_FIELD = "contents";
     public static final String LAYOUT_INFO_FIELD = "layoutInfo";
+    public static final String ID_FIELD = "id";
+    public static final String TYPE_FIELD = "type";
 
     private static final Logger logger = LoggerFactory.getLogger(UIFormat.class);
 
@@ -173,7 +137,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
             JsonObject jsonObject = json.getAsJsonObject();
 
-            String type = jsonObject.get("type").getAsString();
+            String type = jsonObject.get(TYPE_FIELD).getAsString();
             ClassMetadata<? extends UIWidget, ?> elementMetadata = nuiManager.getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
             if (elementMetadata == null) {
                 logger.error("Unknown UIWidget type {}", type);
@@ -181,13 +145,13 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             }
 
             String id = null;
-            if (jsonObject.has("id")) {
-                id = jsonObject.get("id").getAsString();
+            if (jsonObject.has(ID_FIELD)) {
+                id = jsonObject.get(ID_FIELD).getAsString();
             }
 
             UIWidget element = elementMetadata.newInstance();
             if (id != null) {
-                FieldMetadata fieldMetadata = elementMetadata.getField("id");
+                FieldMetadata fieldMetadata = elementMetadata.getField(ID_FIELD);
                 if (fieldMetadata == null) {
                     logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
                 } else {
@@ -196,8 +160,20 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             }
 
             // Deserialize normal fields.
+            Set<String> unknownFields = new HashSet<>();
+            for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                String name = entry.getKey();
+                if (!ID_FIELD.equals(name)
+                    && !CONTENTS_FIELD.equals(name)
+                    && !TYPE_FIELD.equals(name)
+                    && !LAYOUT_INFO_FIELD.equals(name)) {
+                    unknownFields.add(name);
+                }
+            }
+
             for (FieldMetadata<? extends UIWidget, ?> field : elementMetadata.getFields()) {
                 if (jsonObject.has(field.getSerializationName())) {
+                    unknownFields.remove(field.getSerializationName());
                     if (field.getName().equals(CONTENTS_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
                         continue;
                     }
@@ -219,6 +195,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                         logger.error("Failed to deserialize field {} of {}", field.getName(), type, e);
                     }
                 }
+            }
+
+            for (String key : unknownFields) {
+                logger.warn("Field '{}' not recognized for {} in {}", key, typeOfT, json);
             }
 
             // Deserialize contents and layout hints

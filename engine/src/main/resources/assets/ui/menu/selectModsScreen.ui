@@ -123,7 +123,7 @@
                                     "type" : "ColumnLayout",
                                     "id" : "simpleItems",
                                     "columns" : 2,
-                                    "columnWidths" : [0.3, 0.7],
+                                    "column-widths" : [0.3, 0.7],
                                     "verticalSpacing" : 8,
                                     "contents" : [
                                         {
