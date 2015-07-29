@@ -67,12 +67,10 @@ public final class Rect2i extends org.terasology.math.geom.Rect2i implements Ite
     /**
      * @return The smallest vector in the region
      */
-    @Override
     public Vector2i min() {
         return new Vector2i(minX(), minY());
     }
 
-    @Override
     public Vector2i max() {
         return new Vector2i(maxX(), maxY());
     }
@@ -80,7 +78,6 @@ public final class Rect2i extends org.terasology.math.geom.Rect2i implements Ite
     /**
      * @return The size of the region
      */
-    @Override
     public Vector2i size() {
         return new Vector2i(width(), height());
     }
