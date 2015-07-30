@@ -78,3 +78,5 @@ extensions
 .DS_Store?
 .Spotlight-V100
 .Trashes
+modules/GitHub/src/main/java/console/BrowseTree.java
+modules/GitHub/src/main/java/console/ShowChangedFilesBetweenCommits.java
