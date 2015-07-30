@@ -18,6 +18,11 @@ import org.eclipse.jgit.api.errors.RefNotAdvertisedException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.CorruptObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -29,6 +34,13 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
+import org.eclipse.jgit.lib.AnyObjectId;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+
+import java.util.List;
 
 public class Ejemplo {
 
@@ -57,6 +69,8 @@ public class Ejemplo {
         }
         /*----------get commits description--------------------*/
         extractBugs(git, table);  
+        getLog(localRepo);
+        showChangedFilesBetweenCommits(localRepo);
         git.close();
      
 	}
@@ -104,18 +118,18 @@ public class Ejemplo {
 //		return revWalk;
 //	}
 	
-//	public void traverseTree(Repository repo,RevCommit commit) {
-//		TreeWalk treeWalk = new TreeWalk( repo );
-//		treeWalk.addTree( commit.getName() );
-//		treeWalk.setRecursive( true );
-//		treeWalk.setPostOrderTraversal( true );
-//		while( treeWalk.next() ) {
-//			int fileMode = Integer.parseInt( treeWalk.getFileMode( 0 ).toString() );
-//			String objectId = treeWalk.getObjectId( 0 ).name();
-//			String path = treeWalk.getPathString();
-//			System.out.println( String.format( "%06d %s %s", fileMode, objectId, path ) );
-//		}
-//	}
+	public void traverseTree(Repository repo,AnyObjectId commit) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
+		TreeWalk treeWalk = new TreeWalk( repo );
+		treeWalk.addTree( commit );
+		treeWalk.setRecursive( true );
+		treeWalk.setPostOrderTraversal( true );
+		while( treeWalk.next() ) {
+			int fileMode = Integer.parseInt( treeWalk.getFileMode( 0 ).toString() );
+			String objectId = treeWalk.getObjectId( 0 ).name();
+			String path = treeWalk.getPathString();
+			System.out.println( String.format( "%06d %s %s", fileMode, objectId, path ) );
+		}
+	}
 
 
 
@@ -141,5 +155,107 @@ public class Ejemplo {
 		}
 		return bugged;
 	}
+	
+	public static void getLog(Repository repo) throws IOException, GitAPIException  {
+		 Repository repository = repo;
+
+        Iterable<RevCommit> logs = new Git(repository).log()
+                .call();
+        int count = 0;
+        for (RevCommit rev : logs) {
+            System.out.println("Commit: " + rev + ", name: " + rev.getName() + ", id: " + rev.getId().getName());
+            count++;
+        }
+        System.out.println("Had " + count + " commits overall on current branch");
+
+//        logs = new Git(repository).log()
+//                .add(repository.resolve("remotes/origin/testbranch"))
+//                .call();
+//        count = 0;
+//        for (RevCommit rev : logs) {
+//            System.out.println("Commit: " + rev /* + ", name: " + rev.getName() + ", id: " + rev.getId().getName() */);
+//            count++;
+//        }
+//        System.out.println("Had " + count + " commits overall on test-branch");
+
+        logs = new Git(repository).log()
+                .all()
+                .call();
+        count = 0;
+        for (RevCommit rev : logs) {
+            System.out.println("Commit: " + rev /* + ", name: " + rev.getName() + ", id: " + rev.getId().getName() */);
+            count++;
+        }
+        System.out.println("Had " + count + " commits overall in repository");
+
+        logs = new Git(repository).log()
+                // for all log.all()
+                .addPath("README.md")
+                .call();
+        count = 0;
+        for (RevCommit rev : logs) {
+            //System.out.println("Commit: " + rev /* + ", name: " + rev.getName() + ", id: " + rev.getId().getName() */);
+            count++;
+        }
+        System.out.println("Had " + count + " commits on README.md");
+
+        logs = new Git(repository).log()
+                // for all log.all()
+                .addPath("pom.xml")
+                .call();
+        count = 0;
+        for (RevCommit rev : logs) {
+            //System.out.println("Commit: " + rev /* + ", name: " + rev.getName() + ", id: " + rev.getId().getName() */);
+            count++;
+        }
+        System.out.println("Had " + count + " commits on pom.xml");
+
+        repository.close();
+	}
+	
+	public static void showChangedFilesBetweenCommits(Repository repo) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException, GitAPIException {
+		Repository repository =repo;
+		int commits = 4;
+		String commitPointer = "HEAD^";
+		String tree= "{tree}";
+
+        for (int i = 0; i < commits-1; i++) {
+        	ObjectId head = repository.resolve(commitPointer+tree);
+        	commitPointer=commitPointer+"^";
+			ObjectId oldHead = repository.resolve(commitPointer+tree);
+			if (oldHead == null) return;
+			System.out.println("Printing diff between tree: " + oldHead
+					+ " and " + head);
+			// prepare the two iterators to compute the diff between
+			ObjectReader reader = repository.newObjectReader();
+			CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+			oldTreeIter.reset(reader, oldHead);
+			CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+			newTreeIter.reset(reader, head);
+			// finally get the list of changed files
+			List<DiffEntry> diffs = new Git(repository).diff()
+					.setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
+			for (DiffEntry entry : diffs) {
+				System.out.println("Entry: " + entry);
+			}
+			System.out.println("Done");
+			repository.close();
+		}
+        
+       
+	}
+	
+	 public static String extractClassFromEntry(DiffEntry entry) {
+     	String stringEntry= entry.toString();
+     	int start;
+     	int end = stringEntry.length()-6;
+     	for (int j = 0; j < end;j++) {
+     		if (stringEntry.charAt(j)=='/') {
+     			start = j+1;
+     			return stringEntry.substring(start,end);
+     		}
+     	}
+     	return null;
+     }
 
 }
