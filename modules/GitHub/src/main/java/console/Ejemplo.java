@@ -27,6 +27,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 
 public class Ejemplo {
@@ -55,7 +56,7 @@ public class Ejemplo {
         	gitGlone(localPath, remotePath);
         }
         /*----------get commits description--------------------*/
-        extractedBugs(git, table);  
+        extractBugs(git, table);  
         git.close();
      
 	}
@@ -77,7 +78,7 @@ public class Ejemplo {
 	}
 
 
-	private static void extractedBugs(Git git, Hashtable<String, Boolean> table) throws GitAPIException,
+	private static void extractBugs(Git git, Hashtable<String, Boolean> table) throws GitAPIException,
 			NoHeadException {
 		String com;
 		//FetchCommand classflag = new  FetchCommand();
@@ -91,12 +92,32 @@ public class Ejemplo {
         	System.out.println(hasBug(com));
         }
 	}
+	
+//	public PlotWalk findChildrenOfCommit(Repository repo) {
+//		PlotWalk revWalk = new PlotWalk(repo);
+//		ObjectId rootId = (branch==null)?repo.resolve(HEAD):branch.getObjectId();
+//		RevCommit root = revWalk.parseCommit(rootId);
+//		revWalk.markStart(root);
+//		PlotCommitList<PlotLane> plotCommitList = new PlotCommitList<PlotLane>();
+//		plotCommitList.source(revWalk);
+//		plotCommitList.fillTo(Integer.MAX_VALUE);
+//		return revWalk;
+//	}
+	
+//	public void traverseTree(Repository repo,RevCommit commit) {
+//		TreeWalk treeWalk = new TreeWalk( repo );
+//		treeWalk.addTree( commit.getName() );
+//		treeWalk.setRecursive( true );
+//		treeWalk.setPostOrderTraversal( true );
+//		while( treeWalk.next() ) {
+//			int fileMode = Integer.parseInt( treeWalk.getFileMode( 0 ).toString() );
+//			String objectId = treeWalk.getObjectId( 0 ).name();
+//			String path = treeWalk.getPathString();
+//			System.out.println( String.format( "%06d %s %s", fileMode, objectId, path ) );
+//		}
+//	}
 
 
-	private static char[] getName(String com) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 	private static void gitGlone(String localPath, String remotePath)
