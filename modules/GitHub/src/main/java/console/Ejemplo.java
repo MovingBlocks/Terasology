@@ -88,7 +88,7 @@ public class Ejemplo {
 
 	private static void gitPull(Git git, String remotePath) throws WrongRepositoryStateException, InvalidConfigurationException, DetachedHeadException, InvalidRemoteException, CanceledException, RefNotFoundException, RefNotAdvertisedException, NoHeadException, TransportException, GitAPIException {
 		// This method execute a pull from remote repository
-		//git.pull().setRemote(remotePath).call();
+		git.pull().call();
 	}
 
 
