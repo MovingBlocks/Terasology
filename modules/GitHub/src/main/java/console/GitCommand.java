@@ -257,4 +257,27 @@ public class GitCommand extends BaseComponentSystem{
 	        
 	       
 		}
+	 private static void extractVersions(Git git, Repository repo, Hashtable<String, Integer> table) throws GitAPIException,
+		NoHeadException, RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
+	String com;
+	int i=0;
+	Iterable<RevCommit> log = git.log()
+			.call();
+	for(RevCommit commit : log){
+		com = commit.getFullMessage();
+		System.out.println(com);
+		System.out.println(commit.getId());
+		ArrayList<String> classes = getClassesInCommit(i,repo);
+		for(String c: classes) {
+			if (table.get(c) == null) {
+				table.put(c, 1);
+			}
+			else {
+				int versions = table.get(c);
+				table.put(c,versions+1);
+			}
+		}
+		i++;
+	}
+}
 }
