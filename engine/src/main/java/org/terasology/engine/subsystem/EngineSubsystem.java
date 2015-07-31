@@ -18,6 +18,7 @@ package org.terasology.engine.subsystem;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 
 public interface EngineSubsystem {
@@ -39,9 +40,10 @@ public interface EngineSubsystem {
     /**
      * Called to initialise the system
      *
+     * @param engine      The game engine
      * @param rootContext The root context, that will survive the entire run of the engine
      */
-    default void initialise(Context rootContext) {
+    default void initialise(GameEngine engine, Context rootContext) {
     }
 
     /**

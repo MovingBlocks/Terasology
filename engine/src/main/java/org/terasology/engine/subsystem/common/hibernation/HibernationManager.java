@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.subsystem.common.hibernation;
 
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.physics.CollisionGroupManager;
+import org.terasology.module.sandbox.API;
 
 /**
  *
  */
-public class PhysicsSubsystem implements EngineSubsystem {
-    @Override
-    public String getName() {
-        return "Physics";
+@API
+public class HibernationManager {
+    private boolean hibernationAllowed = true;
+    private boolean hibernating;
+
+    public boolean isHibernationAllowed() {
+        return hibernationAllowed;
     }
 
-    @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        rootContext.put(CollisionGroupManager.class, new CollisionGroupManager());
+    public void setHibernationAllowed(boolean hibernationAllowed) {
+        this.hibernationAllowed = hibernationAllowed;
+    }
+
+    public boolean isHibernating() {
+        return hibernating;
+    }
+
+    void setHibernating(boolean hibernating) {
+        this.hibernating = hibernating;
     }
 }

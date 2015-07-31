@@ -127,8 +127,6 @@ public class TerasologyEngine implements GameEngine {
     private volatile boolean shutdownRequested;
     private volatile boolean running;
 
-    private boolean hibernationAllowed;
-
     private TimeSubsystem timeSubsystem;
     private Deque<EngineSubsystem> allSubsystems;
     private ModuleAwareAssetTypeManager assetTypeManager;
@@ -248,7 +246,7 @@ public class TerasologyEngine implements GameEngine {
     private void initSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Initialising " + subsystem.getName() + " subsystem");
-            subsystem.initialise(rootContext);
+            subsystem.initialise(this, rootContext);
         }
     }
 
@@ -387,31 +385,9 @@ public class TerasologyEngine implements GameEngine {
      * and disposal occur afterwards.
      */
     private void mainLoop() {
-        NetworkSystem networkSystem = rootContext.get(NetworkSystem.class);
-
-        DisplayDevice display = rootContext.get(DisplayDevice.class);
-
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (!shutdownRequested && !display.isCloseRequested()) {
-            // Only process rendering and updating once a second
-            if (!display.hasFocus() && isHibernationAllowed()) {
-                timeSubsystem.getEngineTime().setPaused(true);
-                Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
-                while (updateCycles.hasNext()) {
-                    updateCycles.next();
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    logger.warn("Display inactivity sleep interrupted", e);
-                }
-
-                display.processMessages();
-                timeSubsystem.getEngineTime().setPaused(false);
-                continue;
-            }
-
+        while (!shutdownRequested) {
             assetTypeManager.reloadChangedOnDisk();
 
             processPendingState();
@@ -547,16 +523,6 @@ public class TerasologyEngine implements GameEngine {
 
     public Iterable<EngineSubsystem> getSubsystems() {
         return allSubsystems;
-    }
-
-    @Override
-    public boolean isHibernationAllowed() {
-        return hibernationAllowed && currentState.isHibernationAllowed();
-    }
-
-    @Override
-    public void setHibernationAllowed(boolean allowed) {
-        this.hibernationAllowed = allowed;
     }
 
     @Override

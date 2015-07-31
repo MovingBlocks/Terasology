@@ -22,6 +22,7 @@ import org.terasology.audio.StreamingSound;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 
@@ -35,7 +36,7 @@ public class HeadlessAudio implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(Context context) {
+    public void initialise(GameEngine engine, Context context) {
         initNoSound(context);
     }
 

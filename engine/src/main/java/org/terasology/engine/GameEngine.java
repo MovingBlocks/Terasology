@@ -78,10 +78,6 @@ public interface GameEngine {
 
     boolean hasPendingState();
 
-    boolean isHibernationAllowed();
-
-    void setHibernationAllowed(boolean allowed);
-
     /**
      * Creates a context that provides read access to the objects of the engine context and can
      * be populated with it's own private objects.

@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.common;
 
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -36,7 +37,7 @@ public class NetworkSubsystem implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(Context rootContext) {
+    public void initialise(GameEngine engine, Context rootContext) {
         networkSystem = new NetworkSystemImpl(rootContext.get(Time.class), rootContext);
         rootContext.put(NetworkSystem.class, networkSystem);
     }

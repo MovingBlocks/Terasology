@@ -46,6 +46,8 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.engine.subsystem.common.hibernation.HibernationManager;
+import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -117,6 +119,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private static final int NULL_NET_ID = 0;
 
     // Shared
+    private HibernationManager hibernationSettings;
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
@@ -153,12 +156,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public NetworkSystemImpl(Time time, Context context) {
         this.time = time;
         this.config = context.get(Config.class).getNetwork();
+        this.hibernationSettings = context.get(HibernationManager.class);
     }
 
     @Override
     public void host(int port, boolean dedicatedServer) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
             try {
+                hibernationSettings.setHibernationAllowed(false);
                 mode = dedicatedServer ? NetworkMode.DEDICATED_SERVER : NetworkMode.LISTEN_SERVER;
                 for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
@@ -204,6 +209,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public JoinStatus join(String address, int port) throws InterruptedException {
         if (mode == NetworkMode.NONE) {
+            hibernationSettings.setHibernationAllowed(false);
             factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
             ClientBootstrap bootstrap = new ClientBootstrap(factory);
             bootstrap.setPipelineFactory(new TerasologyClientPipelineFactory(this));

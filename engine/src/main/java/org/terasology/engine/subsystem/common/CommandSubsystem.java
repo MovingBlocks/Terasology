@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.common;
 
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 
@@ -29,7 +30,7 @@ public class CommandSubsystem implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(Context rootContext) {
+    public void initialise(GameEngine engine, Context rootContext) {
         rootContext.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
     }
 }

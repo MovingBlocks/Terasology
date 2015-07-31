@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.common;
 
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
@@ -29,7 +30,7 @@ public class WorldGenerationSubsystem implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(Context rootContext) {
+    public void initialise(GameEngine engine, Context rootContext) {
         rootContext.put(WorldGeneratorManager.class, new WorldGeneratorManager(rootContext));
     }
 }

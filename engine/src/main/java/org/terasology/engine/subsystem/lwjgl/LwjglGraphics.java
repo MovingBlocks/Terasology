@@ -33,6 +33,7 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -102,15 +103,21 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private Context context;
     private RenderingConfig config;
 
+    private GameEngine engine;
+    private LwjglDisplayDevice lwjglDisplay;
+
     @Override
     public String getName() {
         return "Graphics";
     }
 
     @Override
-    public void initialise(Context rootContext) {
+    public void initialise(GameEngine gameEngine, Context rootContext) {
+        this.engine = gameEngine;
         this.context = rootContext;
         this.config = context.get(Config.class).getRendering();
+        lwjglDisplay = new LwjglDisplayDevice(context);
+        context.put(DisplayDevice.class, lwjglDisplay);
     }
 
     @Override
@@ -157,10 +164,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void postInitialise(Context rootContext) {
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
-        LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice(context);
-        context.put(DisplayDevice.class, lwjglDisplay);
-
-        initDisplay(lwjglDisplay);
+        initDisplay();
         initOpenGL(context);
 
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
@@ -186,6 +190,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             glViewport(0, 0, Display.getWidth(), Display.getHeight());
         }
 
+        if (lwjglDisplay.isCloseRequested()) {
+            engine.shutdown();
+        }
+
 
     }
 
@@ -202,7 +210,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         Display.destroy();
     }
 
-    private void initDisplay(LwjglDisplayDevice lwjglDisplay) {
+    private void initDisplay() {
         try {
             lwjglDisplay.setFullscreen(config.isFullscreen(), false);
 
