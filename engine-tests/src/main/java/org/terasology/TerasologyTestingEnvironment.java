@@ -36,6 +36,7 @@ import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.game.Game;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -98,6 +99,7 @@ public abstract class TerasologyTestingEnvironment {
         mockTime = mock(EngineTime.class);
         context.put(Time.class, mockTime);
         NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
+        context.put(Game.class, new Game());
         context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);

@@ -103,6 +103,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
@@ -119,7 +120,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private static final int NULL_NET_ID = 0;
 
     // Shared
-    private HibernationManager hibernationSettings;
+    private Optional<HibernationManager> hibernationSettings = Optional.empty();
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
@@ -156,14 +157,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public NetworkSystemImpl(Time time, Context context) {
         this.time = time;
         this.config = context.get(Config.class).getNetwork();
-        this.hibernationSettings = context.get(HibernationManager.class);
+        this.hibernationSettings = Optional.ofNullable(context.get(HibernationManager.class));
     }
 
     @Override
     public void host(int port, boolean dedicatedServer) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
             try {
-                hibernationSettings.setHibernationAllowed(false);
+                if (hibernationSettings.isPresent()) {
+                    hibernationSettings.get().setHibernationAllowed(false);
+                }
                 mode = dedicatedServer ? NetworkMode.DEDICATED_SERVER : NetworkMode.LISTEN_SERVER;
                 for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
@@ -209,7 +212,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public JoinStatus join(String address, int port) throws InterruptedException {
         if (mode == NetworkMode.NONE) {
-            hibernationSettings.setHibernationAllowed(false);
+            if (hibernationSettings.isPresent()) {
+                hibernationSettings.get().setHibernationAllowed(false);
+            }
             factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
             ClientBootstrap bootstrap = new ClientBootstrap(factory);
             bootstrap.setPipelineFactory(new TerasologyClientPipelineFactory(this));
