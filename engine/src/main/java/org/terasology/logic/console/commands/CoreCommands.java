@@ -104,8 +104,8 @@ public class CoreCommands extends BaseComponentSystem {
         pickupBuilder = new PickupBuilder(entityManager);
     }
 
-    @Command
-    public void setTimeRate(@CommandParam("rate") float rate) {
+    @Command(shortDescription = "Alter the rate of time")
+    public void setTimeDilation(@CommandParam("dilation") float rate) {
         time.setGameTimeDilation(rate);
     }
 
