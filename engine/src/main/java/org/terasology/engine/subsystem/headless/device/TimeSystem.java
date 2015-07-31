@@ -18,6 +18,11 @@ package org.terasology.engine.subsystem.headless.device;
 import org.terasology.engine.internal.TimeBase;
 
 public final class TimeSystem extends TimeBase {
+
+    public TimeSystem() {
+        super(System.nanoTime() / 1000000);
+    }
+
     @Override
     public long getRawTimeInMs() {
         return System.nanoTime() / 1000000;

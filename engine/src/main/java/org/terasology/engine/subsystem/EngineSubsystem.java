@@ -22,6 +22,9 @@ import org.terasology.engine.modes.GameState;
 
 public interface EngineSubsystem {
 
+    /**
+     * @return The name of the subsystem
+     */
     String getName();
 
     /**
@@ -55,9 +58,19 @@ public interface EngineSubsystem {
     default void postInitialise(Context context) {
     }
 
+    /**
+     * Called before the main game logic update, once a frame/full update cycle
+     * @param currentState The current state
+     * @param delta The total time this frame/update cycle
+     */
     default void preUpdate(GameState currentState, float delta) {
     }
 
+    /**
+     * Called after the main game logic update, once a frame/full update cycle
+     * @param currentState The current state
+     * @param delta The total time this frame/update cycle
+     */
     default void postUpdate(GameState currentState, float delta) {
     }
 
@@ -72,6 +85,4 @@ public interface EngineSubsystem {
 
     default void registerSystems(ComponentSystemManager componentSystemManager) {
     }
-
-    ;
 }

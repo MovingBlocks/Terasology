@@ -44,6 +44,10 @@ public abstract class TimeBase implements EngineTime {
 
     private AtomicLong gameTime = new AtomicLong(0);
 
+    public TimeBase(long initialTime) {
+        last.set(initialTime);
+    }
+
     protected abstract long getRawTimeInMs();
 
     /**

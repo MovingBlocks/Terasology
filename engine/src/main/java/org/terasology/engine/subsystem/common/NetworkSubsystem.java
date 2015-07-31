@@ -17,6 +17,7 @@ package org.terasology.engine.subsystem.common;
 
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
+import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -26,6 +27,9 @@ import org.terasology.physics.CollisionGroupManager;
  *
  */
 public class NetworkSubsystem implements EngineSubsystem {
+
+    private NetworkSystem networkSystem;
+
     @Override
     public String getName() {
         return "Network";
@@ -33,6 +37,12 @@ public class NetworkSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(Context rootContext) {
-        rootContext.put(NetworkSystem.class, new NetworkSystemImpl(rootContext.get(Time.class), rootContext));
+        networkSystem = new NetworkSystemImpl(rootContext.get(Time.class), rootContext);
+        rootContext.put(NetworkSystem.class, networkSystem);
+    }
+
+    @Override
+    public void preUpdate(GameState currentState, float delta) {
+        networkSystem.update();
     }
 }

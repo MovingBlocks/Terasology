@@ -182,9 +182,10 @@ public class TerasologyEngine implements GameEngine {
             GameThread.setToCurrentThread();
 
             preInitSubsystems();
-            initSubsystems();
 
             initManagers();
+
+            initSubsystems();
 
             changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
             initAssets();
@@ -422,24 +423,16 @@ public class TerasologyEngine implements GameEngine {
 
             Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
 
-            try (Activity ignored = PerformanceMonitor.startActivity("Network Update")) {
-                networkSystem.update();
-            }
-
-            long totalDelta = 0;
-            while (updateCycles.hasNext()) {
-                float updateDelta = updateCycles.next(); // gameTime gets updated here!
-                totalDelta += timeSubsystem.getEngineTime().getGameDeltaInMs();
-                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
-                    currentState.update(updateDelta);
+            for (EngineSubsystem subsystem : allSubsystems) {
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
+                    subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
                 }
             }
 
-            float subsystemsDelta = totalDelta / 1000f;
-
-            for (EngineSubsystem subsystem : getSubsystems()) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
-                    subsystem.preUpdate(currentState, subsystemsDelta);
+            while (updateCycles.hasNext()) {
+                float updateDelta = updateCycles.next(); // gameTime gets updated here!
+                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
+                    currentState.update(updateDelta);
                 }
             }
 
@@ -447,8 +440,8 @@ public class TerasologyEngine implements GameEngine {
             GameThread.processWaitingProcesses();
 
             for (EngineSubsystem subsystem : getSubsystems()) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
-                    subsystem.postUpdate(currentState, subsystemsDelta);
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
+                    subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
                 }
             }
 

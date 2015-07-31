@@ -98,18 +98,6 @@ public class HeadlessGraphics implements EngineSubsystem {
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
     }
 
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void postUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
     private void initHeadless(Context context) {
         context.put(ShaderManager.class, new ShaderManagerHeadless());
     }
