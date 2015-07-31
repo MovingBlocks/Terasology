@@ -84,9 +84,13 @@ public interface CoreChunk {
 
     Region3i getRegion();
 
-    void lock();
+    void writeLock();
 
-    void unlock();
+    void writeUnlock();
+
+    void readLock();
+
+    void readUnlock();
 
     boolean isLocked();
 

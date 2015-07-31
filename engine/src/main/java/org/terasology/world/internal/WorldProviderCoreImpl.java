@@ -185,9 +185,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
-            chunk.lock();
+            chunk.writeLock();
             Block oldBlockType = chunk.setBlock(blockPos, type);
-            chunk.unlock();
+            chunk.writeUnlock();
             if (oldBlockType != type) {
                 BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
@@ -210,7 +210,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
-        // TODO: Could use a read/write lock.
+        // TODO: Could use a read/write writeLock.
         // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
@@ -220,7 +220,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     private void notifyBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
-        // TODO: Could use a read/write lock.
+        // TODO: Could use a read/write writeLock.
         // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
@@ -234,7 +234,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            chunk.lock();
+            chunk.writeLock();
             try {
                 Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
                 LiquidData liquidState = chunk.getLiquid(blockPos);
@@ -243,7 +243,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     return true;
                 }
             } finally {
-                chunk.unlock();
+                chunk.writeUnlock();
             }
         }
         return false;
@@ -291,9 +291,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
-            chunk.lock();
+            chunk.writeLock();
             Biome oldBiomeType = chunk.setBiome(blockPos.x, blockPos.y, blockPos.z, biome);
-            chunk.unlock();
+            chunk.writeUnlock();
             if (oldBiomeType != biome) {
                 BiomeChange oldChange = biomeChanges.get(worldPos);
                 if (oldChange == null) {

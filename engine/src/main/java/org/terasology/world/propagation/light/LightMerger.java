@@ -87,7 +87,7 @@ public class LightMerger<T> {
         localChunks[CENTER_INDEX] = chunk;
         for (Chunk localChunk : localChunks) {
             if (localChunk != null) {
-                localChunk.lock();
+                localChunk.writeLock();
             }
         }
         try {
@@ -127,7 +127,7 @@ public class LightMerger<T> {
         } finally {
             for (Chunk localChunk : localChunks) {
                 if (localChunk != null) {
-                    localChunk.unlock();
+                    localChunk.writeUnlock();
                 }
             }
         }
