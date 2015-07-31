@@ -121,8 +121,8 @@ dependencies {
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // Our developed libs
-    compile group: 'org.terasology', name: 'gestalt-module', version: '4.1.1'
-    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '4.1.1'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '4.1.2'
+    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '4.1.2'
     compile group: 'org.terasology', name: 'TeraMath', version: '1.1.0'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
 
