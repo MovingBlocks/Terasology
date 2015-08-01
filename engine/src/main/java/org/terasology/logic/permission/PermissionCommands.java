@@ -29,7 +29,6 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
 import java.util.HashSet;
@@ -55,7 +54,7 @@ public class PermissionCommands extends BaseComponentSystem {
                     + "Please note that the debug permission will only be granted if the debug setting is on.",
             runOnServer = true, requiredPermission = PermissionManager.NO_PERMISSION)
     public String usePermissionKey(@CommandParam("key") String key, @Sender EntityRef client) {
-        PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
+        PermissionConfig permissionConfig = config.getPermission();
         String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
 
         if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
