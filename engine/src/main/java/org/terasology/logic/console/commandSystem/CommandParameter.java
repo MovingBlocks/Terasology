@@ -17,11 +17,12 @@ package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Primitives;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.logic.console.commandSystem.exceptions.CommandParameterParseException;
 import org.terasology.logic.console.commandSystem.exceptions.SuggesterInstantiationException;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.InjectionHelper;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -75,110 +76,102 @@ public final class CommandParameter<T> implements Parameter {
 
     public static <T> CommandParameter single(String name, Class<T> type, boolean required,
                                               CommandParameterSuggester<T> suggester,
-                                              ParameterAdapterManager parameterAdapterManager) {
+                                              Context context) {
         if (type.isArray()) {
             throw new IllegalArgumentException("The type of a simple CommandParameterDefinition must not be an array!");
         }
-
+        ParameterAdapterManager parameterAdapterManager = context.get(ParameterAdapterManager.class);
         return new CommandParameter(name, type, required, suggester, parameterAdapterManager);
     }
 
     public static <T> CommandParameter single(String name, Class<T> type, boolean required,
                                               Class<? extends CommandParameterSuggester<T>> suggesterClass,
-                                              ParameterAdapterManager parameterAdapterManager)
+                                              Context context)
             throws SuggesterInstantiationException {
-        try {
-            CommandParameterSuggester<T> suggester = suggesterClass != null ? suggesterClass.newInstance() : null;
-            return single(name, type, required, suggester, parameterAdapterManager);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SuggesterInstantiationException(e);
+        CommandParameterSuggester<T> suggester = optionallyCreateSuggestor(suggesterClass, context);
+        return single(name, type, required, suggester, context);
+    }
+
+    private static <T> CommandParameterSuggester<T> optionallyCreateSuggestor(
+            Class<? extends CommandParameterSuggester<T>> suggestorClass,
+            Context context) {
+        if (suggestorClass == null) {
+            return null;
         }
+        return InjectionHelper.createWithConstructorInjection(suggestorClass, context);
     }
 
     @SuppressWarnings("unchecked")
     public static CommandParameter single(String name, Class<?> type, boolean required,
-                                          ParameterAdapterManager parameterAdapterManager) {
-        return single(name, type, required, (CommandParameterSuggester) null, parameterAdapterManager);
+                                          Context context) {
+        return single(name, type, required, (CommandParameterSuggester) null, context);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, Character arrayDelimiter,
                                              boolean required, CommandParameterSuggester<T> suggester,
-                                             ParameterAdapterManager parameterAdapterManager) {
+                                             Context  context) {
         if (childType.isArray()) {
             throw new IllegalArgumentException("The child type of an array CommandParameterDefinition must not be an array!");
         }
 
         Class<?> type = getArrayClass(childType);
-
+        ParameterAdapterManager parameterAdapterManager = context.get(ParameterAdapterManager.class);
         return new CommandParameter(name, type, required, suggester, parameterAdapterManager);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, Character arrayDelimiter,
                                              boolean required,
                                              Class<? extends CommandParameterSuggester<T>> suggesterClass,
-                                             ParameterAdapterManager parameterAdapterManager)
+                                             Context context)
             throws SuggesterInstantiationException {
-        try {
-            CommandParameterSuggester<T> suggester = suggesterClass != null ? suggesterClass.newInstance() : null;
-            return array(name, childType, arrayDelimiter, required, suggester, parameterAdapterManager);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SuggesterInstantiationException(e);
-        }
+        CommandParameterSuggester<T> suggester = optionallyCreateSuggestor(suggesterClass, context);
+        return array(name, childType, arrayDelimiter, required, suggester, context);
     }
 
     @SuppressWarnings("unchecked")
     public static CommandParameter array(String name, Class<?> childType, Character arrayDelimiter,
-                                         boolean required, ParameterAdapterManager parameterAdapterManager) {
+                                         boolean required, Context context) {
         return array(name, childType, arrayDelimiter, required, (CommandParameterSuggester) null,
-                parameterAdapterManager);
+                context);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, boolean required,
                                              CommandParameterSuggester<T> suggester,
-                                             ParameterAdapterManager parameterAdapterManager) {
-        return array(name, childType, null, required, suggester, parameterAdapterManager);
+                                             Context context) {
+        return array(name, childType, null, required, suggester, context);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, boolean required,
                                              Class<? extends CommandParameterSuggester<T>> suggesterClass,
-                                             ParameterAdapterManager parameterAdapterManager)
+                                             Context context)
             throws SuggesterInstantiationException {
-        try {
-            CommandParameterSuggester<T> suggester = suggesterClass != null ? suggesterClass.newInstance() : null;
-            return array(name, childType, required, suggester, parameterAdapterManager);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SuggesterInstantiationException(e);
-        }
+        CommandParameterSuggester<T> suggester = optionallyCreateSuggestor(suggesterClass, context);
+        return array(name, childType, required, suggester, context);
     }
 
     @SuppressWarnings("unchecked")
     public static CommandParameter array(String name, Class<?> childType, boolean required,
-                                         ParameterAdapterManager parameterAdapterManager) {
-        return array(name, childType, required, (CommandParameterSuggester) null, parameterAdapterManager);
+                                         Context context) {
+        return array(name, childType, required, (CommandParameterSuggester) null, context);
     }
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
                                                CommandParameterSuggester<T> suggester,
-                                               ParameterAdapterManager parameterAdapterManager) {
-        return array(name, childType, required, suggester, parameterAdapterManager);
+                                               Context context) {
+        return array(name, childType, required, suggester, context);
     }
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
-                                               Class<? extends CommandParameterSuggester<T>> suggester,
-                                               ParameterAdapterManager parameterAdapterManager)
+                                               Class<? extends CommandParameterSuggester<T>> suggesterClass,
+                                               Context context)
             throws SuggesterInstantiationException {
-        try {
-            return varargs(name, childType, required, suggester != null ? suggester.newInstance() : null,
-                    parameterAdapterManager);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SuggesterInstantiationException(e);
-        }
+        return varargs(name, childType, required, optionallyCreateSuggestor(suggesterClass, context), context);
     }
 
     @SuppressWarnings("unchecked")
     public static CommandParameter varargs(String name, Class<?> childType, boolean required,
-                                           ParameterAdapterManager parameterAdapterManager) {
-        return varargs(name, childType, required, (CommandParameterSuggester) null, parameterAdapterManager);
+                                           Context context) {
+        return varargs(name, childType, required, (CommandParameterSuggester) null, context);
     }
 
     /**

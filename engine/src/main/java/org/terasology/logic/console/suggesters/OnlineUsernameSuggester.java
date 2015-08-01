@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Set;
 
@@ -31,10 +30,15 @@ import java.util.Set;
  *
  * @author Limeth
  */
-public class OnlineUsernameSuggester implements CommandParameterSuggester<String> {
+public final class OnlineUsernameSuggester implements CommandParameterSuggester<String> {
+    private final EntityManager entityManager;
+
+    public OnlineUsernameSuggester(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @Override
     public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         Set<String> clientNames = Sets.newHashSet();
 

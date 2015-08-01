@@ -19,12 +19,15 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.util.reflection.ParameterProvider;
+import org.terasology.util.reflection.SimpleClassFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Immortius
@@ -109,4 +112,14 @@ public final class InjectionHelper {
         }
     }
 
+
+    public static <E> E createWithConstructorInjection(Class<? extends E> clazz, Context context) {
+        SimpleClassFactory simpleClassFactory = new SimpleClassFactory(new ParameterProvider() {
+            @Override
+            public <T> Optional<T> get(Class<T> x) {
+                return Optional.of(context.get(x));
+            }
+        });
+        return simpleClassFactory.instantiateClass(clazz).get();
+    }
 }

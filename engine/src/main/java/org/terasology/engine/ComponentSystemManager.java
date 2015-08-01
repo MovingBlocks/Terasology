@@ -30,7 +30,6 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
-import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
@@ -143,8 +142,7 @@ public class ComponentSystemManager {
         InjectionHelper.inject(system);
 
         if (console != null) {
-            ParameterAdapterManager parameterAdapterManager = context.get(ParameterAdapterManager.class);
-            MethodCommand.registerAvailable(system, console, parameterAdapterManager);
+            MethodCommand.registerAvailable(system, console, context);
         }
 
         try {
