@@ -153,7 +153,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 relMove.y += relativeMovement.y;
                 break;
         }
-        entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump));
+        entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump, time.getGameDeltaInMs()));
         jump = false;
     }
 

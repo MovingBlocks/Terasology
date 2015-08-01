@@ -39,10 +39,6 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     protected CharacterMoveInputEvent() {
     }
 
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested) {
-        this(sequence, pitch, yaw, movementDirection, running, jumpRequested, CoreRegistry.get(Time.class).getGameDeltaInMs());
-    }
-
     public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested, long delta) {
         this.delta = delta;
         this.pitch = pitch;

@@ -15,12 +15,11 @@
  */
 package org.terasology.logic.ai;
 
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -94,7 +93,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 location.getLocalRotation().set(new Vector3f(0, 1, 0), yaw);
                 entity.saveComponent(location);
             }
-            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false));
+            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));
         }
     }
 
