@@ -37,9 +37,11 @@ public final class CommandParameter<T> implements Parameter {
     private final Class<T> type;
     private final CommandParameterSuggester<T> suggester;
     private final boolean required;
+    private final ParameterAdapterManager parameterAdapterManager;
 
     @SuppressWarnings("unchecked")
-    private CommandParameter(String name, Class<T> typeParam, boolean required, CommandParameterSuggester<T> suggester) {
+    private CommandParameter(String name, Class<T> typeParam, boolean required, CommandParameterSuggester<T> suggester,
+                             ParameterAdapterManager parameterAdapterManager) {
         Preconditions.checkNotNull(name, "The parameter name must not be null!");
 
         if (name.length() <= 0) {
@@ -68,48 +70,57 @@ public final class CommandParameter<T> implements Parameter {
         this.type = resultType;
         this.suggester = suggester;
         this.required = required;
+        this.parameterAdapterManager = parameterAdapterManager;
     }
 
     public static <T> CommandParameter single(String name, Class<T> type, boolean required,
-                                              CommandParameterSuggester<T> suggester) {
+                                              CommandParameterSuggester<T> suggester,
+                                              ParameterAdapterManager parameterAdapterManager) {
         if (type.isArray()) {
             throw new IllegalArgumentException("The type of a simple CommandParameterDefinition must not be an array!");
         }
 
-        return new CommandParameter(name, type, required, suggester);
+        return new CommandParameter(name, type, required, suggester, parameterAdapterManager);
     }
 
     public static <T> CommandParameter single(String name, Class<T> type, boolean required,
-                                              Class<? extends CommandParameterSuggester<T>> suggesterClass)
+                                              Class<? extends CommandParameterSuggester<T>> suggesterClass,
+                                              ParameterAdapterManager parameterAdapterManager)
             throws SuggesterInstantiationException {
         try {
-            return single(name, type, required, suggesterClass != null ? suggesterClass.newInstance() : null);
+            CommandParameterSuggester<T> suggester = suggesterClass != null ? suggesterClass.newInstance() : null;
+            return single(name, type, required, suggester, parameterAdapterManager);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SuggesterInstantiationException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static CommandParameter single(String name, Class<?> type, boolean required) {
-        return single(name, type, required, (CommandParameterSuggester) null);
+    public static CommandParameter single(String name, Class<?> type, boolean required,
+                                          ParameterAdapterManager parameterAdapterManager) {
+        return single(name, type, required, (CommandParameterSuggester) null, parameterAdapterManager);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, Character arrayDelimiter,
-                                             boolean required, CommandParameterSuggester<T> suggester) {
+                                             boolean required, CommandParameterSuggester<T> suggester,
+                                             ParameterAdapterManager parameterAdapterManager) {
         if (childType.isArray()) {
             throw new IllegalArgumentException("The child type of an array CommandParameterDefinition must not be an array!");
         }
 
         Class<?> type = getArrayClass(childType);
 
-        return new CommandParameter(name, type, required, suggester);
+        return new CommandParameter(name, type, required, suggester, parameterAdapterManager);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, Character arrayDelimiter,
-                                             boolean required, Class<? extends CommandParameterSuggester<T>> suggesterClass)
+                                             boolean required,
+                                             Class<? extends CommandParameterSuggester<T>> suggesterClass,
+                                             ParameterAdapterManager parameterAdapterManager)
             throws SuggesterInstantiationException {
         try {
-            return array(name, childType, arrayDelimiter, required, suggesterClass != null ? suggesterClass.newInstance() : null);
+            CommandParameterSuggester<T> suggester = suggesterClass != null ? suggesterClass.newInstance() : null;
+            return array(name, childType, arrayDelimiter, required, suggester, parameterAdapterManager);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SuggesterInstantiationException(e);
         }
@@ -117,47 +128,57 @@ public final class CommandParameter<T> implements Parameter {
 
     @SuppressWarnings("unchecked")
     public static CommandParameter array(String name, Class<?> childType, Character arrayDelimiter,
-                                         boolean required) {
-        return array(name, childType, arrayDelimiter, required, (CommandParameterSuggester) null);
+                                         boolean required, ParameterAdapterManager parameterAdapterManager) {
+        return array(name, childType, arrayDelimiter, required, (CommandParameterSuggester) null,
+                parameterAdapterManager);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, boolean required,
-                                             CommandParameterSuggester<T> suggester) {
-        return array(name, childType, null, required, suggester);
+                                             CommandParameterSuggester<T> suggester,
+                                             ParameterAdapterManager parameterAdapterManager) {
+        return array(name, childType, null, required, suggester, parameterAdapterManager);
     }
 
     public static <T> CommandParameter array(String name, Class<T> childType, boolean required,
-                                             Class<? extends CommandParameterSuggester<T>> suggesterClass)
+                                             Class<? extends CommandParameterSuggester<T>> suggesterClass,
+                                             ParameterAdapterManager parameterAdapterManager)
             throws SuggesterInstantiationException {
         try {
-            return array(name, childType, required, suggesterClass != null ? suggesterClass.newInstance() : null);
+            CommandParameterSuggester<T> suggester = suggesterClass != null ? suggesterClass.newInstance() : null;
+            return array(name, childType, required, suggester, parameterAdapterManager);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SuggesterInstantiationException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static CommandParameter array(String name, Class<?> childType, boolean required) {
-        return array(name, childType, required, (CommandParameterSuggester) null);
-    }
-
-    public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required, CommandParameterSuggester<T> suggester) {
-        return array(name, childType, required, suggester);
+    public static CommandParameter array(String name, Class<?> childType, boolean required,
+                                         ParameterAdapterManager parameterAdapterManager) {
+        return array(name, childType, required, (CommandParameterSuggester) null, parameterAdapterManager);
     }
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
-                                               Class<? extends CommandParameterSuggester<T>> suggester)
+                                               CommandParameterSuggester<T> suggester,
+                                               ParameterAdapterManager parameterAdapterManager) {
+        return array(name, childType, required, suggester, parameterAdapterManager);
+    }
+
+    public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
+                                               Class<? extends CommandParameterSuggester<T>> suggester,
+                                               ParameterAdapterManager parameterAdapterManager)
             throws SuggesterInstantiationException {
         try {
-            return varargs(name, childType, required, suggester != null ? suggester.newInstance() : null);
+            return varargs(name, childType, required, suggester != null ? suggester.newInstance() : null,
+                    parameterAdapterManager);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SuggesterInstantiationException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static CommandParameter varargs(String name, Class<?> childType, boolean required) {
-        return varargs(name, childType, required, (CommandParameterSuggester) null);
+    public static CommandParameter varargs(String name, Class<?> childType, boolean required,
+                                           ParameterAdapterManager parameterAdapterManager) {
+        return varargs(name, childType, required, (CommandParameterSuggester) null, parameterAdapterManager);
     }
 
     /**
@@ -186,7 +207,6 @@ public final class CommandParameter<T> implements Parameter {
     }
 
     private Object parse(String string) throws CommandParameterParseException {
-        ParameterAdapterManager parameterAdapterManager = CoreRegistry.get(ParameterAdapterManager.class);
         Class<?> childType = getTypeNotPrimitive();
 
         if (parameterAdapterManager.isAdapterRegistered(childType)) {
@@ -201,8 +221,6 @@ public final class CommandParameter<T> implements Parameter {
     }
 
     public String convertToString(Object object) {
-        ParameterAdapterManager parameterAdapterManager = CoreRegistry.get(ParameterAdapterManager.class);
-
         return parameterAdapterManager.convertToString(object, (Class<? super Object>) getType());
     }
 
