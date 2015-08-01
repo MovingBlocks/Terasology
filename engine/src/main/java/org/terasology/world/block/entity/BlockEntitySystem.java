@@ -83,7 +83,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-        pickupBuilder = new PickupBuilder(entityManager);
+        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
         random = new FastRandom();
     }
 

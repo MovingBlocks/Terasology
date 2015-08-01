@@ -101,7 +101,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
                 }
 
                 if (initialEvent) {
-                    PickupBuilder pickupBuilder = new PickupBuilder(entityManager);
+                    PickupBuilder pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
                     for (int i = 0; i < GATHERING_INVENTORY_SLOT_COUNT; i++) {
                         EntityRef item = inventoryManager.getItemInSlot(gatheringEntity, i);
                         if (item.exists()) {

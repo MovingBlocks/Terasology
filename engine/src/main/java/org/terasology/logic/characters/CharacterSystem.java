@@ -87,7 +87,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder(entityManager);
+        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})

@@ -39,6 +39,7 @@ import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
@@ -110,11 +111,15 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private AssetManager assetManager;
 
+    @In
+    private InventoryManager inventoryManager;
+
+
     private PickupBuilder pickupBuilder;
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder(entityManager);
+        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
     }
 
     @Command(shortDescription = "Alter the rate of time")

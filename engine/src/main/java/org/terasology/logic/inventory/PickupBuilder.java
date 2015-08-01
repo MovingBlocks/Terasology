@@ -22,7 +22,6 @@ import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
@@ -31,9 +30,11 @@ import org.terasology.registry.CoreRegistry;
 public final class PickupBuilder {
 
     private EntityManager entityManager;
+    private InventoryManager inventoryManager;
 
-    public PickupBuilder(EntityManager entityManager) {
+    public PickupBuilder(EntityManager entityManager, InventoryManager inventoryManager) {
         this.entityManager = entityManager;
+        this.inventoryManager = inventoryManager;
     }
 
     public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan) {
@@ -50,12 +51,12 @@ public final class PickupBuilder {
         EntityRef owner = itemEntity.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
             if (dropAll) {
-                final EntityRef removedItem = CoreRegistry.get(InventoryManager.class).removeItem(owner, EntityRef.NULL, pickupItem, false);
+                final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false);
                 if (removedItem != null) {
                     pickupItem = removedItem;
                 }
             } else {
-                final EntityRef removedItem = CoreRegistry.get(InventoryManager.class).removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
+                final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
                 if (removedItem != null) {
                     pickupItem = removedItem;
                 }

@@ -51,7 +51,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder(entityManager);
+        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
     }
 
 
