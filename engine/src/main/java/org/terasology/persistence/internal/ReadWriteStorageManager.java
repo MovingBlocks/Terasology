@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -347,9 +348,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        Time time = CoreRegistry.get(Time.class);
         Game game = CoreRegistry.get(Game.class);
 
-        GameManifest gameManifest = new GameManifest(game.getName(), game.getSeed(), game.getTime().getGameTimeInMs());
+        GameManifest gameManifest = new GameManifest(game.getName(), game.getSeed(), time.getGameTimeInMs());
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
             gameManifest.addModule(module.getId(), module.getVersion());
         }

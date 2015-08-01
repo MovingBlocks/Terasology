@@ -15,36 +15,35 @@
  */
 package org.terasology.engine.subsystem.common;
 
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.Time;
+import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.monitoring.gui.AdvancedMonitor;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.physics.CollisionGroupManager;
 
 /**
  *
  */
-public class MonitoringSubsystem implements EngineSubsystem {
+public class NetworkSubsystem implements EngineSubsystem {
 
-    private AdvancedMonitor advancedMonitor;
+    private NetworkSystem networkSystem;
 
     @Override
     public String getName() {
-        return "Monitoring";
+        return "Network";
     }
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        if (rootContext.get(Config.class).getSystem().isMonitoringEnabled()) {
-            advancedMonitor = new AdvancedMonitor();
-            advancedMonitor.setVisible(true);
-        }
+        networkSystem = new NetworkSystemImpl(rootContext.get(Time.class), rootContext);
+        rootContext.put(NetworkSystem.class, networkSystem);
     }
 
     @Override
-    public void shutdown() {
-        if (advancedMonitor != null) {
-            advancedMonitor.setVisible(false);
-        }
+    public void preUpdate(GameState currentState, float delta) {
+        networkSystem.update();
     }
 }

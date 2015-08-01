@@ -240,13 +240,17 @@ public class ConsoleImpl implements Console {
                 return true;
             } catch (CommandExecutionException e) {
                 Throwable cause = e.getCause();
-                String causeMessage = cause.getLocalizedMessage();
-
-                logger.error("An error occurred while executing a command: ", e);
-
-                if (Strings.isNullOrEmpty(causeMessage)) {
-                    causeMessage = cause.toString();
+                String causeMessage;
+                if (cause != null) {
+                    causeMessage = cause.getLocalizedMessage();
+                    if (Strings.isNullOrEmpty(causeMessage)) {
+                        causeMessage = cause.toString();
+                    }
+                } else {
+                    causeMessage = e.getLocalizedMessage();
                 }
+
+                logger.error("An error occurred while executing a command", e);
 
                 if (!Strings.isNullOrEmpty(causeMessage)) {
                     callingClient.send(new ErrorMessageEvent("An error occurred while executing command '"

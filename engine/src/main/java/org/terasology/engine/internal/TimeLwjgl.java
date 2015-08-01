@@ -18,6 +18,11 @@ package org.terasology.engine.internal;
 import org.lwjgl.Sys;
 
 public final class TimeLwjgl extends TimeBase {
+
+    public TimeLwjgl() {
+        super((Sys.getTime() * 1000) / Sys.getTimerResolution());
+    }
+
     @Override
     public long getRawTimeInMs() {
         return (Sys.getTime() * 1000) / Sys.getTimerResolution();

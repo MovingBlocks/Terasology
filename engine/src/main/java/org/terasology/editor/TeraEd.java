@@ -82,7 +82,6 @@ public final class TeraEd extends JWindow {
             mainWindow = new MainWindow(this, engine);
             lwjglPortlet.setCustomViewport(mainWindow.getViewport());
 
-            engine.setHibernationAllowed(false);
             engine.subscribeToStateChange(mainWindow);
 
             engine.run(new StateMainMenu());

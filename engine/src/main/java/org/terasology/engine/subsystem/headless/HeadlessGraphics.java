@@ -64,15 +64,6 @@ public class HeadlessGraphics implements EngineSubsystem {
     }
 
     @Override
-    public void preInitialise(Context context) {
-    }
-
-    @Override
-    public void initialise(Context context) {
-
-    }
-
-    @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
         assetTypeManager.registerCoreAssetType(Font.class, (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
         assetTypeManager.registerCoreAssetType(Texture.class, (AssetFactory<Texture, TextureData>) HeadlessTexture::new, "textures", "fonts");
@@ -98,24 +89,8 @@ public class HeadlessGraphics implements EngineSubsystem {
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
     }
 
-    @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void postUpdate(GameState currentState, float delta) {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
     private void initHeadless(Context context) {
         context.put(ShaderManager.class, new ShaderManagerHeadless());
-    }
-
-    @Override
-    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

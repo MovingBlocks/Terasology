@@ -20,6 +20,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
@@ -93,11 +94,19 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private Console console;
 
+    @In
+    private Time time;
+
     private PickupBuilder pickupBuilder;
 
     @Override
     public void initialise() {
         pickupBuilder = new PickupBuilder(entityManager);
+    }
+
+    @Command(shortDescription = "Alter the rate of time")
+    public void setTimeDilation(@CommandParam("dilation") float rate) {
+        time.setGameTimeDilation(rate);
     }
 
     @Command(shortDescription = "Reloads a ui screen")

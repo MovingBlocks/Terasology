@@ -51,11 +51,6 @@ public class LwjglInput extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void preUpdate(GameState currentState, float delta) {
-    }
-
-
-    @Override
     public void postUpdate(GameState currentState, float delta) {
         currentState.handleInput(delta);
     }

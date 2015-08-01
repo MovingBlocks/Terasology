@@ -27,6 +27,7 @@ import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
@@ -41,7 +42,7 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     }
 
     @Override
-    public void initialise(Context rootContext) {
+    public void initialise(GameEngine engine, Context rootContext) {
         Config config = rootContext.get(Config.class);
         try {
             audioManager = new OpenALManager(config.getAudio());

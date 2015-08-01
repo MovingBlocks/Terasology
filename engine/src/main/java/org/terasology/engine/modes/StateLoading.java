@@ -238,8 +238,8 @@ public class StateLoading implements GameState {
     public void update(float delta) {
         GameEngine gameEngine = context.get(GameEngine.class);
         EngineTime time = (EngineTime) context.get(Time.class);
-        long startTime = time.getRawTimeInMs();
-        while (current != null && time.getRawTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
+        long startTime = time.getRealTimeInMs();
+        while (current != null && time.getRealTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
             if (current.step()) {
                 popStep();
             }

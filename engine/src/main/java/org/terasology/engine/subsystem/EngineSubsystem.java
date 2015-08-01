@@ -18,10 +18,14 @@ package org.terasology.engine.subsystem;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 
 public interface EngineSubsystem {
 
+    /**
+     * @return The name of the subsystem
+     */
     String getName();
 
     /**
@@ -36,9 +40,10 @@ public interface EngineSubsystem {
     /**
      * Called to initialise the system
      *
+     * @param engine      The game engine
      * @param rootContext The root context, that will survive the entire run of the engine
      */
-    default void initialise(Context rootContext) {
+    default void initialise(GameEngine engine, Context rootContext) {
     }
 
     /**
@@ -55,9 +60,19 @@ public interface EngineSubsystem {
     default void postInitialise(Context context) {
     }
 
+    /**
+     * Called before the main game logic update, once a frame/full update cycle
+     * @param currentState The current state
+     * @param delta The total time this frame/update cycle
+     */
     default void preUpdate(GameState currentState, float delta) {
     }
 
+    /**
+     * Called after the main game logic update, once a frame/full update cycle
+     * @param currentState The current state
+     * @param delta The total time this frame/update cycle
+     */
     default void postUpdate(GameState currentState, float delta) {
     }
 
@@ -72,6 +87,4 @@ public interface EngineSubsystem {
 
     default void registerSystems(ComponentSystemManager componentSystemManager) {
     }
-
-    ;
 }

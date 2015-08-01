@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.game;
+package org.terasology.engine.subsystem.common;
 
-import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.EngineTime;
+import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.game.Game;
 
 /**
- * @author Immortius
+ *
  */
-public class Game {
-
-    private String name = "";
-    private String seed = "";
-
-    public void load(GameManifest manifest) {
-        this.name = manifest.getTitle();
-        this.seed = manifest.getSeed();
-    }
-
+// TODO: Get rid of this subsystem, it is kind of silly (remove Game class, convert to entity?)
+public class GameSubsystem implements EngineSubsystem {
+    @Override
     public String getName() {
-        return name;
+        return "Game";
     }
 
-    public String getSeed() {
-        return seed;
+    @Override
+    public void initialise(GameEngine engine, Context rootContext) {
+        rootContext.put(Game.class, new Game());
     }
 }

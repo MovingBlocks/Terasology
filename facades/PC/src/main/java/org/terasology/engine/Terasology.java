@@ -26,6 +26,7 @@ import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
+import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -293,6 +294,7 @@ public final class Terasology {
                     .add(new LwjglTimer())
                     .add(new LwjglInput());
         }
+        builder.add(new HibernationSubsystem());
     }
 
     private static void reportException(Throwable throwable) {

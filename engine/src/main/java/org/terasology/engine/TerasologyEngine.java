@@ -35,10 +35,15 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
+import org.terasology.engine.subsystem.common.CommandSubsystem;
 import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
+import org.terasology.engine.subsystem.common.GameSubsystem;
 import org.terasology.engine.subsystem.common.MonitoringSubsystem;
+import org.terasology.engine.subsystem.common.NetworkSubsystem;
+import org.terasology.engine.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
+import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -46,13 +51,10 @@ import org.terasology.game.Game;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -85,26 +87,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Immortius
- *         <p>
- *         This GameEngine implementation is the heart of Terasology.
- *         <p>
- *         It first takes care of making a number of application-wide initializations (see init()
- *         method). It then provides a main game loop (see run() method) characterized by a number
- *         of mutually exclusive {@link GameState}s. The current GameState is updated each
- *         frame, and a change of state (see changeState() method) can be requested at any time - the
- *         switch will occur cleanly between frames. Interested parties can be notified of GameState
- *         changes by using the subscribeToStateChange() method.
- *         <p>
- *         At this stage the engine also provides a number of utility methods (see submitTask() and
- *         hasMouseFocus() to name a few) but they might be moved elsewhere.
- *         <p>
- *         Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem}
- *         is a pluggable low-level component of the engine, that is processed every frame - like
- *         rendering or audio. A list of EngineSubsystems is provided in input to the engine's
- *         constructor. Different sets of Subsystems can significantly change the behaviour of
- *         the engine, i.e. providing a "no-frills" server in one case or a full-graphics client
- *         in another.
+ * <p>
+ * This GameEngine implementation is the heart of Terasology.
+ * </p>
+ * <p>
+ * It first takes care of making a number of application-wide initializations (see init()
+ * method). It then provides a main game loop (see run() method) characterized by a number
+ * of mutually exclusive {@link GameState}s. The current GameState is updated each
+ * frame, and a change of state (see changeState() method) can be requested at any time - the
+ * switch will occur cleanly between frames. Interested parties can be notified of GameState
+ * changes by using the subscribeToStateChange() method.
+ * </p>
+ * <p>
+ * At this stage the engine also provides a number of utility methods (see submitTask() and
+ * hasMouseFocus() to name a few) but they might be moved elsewhere.
+ * </p>
+ * <p>
+ * Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem}
+ * is a pluggable low-level component of the engine, that is processed every frame - like
+ * rendering or audio. A list of EngineSubsystems is provided in input to the engine's
+ * constructor. Different sets of Subsystems can significantly change the behaviour of
+ * the engine, i.e. providing a "no-frills" server in one case or a full-graphics client
+ * in another.
+ * </p>
  */
 public class TerasologyEngine implements GameEngine {
 
@@ -121,8 +126,6 @@ public class TerasologyEngine implements GameEngine {
 
     private volatile boolean shutdownRequested;
     private volatile boolean running;
-
-    private boolean hibernationAllowed;
 
     private TimeSubsystem timeSubsystem;
     private Deque<EngineSubsystem> allSubsystems;
@@ -159,9 +162,15 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.addAll(subsystems);
         this.allSubsystems.add(new ThreadManagerSubsystem());
         this.allSubsystems.add(new MonitoringSubsystem());
+        this.allSubsystems.add(new PhysicsSubsystem());
+        this.allSubsystems.add(new CommandSubsystem());
+        this.allSubsystems.add(new NetworkSubsystem());
+        this.allSubsystems.add(new WorldGenerationSubsystem());
+        this.allSubsystems.add(new GameSubsystem());
     }
 
     private void initialize() {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
             logger.info("Initializing Terasology...");
@@ -171,9 +180,10 @@ public class TerasologyEngine implements GameEngine {
             GameThread.setToCurrentThread();
 
             preInitSubsystems();
-            initSubsystems();
 
             initManagers();
+
+            initSubsystems();
 
             changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
             initAssets();
@@ -184,10 +194,7 @@ public class TerasologyEngine implements GameEngine {
 
             postInitSubsystems();
 
-            verifyRequiredSystemIsRegistered(Time.class);
-            verifyRequiredSystemIsRegistered(DisplayDevice.class);
-            verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
-            verifyRequiredSystemIsRegistered(InputSystem.class);
+            verifyInitialisation();
 
             /**
              * Prevent objects being put in engine context after init phase. Engine states should use/create a
@@ -203,6 +210,13 @@ public class TerasologyEngine implements GameEngine {
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
+    }
+
+    private void verifyInitialisation() {
+        verifyRequiredSystemIsRegistered(Time.class);
+        verifyRequiredSystemIsRegistered(DisplayDevice.class);
+        verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
+        verifyRequiredSystemIsRegistered(InputSystem.class);
     }
 
     /**
@@ -232,7 +246,7 @@ public class TerasologyEngine implements GameEngine {
     private void initSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Initialising " + subsystem.getName() + " subsystem");
-            subsystem.initialise(rootContext);
+            subsystem.initialise(this, rootContext);
         }
     }
 
@@ -276,11 +290,6 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager = new ModuleAwareAssetTypeManager();
         rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
-        rootContext.put(CollisionGroupManager.class, new CollisionGroupManager());
-        rootContext.put(WorldGeneratorManager.class, new WorldGeneratorManager(rootContext));
-        rootContext.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
-        rootContext.put(NetworkSystem.class, new NetworkSystemImpl(timeSubsystem.getEngineTime(), rootContext));
-        rootContext.put(Game.class, new Game(this, timeSubsystem.getEngineTime()));
     }
 
     private void initAssets() {
@@ -353,7 +362,6 @@ public class TerasologyEngine implements GameEngine {
         try {
             rootContext.put(GameEngine.class, this);
             changeState(initialState);
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
         } catch (RuntimeException e) {
@@ -377,36 +385,9 @@ public class TerasologyEngine implements GameEngine {
      * and disposal occur afterwards.
      */
     private void mainLoop() {
-        NetworkSystem networkSystem = rootContext.get(NetworkSystem.class);
-
-        DisplayDevice display = rootContext.get(DisplayDevice.class);
-
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (!shutdownRequested && !display.isCloseRequested()) {
-
-            long totalDelta;
-            float updateDelta;
-            float subsystemsDelta;
-
-            // Only process rendering and updating once a second
-            if (!display.hasFocus() && isHibernationAllowed()) {
-                timeSubsystem.getEngineTime().setPaused(true);
-                Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
-                while (updateCycles.hasNext()) {
-                    updateCycles.next();
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    logger.warn("Display inactivity sleep interrupted", e);
-                }
-
-                display.processMessages();
-                timeSubsystem.getEngineTime().setPaused(false);
-                continue;
-            }
-
+        while (!shutdownRequested) {
             assetTypeManager.reloadChangedOnDisk();
 
             processPendingState();
@@ -418,24 +399,16 @@ public class TerasologyEngine implements GameEngine {
 
             Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
 
-            try (Activity ignored = PerformanceMonitor.startActivity("Network Update")) {
-                networkSystem.update();
-            }
-
-            totalDelta = 0;
-            while (updateCycles.hasNext()) {
-                updateDelta = updateCycles.next(); // gameTime gets updated here!
-                totalDelta += timeSubsystem.getEngineTime().getDeltaInMs();
-                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
-                    currentState.update(updateDelta);
+            for (EngineSubsystem subsystem : allSubsystems) {
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
+                    subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
                 }
             }
 
-            subsystemsDelta = totalDelta / 1000f;
-
-            for (EngineSubsystem subsystem : getSubsystems()) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
-                    subsystem.preUpdate(currentState, subsystemsDelta);
+            while (updateCycles.hasNext()) {
+                float updateDelta = updateCycles.next(); // gameTime gets updated here!
+                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
+                    currentState.update(updateDelta);
                 }
             }
 
@@ -443,8 +416,8 @@ public class TerasologyEngine implements GameEngine {
             GameThread.processWaitingProcesses();
 
             for (EngineSubsystem subsystem : getSubsystems()) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
-                    subsystem.postUpdate(currentState, subsystemsDelta);
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
+                    subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
                 }
             }
 
@@ -550,16 +523,6 @@ public class TerasologyEngine implements GameEngine {
 
     public Iterable<EngineSubsystem> getSubsystems() {
         return allSubsystems;
-    }
-
-    @Override
-    public boolean isHibernationAllowed() {
-        return hibernationAllowed && currentState.isHibernationAllowed();
-    }
-
-    @Override
-    public void setHibernationAllowed(boolean allowed) {
-        this.hibernationAllowed = allowed;
     }
 
     @Override
