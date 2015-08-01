@@ -42,7 +42,8 @@ import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.liquid.LiquidData;
 
 import java.text.DecimalFormat;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -82,7 +83,7 @@ public class ChunkImpl implements Chunk {
     private AABB aabb;
     private Region3i region;
 
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     private boolean disposed;
     private boolean ready;
@@ -121,18 +122,32 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void lock() {
-        lock.lock();
+    public void readLock() {
+        readWriteLock.readLock().lock();
     }
 
     @Override
-    public void unlock() {
-        lock.unlock();
+    public void readUnlock() {
+        readWriteLock.readLock().unlock();
+    }
+
+    @Override
+    public void writeLock() {
+        readWriteLock.writeLock().lock();
+    }
+
+    @Override
+    public void writeUnlock() {
+        readWriteLock.writeLock().unlock();
     }
 
     @Override
     public boolean isLocked() {
-        return lock.isLocked();
+        if (readWriteLock.writeLock().tryLock()) {
+            readWriteLock.writeLock().unlock();
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -147,11 +162,11 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void setDirty(boolean dirty) {
-        lock();
+        writeLock();
         try {
             this.dirty = dirty;
         } finally {
-            unlock();
+            writeUnlock();
         }
     }
 

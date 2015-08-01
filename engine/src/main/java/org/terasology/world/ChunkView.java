@@ -25,7 +25,7 @@ import org.terasology.world.liquid.LiquidData;
  * A chunk view is a way of accessing multiple chunks for modification in a performant manner.
  * Chunk views also support relative subviewing - looking at an area of the world with a uniform offset to block positions
  * <br><br>
- * ChunkViews must be locked because write operations can be enacted - any write operations requested outside of a lock
+ * ChunkViews must be locked before write operations can be enacted - any write operations requested outside of a lock
  * are ignored.
  *
  * @author Immortius
@@ -224,12 +224,22 @@ public interface ChunkView {
     /**
      * Locks the chunk view, enabling write operations
      */
-    void lock();
+    void writeLock();
 
     /**
      * Unlocks the chunk view, disabling write operations
      */
-    void unlock();
+    void writeUnlock();
+
+    /**
+     * Locks the chunk view, enabling write operations
+     */
+    void readLock();
+
+    /**
+     * Unlocks the chunk view, disabling write operations
+     */
+    void readUnlock();
 
     /**
      * @return Whether the chunk view is locked and hence whether write operations are allowed.

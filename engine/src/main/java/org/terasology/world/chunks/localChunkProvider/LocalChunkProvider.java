@@ -239,7 +239,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         ReadyChunkInfo readyChunkInfo = lightMerger.completeMerge();
         if (readyChunkInfo != null) {
             Chunk chunk = readyChunkInfo.getChunk();
-            chunk.lock();
+            chunk.writeLock();
             try {
                 chunk.markReady();
                 updateAdjacentChunksReadyFieldOf(chunk);
@@ -288,7 +288,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     region.chunkReady(chunk);
                 }
             } finally {
-                chunk.unlock();
+                chunk.writeUnlock();
             }
         }
     }
@@ -381,7 +381,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             return false;
         }
 
-        chunk.lock();
+        chunk.writeLock();
         try {
             if (!chunk.isReady()) {
                 // Chunk hasn't been finished or changed, so just drop it.
@@ -411,7 +411,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
             return true;
         } finally {
-            chunk.unlock();
+            chunk.writeUnlock();
         }
     }
 

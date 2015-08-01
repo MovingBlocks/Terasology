@@ -25,7 +25,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
@@ -271,22 +270,36 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void lock() {
+    public void writeLock() {
         if (!locked.get()) {
             for (RenderableChunk chunk : chunks) {
-                chunk.lock();
+                chunk.writeLock();
             }
             locked.set(true);
         }
     }
 
     @Override
-    public void unlock() {
+    public void writeUnlock() {
         if (locked.get()) {
             locked.set(false);
             for (RenderableChunk chunk : chunks) {
-                chunk.unlock();
+                chunk.writeUnlock();
             }
+        }
+    }
+
+    @Override
+    public void readLock() {
+        for (RenderableChunk chunk : chunks) {
+            chunk.readLock();
+        }
+    }
+
+    @Override
+    public void readUnlock() {
+        for (RenderableChunk chunk : chunks) {
+            chunk.readUnlock();
         }
     }
 
