@@ -38,7 +38,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
@@ -114,11 +113,12 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private LightMerger<ReadyChunkInfo> lightMerger = new LightMerger<>(this);
 
-    public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator) {
-        this.blockManager = CoreRegistry.get(BlockManager.class);
+    public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
+                              BlockManager blockManager) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
+        this.blockManager = blockManager;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         ChunkMonitor.fireChunkProviderInitialized(this);

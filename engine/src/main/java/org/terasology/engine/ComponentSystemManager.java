@@ -142,7 +142,7 @@ public class ComponentSystemManager {
         InjectionHelper.inject(system);
 
         if (console != null) {
-            MethodCommand.registerAvailable(system);
+            MethodCommand.registerAvailable(system, console, context);
         }
 
         try {

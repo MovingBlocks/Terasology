@@ -21,21 +21,21 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.network.ClientInfoComponent;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Set;
 
 /**
  * Suggests user names of all users even if they aren't online.
- *
- * @author Limeth
- * @author Florian
  */
-public class UsernameSuggester implements CommandParameterSuggester<String> {
+public final class UsernameSuggester implements CommandParameterSuggester<String> {
+    private final EntityManager entityManager;
+
+    public UsernameSuggester(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @Override
     public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-
         Set<String> clientNames = Sets.newHashSet();
         for (EntityRef clientInfo : entityManager.getEntitiesWith(ClientInfoComponent.class)) {
             DisplayNameComponent displayNameComponent = clientInfo.getComponent(DisplayNameComponent.class);

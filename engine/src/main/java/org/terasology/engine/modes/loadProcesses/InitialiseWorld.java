@@ -127,17 +127,19 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             return true; // We need to return true, otherwise the loading state will just call us again immediately
         }
         context.put(StorageManager.class, storageManager);
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
+                blockManager);
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(
-                new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.AIR_ID)));
+                new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.AIR_ID), context)
+                );
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         context.put(WorldProvider.class, worldProvider);
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);
         context.put(BlockEntityRegistry.class, entityWorldProvider);
         context.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel());
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
         context.put(CelestialSystem.class, celestialSystem);
         context.get(ComponentSystemManager.class).register(celestialSystem);
 

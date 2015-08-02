@@ -17,28 +17,15 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.management.AssetTypeManager;
-import org.terasology.assets.management.MapAssetTypeManager;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
-import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.MonitorNode;
 import org.terasology.logic.behavior.tree.ParallelNode;
 import org.terasology.logic.behavior.tree.RepeatNode;
 import org.terasology.logic.behavior.tree.SequenceNode;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -59,7 +46,7 @@ public class FactoryTest extends TerasologyTestingEnvironment {
 
         context.put(BehaviorNodeFactory.class, nodeFactory);
         BehaviorTreeFormat loader = new BehaviorTreeFormat();
-        BehaviorTreeData data = buildSample();
+        BehaviorTreeData data = buildSample(nodeFactory);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
         loader.save(os, data);
@@ -76,7 +63,7 @@ public class FactoryTest extends TerasologyTestingEnvironment {
         Assert.assertArrayEquals(jsonActual, jsonExpected);
     }
 
-    private BehaviorTreeData buildSample() {
+    private BehaviorTreeData buildSample(BehaviorNodeFactory factory) {
         SequenceNode sequence = new SequenceNode();
         sequence.children().add(new DebugNode(1));
         sequence.children().add(new RepeatNode(new DebugNode(2)));
@@ -86,7 +73,7 @@ public class FactoryTest extends TerasologyTestingEnvironment {
         parallel.children().add(new DebugNode(3));
         BehaviorTreeData tree = new BehaviorTreeData();
         tree.setRoot(sequence);
-        tree.createRenderable();
+        tree.createRenderable(factory);
         tree.layout(null);
         return tree;
     }

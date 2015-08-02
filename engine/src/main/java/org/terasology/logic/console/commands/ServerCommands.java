@@ -37,7 +37,6 @@ import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.world.chunks.ChunkProvider;
 
@@ -60,6 +59,15 @@ public class ServerCommands extends BaseComponentSystem {
     @In
     private ChunkProvider chunkProvider;
 
+    @In
+    private NetworkSystem networkSystem;
+
+    @In
+    private Config config;
+
+    @In
+    private GameEngine gameEngine;
+
     @Command(shortDescription = "Shutdown the server", runOnServer = true,
             requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     public String shutdownServer(@Sender EntityRef sender) {
@@ -71,7 +79,7 @@ public class ServerCommands extends BaseComponentSystem {
 
         logger.info("Shutdown triggered by {}", name.name);
 
-        CoreRegistry.get(GameEngine.class).shutdown();
+        gameEngine.shutdown();
 
         return "Server shutdown triggered";
     }
@@ -134,8 +142,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     private String kick(EntityRef clientEntity) {
-        NetworkSystem network = CoreRegistry.get(NetworkSystem.class);
-        Client client = network.getOwner(clientEntity);
+        Client client = networkSystem.getOwner(clientEntity);
 
         if (!client.isLocal()) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
@@ -143,7 +150,7 @@ public class ServerCommands extends BaseComponentSystem {
 
             logger.info("Kicking user {}", name.name);
 
-            network.forceDisconnect(client);
+            networkSystem.forceDisconnect(client);
             return "User kick triggered for '" + name.name + "'";
         }
 
@@ -159,7 +166,7 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Invalidates the specified chunk and recreates it (requires storage manager disabled)", runOnServer = true)
     public String reloadChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
         Vector3i pos = new Vector3i(x, y, z);
-        if (CoreRegistry.get(Config.class).getSystem().isWriteSaveGamesEnabled()) {
+        if (config.getSystem().isWriteSaveGamesEnabled()) {
             return "Writing save games is enabled! Invalidating chunk has no effect";
         }
         boolean success = chunkProvider.reloadChunk(pos);

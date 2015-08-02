@@ -27,6 +27,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
@@ -34,7 +35,6 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.FontUnderline;
 import org.terasology.utilities.collection.CircularBuffer;
@@ -61,7 +61,13 @@ public class ConsoleImpl implements Console {
     private final Map<Name, ConsoleCommand> commandRegistry = Maps.newHashMap();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
-    private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+    private NetworkSystem networkSystem;
+    private Context context;
+
+    public ConsoleImpl(Context context) {
+        this.networkSystem = context.get(NetworkSystem.class);
+        this.context = context;
+    }
 
     /**
      * Registers a {@link org.terasology.logic.console.commandSystem.ConsoleCommand}.
@@ -264,7 +270,7 @@ public class ConsoleImpl implements Console {
     private boolean clientHasPermission(EntityRef callingClient, String requiredPermission) {
         Preconditions.checkNotNull(callingClient, "The calling client must not be null!");
 
-        PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
+        PermissionManager permissionManager = context.get(PermissionManager.class);
         boolean hasPermission = true;
 
         if (permissionManager != null && requiredPermission != null

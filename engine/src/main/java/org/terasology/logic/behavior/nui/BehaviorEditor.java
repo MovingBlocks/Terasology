@@ -18,6 +18,7 @@ package org.terasology.logic.behavior.nui;
 import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
@@ -28,7 +29,6 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
@@ -46,7 +46,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * @author synopia
+ * Call {@link #initialize(Context)} before using this widget.
+ * (Ideally the logic would be moved to the BehaviorEditorScreen instead)
  */
 public class BehaviorEditor extends ZoomableLayout {
     private static final Logger logger = LoggerFactory.getLogger(BehaviorEditor.class);
@@ -56,6 +57,9 @@ public class BehaviorEditor extends ZoomableLayout {
     private BehaviorTree tree;
     private Vector2f mousePos = new Vector2f();
     private Binding<RenderableNode> selectionBinding;
+
+    private BehaviorNodeFactory behaviorNodeFactory;
+    private BehaviorSystem behaviorSystem;
 
     private final InteractionListener moveOver = new BaseInteractionListener() {
         @Override
@@ -87,6 +91,12 @@ public class BehaviorEditor extends ZoomableLayout {
         super(id);
     }
 
+
+    public void initialize(Context context) {
+        this.behaviorNodeFactory = context.get(BehaviorNodeFactory.class);
+        this.behaviorSystem = context.get(BehaviorSystem.class);
+    }
+
     public void setTree(BehaviorTree tree) {
         this.tree = tree;
         selectedNode = null;
@@ -94,7 +104,7 @@ public class BehaviorEditor extends ZoomableLayout {
             selectionBinding.set(null);
         }
         removeAll();
-        for (RenderableNode widget : tree.getRenderableNodes()) {
+        for (RenderableNode widget : tree.getRenderableNodes(behaviorNodeFactory)) {
             addWidget(widget);
         }
     }
@@ -173,7 +183,7 @@ public class BehaviorEditor extends ZoomableLayout {
             } else if (!activeConnectionStart.isInput() && port.isInput()) {
                 ((Port.OutputPort) activeConnectionStart).setTarget((Port.InputPort) port);
             }
-            CoreRegistry.get(BehaviorSystem.class).treeModified(tree);
+            behaviorSystem.treeModified(tree);
             activeConnectionStart = null;
         }
     }
@@ -210,9 +220,9 @@ public class BehaviorEditor extends ZoomableLayout {
         if (tree == null) {
             return null;
         }
-        Node node = CoreRegistry.get(BehaviorNodeFactory.class).getNode(data);
-        newNode = tree.createNode(node);
-        CoreRegistry.get(BehaviorSystem.class).treeModified(tree);
+        Node node = behaviorNodeFactory.getNode(data);
+        newNode = tree.createNode(node, behaviorNodeFactory);
+        behaviorSystem.treeModified(tree);
         return newNode;
     }
 
@@ -241,7 +251,7 @@ public class BehaviorEditor extends ZoomableLayout {
             loader.save(os, data);
             BehaviorTreeData copy = loader.load(new ByteArrayInputStream(os.toByteArray()));
             Port.OutputPort parent = node.getInputPort().getTargetPort();
-            copy.createRenderable();
+            copy.createRenderable(behaviorNodeFactory);
             RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());
             addNode(copyRenderable);
             RenderableNode nodeToLayout;
@@ -264,7 +274,7 @@ public class BehaviorEditor extends ZoomableLayout {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(node.getNode());
         Port.OutputPort parent = node.getInputPort().getTargetPort();
-        data.createRenderable();
+        data.createRenderable(behaviorNodeFactory);
         RenderableNode copyRenderable = data.getRenderableNode(data.getRoot());
         addNode(copyRenderable);
         RenderableNode nodeToLayout;

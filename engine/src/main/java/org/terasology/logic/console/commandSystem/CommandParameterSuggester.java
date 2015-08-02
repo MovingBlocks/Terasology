@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commandSystem;
 
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.module.sandbox.API;
 
@@ -23,7 +24,7 @@ import java.util.Set;
 /**
  * A class used for suggesting command parameter values
  *
- * @author Limeth
+ * Constructor arguments will be filled from the {@link Context} via dependency injection.
  */
 @API
 public interface CommandParameterSuggester<T> {

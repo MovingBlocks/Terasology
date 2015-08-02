@@ -48,6 +48,8 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
     private Random random = new FastRandom();
     @In
     private Time time;
+    @In
+    private LocalPlayer localPlayer;
 
     @Override
     public void update(float delta) {
@@ -63,7 +65,6 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
 
             Vector3f drive = new Vector3f();
             // TODO: shouldn't use local player, need some way to find nearest player
-            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             if (localPlayer != null) {
                 Vector3f dist = new Vector3f(worldPos);
                 dist.sub(localPlayer.getPosition());
@@ -76,7 +77,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                     entity.saveComponent(ai);
                 } else {
                     // Random walk
-                    if (CoreRegistry.get(Time.class).getGameTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
+                    if (time.getGameTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
                         ai.movementTarget.set(worldPos.x + random.nextFloat(-500.0f, 500.0f), worldPos.y, worldPos.z + random.nextFloat(-500.0f, 500.0f));
                         ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                         ai.followingPlayer = false;

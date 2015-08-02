@@ -31,7 +31,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
@@ -74,7 +73,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
-    public RemoteChunkProvider(BlockManager blockManager) {
+    private LocalPlayer localPlayer;
+
+    public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -315,9 +316,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
     }
 
-    private static class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
-
-        private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
 
         @Override
         public int compare(ChunkTask o1, ChunkTask o2) {
@@ -331,8 +330,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private class ReadyChunkRelevanceComparator implements Comparator<Chunk> {
-
-        private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         @Override
         public int compare(Chunk o1, Chunk o2) {

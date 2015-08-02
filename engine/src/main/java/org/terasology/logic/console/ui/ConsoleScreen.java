@@ -65,7 +65,7 @@ public class ConsoleScreen extends CoreScreenLayer {
 
         commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);
-        commandLine.setTabCompletionEngine(new CyclingTabCompletionEngine(console));
+        commandLine.setTabCompletionEngine(new CyclingTabCompletionEngine(console, localPlayer));
         commandLine.bindCommandHistory(new ReadOnlyBinding<List<String>>() {
             @Override
             public List<String> get() {

@@ -16,20 +16,19 @@
 
 package org.terasology.world.sun;
 
-import static org.terasology.world.time.WorldTime.DAY_LENGTH;
-
-import java.math.RoundingMode;
-
+import com.google.common.math.LongMath;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.time.WorldTime;
 
-import com.google.common.math.LongMath;
+import java.math.RoundingMode;
+
+import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 
 /**
  * A base class that fires events at
@@ -44,8 +43,11 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     private final CelestialModel model;
 
-    public DefaultCelestialSystem(CelestialModel model) {
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+    private final EntityManager entityManager;
+
+    public DefaultCelestialSystem(CelestialModel model, Context context) {
+        WorldProvider worldProvider = context.get(WorldProvider.class);
+        entityManager = context.get(EntityManager.class);
         worldTime = worldProvider.getTime();
         lastUpdate = worldTime.getMilliseconds();
         this.model = model;
@@ -104,7 +106,6 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     }
 
     protected EntityRef getWorldEntity() {
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
             return entity;
         }

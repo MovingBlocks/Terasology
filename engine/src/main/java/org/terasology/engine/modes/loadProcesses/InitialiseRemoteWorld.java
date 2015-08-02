@@ -61,20 +61,21 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(LocalPlayer.class, new LocalPlayer());
+        LocalPlayer localPlayer = new LocalPlayer();
+        context.put(LocalPlayer.class, localPlayer);
         BlockManager blockManager = context.get(BlockManager.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager);
+        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer);
 
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
-                blockManager.getBlock(BlockManager.AIR_ID));
+                blockManager.getBlock(BlockManager.AIR_ID), context);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         context.put(WorldProvider.class, worldProvider);
         context.put(BlockEntityRegistry.class, entityWorldProvider);
         context.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel());
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
         context.put(CelestialSystem.class, celestialSystem);
         context.get(ComponentSystemManager.class).register(celestialSystem);
 

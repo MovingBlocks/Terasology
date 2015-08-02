@@ -19,7 +19,6 @@ import org.terasology.asset.Assets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
@@ -52,7 +51,6 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.cameras.Camera;
@@ -97,6 +95,21 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private Time time;
 
+    @In
+    private GameEngine gameEngine;
+
+    @In
+    private NetworkSystem networkSystem;
+
+    @In
+    private DisplayDevice displayDevice;
+
+    @In
+    private NUIManager nuiManager;
+
+    @In
+    private AssetManager assetManager;
+
     private PickupBuilder pickupBuilder;
 
     @Override
@@ -111,9 +124,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Reloads a ui screen")
     public String reloadScreen(@CommandParam("ui") String ui) {
-        Optional<UIElement> uiData = CoreRegistry.get(AssetManager.class).getAsset(ui, UIElement.class);
+        Optional<UIElement> uiData = assetManager.getAsset(ui, UIElement.class);
         if (uiData.isPresent()) {
-            NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
             boolean wasOpen = nuiManager.isOpen(uiData.get().getUrn());
             if (wasOpen) {
                 nuiManager.closeScreen(uiData.get().getUrn());
@@ -130,11 +142,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
     public String fullscreen() {
-        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+        displayDevice.setFullscreen(!displayDevice.isFullscreen());
 
-        display.setFullscreen(!display.isFullscreen());
-
-        if (display.isFullscreen()) {
+        if (displayDevice.isFullscreen()) {
             return "Switched to fullscreen mode";
         } else {
             return "Switched to windowed mode";
@@ -156,7 +166,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Exits the game", requiredPermission = PermissionManager.NO_PERMISSION)
     public void exit() {
-        CoreRegistry.get(GameEngine.class).shutdown();
+        gameEngine.shutdown();
     }
 
     @Command(shortDescription = "Join a game", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -167,21 +177,18 @@ public class CoreCommands extends BaseComponentSystem {
 
             @Override
             public JoinStatus call() throws InterruptedException {
-                NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
                 JoinStatus joinStatus = networkSystem.join(address, port);
                 return joinStatus;
             }
         };
 
-        final NUIManager manager = CoreRegistry.get(NUIManager.class);
-        final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        final WaitPopup<JoinStatus> popup = nuiManager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
         popup.onSuccess(result -> {
-                GameEngine engine = CoreRegistry.get(GameEngine.class);
                 if (result.getStatus() != JoinStatus.Status.FAILED) {
-                    engine.changeState(new StateLoading(result));
+                    gameEngine.changeState(new StateLoading(result));
                 } else {
-                    MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    MessagePopup screen = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
                 }
             });
@@ -191,9 +198,8 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Leaves the current game and returns to main menu",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String leave() {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
         if (networkSystem.getMode() != NetworkMode.NONE) {
-            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            gameEngine.changeState(new StateMainMenu());
             return "Leaving..";
         } else {
             return "Not connected";

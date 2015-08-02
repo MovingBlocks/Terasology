@@ -27,7 +27,6 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
@@ -105,7 +104,7 @@ public class WorldGeneratorManager {
      * @return The instantiated world generator.
      */
     public WorldGenerator createGenerator(SimpleUri uri, Context context) throws UnresolvedWorldGeneratorException {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
         Module module = moduleManager.getEnvironment().get(uri.getModuleName());
         if (module == null) {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());

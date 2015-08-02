@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandInitializationException;
@@ -62,7 +63,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
     private String usage;
 
     public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
-                           SpecificAccessibleObject<Method> executionMethod) {
+                           SpecificAccessibleObject<Method> executionMethod, Context context) {
         Preconditions.checkNotNull(executionMethod);
         Preconditions.checkNotNull(description);
         Preconditions.checkNotNull(helpText);
@@ -74,7 +75,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
         this.helpText = helpText;
         this.executionMethod = executionMethod;
 
-        constructParametersNotNull();
+        constructParametersNotNull(context);
         registerParameters();
         validateExecutionMethod();
         initUsage();
@@ -83,10 +84,10 @@ public abstract class AbstractCommand implements ConsoleCommand {
     /**
      * @return A list of parameter types provided to the execution method.
      */
-    protected abstract List<Parameter> constructParameters();
+    protected abstract List<Parameter> constructParameters(Context context);
 
-    private void constructParametersNotNull() {
-        List<Parameter> constructedParameters = constructParameters();
+    private void constructParametersNotNull(Context context) {
+        List<Parameter> constructedParameters = constructParameters(context);
 
         if (constructedParameters == null || constructedParameters.size() <= 0) {
             commandParameters = ImmutableList.of();

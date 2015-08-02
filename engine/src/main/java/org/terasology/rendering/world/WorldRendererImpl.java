@@ -69,6 +69,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
+    private final Context context;
+
     private final BackdropRenderer backdropRenderer;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
@@ -106,7 +108,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Z_PRE_PASS
     }
 
-    private ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
+    private ComponentSystemManager systemManager;
 
     private final Config config;
     private final RenderingConfig renderingConfig;
@@ -117,12 +119,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     private PostProcessor postProcessor;
 
     public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
+        this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.backdropRenderer = context.get(BackdropRenderer.class);
         this.config = context.get(Config.class);
         this.renderingConfig = config.getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
+        this.systemManager = context.get(ComponentSystemManager.class);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         if (renderingConfig.isOculusVrSupport()) {
@@ -157,17 +161,17 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initRenderingSupport() {
         renderingProcess = new LwjglRenderingProcess();
-        CoreRegistry.put(LwjglRenderingProcess.class, renderingProcess);
+        context.put(LwjglRenderingProcess.class, renderingProcess);
 
         graphicState = new GraphicState(renderingProcess);
         postProcessor = new PostProcessor(renderingProcess, graphicState);
-        CoreRegistry.put(PostProcessor.class, postProcessor);
+        context.put(PostProcessor.class, postProcessor);
 
         renderingProcess.setGraphicState(graphicState);
         renderingProcess.setPostProcessor(postProcessor);
         renderingProcess.initialize();
 
-        CoreRegistry.get(ShaderManager.class).initShaders();
+        context.get(ShaderManager.class).initShaders();
         postProcessor.initializeMaterials();
         initMaterials();
     }
@@ -461,7 +465,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         simple.enable();
         simple.setCamera(playerCamera);
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        EntityManager entityManager = context.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -474,7 +478,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         */
 
         graphicState.preRenderSetupLightGeometry();
-        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        EntityManager entityManager = context.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);

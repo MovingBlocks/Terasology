@@ -18,10 +18,9 @@ package org.terasology.logic.console.suggesters;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Collection;
 import java.util.Set;
@@ -29,10 +28,15 @@ import java.util.Set;
 /**
  * @author Limeth
  */
-public class CommandNameSuggester implements CommandParameterSuggester<Name> {
+public final class CommandNameSuggester implements CommandParameterSuggester<Name> {
+    private final Console console;
+
+    public CommandNameSuggester(Console console) {
+        this.console = console;
+    }
+
     @Override
     public Set<Name> suggest(EntityRef sender, Object... resolvedParameters) {
-        Console console = CoreRegistry.get(Console.class);
         Collection<ConsoleCommand> commands = console.getCommands();
         Set<Name> suggestions = Sets.newHashSetWithExpectedSize(commands.size());
 
