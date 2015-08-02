@@ -43,9 +43,9 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * @author Immortius
@@ -61,6 +61,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
     private DependencyResolver resolver;
+    private ModuleListDownloader metaDownloader;
+    private boolean needsUpdate = true;
 
     @Override
     public void onOpened() {
@@ -75,18 +77,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
+
         resolver = new DependencyResolver(moduleManager.getRegistry());
         modulesLookup = Maps.newHashMap();
         sortedModules = Lists.newArrayList();
-
-        populateModuleInformation();
-
-        Collections.sort(sortedModules, new Comparator<ModuleSelectionInfo>() {
-            @Override
-            public int compare(ModuleSelectionInfo o1, ModuleSelectionInfo o2) {
-                return o1.getMetadata().getDisplayName().toString().compareTo(o2.getMetadata().getDisplayName().toString());
-            }
-        });
 
         final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
@@ -155,15 +150,31 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 });
             }
 
-            UILabel version = find("version", UILabel.class);
-            if (version != null) {
-                version.bindText(new ReadOnlyBinding<String>() {
+            UILabel installedVersion = find("installedVersion", UILabel.class);
+            if (installedVersion != null) {
+                installedVersion.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
-                        if (moduleInfoBinding.get() != null) {
-                            return moduleInfoBinding.get().getVersion().toString();
+                        ModuleSelectionInfo sel = moduleList.getSelection();
+                        if (sel == null) {
+                            return "";
                         }
-                        return "";
+                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : "none";
+                    }
+                });
+            }
+
+            UILabel onlineVersion = find("onlineVersion", UILabel.class);
+            if (onlineVersion != null) {
+                onlineVersion.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        ModuleSelectionInfo sel = moduleList.getSelection();
+                        if (sel == null) {
+                            return "";
+                        }
+                        return (sel.getOnlineVersion() != null)
+                              ? sel.getOnlineVersion().getVersion().toString() : "none";
                     }
                 });
             }
@@ -175,6 +186,30 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         if (moduleInfoBinding.get() != null) {
                             return moduleInfoBinding.get().getDescription().toString();
+                        }
+                        return "";
+                    }
+                });
+            }
+
+            UILabel status = find("status", UILabel.class);
+            if (status != null) {
+                status.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        ModuleSelectionInfo info = moduleList.getSelection();
+                        if (info != null) {
+                            if (isSelectedGameplayModule(info)) {
+                                return "gameplay";
+                            } else if (info.isSelected() && info.isExplicitSelection()) {
+                                return "enabled";
+                            } else if (info.isSelected()) {
+                                return "dependency";
+                            } else if (info.isValidToSelect()) {
+                                return "disabled";
+                            } else {
+                                return "invalid";
+                            }
                         }
                         return "";
                     }
@@ -196,30 +231,31 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 });
             }
 
-            UIButton toggle = find("toggleActivation", UIButton.class);
-            if (toggle != null) {
-                toggle.subscribe(new ActivateEventListener() {
+            UIButton toggleActivate = find("toggleActivation", UIButton.class);
+            if (toggleActivate != null) {
+                toggleActivate.subscribe(new ActivateEventListener() {
                     @Override
                     public void onActivated(UIWidget button) {
-                        if (moduleList.getSelection() != null) {
-
+                        ModuleSelectionInfo info = moduleList.getSelection();
+                        if (info != null) {
                             // Toggle
-                            if (moduleList.getSelection().isSelected() && moduleList.getSelection().isExplicitSelection()) {
-                                deselect(moduleList.getSelection());
-                            } else if (moduleList.getSelection().isValidToSelect()) {
-                                select(moduleList.getSelection());
+                            if (info.isSelected() && info.isExplicitSelection()) {
+                                deselect(info);
+                            } else if (info.isValidToSelect()) {
+                                select(info);
                             }
                         }
                     }
                 });
-                toggle.bindVisible(new ReadOnlyBinding<Boolean>() {
+                toggleActivate.bindEnabled(new ReadOnlyBinding<Boolean>() {
                     @Override
                     public Boolean get() {
-                        return moduleList.getSelection() != null
-                                && (moduleList.getSelection().isSelected() || moduleList.getSelection().isValidToSelect());
+                        ModuleSelectionInfo info = moduleList.getSelection();
+                        return info != null && info.isPresent()
+                                && (info.isSelected() || info.isValidToSelect());
                     }
                 });
-                toggle.bindText(new ReadOnlyBinding<String>() {
+                toggleActivate.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
                         if (moduleList.getSelection() != null) {
@@ -230,6 +266,57 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             }
                         }
                         return "";
+                    }
+                });
+            }
+
+            UIButton downloadButton = find("download", UIButton.class);
+            if (downloadButton != null) {
+                downloadButton.subscribe(new ActivateEventListener() {
+                    @Override
+                    public void onActivated(UIWidget button) {
+                        if (moduleList.getSelection() != null) {
+
+                            ModuleSelectionInfo info = moduleList.getSelection();
+                        }
+                    }
+                });
+
+                Predicate<ModuleSelectionInfo> canDownload = info -> info != null && !info.isPresent();
+                Predicate<ModuleSelectionInfo> canUpdate = info -> {
+                    if (info != null) {
+                        Module online = info.getOnlineVersion();
+                        if (online != null) {
+                            return online.getVersion().compareTo(info.getLatestVersion().getVersion()) > 0;
+                        }
+                        return false;
+                    }
+                    return false;
+                };
+
+                downloadButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        ModuleSelectionInfo info = moduleList.getSelection();
+                        if (canDownload.test(info)) {
+                            return true;
+                        }
+
+                        return canUpdate.test(info);
+                    }
+                });
+                downloadButton.bindText(new ReadOnlyBinding<String>() {
+
+                    @Override
+                    public String get() {
+                        ModuleSelectionInfo info = moduleList.getSelection();
+                        if (canDownload.test(info)) {
+                            return "Download";
+                        }
+                        if (canUpdate.test(info)) {
+                            return "Update";
+                        }
+                        return "-";
                     }
                 });
             }
@@ -260,13 +347,13 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private void updateValidToSelect() {
         List<Name> selectedModules = Lists.newArrayList();
-        for (SelectModulesScreen.ModuleSelectionInfo info : sortedModules) {
+        for (ModuleSelectionInfo info : sortedModules) {
             if (info.isSelected()) {
                 selectedModules.add(info.getMetadata().getId());
             }
         }
         Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-        for (SelectModulesScreen.ModuleSelectionInfo info : sortedModules) {
+        for (ModuleSelectionInfo info : sortedModules) {
             if (!info.isSelected()) {
                 info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess());
             }
@@ -276,7 +363,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
         if (currentSelectionResults.isSuccess()) {
             for (Module module : currentSelectionResults.getModules()) {
-                SelectModulesScreen.ModuleSelectionInfo info = modulesLookup.get(module.getId());
+                ModuleSelectionInfo info = modulesLookup.get(module.getId());
 
                 // the engine module is not listed
                 if (info != null) {
@@ -286,14 +373,43 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
     }
 
-    private void populateModuleInformation() {
+    private void updateModuleInformation() {
+        modulesLookup.clear();
+        sortedModules.clear();
+
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (!latestVersion.isOnClasspath()) {
-                SelectModulesScreen.ModuleSelectionInfo info = new SelectModulesScreen.ModuleSelectionInfo(latestVersion);
+                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
                 modulesLookup.put(info.getMetadata().getId(), info);
                 sortedModules.add(info);
             }
+        }
+
+        for (RemoteModule remote : metaDownloader.getModules()) {
+            ModuleSelectionInfo info = modulesLookup.get(remote.getId());
+            if (info == null) {
+                info = ModuleSelectionInfo.remote(remote);
+                modulesLookup.put(remote.getId(), info);
+                sortedModules.add(info);
+            }
+            info.setOnlineVersion(remote);
+        }
+
+        Collections.sort(sortedModules, (o1, o2) ->
+            o1.getMetadata().getDisplayName().toString().compareTo(
+            o2.getMetadata().getDisplayName().toString()));
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        if (needsUpdate) {
+            if (metaDownloader.isDone()) {
+                needsUpdate = false;
+            }
+            updateModuleInformation();
         }
     }
 
@@ -329,7 +445,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private List<Name> getExplicitlySelectedModules() {
         List<Name> selectedModules = Lists.newArrayList();
-        for (SelectModulesScreen.ModuleSelectionInfo info : sortedModules) {
+        for (ModuleSelectionInfo info : sortedModules) {
             if (info.isExplicitSelection()) {
                 selectedModules.add(info.getMetadata().getId());
             }
@@ -360,26 +476,61 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
 
-    private static class ModuleSelectionInfo {
+    private static final class ModuleSelectionInfo {
         private Module latestVersion;
         private Module selectedVersion;
+        private Module onlineVersion;
         private boolean explicitSelection;
         private boolean validToSelect = true;
 
-        public ModuleSelectionInfo(Module module) {
+        private ModuleSelectionInfo(Module module) {
             this.latestVersion = module;
+        }
+
+        public static ModuleSelectionInfo remote(Module module) {
+            ModuleSelectionInfo info = new ModuleSelectionInfo(null);
+            info.setOnlineVersion(module);
+            return info;
+        }
+
+        public static ModuleSelectionInfo local(Module module) {
+            return new ModuleSelectionInfo(module);
         }
 
         public ModuleMetadata getMetadata() {
             if (selectedVersion != null) {
                 return selectedVersion.getMetadata();
-            } else {
+            } else if (latestVersion != null) {
                 return latestVersion.getMetadata();
+            } else if (onlineVersion != null) {
+                return onlineVersion.getMetadata();
             }
+
+            return null;
+        }
+
+        public boolean isPresent() {
+            return latestVersion != null;
         }
 
         public boolean isSelected() {
             return selectedVersion != null;
+        }
+
+        public Module getOnlineVersion() {
+            return onlineVersion;
+        }
+
+        public Module getLatestVersion() {
+            return latestVersion;
+        }
+
+        public Module getSelectedVersion() {
+            return selectedVersion;
+        }
+
+        public void setOnlineVersion(Module onlineVersion) {
+            this.onlineVersion = onlineVersion;
         }
 
         public void setSelectedVersion(Module selectedVersion) {

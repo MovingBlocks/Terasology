@@ -137,12 +137,30 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Version: "
+                                            "text" : "Installed: "
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "id" : "version",
+                                            "id" : "installedVersion",
                                             "text" : "Module Version Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Online: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "onlineVersion",
+                                            "text" : "Module Version Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Status: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "status",
+                                            "text" : "Module Status Goes Here"
                                         }
                                     ],
                                     "layoutInfo" : {
@@ -182,22 +200,36 @@
                                         },
                                         "position-bottom" : {
                                             "target" : "TOP",
-                                            "widget" : "toggleActivation",
+                                            "widget" : "buttonRow",
                                             "offset" : 8
                                         }
                                     }
                                 },
                                 {
-                                    "type" : "UIButton",
-                                    "id" : "toggleActivation",
-                                    "text" : "Activate",
+                                    "type" : "ColumnLayout",
+                                    "id" : "buttonRow",
+                                    "columns" : 2,
+                                    "horizontalSpacing" : 8,
+                                    "verticalSpacing" : 8,
+                                    "contents" : [
+		                                {
+		                                    "type" : "UIButton",
+		                                    "id" : "toggleActivation",
+		                                    "text" : "Activate"
+		                                },
+		                                {
+		                                    "type" : "UIButton",
+		                                    "id" : "download",
+		                                    "text" : "Download"
+		                                }
+                                    ],
                                     "layoutInfo" : {
                                         "height" : 24,
                                         "position-bottom" : {
                                             "target" : "BOTTOM"
                                         }
                                     }
-                                },
+								},
                                 {
                                     "type" : "UILabel",
                                     "id" : "errorMessage",
