@@ -84,7 +84,7 @@ public class ScrollableArea extends CoreLayout {
             int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).x;
             int scrollbarHeight = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).y;
 
-            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth - scrollbarWidth, availableHeight));
+            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth - scrollbarWidth, Integer.MAX_VALUE));
             if (horizontalScrollbar && contentSize.x > availableWidth - scrollbarWidth) {
                 if (contentSize.y > availableHeight - scrollbarHeight) {
                     layoutWithBothScrollbars(canvas, contentSize, availableWidth, availableHeight, scrollbarWidth, scrollbarHeight);
@@ -100,7 +100,7 @@ public class ScrollableArea extends CoreLayout {
             int scrollbarHeight = canvas.calculateRestrictedSize(verticalBar, new Vector2i(availableWidth, availableHeight)).y;
             availableHeight -= scrollbarHeight;
 
-            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(availableWidth, availableHeight - scrollbarHeight));
+            contentSize = canvas.calculateRestrictedSize(content, new Vector2i(Integer.MAX_VALUE, availableHeight - scrollbarHeight));
             layoutWithJustHorizontal(canvas, contentSize, availableWidth, availableHeight, scrollbarHeight);
         } else {
             throw new IllegalStateException("ScrollableArea without any scrollbar allowed, what's the point of that?!");
