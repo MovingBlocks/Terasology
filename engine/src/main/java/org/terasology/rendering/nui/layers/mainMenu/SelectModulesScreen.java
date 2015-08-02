@@ -150,24 +150,31 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 });
             }
 
-            UILabel version = find("version", UILabel.class);
-            if (version != null) {
-                version.bindText(new ReadOnlyBinding<String>() {
+            UILabel installedVersion = find("installedVersion", UILabel.class);
+            if (installedVersion != null) {
+                installedVersion.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
                         ModuleSelectionInfo sel = moduleList.getSelection();
                         if (sel == null) {
                             return "";
                         }
-                        ModuleMetadata info = sel.getMetadata();
+                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : "none";
+                    }
+                });
+            }
 
-                        String ver = info.getVersion().toString();
-
-                        if (sel.getOnlineVersion() != null) {
-                            ver += " (" + sel.getOnlineVersion().getVersion() + ")";
+            UILabel onlineVersion = find("onlineVersion", UILabel.class);
+            if (onlineVersion != null) {
+                onlineVersion.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        ModuleSelectionInfo sel = moduleList.getSelection();
+                        if (sel == null) {
+                            return "";
                         }
-
-                        return ver;
+                        return (sel.getOnlineVersion() != null)
+                              ? sel.getOnlineVersion().getVersion().toString() : "none";
                     }
                 });
             }

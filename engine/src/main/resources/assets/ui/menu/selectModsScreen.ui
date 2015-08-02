@@ -137,11 +137,20 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Version: "
+                                            "text" : "Installed: "
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "id" : "version",
+                                            "id" : "installedVersion",
+                                            "text" : "Module Version Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Online: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "onlineVersion",
                                             "text" : "Module Version Goes Here"
                                         },
                                         {
