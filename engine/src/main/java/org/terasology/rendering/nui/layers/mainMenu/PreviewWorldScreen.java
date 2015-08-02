@@ -15,6 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -32,6 +38,7 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -57,11 +64,6 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * Shows a preview of the generated world and provides some
@@ -202,9 +204,24 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
         }
 
-        PropertyProvider provider = new PropertyProvider();
-
         for (String label : params.keySet()) {
+
+            PropertyProvider provider = new PropertyProvider() {
+                @Override
+                protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
+                    Binding<T> binding = super.createTextBinding(target, fieldMetadata);
+                    Binding<T> wrap = new WorldConfigBinding<T>(binding, worldConfig, label, (Component) target);
+                    return wrap;
+                }
+
+                @Override
+                protected Binding<Float> createFloatBinding(Object target, FieldMetadata<Object, ?> fieldMetadata) {
+                    Binding<Float> binding = super.createFloatBinding(target, fieldMetadata);
+                    Binding<Float> wrap = new WorldConfigBinding<Float>(binding, worldConfig, label, (Component) target);
+                    return wrap;
+                }
+            };
+
             Component target = params.get(label);
             List<Property<?, ?>> properties = provider.createProperties(target);
             propLayout.addProperties(label, properties);
@@ -296,6 +313,38 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         popup.onSuccess(texture::reload);
         popup.startOperation(operation, true);
+    }
+
+    /**
+     * Updates a world configurator through setProperty() whenever Binding#set() is called.
+     */
+    private static final class WorldConfigBinding<T> implements Binding<T> {
+        private Binding<T> binding;
+        private String label;
+        private Component target;
+        private WorldConfigurator worldConfig;
+
+        private WorldConfigBinding(Binding<T> binding, WorldConfigurator config, String label, Component target) {
+            this.binding = binding;
+            this.worldConfig = config;
+            this.label = label;
+            this.target = target;
+        }
+
+        @Override
+        public T get() {
+            return binding.get();
+        }
+
+        @Override
+        public void set(T value) {
+            T old = binding.get();
+            binding.set(value);
+
+            if (!Objects.equals(old, value)) {
+                worldConfig.setProperty(label, target);
+            }
+        }
     }
 }
 
