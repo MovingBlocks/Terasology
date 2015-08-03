@@ -18,19 +18,27 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.RemoteModuleExtension;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.math.Vector2i;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
+import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -42,6 +50,9 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +63,16 @@ import java.util.function.Predicate;
  */
 public class SelectModulesScreen extends CoreScreenLayer {
 
+    private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
+
     @In
     private ModuleManager moduleManager;
 
     @In
     private Config config;
+
+    @In
+    private Context context;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -278,6 +294,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (moduleList.getSelection() != null) {
 
                             ModuleSelectionInfo info = moduleList.getSelection();
+                            startDownload(info.getOnlineVersion());
                         }
                     }
                 });
@@ -343,6 +360,37 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    private void startDownload(Module onlineVersion) {
+        final NUIManager manager = context.get(NUIManager.class);
+        final WaitPopup<Path> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Downloading Module", "Please wait ...");
+
+        ProgressListener progressListener = progress ->
+                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+
+        ModuleMetadata meta = onlineVersion.getMetadata();
+        String version = meta.getVersion().toString();
+        String id = meta.getId().toString();
+        URL url = RemoteModuleExtension.getDownloadUrl(meta);
+        popup.onSuccess(filePath -> {
+            ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
+            loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+            try {
+                Module module = loader.load(filePath);
+                moduleManager.getRegistry().add(module);
+                // TODO: update installed list
+            } catch (IOException e) {
+                logger.warn("Could not load module '{}:{}'", id, version, e);
+            }
+        });
+        String fileName = String.format("%s-%s.jar", id, version);
+        Path folder = PathManager.getInstance().getHomeModPath().normalize();
+        Path target = folder.resolve(fileName);
+
+        FileDownloader operation = new FileDownloader(url, target, progressListener);
+        popup.startOperation(operation, true);
     }
 
     private void updateValidToSelect() {
