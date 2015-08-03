@@ -140,9 +140,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
-    private boolean ensurePreviewAvailable()
-    {
-        if(previewInitialized) {
+    private boolean ensurePreviewAvailable() {
+        if (previewInitialized) {
             return false;
         } else {
             EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
@@ -153,9 +152,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
-    private boolean ensurePreviewUnloaded()
-    {
-        if(previewInitialized) {
+    private boolean ensurePreviewUnloaded() {
+        if (previewInitialized) {
             previewGen.close();
             return true;
         } else {
