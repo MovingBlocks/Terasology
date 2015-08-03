@@ -105,6 +105,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private Texture texture;
 
     private boolean triggerUpdate;
+    private boolean previewInitialized;
 
     public PreviewWorldScreen() {
     }
@@ -124,14 +125,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 CoreRegistry.setContext(subContext);
                 environment = moduleManager.loadEnvironment(result.getModules(), false);
                 subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
-                EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-                environmentSwitchHandler.handleSwitchToPreviewEnivronment(context, environment);
-                genTexture();
+
                 worldGenerator = worldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
                 worldGenerator.setWorldSeed(seed.getText());
-                previewGen = new FacetLayerPreview(environment, worldGenerator);
                 configureProperties();
-                triggerUpdate = true;
             } else {
                 logger.error("Could not resolve modules for: {}", worldGenUri);
             }
@@ -140,6 +137,29 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             // if errors happen, don't enable this feature
             worldGenerator = null;
             logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
+        }
+    }
+
+    private boolean ensurePreviewAvailable()
+    {
+        if(previewInitialized) {
+            return false;
+        } else {
+            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+            environmentSwitchHandler.handleSwitchToPreviewEnivronment(context, environment);
+            genTexture();
+            previewGen = new FacetLayerPreview(environment, worldGenerator);
+            return true;
+        }
+    }
+
+    private boolean ensurePreviewUnloaded()
+    {
+        if(previewInitialized) {
+            previewGen.close();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -205,10 +225,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             environment = null;
         }
 
-        if (previewGen != null) {
-            previewGen.close();
-            previewGen = null;
-        }
+        ensurePreviewUnloaded();
 
         WorldConfigurator worldConfig = worldGenerator.getConfigurator();
 
@@ -259,6 +276,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
+        ensurePreviewAvailable();
 
         final NUIManager manager = context.get(NUIManager.class);
         final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
