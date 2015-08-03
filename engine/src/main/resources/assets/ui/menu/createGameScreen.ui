@@ -105,7 +105,7 @@
                                 },
                                 {
                                     "type" : "UIButton",
-                                    "text" : "Configure...",
+                                    "text" : "Details...",
                                     "id" : "previewSeed"
                                 }
                             ]
