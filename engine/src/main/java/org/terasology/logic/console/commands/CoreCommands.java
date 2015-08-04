@@ -66,8 +66,10 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * @author Immortius
@@ -120,6 +122,22 @@ public class CoreCommands extends BaseComponentSystem {
     @Override
     public void initialise() {
         pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
+    }
+
+    @Command(shortDescription = "Search for a command", helpText = "Displays commands with matching name, description, help text, usage or required permission")
+    public String search(@CommandParam("searched") String searched) {
+        String searchedLowercase = searched.toLowerCase();
+        List<String> result = console.getCommands().stream().filter(command -> matchesSearch(searchedLowercase, command)).map(ConsoleCommand::getUsage).collect(Collectors.toList());
+
+        return result.isEmpty() ? "Found 0 matches." : result.stream().reduce("Found " + result.size() + " matches:", (t, u) -> t + "\n    " + u);
+    }
+
+    private boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
+        return command.getName().toLowerCase().contains(searchLowercase)
+                || command.getDescription().toLowerCase().contains(searchLowercase)
+                || command.getHelpText().toLowerCase().contains(searchLowercase)
+                || command.getUsage().toLowerCase().contains(searchLowercase)
+                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
     }
 
     @Command(shortDescription = "Alter the rate of time")
