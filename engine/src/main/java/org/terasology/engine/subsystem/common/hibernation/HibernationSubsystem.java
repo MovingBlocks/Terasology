@@ -31,9 +31,6 @@ public class HibernationSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(HibernationSubsystem.class);
     private HibernationManager hibernationManager;
     private DisplayDevice displayDevice;
-    private Time time;
-
-    private boolean pausedBeforeHibernation;
 
     @Override
     public String getName() {
@@ -49,7 +46,6 @@ public class HibernationSubsystem implements EngineSubsystem {
     @Override
     public void postInitialise(Context rootContext) {
         displayDevice = rootContext.get(DisplayDevice.class);
-        time = rootContext.get(Time.class);
     }
 
     @Override
@@ -57,13 +53,10 @@ public class HibernationSubsystem implements EngineSubsystem {
         if (hibernationManager.isHibernating()) {
             if (!hibernationManager.isHibernationAllowed() || displayDevice.hasFocus()) {
                 hibernationManager.setHibernating(false);
-                time.setPaused(pausedBeforeHibernation);
             }
         } else {
             if (hibernationManager.isHibernationAllowed() && !displayDevice.hasFocus()) {
                 hibernationManager.setHibernating(true);
-                pausedBeforeHibernation = time.isPaused();
-                time.setPaused(true);
             }
         }
 
