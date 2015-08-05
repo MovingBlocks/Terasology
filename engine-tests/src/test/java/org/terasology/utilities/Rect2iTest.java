@@ -19,44 +19,10 @@ package org.terasology.utilities;
 import org.junit.Test;
 import org.terasology.math.Rect2i;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class Rect2iTest {
-
-    @Test
-    public void testSubtraction0() {
-        Rect2i a = Rect2i.createFromMinAndSize(1, 2, 3, 3);
-        Rect2i b = Rect2i.createFromMinAndSize(0, 4, 3, 3);
-
-        List<Rect2i> sub = Rect2i.difference(a, b);
-
-        assertEquals(2, sub.size());
-
-        int area = 0;
-        for (Rect2i r : sub) {
-            area += r.area();
-        }
-
-        assertEquals(7, area);
-
-        assertTrue(sub.contains(Rect2i.createFromMinAndSize(1, 2, 3, 2)));
-        assertTrue(sub.contains(Rect2i.createFromMinAndSize(3, 4, 1, 1)));
-    }
-
-    @Test
-    public void testSubtraction1() {
-        Rect2i a = Rect2i.createFromMinAndSize(1, 2, 3, 3);
-        Rect2i b = Rect2i.createFromMinAndSize(3, 2, 3, 3);
-
-        List<Rect2i> sub = Rect2i.difference(a, b);
-
-        assertEquals(1, sub.size());
-        assertEquals(Rect2i.createFromMinAndSize(1, 2, 2, 3), sub.get(0));
-    }
 
     @Test
     public void overlap() {

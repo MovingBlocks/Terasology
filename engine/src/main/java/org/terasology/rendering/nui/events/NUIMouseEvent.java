@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.events;
 
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 
 
 /**

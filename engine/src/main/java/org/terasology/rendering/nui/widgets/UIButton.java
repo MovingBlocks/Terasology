@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -188,7 +188,7 @@ public class UIButton extends CoreWidget {
     public void setClickVolume(float val) {
         clickVolume.set(val);
     }
-    
+
     public void bindEnabled(Binding<Boolean> binding) {
         enabled = binding;
     }

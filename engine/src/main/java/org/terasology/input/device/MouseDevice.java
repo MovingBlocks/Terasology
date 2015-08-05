@@ -15,8 +15,8 @@
  */
 package org.terasology.input.device;
 
-import org.terasology.math.Vector2i;
 import org.terasology.module.sandbox.API;
+import org.terasology.math.geom.Vector2i;
 
 /**
  * @author Immortius

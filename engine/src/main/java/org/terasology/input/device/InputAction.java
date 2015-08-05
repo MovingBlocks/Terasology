@@ -17,7 +17,7 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 
 /**
  * @author Immortius
@@ -96,7 +96,7 @@ public final class InputAction {
     public Vector2i getMousePosition() {
         return mousePosition;
     }
-    
+
     @Override
     public String toString() {
         return "InputAction [" + this.input + " \'" + inputChar + "' (" + state + "), mouse: " + mousePosition + "]";

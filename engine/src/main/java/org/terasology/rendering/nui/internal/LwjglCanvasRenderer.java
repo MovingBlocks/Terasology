@@ -28,9 +28,9 @@ import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Rect2f;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -265,7 +265,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         }
 
         if (!currentTextureCropRegion.equals(requestedCropRegion)
-                && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
+                && !(currentTextureCropRegion.contains(absoluteRegion) && requestedCropRegion.contains(absoluteRegion))) {
             textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
                     requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
             currentTextureCropRegion = requestedCropRegion;
@@ -365,7 +365,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         }
 
         if (!currentTextureCropRegion.equals(requestedCropRegion)
-                && !(currentTextureCropRegion.encompasses(region) && requestedCropRegion.encompasses(region))) {
+                && !(currentTextureCropRegion.contains(region) && requestedCropRegion.contains(region))) {
             textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
                     requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
             currentTextureCropRegion = requestedCropRegion;

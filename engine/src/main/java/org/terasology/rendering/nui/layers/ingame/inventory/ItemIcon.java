@@ -15,11 +15,9 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.terasology.asset.Assets;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.Mesh;

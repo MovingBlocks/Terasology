@@ -50,7 +50,7 @@ import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
 import java.util.List;
