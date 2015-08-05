@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import com.google.api.client.util.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.GameEngine;
@@ -61,8 +62,10 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -70,6 +73,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Immortius
@@ -126,18 +130,63 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Search for a command", helpText = "Displays commands with matching name, description, help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
-        String searchedLowercase = searched.toLowerCase();
-        List<String> result = console.getCommands().stream().filter(command -> matchesSearch(searchedLowercase, command)).map(ConsoleCommand::getUsage).collect(Collectors.toList());
+        String searchLowercase = searched.toLowerCase();
+        List<String> commands = findCommandMatches(searchLowercase);
+        List<String> prefabs = findPrefabMatches(searchLowercase);
+        List<String> blocks = findBlockMatches(searchLowercase);
+        String result = "Found " + commands.size() + " command matches, " + prefabs.size() + " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
-        return result.isEmpty() ? "Found 0 matches." : result.stream().reduce("Found " + result.size() + " matches:", (t, u) -> t + "\n    " + u);
+        if(commands.size() > 0) {
+            result += "\nCommands:";
+            result = commands.stream().reduce(result, (t, u) -> t + "\n    " + u);
+        }
+
+        if(prefabs.size() > 0) {
+            result += "\nPrefabs:";
+            result = prefabs.stream().reduce(result, (t, u) -> t + "\n    " + u);
+        }
+
+        if(blocks.size() > 0) {
+            result += "\nBlocks:";
+            result = blocks.stream().reduce(result, (t, u) -> t + "\n    " + u);
+        }
+
+        return result;
     }
 
-    private boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
+    private List<String> findCommandMatches(String searchLowercase) {
+        return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
+                .map(ConsoleCommand::getUsage).collect(Collectors.toList());
+    }
+
+    private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
         return command.getName().toLowerCase().contains(searchLowercase)
                 || command.getDescription().toLowerCase().contains(searchLowercase)
                 || command.getHelpText().toLowerCase().contains(searchLowercase)
                 || command.getUsage().toLowerCase().contains(searchLowercase)
                 || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+    }
+
+    private List<String> findPrefabMatches(String searchLowercase) {
+        return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
+                .filter(prefab -> matchesSearch(searchLowercase, prefab))
+                .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
+    }
+
+    private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
+        return prefab.getName().toLowerCase().contains(searchLowercase)
+                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+    }
+
+    private List<String> findBlockMatches(String searchLowercase) {
+        return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
+                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+    }
+
+    private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
+        return def.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     @Command(shortDescription = "Alter the rate of time")
