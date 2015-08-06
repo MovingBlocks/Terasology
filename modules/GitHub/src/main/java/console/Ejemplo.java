@@ -52,6 +52,7 @@ public class Ejemplo {
 	    Git git;
 	    String projectName = "My_project";
 	    Hashtable<String, Boolean> table = new Hashtable<String, Boolean>();
+	    Hashtable<String, Integer> versions = new Hashtable<String, Integer>();
 	    /*------Setting Parameters-------------------------------*/
 	    
 		localPath="C:/Users/I/Desktop/temp/"+projectName;
@@ -69,9 +70,12 @@ public class Ejemplo {
         	gitGlone(localPath, remotePath);
         }
         /*----------get commits description--------------------*/
-        extractBugs(git, localRepo, table);  
+        VersionMetric version = new VersionMetric();
+        version.getVersions(git, localRepo, versions);
         getBranchLog(localRepo);
-        showChangedFilesBetweenCommits(localRepo);
+        //showChangedFilesBetweenCommits(localRepo);
+        extractBugs(git, localRepo, table);  
+        //version.get(git,localRepo,versions);
         git.close();
      
 	}
@@ -103,28 +107,33 @@ public class Ejemplo {
         for(RevCommit commit : log){
         	com = commit.getFullMessage();
         	System.out.println(com);
-        	System.out.println(commit.getId());
+        	//System.out.println(commit.getId());
         	System.out.println(hasBug(com));
         	ArrayList<String> classes = getClassesInCommit(i,repo);
         	for(String c: classes) {
-        		if (table.get(c) == null) {
+        		System.out.println("Bugs table: " + table);
+        		if (table.get(c)==null) {
         			table.put(c, hasBug(com));
+        			
+        		}
+        		else {table.remove(c);
+        		table.put(c,hasBug(com));
         		}
         	}
+        	
         	i++;
         }
+        System.out.println("Final bugs table: " + table);
+        
 	}
 	
 	private static void extractVersions(Git git, Repository repo, Hashtable<String, Integer> table) throws GitAPIException,
 			NoHeadException, RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException, IOException {
-		String com;
 		int i=0;
 		Iterable<RevCommit> log = git.log()
 				.call();
-		for(RevCommit commit : log){
-			com = commit.getFullMessage();
-			System.out.println(com);
-			System.out.println(commit.getId());
+		for(RevCommit commit : log) {
+			//System.out.println(commit.getFullMessage());
 			ArrayList<String> classes = getClassesInCommit(i,repo);
 			for(String c: classes) {
 				if (table.get(c) == null) {
@@ -135,20 +144,12 @@ public class Ejemplo {
 					table.put(c,versions+1);
 				}
 			}
+			
 			i++;
 		}
+		System.out.println(table);
+		
 	}
-	
-//	public PlotWalk findChildrenOfCommit(Repository repo) {
-//		PlotWalk revWalk = new PlotWalk(repo);
-//		ObjectId rootId = (branch==null)?repo.resolve(HEAD):branch.getObjectId();
-//		RevCommit root = revWalk.parseCommit(rootId);
-//		revWalk.markStart(root);
-//		PlotCommitList<PlotLane> plotCommitList = new PlotCommitList<PlotLane>();
-//		plotCommitList.source(revWalk);
-//		plotCommitList.fillTo(Integer.MAX_VALUE);
-//		return revWalk;
-//	}
 	
 	public void traverseTree(Repository repo,AnyObjectId commit) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException {
 		TreeWalk treeWalk = new TreeWalk( repo );
@@ -159,19 +160,15 @@ public class Ejemplo {
 			int fileMode = Integer.parseInt( treeWalk.getFileMode( 0 ).toString() );
 			String objectId = treeWalk.getObjectId( 0 ).name();
 			String path = treeWalk.getPathString();
-			System.out.println( String.format( "%06d %s %s", fileMode, objectId, path ) );
+			//System.out.println( String.format( "%06d %s %s", fileMode, objectId, path ) );
 		}
 	}
-
-
-
 
 	private static void gitGlone(String localPath, String remotePath)
 			throws GitAPIException, InvalidRemoteException, TransportException {
 		CloneCommand clone =Git.cloneRepository().setURI(remotePath);        
         clone.setDirectory(new File(localPath)).call();
 	}
-	
 
 	public static boolean hasBug(String message){
 		String aux;
@@ -195,10 +192,10 @@ public class Ejemplo {
                 .call();
         int count = 0;
         for (RevCommit rev : logs) {
-            System.out.println("Commit: " + rev + ", name: " + rev.getName() + ", id: " + rev.getId().getName());
+           // System.out.println("Commit: " + rev + ", name: " + rev.getName() + ", id: " + rev.getId().getName());
             count++;
         }
-        System.out.println("Had " + count + " commits overall on current branch");
+        //System.out.println("Had " + count + " commits overall on current branch");
         repository.close();
 	}
 	
@@ -213,8 +210,7 @@ public class Ejemplo {
         	commitPointer=commitPointer+"^";
 			ObjectId oldHead = repository.resolve(commitPointer+tree);
 			if (oldHead == null) return;
-			System.out.println("Printing diff between tree: " + oldHead
-					+ " and " + head);
+			//System.out.println("Printing diff between tree: " + oldHead+ " and " + head);
 			// prepare the two iterators to compute the diff between
 			ObjectReader reader = repository.newObjectReader();
 			CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
@@ -225,7 +221,7 @@ public class Ejemplo {
 			List<DiffEntry> diffs = new Git(repository).diff()
 					.setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
 			for (DiffEntry entry : diffs) {
-				System.out.println("Class: " + extractClassFromEntry(entry));
+				//System.out.println("Class: " + extractClassFromEntry(entry));
 			}
 			repository.close();
 		}
@@ -246,8 +242,7 @@ public class Ejemplo {
     	commitPointer=commitPointer+"^";
 		ObjectId oldHead = repository.resolve(commitPointer+tree);
 		if (oldHead != null) {
-			System.out.println("Printing diff between tree: " + oldHead
-					+ " and " + head);
+			//System.out.println("Printing diff between tree: " + oldHead+ " and " + head);
 			// prepare the two iterators to compute the diff between
 			ObjectReader reader = repository.newObjectReader();
 			CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
@@ -258,11 +253,10 @@ public class Ejemplo {
 			List<DiffEntry> diffs = new Git(repository).diff()
 					.setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
 			for (DiffEntry entry : diffs) {
-				System.out.println("Class: " + extractClassFromEntry(entry));
+				//System.out.println("extracted class\t " + extractClassFromEntry(entry));
 				classes.add(extractClassFromEntry(entry));
 			}
 		}
-		
 		repository.close();
 		return classes;
 	}
