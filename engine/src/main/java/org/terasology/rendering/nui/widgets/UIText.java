@@ -312,7 +312,8 @@ public class UIText extends CoreWidget {
                         eventHandled = true;
                         break;
                     }
-                    case KeyId.ENTER: {
+                    case KeyId.ENTER:
+                    case KeyId.NUMPAD_ENTER: {
                         for (ActivateEventListener listener : activationListeners) {
                             listener.onActivated(this);
                         }
