@@ -17,7 +17,6 @@ package org.terasology.world.block.regions;
 
 
 import org.terasology.entitySystem.Component;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
@@ -27,4 +26,5 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public final class ActAsBlockComponent implements Component {
     public BlockFamily block;
+    public boolean dropBlocksInRegion;
 }

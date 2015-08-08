@@ -107,18 +107,26 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
-    public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent, LocationComponent locationComp) {
+    public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent) {
         if (blockComponent.block != null) {
-            Vector3i location = new Vector3i(locationComp.getWorldPosition(), 0.5f);
-            commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
-        }
-    }
-
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
-    public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent, BlockRegionComponent blockRegion) {
-        if (!entity.hasComponent(LocationComponent.class) && blockComponent.block != null) {
-            Vector3i location = new Vector3i(blockRegion.region.center(), 0.5f);
-            commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
+            if (entity.hasComponent(BlockRegionComponent.class)) {
+                BlockRegionComponent blockRegion = entity.getComponent(BlockRegionComponent.class);
+                if (blockComponent.dropBlocksInRegion) {
+                    // loop through all the blocks in this region and drop them
+                    for (Vector3i location : blockRegion.region) {
+                        Block blockInWorld = worldProvider.getBlock(location);
+                        commonDefaultDropsHandling(event, entity, location, blockInWorld.getBlockFamily().getArchetypeBlock());
+                    }
+                } else {
+                    // just drop the ActAsBlock block
+                    Vector3i location = new Vector3i(blockRegion.region.center(), 0.5f);
+                    commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
+                }
+            } else if (entity.hasComponent(LocationComponent.class)) {
+                LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+                Vector3i location = new Vector3i(locationComponent.getWorldPosition(), 0.5f);
+                commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
+            }
         }
     }
 
