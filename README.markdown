@@ -128,6 +128,7 @@ Console Commands
 Press the `grave` key (usually the \` key immediately above `tab`) to show the in-game console. Mostly everything is case insensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
 
 * help - Show in-game help (more thorough)
+* search [something] - searches for any command, prefab, or asset with "something" in its name, help text, etc
 * flight - just what it sounds like :)
 * ghost - no-clip mode (fly through anything)
 * hspeed - greatly increase your movement speed

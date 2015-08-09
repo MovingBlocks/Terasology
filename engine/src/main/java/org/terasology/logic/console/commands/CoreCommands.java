@@ -128,7 +128,7 @@ public class CoreCommands extends BaseComponentSystem {
         pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
     }
 
-    @Command(shortDescription = "Search for a command", helpText = "Displays commands with matching name, description, help text, usage or required permission")
+    @Command(shortDescription = "Search commands/prefabs/assets", helpText = "Displays commands, prefabs, and assets with matching name, description, help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
         List<String> commands = findCommandMatches(searchLowercase);
