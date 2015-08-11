@@ -216,30 +216,15 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         if (info != null) {
                             if (isSelectedGameplayModule(info)) {
-                                return "gameplay";
+                                return "Active gameplay";
                             } else if (info.isSelected() && info.isExplicitSelection()) {
-                                return "enabled";
+                                return "Activated";
                             } else if (info.isSelected()) {
-                                return "dependency";
+                                return "Dependency";
                             } else if (info.isValidToSelect()) {
-                                return "disabled";
+                                return "inactive";
                             } else {
-                                return "invalid";
-                            }
-                        }
-                        return "";
-                    }
-                });
-            }
-
-            UILabel error = find("errorMessage", UILabel.class);
-            if (error != null) {
-                error.bindText(new ReadOnlyBinding<String>() {
-                    @Override
-                    public String get() {
-                        if (moduleList.getSelection() != null) {
-                            if (!moduleList.getSelection().isValidToSelect()) {
-                                return "Incompatible with existing selection, or dependencies cannot be resolved";
+                                return "Incompatible or unresolved dependencies";
                             }
                         }
                         return "";
@@ -281,7 +266,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                                 return "Activate";
                             }
                         }
-                        return "";
+                        return "Activate";  // button should be disabled
                     }
                 });
             }
@@ -294,7 +279,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (moduleList.getSelection() != null) {
 
                             ModuleSelectionInfo info = moduleList.getSelection();
-                            startDownload(info.getOnlineVersion());
+                            startDownload(info);
                         }
                     }
                 });
@@ -333,7 +318,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (canUpdate.test(info)) {
                             return "Update";
                         }
-                        return "-";
+                        return "Download";  // button should be disabled
                     }
                 });
             }
@@ -362,7 +347,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         });
     }
 
-    private void startDownload(Module onlineVersion) {
+    private void startDownload(ModuleSelectionInfo info) {
         final NUIManager manager = context.get(NUIManager.class);
         final WaitPopup<Path> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Downloading Module", "Please wait ...");
@@ -370,7 +355,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         ProgressListener progressListener = progress ->
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
-        ModuleMetadata meta = onlineVersion.getMetadata();
+        ModuleMetadata meta = info.getOnlineVersion().getMetadata();
         String version = meta.getVersion().toString();
         String id = meta.getId().toString();
         URL url = RemoteModuleExtension.getDownloadUrl(meta);
@@ -379,8 +364,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
             loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
             try {
                 Module module = loader.load(filePath);
+                info.setLocalVersion(module);
                 moduleManager.getRegistry().add(module);
-                // TODO: update installed list
             } catch (IOException e) {
                 logger.warn("Could not load module '{}:{}'", id, version, e);
             }
@@ -470,7 +455,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 moduleConfig.addModule(info.getMetadata().getId());
             }
         }
-        if (!modulesLookup.get(config.getWorldGeneration().getDefaultGenerator().getModuleName()).isSelected()) {
+        SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
+        ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
+        if (info != null && !info.isSelected()) {
             config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
         }
         config.save();
@@ -533,6 +520,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
         private ModuleSelectionInfo(Module module) {
             this.latestVersion = module;
+        }
+
+        public void setLocalVersion(Module module) {
+            latestVersion = module;
         }
 
         public static ModuleSelectionInfo remote(Module module) {

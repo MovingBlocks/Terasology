@@ -172,19 +172,6 @@
                                     }
                                 },
                                 {
-                                    "type" : "UILabel",
-                                    "id" : "descriptionTitle",
-                                    "text" : "Description:",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
-                                            "widget" : "simpleItems",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
                                     "type" : "ScrollableArea",
                                     "content" : {
                                         "type" : "UILabel",
@@ -195,7 +182,7 @@
                                         "position-horizontal-center" : {},
                                         "position-top" : {
                                             "target" : "BOTTOM",
-                                            "widget" : "descriptionTitle",
+                                            "widget" : "simpleItems",
                                             "offset" : 8
                                         },
                                         "position-bottom" : {
@@ -212,29 +199,17 @@
                                     "horizontalSpacing" : 8,
                                     "verticalSpacing" : 8,
                                     "contents" : [
-		                                {
-		                                    "type" : "UIButton",
-		                                    "id" : "toggleActivation",
-		                                    "text" : "Activate"
-		                                },
-		                                {
-		                                    "type" : "UIButton",
-		                                    "id" : "download",
-		                                    "text" : "Download"
-		                                }
-                                    ],
-                                    "layoutInfo" : {
-                                        "height" : 24,
-                                        "position-bottom" : {
-                                            "target" : "BOTTOM"
+                                        {
+                                            "type" : "UIButton",
+                                            "id" : "toggleActivation",
+                                            "text" : "Activate"
+                                        },
+                                        {
+                                            "type" : "UIButton",
+                                            "id" : "download",
+                                            "text" : "Download"
                                         }
-                                    }
-								},
-                                {
-                                    "type" : "UILabel",
-                                    "id" : "errorMessage",
-                                    "text" : "Error",
-                                    "family" : "error",
+                                    ],
                                     "layoutInfo" : {
                                         "height" : 24,
                                         "position-bottom" : {
