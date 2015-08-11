@@ -60,13 +60,16 @@
                         "item": {
                             "modes": {
                                 "gameplay": {
-                                    "text-color": "2B65ECFF"
+                                    "text-color": "8B85FFFF"
                                 },
                                 "enabled": {
                                     "text-color": "00FF00FF"
                                 },
                                 "dependency": {
                                     "text-color": "FFFF00FF"
+                                },
+                                "available": {
+                                    "text-color": "FFFFFFFF"
                                 },
                                 "disabled": {
                                     "text-color": "AAAAAAFF"

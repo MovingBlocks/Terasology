@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -54,8 +55,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -80,6 +83,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private ModuleListDownloader metaDownloader;
     private boolean needsUpdate = true;
 
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
+            o1.getMetadata().getDisplayName().toString().compareTo(
+            o2.getMetadata().getDisplayName().toString());
+
     @Override
     public void onOpened() {
         super.onOpened();
@@ -96,8 +103,19 @@ public class SelectModulesScreen extends CoreScreenLayer {
         metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
+
         modulesLookup = Maps.newHashMap();
         sortedModules = Lists.newArrayList();
+        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+            if (!latestVersion.isOnClasspath()) {
+                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
+                modulesLookup.put(info.getMetadata().getId(), info);
+                sortedModules.add(info);
+            }
+        }
+
+        Collections.sort(sortedModules, moduleInfoComparator);
 
         final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
@@ -116,10 +134,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         canvas.setMode("enabled");
                     } else if (value.isSelected()) {
                         canvas.setMode("dependency");
-                    } else if (value.isValidToSelect()) {
+                    } else if (!value.isPresent()) {
                         canvas.setMode("disabled");
-                    } else {
+                    } else if (!value.isValidToSelect()) {
                         canvas.setMode("invalid");
+                    } else {
+                        canvas.setMode("available");
                     }
                     canvas.drawText(getString(value), canvas.getRegion());
                 }
@@ -221,8 +241,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
                                 return "Activated";
                             } else if (info.isSelected()) {
                                 return "Dependency";
+                            } else if (!info.isPresent()) {
+                                return "Not present";
                             } else if (info.isValidToSelect()) {
-                                return "inactive";
+                                return "Available";
                             } else {
                                 return "Incompatible or unresolved dependencies";
                             }
@@ -252,7 +274,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     @Override
                     public Boolean get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
-                        return info != null && info.isPresent()
+                        return info != null && info.isPresent() && !isSelectedGameplayModule(info)
                                 && (info.isSelected() || info.isValidToSelect());
                     }
                 });
@@ -366,6 +388,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 Module module = loader.load(filePath);
                 info.setLocalVersion(module);
                 moduleManager.getRegistry().add(module);
+                updateValidToSelect();
             } catch (IOException e) {
                 logger.warn("Could not load module '{}:{}'", id, version, e);
             }
@@ -407,31 +430,22 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void updateModuleInformation() {
-        modulesLookup.clear();
-        sortedModules.clear();
 
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
-                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
-                modulesLookup.put(info.getMetadata().getId(), info);
-                sortedModules.add(info);
-            }
-        }
-
+        Set<Name> filtered = ImmutableSet.of(new Name("engine"), new Name("engine-test"));
         for (RemoteModule remote : metaDownloader.getModules()) {
             ModuleSelectionInfo info = modulesLookup.get(remote.getId());
-            if (info == null) {
-                info = ModuleSelectionInfo.remote(remote);
-                modulesLookup.put(remote.getId(), info);
-                sortedModules.add(info);
+            if (!filtered.contains(remote.getId())) {
+                if (info == null) {
+                    info = ModuleSelectionInfo.remote(remote);
+                    modulesLookup.put(remote.getId(), info);
+                    int pos = Collections.binarySearch(sortedModules, info, moduleInfoComparator);
+                    if (pos < 0) {                             // not yet in the (sorted) list
+                        sortedModules.add(-pos - 1, info);     // use "insertion point" to keep the list sorted
+                    }
+                }
+                info.setOnlineVersion(remote);
             }
-            info.setOnlineVersion(remote);
         }
-
-        Collections.sort(sortedModules, (o1, o2) ->
-            o1.getMetadata().getDisplayName().toString().compareTo(
-            o2.getMetadata().getDisplayName().toString()));
     }
 
     @Override
@@ -562,10 +576,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
         public Module getLatestVersion() {
             return latestVersion;
-        }
-
-        public Module getSelectedVersion() {
-            return selectedVersion;
         }
 
         public void setOnlineVersion(Module onlineVersion) {

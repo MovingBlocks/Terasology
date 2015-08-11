@@ -24,10 +24,9 @@ import org.terasology.module.ModuleMetadata;
 import com.google.common.collect.ImmutableList;
 
 /**
- * TODO Type description
- * @author Martin Steiger
+ * A module that lives in a remote location.
  */
-public class RemoteModule extends BaseModule {
+class RemoteModule extends BaseModule {
 
     public RemoteModule(ModuleMetadata meta) {
         super(Collections.emptyList(), meta);

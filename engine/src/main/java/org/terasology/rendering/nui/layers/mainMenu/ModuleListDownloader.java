@@ -123,6 +123,12 @@ class ModuleListDownloader {
 
                 int count = modules.size();
                 status = String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries");
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // ignore - this is just to create an animation anyway
+                }
             }
 
             reader.endArray();

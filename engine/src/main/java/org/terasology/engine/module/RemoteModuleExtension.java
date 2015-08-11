@@ -23,7 +23,7 @@ import org.terasology.module.ModuleMetadata;
 
 /**
  * A set of module extensions for remote modules.
- * NOTE: this is copy&paste from master-server.
+ * NOTE: this is copy&paste from meta-server.
  */
 public enum RemoteModuleExtension {
 
