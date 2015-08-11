@@ -116,7 +116,7 @@ dependencies {
             // Check for any needed module dependencies on other modules that we need at runtime
             if (id.group == 'org.terasology.modules' && id.name != "Core") {
                 File moduleSrcPath = new File(rootDir, 'modules/' + id.name)
-                File moduleJarPath = new File(rootDir, 'modules/' + id.name + id.version + '.jar')
+                File moduleJarPath = new File(rootDir, 'modules/' + id.name + '-' + id.version + '.jar')
 
                 if (moduleSrcPath.exists()) {
                     println "*** Found module dependency $id.name in source form, not copying a runtime jar from Gradle"
