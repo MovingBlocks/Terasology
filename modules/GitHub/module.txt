@@ -1,9 +1,10 @@
 {
     "id" : "GitHub",
     "version" : "0.1.0",
-    "author" : "",
+    "author" : "kidonkey",
     "displayName" : "GitHub",
-    "description" : "",
-    "dependencies" : [],
+    "description" : "Module for CodeCity coloring with GitHub repo",
+    "dependencies" : [
+],
     "isServerSideOnly" : false
 }
