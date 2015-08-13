@@ -65,6 +65,10 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * Shows a preview of the generated world and provides some
  * configuration options to tweak the generation process.
@@ -150,6 +154,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             environmentSwitchHandler.handleSwitchToPreviewEnivronment(context, environment);
             genTexture();
             previewGen = new FacetLayerPreview(environment, worldGenerator);
+            previewInitialized = true;
             return true;
         }
     }
@@ -209,15 +214,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             PropertyProvider provider = new PropertyProvider() {
                 @Override
                 protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
-                    Binding<T> binding = super.createTextBinding(target, fieldMetadata);
-                    Binding<T> wrap = new WorldConfigBinding<T>(binding, worldConfig, label, (Component) target);
+                    Binding<T> wrap = new WorldConfigBinding<T>(worldConfig, label, fieldMetadata);
                     return wrap;
                 }
 
                 @Override
                 protected Binding<Float> createFloatBinding(Object target, FieldMetadata<Object, ?> fieldMetadata) {
-                    Binding<Float> binding = super.createFloatBinding(target, fieldMetadata);
-                    Binding<Float> wrap = new WorldConfigBinding<Float>(binding, worldConfig, label, (Component) target);
+                    Binding<Float> wrap = new WorldConfigNumberBinding(worldConfig, label, (FieldMetadata<Object, Float>) fieldMetadata);
                     return wrap;
                 }
             };
@@ -318,32 +321,63 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     /**
      * Updates a world configurator through setProperty() whenever Binding#set() is called.
      */
-    private static final class WorldConfigBinding<T> implements Binding<T> {
-        private Binding<T> binding;
-        private String label;
-        private Component target;
-        private WorldConfigurator worldConfig;
+    private static class WorldConfigBinding<T> implements Binding<T> {
+        private final String label;
+        private final WorldConfigurator worldConfig;
+        private final FieldMetadata<Object, T> fieldMetadata;
 
-        private WorldConfigBinding(Binding<T> binding, WorldConfigurator config, String label, Component target) {
-            this.binding = binding;
+        WorldConfigBinding(WorldConfigurator config, String label, FieldMetadata<Object, T> fieldMetadata) {
             this.worldConfig = config;
             this.label = label;
-            this.target = target;
+            this.fieldMetadata = fieldMetadata;
         }
 
         @Override
         public T get() {
-            return binding.get();
+            Component comp = worldConfig.getProperties().get(label);
+            return fieldMetadata.getValue(comp);
         }
 
         @Override
         public void set(T value) {
-            T old = binding.get();
-            binding.set(value);
+            T old = get();
 
             if (!Objects.equals(old, value)) {
-                worldConfig.setProperty(label, target);
+                notifyObservers(label, fieldMetadata.getName(), value);
             }
+        }
+
+        private void notifyObservers(String group, String fieldName, Object value) {
+            Component comp = worldConfig.getProperties().get(group);
+            Component clone = cloneAndSet(comp, fieldName, value);
+
+            // first notify the world generator about the new component
+            worldConfig.setProperty(label, clone);
+        }
+
+        private static Component cloneAndSet(Component object, String field, Object value) {
+            Gson gson = new Gson();
+            JsonObject json = (JsonObject) gson.toJsonTree(object);
+            JsonElement jsonValue = gson.toJsonTree(value);
+            json.add(field, jsonValue);
+            Component clone = gson.fromJson(json, object.getClass());
+            return clone;
+        }
+    }
+
+    private static class WorldConfigNumberBinding extends WorldConfigBinding<Float> {
+
+        WorldConfigNumberBinding(WorldConfigurator config, String label, FieldMetadata<Object, Float> field) {
+            super(config, label, field);
+        }
+
+        @Override
+        public Float get() {
+            Number val = super.get();
+            if (val instanceof Float) {
+                return (Float) val;
+            }
+            return (val).floatValue();
         }
     }
 }
