@@ -16,14 +16,16 @@
 package org.terasology.rendering.world.viewDistance;
 
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.network.ClientComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
+
+import java.beans.PropertyChangeListener;
 
 /**
  * Handles view distance changes on the client.
@@ -37,16 +39,34 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
     @In
     private WorldRenderer worldRenderer;
 
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onChangeViewDistanceChangeRequest(ViewDistanceChangeRequest request, EntityRef entity) {
-        ViewDistance viewDistance = request.getNewViewRange();
-        config.getRendering().setViewDistance(viewDistance);
+    @In
+    private LocalPlayer localPlayer;
+
+    private PropertyChangeListener propertyChangeListener;
+
+    @Override
+    public void initialise() {
+        propertyChangeListener = evt -> {
+            if (evt.getPropertyName().equals(RenderingConfig.VIEW_DISTANCE)) {
+                onChangeViewDistanceChange();
+            }
+        };
+        config.getRendering().subscribe(propertyChangeListener);
+    }
+
+    public void onChangeViewDistanceChange() {
+        ViewDistance viewDistance = config.getRendering().getViewDistance();
 
         if (worldRenderer != null) {
             worldRenderer.changeViewDistance(viewDistance);
         }
 
-        entity.send(new ViewDistanceChangedEvent(request.getNewViewRange()));
+        EntityRef clientEntity = localPlayer.getClientEntity();
+        clientEntity.send(new ViewDistanceChangedEvent(viewDistance));
     }
 
+    @Override
+    public void shutdown() {
+        config.getRendering().unsubscribe(propertyChangeListener);
+    }
 }

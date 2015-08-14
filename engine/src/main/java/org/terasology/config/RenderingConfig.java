@@ -22,10 +22,15 @@ import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 /**
  * @author Immortius
  */
 public class RenderingConfig {
+    public static final String VIEW_DISTANCE = "viewDistance";
+
     private PixelFormat pixelFormat;
     private int windowPosX;
     private int windowPosY;
@@ -73,6 +78,8 @@ public class RenderingConfig {
     private PerspectiveCameraSettings cameraSettings;
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
+
+    private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public PerspectiveCameraSettings getCameraSettings() {
         return cameraSettings;
@@ -134,8 +141,15 @@ public class RenderingConfig {
         return viewDistance;
     }
 
+    /**
+     * Sets the view distance and notifies the property change listeners registered via
+     * {@link RenderingConfig#subscribe(PropertyChangeListener)} that listen for the property {@link #VIEW_DISTANCE}.
+     * @param viewDistance the new view distance
+     */
     public void setViewDistance(ViewDistance viewDistance) {
+        ViewDistance oldValue = this.viewDistance;
         this.viewDistance = viewDistance;
+        propertyChangeSupport.firePropertyChange(VIEW_DISTANCE, oldValue, viewDistance);
     }
 
     public boolean isFlickeringLight() {
@@ -440,6 +454,17 @@ public class RenderingConfig {
 
     public void setDumpShaders(boolean dumpShaders) {
         this.dumpShaders = dumpShaders;
+    }
+
+    /**
+     * Subscribe a listener that gets nofified when a property cahnges..
+     */
+    public void subscribe(PropertyChangeListener changeListener) {
+        this.propertyChangeSupport.addPropertyChangeListener(changeListener);
+    }
+
+    public void unsubscribe(PropertyChangeListener changeListener) {
+        this.propertyChangeSupport.removePropertyChangeListener(changeListener);
     }
 
 }
