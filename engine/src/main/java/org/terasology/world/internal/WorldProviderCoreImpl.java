@@ -83,15 +83,15 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Map<Vector3i, BiomeChange> biomeChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
-    private Block defaultBlock;
+    private Block unloadedBlock;
 
     public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator,
-                                 GeneratingChunkProvider chunkProvider, Block defaultBlock, Context context) {
+                                 GeneratingChunkProvider chunkProvider, Block unloadedBlock, Context context) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
-        this.defaultBlock = defaultBlock;
+        this.unloadedBlock = unloadedBlock;
         this.entityManager = context.get(EntityManager.class);
         context.put(ChunkProvider.class, chunkProvider);
 
@@ -107,10 +107,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block defaultBlock,
+    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block unloadedBlock,
                                  Context context) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider, defaultBlock,
-                context);
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
+                unloadedBlock, context);
     }
 
     @Override
@@ -273,7 +273,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getBlock(blockPos);
         }
-        return defaultBlock;
+        return unloadedBlock;
     }
 
     @Override

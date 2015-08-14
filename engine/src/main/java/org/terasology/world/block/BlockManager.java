@@ -27,6 +27,7 @@ import java.util.Map;
 public abstract class BlockManager {
 
     public static final BlockUri AIR_ID = new BlockUri(new ResourceUrn("engine:air"));
+    public static final BlockUri UNLOADED_ID = new BlockUri(new ResourceUrn("engine:unloaded"));
 
     /**
      * @return A map of the mapping between Block Uris and Ids
