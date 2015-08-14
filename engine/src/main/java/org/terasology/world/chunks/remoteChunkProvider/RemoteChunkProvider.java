@@ -77,6 +77,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
+        this.localPlayer = localPlayer;
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
