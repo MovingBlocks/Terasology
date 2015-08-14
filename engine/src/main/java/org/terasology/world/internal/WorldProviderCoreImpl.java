@@ -262,7 +262,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getLiquid(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via liquid data at {}, {}, {}", x, y, z);
         return new LiquidData();
     }
 
@@ -274,7 +273,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getBlock(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", x, y, z);
         return defaultBlock;
     }
 
@@ -286,7 +284,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(pos);
             return chunk.getBiome(blockPos.x, blockPos.y, blockPos.z);
         }
-        logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", pos.x, pos.y, pos.z);
         return BiomeManager.getUnknownBiome();
     }
 
@@ -328,7 +325,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via light at {}, {}, {}", x, y, z);
         return 0;
     }
 
@@ -340,7 +336,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
-        logger.warn("Attempted to access unavailable chunk via sunlight at {}, {}, {}", x, y, z);
         return 0;
     }
 
@@ -352,7 +347,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
-        logger.warn("Attempted to access unavailable chunk via total light at {}, {}, {}", x, y, z);
         return 0;
     }
 
