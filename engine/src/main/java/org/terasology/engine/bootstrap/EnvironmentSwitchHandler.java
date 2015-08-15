@@ -129,11 +129,16 @@ public final class EnvironmentSwitchHandler {
     }
 
 
-    public void handleSwitchToPreviewEnivronment(Context context, ModuleEnvironment environment) {
+    public void handleSwitchToPreviewEnvironment(Context context, ModuleEnvironment environment) {
         cheapAssetManagerUpdate(context, environment);
+        ComponentLibrary library = new ComponentLibrary(context);
+        context.put(ComponentLibrary.class, library);
+
+        registerComponents(library, environment);
     }
 
-    public void handleSwitchBackFromPreviewEnivronment(Context context) {
+    public void handleSwitchBackFromPreviewEnvironment(Context context) {
+        // The newly created ComponentLibrary instance cannot be invalidated in context
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         cheapAssetManagerUpdate(context, environment);
     }
@@ -147,7 +152,7 @@ public final class EnvironmentSwitchHandler {
     private void unregisterPrefabFormats(ModuleAwareAssetTypeManager assetTypeManager) {
         if (registeredPrefabFormat != null) {
             assetTypeManager.removeCoreFormat(Prefab.class, registeredPrefabFormat);
-            registeredPrefabFormat =null;
+            registeredPrefabFormat = null;
         }
         if (registeredPrefabDeltaFormat != null) {
             assetTypeManager.removeCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
