@@ -1,0 +1,7 @@
+{
+    "engine:mainMenuScreen#singleplayer#text": "Singleplayer",
+    "engine:mainMenuScreen#multiplayer#text": "Hostuj Grę",
+    "engine:mainMenuScreen#join#text": "Dołącz do Gry",
+    "engine:mainMenuScreen#settings#text": "Ustawienia",
+    "engine:mainMenuScreen#exit#text": "wyjście"
+}
