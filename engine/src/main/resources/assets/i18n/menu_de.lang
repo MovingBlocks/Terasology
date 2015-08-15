@@ -1,0 +1,9 @@
+
+{
+    "engine:mainMenuScreen#singleplayer#text": "Einzelspieler",
+    "engine:mainMenuScreen#multiplayer#text": "Onlinespiel erstellen",
+    "engine:mainMenuScreen#join#text": "Spiel beitreten",
+    "engine:mainMenuScreen#settings#text": "Einstellungen",
+    "engine:mainMenuScreen#exit#text": "Beenden"
+}
+
