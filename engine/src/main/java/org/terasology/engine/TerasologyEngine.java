@@ -47,13 +47,14 @@ import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.game.Game;
+import org.terasology.i18n.assets.I18n;
+import org.terasology.i18n.assets.I18nData;
+import org.terasology.i18n.assets.I18nImpl;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -76,8 +77,6 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
-
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -315,6 +314,8 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.registerCoreAssetType(I18n.class,
+                (AssetFactory<I18n, I18nData>) I18nImpl::new, false, "i18n");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);
