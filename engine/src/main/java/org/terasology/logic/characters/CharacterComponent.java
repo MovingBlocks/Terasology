@@ -33,6 +33,10 @@ import org.terasology.network.Replicate;
  * @author Immortius
  */
 public final class CharacterComponent implements Component {
+    /**
+     * Recommended height from center at which name tags should be placed if there is one.
+     */
+    public float nameTagOffset = 0.8f;
     public float eyeOffset = 0.6f;
     /**
      * Specifies the maximium range at which this character is able to interact with other objects.
