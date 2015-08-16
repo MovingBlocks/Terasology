@@ -16,11 +16,12 @@
 
 package org.terasology.i18n;
 
+import java.util.Locale;
+
 import org.terasology.i18n.assets.Translation;
 
 /**
  * TODO Type description
- * @author Martin Steiger
  */
 public interface TranslationProject {
 
@@ -29,4 +30,5 @@ public interface TranslationProject {
      */
     void add(Translation trans);
 
+    String translate(String screenId, String widgetId, String fragment, Locale locale);
 }

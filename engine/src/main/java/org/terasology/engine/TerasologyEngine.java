@@ -47,9 +47,11 @@ import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.i18n.assets.I18n;
-import org.terasology.i18n.assets.I18nData;
-import org.terasology.i18n.assets.I18nImpl;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.i18n.TranslationSystemImpl;
+import org.terasology.i18n.assets.Translation;
+import org.terasology.i18n.assets.TranslationData;
+import org.terasology.i18n.assets.TranslationImpl;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
@@ -186,10 +188,14 @@ public class TerasologyEngine implements GameEngine {
 
             changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
             initAssets();
+
             EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
             rootContext.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
             environmentSwitcher.handleSwitchToGameEnvironment(rootContext);
+
+            // TODO: find the right place to put this
+            rootContext.put(TranslationSystem.class, new TranslationSystemImpl(rootContext));
 
             postInitSubsystems();
 
@@ -314,8 +320,8 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
-        assetTypeManager.registerCoreAssetType(I18n.class,
-                (AssetFactory<I18n, I18nData>) I18nImpl::new, false, "i18n");
+        assetTypeManager.registerCoreAssetType(Translation.class,
+                (AssetFactory<Translation, TranslationData>) TranslationImpl::new, false, "i18n");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);

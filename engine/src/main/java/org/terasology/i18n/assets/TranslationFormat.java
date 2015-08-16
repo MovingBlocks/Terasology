@@ -20,6 +20,7 @@ import com.google.common.base.Charsets;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidAssetFilenameException;
@@ -48,7 +49,7 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
      */
     public static final String LANGDATA_EXT = ".lang";
 
-    private static final Pattern FILENAME_PATTERN = Pattern.compile("(.*)(_)([\\w]{2}).lang");
+    private static final Pattern FILENAME_PATTERN = Pattern.compile("([^_]+)_?([\\w-]+)?.lang");
 
 
     private static final TypeToken<Map<String, String>> MAP_TOKEN = new TypeToken<Map<String, String>>() {
@@ -89,6 +90,8 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         try (InputStreamReader isr = new InputStreamReader(file.openStream(), Charsets.UTF_8)) {
             Map<String, String> entry = gson.fromJson(isr, MAP_TOKEN.getType());
             data.addAll(entry);
+        } catch (JsonParseException e) {
+            throw new IOException("Could not parse file '" + file + "'", e);
         }
 
         return data;
@@ -104,8 +107,8 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
 
     private Locale localeFromFilename(String filename) {
         Matcher m = FILENAME_PATTERN.matcher(filename);
-        if (m.matches()) {
-            return Locale.forLanguageTag(m.group(3));
+        if (m.matches() && m.group(2) != null) {
+            return Locale.forLanguageTag(m.group(2));
         }
         return Locale.ROOT;
     }

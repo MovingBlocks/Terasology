@@ -37,4 +37,12 @@ public class StandardTranslationProject implements TranslationProject {
             table.put(entry.getKey(), trans.getLocale(), entry.getValue());
         }
     }
+
+    @Override
+    public String translate(String screenId, String widgetId, String fragment, Locale locale) {
+        String key = screenId + "#" + widgetId + "#" + fragment;
+        I18nMap mappedId = new I18nMap(table.row(key));
+        String value = mappedId.valueFor(locale);
+        return value;
+    }
 }
