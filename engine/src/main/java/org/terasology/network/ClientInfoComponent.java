@@ -17,6 +17,7 @@
 package org.terasology.network;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * The component that marks an entity as being a Client Info Entity.
@@ -34,4 +35,10 @@ public final class ClientInfoComponent implements Component {
      */
     @NoReplicate
     public String playerId;
+
+    /**
+     * Set to the client entity if it is connected, otherwise it is EntityRef.NULL.
+     */
+    @Replicate
+    public EntityRef client = EntityRef.NULL;
 }
