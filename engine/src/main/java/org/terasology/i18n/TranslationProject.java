@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.i18n.assets;
+package org.terasology.i18n;
 
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.i18n.assets.Translation;
 
 /**
  * TODO Type description
+ * @author Martin Steiger
  */
-@RegisterSystem
-public class I18nSystem {
+public interface TranslationProject {
 
-    String translate(SimpleUri uri, String id) {
-        return id;
+    /**
+     * @param trans
+     */
+    void add(Translation trans);
 
-    }
 }

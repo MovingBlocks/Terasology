@@ -41,12 +41,15 @@ import java.util.regex.Pattern;
  * TODO: describe
  */
 @RegisterAssetFileFormat
-public class I18nFormat implements AssetFileFormat<I18nData> {
+public class TranslationFormat implements AssetFileFormat<TranslationData> {
 
     /**
      * The extension of translation files
      */
     public static final String LANGDATA_EXT = ".lang";
+
+    private static final Pattern FILENAME_PATTERN = Pattern.compile("(.*)(_)([\\w]{2}).lang");
+
 
     private static final TypeToken<Map<String, String>> MAP_TOKEN = new TypeToken<Map<String, String>>() {
         private static final long serialVersionUID = -2255189133660408141L;
@@ -71,16 +74,17 @@ public class I18nFormat implements AssetFileFormat<I18nData> {
     }
 
     @Override
-    public I18nData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
+    public TranslationData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
 
         if (inputs.size() != 1) {
-            throw new IOException("Failed to load i18n data'" + urn + "'");
+            throw new IOException("Failed to load translation data '" + urn + "'");
         }
 
         AssetDataFile file = inputs.get(0);
 
         Locale locale = localeFromFilename(file.getFilename());
-        I18nData data = new I18nData(locale);
+        Name name = basenameFromFilename(file.getFilename());
+        TranslationData data = new TranslationData(name, locale);
 
         try (InputStreamReader isr = new InputStreamReader(file.openStream(), Charsets.UTF_8)) {
             Map<String, String> entry = gson.fromJson(isr, MAP_TOKEN.getType());
@@ -90,11 +94,18 @@ public class I18nFormat implements AssetFileFormat<I18nData> {
         return data;
     }
 
-    private Locale localeFromFilename(String filename) {
-        Pattern p = Pattern.compile("(.*)(_[\\w]{2}).lang");
-        Matcher m = p.matcher(filename);
+    private Name basenameFromFilename(String filename) {
+        Matcher m = FILENAME_PATTERN.matcher(filename);
         if (m.matches()) {
-            return Locale.forLanguageTag(m.group(2));
+            return new Name(m.group(1));
+        }
+        return null;
+    }
+
+    private Locale localeFromFilename(String filename) {
+        Matcher m = FILENAME_PATTERN.matcher(filename);
+        if (m.matches()) {
+            return Locale.forLanguageTag(m.group(3));
         }
         return Locale.ROOT;
     }

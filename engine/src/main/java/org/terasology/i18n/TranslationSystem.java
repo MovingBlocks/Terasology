@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.i18n.assets;
+package org.terasology.i18n;
 
-import java.util.Locale;
-
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.naming.Name;
 
 /**
  * TODO Type description
  */
-public abstract class I18n extends Asset<I18nData> {
+public interface TranslationSystem {
 
-    protected I18n(ResourceUrn urn, AssetType<?, I18nData> assetType) {
-        super(urn, assetType);
-    }
-
-    public String translate(String id, String string, Locale german) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    /**
+     * @param name
+     * @return the project or <code>null</code>.
+     */
+    TranslationProject getProject(Name name);
 }

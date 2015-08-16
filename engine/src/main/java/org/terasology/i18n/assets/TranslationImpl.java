@@ -15,17 +15,21 @@
  */
 package org.terasology.i18n.assets;
 
+import java.util.Locale;
+import java.util.Map;
+
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.naming.Name;
 
 /**
  * TODO: describe
  */
-public final class I18nImpl extends I18n {
+public final class TranslationImpl extends Translation {
 
-    protected I18nData data;
+    protected TranslationData data;
 
-    public I18nImpl(ResourceUrn urn, AssetType<?, I18nData> assetType, I18nData data) {
+    public TranslationImpl(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data) {
         super(urn, assetType);
         reload(data);
     }
@@ -41,7 +45,22 @@ public final class I18nImpl extends I18n {
     }
 
     @Override
-    protected void doReload(I18nData newData) {
+    protected void doReload(TranslationData newData) {
         this.data = newData;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return data.getLocale();
+    }
+
+    @Override
+    public Name getName() {
+        return data.getName();
+    }
+
+    @Override
+    public Map<String, String> getTranslations() {
+        return data.getTranslations();
     }
 }

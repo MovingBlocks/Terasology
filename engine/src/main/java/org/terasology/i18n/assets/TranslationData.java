@@ -15,25 +15,53 @@
  */
 package org.terasology.i18n.assets;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
 import org.terasology.assets.AssetData;
+import org.terasology.naming.Name;
+
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 
 /**
  * TODO: describe
  */
-public class I18nData implements AssetData {
+public class TranslationData implements AssetData {
 
     private final Map<String, String> map = new HashMap<>();
     private final Locale locale;
+    private final Name name;
 
-    public I18nData(Locale locale) {
+    /**
+     * @param name the base name of the data set, never <code>null</code>.
+     * @param locale the locale of the data set, never <code>null</code>.
+     */
+    public TranslationData(Name name, Locale locale) {
+        Preconditions.checkArgument(name != null);
+        Preconditions.checkArgument(locale != null);
+
+        this.name = name;
         this.locale = locale;
     }
 
+    /**
+     * Existing entries will be overwritten.
+     * @param entries the entries to add
+     */
     public void addAll(Map<String, String> entries) {
         map.putAll(entries);
+    }
+
+    public Map<String, String> getTranslations() {
+        return Collections.unmodifiableMap(map);
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public Name getName() {
+        return name;
     }
 }
