@@ -16,6 +16,8 @@
 
 package org.terasology.i18n;
 
+import java.util.Locale;
+
 import org.terasology.naming.Name;
 
 /**
@@ -28,4 +30,11 @@ public interface TranslationSystem {
      * @return the project or <code>null</code>.
      */
     TranslationProject getProject(Name name);
+
+    /**
+     * @param locale
+     */
+    void setLocale(Locale locale);
+
+    Locale getLocale();
 }

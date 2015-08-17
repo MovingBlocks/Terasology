@@ -30,5 +30,15 @@ public interface TranslationProject {
      */
     void add(Translation trans);
 
-    String translate(String screenId, String widgetId, String fragment, Locale locale);
+    String translate(String screenId, String widgetId, String fragment);
+
+    /**
+     * @return
+     */
+    Locale getLocale();
+
+    /**
+     * @param locale
+     */
+    void setLocale(Locale locale);
 }

@@ -30,6 +30,11 @@ import com.google.common.collect.Table;
 public class StandardTranslationProject implements TranslationProject {
 
     private final Table<String, Locale, String> table = HashBasedTable.create();
+    private Locale locale;
+
+    public StandardTranslationProject(Locale locale) {
+        setLocale(locale);
+    }
 
     @Override
     public void add(Translation trans) {
@@ -39,10 +44,20 @@ public class StandardTranslationProject implements TranslationProject {
     }
 
     @Override
-    public String translate(String screenId, String widgetId, String fragment, Locale locale) {
+    public String translate(String screenId, String widgetId, String fragment) {
         String key = screenId + "#" + widgetId + "#" + fragment;
         I18nMap mappedId = new I18nMap(table.row(key));
         String value = mappedId.valueFor(locale);
         return value;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return locale;
+    }
+
+    @Override
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 }

@@ -17,6 +17,7 @@
 package org.terasology.i18n;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -39,7 +40,11 @@ public class TranslationSystemImpl implements TranslationSystem {
     private final AssetManager assetManager;
     private final Map<Name, TranslationProject> projects = new HashMap<>();
 
+    private Locale locale;
+
     public TranslationSystemImpl(Context context) {
+
+        locale = Locale.getDefault(Locale.Category.DISPLAY);
         assetManager = context.get(AssetManager.class);
 
         Set<ResourceUrn> urns = assetManager.getAvailableAssets(Translation.class);
@@ -48,7 +53,7 @@ public class TranslationSystemImpl implements TranslationSystem {
             if (asset.isPresent()) {
                 Translation trans = asset.get();
                 Name name = trans.getName();
-                TranslationProject proj = projects.computeIfAbsent(name, e -> new StandardTranslationProject());
+                TranslationProject proj = projects.computeIfAbsent(name, e -> new StandardTranslationProject(locale));
                 proj.add(trans);
                 logger.info("Discovered " + trans);
             }
@@ -58,5 +63,18 @@ public class TranslationSystemImpl implements TranslationSystem {
     @Override
     public TranslationProject getProject(Name name) {
         return projects.get(name);
+    }
+
+    @Override
+    public Locale getLocale() {
+        return locale;
+    }
+
+    @Override
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+        for (TranslationProject project : projects.values()) {
+            project.setLocale(locale);
+        }
     }
 }
