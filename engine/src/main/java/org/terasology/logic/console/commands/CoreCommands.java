@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commands;
 
-import com.google.api.client.util.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.GameEngine;
@@ -32,6 +31,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
@@ -70,6 +70,7 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -120,6 +121,8 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
+    @In
+    private TranslationSystem translationSystem;
 
     private PickupBuilder pickupBuilder;
 
@@ -192,6 +195,14 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Alter the rate of time")
     public void setTimeDilation(@CommandParam("dilation") float rate) {
         time.setGameTimeDilation(rate);
+    }
+
+    @Command(shortDescription = "Changes the UI language")
+    public String setLanguage(@CommandParam("language-tag") String langTag) {
+        Locale locale = Locale.forLanguageTag(langTag);
+        translationSystem.setLocale(locale);
+        // TODO: reload all open screens
+        return "Language set to " + locale.toString();
     }
 
     @Command(shortDescription = "Reloads a ui screen")

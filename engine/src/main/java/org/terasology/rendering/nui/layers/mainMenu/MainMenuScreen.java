@@ -16,21 +16,13 @@
 
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.util.Collection;
-import java.util.Locale;
-
 import org.terasology.engine.GameEngine;
-import org.terasology.i18n.TranslationProject;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 

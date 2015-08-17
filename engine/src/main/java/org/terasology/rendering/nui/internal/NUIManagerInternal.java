@@ -20,6 +20,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -31,6 +32,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
@@ -54,7 +56,9 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
+import org.terasology.rendering.nui.widgets.UIButton;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Optional;
@@ -553,7 +557,28 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private void prepare(ControlWidget screen) {
         InjectionHelper.inject(screen);
+        updateTranslations(screen);
         screen.onOpened();
+    }
+
+    private void updateTranslations(ControlWidget screen) {
+        TranslationSystem system = context.get(TranslationSystem.class);
+        Collection<UIButton> buttons = screen.findAll(UIButton.class);
+
+        for (UIButton button : buttons) {
+            String i18nId = extractId(button.getText());
+            if (i18nId != null) {
+                String i18nText = system.translate(i18nId);
+                button.setText(i18nText);
+            }
+        }
+    }
+
+    private static String extractId(String text) {
+        if (text.startsWith("${") && text.endsWith("}")) {
+            return text.substring(2, text.length() - 1);
+        }
+        return null;
     }
 
 }

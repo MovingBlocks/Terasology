@@ -53,22 +53,22 @@
                     {
                         "type" : "UIButton",
                         "id" : "singleplayer",
-                        "text" : "Single Player"
+                        "text" : "${engine:menu#start-singleplayer-game}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "multiplayer",
-                        "text" : "Host Game"
+                        "text" : "${engine:menu#host-multiplayer-game}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "join",
-                        "text" : "Join Game"
+                        "text" : "${engine:menu#join-game-online}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "settings",
-                        "text" : "Settings"
+                        "text" : "${engine:menu#game-settings}"
                     },
                     {
                         "type" : "UIButton",
@@ -82,7 +82,7 @@
                     {
                         "type" : "UIButton",
                         "id" : "exit",
-                        "text" : "Exit"
+                        "text" : "${engine:menu#exit-game}"
                     }
                 ]
             }

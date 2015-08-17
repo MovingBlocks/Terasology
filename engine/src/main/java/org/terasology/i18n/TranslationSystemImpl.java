@@ -81,10 +81,14 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     @Override
     public String translate(String id) {
-        String[] parts = id.split("#"); // TODO: split at first only
-        if (parts.length == 2) {
-            TranslationProject project = getProject(new SimpleUri(parts[0]));
-            return project.translate(parts[1]);
+        int splitPoint = id.indexOf('#');
+        if (splitPoint > 0) {
+            String projName = id.substring(0, splitPoint);
+            String fragment = id.substring(splitPoint + 1);
+            TranslationProject project = getProject(new SimpleUri(projName));
+            if (project != null) {
+                return project.translate(fragment);
+            }
         }
         return null;
     }
