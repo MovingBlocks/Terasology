@@ -27,6 +27,7 @@ import org.terasology.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.format.AssetFileFormat;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 
 import java.io.IOException;
@@ -84,8 +85,9 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         AssetDataFile file = inputs.get(0);
 
         Locale locale = localeFromFilename(file.getFilename());
-        Name name = basenameFromFilename(file.getFilename());
-        TranslationData data = new TranslationData(name, locale);
+        Name projName = basenameFromFilename(file.getFilename());
+        SimpleUri projUri = new SimpleUri(urn.getModuleName(), projName);
+        TranslationData data = new TranslationData(projUri, locale);
 
         try (InputStreamReader isr = new InputStreamReader(file.openStream(), Charsets.UTF_8)) {
             Map<String, String> entry = gson.fromJson(isr, MAP_TOKEN.getType());

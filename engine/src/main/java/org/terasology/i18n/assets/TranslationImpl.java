@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.naming.Name;
+import org.terasology.engine.Uri;
 
 /**
  * TODO: describe
@@ -55,8 +55,8 @@ public final class TranslationImpl extends Translation {
     }
 
     @Override
-    public Name getName() {
-        return data.getName();
+    public Uri getProjectUri() {
+        return data.getProjectUri();
     }
 
     @Override

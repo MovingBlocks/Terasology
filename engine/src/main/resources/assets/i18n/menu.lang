@@ -1,9 +1,8 @@
-
 {
-  "engine:mainMenuScreen#singleplayer#text": "start-singleplayer-game",
-  "engine:mainMenuScreen#multiplayer#text": "host-multiplayer-game",
-  "engine:mainMenuScreen#join#text": "join-game-online",
-  "engine:mainMenuScreen#settings#text": "game-settings",
-  "engine:mainMenuScreen#exit#text": "exit-game"
+    "start-singleplayer-game": "start-singleplayer-game",
+    "host-multiplayer-game": "host-multiplayer-game",
+    "join-game-online": "join-game-online",
+    "game-settings": "game-settings",
+    "exit-game": "exit-game"
 }
 

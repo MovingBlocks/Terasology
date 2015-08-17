@@ -34,6 +34,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.format.FileFormat;
+import org.terasology.engine.SimpleUri;
 import org.terasology.i18n.assets.TranslationData;
 import org.terasology.i18n.assets.TranslationFormat;
 import org.terasology.naming.Name;
@@ -72,7 +73,7 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        Assert.assertEquals(new Name("menu"), data.getName());
+        Assert.assertEquals(new SimpleUri("engine:menu"), data.getProjectUri());
         Assert.assertEquals(Locale.ROOT, data.getLocale());
     }
 
@@ -82,7 +83,6 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        Assert.assertEquals(new Name("menu"), data.getName());
         Assert.assertEquals(Locale.GERMANY, data.getLocale());
         Assert.assertTrue(data.getTranslations().isEmpty());
     }

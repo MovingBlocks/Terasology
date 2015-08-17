@@ -44,8 +44,7 @@ public class StandardTranslationProject implements TranslationProject {
     }
 
     @Override
-    public String translate(String screenId, String widgetId, String fragment) {
-        String key = screenId + "#" + widgetId + "#" + fragment;
+    public String translate(String key) {
         I18nMap mappedId = new I18nMap(table.row(key));
         String value = mappedId.valueFor(locale);
         return value;

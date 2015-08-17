@@ -27,8 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.Uri;
 import org.terasology.i18n.assets.Translation;
-import org.terasology.naming.Name;
 
 /**
  * TODO Type description
@@ -38,7 +39,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     private static final Logger logger = LoggerFactory.getLogger(TranslationSystemImpl.class);
 
     private final AssetManager assetManager;
-    private final Map<Name, TranslationProject> projects = new HashMap<>();
+    private final Map<Uri, TranslationProject> projects = new HashMap<>();
 
     private Locale locale;
 
@@ -52,8 +53,8 @@ public class TranslationSystemImpl implements TranslationSystem {
             Optional<Translation> asset = assetManager.getAsset(urn, Translation.class);
             if (asset.isPresent()) {
                 Translation trans = asset.get();
-                Name name = trans.getName();
-                TranslationProject proj = projects.computeIfAbsent(name, e -> new StandardTranslationProject(locale));
+                Uri uri = trans.getProjectUri();
+                TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject(locale));
                 proj.add(trans);
                 logger.info("Discovered " + trans);
             }
@@ -61,7 +62,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     @Override
-    public TranslationProject getProject(Name name) {
+    public TranslationProject getProject(Uri name) {
         return projects.get(name);
     }
 
@@ -76,5 +77,15 @@ public class TranslationSystemImpl implements TranslationSystem {
         for (TranslationProject project : projects.values()) {
             project.setLocale(locale);
         }
+    }
+
+    @Override
+    public String translate(String id) {
+        String[] parts = id.split("#"); // TODO: split at first only
+        if (parts.length == 2) {
+            TranslationProject project = getProject(new SimpleUri(parts[0]));
+            return project.translate(parts[1]);
+        }
+        return null;
     }
 }

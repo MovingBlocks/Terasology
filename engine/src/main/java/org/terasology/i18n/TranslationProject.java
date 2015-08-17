@@ -30,7 +30,7 @@ public interface TranslationProject {
      */
     void add(Translation trans);
 
-    String translate(String screenId, String widgetId, String fragment);
+    String translate(String key);
 
     /**
      * @return

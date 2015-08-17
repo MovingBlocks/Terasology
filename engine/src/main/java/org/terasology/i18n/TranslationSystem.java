@@ -18,7 +18,7 @@ package org.terasology.i18n;
 
 import java.util.Locale;
 
-import org.terasology.naming.Name;
+import org.terasology.engine.Uri;
 
 /**
  * TODO Type description
@@ -29,7 +29,9 @@ public interface TranslationSystem {
      * @param name
      * @return the project or <code>null</code>.
      */
-    TranslationProject getProject(Name name);
+    TranslationProject getProject(Uri name);
+
+    String translate(String id);
 
     /**
      * @param locale

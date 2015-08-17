@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.terasology.assets.AssetData;
-import org.terasology.naming.Name;
+import org.terasology.engine.Uri;
 
 import com.google.common.base.Preconditions;
 
@@ -33,17 +33,17 @@ public class TranslationData implements AssetData {
 
     private final Map<String, String> map = new HashMap<>();
     private final Locale locale;
-    private final Name name;
+    private final Uri uri;
 
     /**
-     * @param name the base name of the data set, never <code>null</code>.
+     * @param uri the id of the data set, never <code>null</code>.
      * @param locale the locale of the data set, never <code>null</code>.
      */
-    public TranslationData(Name name, Locale locale) {
-        Preconditions.checkArgument(name != null);
+    public TranslationData(Uri uri, Locale locale) {
+        Preconditions.checkArgument(uri != null);
         Preconditions.checkArgument(locale != null);
 
-        this.name = name;
+        this.uri = uri;
         this.locale = locale;
     }
 
@@ -63,7 +63,7 @@ public class TranslationData implements AssetData {
         return locale;
     }
 
-    public Name getName() {
-        return name;
+    public Uri getProjectUri() {
+        return uri;
     }
 }

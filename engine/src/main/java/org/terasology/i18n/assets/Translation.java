@@ -18,10 +18,11 @@ package org.terasology.i18n.assets;
 
 import java.util.Locale;
 import java.util.Map;
+
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.naming.Name;
+import org.terasology.engine.Uri;
 
 /**
  * TODO Type description
@@ -32,7 +33,7 @@ public abstract class Translation extends Asset<TranslationData> {
         super(urn, assetType);
     }
 
-    public abstract Name getName();
+    public abstract Uri getProjectUri();
 
     public abstract Locale getLocale();
 
