@@ -16,7 +16,9 @@
 
 package org.terasology.i18n;
 
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.terasology.i18n.assets.Translation;
@@ -30,11 +32,6 @@ import com.google.common.collect.Table;
 public class StandardTranslationProject implements TranslationProject {
 
     private final Table<String, Locale, String> table = HashBasedTable.create();
-    private Locale locale;
-
-    public StandardTranslationProject(Locale locale) {
-        setLocale(locale);
-    }
 
     @Override
     public void add(Translation trans) {
@@ -44,19 +41,14 @@ public class StandardTranslationProject implements TranslationProject {
     }
 
     @Override
-    public String translate(String key) {
+    public String translate(String key, Locale locale) {
         I18nMap mappedId = new I18nMap(table.row(key));
         String value = mappedId.valueFor(locale);
         return value;
     }
 
     @Override
-    public Locale getLocale() {
-        return locale;
-    }
-
-    @Override
-    public void setLocale(Locale locale) {
-        this.locale = locale;
+    public Set<Locale> getAvailableLocales() {
+        return Collections.unmodifiableSet(table.columnKeySet());
     }
 }

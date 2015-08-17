@@ -17,11 +17,16 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.i18n.TranslationProject;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -36,7 +41,11 @@ import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import javax.imageio.ImageIO;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Immortius
@@ -56,6 +65,9 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @In
     private LocalPlayer localPlayer;
 
+    @In
+    private Context context;
+
     public VideoSettingsScreen() {
     }
 
@@ -66,6 +78,17 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         if (videoQuality != null) {
             videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
+        }
+
+        UIDropdown<Locale> language = find("language", UIDropdown.class);
+        if (language != null) {
+            TranslationSystem translationSystem = context.get(TranslationSystem.class);
+            SimpleUri menuUri = new SimpleUri("engine:menu");
+            TranslationProject menuProject = translationSystem.getProject(menuUri);
+            List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
+            language.setOptions(Lists.newArrayList(locales));
+            language.setOptionRenderer(new LocaleRenderer(context));
+            language.bindSelection(new LocaleBinding(context, config.getSystem()));
         }
 
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);

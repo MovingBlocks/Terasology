@@ -17,6 +17,7 @@
 package org.terasology.i18n;
 
 import java.util.Locale;
+import java.util.Set;
 
 import org.terasology.i18n.assets.Translation;
 
@@ -30,15 +31,10 @@ public interface TranslationProject {
      */
     void add(Translation trans);
 
-    String translate(String key);
+    String translate(String key, Locale locale);
 
     /**
      * @return
      */
-    Locale getLocale();
-
-    /**
-     * @param locale
-     */
-    void setLocale(Locale locale);
+    Set<Locale> getAvailableLocales();
 }

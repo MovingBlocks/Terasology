@@ -53,7 +53,7 @@
                     {
                         "type" : "UIButton",
                         "id" : "player",
-                        "text" : "Player"
+                        "text" : "${engine:menu#player-settings}"
                     },
                     {
                         "type" : "UISpace",
@@ -62,17 +62,17 @@
                     {
                         "type" : "UIButton",
                         "id" : "video",
-                        "text" : "Video"
+                        "text" : "${engine:menu#video-settings}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "audio",
-                        "text" : "Audio"
+                        "text" : "${engine:menu#audio-settings}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "input",
-                        "text" : "Input"
+                        "text" : "${engine:menu#input-settings}"
                     },
                     {
                         "type" : "UISpace",
@@ -81,7 +81,7 @@
                     {
                         "type" : "UIButton",
                         "id" : "close",
-                        "text" : "Back"
+                        "text" : "${engine:menu#back}"
                     }
                 ]
             }

@@ -1,7 +1,12 @@
 {
+    "this-language-native": "English",
+    "this-language-English": "English",
+
     "start-singleplayer-game": "Singleplayer",
     "host-multiplayer-game": "Host Game",
     "join-game-online": "Join Game",
     "game-settings": "Settings",
-    "exit-game": "Exit"
+    "exit-game": "Exit",
+
+    "language": "Language"
 }

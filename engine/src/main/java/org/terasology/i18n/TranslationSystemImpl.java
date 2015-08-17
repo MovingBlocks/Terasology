@@ -54,7 +54,7 @@ public class TranslationSystemImpl implements TranslationSystem {
             if (asset.isPresent()) {
                 Translation trans = asset.get();
                 Uri uri = trans.getProjectUri();
-                TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject(locale));
+                TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
                 proj.add(trans);
                 logger.info("Discovered " + trans);
             }
@@ -74,20 +74,22 @@ public class TranslationSystemImpl implements TranslationSystem {
     @Override
     public void setLocale(Locale locale) {
         this.locale = locale;
-        for (TranslationProject project : projects.values()) {
-            project.setLocale(locale);
-        }
     }
 
     @Override
     public String translate(String id) {
+        return translate(id, locale);
+    }
+
+    @Override
+    public String translate(String id, Locale otherLocale) {
         int splitPoint = id.indexOf('#');
         if (splitPoint > 0) {
             String projName = id.substring(0, splitPoint);
             String fragment = id.substring(splitPoint + 1);
             TranslationProject project = getProject(new SimpleUri(projName));
             if (project != null) {
-                return project.translate(fragment);
+                return project.translate(fragment, otherLocale);
             }
         }
         return null;

@@ -31,7 +31,18 @@ public interface TranslationSystem {
      */
     TranslationProject getProject(Uri name);
 
+    /**
+     * @param id must match the pattern <code>${module:project#id}</code>
+     * @return
+     */
     String translate(String id);
+
+    /**
+     * @param string
+     * @param locale
+     * @return
+     */
+    String translate(String string, Locale locale);
 
     /**
      * @param locale

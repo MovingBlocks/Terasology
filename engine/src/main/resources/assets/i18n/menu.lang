@@ -1,4 +1,6 @@
 {
+    "this-language-native": "this-language-native",
+    "this-language-English": "this-language-English",
     "start-singleplayer-game": "start-singleplayer-game",
     "host-multiplayer-game": "host-multiplayer-game",
     "join-game-online": "join-game-online",

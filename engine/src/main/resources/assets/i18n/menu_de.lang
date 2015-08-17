@@ -1,8 +1,19 @@
 {
+    "this-language-native": "Deutsch",
+    "this-language-English": "German",
+
     "start-singleplayer-game": "Einzelspieler",
     "host-multiplayer-game": "Onlinespiel erstellen",
     "join-game-online": "Spiel beitreten",
     "game-settings": "Einstellungen",
-    "exit-game": "Beenden"
+    "exit-game": "Beenden",
+
+    "back": "Zurück",
+    "player-settings": "Spieler",
+    "video-settings": "Grafik",
+    "audio-settings": "Ton",
+    "input-settings": "Eingabegeräte",
+
+    "language": "Sprache"
 }
 

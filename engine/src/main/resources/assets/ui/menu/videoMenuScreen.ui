@@ -100,6 +100,14 @@
                                 "id": "vsync"
                             },
                             {
+                                "type": "UILabel",
+                                "text": "${engine:menu#language}: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "language"
+                            },
+                            {
                                 "type": "UISpace",
                                 "size": [1, 13]
                             },
