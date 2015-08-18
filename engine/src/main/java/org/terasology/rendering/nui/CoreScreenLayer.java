@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -177,6 +178,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public Iterator<UIWidget> iterator() {
+        if (contents == null) {
+            return Collections.emptyIterator();
+        }
         return Arrays.asList(contents).iterator();
     }
 }
