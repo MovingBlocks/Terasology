@@ -200,9 +200,9 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Changes the UI language")
     public String setLanguage(@CommandParam("language-tag") String langTag) {
         Locale locale = Locale.forLanguageTag(langTag);
-        translationSystem.setLocale(locale);
-        // TODO: reload all open screens
-        return "Language set to " + locale.toString();
+        String nat = translationSystem.translate("engine:menu#this-language-native", locale);
+        String eng = translationSystem.translate("engine:menu#this-language-English", locale);
+        return String.format("Language set to %s (%s)", nat, eng);
     }
 
     @Command(shortDescription = "Reloads a ui screen")

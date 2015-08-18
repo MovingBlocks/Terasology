@@ -26,12 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Uri;
 import org.terasology.i18n.assets.Translation;
-
-import com.google.common.base.Preconditions;
 
 /**
  * TODO Type description
@@ -43,23 +43,15 @@ public class TranslationSystemImpl implements TranslationSystem {
     private final AssetManager assetManager;
     private final Map<Uri, TranslationProject> projects = new HashMap<>();
 
-    private Locale locale;
+    private final SystemConfig config;
 
     /**
      * @param context the context to use
      */
     public TranslationSystemImpl(Context context) {
-        this(context, Locale.getDefault(Locale.Category.DISPLAY));
-    }
-
-    /**
-     * @param context the context to use
-     * @param locale the default locale to use
-     */
-    public TranslationSystemImpl(Context context, Locale locale) {
 
         assetManager = context.get(AssetManager.class);
-        this.locale = locale;
+        config = context.get(Config.class).getSystem();
 
         Set<ResourceUrn> urns = assetManager.getAvailableAssets(Translation.class);
         for (ResourceUrn urn : urns) {
@@ -84,19 +76,8 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     @Override
-    public Locale getLocale() {
-        return locale;
-    }
-
-    @Override
-    public void setLocale(Locale locale) {
-        Preconditions.checkArgument(locale != null);
-        this.locale = locale;
-    }
-
-    @Override
     public String translate(String id) {
-        return translate(id, locale);
+        return translate(id, config.getLocale());
     }
 
     @Override

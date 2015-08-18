@@ -40,15 +40,23 @@ public class StandardTranslationProject implements TranslationProject {
     public String translate(String key, Locale locale) {
         String result = translateExact(key, locale);
         if (result == null && !locale.getVariant().isEmpty()) {
+            // try without variant
             Locale fallbackLocale = new Locale(locale.getLanguage(), locale.getCountry());
             result = translateExact(key, fallbackLocale);
         }
         if (result == null && !locale.getCountry().isEmpty()) {
+            // try without country
             Locale fallbackLocale = new Locale(locale.getLanguage());
             result = translateExact(key, fallbackLocale);
         }
         if (result == null) {
+            result = translateExact(key, Locale.ENGLISH);
+        }
+        if (result == null) {
             result = translateExact(key, Locale.ROOT);
+        }
+        if (result == null) {
+            return "<" + key + ">";
         }
         return result;
     }

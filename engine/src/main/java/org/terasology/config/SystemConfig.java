@@ -17,6 +17,7 @@
 package org.terasology.config;
 
 import java.util.Locale;
+import java.util.Locale.Category;
 
 /**
  * @author Immortius
@@ -31,7 +32,7 @@ public class SystemConfig {
     private boolean debugEnabled;
     private boolean monitoringEnabled;
     private boolean writeSaveGamesEnabled;
-    private Locale locale;
+    private String locale;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;
@@ -94,10 +95,13 @@ public class SystemConfig {
     }
 
     public Locale getLocale() {
-        return locale;
+        if (locale == null) {
+            setLocale(Locale.getDefault(Category.DISPLAY));
+        }
+        return Locale.forLanguageTag(locale);
     }
 
     public void setLocale(Locale locale) {
-        this.locale = locale;
+        this.locale = locale.toLanguageTag();
     }
 }

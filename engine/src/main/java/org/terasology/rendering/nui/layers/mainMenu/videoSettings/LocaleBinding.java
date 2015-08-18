@@ -19,7 +19,6 @@ import java.util.Locale;
 
 import org.terasology.config.SystemConfig;
 import org.terasology.context.Context;
-import org.terasology.i18n.TranslationSystem;
 import org.terasology.rendering.nui.databinding.Binding;
 
 /**
@@ -43,10 +42,6 @@ public class LocaleBinding implements Binding<Locale> {
     @Override
     public void set(Locale value) {
         config.setLocale(value);
-        TranslationSystem translationSystem = context.get(TranslationSystem.class);
-        if (translationSystem != null) {
-            translationSystem.setLocale(value);
-        }
         // TODO: reload open NUI screens
     }
 }

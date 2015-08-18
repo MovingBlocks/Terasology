@@ -45,14 +45,4 @@ public interface TranslationSystem {
      * @return the translated string
      */
     String translate(String id, Locale locale);
-
-    /**
-     * @param locale the new default locale to set.
-     */
-    void setLocale(Locale locale);
-
-    /**
-     * @return the currently used default locale
-     */
-    Locale getLocale();
 }
