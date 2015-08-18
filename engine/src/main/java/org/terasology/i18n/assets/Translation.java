@@ -17,7 +17,6 @@
 package org.terasology.i18n.assets;
 
 import java.util.Locale;
-import java.util.Map;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
@@ -44,7 +43,9 @@ public abstract class Translation extends Asset<TranslationData> {
     public abstract Locale getLocale();
 
     /**
-     * @return the translation data, possibly unmodifiable
+     * Retrieves the matching entry for the given key.
+     * @param id the id of the entry
+     * @return the translated string
      */
-    public abstract Map<String, String> getTranslations();
+    public abstract String lookup(String id);
 }

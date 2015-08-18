@@ -56,7 +56,7 @@ public class TranslationData implements AssetData {
     }
 
     /**
-     * @return an unmodifiable view on the translation data
+     * @return an unmodifiable view on the translation data, never <code>null</code>.
      */
     public Map<String, String> getTranslations() {
         return Collections.unmodifiableMap(map);

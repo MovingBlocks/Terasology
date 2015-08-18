@@ -28,6 +28,7 @@ import org.terasology.i18n.assets.Translation;
 public interface TranslationProject {
 
     /**
+     * Adds a translation asset. If an assets for a given locale existed before it will be replaced with the new entry.
      * @param trans the translation to add.
      */
     void add(Translation trans);

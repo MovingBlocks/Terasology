@@ -31,6 +31,8 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Uri;
 import org.terasology.i18n.assets.Translation;
 
+import com.google.common.base.Preconditions;
+
 /**
  * TODO Type description
  */
@@ -88,6 +90,7 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     @Override
     public void setLocale(Locale locale) {
+        Preconditions.checkArgument(locale != null);
         this.locale = locale;
     }
 

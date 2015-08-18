@@ -17,38 +17,52 @@
 package org.terasology.i18n;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.terasology.i18n.assets.Translation;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-
 /**
- * TODO Type description
+ * Performs textual translations based on a set of {@link Translation} instances.
  */
 public class StandardTranslationProject implements TranslationProject {
 
-    private final Table<String, Locale, String> table = HashBasedTable.create();
+    private final Map<Locale, Translation> translations = new HashMap<>();
 
     @Override
     public void add(Translation trans) {
-        for (Entry<String, String> entry : trans.getTranslations().entrySet()) {
-            table.put(entry.getKey(), trans.getLocale(), entry.getValue());
-        }
+        translations.put(trans.getLocale(), trans);
     }
 
     @Override
     public String translate(String key, Locale locale) {
-        I18nMap mappedId = new I18nMap(table.row(key));
-        String value = mappedId.valueFor(locale);
-        return value;
+        String result = translateExact(key, locale);
+        if (result == null && !locale.getVariant().isEmpty()) {
+            Locale fallbackLocale = new Locale(locale.getLanguage(), locale.getCountry());
+            result = translateExact(key, fallbackLocale);
+        }
+        if (result == null && !locale.getCountry().isEmpty()) {
+            Locale fallbackLocale = new Locale(locale.getLanguage());
+            result = translateExact(key, fallbackLocale);
+        }
+        if (result == null) {
+            result = translateExact(key, Locale.ROOT);
+        }
+        return result;
     }
 
     @Override
     public Set<Locale> getAvailableLocales() {
-        return Collections.unmodifiableSet(table.columnKeySet());
+        return Collections.unmodifiableSet(translations.keySet());
+    }
+
+    private String translateExact(String key, Locale locale) {
+        Translation trans = translations.get(locale);
+        if (trans != null) {
+            return trans.lookup(key);
+        }
+        return null;
     }
 }

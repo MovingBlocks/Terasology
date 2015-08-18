@@ -16,7 +16,6 @@
 package org.terasology.i18n.assets;
 
 import java.util.Locale;
-import java.util.Map;
 
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
@@ -69,7 +68,7 @@ public final class TranslationImpl extends Translation {
     }
 
     @Override
-    public Map<String, String> getTranslations() {
-        return data.getTranslations();  // already unmodifiable
+    public String lookup(String id) {
+        return data.getTranslations().get(id);
     }
 }
