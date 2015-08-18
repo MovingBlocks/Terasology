@@ -1,7 +1,7 @@
 {
-    "start-singleplayer-game": "start-singleplayer-game",
-    "host-multiplayer-game": "host-multiplayer-game",
-    "join-game-online": "join-game-online",
-    "game-settings": "game-settings",
-    "exit-game": "exit-game"
+    "exit-game": "Esci", 
+    "game-settings": "Opzioni", 
+    "host-multiplayer-game": "Ospita partita", 
+    "join-game-online": "Unisciti alla partita", 
+    "start-singleplayer-game": "Singleplayer"
 }
