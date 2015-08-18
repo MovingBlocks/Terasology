@@ -65,6 +65,10 @@ public class PlayerNameTagSystem extends BaseComponentSystem {
             logger.warn("Can't create player based name tag for character as owner has no client component");
             return;
         }
+        if (clientComponent.local) {
+            return; // the character belongs to the local player and does not need a name tag
+        }
+
         EntityRef clientInfoEntity = clientComponent.clientInfo;
 
         DisplayNameComponent displayNameComponent = clientInfoEntity.getComponent(DisplayNameComponent.class);
@@ -98,6 +102,22 @@ public class PlayerNameTagSystem extends BaseComponentSystem {
 
     }
 
+    /**
+     * The player entity may currently become "local" afterh the player has been activated.
+     *
+     * To address this issue the name tag component will be removed again when a client turns out to be local
+     * afterwards.
+     */
+    @ReceiveEvent
+    public void onClientComponentChange(OnChangedComponent event, EntityRef clientEntity,
+                                    ClientComponent clientComponent) {
+        if (clientComponent.local) {
+            EntityRef character = clientComponent.character;
+            if (character.exists() && character.hasComponent(NameTagComponent.class)) {
+                character.removeComponent(NameTagComponent.class);
+            }
+        }
+    }
 
     @ReceiveEvent
     public void onDisplayNameChange(OnChangedComponent event, EntityRef clientInfoEntity,
@@ -125,8 +145,7 @@ public class PlayerNameTagSystem extends BaseComponentSystem {
 
         NameTagComponent nameTagComponent = characterEntity.getComponent(NameTagComponent.class);
         if (nameTagComponent == null) {
-            logger.warn("Tried to update the name tag component with a new player name but it was missing");
-
+            return; // local players don't have a name tag
         }
 
         nameTagComponent.text = displayNameComponent.name;
