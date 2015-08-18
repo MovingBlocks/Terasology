@@ -86,7 +86,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             SimpleUri menuUri = new SimpleUri("engine:menu");
             TranslationProject menuProject = translationSystem.getProject(menuUri);
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
-            locales.remove(Locale.ROOT);
             language.setOptions(Lists.newArrayList(locales));
             language.setOptionRenderer(new LocaleRenderer(context));
             language.bindSelection(new LocaleBinding(context, config.getSystem()));

@@ -1,10 +1,18 @@
 {
-    "this-language-native": "this-language-native",
-    "this-language-English": "this-language-English",
-    "start-singleplayer-game": "start-singleplayer-game",
-    "host-multiplayer-game": "host-multiplayer-game",
-    "join-game-online": "join-game-online",
-    "game-settings": "game-settings",
-    "exit-game": "exit-game"
-}
+    "this-language-native": "",
+    "this-language-English": "",
 
+    "start-singleplayer-game": "",
+    "host-multiplayer-game": "",
+    "join-game-online": "",
+    "game-settings": "",
+    "exit-game": "",
+
+    "back": "",
+    "player-settings": "",
+    "video-settings": "",
+    "audio-settings": "",
+    "input-settings": "",
+
+    "language": ""
+}

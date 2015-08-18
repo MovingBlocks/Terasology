@@ -100,4 +100,6 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void setForceReleasingMouse(boolean value);
 
+    void invalidate();
+
 }

@@ -8,5 +8,11 @@
     "game-settings": "Settings",
     "exit-game": "Exit",
 
+    "back": "Back",
+    "player-settings": "Player",
+    "video-settings": "Video",
+    "audio-settings": "Audio",
+    "input-settings": "Input",
+
     "language": "Language"
 }

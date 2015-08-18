@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -55,7 +56,9 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
+
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -550,6 +553,27 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
                 return;
             }
+        }
+    }
+
+    @Override
+    public void invalidate() {
+        AssetManager assetManager = context.get(AssetManager.class);
+        for (UIElement element : assetManager.getLoadedAssets(UIElement.class)) {
+            element.dispose();
+        }
+        Deque<ResourceUrn> reverseUrns = new LinkedList<>();
+        Map<UIScreenLayer, ResourceUrn> inverseLookup = screenLookup.inverse();
+        for (UIScreenLayer screen : screens) {
+            screen.onClosed();
+            reverseUrns.addFirst(inverseLookup.get(screen));
+        }
+
+        screens.clear();
+        screenLookup.clear();
+
+        for (ResourceUrn urn : reverseUrns) {
+            pushScreen(urn);
         }
     }
 

@@ -16,8 +16,8 @@
 
 package org.terasology.i18n;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -63,7 +63,9 @@ public class StandardTranslationProject implements TranslationProject {
 
     @Override
     public Set<Locale> getAvailableLocales() {
-        return Collections.unmodifiableSet(translations.keySet());
+        Set<Locale> result = new HashSet<Locale>(translations.keySet());
+        result.remove(Locale.ROOT);
+        return result;
     }
 
     private String translateExact(String key, Locale locale) {

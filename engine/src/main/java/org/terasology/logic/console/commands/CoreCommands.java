@@ -17,7 +17,9 @@ package org.terasology.logic.console.commands;
 
 import org.terasology.asset.Assets;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateLoading;
@@ -31,6 +33,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -124,6 +127,9 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private TranslationSystem translationSystem;
 
+    @In
+    private Config config;
+
     private PickupBuilder pickupBuilder;
 
     @Override
@@ -200,9 +206,16 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Changes the UI language")
     public String setLanguage(@CommandParam("language-tag") String langTag) {
         Locale locale = Locale.forLanguageTag(langTag);
-        String nat = translationSystem.translate("engine:menu#this-language-native", locale);
-        String eng = translationSystem.translate("engine:menu#this-language-English", locale);
-        return String.format("Language set to %s (%s)", nat, eng);
+        TranslationProject proj = translationSystem.getProject(new SimpleUri("engine:menu"));
+        if (proj.getAvailableLocales().contains(locale)) {
+            String nat = translationSystem.translate("engine:menu#this-language-native", locale);
+            String eng = translationSystem.translate("engine:menu#this-language-English", locale);
+            config.getSystem().setLocale(locale);
+            nuiManager.invalidate();
+            return String.format("Language set to %s (%s)", nat, eng);
+        } else {
+            return "Unrecognized locale! Try one of: " + proj.getAvailableLocales();
+        }
     }
 
     @Command(shortDescription = "Reloads a ui screen")
