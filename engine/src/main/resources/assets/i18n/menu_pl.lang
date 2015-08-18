@@ -1,7 +1,7 @@
 {
-    "start-singleplayer-game": "Singleplayer",
-    "host-multiplayer-game": "Hostuj Grę",
-    "join-game-online": "Dołącz do Gry",
-    "game-settings": "Ustawienia",
-    "exit-game": "Wyjście"
+    "exit-game": "Wyjście", 
+    "game-settings": "Ustawienia", 
+    "host-multiplayer-game": "Hostuj Grę", 
+    "join-game-online": "Dołączyć do gry", 
+    "start-singleplayer-game": "Singleplayer"
 }
