@@ -17,6 +17,7 @@ package org.terasology.core.world.generator.facetProviders;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.properties.OneOf.List;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
@@ -64,9 +66,16 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
 
     @Override
     public void initialize() {
-        logger.info("Reading height map..");
+        if (heightmap == null) {
+            reloadHeightmap();
+        }
+    }
 
-        Texture texture = Assets.getTexture(new ResourceUrn("core", configuration.heightMap)).get();
+    private void reloadHeightmap() {
+        logger.info("Reading height map '{}'", configuration.heightMap);
+
+        ResourceUrn urn = new ResourceUrn("core", configuration.heightMap);
+        Texture texture = Assets.getTexture(urn).get();
         ByteBuffer[] bb = texture.getData().getBuffers();
         IntBuffer intBuf = bb[0].asIntBuffer();
 
@@ -152,7 +161,12 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
 
     @Override
     public void setConfiguration(Component configuration) {
+        String prevHeightMap = this.configuration.heightMap;
         this.configuration = (HeightMapConfiguration) configuration;
+
+        if (!Objects.equals(prevHeightMap, this.configuration.heightMap)) {
+            reloadHeightmap();
+        }
     }
 
     private static class HeightMapConfiguration implements Component {
@@ -160,9 +174,7 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
         @Enum(description = "Wrap Mode")
         private WrapMode wrapMode = WrapMode.REPEAT;
 
-        // Changing the terrain asset after initialize() is not yet supported
-        // TODO: add notification system so that WorldGens can reload data when necessary
-//        @List(items = { "platec_heightmap", "opposing_islands" }, description = "Height Map")
+        @List(items = { "platec_heightmap", "opposing_islands" }, description = "Height Map")
         private String heightMap = "platec_heightmap";
 
         @Range(min = 0, max = 50f, increment = 1f, precision = 0, description = "Height Offset")

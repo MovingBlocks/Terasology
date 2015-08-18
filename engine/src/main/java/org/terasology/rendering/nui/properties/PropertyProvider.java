@@ -110,10 +110,12 @@ public class PropertyProvider {
         return null;
     }
 
-    protected <T> TextMapper<T> createTextMapping(Class<?> type) {
+    private <T> TextMapper<T> createTextMapping(Class<?> type) {
         TextMapper<?> textBinding = null;
         if (type == String.class) {
             textBinding = new StringTextBinding();
+        } else if (type == Boolean.TYPE || type == Boolean.class) {
+            textBinding = new BooleanTextBinding();
         } else if (type == Integer.TYPE || type == Integer.class) {
             textBinding = new IntegerTextBinding();
         } else if (type == Float.TYPE || type == Float.class) {
@@ -126,6 +128,9 @@ public class PropertyProvider {
         return (TextMapper<T>) textBinding;
     }
 
+    protected <T> Binding<T> createTextBinding(Object target, final FieldMetadata<Object, T> fieldMetadata) {
+        return new TextBinding<T>(target, fieldMetadata);
+    }
 
     protected Binding<Float> createFloatBinding(Object target, final FieldMetadata<Object, ?> fieldMetadata) {
         Class<?> type = fieldMetadata.getType();
@@ -202,7 +207,7 @@ public class PropertyProvider {
         @Override
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, Checkbox info) {
             UICheckbox checkbox = new UICheckbox();
-            Binding<Boolean> binding = new TextBinding(target, (FieldMetadata<Object, Boolean>) fieldMetadata);
+            Binding<Boolean> binding = createTextBinding(target, (FieldMetadata<Object, Boolean>) fieldMetadata);
             checkbox.bindChecked(binding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, binding, checkbox, info.description());
@@ -214,7 +219,7 @@ public class PropertyProvider {
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, OneOf.List info) {
             UIDropdown<String> dropdown = new UIDropdown<>();
             dropdown.bindOptions(new DefaultBinding<>(Arrays.asList(info.items())));
-            Binding<String> binding = new TextBinding(target, (FieldMetadata<Object, String>) fieldMetadata);
+            Binding<String> binding = createTextBinding(target, (FieldMetadata<Object, String>) fieldMetadata);
             dropdown.bindSelection(binding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, binding, dropdown, info.description());
@@ -228,17 +233,7 @@ public class PropertyProvider {
             Object[] items = cls.getEnumConstants();
             UIDropdown dropdown = new UIDropdown();
             dropdown.bindOptions(new DefaultBinding(Arrays.asList(items)));
-            Binding binding = new Binding() {
-                @Override
-                public Object get() {
-                    return fieldMetadata.getValueChecked(target);
-                }
-
-                @Override
-                public void set(Object value) {
-                    fieldMetadata.setValue(target, value);
-                }
-            };
+            Binding binding = createTextBinding(target, fieldMetadata);
             dropdown.bindSelection(binding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, binding, dropdown, info.description());
@@ -250,22 +245,15 @@ public class PropertyProvider {
         public Property create(Object target, final FieldMetadata<Object, ?> fieldMetadata, String id, OneOf.Provider info) {
             UIDropdown dropdown = new UIDropdown();
             OneOfProviderFactory factory = CoreRegistry.get(OneOfProviderFactory.class);
-            dropdown.bindOptions(factory.get(info.name()));
+            Binding<?> listBinding = factory.get(info.name());
+            if (listBinding != null) {
+                dropdown.bindOptions(listBinding);
+            }
             ItemRenderer<?> itemRenderer = factory.getItemRenderer(info.name());
             if (itemRenderer != null) {
                 dropdown.setOptionRenderer(itemRenderer);
             }
-            Binding binding = new Binding() {
-                @Override
-                public Object get() {
-                    return fieldMetadata.getValueChecked(target);
-                }
-
-                @Override
-                public void set(Object value) {
-                    fieldMetadata.setValue(target, value);
-                }
-            };
+            Binding binding = createTextBinding(target, fieldMetadata);
             dropdown.bindSelection(binding);
             String label = fromLabelOrId(info.label(), id);
             return new Property<>(label, binding, dropdown, info.description());
@@ -277,7 +265,7 @@ public class PropertyProvider {
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, TextField info) {
             UITextEntry<T> text = new UITextEntry<>();
 
-            Binding<T> textBinding = new TextBinding(target, (FieldMetadata<Object, T>) fieldMetadata);
+            Binding<T> textBinding = createTextBinding(target, (FieldMetadata<Object, T>) fieldMetadata);
             TextMapper<T> textMapper = createTextMapping(fieldMetadata.getType());
             text.setFormatter(textMapper);
             text.setParser(textMapper);
