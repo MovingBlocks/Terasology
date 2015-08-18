@@ -25,7 +25,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.Uri;
 
 /**
- * TODO Type description
+ * Defines a translation asset.
  */
 public abstract class Translation extends Asset<TranslationData> {
 
@@ -33,9 +33,18 @@ public abstract class Translation extends Asset<TranslationData> {
         super(urn, assetType);
     }
 
+    /**
+     * @return the uri of the project this instance is part of
+     */
     public abstract Uri getProjectUri();
 
+    /**
+     * @return the locale of the translation data
+     */
     public abstract Locale getLocale();
 
+    /**
+     * @return the translation data, possibly unmodifiable
+     */
     public abstract Map<String, String> getTranslations();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * TODO: describe
+ * Defines the file format of translation data. Matching files are of the form:
+ * <pre>
+ * &lt;project-name&gt;.lang
+ * &lt;project-name&gt;_&lt;language-tag&gt;.lang
+ * </pre>
+ * All IETF BCP 47 language tags are supported, but consider sticking to ISO 639-1 for simplicity.
+ * The data in the files is expected to be JSON entries of the form of a &lt;String, String&gt; map.
  */
 @RegisterAssetFileFormat
 public class TranslationFormat implements AssetFileFormat<TranslationData> {
@@ -63,7 +69,7 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
     public PathMatcher getFileMatcher() {
         return path -> {
             String name = path.getFileName().toString();
-            return name.endsWith(LANGDATA_EXT);
+            return FILENAME_PATTERN.matcher(name).matches();
         };
     }
 
@@ -79,13 +85,14 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
     public TranslationData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
 
         if (inputs.size() != 1) {
-            throw new IOException("Failed to load translation data '" + urn + "'");
+            throw new IOException("Failed to load translation data '" + urn + "': " + inputs);
         }
 
         AssetDataFile file = inputs.get(0);
 
         Locale locale = localeFromFilename(file.getFilename());
         Name projName = basenameFromFilename(file.getFilename());
+
         SimpleUri projUri = new SimpleUri(urn.getModuleName(), projName);
         TranslationData data = new TranslationData(projUri, locale);
 
@@ -99,19 +106,20 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         return data;
     }
 
-    private Name basenameFromFilename(String filename) {
+    private static Name basenameFromFilename(String filename) throws IOException {
         Matcher m = FILENAME_PATTERN.matcher(filename);
         if (m.matches()) {
             return new Name(m.group(1));
         }
-        return null;
+        throw new IOException("Could not parse project name: " + filename);
     }
 
-    private Locale localeFromFilename(String filename) {
+    private static Locale localeFromFilename(String filename) throws IOException {
         Matcher m = FILENAME_PATTERN.matcher(filename);
-        if (m.matches() && m.group(2) != null) {
-            return Locale.forLanguageTag(m.group(2));
+        if (m.matches()) {
+            String langTag = m.group(2);
+            return (langTag != null) ? Locale.forLanguageTag(langTag) : Locale.ROOT;
         }
-        return Locale.ROOT;
+        throw new IOException("Could not parse locale: " + filename);
     }
 }

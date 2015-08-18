@@ -32,22 +32,27 @@ public interface TranslationSystem {
     TranslationProject getProject(Uri name);
 
     /**
+     * If no perfect match is found for the default locale, fallback strategies will attempt to find the closest match.
      * @param id must match the pattern <code>${module:project#id}</code>
-     * @return
+     * @return the translated string
      */
     String translate(String id);
 
     /**
-     * @param string
-     * @param locale
-     * @return
+     * If no perfect match is found for the given locale, fallback strategies will attempt to find the closest match.
+     * @param id must match the pattern <code>${module:project#id}</code>
+     * @param locale the target locale
+     * @return the translated string
      */
-    String translate(String string, Locale locale);
+    String translate(String id, Locale locale);
 
     /**
-     * @param locale
+     * @param locale the new default locale to set.
      */
     void setLocale(Locale locale);
 
+    /**
+     * @return the currently used default locale
+     */
     Locale getLocale();
 }

@@ -22,15 +22,23 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.Uri;
 
+import com.google.common.base.Preconditions;
+
 /**
- * TODO: describe
+ * The default implementation of a translation asset.
  */
 public final class TranslationImpl extends Translation {
 
-    protected TranslationData data;
+    private TranslationData data;
 
+    /**
+     * @param urn       The urn identifying the asset. Never <code>null</code>.
+     * @param assetType The asset type this asset belongs to. Never <code>null</code>.
+     * @param data      The actual translation data. Never <code>null</code>.
+     */
     public TranslationImpl(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data) {
         super(urn, assetType);
+        Preconditions.checkArgument(data != null);
         reload(data);
     }
 
@@ -46,6 +54,7 @@ public final class TranslationImpl extends Translation {
 
     @Override
     protected void doReload(TranslationData newData) {
+        Preconditions.checkArgument(newData != null);
         this.data = newData;
     }
 
@@ -61,6 +70,6 @@ public final class TranslationImpl extends Translation {
 
     @Override
     public Map<String, String> getTranslations() {
-        return data.getTranslations();
+        return data.getTranslations();  // already unmodifiable
     }
 }

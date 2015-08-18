@@ -27,7 +27,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * TODO: describe
+ * Defines translation data in the form of a map {ID -> value}.
  */
 public class TranslationData implements AssetData {
 
@@ -55,14 +55,23 @@ public class TranslationData implements AssetData {
         map.putAll(entries);
     }
 
+    /**
+     * @return an unmodifiable view on the translation data
+     */
     public Map<String, String> getTranslations() {
         return Collections.unmodifiableMap(map);
     }
 
+    /**
+     * @return the locale of this translation data set
+     */
     public Locale getLocale() {
         return locale;
     }
 
+    /**
+     * @return the project uri this data set belongs to.
+     */
     public Uri getProjectUri() {
         return uri;
     }

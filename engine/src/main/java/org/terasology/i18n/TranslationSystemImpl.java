@@ -43,10 +43,21 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     private Locale locale;
 
+    /**
+     * @param context the context to use
+     */
     public TranslationSystemImpl(Context context) {
+        this(context, Locale.getDefault(Locale.Category.DISPLAY));
+    }
 
-        locale = Locale.getDefault(Locale.Category.DISPLAY);
+    /**
+     * @param context the context to use
+     * @param locale the default locale to use
+     */
+    public TranslationSystemImpl(Context context, Locale locale) {
+
         assetManager = context.get(AssetManager.class);
+        this.locale = locale;
 
         Set<ResourceUrn> urns = assetManager.getAvailableAssets(Translation.class);
         for (ResourceUrn urn : urns) {
@@ -54,9 +65,13 @@ public class TranslationSystemImpl implements TranslationSystem {
             if (asset.isPresent()) {
                 Translation trans = asset.get();
                 Uri uri = trans.getProjectUri();
-                TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
-                proj.add(trans);
-                logger.info("Discovered " + trans);
+                if (uri.isValid()) {
+                    TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
+                    proj.add(trans);
+                    logger.info("Discovered " + trans);
+                } else {
+                    logger.warn("Ignoring invalid project uri: {}", uri);
+                }
             }
         }
     }
@@ -87,9 +102,12 @@ public class TranslationSystemImpl implements TranslationSystem {
         if (splitPoint > 0) {
             String projName = id.substring(0, splitPoint);
             String fragment = id.substring(splitPoint + 1);
-            TranslationProject project = getProject(new SimpleUri(projName));
+            SimpleUri uri = new SimpleUri(projName);
+            TranslationProject project = getProject(uri);
             if (project != null) {
                 return project.translate(fragment, otherLocale);
+            } else {
+                logger.warn("Invalid project for '{}'", id);
             }
         }
         return null;

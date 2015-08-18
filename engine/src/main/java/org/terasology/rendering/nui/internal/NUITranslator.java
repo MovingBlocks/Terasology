@@ -33,11 +33,20 @@ public class NUITranslator {
     private final Context context;
     private final ClassLibrary<UIWidget> classLibrary;
 
+    /**
+     * @param context a context that provides a translation system
+     * @param classLibrary a class library for UIWidget field metadata
+     */
     public NUITranslator(Context context, ClassLibrary<UIWidget> classLibrary) {
         this.context = context;
         this.classLibrary = classLibrary;
     }
 
+    /**
+     * Replaces all matching ID tags with translated strings in a recursive manner.
+     * The tag must match <code>${module:project#id}</code>.
+     * @param container the root container widget
+     */
     public void updateWidget(UIWidget container) {
         TranslationSystem system = context.get(TranslationSystem.class);
         Collection<UIWidget> elements = container.findAll(UIWidget.class);

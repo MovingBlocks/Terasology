@@ -22,19 +22,26 @@ import java.util.Set;
 import org.terasology.i18n.assets.Translation;
 
 /**
- * TODO Type description
+ * Describes a translation project. It performs the actual mapping of ID strings to human-readable text
+ * in a language that is specified through {@link Locale}.
  */
 public interface TranslationProject {
 
     /**
-     * @param trans
+     * @param trans the translation to add.
      */
     void add(Translation trans);
 
-    String translate(String key, Locale locale);
+    /**
+     * If no perfect match is found for the given locale, fallback strategies will attempt to find the closest match.
+     * @param id the id of the string to translate (without project reference).
+     * @param locale the target locale
+     * @return the translated string
+     */
+    String translate(String id, Locale locale);
 
     /**
-     * @return
+     * @return the set of registered locales with at least one entry
      */
     Set<Locale> getAvailableLocales();
 }
