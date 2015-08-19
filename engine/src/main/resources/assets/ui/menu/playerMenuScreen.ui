@@ -45,7 +45,7 @@
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "Player Name:"
+                            "text" : "${engine:menu#player-name}:"
                         },
                         {
                             "type" : "UIText",
@@ -53,7 +53,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Player Color:"
+                            "text" : "${engine:menu#player-color}:"
                         },
                         {
                             "type" : "RowLayout",
@@ -93,7 +93,7 @@
             },
             {
                 "type" : "UIButton",
-                "text" : "Back",
+                "text" : "${engine:menu#back}",
                 "id" : "close",
                 "layoutInfo" : {
                     "height" : 32,

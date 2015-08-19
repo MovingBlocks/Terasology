@@ -59,7 +59,7 @@
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "Sound Volume:"
+                            "text" : "${engine:menu#sound-volume}:"
                         },
                         {
                             "type" : "UISlider",
@@ -67,7 +67,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Music Volume:"
+                            "text" : "${engine:menu#music volume}:"
                         },
                         {
                             "type" : "UISlider",
@@ -93,7 +93,7 @@
             },
             {
                 "type" : "UIButton",
-                "text" : "Back",
+                "text" : "${engine:menu#back}",
                 "id" : "close",
                 "layoutInfo" : {
                     "height" : 32,
