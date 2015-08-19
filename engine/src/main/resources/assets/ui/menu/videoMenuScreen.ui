@@ -21,7 +21,7 @@
             {
                 "type": "UILabel",
                 "family": "title",
-                "text": "Video Settings",
+                "text": "${engine:menu#video-settings-title}",
                 "id": "subtitle",
                 "layoutInfo": {
                     "height": 48,
@@ -124,16 +124,8 @@
                                 "size": [1, 13]
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
-                            },
-                            {
-                                "type": "UISpace",
-                                "size": [1, 13]
-                            },
-                            {
                                 "type": "UILabel",
-                                "text": "Camera / Graphic Detail Settings: "
+                                "text": "${engine:menu#camera-details-settings}: "
                             },
                             {
                                 "type": "UISpace",
@@ -149,7 +141,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Blur: "
+                                "text": "${engine:menu#camera-blur}: "
                             },
                             {
                                 "type": "UIDropdown",
@@ -157,7 +149,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Camera Setting: "
+                                "text": "${engine:menu#camera-setting}: "
                             },
                             {
                                 "type": "UIDropdown",
@@ -165,7 +157,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Outline: "
+                                "text": "${engine:menu#outline}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -173,7 +165,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Cloud Shadows: "
+                                "text": "${engine:menu#cloud-shadows}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -181,7 +173,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Parallax Mapping: "
+                                "text": "${engine:menu#parallax-mapping}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -189,7 +181,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Film Grain: "
+                                "text": "${engine:menu#camera-film-grain}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -197,7 +189,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Bobbing: "
+                                "text": "${engine:menu#bobbing}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -205,7 +197,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Fov amount: "
+                                "text": "${engine:menu#fov-amount}: "
                             },
                             {
                                 "type": "UISlider",
@@ -213,7 +205,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "View Distance: "
+                                "text": "${engine:menu#view-distance}: "
                             },
                             {
                                 "type": "UIDropdown",
@@ -225,12 +217,12 @@
                             },
                             {
                                 "type": "UIButton",
-                                "text": "Reset fov amount",
+                                "text": "${engine:menu#reset-fov-amount}",
                                 "id": "fovReset"
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Frame Limit: "
+                                "text": "${engine:menu#framerate-limit}: "
                             },
                             {
                                 "type": "UISlider",
@@ -238,7 +230,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Resolution Scale: "
+                                "text": "${engine:menu#resolution-scale}: "
                             },
                             {
                                 "type": "UISlider",
@@ -278,7 +270,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "High-End / Experimental Settings: "
+                                "text": "${engine:menu#video-high-end-settings}: "
                             },
                             {
                                 "type": "UISpace",
@@ -294,7 +286,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Environment Effects: "
+                                "text": "${engine:menu#environment-effects}: "
                             },
                             {
                                 "type": "UIDropdown",
@@ -302,7 +294,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Eye-Adaption: "
+                                "text": "${engine:menu#eye-adaption}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -310,7 +302,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Motion Blur: "
+                                "text": "${engine:menu#motion-blur}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -318,7 +310,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Water Reflections: "
+                                "text": "${engine:menu#water-reflections}: "
                             },
                             {
                                 "type": "UIDropdown",
@@ -326,7 +318,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Shadows: "
+                                "text": "${engine:menu#shadows}: "
                             },
                             {
                                 "type": "UIDropdown",
@@ -334,7 +326,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Oculus Rift Support: "
+                                "text": "${engine:menu#oculus-rift-support}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -342,7 +334,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "SSAO: "
+                                "text": "${engine:menu#ssao}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -350,7 +342,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Clamp Lighting: "
+                                "text": "${engine:menu#clamp-lighting}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -358,7 +350,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Bloom: "
+                                "text": "${engine:menu#bloom-effect}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -366,7 +358,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Light Shafts: "
+                                "text": "${engine:menu#light-shafts}: "
                             },
                             {
                                 "type": "UICheckbox",
@@ -374,7 +366,7 @@
                             },
                             {
                                "type": "UILabel",
-                               "text": "Vignette: "
+                               "text": "${engine:menu#vignette}: "
                             },
                             {
                                "type": "UICheckbox",
@@ -382,7 +374,7 @@
                             },
                             {
                               "type": "UILabel",
-                              "text": "Flickering Lights: "
+                              "text": "${engine:menu#flickering-lights}: "
                             },
                             {
                               "type": "UICheckbox",

@@ -17,10 +17,13 @@
 package org.terasology.i18n;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +44,7 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(TranslationSystemImpl.class);
 
-    private final AssetManager assetManager;
+    private final List<Consumer<TranslationProject>> changeListeners = new CopyOnWriteArrayList<>();
     private final Map<Uri, TranslationProject> projects = new HashMap<>();
 
     private final SystemConfig config;
@@ -51,8 +54,8 @@ public class TranslationSystemImpl implements TranslationSystem {
      */
     public TranslationSystemImpl(Context context) {
 
-        assetManager = context.get(AssetManager.class);
         config = context.get(Config.class).getSystem();
+        AssetManager assetManager = context.get(AssetManager.class);
 
         Set<ResourceUrn> urns = assetManager.getAvailableAssets(Translation.class);
         for (ResourceUrn urn : urns) {
@@ -63,6 +66,7 @@ public class TranslationSystemImpl implements TranslationSystem {
                 if (uri.isValid()) {
                     TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
                     proj.add(trans);
+                    trans.subscribe(this::reloadAsset);
                     logger.info("Discovered " + trans);
                 } else {
                     logger.warn("Ignoring invalid project uri: {}", uri);
@@ -96,5 +100,23 @@ public class TranslationSystemImpl implements TranslationSystem {
             }
         }
         return null;
+    }
+
+    @Override
+    public void subscribe(Consumer<TranslationProject> reloadListener) {
+        changeListeners.add(reloadListener);
+    }
+
+    @Override
+    public void unsubscribe(Consumer<TranslationProject> reloadListener) {
+        changeListeners.remove(reloadListener);
+    }
+
+    private void reloadAsset(Translation trans) {
+        Uri uri = trans.getProjectUri();
+        TranslationProject project = projects.get(uri);
+        for (Consumer<TranslationProject> listener : changeListeners) {
+            listener.accept(project);
+        }
     }
 }

@@ -22,7 +22,7 @@
                     "type" : "UILabel",
                     "id" : "subtitle",
                     "family" : "title",
-                    "text" : "Join Server",
+                    "text" : "${engine:menu#join-server-title}",
                     "layoutInfo" : {
                         "height" : 48,
                         "position-horizontal-center" : {},
@@ -80,7 +80,7 @@
                                     {
                                         "type" : "UIButton",
                                         "id" : "onlineButton",
-                                        "text": "Listed",
+                                        "text": "${engine:menu#listed-servers}",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.5
                                         }
@@ -88,7 +88,7 @@
                                     {
                                         "type": "UIButton",
                                         "id": "customButton",
-                                        "text": "Custom"
+                                        "text": "${engine:menu#custom-servers}"
                                     }
                                     ],
                                     "layoutInfo" : {
@@ -128,7 +128,7 @@
                                             {
                                                 "type" : "UIButton",
                                                 "id" : "edit",
-                                                "text" : "Edit",
+                                                "text" : "${engine:menu#edit-server}",
                                                 "layoutInfo" : {
                                                     "use-content-height" : true,
                                                     "width" : 135,
@@ -142,7 +142,7 @@
                                             {
                                                 "type" : "UIButton",
                                                 "id" : "remove",
-                                                "text" : "Remove",
+                                                "text" : "${engine:menu#remove-server}",
                                                 "layoutInfo" : {
                                                     "use-content-height" : true,
                                                     "position-left" : {
@@ -160,7 +160,7 @@
                                             {
                                                 "type" : "UIButton",
                                                 "id" : "add",
-                                                "text" : "Add New",
+                                                "text" : "${engine:menu#add-server}",
                                                 "layoutInfo" : {
                                                     "use-content-height" : true,
                                                     "position-bottom" : {
@@ -233,7 +233,7 @@
                                     "contents" : [
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Name: "
+                                            "text" : "${engine:menu#server-name}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -242,7 +242,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Owner: "
+                                            "text" : "${engine:menu#server-owner}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -251,7 +251,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Address: "
+                                            "text" : "${engine:menu#server-address}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -260,7 +260,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Port: "
+                                            "text" : "${engine:menu#server-port}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -269,7 +269,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Worlds: "
+                                            "text" : "${engine:menu#game-worlds}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -278,7 +278,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Modules: "
+                                            "text" : "${engine:menu#module-list}: "
                                         },
                                         {
                                             "type" : "ScrollableArea",
@@ -305,7 +305,7 @@
                                 {
                                     "type" : "UIButton",
                                     "id" : "join",
-                                    "text" : "Join",
+                                    "text" : "${engine:menu#join-server-action}",
                                     "family" : "highlight",
                                     "layoutInfo" : {
                                         "height" : 40,
@@ -320,7 +320,7 @@
                 },
                 {
                     "type" : "UIButton",
-                    "text" : "Back",
+                    "text" : "${engine:menu#back}",
                     "id" : "close",
                     "layoutInfo" : {
                         "width" : 128,

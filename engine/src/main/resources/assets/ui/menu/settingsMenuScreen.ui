@@ -20,7 +20,7 @@
             },
             {
                 "type" : "UILabel",
-                "text" : "Settings",
+                "text" : "${engine:menu#settings-title}",
                 "family" : "title",
                 "id" : "subtitle",
                 "layoutInfo" : {

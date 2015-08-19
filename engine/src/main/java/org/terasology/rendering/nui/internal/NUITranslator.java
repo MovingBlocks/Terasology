@@ -30,15 +30,15 @@ import org.terasology.rendering.nui.UIWidget;
  */
 public class NUITranslator {
 
-    private final Context context;
+    private final TranslationSystem translationSystem;
     private final ClassLibrary<UIWidget> classLibrary;
 
     /**
-     * @param context a context that provides a translation system
+     * @param translationSystem the translation system to use
      * @param classLibrary a class library for UIWidget field metadata
      */
-    public NUITranslator(Context context, ClassLibrary<UIWidget> classLibrary) {
-        this.context = context;
+    public NUITranslator(TranslationSystem translationSystem, ClassLibrary<UIWidget> classLibrary) {
+        this.translationSystem = translationSystem;
         this.classLibrary = classLibrary;
     }
 
@@ -48,7 +48,6 @@ public class NUITranslator {
      * @param container the root container widget
      */
     public void updateWidget(UIWidget container) {
-        TranslationSystem system = context.get(TranslationSystem.class);
         Collection<UIWidget> elements = container.findAll(UIWidget.class);
 
         for (UIWidget element : elements) {
@@ -59,7 +58,7 @@ public class NUITranslator {
                         String value = (String) field.getValue(element);
                         String i18nId = extractId(value);
                         if (i18nId != null) {
-                            String i18nText = system.translate(i18nId);
+                            String i18nText = translationSystem.translate(i18nId);
                             field.setValue(element, i18nText);
                         }
                     }

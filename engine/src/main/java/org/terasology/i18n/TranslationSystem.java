@@ -17,6 +17,7 @@
 package org.terasology.i18n;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.terasology.engine.Uri;
 
@@ -46,4 +47,17 @@ public interface TranslationSystem {
      * @return the translated string
      */
     String translate(String id, Locale locale);
+
+    /**
+     * Subscribe to change events. Will be fired when the content of a project is changed.
+     * @param changeListener the listener to add
+     */
+    public void subscribe(Consumer<TranslationProject> changeListener);
+
+    /**
+     * Unsubscribe from change events.
+     * @param reloadListener the listener to remove. Non-existing entries will be ignored.
+     */
+    public void unsubscribe(Consumer<TranslationProject> reloadListener);
+
 }

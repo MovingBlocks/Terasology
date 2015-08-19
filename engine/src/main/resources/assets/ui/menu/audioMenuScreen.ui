@@ -20,7 +20,7 @@
             },
             {
                 "type" : "UILabel",
-                "text" : "Audio Settings",
+                "text": "${engine:menu#audio-settings-title}",
                 "family" : "title",
                 "id" : "subtitle",
                 "layoutInfo" : {
@@ -67,7 +67,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#music volume}:"
+                            "text" : "${engine:menu#music-volume}:"
                         },
                         {
                             "type" : "UISlider",

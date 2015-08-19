@@ -33,6 +33,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
@@ -91,7 +92,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
         refreshWidgetsLibrary();
-        this.translator = new NUITranslator(context, getWidgetMetadataLibrary());
+
+        TranslationSystem system = context.get(TranslationSystem.class);
+        this.translator = new NUITranslator(system, getWidgetMetadataLibrary());
+        system.subscribe(proj -> invalidate());
     }
 
     public void refreshWidgetsLibrary() {
