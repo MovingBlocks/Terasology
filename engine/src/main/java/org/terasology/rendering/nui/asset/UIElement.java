@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.nui.asset;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
@@ -29,14 +33,35 @@ public class UIElement extends Asset<UIData> {
 
     private UIWidget rootWidget;
 
+    private final List<Consumer<UIElement>> reloadListeners = new CopyOnWriteArrayList<>();
+
     public UIElement(ResourceUrn urn, AssetType<?, UIData> assetType, UIData data) {
         super(urn, assetType);
         reload(data);
     }
 
+    /**
+     * Subscribe to reload events.
+     * @param reloadListener the listener to add
+     */
+    public void subscribe(Consumer<UIElement> reloadListener) {
+        reloadListeners.add(reloadListener);
+    }
+
+    /**
+     * Unsubscribe from reload events.
+     * @param reloadListener the listener to remove. Non-existing entries will be ignored.
+     */
+    public void unsubscribe(Consumer<UIElement> reloadListener) {
+        reloadListeners.remove(reloadListener);
+    }
+
     @Override
     protected void doReload(UIData data) {
         rootWidget = data.getRootWidget();
+        for (Consumer<UIElement> listener : reloadListeners) {
+            listener.accept(this);
+        }
     }
 
     @Override

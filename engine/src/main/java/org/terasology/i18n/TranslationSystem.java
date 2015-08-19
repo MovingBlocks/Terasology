@@ -21,7 +21,8 @@ import java.util.Locale;
 import org.terasology.engine.Uri;
 
 /**
- * TODO Type description
+ * A translation system that consists of different projects. An i18n string can either
+ * contain a project URI or be used directly in a project.
  */
 public interface TranslationSystem {
 

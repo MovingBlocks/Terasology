@@ -68,7 +68,7 @@ import java.util.Set;
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
     private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
-    private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
+    private LinkedList<UIScreenLayer> screens = new LinkedList<>();
     private HUDScreenLayer hudScreenLayer;
     private BiMap<ResourceUrn, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
@@ -243,6 +243,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
             if (!screens.contains(result)) {
                 result.setId(element.getUrn().toString());
+                element.subscribe(this::reload);
                 pushScreen(result, element.getUrn());
             }
             return result;
@@ -554,6 +555,21 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 return;
             }
         }
+    }
+
+    private void reload(UIElement element) {
+        CoreScreenLayer newScreen = (CoreScreenLayer) element.getRootWidget();
+        UIScreenLayer oldScreen = screenLookup.get(element.getUrn());
+
+        oldScreen.onClosed();
+
+        newScreen.setId(element.getUrn().toString());
+        newScreen.setManager(this);
+        prepare(newScreen);
+        int idx = screens.indexOf(oldScreen);
+
+        screens.set(idx, newScreen);
+        screenLookup.put(element.getUrn(), newScreen);
     }
 
     @Override

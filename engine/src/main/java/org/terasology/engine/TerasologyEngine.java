@@ -51,7 +51,6 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.i18n.TranslationSystemImpl;
 import org.terasology.i18n.assets.Translation;
 import org.terasology.i18n.assets.TranslationData;
-import org.terasology.i18n.assets.TranslationImpl;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
@@ -321,7 +320,7 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
         assetTypeManager.registerCoreAssetType(Translation.class,
-                (AssetFactory<Translation, TranslationData>) TranslationImpl::new, false, "i18n");
+                (AssetFactory<Translation, TranslationData>) Translation::new, false, "i18n");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);

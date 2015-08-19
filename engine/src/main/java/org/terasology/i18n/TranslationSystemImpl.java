@@ -34,7 +34,8 @@ import org.terasology.engine.Uri;
 import org.terasology.i18n.assets.Translation;
 
 /**
- * TODO Type description
+ * A translation system that uses {@link Translation} data assets to
+ * perform the lookup.
  */
 public class TranslationSystemImpl implements TranslationSystem {
 
