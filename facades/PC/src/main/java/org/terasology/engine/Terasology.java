@@ -22,7 +22,6 @@ import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
@@ -41,8 +40,14 @@ import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.splash.SplashScreen;
+import org.terasology.splash.SplashScreenBuilder;
+import org.terasology.splash.overlay.AnimatedBoxRowOverlay;
+import org.terasology.splash.overlay.RectOverlay;
+import org.terasology.splash.overlay.TextOverlay;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -111,7 +116,9 @@ public final class Terasology {
         //
         // as JVM argument (not program argument!)
 
-        SplashScreen.getInstance().post("Java Runtime " + System.getProperty("java.version") + " loaded");
+        SplashScreen splashScreen = configureSplashScreen();
+
+        splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
@@ -124,9 +131,9 @@ public final class Terasology {
             TerasologyEngine engine = builder.build();
             engine.subscribe(newStatus -> {
                 if (newStatus == StandardGameStatus.RUNNING) {
-                    SplashScreen.getInstance().close();
+                    splashScreen.close();
                 } else {
-                    SplashScreen.getInstance().post(newStatus.getDescription());
+                    splashScreen.post(newStatus.getDescription());
                 }
             });
 
@@ -147,9 +154,32 @@ public final class Terasology {
             }
         } catch (Throwable e) {
             // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
-            SplashScreen.getInstance().close();
+            splashScreen.close();
             reportException(e);
         }
+    }
+
+    private static SplashScreen configureSplashScreen() {
+        int imageHeight = 283;
+        int maxTextWidth = 450;
+        int width = 600;
+        int height = 30;
+        int left = 20;
+        int top = imageHeight - height - 20;
+
+        Rectangle rectRc = new Rectangle(left, top, width, height);
+        Rectangle textRc = new Rectangle(left + 10, top + 5, maxTextWidth, height);
+        Rectangle boxRc = new Rectangle(left + maxTextWidth + 10, top, width - maxTextWidth - 20, height);
+
+        SplashScreenBuilder builder = new SplashScreenBuilder();
+
+        SplashScreen instance = builder
+                .add(new RectOverlay(rectRc))
+                .add(new TextOverlay(textRc))
+                .add(new AnimatedBoxRowOverlay(boxRc))
+                .build();
+
+        return instance;
     }
 
     private static void setupLogging() {

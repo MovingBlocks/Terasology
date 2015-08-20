@@ -125,6 +125,7 @@ dependencies {
     compile group: 'org.terasology', name: 'gestalt-asset-core', version: '4.1.2'
     compile group: 'org.terasology', name: 'TeraMath', version: '1.1.1-SNAPSHOT'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
+    compile group: 'org.terasology', name: 'splash-screen', version: '1.0.1'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
