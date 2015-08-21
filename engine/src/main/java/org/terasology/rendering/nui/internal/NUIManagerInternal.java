@@ -58,6 +58,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
@@ -393,7 +394,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void update(float delta) {
         canvas.processMousePosition(mouse.getPosition());
 
-        for (UIScreenLayer screen : screens) {
+        // part of the update could be adding/removing screens
+        // modifying a collection while iterating of it is typically not supported
+        for (UIScreenLayer screen : new ArrayList<>(screens)) {
             screen.update(delta);
         }
 
