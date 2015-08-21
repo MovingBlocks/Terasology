@@ -111,8 +111,8 @@ public final class Terasology {
 
         // To have the splash screen in your favorite IDE add
         //
-        //   eclipse:  -splash:src/main/resources/splash.jpg (the PC facade root folder is the working dir.)
-        //   IntelliJ: -splash:facades/PC/src/main/resources/splash.jpg (root project is the working dir.)
+        //   eclipse:  -splash:src/main/resources/splash/splash.jpg (the PC facade root folder is the working dir.)
+        //   IntelliJ: -splash:facades/PC/src/main/resources/splash/splash.jpg (root project is the working dir.)
         //
         // as JVM argument (not program argument!)
 

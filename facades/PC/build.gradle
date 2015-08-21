@@ -50,7 +50,7 @@ jar {
         attributes("Class-Path" : manifestClasspath)
         attributes("Implementation-Title": "Terasology-" + project.name)
         attributes("Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
-        attributes("SplashScreen-Image": "splash.jpg")
+        attributes("SplashScreen-Image": "splash/splash.jpg")
     }
 }
 
@@ -74,7 +74,7 @@ task runPC(type:JavaExec) {
     workingDir = rootDir
     String[] runArgs = ["-homedir"]
     args runArgs
-    jvmArgs "-splash:${sourceSets.main.output.resourcesDir}/splash.jpg"
+    jvmArgs "-splash:${sourceSets.main.output.resourcesDir}/splash/splash.jpg"
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDir
