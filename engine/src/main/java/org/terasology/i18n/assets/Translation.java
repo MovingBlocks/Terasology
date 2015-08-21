@@ -33,9 +33,11 @@ import com.google.common.base.Preconditions;
  */
 public class Translation extends Asset<TranslationData> {
 
-    private final List<Consumer<Translation>> reloadListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<Translation>> changeListeners = new CopyOnWriteArrayList<>();
 
     private TranslationData data;
+    private Locale locale;
+    private Uri projectUri;
 
     /**
      * @param urn       The urn identifying the asset. Never <code>null</code>.
@@ -44,7 +46,6 @@ public class Translation extends Asset<TranslationData> {
      */
     public Translation(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data) {
         super(urn, assetType);
-        Preconditions.checkArgument(data != null);
         reload(data);
     }
 
@@ -52,29 +53,29 @@ public class Translation extends Asset<TranslationData> {
      * @return the uri of the project this instance is part of
      */
     public Uri getProjectUri() {
-        return data.getProjectUri();
+        return projectUri;
     }
     /**
      * @return the locale of the translation data
      */
     public Locale getLocale() {
-        return data.getLocale();
+        return locale;
     }
 
     /**
-     * Subscribe to reload events.
-     * @param reloadListener the listener to add
+     * Subscribe to reload/dispose events.
+     * @param changeListener the listener to add
      */
-    public void subscribe(Consumer<Translation> reloadListener) {
-        reloadListeners.add(reloadListener);
+    public void subscribe(Consumer<Translation> changeListener) {
+        changeListeners.add(changeListener);
     }
 
     /**
-     * Unsubscribe from reload events.
-     * @param reloadListener the listener to remove. Non-existing entries will be ignored.
+     * Unsubscribe from reload/dispose events.
+     * @param changeListener the listener to remove. Non-existing entries will be ignored.
      */
-    public void unsubscribe(Consumer<Translation> reloadListener) {
-        reloadListeners.remove(reloadListener);
+    public void unsubscribe(Consumer<Translation> changeListener) {
+        changeListeners.remove(changeListener);
     }
 
     /**
@@ -89,6 +90,10 @@ public class Translation extends Asset<TranslationData> {
     @Override
     protected void doDispose() {
         this.data = null;
+        // locale and project uri are still available!
+        for (Consumer<Translation> listener : changeListeners) {
+            listener.accept(this);
+        }
     }
 
     @Override
@@ -100,7 +105,10 @@ public class Translation extends Asset<TranslationData> {
     protected void doReload(TranslationData newData) {
         Preconditions.checkArgument(newData != null);
         this.data = newData;
-        for (Consumer<Translation> listener : reloadListeners) {
+        this.projectUri = data.getProjectUri();
+        this.locale = data.getLocale();
+
+        for (Consumer<Translation> listener : changeListeners) {
             listener.accept(this);
         }
     }

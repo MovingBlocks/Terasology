@@ -34,6 +34,12 @@ public interface TranslationProject {
     void add(Translation trans);
 
     /**
+     * Removes a translation asset.
+     * @param trans the translation to remove. Non-existing entries are ignored.
+     */
+    void remove(Translation trans);
+
+    /**
      * If no perfect match is found for the given locale, fallback strategies will attempt to find the closest match.
      * @param id the id of the string to translate (without project reference).
      * @param locale the target locale

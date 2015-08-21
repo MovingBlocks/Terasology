@@ -66,7 +66,7 @@ public class TranslationSystemImpl implements TranslationSystem {
                 if (uri.isValid()) {
                     TranslationProject proj = projects.computeIfAbsent(uri, e -> new StandardTranslationProject());
                     proj.add(trans);
-                    trans.subscribe(this::reloadAsset);
+                    trans.subscribe(this::onAssetChanged);
                     logger.info("Discovered " + trans);
                 } else {
                     logger.warn("Ignoring invalid project uri: {}", uri);
@@ -112,9 +112,12 @@ public class TranslationSystemImpl implements TranslationSystem {
         changeListeners.remove(reloadListener);
     }
 
-    private void reloadAsset(Translation trans) {
+    private void onAssetChanged(Translation trans) {
         Uri uri = trans.getProjectUri();
         TranslationProject project = projects.get(uri);
+        if (trans.isDisposed()) {
+            project.remove(trans);
+        }
         for (Consumer<TranslationProject> listener : changeListeners) {
             listener.accept(project);
         }

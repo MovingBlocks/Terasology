@@ -52,12 +52,12 @@ public interface TranslationSystem {
      * Subscribe to change events. Will be fired when the content of a project is changed.
      * @param changeListener the listener to add
      */
-    public void subscribe(Consumer<TranslationProject> changeListener);
+    void subscribe(Consumer<TranslationProject> changeListener);
 
     /**
      * Unsubscribe from change events.
      * @param reloadListener the listener to remove. Non-existing entries will be ignored.
      */
-    public void unsubscribe(Consumer<TranslationProject> reloadListener);
+    void unsubscribe(Consumer<TranslationProject> reloadListener);
 
 }

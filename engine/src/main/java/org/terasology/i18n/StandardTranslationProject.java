@@ -37,6 +37,11 @@ public class StandardTranslationProject implements TranslationProject {
     }
 
     @Override
+    public void remove(Translation trans) {
+        translations.remove(trans.getLocale(), trans);
+    }
+
+    @Override
     public String translate(String key, Locale locale) {
         String result = translateExact(key, locale);
         if (result == null && !locale.getVariant().isEmpty()) {
