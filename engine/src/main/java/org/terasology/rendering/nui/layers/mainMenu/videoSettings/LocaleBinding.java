@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 import java.util.Locale;
 
 import org.terasology.config.SystemConfig;
-import org.terasology.context.Context;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
 
@@ -28,10 +27,10 @@ import org.terasology.rendering.nui.databinding.Binding;
 public class LocaleBinding implements Binding<Locale> {
 
     private SystemConfig config;
-    private Context context;
+    private NUIManager nuiManager;
 
-    public LocaleBinding(Context context, SystemConfig config) {
-        this.context = context;
+    public LocaleBinding(NUIManager nuiManager, SystemConfig config) {
+        this.nuiManager = nuiManager;
         this.config = config;
     }
 
@@ -43,6 +42,6 @@ public class LocaleBinding implements Binding<Locale> {
     @Override
     public void set(Locale value) {
         config.setLocale(value);
-        context.get(NUIManager.class).invalidate();
+        nuiManager.invalidate();
     }
 }

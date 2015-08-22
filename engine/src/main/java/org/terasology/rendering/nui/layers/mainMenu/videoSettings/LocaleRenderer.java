@@ -18,29 +18,27 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import java.util.Locale;
 
-import org.terasology.context.Context;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 
 /**
- * TODO Type description
+ * Renders locale in the format "{@literal <native name> (<English name>)}".
  */
 public class LocaleRenderer extends StringTextRenderer<Locale> {
 
-    private final Context context;
+    private final TranslationSystem translationSystem;
 
     /**
-     * @param context
+     * @param translationSystem the translation system to use for locale formatting
      */
-    public LocaleRenderer(Context context) {
-        this.context = context;
+    public LocaleRenderer(TranslationSystem translationSystem) {
+        this.translationSystem = translationSystem;
     }
 
     @Override
     public String getString(Locale locale) {
-        TranslationSystem translationSystem = context.get(TranslationSystem.class);
-        String nat = translationSystem.translate("engine:menu#this-language-native", locale);
-        String eng = translationSystem.translate("engine:menu#this-language-English", locale);
+        String nat = translationSystem.translate("engine:menu#this-language-native", locale).orElse("");
+        String eng = translationSystem.translate("engine:menu#this-language-English", locale).orElse(locale.toString());
         return String.format("%s (%s)", nat, eng);
     }
 

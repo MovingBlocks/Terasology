@@ -17,8 +17,8 @@
 package org.terasology.rendering.nui.internal;
 
 import java.util.Collection;
+import java.util.Optional;
 
-import org.terasology.context.Context;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -58,8 +58,10 @@ public class NUITranslator {
                         String value = (String) field.getValue(element);
                         String i18nId = extractId(value);
                         if (i18nId != null) {
-                            String i18nText = translationSystem.translate(i18nId);
-                            field.setValue(element, i18nText);
+                            Optional<String> i18nText = translationSystem.translate(i18nId);
+                            if (i18nText.isPresent()) {
+                                field.setValue(element, i18nText.get());
+                            }
                         }
                     }
                 }

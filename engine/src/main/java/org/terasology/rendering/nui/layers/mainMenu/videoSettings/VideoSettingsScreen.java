@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -66,7 +65,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     private LocalPlayer localPlayer;
 
     @In
-    private Context context;
+    private TranslationSystem translationSystem;
 
     public VideoSettingsScreen() {
     }
@@ -82,13 +81,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<Locale> language = find("language", UIDropdown.class);
         if (language != null) {
-            TranslationSystem translationSystem = context.get(TranslationSystem.class);
             SimpleUri menuUri = new SimpleUri("engine:menu");
             TranslationProject menuProject = translationSystem.getProject(menuUri);
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
             language.setOptions(Lists.newArrayList(locales));
-            language.setOptionRenderer(new LocaleRenderer(context));
-            language.bindSelection(new LocaleBinding(context, config.getSystem()));
+            language.setOptionRenderer(new LocaleRenderer(translationSystem));
+            language.bindSelection(new LocaleBinding(getManager(), config.getSystem()));
         }
 
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);

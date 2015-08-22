@@ -20,6 +20,7 @@ import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -47,8 +48,7 @@ import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.i18n.TranslationSystemImpl;
+import org.terasology.i18n.I18nSubsystem;
 import org.terasology.i18n.assets.Translation;
 import org.terasology.i18n.assets.TranslationData;
 import org.terasology.input.InputSystem;
@@ -78,6 +78,7 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
+
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -167,6 +168,7 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new NetworkSubsystem());
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
+        this.allSubsystems.add(new I18nSubsystem());
     }
 
     private void initialize() {
@@ -192,9 +194,6 @@ public class TerasologyEngine implements GameEngine {
             rootContext.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
             environmentSwitcher.handleSwitchToGameEnvironment(rootContext);
-
-            // TODO: find the right place to put this
-            rootContext.put(TranslationSystem.class, new TranslationSystemImpl(rootContext));
 
             postInitSubsystems();
 
@@ -320,7 +319,7 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
         assetTypeManager.registerCoreAssetType(Translation.class,
-                (AssetFactory<Translation, TranslationData>) Translation::new, false, "i18n");
+                (AssetFactory<Translation, TranslationData>) Translation::new, "i18n");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);

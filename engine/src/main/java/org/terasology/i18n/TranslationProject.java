@@ -17,13 +17,14 @@
 package org.terasology.i18n;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import org.terasology.i18n.assets.Translation;
+import org.terasology.naming.Name;
 
 /**
- * Describes a translation project. It performs the actual mapping of ID strings to human-readable text
- * in a language that is specified through {@link Locale}.
+ * Describes a translation project. It aggregates individual translations (one per {@link Locale}).
  */
 public interface TranslationProject {
 
@@ -45,7 +46,7 @@ public interface TranslationProject {
      * @param locale the target locale
      * @return the translated string
      */
-    String translate(String id, Locale locale);
+    Optional<String> translate(Name id, Locale locale);
 
     /**
      * @return the set of registered locales with at least one entry

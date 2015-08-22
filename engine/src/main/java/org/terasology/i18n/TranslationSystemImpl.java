@@ -32,7 +32,6 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Uri;
 import org.terasology.i18n.assets.Translation;
 
@@ -49,14 +48,21 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     private final SystemConfig config;
 
+    private AssetManager assetManager;
+
     /**
      * @param context the context to use
      */
     public TranslationSystemImpl(Context context) {
 
         config = context.get(Config.class).getSystem();
-        AssetManager assetManager = context.get(AssetManager.class);
+        assetManager = context.get(AssetManager.class);
 
+        refresh();
+    }
+
+    @Override
+    public void refresh() {
         Set<ResourceUrn> urns = assetManager.getAvailableAssets(Translation.class);
         for (ResourceUrn urn : urns) {
             Optional<Translation> asset = assetManager.getAsset(urn, Translation.class);
@@ -81,25 +87,22 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     @Override
-    public String translate(String id) {
+    public Optional<String> translate(String id) {
         return translate(id, config.getLocale());
     }
 
     @Override
-    public String translate(String id, Locale otherLocale) {
-        int splitPoint = id.indexOf('#');
-        if (splitPoint > 0) {
-            String projName = id.substring(0, splitPoint);
-            String fragment = id.substring(splitPoint + 1);
-            SimpleUri uri = new SimpleUri(projName);
-            TranslationProject project = getProject(uri);
+    public Optional<String> translate(String id, Locale otherLocale) {
+        TranslationUri uri = new TranslationUri(id);
+        if (uri.isValid()) {
+            TranslationProject project = getProject(uri.getProjectUri());
             if (project != null) {
-                return project.translate(fragment, otherLocale);
+                return project.translate(uri.getId(), otherLocale);
             } else {
                 logger.warn("Invalid project for '{}'", id);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override

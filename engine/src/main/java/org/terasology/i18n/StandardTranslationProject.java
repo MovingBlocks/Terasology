@@ -20,9 +20,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.terasology.i18n.assets.Translation;
+import org.terasology.naming.Name;
 
 /**
  * Performs textual translations based on a set of {@link Translation} instances.
@@ -42,7 +44,7 @@ public class StandardTranslationProject implements TranslationProject {
     }
 
     @Override
-    public String translate(String key, Locale locale) {
+    public Optional<String> translate(Name key, Locale locale) {
         String result = translateExact(key, locale);
         if (result == null && !locale.getVariant().isEmpty()) {
             // try without variant
@@ -60,10 +62,8 @@ public class StandardTranslationProject implements TranslationProject {
         if (result == null) {
             result = translateExact(key, Locale.ROOT);
         }
-        if (result == null) {
-            return "<" + key + ">";
-        }
-        return result;
+
+        return Optional.ofNullable(result);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class StandardTranslationProject implements TranslationProject {
         return result;
     }
 
-    private String translateExact(String key, Locale locale) {
+    private String translateExact(Name key, Locale locale) {
         Translation trans = translations.get(locale);
         if (trans != null) {
             return trans.lookup(key);

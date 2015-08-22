@@ -16,8 +16,10 @@
 
 package org.terasology.i18n.assets;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -25,7 +27,9 @@ import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.Uri;
+import org.terasology.naming.Name;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -35,7 +39,7 @@ public class Translation extends Asset<TranslationData> {
 
     private final List<Consumer<Translation>> changeListeners = new CopyOnWriteArrayList<>();
 
-    private TranslationData data;
+    private Map<String, String> dictionary = new HashMap<>();
     private Locale locale;
     private Uri projectUri;
 
@@ -83,13 +87,13 @@ public class Translation extends Asset<TranslationData> {
      * @param id the id of the entry
      * @return the translated string
      */
-    public String lookup(String id) {
-        return data.getTranslations().get(id);
+    public String lookup(Name id) {
+        return dictionary.get(id.toString());
     }
 
     @Override
     protected void doDispose() {
-        this.data = null;
+        this.dictionary.clear();
         // locale and project uri are still available!
         for (Consumer<Translation> listener : changeListeners) {
             listener.accept(this);
@@ -102,14 +106,22 @@ public class Translation extends Asset<TranslationData> {
     }
 
     @Override
-    protected void doReload(TranslationData newData) {
-        Preconditions.checkArgument(newData != null);
-        this.data = newData;
-        this.projectUri = data.getProjectUri();
-        this.locale = data.getLocale();
+    protected void doReload(TranslationData data) {
+        Preconditions.checkArgument(data != null);
 
-        for (Consumer<Translation> listener : changeListeners) {
-            listener.accept(this);
+        boolean isEqual = Objects.equal(data.getProjectUri(), projectUri)
+                && Objects.equal(data.getLocale(), locale)
+                && Objects.equal(data.getTranslations(), dictionary);
+
+        if (!isEqual) {
+            this.dictionary.clear();
+            this.dictionary.putAll(data.getTranslations());
+            this.projectUri = data.getProjectUri();
+            this.locale = data.getLocale();
+
+            for (Consumer<Translation> listener : changeListeners) {
+                listener.accept(this);
+            }
         }
     }
 

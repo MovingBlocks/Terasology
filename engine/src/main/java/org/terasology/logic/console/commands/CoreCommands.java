@@ -208,10 +208,10 @@ public class CoreCommands extends BaseComponentSystem {
         Locale locale = Locale.forLanguageTag(langTag);
         TranslationProject proj = translationSystem.getProject(new SimpleUri("engine:menu"));
         if (proj.getAvailableLocales().contains(locale)) {
-            String nat = translationSystem.translate("engine:menu#this-language-native", locale);
-            String eng = translationSystem.translate("engine:menu#this-language-English", locale);
             config.getSystem().setLocale(locale);
             nuiManager.invalidate();
+            String nat = translationSystem.translate("engine:menu#this-language-native", locale).orElse("");
+            String eng = translationSystem.translate("engine:menu#this-language-English", locale).orElse(langTag);
             return String.format("Language set to %s (%s)", nat, eng);
         } else {
             return "Unrecognized locale! Try one of: " + proj.getAvailableLocales();
