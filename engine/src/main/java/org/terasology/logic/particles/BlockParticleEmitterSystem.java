@@ -40,6 +40,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.logic.NearestSortingList;
+import org.terasology.rendering.opengl.OpenGLUtil;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -296,7 +297,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         for (Particle particle : particleEffect.particles) {
             glPushMatrix();
             glTranslatef(particle.position.x, particle.position.y, particle.position.z);
-            applyOrientation();
+            OpenGLUtil.applyBillboardOrientation();
             glScalef(particle.size, particle.size, particle.size);
 
             float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
@@ -314,7 +315,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         for (Particle particle : particleEffect.particles) {
             glPushMatrix();
             glTranslatef(particle.position.x, particle.position.y, particle.position.z);
-            applyOrientation();
+            OpenGLUtil.applyBillboardOrientation();
             glScalef(particle.size, particle.size, particle.size);
 
             float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
@@ -327,24 +328,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
 
-    private void applyOrientation() {
-        // Fetch the current modelview matrix
-        final FloatBuffer model = BufferUtils.createFloatBuffer(16);
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
 
-        // And undo all rotations and scaling
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (i == j) {
-                    model.put(i * 4 + j, 1.0f);
-                } else {
-                    model.put(i * 4 + j, 0.0f);
-                }
-            }
-        }
-
-        GL11.glLoadMatrix(model);
-    }
 
     protected void renderParticle(Particle particle, float light) {
         Material mat = Assets.getMaterial("engine:prog.particle").get();

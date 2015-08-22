@@ -45,6 +45,10 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public void disconnect() {
+        EntityRef clientInfoEntity = clientEntity.getComponent(ClientComponent.class).clientInfo;
+        ClientInfoComponent clientInfoComp = clientInfoEntity.getComponent(ClientInfoComponent.class);
+        clientInfoComp.client = EntityRef.NULL;
+        clientInfoEntity.saveComponent(clientInfoComp);
         clientEntity.destroy();
     }
 
@@ -68,6 +72,13 @@ public abstract class AbstractClient implements Client {
         if (!clientInfo.exists()) {
             clientInfo = createClientInfoEntity(entityManager);
         }
+        ClientInfoComponent clientInfoComp = clientInfo.getComponent(ClientInfoComponent.class);
+        clientInfoComp.client = clientEntity;
+        clientInfo.saveComponent(clientInfoComp);
+
+        ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
+        clientComponent.clientInfo = clientInfo;
+        clientEntity.saveComponent(clientComponent);
 
         addOrSetColorComponent(clientInfo, color);
 
@@ -76,10 +87,6 @@ public abstract class AbstractClient implements Client {
             String bestAvailableName = findUniquePlayerName(preferredName, entityManager, clientInfo);
             addOrSetDisplayNameComponent(clientInfo, bestAvailableName);
         }
-
-        ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
-        clientComponent.clientInfo = clientInfo;
-        clientEntity.saveComponent(clientComponent);
     }
 
     private void addOrSetColorComponent(EntityRef clientInfo, Color color) {

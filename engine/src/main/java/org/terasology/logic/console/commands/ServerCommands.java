@@ -28,6 +28,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.math.geom.Vector3i;
@@ -99,6 +100,32 @@ public class ServerCommands extends BaseComponentSystem {
         }
 
         throw new IllegalArgumentException("No such user '" + username + "'");
+    }
+
+    @Command(shortDescription = "Rename a user", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
+    public String renameUser(
+            @CommandParam(value = "userName", suggester = UsernameSuggester.class) String userName,
+            @CommandParam(value = "newUserName") String newUserName) {
+        Iterable<EntityRef> clientInfoEntities = entityManager.getEntitiesWith(ClientInfoComponent.class);
+        for (EntityRef clientInfo : clientInfoEntities) {
+            DisplayNameComponent nameComp = clientInfo.getComponent(DisplayNameComponent.class);
+            if (newUserName.equals(nameComp.name)) {
+                throw new IllegalArgumentException("New user name is already in use");
+            }
+        }
+
+
+        for (EntityRef clientInfo : clientInfoEntities) {
+            DisplayNameComponent nameComp = clientInfo.getComponent(DisplayNameComponent.class);
+            if (userName.equals(nameComp.name)) {
+                nameComp.name = newUserName;
+                clientInfo.saveComponent(nameComp);
+                return "User " + userName + " has been renamed to " + newUserName;
+            }
+        }
+
+        throw new IllegalArgumentException("No such user '" + userName + "'");
     }
 
     @Command(shortDescription = "Kick user by ID", runOnServer = true,
