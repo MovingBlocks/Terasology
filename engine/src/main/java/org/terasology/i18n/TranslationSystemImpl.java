@@ -87,22 +87,29 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     @Override
-    public Optional<String> translate(String id) {
+    public String translate(String id) {
         return translate(id, config.getLocale());
     }
 
     @Override
-    public Optional<String> translate(String id, Locale otherLocale) {
-        TranslationUri uri = new TranslationUri(id);
-        if (uri.isValid()) {
-            TranslationProject project = getProject(uri.getProjectUri());
-            if (project != null) {
-                return project.translate(uri.getId(), otherLocale);
-            } else {
-                logger.warn("Invalid project for '{}'", id);
+    public String translate(String text, Locale otherLocale) {
+        Optional<String> idOpt = extractId(text);
+        if (idOpt.isPresent()) {
+            String id = idOpt.get();
+            TranslationUri uri = new TranslationUri(id);
+            if (uri.isValid()) {
+                TranslationProject project = getProject(uri.getProjectUri());
+                if (project != null) {
+                    Optional<String> opt = project.translate(uri.getId(), otherLocale);
+                    if (opt.isPresent()) {
+                        return opt.get();
+                    }
+                }
             }
+            logger.warn("Invalid id '{}'", id);
+            return "?" + id + "?";
         }
-        return Optional.empty();
+        return text;
     }
 
     @Override
@@ -124,5 +131,20 @@ public class TranslationSystemImpl implements TranslationSystem {
         for (Consumer<TranslationProject> listener : changeListeners) {
             listener.accept(project);
         }
+    }
+
+    /**
+     * @param text the text to use
+     * @return the translation ID string or <code>null</code>.
+     */
+    private static Optional<String> extractId(String text) {
+        if (text != null) {
+            int start = text.indexOf("${");
+            int end = text.lastIndexOf('}');
+            if (start >= 0 && end > start) {
+                return Optional.of(text.substring(start + 2, end));
+            }
+        }
+        return Optional.empty();
     }
 }

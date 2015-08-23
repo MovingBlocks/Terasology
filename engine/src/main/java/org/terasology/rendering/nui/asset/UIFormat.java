@@ -58,7 +58,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -102,17 +101,6 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             reader.setLenient(true);
             return gson.fromJson(reader, UIData.class);
         }
-    }
-
-    private static String extractId(String text) {
-        if (text != null) {
-            int start = text.indexOf("${");
-            int end = text.lastIndexOf('}');
-            if (start >= 0 && end > start) {
-                return text.substring(start + 2, end);
-            }
-        }
-        return null;
     }
 
     /**
@@ -207,14 +195,8 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                         } else if (field.getType().equals(String.class)) {
                             JsonElement jsonValue = jsonObject.get(field.getSerializationName());
                             String text = context.deserialize(jsonValue, field.getType());
-                            String i18nId = extractId(text);
-                            if (i18nId != null) {
-                                Optional<String> i18nText = translationSystem.translate(i18nId);
-                                if (i18nText.isPresent()) {
-                                    text = i18nText.get();
-                                }
-                            }
-                            field.setValue(element, text);
+                            String i18nText = translationSystem.translate(text);
+                            field.setValue(element, i18nText);
                         } else {
                             field.setValue(element, context.deserialize(jsonObject.get(field.getSerializationName()), field.getType()));
                         }

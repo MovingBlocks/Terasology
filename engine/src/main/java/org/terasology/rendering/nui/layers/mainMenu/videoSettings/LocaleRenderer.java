@@ -37,8 +37,8 @@ public class LocaleRenderer extends StringTextRenderer<Locale> {
 
     @Override
     public String getString(Locale locale) {
-        String nat = translationSystem.translate("engine:menu#this-language-native", locale).orElse("");
-        String eng = translationSystem.translate("engine:menu#this-language-English", locale).orElse(locale.toString());
+        String nat = translationSystem.translate("${engine:menu#this-language-native}", locale);
+        String eng = translationSystem.translate("${engine:menu#this-language-English}", locale);
         return String.format("%s (%s)", nat, eng);
     }
 

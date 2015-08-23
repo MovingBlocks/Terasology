@@ -17,7 +17,6 @@
 package org.terasology.i18n;
 
 import java.util.Locale;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.terasology.engine.Uri;
@@ -39,7 +38,7 @@ public interface TranslationSystem {
      * @param id must match the pattern <code>${module:project#id}</code>
      * @return the translated string
      */
-    Optional<String> translate(String id);
+    String translate(String id);
 
     /**
      * If no perfect match is found for the given locale, fallback strategies will attempt to find the closest match.
@@ -47,7 +46,7 @@ public interface TranslationSystem {
      * @param locale the target locale
      * @return the translated string
      */
-    Optional<String> translate(String id, Locale locale);
+    String translate(String id, Locale locale);
 
     /**
      * Subscribe to change events. Will be fired when the content of a project is changed.
@@ -65,5 +64,4 @@ public interface TranslationSystem {
      * Check if the collection of translation assets has changed.
      */
     void refresh();
-
 }
