@@ -43,12 +43,16 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
 import org.terasology.splash.overlay.AnimatedBoxRowOverlay;
+import org.terasology.splash.overlay.ImageOverlay;
 import org.terasology.splash.overlay.RectOverlay;
 import org.terasology.splash.overlay.TextOverlay;
+import org.terasology.splash.overlay.TriggerImageOverlay;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -72,7 +76,9 @@ import java.util.List;
  * <tr><td>-headless</td><td>Start headless.</td></tr>
  * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
  * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
- * <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
+ * <tr><td>-noCrashReport</td><td>Disable crash reporting.</td></tr>
+ * <tr><td>-noSound</td><td>Disable sound.</td></tr>
+ * <tr><td>-noSplash</td><td>Disable splash screen.</td></tr>
  * <tr><td>-serverPort=xxxxx</td><td>Change the server port.</td></tr>
  * </tbody>
  * </table>
@@ -97,11 +103,13 @@ public final class Terasology {
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
     private static final String NO_SOUND = "-noSound";
+    private static final String NO_SPLASH = "-noSplash";
     private static final String SERVER_PORT = "-serverPort=";
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
     private static boolean soundEnabled = true;
+    private static boolean splashEnabled = true;
     private static boolean loadLastGame;
 
     private Terasology() {
@@ -109,19 +117,12 @@ public final class Terasology {
 
     public static void main(String[] args) {
 
-        // To have the splash screen in your favorite IDE add
-        //
-        //   eclipse:  -splash:src/main/resources/splash/splash.jpg (the PC facade root folder is the working dir.)
-        //   IntelliJ: -splash:facades/PC/src/main/resources/splash/splash.jpg (root project is the working dir.)
-        //
-        // as JVM argument (not program argument!)
-
-        SplashScreen splashScreen = configureSplashScreen();
-
-        splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
-
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
+
+        SplashScreen splashScreen = splashEnabled ? configureSplashScreen() : SplashScreenBuilder.createStub();
+
+        splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         setupLogging();
 
@@ -173,6 +174,44 @@ public final class Terasology {
 
         SplashScreenBuilder builder = new SplashScreenBuilder();
 
+        String[] imgFiles = new String[] {
+                "splash_1.png",
+                "splash_2.png",
+                "splash_3.png",
+                "splash_4.png",
+                "splash_5.png"
+        };
+
+        Point[] imgOffsets = new Point[] {
+                new Point(0, 0),
+                new Point(150, 0),
+                new Point(300, 0),
+                new Point(450, 0),
+                new Point(630, 0)
+        };
+
+        EngineStatus[] trigger = new EngineStatus[] {
+                TerasologyEngineStatus.PREPARING_SUBSYSTEMS,
+                TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER,
+                TerasologyEngineStatus.INITIALIZING_ASSET_TYPES,
+                TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS,
+                TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT,
+        };
+
+        try {
+            for (int index = 0; index < 5; index++) {
+                URL resource = Terasology.class.getResource("/splash/" + imgFiles[index]);
+                builder.add(new TriggerImageOverlay(resource)
+                        .setTrigger(trigger[index].getDescription())
+                        .setPosition(imgOffsets[index].x, imgOffsets[index].y));
+            }
+
+            builder.add(new ImageOverlay(Terasology.class.getResource("/splash/splash_text.png")));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         SplashScreen instance = builder
                 .add(new RectOverlay(rectRc))
                 .add(new TextOverlay(textRc))
@@ -213,6 +252,7 @@ public final class Terasology {
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
                 NO_SOUND,
+                NO_SPLASH,
                 SERVER_PORT + "<port>");
 
         StringBuilder optText = new StringBuilder();
@@ -242,6 +282,8 @@ public final class Terasology {
         System.out.println("To disable this feature use the " + NO_CRASH_REPORT + " launch argument.");
         System.out.println();
         System.out.println("To disable sound use the " + NO_SOUND + " launch argument (default in headless mode).");
+        System.out.println();
+        System.out.println("To disable the splash screen use the " + NO_SPLASH + " launch argument.");
         System.out.println();
         System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
         System.out.println();
@@ -286,6 +328,8 @@ public final class Terasology {
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SOUND)) {
                 soundEnabled = false;
+            } else if (arg.equals(NO_SPLASH)) {
+                splashEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {

@@ -238,6 +238,7 @@ public class TerasologyEngine implements GameEngine {
      * Gives a chance to subsystems to do something BEFORE managers and Time are initialized.
      */
     private void preInitSubsystems() {
+        changeStatus(TerasologyEngineStatus.PREPARING_SUBSYSTEMS);
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Pre-initialising " + subsystem.getName() + " subsystem");
             subsystem.preInitialise(rootContext);
@@ -245,6 +246,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initSubsystems() {
+        changeStatus(TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS);
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Initialising " + subsystem.getName() + " subsystem");
             subsystem.initialise(this, rootContext);

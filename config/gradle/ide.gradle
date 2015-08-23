@@ -243,9 +243,9 @@ ext {
             </configuration>
         '''))
 
-        // Run config that includes the game splash screen
+        // Run config that disables the splash screen
         runManager.append(new XmlParser().parseText('''
-            <configuration default="false" name="TerasologyPC (Splash enabled)" type="Application" factoryName="Application">
+            <configuration default="false" name="TerasologyPC (Splash disabled)" type="Application" factoryName="Application">
               <extension name="coverage" enabled="false" merge="false" runner="idea">
                 <pattern>
                   <option name="PATTERN" value="org.terasology.engine.*"/>
@@ -253,8 +253,8 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m -splash:facades/PC/src/main/resources/splash/splash.jpg"/>
-              <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -noSplash"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
               <option name="ALTERNATIVE_JRE_PATH" value=""/>
