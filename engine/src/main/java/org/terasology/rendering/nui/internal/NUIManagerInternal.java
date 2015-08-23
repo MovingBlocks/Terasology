@@ -83,7 +83,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
-    private NUITranslator translator;
 
     public NUIManagerInternal(CanvasRenderer renderer, Context context) {
         this.context = context;
@@ -95,7 +94,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         refreshWidgetsLibrary();
 
         TranslationSystem system = context.get(TranslationSystem.class);
-        this.translator = new NUITranslator(system, getWidgetMetadataLibrary());
         system.subscribe(proj -> invalidate());
     }
 
@@ -586,7 +584,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private void prepare(ControlWidget screen) {
         InjectionHelper.inject(screen);
-        translator.updateWidget(screen);
         screen.onOpened();
     }
 

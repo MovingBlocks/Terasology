@@ -33,6 +33,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.Border;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -57,6 +58,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -82,6 +84,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     @Override
     public UIData load(ResourceUrn resourceUrn, List<AssetDataFile> inputs) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
         library.add(UISkin.class, new AssetTypeHandler<>(UISkin.class));
         library.add(Border.class, new BorderTypeHandler());
@@ -89,7 +92,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
-                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
+                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager, translationSystem));
         for (Class<?> handledType : library.getCoreTypes()) {
             gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
         }
@@ -99,6 +102,17 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             reader.setLenient(true);
             return gson.fromJson(reader, UIData.class);
         }
+    }
+
+    private static String extractId(String text) {
+        if (text != null) {
+            int start = text.indexOf("${");
+            int end = text.lastIndexOf('}');
+            if (start >= 0 && end > start) {
+                return text.substring(start + 2, end);
+            }
+        }
+        return null;
     }
 
     /**
@@ -124,9 +138,11 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     private static final class UIWidgetTypeAdapter implements JsonDeserializer<UIWidget> {
 
         private NUIManager nuiManager;
+        private TranslationSystem translationSystem;
 
-        public UIWidgetTypeAdapter(NUIManager nuiManager) {
+        public UIWidgetTypeAdapter(NUIManager nuiManager, TranslationSystem translationSystem) {
             this.nuiManager = nuiManager;
+            this.translationSystem = translationSystem;
         }
 
         @Override
@@ -188,6 +204,17 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                                 }
                                 field.setValue(element, result);
                             }
+                        } else if (field.getType().equals(String.class)) {
+                            JsonElement jsonValue = jsonObject.get(field.getSerializationName());
+                            String text = context.deserialize(jsonValue, field.getType());
+                            String i18nId = extractId(text);
+                            if (i18nId != null) {
+                                Optional<String> i18nText = translationSystem.translate(i18nId);
+                                if (i18nText.isPresent()) {
+                                    text = i18nText.get();
+                                }
+                            }
+                            field.setValue(element, text);
                         } else {
                             field.setValue(element, context.deserialize(jsonObject.get(field.getSerializationName()), field.getType()));
                         }
