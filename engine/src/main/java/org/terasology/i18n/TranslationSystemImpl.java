@@ -32,6 +32,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Uri;
 import org.terasology.i18n.assets.Translation;
 
@@ -96,14 +97,13 @@ public class TranslationSystemImpl implements TranslationSystem {
         Optional<String> idOpt = extractId(text);
         if (idOpt.isPresent()) {
             String id = idOpt.get();
-            TranslationUri uri = new TranslationUri(id);
-            if (uri.isValid()) {
-                TranslationProject project = getProject(uri.getProjectUri());
-                if (project != null) {
-                    Optional<String> opt = project.translate(uri.getId(), otherLocale);
-                    if (opt.isPresent()) {
-                        return opt.get();
-                    }
+            ResourceUrn uri = new ResourceUrn(id);
+            SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
+            TranslationProject project = getProject(projectUri);
+            if (project != null) {
+                Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale);
+                if (opt.isPresent()) {
+                    return opt.get();
                 }
             }
             logger.warn("Invalid id '{}'", id);

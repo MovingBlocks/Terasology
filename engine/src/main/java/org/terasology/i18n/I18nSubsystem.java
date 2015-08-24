@@ -16,9 +16,13 @@
 
 package org.terasology.i18n;
 
+import org.terasology.assets.AssetFactory;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.i18n.assets.Translation;
+import org.terasology.i18n.assets.TranslationData;
 
 /**
  * Registers internationalization systems.
@@ -28,6 +32,12 @@ public class I18nSubsystem implements EngineSubsystem {
     @Override
     public String getName() {
         return "Internationalization";
+    }
+
+    @Override
+    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
+        assetTypeManager.registerCoreAssetType(Translation.class,
+                (AssetFactory<Translation, TranslationData>) Translation::new, "i18n");
     }
 
     @Override

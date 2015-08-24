@@ -49,8 +49,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.i18n.I18nSubsystem;
-import org.terasology.i18n.assets.Translation;
-import org.terasology.i18n.assets.TranslationData;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
@@ -318,8 +316,6 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
-        assetTypeManager.registerCoreAssetType(Translation.class,
-                (AssetFactory<Translation, TranslationData>) Translation::new, "i18n");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);

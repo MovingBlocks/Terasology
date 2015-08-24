@@ -91,15 +91,32 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
-                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager, translationSystem));
+                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
         for (Class<?> handledType : library.getCoreTypes()) {
             gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
         }
+        // override the String TypeAdapter from the serialization library
+        gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem));
         Gson gson = gsonBuilder.create();
 
         try (JsonReader reader = new JsonReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UIData.class);
+        }
+    }
+
+    private static final class I18nStringTypeAdapter implements JsonDeserializer<String> {
+
+        private final TranslationSystem translationSystem;
+
+        public I18nStringTypeAdapter(TranslationSystem translationSystem) {
+            this.translationSystem = translationSystem;
+        }
+
+        @Override
+        public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            String text = json.getAsString();
+            return translationSystem.translate(text);
         }
     }
 
@@ -126,11 +143,9 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     private static final class UIWidgetTypeAdapter implements JsonDeserializer<UIWidget> {
 
         private NUIManager nuiManager;
-        private TranslationSystem translationSystem;
 
-        public UIWidgetTypeAdapter(NUIManager nuiManager, TranslationSystem translationSystem) {
+        public UIWidgetTypeAdapter(NUIManager nuiManager) {
             this.nuiManager = nuiManager;
-            this.translationSystem = translationSystem;
         }
 
         @Override
@@ -192,11 +207,6 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                                 }
                                 field.setValue(element, result);
                             }
-                        } else if (field.getType().equals(String.class)) {
-                            JsonElement jsonValue = jsonObject.get(field.getSerializationName());
-                            String text = context.deserialize(jsonValue, field.getType());
-                            String i18nText = translationSystem.translate(text);
-                            field.setValue(element, i18nText);
                         } else {
                             field.setValue(element, context.deserialize(jsonObject.get(field.getSerializationName()), field.getType()));
                         }
