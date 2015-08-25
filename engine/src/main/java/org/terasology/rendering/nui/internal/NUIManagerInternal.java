@@ -567,6 +567,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         for (UIElement element : assetManager.getLoadedAssets(UIElement.class)) {
             element.dispose();
         }
+
+        boolean hudVisible = isHUDVisible();
+        if (hudVisible) {
+            setHUDVisible(false);
+        }
+
         Deque<ResourceUrn> reverseUrns = new LinkedList<>();
         Map<UIScreenLayer, ResourceUrn> inverseLookup = screenLookup.inverse();
         for (UIScreenLayer screen : screens) {
@@ -579,6 +585,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         for (ResourceUrn urn : reverseUrns) {
             pushScreen(urn);
+        }
+
+        if (hudVisible) {
+            setHUDVisible(true);
         }
     }
 
