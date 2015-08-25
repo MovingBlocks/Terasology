@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
@@ -27,6 +28,8 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -38,6 +41,7 @@ public class OpenGLTexture extends Texture {
     private final LwjglGraphics graphicsManager;
     private transient int id;
     private transient LoadedTextureInfo loadedTextureInfo;
+    private final List<Runnable> disposalSubscribers = Lists.newArrayList();
 
     public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, LwjglGraphics graphicsManager) {
         super(urn, assetType);
@@ -128,6 +132,7 @@ public class OpenGLTexture extends Texture {
     @Override
     protected void doDispose() {
         if (loadedTextureInfo != null) {
+            disposalSubscribers.forEach(java.lang.Runnable::run);
             graphicsManager.disposeTexture(id);
             loadedTextureInfo = null;
             id = 0;
@@ -191,6 +196,16 @@ public class OpenGLTexture extends Texture {
     @Override
     public Rect2i getPixelRegion() {
         return Rect2i.createFromMinAndSize(0, 0, getWidth(), getHeight());
+    }
+
+    @Override
+    public synchronized void subscribeToDisposal(Runnable subscriber) {
+        disposalSubscribers.add(subscriber);
+    }
+
+    @Override
+    public synchronized void unsubscribeToDisposal(Runnable subscriber) {
+        disposalSubscribers.remove(subscriber);
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.headless.assets;
 
+import com.google.common.collect.Lists;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2f;
@@ -23,6 +24,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HeadlessTexture extends Texture {
@@ -31,6 +33,7 @@ public class HeadlessTexture extends Texture {
 
     private TextureData textureData;
     private int id;
+    private final List<Runnable> disposalListeners = Lists.newArrayList();
 
     public HeadlessTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
         super(urn, assetType);
@@ -74,6 +77,7 @@ public class HeadlessTexture extends Texture {
 
     @Override
     protected void doDispose() {
+        disposalListeners.forEach(java.lang.Runnable::run);
         this.textureData = null;
     }
 
@@ -120,5 +124,15 @@ public class HeadlessTexture extends Texture {
     @Override
     public Rect2i getPixelRegion() {
         return Rect2i.createFromMinAndSize(0, 0, textureData.getWidth(), textureData.getHeight());
+    }
+
+    @Override
+    public synchronized void subscribeToDisposal(Runnable subscriber) {
+        disposalListeners.add(subscriber);
+    }
+
+    @Override
+    public synchronized void unsubscribeToDisposal(Runnable subscriber) {
+        disposalListeners.remove(subscriber);
     }
 }
