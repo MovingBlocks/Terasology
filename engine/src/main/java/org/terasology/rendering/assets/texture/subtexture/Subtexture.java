@@ -34,14 +34,20 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     private Texture texture;
     private Rect2f subregion;
+    private Runnable disposalAction;
 
     public Subtexture(ResourceUrn urn, AssetType<?, SubtextureData> assetType, SubtextureData data) {
         super(urn, assetType);
+        disposalAction = this::dispose;
         reload(data);
     }
 
     @Override
     protected void doReload(SubtextureData data) {
+        data.getTexture().subscribeToDisposal(disposalAction);
+        if (texture != null) {
+              texture.unsubscribeToDisposal(disposalAction);
+        }
         this.texture = data.getTexture();
         this.subregion = data.getRegion();
     }

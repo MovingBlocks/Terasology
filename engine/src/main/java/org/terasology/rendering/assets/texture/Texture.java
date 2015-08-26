@@ -60,5 +60,8 @@ public abstract class Texture extends TextureRegionAsset<TextureData> {
 
     public abstract boolean isLoaded();
 
+    public abstract void subscribeToDisposal(Runnable subscriber);
+
+    public abstract void unsubscribeToDisposal(Runnable subscriber);
 
 }
