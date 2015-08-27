@@ -1,10 +1,9 @@
 {
-    "this-language-native": "Polski",
-    "this-language-English": "Polish",
-
     "exit-game": "Wyjście", 
     "game-settings": "Ustawienia", 
     "host-multiplayer-game": "Hostuj Grę", 
-    "join-game-online": "Dołączyć do gry", 
-    "start-singleplayer-game": "Singleplayer"
+    "join-game-online": "Dołącz do gry", 
+    "start-singleplayer-game": "Singleplayer", 
+    "this-language-English": "Polish", 
+    "this-language-native": "Polski"
 }
