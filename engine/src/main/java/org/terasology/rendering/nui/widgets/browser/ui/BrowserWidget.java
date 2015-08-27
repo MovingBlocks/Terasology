@@ -41,9 +41,6 @@ public class BrowserWidget extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         hyperlinkBoxes.clear();
-        if (displayedPage != null) {
-            DocumentRenderer.drawDocumentInRegion(displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), canvas.size(), register);
-        }
         canvas.addInteractionRegion(
                 new BaseInteractionListener() {
                     @Override
@@ -61,6 +58,9 @@ public class BrowserWidget extends CoreWidget {
                         return true;
                     }
                 });
+        if (displayedPage != null) {
+            DocumentRenderer.drawDocumentInRegion(displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), canvas.size(), register);
+        }
     }
 
 
