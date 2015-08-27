@@ -114,27 +114,6 @@ public class CreateGameScreen extends CoreScreenLayer {
 
             @Override
             public Module get() {
-                // try and be smart about auto selecting a gameplay
-                if (selected == null) {
-                    // get the default gameplay module from the config.  This is likely to have  a user triggered selection.
-                    Module defaultGameplayModule = moduleManager.getRegistry().getLatestModuleVersion(
-                            new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
-                    if (defaultGameplayModule != null) {
-                        set(defaultGameplayModule);
-                        return selected;
-                    }
-
-                    // find the first gameplay module that is available
-                    for (Module module : moduleManager.getRegistry()) {
-                        // module is null if it is no longer present
-                        if (module != null && StandardModuleExtension.isGameplayModule(module)) {
-                            set(module);
-                            return selected;
-                        }
-                    }
-
-                }
-
                 return selected;
             }
 
@@ -294,6 +273,28 @@ public class CreateGameScreen extends CoreScreenLayer {
         });
     }
 
+    @Override
+    public void onOpened() {
+        super.onOpened();
+
+        final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
+
+        // get the default gameplay module from the config.  This is likely to have a user triggered selection.
+        Name defaultGameplayModuleName = new Name(config.getDefaultModSelection().getDefaultGameplayModuleName());
+        Module defaultGameplayModule = moduleManager.getRegistry().getLatestModuleVersion(defaultGameplayModuleName);
+        if (defaultGameplayModule != null) {
+            gameplay.setSelection(defaultGameplayModule);
+        } else {
+            // find the first gameplay module that is available
+            for (Module module : moduleManager.getRegistry()) {
+                // module is null if it is no longer present
+                if (module != null && StandardModuleExtension.isGameplayModule(module)) {
+                    gameplay.setSelection(module);
+                }
+            }
+        }
+    }
+
     private Set<Name> getAllEnabledModuleNames() {
         Set<Name> enabledModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
@@ -307,29 +308,30 @@ public class CreateGameScreen extends CoreScreenLayer {
     private void recursivelyAddModuleDependencies(Set<Name> modules, Name moduleName) {
         Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
         if (module != null) {
-            if (module != null) {
-                for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-                    modules.add(dependencyInfo.getId());
-                    recursivelyAddModuleDependencies(modules, dependencyInfo.getId());
-                }
+            for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
+                modules.add(dependencyInfo.getId());
+                recursivelyAddModuleDependencies(modules, dependencyInfo.getId());
             }
         }
     }
 
     private void setSelectedGameplayModule(Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
+        if (moduleConfig.getDefaultGameplayModuleName().equals(module.getId().toString())) {
+            // same as before -> we're done
+            return;
+        }
+
         moduleConfig.setDefaultGameplayModuleName(module.getId().toString());
         moduleConfig.clear();
         moduleConfig.addModule(module.getId());
 
         // Set the default generator of the selected gameplay module
-        if (module != null) {
-            SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
-            if (defaultWorldGenerator != null) {
-                for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
-                    if (worldGenInfo.getUri().equals(defaultWorldGenerator)) {
-                        config.getWorldGeneration().setDefaultGenerator(worldGenInfo.getUri());
-                    }
+        SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
+        if (defaultWorldGenerator != null) {
+            for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
+                if (worldGenInfo.getUri().equals(defaultWorldGenerator)) {
+                    config.getWorldGeneration().setDefaultGenerator(worldGenInfo.getUri());
                 }
             }
         }
