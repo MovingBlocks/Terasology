@@ -1,10 +1,9 @@
 {
-    "this-language-native": "Italiano",
-    "this-language-English": "Italian",
-
     "exit-game": "Esci", 
-    "game-settings": "Opzioni", 
+    "game-settings": "Impostazioni", 
     "host-multiplayer-game": "Ospita partita", 
     "join-game-online": "Unisciti alla partita", 
-    "start-singleplayer-game": "Singleplayer"
+    "start-singleplayer-game": "Singleplayer", 
+    "this-language-English": "Italian", 
+    "this-language-native": "Italiano"
 }
