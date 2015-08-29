@@ -68,6 +68,8 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
         int minY = worldRegion.minY();
         int maxY = worldRegion.maxY();
 
+        Vector3i pos = new Vector3i();
+
         for (int z = worldRegion.minZ(); z <= worldRegion.maxZ(); z++) {
             for (int x = worldRegion.minX(); x <= worldRegion.maxX(); x++) {
                 int height = TeraMath.floorToInt(surfaceFacet.getWorld(x, z)) + 1;
@@ -75,7 +77,7 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
                 // if the surface is in range
                 if (height >= minY && height <= maxY) {
 
-                    Vector3i pos = new Vector3i(x, height, z);
+                    pos.set(x, height, z);
 
                     // if all predicates match
                     if (applyAll(filters, pos)) {
