@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,11 @@ import org.terasology.i18n.assets.Translation;
 public class TranslationSystemImpl implements TranslationSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(TranslationSystemImpl.class);
+
+    /**
+     * The unescaped pattern is <code>${[^}]+})}</code>. Searches for <code>${text}<code> expressions.
+     */
+    private static final Pattern ID_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
     private final List<Consumer<TranslationProject>> changeListeners = new CopyOnWriteArrayList<>();
     private final Map<Uri, TranslationProject> projects = new HashMap<>();
@@ -94,22 +101,35 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     @Override
     public String translate(String text, Locale otherLocale) {
-        Optional<String> idOpt = extractId(text);
-        if (idOpt.isPresent()) {
-            String id = idOpt.get();
+        int cursor = 0;
+
+        Matcher m = ID_PATTERN.matcher(text);
+        StringBuffer sb = new StringBuffer();
+
+        while (m.find()) {
+            sb.append(text, cursor, m.start());
+
+            String id = m.group(1);
             ResourceUrn uri = new ResourceUrn(id);
             SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
             TranslationProject project = getProject(projectUri);
             if (project != null) {
                 Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale);
                 if (opt.isPresent()) {
-                    return opt.get();
+                    sb.append(opt.get());
+                } else {
+                    logger.warn("No translation for '{}'", id);
+                    sb.append("?" + uri.getFragmentName() + "?");
                 }
+            } else {
+                logger.warn("Invalid project id '{}'", id);
+                sb.append("?" + uri.getFragmentName() + "?");
             }
-            logger.warn("Invalid id '{}'", id);
-            return "?" + id + "?";
+            cursor = m.end();
         }
-        return text;
+
+        sb.append(text, cursor, text.length());
+        return sb.toString();
     }
 
     @Override
@@ -131,20 +151,5 @@ public class TranslationSystemImpl implements TranslationSystem {
         for (Consumer<TranslationProject> listener : changeListeners) {
             listener.accept(project);
         }
-    }
-
-    /**
-     * @param text the text to use
-     * @return the translation ID string or <code>null</code>.
-     */
-    private static Optional<String> extractId(String text) {
-        if (text != null) {
-            int start = text.indexOf("${");
-            int end = text.lastIndexOf('}');
-            if (start >= 0 && end > start) {
-                return Optional.of(text.substring(start + 2, end));
-            }
-        }
-        return Optional.empty();
     }
 }
