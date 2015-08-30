@@ -10,7 +10,7 @@
                 "contents" : [
                     {
                         "type" : "UILabel",
-                        "text" : "Ingame Menu"
+                        "text" : "${engine:menu#ingame-menu-title}"
                     },
                     {
                         "type" : "UISpace",
@@ -19,7 +19,7 @@
                     {
                         "type" : "UIButton",
                         "id" : "close",
-                        "text" : "Back"
+                        "text" : "${engine:menu#back}"
                     },
                     {
                         "type" : "UISpace",
@@ -28,17 +28,17 @@
                     {
                         "type" : "UIButton",
                         "id" : "settings",
-                        "text" : "Settings"
+                        "text" : "${engine:menu#game-settings}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "mainMenu",
-                        "text" : "Return to Menu"
+                        "text" : "${engine:menu#return-main-menu}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "exit",
-                        "text" : "Exit Terasology"
+                        "text" : "${engine:menu#exit-game}"
                     }
                 ],
                 "layoutInfo" : {

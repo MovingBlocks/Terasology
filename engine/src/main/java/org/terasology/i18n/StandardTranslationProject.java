@@ -59,9 +59,6 @@ public class StandardTranslationProject implements TranslationProject {
         if (result == null) {
             result = translateExact(key, Locale.ENGLISH);
         }
-        if (result == null) {
-            result = translateExact(key, Locale.ROOT);
-        }
 
         return Optional.ofNullable(result);
     }

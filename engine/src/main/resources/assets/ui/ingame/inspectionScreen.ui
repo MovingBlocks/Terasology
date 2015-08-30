@@ -45,7 +45,6 @@
                 ],
                 "layoutInfo" : {
                     "use-content-height" : true,
-                    "use-content-height" : true,
                     "width" : 500,
                     "position-horizontal-center" : {},
                     "position-vertical-top" : {},
@@ -54,7 +53,7 @@
                             "target": "TOP"
                     }
                 }
-            },
+            }
 
         ]
     }

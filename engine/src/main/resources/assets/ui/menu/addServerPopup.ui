@@ -19,7 +19,7 @@
                         "contents" : [
                             {
                                 "type" : "UILabel",
-                                "text" : "Add Server",
+                                "text" : "${engine:menu#edit-server-title}",
                                 "family" : "title"
                             },
                             {
@@ -31,7 +31,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "Server Name: ",
+                                        "text" : "${engine:menu#server-name}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -48,7 +48,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "Owner: ",
+                                        "text" : "${engine:menu#server-owner}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -65,7 +65,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "Address: ",
+                                        "text" : "${engine:menu#server-address}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -82,7 +82,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "Port: ",
+                                        "text" : "${engine:menu#server-port}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -108,12 +108,12 @@
                                 "contents" : [
                                     {
                                         "type" : "UIButton",
-                                        "text" : "Ok",
+                                        "text" : "${engine:menu#dialog-ok}",
                                         "id" : "ok"
                                     },
                                     {
                                         "type" : "UIButton",
-                                        "text" : "Cancel",
+                                        "text" : "${engine:menu#dialog-cancel}",
                                         "id" : "cancel"
                                     }
                                 ]

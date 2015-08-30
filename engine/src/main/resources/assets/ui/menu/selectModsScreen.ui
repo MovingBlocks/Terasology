@@ -22,7 +22,7 @@
                     "type" : "UILabel",
                     "id" : "subtitle",
                     "family" : "title",
-                    "text" : "Select Modules...",
+                    "text" : "${engine:menu#select-modules-title}",
                     "layoutInfo" : {
                         "height" : 48,
                         "position-horizontal-center" : {},
@@ -101,7 +101,7 @@
                                         {
                                             "type" : "UIButton",
                                             "id" : "disableAll",
-                                            "text" : "Disable All"
+                                            "text" : "${engine:menu#disable-all-modules}"
                                         }
                                     ],
                                     "layoutInfo" : {
@@ -128,7 +128,7 @@
                                     "contents" : [
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Name: "
+                                            "text" : "${engine:menu#module-name}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -137,7 +137,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Installed: "
+                                            "text" : "${engine:menu#module-version-installed}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -146,7 +146,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Online: "
+                                            "text" : "${engine:menu#module-version-available}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -155,7 +155,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Status: "
+                                            "text" : "${engine:menu#module-status}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -202,12 +202,12 @@
                                         {
                                             "type" : "UIButton",
                                             "id" : "toggleActivation",
-                                            "text" : "Activate"
+                                            "text" : "${engine:menu#activate-module}"
                                         },
                                         {
                                             "type" : "UIButton",
                                             "id" : "download",
-                                            "text" : "Download"
+                                            "text" : "${engine:menu#download-module}"
                                         }
                                     ],
                                     "layoutInfo" : {
@@ -223,7 +223,7 @@
                 },
                 {
                     "type" : "UIButton",
-                    "text" : "Back",
+                    "text" : "${engine:menu#back}",
                     "id" : "close",
                     "layoutInfo" : {
                         "width" : 128,
