@@ -10,7 +10,7 @@
                 "contents" : [
                     {
                         "type" : "UILabel",
-                        "text" : "You are Dead"
+                        "text" : "${engine:menu#death-screen-title}"
                     },
                     {
                         "type" : "UISpace",
@@ -18,22 +18,22 @@
                     },
                     {
                         "type" : "UIButton",
-                        "text" : "Respawn",
+                        "text" : "${engine:menu#respawn}",
                         "id" : "respawn"
                     },
                     {
                         "type" : "UIButton",
-                        "text" : "Settings",
+                        "text" : "${engine:menu#game-settings}",
                         "id" : "settings"
                     },
                     {
                         "type" : "UIButton",
-                        "text" : "Exit to Main Menu",
+                        "text" : "${engine:menu#return-main-menu}",
                         "id" : "mainMenu"
                     },
                     {
                         "type" : "UIButton",
-                        "text" : "Exit Terasology",
+                        "text" : "${engine:menu#exit-game}",
                         "id" : "exitGame"
                     }
                 ],

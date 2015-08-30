@@ -22,7 +22,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle",
                 "family" : "title",
-                "text" : "Create Game",
+                "text" : "${engine:menu#create-game-title}",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},
@@ -44,7 +44,7 @@
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "Game name:"
+                            "text" : "${engine:menu#game-name}:"
                         },
                         {
                             "type" : "UIText",
@@ -56,7 +56,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Gameplay Template (can click 'modules' to customize further):"
+                            "text" : "${engine:menu#gameplay} (${engine:menu#gameplay-info}):"
                         },
                         {
                             "type" : "RowLayout",
@@ -71,7 +71,7 @@
                                 },
                                 {
                                     "type" : "UIButton",
-                                    "text" : "Modules...",
+                                    "text" : "${engine:menu#select-modules}",
                                     "id" : "mods"
                                 }
                             ]
@@ -90,7 +90,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Seed:"
+                            "text" : "${engine:menu#world-seed}:"
                         },
                         {
                             "type" : "RowLayout",
@@ -105,7 +105,7 @@
                                 },
                                 {
                                     "type" : "UIButton",
-                                    "text" : "Details...",
+                                    "text" : "${engine:menu#world-config-preview}",
                                     "id" : "previewSeed"
                                 }
                             ]
@@ -116,7 +116,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Choose World Generator (enabling modules may add more):"
+                            "text" : "${engine:menu#select-world-gen} (${engine:menu#select-world-gen-info}):"
                         },
                         {
                             "type" : "RowLayout",
@@ -151,12 +151,12 @@
                 "contents" : [
                     {
                         "type" : "UIButton",
-                        "text" : "Play",
+                        "text" : "${engine:menu#start-game}",
                         "id" : "play"
                     },
                     {
                         "type" : "UIButton",
-                        "text" : "Back",
+                        "text" : "${engine:menu#back}",
                         "id" : "close"
                     }
                 ],
