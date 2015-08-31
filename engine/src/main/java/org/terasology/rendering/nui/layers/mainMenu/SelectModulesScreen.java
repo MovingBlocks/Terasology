@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
-import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
@@ -39,7 +38,6 @@ import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -50,6 +48,7 @@ import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -75,7 +74,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private Config config;
 
     @In
-    private Context context;
+    private WorldGeneratorManager worldGenManager;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -370,8 +369,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void startDownload(ModuleSelectionInfo info) {
-        final NUIManager manager = context.get(NUIManager.class);
-        final WaitPopup<Path> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        final WaitPopup<Path> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Downloading Module", "Please wait ...");
 
         ProgressListener progressListener = progress ->
@@ -474,6 +472,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
         if (info != null && !info.isSelected()) {
             config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
         }
+
+        worldGenManager.refresh();
+
         config.save();
     }
 
