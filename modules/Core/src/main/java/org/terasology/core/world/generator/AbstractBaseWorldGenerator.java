@@ -25,6 +25,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.EntityBuffer;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldFacet;
@@ -37,7 +38,6 @@ import org.terasology.world.generator.WorldGenerator2DPreview;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -92,7 +92,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     }
 
     @Override
-    public void createChunk(final CoreChunk chunk) {
+    public void createChunk(final CoreChunk chunk, EntityBuffer buffer) {
         for (final ChunkGenerationPass generator : generationPasses) {
             try {
                 generator.generateChunk(chunk);
