@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.terasology.rendering.logic;
 
 import com.google.api.client.util.Maps;
@@ -39,9 +55,9 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 @RegisterSystem(RegisterMode.CLIENT)
 public class FloatingTextRenderer extends BaseComponentSystem implements  RenderSystem {
 
-    private static final int PIXEL_PER_METER = 100;
+    private static final int PIXEL_PER_METER = 250;
 
-    private static final float METER_PER_PIXEL= 1.0f / PIXEL_PER_METER;
+    private static final float METER_PER_PIXEL = 1.0f / PIXEL_PER_METER;
 
     @In
     private EntityManager entityManager;
@@ -61,7 +77,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
 
     @Override
     public void initialise() {
-        this.font = assetManager.getAsset("engine:default", Font.class).get();
+        this.font = assetManager.getAsset("engine:NotoSans-Regular-Large", Font.class).get();
         this.underlineMaterial = assetManager.getAsset("engine:UIUnderline", Material.class).get();
     }
 
@@ -104,7 +120,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
             OpenGLUtil.applyBillboardOrientation();
             glScaled(METER_PER_PIXEL, -METER_PER_PIXEL, METER_PER_PIXEL);
-            glTranslated(-(textWidth/2.0), 0.0, 0.0);
+            glTranslated(-textWidth / 2.0, 0.0, 0.0);
             for (Map.Entry<Material, Mesh> meshMapEntry : meshMap.entrySet()) {
                 Mesh mesh = meshMapEntry.getValue();
                 Material material = meshMapEntry.getKey();
