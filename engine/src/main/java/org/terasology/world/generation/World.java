@@ -34,7 +34,7 @@ public interface World {
      */
     int getSeaLevel();
 
-    void rasterizeChunk(CoreChunk chunk);
+    void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer);
 
     /**
      * @return a <b>new</b> set containing all facet classes

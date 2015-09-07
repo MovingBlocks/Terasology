@@ -71,8 +71,8 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
     }
 
     @Override
-    public void createChunk(CoreChunk chunk) {
-        world.rasterizeChunk(chunk);
+    public void createChunk(CoreChunk chunk, EntityBuffer buffer) {
+        world.rasterizeChunk(chunk, buffer);
     }
 
     @Override

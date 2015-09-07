@@ -27,8 +27,11 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.EntityStore;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -62,6 +65,7 @@ import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
+import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
@@ -253,6 +257,15 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     generateBlockEntities(chunk);
                     PerformanceMonitor.endActivity();
                 }
+
+                if (readyChunkInfo.isNewChunk()) {
+                    PerformanceMonitor.startActivity("Generating queued Entities");
+                    for (EntityStore entity : readyChunkInfo.getEntities()) {
+                        generateQueuedEntities(entity);
+                    }
+                    PerformanceMonitor.endActivity();
+                }
+
                 if (readyChunkInfo.getChunkStore() != null) {
                     readyChunkInfo.getChunkStore().restoreEntities();
                 }
@@ -293,6 +306,19 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             } finally {
                 chunk.writeUnlock();
             }
+        }
+    }
+
+    private void generateQueuedEntities(EntityStore store) {
+        Prefab prefab = store.getPrefab();
+        EntityRef entity;
+        if (prefab != null) {
+            entity = entityManager.create(prefab);
+        } else {
+            entity = entityManager.create();
+        }
+        for (Component component : store.iterateComponents()) {
+            entity.addComponent(component);
         }
     }
 
@@ -629,16 +655,18 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 public void run() {
                     ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                     Chunk chunk;
+                    EntityBufferImpl buffer = new EntityBufferImpl();
                     if (chunkStore == null) {
                         chunk = new ChunkImpl(getPosition(), blockManager, biomeManager);
-                        generator.createChunk(chunk);
+                        generator.createChunk(chunk, buffer);
                     } else {
                         chunk = chunkStore.getChunk();
                     }
 
                     InternalLightProcessor.generateInternalLighting(chunk);
                     chunk.deflate();
-                    readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk), chunkStore));
+                    TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
+                    readyChunks.offer(new ReadyChunkInfo(chunk, mappings, chunkStore, buffer.getAll()));
                 }
             });
         }
@@ -647,7 +675,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     @Override
     public void onChunkIsReady(Chunk chunk) {
-        readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk)));
+        readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk), Collections.emptyList()));
     }
 
     @Override

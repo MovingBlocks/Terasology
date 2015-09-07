@@ -40,6 +40,7 @@ public class WorldBuilder {
     private final List<FacetProvider> providersList = Lists.newArrayList();
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
+    private final List<EntityProvider> entityProviders = new ArrayList<>();
     private int seaLevel = 32;
     private Long seed;
 
@@ -56,6 +57,11 @@ public class WorldBuilder {
 
     public WorldBuilder addRasterizer(WorldRasterizer rasterizer) {
         rasterizers.add(rasterizer);
+        return this;
+    }
+
+    public WorldBuilder addEntities(EntityProvider entityProvider) {
+        entityProviders.add(entityProvider);
         return this;
     }
 
@@ -89,7 +95,7 @@ public class WorldBuilder {
             provider.setSeed(seed);
         }
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
-        return new WorldImpl(providerChains, rasterizers, determineBorders(providerChains), seaLevel);
+        return new WorldImpl(providerChains, rasterizers, entityProviders, determineBorders(providerChains), seaLevel);
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {

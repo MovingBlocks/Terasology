@@ -34,15 +34,18 @@ import com.google.common.collect.Sets;
 public class WorldImpl implements World {
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final List<WorldRasterizer> worldRasterizers;
+    private final List<EntityProvider> entityProviders;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
     private final int seaLevel;
 
     public WorldImpl(ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
                      List<WorldRasterizer> worldRasterizers,
+                     List<EntityProvider> entityProviders,
                      Map<Class<? extends WorldFacet>, Border3D> borders,
                      int seaLevel) {
         this.facetProviderChains = facetProviderChains;
         this.worldRasterizers = worldRasterizers;
+        this.entityProviders = entityProviders;
         this.borders = borders;
         this.seaLevel = seaLevel;
     }
@@ -58,10 +61,13 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public void rasterizeChunk(CoreChunk chunk) {
+    public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
         Region chunkRegion = getWorldData(chunk.getRegion());
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.generateChunk(chunk, chunkRegion);
+        }
+        for (EntityProvider entityProvider : entityProviders) {
+            entityProvider.process(chunkRegion, buffer);
         }
     }
 
@@ -95,6 +101,10 @@ public class WorldImpl implements World {
 
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.initialize();
+        }
+
+        for (EntityProvider entityProvider : entityProviders) {
+            entityProvider.initialize();
         }
     }
 }
