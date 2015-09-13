@@ -21,6 +21,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.math.geom.BaseVector2i;
+import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -34,8 +36,6 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
@@ -44,11 +44,11 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;
-    private Vector2i size;
+    private ImmutableVector2i size;
     private IntBuffer vp;
 
-    public LwjglFrameBufferObject(ResourceUrn urn, Vector2i size) {
-        this.size = size;
+    public LwjglFrameBufferObject(ResourceUrn urn, BaseVector2i size) {
+        this.size = ImmutableVector2i.createOrUse(size);
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);
@@ -69,8 +69,13 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
+    public void dispose() {
+        // texture assets are disposed automatically
+        GL30.glDeleteFramebuffers(frame);
+    }
+
     private Texture generateTexture(ResourceUrn urn) {
-        TextureData data = new TextureData(size.x, size.y, new ByteBuffer[]{}, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        TextureData data = new TextureData(size.x(), size.y(), new ByteBuffer[]{}, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         return Assets.generateAsset(urn, data, Texture.class);
     }
 
@@ -94,16 +99,13 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         GL11.glGetInteger(GL11.GL_VIEWPORT, vp);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
-        GL11.glViewport(0, 0, size.x, size.y);
+        GL11.glViewport(0, 0, size.x(), size.y());
 
         glMatrixMode(GL_TEXTURE);
         glLoadIdentity();
-        glTranslatef(0.5f, 0.5f, 0.0f);
-        glScalef(1, -1, 1);
-        glTranslatef(-0.5f, -0.5f, 0.0f);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, size.x, size.y, 0, 0, 2048f);
+        glOrtho(0, size.x(), size.y(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }

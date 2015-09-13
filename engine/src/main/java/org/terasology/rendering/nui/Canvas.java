@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Quat4f;
@@ -246,7 +247,7 @@ public interface Canvas {
      * @param size the size of the texture.
      * @return A SubRegion, to be closed when no long needed
      */
-    SubRegion subRegionFBO(ResourceUrn uri, Vector2i size);
+    SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size);
 
     /**
      * When drawOnTop is set to true, subsequent drawing will be on top of everything else.

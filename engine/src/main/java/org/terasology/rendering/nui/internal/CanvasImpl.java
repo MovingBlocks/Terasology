@@ -32,6 +32,7 @@ import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -277,7 +278,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public SubRegion subRegionFBO(ResourceUrn uri, Vector2i size) {
+    public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
         return new SubRegionFBOImpl(uri, size);
     }
 
@@ -830,7 +831,7 @@ public class CanvasImpl implements CanvasControl {
         private FrameBufferObject fbo;
         private CanvasState previousState;
 
-        private SubRegionFBOImpl(ResourceUrn uri, Vector2i size) {
+        private SubRegionFBOImpl(ResourceUrn uri, BaseVector2i size) {
             previousState = state;
 
             fbo = renderer.getFBO(uri, size);

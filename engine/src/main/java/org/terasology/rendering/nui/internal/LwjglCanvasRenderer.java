@@ -30,6 +30,7 @@ import org.terasology.math.MatrixUtils;
 import org.terasology.math.Rect2f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
@@ -104,7 +105,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Rect2i requestedCropRegion;
     private Rect2i currentTextureCropRegion;
 
-    private Map<ResourceUrn, FrameBufferObject> fboMap = Maps.newHashMap();
+    private Map<ResourceUrn, LwjglFrameBufferObject> fboMap = Maps.newHashMap();
 
 
     public LwjglCanvasRenderer(Context context) {
@@ -249,9 +250,14 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     }
 
     @Override
-    public FrameBufferObject getFBO(ResourceUrn urn, Vector2i size) {
-        FrameBufferObject frameBufferObject = fboMap.get(urn);
-        if (frameBufferObject == null) {
+    public FrameBufferObject getFBO(ResourceUrn urn, BaseVector2i size) {
+        LwjglFrameBufferObject frameBufferObject = fboMap.get(urn);
+        if (frameBufferObject == null || !Assets.getTexture(urn).isPresent()) {
+            // If a FBO exists, but no texture, then the texture was disposed
+            // TODO: update fboMap whenever a texture is disposed (or convert FBO instances to assets?)
+            if (frameBufferObject != null) {
+                frameBufferObject.dispose();
+            }
             frameBufferObject = new LwjglFrameBufferObject(urn, size);
             fboMap.put(urn, frameBufferObject);
         }
