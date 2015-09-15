@@ -91,6 +91,9 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+
+        // reset color mask
+        GL11.glColorMask(true, true, true, true);
     }
 
     @Override
@@ -108,5 +111,12 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         glOrtho(0, size.x(), size.y(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+
+        // clear and fill with full alpha, then disable writing alpha values
+        // thus, blending semi-transparent billboards works as expected
+        GL11.glClearColor(0f, 0f, 0f, 1f);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glClearColor(0f, 0f, 0f, 0f);  // reset
+        GL11.glColorMask(true, true, true, false);
     }
 }
