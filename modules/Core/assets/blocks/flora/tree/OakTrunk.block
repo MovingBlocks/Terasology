@@ -25,7 +25,7 @@
     "displayName": "Oak Log",
     // Graphics
     "tiles": {
-        "sides": "OakBark",
-        "topBottom" : "OakTrunk"
+        "sides": "Core:OakBark",
+        "topBottom": "Core:OakTrunk"
     }
 }
