@@ -18,7 +18,7 @@
     "basedOn" : "core:wood",
     "displayName": "Pine Log",
     "tiles" : {
-        "topBottom" : "PineTrunk",
-        "sides" : "PineBark"
+        "topBottom": "Core:PineTrunk",
+        "sides": "Core:PineBark"
     }
 }
