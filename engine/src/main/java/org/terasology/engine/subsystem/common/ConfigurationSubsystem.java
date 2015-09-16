@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.common;
 
+import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -25,9 +26,6 @@ import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
-
-import java.io.IOException;
-import java.nio.file.Files;
 
 /**
  * The configuration subsystem manages Terasology's configuration
@@ -56,7 +54,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
             }
         }
 
-        if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_GAMEPLAY_MODULE)) {
+        if (Iterables.isEmpty(config.getDefaultModSelection().listModules())) {
             config.getDefaultModSelection().addModule(TerasologyConstants.CORE_GAMEPLAY_MODULE);
         }
 
