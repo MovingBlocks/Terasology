@@ -58,11 +58,6 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
     }
 
     @Override
-    protected void doDispose() {
-        texture = null;
-    }
-
-    @Override
     public Texture getTexture() {
         return texture;
     }

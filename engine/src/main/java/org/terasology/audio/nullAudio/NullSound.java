@@ -85,7 +85,4 @@ public class NullSound extends StaticSound {
         return Optional.of(new NullSound(instanceUrn, parentAssetType, channels, sampleRate, length));
     }
 
-    @Override
-    protected void doDispose() {
-    }
 }

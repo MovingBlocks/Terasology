@@ -37,11 +37,6 @@ public class UISkin extends Asset<UISkinData> {
         this.skinData = data;
     }
 
-    @Override
-    protected void doDispose() {
-        this.skinData = null;
-    }
-
     public UIStyle getDefaultStyle() {
         return getFamily("").getBaseStyle();
     }

@@ -53,8 +53,4 @@ public class HeadlessShader extends Shader {
         shaderProgramBase = data;
     }
 
-    @Override
-    protected void doDispose() {
-        shaderProgramBase = null;
-    }
 }

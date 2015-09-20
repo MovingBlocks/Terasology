@@ -26,6 +26,8 @@ import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.engine.GameThread;
 
+import java.lang.ref.WeakReference;
+
 import static org.lwjgl.openal.AL10.AL_BITS;
 import static org.lwjgl.openal.AL10.AL_CHANNELS;
 import static org.lwjgl.openal.AL10.AL_FREQUENCY;
@@ -41,12 +43,16 @@ public final class OpenALSound extends StaticSound {
     protected float length;
     private final OpenALManager audioManager;
 
+    private DisposalAction disposalAction;
+
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
     public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager) {
         super(urn, assetType);
         this.audioManager = audioManager;
+        disposalAction = new DisposalAction(urn, this);
+        getDisposalHook().setDisposeAction(disposalAction);
         reload(data);
     }
 
@@ -94,6 +100,7 @@ public final class OpenALSound extends StaticSound {
             GameThread.synch(() -> {
                 if (bufferId == 0) {
                     bufferId = alGenBuffers();
+                    disposalAction.bufferId = bufferId;
                 } else {
                     audioManager.purgeSound(this);
                 }
@@ -112,20 +119,32 @@ public final class OpenALSound extends StaticSound {
         }
     }
 
+    private static class DisposalAction implements Runnable {
+        private final ResourceUrn urn;
+        private int bufferId;
+        private final WeakReference<OpenALSound> asset;
 
-    @Override
-    protected void doDispose() {
-        try {
-            GameThread.synch(() -> {
-                if (bufferId != 0) {
-                    audioManager.purgeSound(this);
-                    alDeleteBuffers(bufferId);
-                    bufferId = 0;
-                    OpenALException.checkState("Deleting buffer data");
-                }
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+        public DisposalAction(ResourceUrn urn, OpenALSound openALSound) {
+            this.urn = urn;
+             asset = new WeakReference<>(openALSound);
+        }
+
+        @Override
+        public void run() {
+            try {
+                GameThread.synch(() -> {
+                    OpenALSound sound = asset.get();
+                    if (bufferId != 0) {
+                        if (sound != null) {
+                            sound.audioManager.purgeSound(sound);
+                        }
+                        alDeleteBuffers(bufferId);
+                        OpenALException.checkState("Deleting buffer data");
+                    }
+                });
+            } catch (InterruptedException e) {
+                logger.error("Failed to dispose {}", urn, e);
+            }
         }
     }
 }

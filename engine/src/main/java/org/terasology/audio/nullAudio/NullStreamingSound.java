@@ -82,8 +82,4 @@ public final class NullStreamingSound extends StreamingSound {
         return Optional.of(new NullStreamingSound(copyUrn, parentAssetType, channels, sampleRate));
     }
 
-    @Override
-    protected void doDispose() {
-
-    }
 }

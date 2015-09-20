@@ -115,11 +115,6 @@ public final class FontImpl extends Font {
     }
 
     @Override
-    protected void doDispose() {
-        this.data = null;
-    }
-
-    @Override
     public String toString() {
         return getUrn().toString();
     }

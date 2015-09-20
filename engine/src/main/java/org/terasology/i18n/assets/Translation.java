@@ -16,6 +16,7 @@
 
 package org.terasology.i18n.assets;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,11 +38,11 @@ import com.google.common.base.Preconditions;
  */
 public class Translation extends Asset<TranslationData> {
 
-    private final List<Consumer<Translation>> changeListeners = new CopyOnWriteArrayList<>();
-
     private Map<String, String> dictionary = new HashMap<>();
     private Locale locale;
     private Uri projectUri;
+
+    private final DisposalAction disposalAction;
 
     /**
      * @param urn       The urn identifying the asset. Never <code>null</code>.
@@ -50,6 +51,8 @@ public class Translation extends Asset<TranslationData> {
      */
     public Translation(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data) {
         super(urn, assetType);
+        this.disposalAction = new DisposalAction(this);
+        getDisposalHook().setDisposeAction(disposalAction);
         reload(data);
     }
 
@@ -71,7 +74,7 @@ public class Translation extends Asset<TranslationData> {
      * @param changeListener the listener to add
      */
     public void subscribe(Consumer<Translation> changeListener) {
-        changeListeners.add(changeListener);
+        disposalAction.changeListeners.add(changeListener);
     }
 
     /**
@@ -79,7 +82,7 @@ public class Translation extends Asset<TranslationData> {
      * @param changeListener the listener to remove. Non-existing entries will be ignored.
      */
     public void unsubscribe(Consumer<Translation> changeListener) {
-        changeListeners.remove(changeListener);
+        disposalAction.changeListeners.remove(changeListener);
     }
 
     /**
@@ -89,15 +92,6 @@ public class Translation extends Asset<TranslationData> {
      */
     public String lookup(Name id) {
         return dictionary.get(id.toString());
-    }
-
-    @Override
-    protected void doDispose() {
-        this.dictionary.clear();
-        // locale and project uri are still available!
-        for (Consumer<Translation> listener : changeListeners) {
-            listener.accept(this);
-        }
     }
 
     @Override
@@ -119,8 +113,28 @@ public class Translation extends Asset<TranslationData> {
             this.projectUri = data.getProjectUri();
             this.locale = data.getLocale();
 
-            for (Consumer<Translation> listener : changeListeners) {
+            for (Consumer<Translation> listener : disposalAction.changeListeners) {
                 listener.accept(this);
+            }
+        }
+    }
+
+    private static class DisposalAction implements Runnable {
+
+        private final List<Consumer<Translation>> changeListeners = new CopyOnWriteArrayList<>();
+        private final WeakReference<Translation> asset;
+
+        public DisposalAction(Translation asset) {
+            this.asset = new WeakReference<>(asset);
+        }
+
+        @Override
+        public void run() {
+            Translation translation = asset.get();
+            if (translation != null) {
+                for (Consumer<Translation> listener : changeListeners) {
+                    listener.accept(translation);
+                }
             }
         }
     }

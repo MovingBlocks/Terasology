@@ -76,16 +76,13 @@ public class OpenGLMesh extends Mesh {
     private boolean hasTexCoord1;
     private boolean hasColor;
     private boolean hasNormal;
-
-    private int vboVertexBuffer;
-    private int vboIndexBuffer;
     private int indexCount;
 
-    private GLBufferPool bufferPool;
+    private DisposalAction disposalAction;
 
     public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data) {
         super(urn, assetType);
-        this.bufferPool = bufferPool;
+        this.disposalAction = new DisposalAction(urn, bufferPool);
         reload(data);
     }
 
@@ -95,29 +92,6 @@ public class OpenGLMesh extends Mesh {
             GameThread.synch(() -> buildMesh(newData));
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);
-        }
-    }
-
-    @Override
-    protected void doDispose() {
-        try {
-            GameThread.synch(() -> {
-                hasTexCoord0 = false;
-                hasTexCoord1 = false;
-                hasColor = false;
-                hasNormal = false;
-                indexCount = 0;
-                if (vboVertexBuffer != 0) {
-                    bufferPool.dispose(vboVertexBuffer);
-                    vboVertexBuffer = 0;
-                }
-                if (vboIndexBuffer != 0) {
-                    bufferPool.dispose(vboIndexBuffer);
-                    vboIndexBuffer = 0;
-                }
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to dispose {}", getUrn(), e);
         }
     }
 
@@ -144,8 +118,8 @@ public class OpenGLMesh extends Mesh {
                 glEnableClientState(GL_NORMAL_ARRAY);
             }
 
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboVertexBuffer);
-            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboIndexBuffer);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, disposalAction.vboVertexBuffer);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, disposalAction.vboIndexBuffer);
 
             glVertexPointer(VERTEX_SIZE, GL11.GL_FLOAT, stride, vertexOffset);
 
@@ -303,10 +277,10 @@ public class OpenGLMesh extends Mesh {
             }
         }
         vertexBuffer.flip();
-        if (vboVertexBuffer == 0) {
-            vboVertexBuffer = bufferPool.get(getUrn().toString());
+        if (disposalAction.vboVertexBuffer == 0) {
+            disposalAction.vboVertexBuffer = disposalAction.bufferPool.get(getUrn().toString());
         }
-        VertexBufferObjectUtil.bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
+        VertexBufferObjectUtil.bufferVboData(disposalAction.vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
         vertexBuffer.flip();
     }
 
@@ -318,11 +292,43 @@ public class OpenGLMesh extends Mesh {
         }
         indexBuffer.flip();
 
-        if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get(getUrn().toString());
+        if (disposalAction.vboIndexBuffer == 0) {
+            disposalAction.vboIndexBuffer = disposalAction.bufferPool.get(getUrn().toString());
         }
-        VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+        VertexBufferObjectUtil.bufferVboElementData(disposalAction.vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
         indexBuffer.flip();
+    }
+
+    private static class DisposalAction implements Runnable {
+
+        private final ResourceUrn urn;
+        private final GLBufferPool bufferPool;
+
+        private int vboVertexBuffer;
+        private int vboIndexBuffer;
+
+        public DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
+            this.urn = urn;
+            this.bufferPool = bufferPool;
+        }
+
+        @Override
+        public void run() {
+            try {
+                GameThread.synch(() -> {
+                    if (vboVertexBuffer != 0) {
+                        bufferPool.dispose(vboVertexBuffer);
+                        vboVertexBuffer = 0;
+                    }
+                    if (vboIndexBuffer != 0) {
+                        bufferPool.dispose(vboIndexBuffer);
+                        vboIndexBuffer = 0;
+                    }
+                });
+            } catch (InterruptedException e) {
+                logger.error("Failed to dispose {}", urn, e);
+            }
+        }
     }
 
 
