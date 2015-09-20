@@ -209,7 +209,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Genome](https://github.com/Terasology/Genome) - genetics WOO! Complete with DNA letters and mutating plants. Part of the Wood & Stone line-up
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
-* [InGameHelp](https://github.com/Terasology/InGameHelp) - system for showing help in-game
+* [InGameHelp](https://github.com/Terasology/InGameHelp) - system for showing help in-game, default key `P`
 * [IRLCorp](https://github.com/Terasology/IRLCorp) - Industrialized Reduction of Labor Corporation - Helping workmen everywhere
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
@@ -228,7 +228,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Miniion](https://github.com/Terasology/Miniion) - base creature control system, used by MasterOfOreon - old module that has gone through a few redesigns
-* [Minimap](https://github.com/Terasology/Minimap) - a basic minimap using "slicing" (showing a single layer at a time as per a selected axis). Show/hide with 'M' by default
+* [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
 * [MobileBlocks](https://github.com/Terasology/MobileBlocks) - supports blocks that can move their location based on some directions
 * [ModularComputers](https://github.com/Terasology/ModularComputers) - central module for the creation of computers that themselves can have "hardware modules" of sorts added to them in-game to add interesting functionality
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
