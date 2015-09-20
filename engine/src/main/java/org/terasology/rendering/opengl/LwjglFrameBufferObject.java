@@ -28,6 +28,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
@@ -64,7 +65,12 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
             throw new IllegalStateException("Something went wrong with framebuffer! " + result);
         }
 
+        // clear and fill with full alpha
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_COLOR_CLEAR_VALUE, buffer);
+        GL11.glClearColor(0f, 0f, 0f, 1f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glClearColor(buffer.get(), buffer.get(), buffer.get(), buffer.get());  // reset
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
@@ -112,11 +118,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        // clear and fill with full alpha, then disable writing alpha values
-        // thus, blending semi-transparent billboards works as expected
-        GL11.glClearColor(0f, 0f, 0f, 1f);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-        GL11.glClearColor(0f, 0f, 0f, 0f);  // reset
+        // disable writing alpha values so that blending semi-transparent billboards works as expected
         GL11.glColorMask(true, true, true, false);
     }
 }
