@@ -35,4 +35,5 @@ public class NameTagComponent implements Component {
 
     public Color textColor = Color.WHITE;
 
+    public float scale = 1f;
 }

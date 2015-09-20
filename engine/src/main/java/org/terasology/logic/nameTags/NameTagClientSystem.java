@@ -68,6 +68,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
             FloatingTextComponent floatingText = nameTag.getComponent(FloatingTextComponent.class);
             floatingText.text = nameTagComponent.text;
             floatingText.textColor = nameTagComponent.textColor;
+            floatingText.scale = nameTagComponent.scale;
             nameTag.saveComponent(floatingText);
             LocationComponent nameTagLoc = nameTag.getComponent(LocationComponent.class);
             nameTagLoc.setLocalPosition(offset);
@@ -80,6 +81,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
             nameTagBuilder.addComponent(locationComponent);
             floatingTextComponent.text = nameTagComponent.text;
             floatingTextComponent.textColor = nameTagComponent.textColor;
+            floatingTextComponent.scale = nameTagComponent.scale;
             nameTagBuilder.setOwner(entity);
             nameTagBuilder.setPersistent(false);
 

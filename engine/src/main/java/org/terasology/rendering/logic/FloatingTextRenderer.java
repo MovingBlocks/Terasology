@@ -116,10 +116,11 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
             }
             glPushMatrix();
 
+            float scale = METER_PER_PIXEL * floatingText.scale;
 
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
             OpenGLUtil.applyBillboardOrientation();
-            glScaled(METER_PER_PIXEL, -METER_PER_PIXEL, METER_PER_PIXEL);
+            glScaled(scale, -scale, scale);
             glTranslated(-textWidth / 2.0, 0.0, 0.0);
             for (Map.Entry<Material, Mesh> meshMapEntry : meshMap.entrySet()) {
                 Mesh mesh = meshMapEntry.getValue();
