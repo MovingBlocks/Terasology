@@ -61,7 +61,6 @@ public class GLSLMaterial extends BaseMaterial {
 
     private int textureIndex;
 
-    private TIntIntMap shaderPrograms = new TIntIntHashMap();
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<>();
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<>();
     private GLSLShader shader;
@@ -74,8 +73,12 @@ public class GLSLMaterial extends BaseMaterial {
     private final ShaderManager shaderManager;
     private ShaderParameters shaderParameters;
 
+    private DisposalAction disposalAction;
+
     public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
         super(urn, assetType);
+        disposalAction = new DisposalAction(urn);
+        getDisposalHook().setDisposeAction(disposalAction);
         shaderManager = CoreRegistry.get(ShaderManager.class);
         reload(data);
     }
@@ -135,18 +138,18 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public void recompile() {
-        TIntIntIterator it = shaderPrograms.iterator();
+        TIntIntIterator it = disposalAction.shaderPrograms.iterator();
         while (it.hasNext()) {
             it.advance();
             GL20.glDeleteProgram(it.value());
         }
-        shaderPrograms.clear();
+        disposalAction.shaderPrograms.clear();
         uniformLocationMap.clear();
 
-        shaderPrograms.put(0, shader.linkShaderProgram(0));
+        disposalAction.shaderPrograms.put(0, shader.linkShaderProgram(0));
         for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
             int featureMask = ShaderProgramFeature.getBitset(permutation);
-            shaderPrograms.put(featureMask, shader.linkShaderProgram(featureMask));
+            disposalAction.shaderPrograms.put(featureMask, shader.linkShaderProgram(featureMask));
         }
         if (shaderParameters != null) {
             shaderParameters.initialParameters(this);
@@ -157,7 +160,8 @@ public class GLSLMaterial extends BaseMaterial {
     public final void doReload(MaterialData data) {
         try {
             GameThread.synch(() -> {
-                doDispose();
+                disposalAction.run();
+                uniformLocationMap.clear();
 
                 shader = (GLSLShader) data.getShader();
                 recompile();
@@ -196,26 +200,6 @@ public class GLSLMaterial extends BaseMaterial {
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);
-        }
-    }
-
-
-    @Override
-    protected void doDispose() {
-        try {
-            GameThread.synch(() -> {
-                logger.debug("Disposing material {}.", getUrn());
-                TIntIntIterator it = shaderPrograms.iterator();
-                while (it.hasNext()) {
-                    it.advance();
-                    GL20.glDeleteProgram(it.value());
-                }
-                shaderPrograms.clear();
-                uniformLocationMap.clear();
-                shader = null;
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to dispose {}", getUrn(), e);
         }
     }
 
@@ -287,7 +271,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform1f(id, f);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -310,7 +294,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform1(id, buffer);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -333,7 +317,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform2f(id, f1, f2);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -356,7 +340,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform2(id, buffer);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -379,7 +363,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform3f(id, f1, f2, f3);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -402,7 +386,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform3(id, buffer);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -425,7 +409,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform4f(id, f1, f2, f3, f4);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -448,7 +432,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform4(id, buffer);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -471,7 +455,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform1i(id, i);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -494,7 +478,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniform1i(id, value ? 1 : 0);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -517,7 +501,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -540,7 +524,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniformMatrix3(id, false, value);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -563,7 +547,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -586,7 +570,7 @@ public class GLSLMaterial extends BaseMaterial {
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
             GL20.glUniformMatrix4(id, false, value);
         } else {
-            TIntIntIterator it = shaderPrograms.iterator();
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
                 it.advance();
 
@@ -600,7 +584,7 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     private int getActiveShaderProgramId() {
-        return shaderPrograms.get(activeFeaturesMask);
+        return disposalAction.shaderPrograms.get(activeFeaturesMask);
     }
 
     private int getUniformLocation(int activeShaderProgramId, String desc) {
@@ -648,6 +632,34 @@ public class GLSLMaterial extends BaseMaterial {
         @Override
         public int hashCode() {
             return Objects.hashCode(shaderProgramId, name);
+        }
+    }
+
+    private static class DisposalAction implements Runnable {
+
+        private final ResourceUrn urn;
+
+        private TIntIntMap shaderPrograms = new TIntIntHashMap();
+
+        public DisposalAction(ResourceUrn urn) {
+            this.urn = urn;
+        }
+
+        @Override
+        public void run() {
+            try {
+                GameThread.synch(() -> {
+                    logger.debug("Disposing material {}.", urn);
+                    TIntIntIterator it = shaderPrograms.iterator();
+                    while (it.hasNext()) {
+                        it.advance();
+                        GL20.glDeleteProgram(it.value());
+                    }
+                    shaderPrograms.clear();
+                });
+            } catch (InterruptedException e) {
+                logger.error("Failed to dispose {}", urn, e);
+            }
         }
     }
 

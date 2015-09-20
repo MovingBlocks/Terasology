@@ -85,11 +85,6 @@ public class BehaviorTree extends Asset<BehaviorTreeData> {
         this.data = newData;
     }
 
-    @Override
-    protected void doDispose() {
-        this.data = null;
-    }
-
     public RenderableNode createNode(Node node, BehaviorNodeFactory factory) {
         RenderableNode renderable = data.createRenderable(node, factory);
         data.layout(renderable);

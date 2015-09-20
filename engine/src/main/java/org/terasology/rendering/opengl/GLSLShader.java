@@ -44,7 +44,6 @@ import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.tiles.WorldAtlas;
 
-import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,9 +88,6 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private TIntIntMap fragmentPrograms = new TIntIntHashMap();
-    private TIntIntMap vertexPrograms = new TIntIntHashMap();
-
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
 
     private ShaderData shaderProgramBase;
@@ -99,8 +95,12 @@ public class GLSLShader extends Shader {
 
     private Config config = CoreRegistry.get(Config.class);
 
+    private DisposalAction disposalAction;
+
     public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
         super(urn, assetType);
+        disposalAction = new DisposalAction(urn);
+        getDisposalHook().setDisposeAction(disposalAction);
         reload(data);
     }
 
@@ -111,8 +111,8 @@ public class GLSLShader extends Shader {
     public int linkShaderProgram(int featureHash) {
         int shaderProgram = GL20.glCreateProgram();
 
-        GL20.glAttachShader(shaderProgram, fragmentPrograms.get(featureHash));
-        GL20.glAttachShader(shaderProgram, vertexPrograms.get(featureHash));
+        GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
+        GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
         GL20.glLinkProgram(shaderProgram);
         GL20.glValidateProgram(shaderProgram);
         return shaderProgram;
@@ -132,23 +132,6 @@ public class GLSLShader extends Shader {
     @Override
     public Iterable<ShaderParameterMetadata> listParameters() {
         return parameters.values();
-    }
-
-    private void disposeData() {
-        TIntIntIterator it = fragmentPrograms.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            GL20.glDeleteShader(it.value());
-        }
-        fragmentPrograms.clear();
-
-        it = vertexPrograms.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            GL20.glDeleteShader(it.value());
-        }
-        vertexPrograms.clear();
-        shaderProgramBase = null;
     }
 
     private StringBuilder createShaderBuilder() {
@@ -273,12 +256,12 @@ public class GLSLShader extends Shader {
 
             if (compileSuccess(fragShaderId) && compileSuccess(vertShaderId)) {
                 int featureHash = ShaderProgramFeature.getBitset(permutation);
-                fragmentPrograms.put(featureHash, fragShaderId);
-                vertexPrograms.put(featureHash, vertShaderId);
+                disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
+                disposalAction.vertexPrograms.put(featureHash, vertShaderId);
             } else {
                 throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.\n\n"
-                        + "Vertex Shader Info: \n%s\n"
-                        + "Fragment Shader Info: \n%s",
+                                + "Vertex Shader Info: \n%s\n"
+                                + "Fragment Shader Info: \n%s",
                         getUrn(), permutation,
                         getLogInfo(vertShaderId), getLogInfo(fragShaderId)));
             }
@@ -380,7 +363,7 @@ public class GLSLShader extends Shader {
             GameThread.synch(() -> {
                 logger.debug("Recompiling shader {}.", getUrn());
 
-                doDispose();
+                disposalAction.disposeData();
                 shaderProgramBase = data;
                 parameters.clear();
                 for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
@@ -394,13 +377,41 @@ public class GLSLShader extends Shader {
         }
     }
 
-    @Override
-    protected void doDispose() {
-        logger.debug("Disposing shader {}.", getUrn());
-        try {
-            GameThread.synch(this::disposeData);
-        } catch (InterruptedException e) {
-            logger.error("Failed to dispose {}", getUrn(), e);
+    private static class DisposalAction implements Runnable {
+
+        private final ResourceUrn urn;
+
+        private TIntIntMap fragmentPrograms = new TIntIntHashMap();
+        private TIntIntMap vertexPrograms = new TIntIntHashMap();
+
+        public DisposalAction(ResourceUrn urn) {
+            this.urn = urn;
+        }
+
+        @Override
+        public void run() {
+            logger.debug("Disposing shader {}.", urn);
+            try {
+                GameThread.synch(this::disposeData);
+            } catch (InterruptedException e) {
+                logger.error("Failed to dispose {}", urn, e);
+            }
+        }
+
+        private void disposeData() {
+            TIntIntIterator it = fragmentPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+                GL20.glDeleteShader(it.value());
+            }
+            fragmentPrograms.clear();
+
+            it = vertexPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+                GL20.glDeleteShader(it.value());
+            }
+            vertexPrograms.clear();
         }
     }
 }

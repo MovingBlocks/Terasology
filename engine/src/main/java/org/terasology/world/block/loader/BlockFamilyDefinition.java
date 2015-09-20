@@ -49,11 +49,6 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
         this.data = blockFamilyDefinitionData;
     }
 
-    @Override
-    protected void doDispose() {
-        data = null;
-    }
-
     public List<String> getCategories() {
         return Collections.unmodifiableList(data.getCategories());
     }

@@ -64,11 +64,6 @@ public class UIElement extends Asset<UIData> {
         }
     }
 
-    @Override
-    protected void doDispose() {
-        rootWidget = null;
-    }
-
     public UIWidget getRootWidget() {
         return rootWidget;
     }

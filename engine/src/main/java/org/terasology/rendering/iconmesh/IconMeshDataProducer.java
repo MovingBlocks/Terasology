@@ -76,7 +76,7 @@ public class IconMeshDataProducer implements AssetDataProducer<MeshData> {
         if (ICON_DISCRIMINATOR.equals(urn.getResourceName())) {
             ResourceUrn textureUrn = new ResourceUrn(urn.getModuleName().toString() + ResourceUrn.RESOURCE_SEPARATOR + urn.getFragmentName().toString());
             Optional<TextureRegionAsset> textureRegionAsset = assetManager.getAsset(textureUrn, TextureRegionAsset.class);
-            if (textureRegionAsset.isPresent()) {
+            if (textureRegionAsset.isPresent() && !textureRegionAsset.get().getTexture().isDisposed()) {
                 return Optional.of(IconMeshFactory.generateIconMeshData(textureRegionAsset.get()));
             }
         }

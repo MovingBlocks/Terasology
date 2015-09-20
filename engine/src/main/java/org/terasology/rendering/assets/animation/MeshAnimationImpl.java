@@ -83,9 +83,4 @@ public class MeshAnimationImpl extends MeshAnimation {
     protected Optional<? extends Asset<MeshAnimationData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, MeshAnimationData> parentAssetType) {
         return Optional.of(new MeshAnimationImpl(copyUrn, parentAssetType, data));
     }
-
-    @Override
-    protected void doDispose() {
-    }
-
 }

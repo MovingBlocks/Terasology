@@ -63,8 +63,4 @@ public class BlockTile extends Asset<TileData> {
         }
     }
 
-    @Override
-    protected void doDispose() {
-        this.image = null;
-    }
 }
