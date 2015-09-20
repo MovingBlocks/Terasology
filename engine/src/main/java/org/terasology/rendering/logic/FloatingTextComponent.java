@@ -25,4 +25,5 @@ public class FloatingTextComponent implements Component {
     public String text;
     public Color textColor = Color.WHITE;
     public Color textShadowColor = Color.BLACK;
+    public float scale = 1f;
 }

@@ -16,6 +16,7 @@
 package org.terasology.logic.nameTags;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.Color;
 
 /**
@@ -25,6 +26,7 @@ import org.terasology.rendering.nui.Color;
  *
  * The color of the name tag is based on the {@link org.terasology.network.ColorComponent} of this entity
  */
+@API
 public class NameTagComponent implements Component {
 
     public float yOffset = 0.3f;
@@ -33,4 +35,5 @@ public class NameTagComponent implements Component {
 
     public Color textColor = Color.WHITE;
 
+    public float scale = 1f;
 }
