@@ -195,9 +195,9 @@ public class WorldBuilder {
                 }
                 orderedProviders.add(provider);
             }
-            result.putAll(facet, orderedProviders);
-            facetCalculationInProgress.remove(facet);
         }
+        result.putAll(facet, orderedProviders);
+        facetCalculationInProgress.remove(facet);
     }
 
     private boolean producesFacet(FacetProvider provider, Class<? extends WorldFacet> facet) {
