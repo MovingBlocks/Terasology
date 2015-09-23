@@ -437,11 +437,7 @@ public class EventSystemImpl implements EventSystem {
                     params[i + 2] = entity.getComponent(componentParams.get(i));
                 }
                 method.invoke(handler, params);
-            } catch (IllegalAccessException ex) {
-                logger.error("Failed to invoke event", ex);
-            } catch (IllegalArgumentException ex) {
-                logger.error("Failed to invoke event", ex);
-            } catch (InvocationTargetException ex) {
+            } catch (Exception ex) {
                 logger.error("Failed to invoke event", ex);
             }
         }
@@ -509,7 +505,7 @@ public class EventSystemImpl implements EventSystem {
                         PerformanceMonitor.endActivity();
                     }
                 }
-            } catch (IllegalArgumentException ex) {
+            } catch (Exception ex) {
                 logger.error("Failed to invoke event", ex);
             }
         }
