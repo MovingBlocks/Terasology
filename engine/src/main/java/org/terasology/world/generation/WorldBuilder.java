@@ -20,12 +20,15 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -156,7 +159,7 @@ public class WorldBuilder {
 
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains() {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
-        Set<Class<? extends WorldFacet>> facets = Sets.newHashSet();
+        Set<Class<? extends WorldFacet>> facets = new LinkedHashSet<>();
         for (FacetProvider provider : providersList) {
             Produces produces = provider.getClass().getAnnotation(Produces.class);
             if (produces != null) {
@@ -171,6 +174,18 @@ public class WorldBuilder {
         }
         for (Class<? extends WorldFacet> facet : facets) {
             determineProviderChainFor(facet, result);
+            if (logger.isDebugEnabled()) {
+                StringBuilder text = new StringBuilder(facet.getSimpleName());
+                text.append(" --> ");
+                Iterator<FacetProvider> it = result.get(facet).iterator();
+                while (it.hasNext()) {
+                    text.append(it.next().getClass().getSimpleName());
+                    if (it.hasNext()) {
+                        text.append(", ");
+                    }
+                }
+                logger.debug(text.toString());
+            }
         }
 
         return result;
@@ -186,26 +201,47 @@ public class WorldBuilder {
         Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
 
         // first add all @Produces facet providers
+        FacetProvider producer = null;
         for (FacetProvider provider : providersList) {
             if (producesFacet(provider, facet)) {
-                Requires requirements = provider.getClass().getAnnotation(Requires.class);
-                if (requirements != null) {
-                    for (Facet requirement : requirements.value()) {
-                        determineProviderChainFor(requirement.value(), result);
-                        orderedProviders.addAll(result.get(requirement.value()));
-                    }
+                if (producer != null) {
+                    logger.warn("Facet already produced by {} and overwritten by {}", producer, provider);
+                }
+                // add all required facets for producing provider
+                for (Facet requirement : requiredFacets(provider)) {
+                    determineProviderChainFor(requirement.value(), result);
+                    orderedProviders.addAll(result.get(requirement.value()));
+                }
+                // add all updated facets for producing provider
+                for (Facet updated : updatedFacets(provider)) {
+                    determineProviderChainFor(updated.value(), result);
+                    orderedProviders.addAll(result.get(updated.value()));
                 }
                 orderedProviders.add(provider);
+                producer = provider;
             }
         }
+
+        if (producer == null) {
+            logger.warn("No facet provider found that produces {}", facet);
+        }
+
         // then add all @Updates facet providers
         for (FacetProvider provider : providersList) {
             if (updatesFacet(provider, facet)) {
-                Requires requirements = provider.getClass().getAnnotation(Requires.class);
-                if (requirements != null) {
-                    for (Facet requirement : requirements.value()) {
-                        determineProviderChainFor(requirement.value(), result);
-                        orderedProviders.addAll(result.get(requirement.value()));
+                // add all required facets for updating provider
+                for (Facet requirement : requiredFacets(provider)) {
+                    determineProviderChainFor(requirement.value(), result);
+                    orderedProviders.addAll(result.get(requirement.value()));
+                }
+                // the provider updates this and other facets
+                // just add producers for the other facets
+                for (Facet updated : updatedFacets(provider)) {
+                    for (FacetProvider fp : providersList) {
+                        // only add @Produces providers to avoid infinite recursion
+                        if (producesFacet(fp, updated.value())) {
+                            orderedProviders.add(fp);
+                        }
                     }
                 }
                 orderedProviders.add(provider);
@@ -213,6 +249,22 @@ public class WorldBuilder {
         }
         result.putAll(facet, orderedProviders);
         facetCalculationInProgress.remove(facet);
+    }
+
+    private Facet[] requiredFacets(FacetProvider provider) {
+        Requires requirements = provider.getClass().getAnnotation(Requires.class);
+        if (requirements != null) {
+            return requirements.value();
+        }
+        return new Facet[0];
+    }
+
+    private Facet[] updatedFacets(FacetProvider provider) {
+        Updates updates = provider.getClass().getAnnotation(Updates.class);
+        if (updates != null) {
+            return updates.value();
+        }
+        return new Facet[0];
     }
 
     private boolean producesFacet(FacetProvider provider, Class<? extends WorldFacet> facet) {
