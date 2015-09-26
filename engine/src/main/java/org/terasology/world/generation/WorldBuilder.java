@@ -184,8 +184,23 @@ public class WorldBuilder {
             throw new RuntimeException("Circular dependency detected when calculating facet provider ordering for " + facet);
         }
         Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
+
+        // first add all @Produces facet providers
         for (FacetProvider provider : providersList) {
             if (producesFacet(provider, facet)) {
+                Requires requirements = provider.getClass().getAnnotation(Requires.class);
+                if (requirements != null) {
+                    for (Facet requirement : requirements.value()) {
+                        determineProviderChainFor(requirement.value(), result);
+                        orderedProviders.addAll(result.get(requirement.value()));
+                    }
+                }
+                orderedProviders.add(provider);
+            }
+        }
+        // then add all @Updates facet providers
+        for (FacetProvider provider : providersList) {
+            if (updatesFacet(provider, facet)) {
                 Requires requirements = provider.getClass().getAnnotation(Requires.class);
                 if (requirements != null) {
                     for (Facet requirement : requirements.value()) {
@@ -205,7 +220,10 @@ public class WorldBuilder {
         if (produces != null && Arrays.asList(produces.value()).contains(facet)) {
             return true;
         }
+        return false;
+    }
 
+    private boolean updatesFacet(FacetProvider provider, Class<? extends WorldFacet> facet) {
         Updates updates = provider.getClass().getAnnotation(Updates.class);
         if (updates != null) {
             for (Facet updatedFacet : updates.value()) {
