@@ -1,0 +1,15 @@
+{
+    "ListOfObject" : {
+        "shortName" : "Test",
+        "elements" : [
+            {
+                "id" : "goSomewhere",
+                "type" : "myType1"
+            },
+            {
+                "id" : "returnHome",
+                "type" : "myType2"
+            }
+        ]
+    }
+}
