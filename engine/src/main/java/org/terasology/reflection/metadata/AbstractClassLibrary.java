@@ -20,6 +20,9 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -39,6 +42,8 @@ import java.util.Set;
  * @author Immortius
  */
 public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractClassLibrary.class);
 
     private ModuleManager moduleManager;
     protected final CopyStrategyLibrary copyStrategyLibrary;
@@ -87,7 +92,10 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
         if (metadata != null) {
             classLookup.put(clazz, metadata);
-            uriLookup.put(uri.getObjectName(), uri.getModuleName(), metadata);
+            ClassMetadata<? extends T, ?> prev = uriLookup.put(uri.getObjectName(), uri.getModuleName(), metadata);
+            if (prev != null && !prev.equals(metadata)) {
+                logger.warn("Duplicate entry for '{}': {} and {}", uri, prev.getType(), metadata.getType());
+            }
         }
     }
 
