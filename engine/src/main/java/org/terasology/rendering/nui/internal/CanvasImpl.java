@@ -345,7 +345,8 @@ public class CanvasImpl implements CanvasControl {
         }
 
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
-        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
+        UISkin skin = (widget.getSkin() != null) ? widget.getSkin() : state.skin;
+        UIStyle elementStyle = skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
         Rect2i region = applyStyleToSize(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
         try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
             Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
