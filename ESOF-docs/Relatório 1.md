@@ -12,7 +12,8 @@ O jogo consiste num mundo amplo feito de blocos cúbicos que podem representar t
 
 A partir do repositório conseguimos perceber que este foi criado em Fevereiro de 2011, pelo que o projeto em si deve ter surgido poucos meses antes. Ao todo existem mais de 60 contribuidores no projeto, embora apenas 16 tenham estado ativos durante este ano (2015). O criador do projeto foi Benjamin Glatzel (["*begla*"](https://github.com/begla)) que, juntamente com 3 outros utilizadores (["*immortius*"](https://github.com/immortius), ["*Cervator*"](https://github.com/Cervator) e ["*msteiger*"](https://github.com/msteiger)), constitui o núcleo principal de desenvolvimento do projeto.
 
-O Terasology também possui uma comunidade grande em várias redes sociais (por exemplo, a [página do Facebook](https://www.facebook.com/Terasology) do projeto tem mais de 4000 "*likes*").
+O Terasology também possui uma comunidade grande em várias redes sociais ([Facebook](https://www.facebook.com/Terasology), [Twitter](https://twitter.com/terasology), [Google+](https://plus.google.com/103835217961917018533/posts), ...).
+As *pre-alpha releases* são divulgadas publicamente por esses meios, pelo que podem ser [descarregadas por utilizadores que não sejam programadores de forma fácil](https://github.com/MovingBlocks/Terasology/releases).
 
 O projeto está licenciado sob a [licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
@@ -37,8 +38,6 @@ Através da análise do repositório é percetível que os contribuidores se div
 Para além disso, o projeto utiliza o modelo de prototipagem de software uma vez que são feitas várias *pre-alpha releases* que podem ser consideradas como protótipos uma vez que apresentam estabilidade crescente e refletem as funcionalidades entretanto adicionadas/melhoradas.
 
 O sistema de *issues* do GitHub é amplamente utilizado para controlar tarefas, melhorias e bugs. Algumas dessas *issues* estão incluidas em *milestones* do projeto, que definem objetivos a atingir como, por exemplo, um estado considerável *alpha* e um estado considerável *beta* do desenvolvimento jogo.
-
-As *pre-alpha releases* são divulgadas publicamente através das diferentes redes sociais associadas ao projeto ([Facebook](https://www.facebook.com/Terasology), [Twitter](https://twitter.com/terasology), [Google+](https://plus.google.com/103835217961917018533/posts), ...) pelo que podem ser [descarregadas por utilizadores que não sejam programadores de forma fácil](https://github.com/MovingBlocks/Terasology/releases).
 
 ### Estrutura do repositório
 
