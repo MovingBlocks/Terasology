@@ -6,7 +6,7 @@
 
 ![Terasology Gameplay 1](/ESOF-docs/resources/gameplay1.jpg)
 
-O objetivo do Terasology é de servir como ferramenta de investigação de geração procedimental de terreno (["*procedural terrain generation*"](https://en.wikipedia.org/wiki/Procedural_generation) - uma técnica de gerar terreno de forma a minimizar o espaço em disco do jogo) e técnicas de [*rendering*](https://en.wikipedia.org/wiki/Rendering_(computer_graphics)) em Java.
+O objetivo do Terasology é de servir como ferramenta de investigação de geração procedimental de terreno (["*procedural terrain generation*"](https://en.wikipedia.org/wiki/Procedural_generation) - uma técnica de gerar terreno de forma algorítmica que minimiza o espaço em disco do jogo) e técnicas de [*rendering*](https://en.wikipedia.org/wiki/Rendering_(computer_graphics)) em Java.
 
 O jogo consiste num mundo amplo feito de blocos cúbicos que podem representar todo o tipo de materials como terra, relva, pedra, madeira ou ferro. O utilizador controla uma personagem que se move pelo mundo, tentando sobreviver a criaturas selvagens e procurar materiais raros.
 
