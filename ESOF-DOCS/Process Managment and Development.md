@@ -8,30 +8,18 @@
 
 **Terasology** é um jogo de tributo ao *Minecraft* que mantém fiel ao original o aspeto e alguns dos modos de jogo. Em certas características **Terasology** poderá ser entendido como uma expansão do *Minecraft* pois apesar de ter aspetos oriundos do mesmo permite também uma maior profundidade e sofisticação. O modo de jogo *Multiplayer* também é possível para além de vários *mods* de jogo. O projeto está a ser desenvolvido em Java e conta com 63 contribuidores.
 
-#### 1.2 História
+### 1.2 História
 
 O jogo foi criado por Benjamin Glatzel ([begla](https://github.com/begla)). Inicialmente, o projeto estava destinado a ser apenas um *voxel engine* e tinha o nome *Blockmania*. Depois da equipa crescer o objetivo era criar um nome único e inesquecível. Daí surgiu o nome *Terasology*. Este deriva da combinação de duas palavras gregas: τέρας que se traduz *teras* e λόγος que remete para *logos*. 
 O projeto servia propósitos de pesquisa sobre a criação de terrenos e técnicas eficientes de *rendering* em Java usando a biblioteca **[LWJGL](http://www.lwjgl.org/)**.
 Desde o início o número de contribuidores foi subindo e continua a crescer o número de pessoas interessadas em colaborar. 
 **Moving Blocks** é o nome da equipa e a mesma tem muitos outros projetos apesar de **Terasology** ser o mais evidenciado. 
 
-<div id="begla">
-    <img />
+<img style="float: right;" src="begla.png">
     ![Benjamin "begla" Glatzel](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/begla.png?raw=true)
-</div>
-
-#begla {
-    height:50px;
-    line-height:50px;
-}
-
-#begla img {
-    vertical-align:middle;
-    max-height:100%;
-}
 
 
-##### 1.3 Desenvolvimento e recursos
+### 1.3 Desenvolvimento e recursos
 
 A página do **[Terasology](http://terasology.org/)** permite fazer o download gratuito do jogo, tendo variadas apresentações do gameplay e permitindo ainda acesso a guias para quem quiser contribuir para o desenvolvimento do projeto:
 1. **[Guia para o contribuidor](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Guide)** - apresenta tópicos que remetem para a explicação das variadas tecnologias usadas no desenvolvimento e explica brevemente como é feita a criação de blocos e como são usadas as texturas. 
