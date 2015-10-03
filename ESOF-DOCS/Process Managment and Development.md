@@ -15,8 +15,8 @@ O projeto servia propósitos de pesquisa sobre a criação de terrenos e técnic
 Desde o início o número de contribuidores foi subindo e continua a crescer o número de pessoas interessadas em colaborar. 
 **Moving Blocks** é o nome da equipa e a mesma tem muitos outros projetos apesar de **Terasology** ser o mais evidenciado. 
 
-<img style="float: right;" src="begla.png">
-    ![Benjamin "begla" Glatzel](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/begla.png?raw=true)
+![Benjamin "begla" Glatzel](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/begla.png?raw=true)
+img[alt=Benjamin "begla" Glatzel] { float: right; }
 
 
 ### 1.3 Desenvolvimento e recursos
