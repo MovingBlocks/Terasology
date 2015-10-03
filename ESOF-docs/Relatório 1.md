@@ -2,19 +2,19 @@
 
 ## Descrição do Projeto
 
-**Terasology** is a Java game that is inspired by Minecraft. It is an open-world 3D game that tries to add some sophistication to the popular game from Mojang.
+**Terasology** é um jogo em Java com um mundo aberto em 3D que tenta adicionar alguma sofisticação ao jogo da Mojang, "Minecraft", no qual foi inspirado.
 
 ![Terasology Gameplay 1](/ESOF-docs/resources/gameplay1.jpg)
 
-The purpose of Terasology is to research procedural terrain generation and efficient rendering techniques in Java.
+O objetivo do Terasology é de servir como ferramenta de investigação de geração procedimental de terreno (["*procedural terrain generation*"](https://en.wikipedia.org/wiki/Procedural_generation) - uma técnica de gerar terreno de forma a minimizar o espaço em disco do jogo) e técnicas de [*rendering*](https://en.wikipedia.org/wiki/Rendering_(computer_graphics)) em Java.
 
-The game consists in a very large and procedurally generated world made of blocks. These blocks can represent different materials or objects such as dirt, stone, wood, trees, grass, sans, etc. The user controls a player, moving around in the world trying to survive wild creatures and find rare materials.
+O jogo consiste num mundo amplo feito de blocos cúbicos que podem representar todo o tipo de materials como terra, relva, pedra, madeira ou ferro O utilizador controla uma personagem que se move pelo mundo, tentando sobreviver a criaturas selvagens e procurar materiais raros.
 
-As far as the repository can tell the project dates back to February 2011 and has a total of 63 contributors, even though only 16 have been active this year. The creator of the project is Benjamin Glatzel (begla) who is joined by 3 other users ("immortius", "Cervator", "msteiger") as the project's main developers with over 2300 combined commits to the repository.
+A partir do repositório conseguimos perceber que este foi criado em Fevereiro de 2011, pelo que o projeto em si deve ter surgido poucos meses antes. Ao todo existem mais de 60 contribuidores no projeto, embora apenas 16 tenham estado ativos durante este ano (2015). O criador do projeto foi Benjamin Glatzel (["*begla*"](https://github.com/begla)) que, juntamente com 3 outros utilizadores (["*immortius*"](https://github.com/immortius), ["*Cervator*"](https://github.com/Cervator) e ["*msteiger*"](https://github.com/msteiger)), constitui o núcleo principal de desenvolvimento do projeto.
 
-Terasology also has a quite large community of fans on several social networks (for example, Terasology´s [Facebook page](https://www.facebook.com/Terasology) has over 4000 "likes").
+O Terasology também possui uma comunidade grande em várias redes sociais (por exemplo, a [página do Facebook](https://www.facebook.com/Terasology) do projeto tem mais de 4000 "*likes*").
 
-The project is licensed under the Apache 2.0 License.
+O projeto está licensiado sob a [licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
 ![Terasology Gameplay 2](/ESOF-docs/resources/gameplay2.png)
 
