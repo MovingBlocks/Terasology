@@ -40,6 +40,10 @@ As *pre-alpha releases* são divulgadas publicamente através das diferentes red
 
 ### Estrutura do repositório
 
+The repository has several branches, but the only active ones are "[*develop*](https://github.com/andrelago13/Terasology/tree/develop)" and "[*weblate*](https://github.com/andrelago13/Terasology/tree/weblate)". As far as we can see, developers implementing new functionality or correcting previous issues add their code to the "*develop*" branch. Later, the managers of the repository merge this branch to "*master*" therefore launching a new *release*/*prototype*.
+
+As said above, the [*releases*](https://github.com/MovingBlocks/Terasology/releases) in the repository represent pre-alpha releases of the game, allowing users to download and run them. The description of the *releases* details the features added or fixed.
+
 ## Análise Crítica
 
 ## Links externos
