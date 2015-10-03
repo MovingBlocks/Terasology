@@ -2,7 +2,7 @@
 
 ## 1. Terasology
 
-![Terasology](https://github.com/dimamo5/Terasology/tree/develop/ESOF-DOCS/images/terasology.png)
+![Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/terasology.png?raw=true)
 
 ### 1.1 O que é?
 
@@ -16,7 +16,7 @@ Desde o início o número de contribuidores foi subindo e continua a crescer o n
 **Moving Blocks** é o nome da equipa e a mesma tem muitos outros projetos apesar de **Terasology** ser o mais evidenciado. 
 
 
-![Benjamin "begla" Glatzel](https://github.com/dimamo5/Terasology/tree/develop/ESOF-DOCS/images/begla.png)
+![Benjamin "begla" Glatzel](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/begla.png?raw=true)
 
 ##### 1.3 Desenvolvimento e recursos
 
@@ -28,4 +28,4 @@ A página do **[Terasology](http://terasology.org/)** permite fazer o download g
 Para além da página principal existe ainda um [fórum](http://forum.terasology.org/) onde os contribuidores comunicam entre si sobre o projeto e os principais programadores fazem avisos. A comunicação entre membros é também gerida através do painel de [issues](https://github.com/MovingBlocks/Terasology/issues) do Github que permite a comunicação de bugs descobertos e qualquer outro assunto pernitente para aumentar a eficiência e ajudar na gestão do projeto. Estes *issues* são classificados com *labels* como por exemplo **Bug**, **Logistics**, **Known issue**, etc... Desta forma a comunicação torna-se mais eficaz.
 O jogo é dado a conhecer em inúmeros outros sites e blogs como o blog do **[Moving Blocks](http://blog.movingblocks.net/blockmania/)**. 
 
-![Screenshot do website Terasology](https://github.com/dimamo5/Terasology/tree/develop/ESOF-DOCS/images/site.png)
+![Screenshot do website Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/site.png?raw=true)
