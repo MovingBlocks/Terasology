@@ -22,6 +22,9 @@ O projeto está licenciado sob a [licença Apache 2.0](http://www.apache.org/lic
 
 ### Processo de software
 
+O Terasology usa um modelo de prototipagem de software.
+Os contribuidores estão divididos em equipas: arquitetura, arte, design, geral, GUI, logística, mundo.
+
 ### Estrutura do repositório
 
 ## Análise Crítica
