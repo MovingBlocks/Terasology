@@ -4,11 +4,9 @@
 
 **Terasology** is a Java game that is inspired by Minecraft. It is an open-world 3D game that tries to add some sophistication to the popular game from Mojang.
 
-![Terasology Gameplay 1](/resources/gameplay1.jpg)
+![Terasology Gameplay 1](/ESOF-docs/resources/gameplay1.jpg)
 
-[a relative link](/resources/gameplay1.jpg)
-
-[a relative link](resources/gameplay1.jpg)
+![Terasology Gameplay 1](https://raw.githubusercontent.com/andrelago13/Terasology/master/ESOF-docs/resources/gameplay2.png
 
 The purpose of Terasology is to research procedural terrain generation and efficient rendering techniques in Java.
 
