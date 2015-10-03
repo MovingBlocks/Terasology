@@ -14,7 +14,7 @@ A partir do repositório conseguimos perceber que este foi criado em Fevereiro d
 
 O Terasology também possui uma comunidade grande em várias redes sociais (por exemplo, a [página do Facebook](https://www.facebook.com/Terasology) do projeto tem mais de 4000 "*likes*").
 
-O projeto está licensiado sob a [licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+O projeto está licenciado sob a [licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
 ![Terasology Gameplay 2](/ESOF-docs/resources/gameplay2.png)
 
