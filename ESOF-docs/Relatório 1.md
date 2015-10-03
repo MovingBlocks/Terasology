@@ -2,7 +2,7 @@
 
 ## Descrição do Projeto
 
-**Terasology** é um jogo em Java com um mundo aberto em 3D que tenta adicionar alguma sofisticação ao jogo da Mojang, "Minecraft", no qual foi inspirado.
+[**Terasology**](http://terasology.org/) é um jogo em Java com um mundo aberto em 3D que tenta adicionar alguma sofisticação ao jogo da Mojang, "Minecraft", no qual foi inspirado.
 
 ![Terasology Gameplay 1](/ESOF-docs/resources/gameplay1.jpg)
 
@@ -20,4 +20,18 @@ O projeto está licensiado sob a [licença Apache 2.0](http://www.apache.org/lic
 
 ## Processo
 
+### Processo de software
+
+### Estrutura do repositório
+
 ## Análise Crítica
+
+## Links externos
+
+Página oficial do projeto: http://terasology.org/
+
+Grupo:
+ - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt)
+ - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt)
+ - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt)
+ - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt)
