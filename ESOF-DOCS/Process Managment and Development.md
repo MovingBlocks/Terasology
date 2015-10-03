@@ -3,7 +3,6 @@
 ## 1. Terasology
 
 ![Terasology](/images/terasology.jpg)
-Format: ![Alt Text](url)
 
 ### 1.1 O que é?
 
@@ -18,7 +17,6 @@ Desde o início o número de contribuidores foi subindo e continua a crescer o n
 
 
 ![Benjamin "begla" Glatzel](/images/begla.jpg)
-Format: ![Alt Text](url)
 
 ##### 1.3 Desenvolvimento e recursos
 
@@ -31,4 +29,3 @@ Para além da página principal existe ainda um [fórum](http://forum.terasology
 O jogo é dado a conhecer em inúmeros outros sites e blogs como o blog do **[Moving Blocks](http://blog.movingblocks.net/blockmania/)**. 
 
 ![Screenshot do website Terasology](/images/site.jpg)
-Format: ![Alt Text](url)
