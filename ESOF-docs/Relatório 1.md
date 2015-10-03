@@ -6,6 +6,10 @@
 
 ![Terasology Gameplay 1](/resources/gameplay1.jpg)
 
+[a relative link](/resources/gameplay1.jpg)
+
+[a relative link](resources/gameplay1.jpg)
+
 The purpose of Terasology is to research procedural terrain generation and efficient rendering techniques in Java.
 
 The game consists in a very large and procedurally generated world made of blocks. These blocks can represent different materials or objects such as dirt, stone, wood, trees, grass, sans, etc. The user controls a player, moving around in the world trying to survive wild creatures and find rare materials.
