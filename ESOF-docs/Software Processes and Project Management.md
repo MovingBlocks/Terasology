@@ -18,7 +18,7 @@ Despite being already at its 4th anniversary of development, this project is sti
 
 Development process
 --------
-Terasology is an open-source project that has had throughout its development dozens of contributors. Most of those contribute through pull requests (the others being the main developers). They rely on Github’s issue page to keep track of bugs and they also use forums and a [subreddit](https://github.com/MovingBlocks/Terasology/graphs/contributors) to communicate between each other and with players.
+Terasology is an open-source project that has had throughout its development dozens of contributors. Most of those contribute through pull requests (the others being the main developers). They rely on Github’s issue page to keep track of bugs and they also use forums and a [subreddit](https://www.reddit.com/r/terasology) to communicate between each other and with players.
 
 Whenever a pull request is issued, the main developers of the project review and test it, providing feedback to the person that issued it. If it gets approved, it will be merged.
 
