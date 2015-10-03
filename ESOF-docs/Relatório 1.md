@@ -6,8 +6,6 @@
 
 ![Terasology Gameplay 1](/ESOF-docs/resources/gameplay1.jpg)
 
-![Terasology Gameplay 1](https://raw.githubusercontent.com/andrelago13/Terasology/master/ESOF-docs/resources/gameplay2.png
-
 The purpose of Terasology is to research procedural terrain generation and efficient rendering techniques in Java.
 
 The game consists in a very large and procedurally generated world made of blocks. These blocks can represent different materials or objects such as dirt, stone, wood, trees, grass, sans, etc. The user controls a player, moving around in the world trying to survive wild creatures and find rare materials.
@@ -18,7 +16,7 @@ Terasology also has a quite large community of fans on several social networks (
 
 The project is licensed under the Apache 2.0 License.
 
-![Terasology Gameplay 2](/resources/gameplay2.png)
+![Terasology Gameplay 2](/ESOF-docs/resources/gameplay2.png)
 
 ## Processo
 
