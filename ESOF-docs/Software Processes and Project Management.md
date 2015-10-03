@@ -2,6 +2,8 @@
 	Describe project selected
 -->
 
+Project Description
+--------
 
 - Terasology is a project developed by the MovingBlocks github team. It was started by Benjamin "begla" Glatzel in order to research procedural terrain generation and efficient rendering techniques in Java using the LWJGL, a lightweight Java open-source library for game development.
 - In its essence, Terasology is a voxel based, Minecraft-like game, but tries to impose a NPC-helper gameplay like the games Dwarf Fortress and Dungeon Keeper.
@@ -12,7 +14,8 @@
 	Analyse development process used
 -->
 
-
+Development process
+--------
 - Terasology is an open-source project that has had throughout its development dozens of contributors. Most of those contribute through pull requests (the others being the main developers). They rely on Github’s issue page to keep track of bugs and they also use forums and a subreddit to communicate between each other and with players. <!--- link: https://github.com/MovingBlocks/Terasology/graphs/contributors -->
 - Whenever a pull request is issued, the main developers of the project review and test it, providing feedback to the person that issued it. If it gets approved, it will be merged.
 - In order to test said pull request, they use Jenkins, a tool that builds the project and reports any compiler warnings and errors, as well as any JUnit test failures. The head developer has shown interest in automating their Jenkins setup, so that they don’t have to manually test them everytime they get a new pull request. <!--- link: http://jenkins.terasology.org/job/TerasologyPRs/ -->
