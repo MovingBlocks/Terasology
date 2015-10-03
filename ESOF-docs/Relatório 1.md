@@ -25,6 +25,19 @@ O projeto está licenciado sob a [licença Apache 2.0](http://www.apache.org/lic
 O Terasology usa um modelo de prototipagem de software.
 Os contribuidores estão divididos em equipas: arquitetura, arte, design, geral, GUI, logística, mundo.
 
+Através da análise do repositório é percetível que os contribuidores se dividem em equipas dedicadas a certas partes do projeto, sendo possível que o mesmo contribuidor trabalhe para mais do que uma equipa. As diferentes equipas são:
+ - Arquitetura
+ - Arte
+ - Design
+ - Geral
+ - GUI
+ - Logística
+ - Mundo
+ 
+Para além disso, o projeto utiliza o modelo de prototipagem de software uma vez que são feitas várias *pre-alpha releases* que podem ser consideradas como protótipos uma vez que apresentam estabilidade crescente e refletem as funcionalidades entretanto adicionadas/melhoradas.
+
+As *pre-alpha releases* são divulgadas publicamente através das diferentes redes sociais associadas ao projeto ([Facebook](https://www.facebook.com/Terasology), [Twitter](https://twitter.com/terasology), [Google+](https://plus.google.com/103835217961917018533/posts), ...) pelo que podem ser [descarregadas por utilizadores que não sejam programadores de forma fácil](https://github.com/MovingBlocks/Terasology/releases).
+
 ### Estrutura do repositório
 
 ## Análise Crítica
