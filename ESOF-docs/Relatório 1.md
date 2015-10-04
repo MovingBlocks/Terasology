@@ -56,6 +56,15 @@ Como foi dito, as [*releases*](https://github.com/MovingBlocks/Terasology/releas
 
 ## Análise Crítica
 
+### Atividade
+O projeto encontra-se ativo, com uma média diária de *commits* superior a 2.
+
+Existem cerca de 300 *issues* abertas, algumas das quais possuem a tag *Contributor-friendly*, o que significa que são de resolução relativamente acessível por qualquer contribuidor com alguns conhecimentos técnicos das ferramentas utilizadas. Isto é, na opinião do grupo, uma ótima forma de incentivar às contribuições por parte de terceiros, independentemente das suas capacidades.
+
+Além disso, a 1 de Outubro foi criado um [*post*](http://forum.terasology.org/threads/contribute-to-open-source-get-a-free-shirt.1384/#post-12439) no fórum do Terasology a divulgar uma campanha de incentivo às contribuições em projetos open-source, organizada pelo GitHub e pela DigitalOcean.
+
+### Desenvolvimento e Milestones
+
 ## Links externos
 
 Página oficial do projeto: http://terasology.org/
