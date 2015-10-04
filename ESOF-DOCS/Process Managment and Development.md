@@ -12,6 +12,3 @@ Dado que o Terasology conta com dezenas de contribuidores e de modo a permitir u
 O projecto não tem um modelo bem definido devido ao número elevado de voluntários e à constante actividade/inactividade dos contribuidores, mencionada por um dos administradores. O fundador e head developer insiste em adotar o modelo BDD (Behaviour Driven-Development) - indicação dada pelo mesmo no guia de [Unit Testing](https://github.com/MovingBlocks/Terasology/wiki/Unit-Testing) para novos contribuidores. Este modelo permite maior flexibilidade e facilidade em adquirir novos colaboradores e também uma melhor comunicação entre as diferentes equipas presentes no projecto, tais como a a equipa de teste (beta-testers) e de desenvolvimento (implementação da lógica de jogo). 
 
 ![Screenshot do website Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/site.png?raw=true)
-
-
-
