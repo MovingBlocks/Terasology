@@ -46,7 +46,7 @@ A segunda forma de contribuir é semelhante à anterior mas não requer que se f
 
 O projeto utiliza o modelo **Behavior Driven Development** (BDD) por vários motivos. Por um lado, pretende-se estimular a participação de contribuidores externos para promover a comunicação entre eles e a prática de Desenvolvimento de Fora para Dentro (*Outside-In Development*). O objetivo é que os diversos contribuidores desenvolvam diferentes módulos da aplicação final com base em padrões pré-estabelecidos de comunicação entre módulos. Por exemplo, se o fundador do projeto estipula que o input dos controlos do utilizador deve ser feito de uma certa forma, qualquer contribuidor externo deve desenvolver o seu módulo tendo em conta esta informação.
 
-Para além disso, consideramos que o modelo **Incremental Development and Delivery** (IDD) é também utilizado uma vez que à medida que novas funcionalidades são adicionadas é feito o lançamento de [*pre-alpha releases*](https://github.com/MovingBlocks/Terasology/releases) que permitem a qualquer utilizador testar o jogo e experimentar o que foi desenvolvido.
+Para além disso, consideramos que o modelo **Software Prototyping** (IDD) é também utilizado uma vez são frequentemente divulgadas [*pre-alpha releases*](https://github.com/MovingBlocks/Terasology/releases) que permitem a qualquer utilizador testar o jogo e experimentar o que foi desenvolvido.
 
 ### Estrutura do repositório
 
