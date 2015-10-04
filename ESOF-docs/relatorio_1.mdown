@@ -1,8 +1,13 @@
-# RELATORIO
+# ESOF
+# RELATÓRIO 1
+## Terasology
 
 ## Descrição do Projecto
+O Terasology é um jogo de sobrevivência e descoberta de código aberto com influências de Minecraft, Dwarf Fortress, e Dungeon Keeper.
+Este projecto foi inicializado por [Benjamin "begla" Glatzel](https://github.com/begla) para pesquisar geração de terreno processoal e técnicas de renderização eficientes em Java usando o [LWJGL](https://en.wikipedia.org/wiki/Lightweight_Java_Game_Library) (Lightweight Java Game Library). O motor utiliza um *voxel* como abordagem baseada em bloco como visto em Minecraft. 
+Os criadores de Terasology são uma mistura deversificada de desenvolvedores de *software*, testadores de jogos, artistas gráficos e músicos. Sobre o Terasology podemos encontrar informações, como lançamentos e correções de *bugs* em várias redes sociais como [Community Portal](http://forum.terasology.org/), [Facebook Page](https://www.facebook.com/Terasology/timeline/), [Twiter](https://twitter.com/Terasology), [G+](https://plus.google.com/103835217961917018533/posts), ou [Reddit](https://www.reddit.com/r/Terasology).
 
-
+Terasology está licenciado sob a [Licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) e está disponível em forma de código fonte no [GitHub](https://github.com/MovingBlocks/Terasology).
 
 ## Processo
 
