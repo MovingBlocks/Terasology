@@ -3,9 +3,24 @@
 ## Terasology
 
 ## Descrição do Projecto
-O Terasology é um jogo de sobrevivência e descoberta de código aberto com influências de Minecraft, Dwarf Fortress, e Dungeon Keeper.
-Este projecto foi inicializado por [Benjamin "begla" Glatzel](https://github.com/begla) para pesquisar geração de terreno processoal e técnicas de renderização eficientes em Java usando o [LWJGL](https://en.wikipedia.org/wiki/Lightweight_Java_Game_Library) (Lightweight Java Game Library). O motor utiliza um *voxel* como abordagem baseada em bloco como visto em Minecraft. 
-Os criadores de Terasology são uma mistura deversificada de desenvolvedores de *software*, testadores de jogos, artistas gráficos e músicos. Sobre o Terasology podemos encontrar informações, como lançamentos e correções de *bugs*, em várias redes sociais como [Community Portal](http://forum.terasology.org/), [Facebook Page](https://www.facebook.com/Terasology/timeline/), [Twiter](https://twitter.com/Terasology), [G+](https://plus.google.com/103835217961917018533/posts), ou [Reddit](https://www.reddit.com/r/Terasology).
+O Terasology é um jogo de sobrevivência e descoberta, de *open source* com influências de Minecraft, Dwarf Fortress, e 
+Dungeon Keeper.
+Este projecto foi inicializado por [Benjamin "begla" Glatzel](https://github.com/begla) com o objetivo de 
+investigar e testar técnicas procedimentais de geração de terreno e 
+técnicas de renderização eficientes em Java usando o 
+[LWJGL](https://en.wikipedia.org/wiki/Lightweight_Java_Game_Library) (Lightweight Java Game Library) como base.
+O motor utiliza uma técnica de renderização tendo como base o voxel (unidade de volume baseada em pixel) que faz
+abordagem baseada em bloco que é vista, por exemplo, no Minecraft.
+
+Contudo, com o crescimento da equipa de participantes, o projecto evoluiu para um verdadeiro jogo de descoberta e sobrevivência, enfrentando potenciais perigos que vão aparecendo com o desenrolar do jogo.
+
+Os criadores de Terasology são uma mistura deversificada de *software developers*, testadores de jogos,
+artistas gráficos e músicos. 
+
+Sobre o Terasology podemos encontrar informações, como lançamentos e correções de *bugs*, 
+em várias redes sociais como [Community Portal](http://forum.terasology.org/), 
+[Facebook Page](https://www.facebook.com/Terasology/timeline/), [Twiter](https://twitter.com/Terasology), 
+[G+](https://plus.google.com/103835217961917018533/posts), ou [Reddit](https://www.reddit.com/r/Terasology).
 
 Terasology está licenciado sob a [Licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) e está disponível em forma de código fonte no [GitHub](https://github.com/MovingBlocks/Terasology).
 
@@ -14,14 +29,24 @@ Terasology está licenciado sob a [Licença Apache 2.0](http://www.apache.org/li
 O Terasology conta com uma equipa de desenvolvimento, todos voluntários sem remuneração.
 
 Nas palavras de [Cervator](https://github.com/Cervator):
->Our project isn't super structured though as we're all unpaid volunteers often with RL commitments keeping us from spending too much time coding.
+>Our project isn't super structured though as we're all unpaid volunteers often
+with RL commitments keeping us from spending too much time coding.
 
-A equipa pode ser dividida em áreas estando cada um dos elementos responsável por uma área diferente, havendo elementos da equipa que contribuem em diferentes áreas do projeto. Uma área pode também conter vários elementos da equipa.
+A equipa pode ser dividida em áreas, estando cada um dos elementos responsável por uma área diferente,
+havendo elementos da equipa que contribuem em diferentes áreas do projeto. Uma área pode também conter vários
+elementos da equipa.
 A equipa é gerida pelo Organizador de Projectos [Cervator](https://github.com/Cervator).
 
-A equipa não tem um processo desenvolvimento determinado, mas podem-se identificar algumas caracteristicas semelhantes as caracteristicas dos metodos *Agile*. Caracteristicas estas que consistem num grupo de métodos de desenvolvimento de software em que as soluções evoluem através da colaboração entre a auto-organização e multifuncionabilidade das equipas, promovendo o planejamento adaptativo, o desenvolvimento evolucionário, parto prematuro, melhoria contínua, e incentiva a resposta rápida e flexível para mudar. Todas estas caracteristicas, de serta forma, são encontradas neste projecto.
+A equipa não tem um processo de desenvolvimento determinado, mas podem-se identificar algumas 
+caracteristicas semelhantes as caracteristicas dos metodos *Agile*. Caracteristicas estas, que 
+consistem num grupo de métodos de desenvolvimento de *software* em que as soluções evoluem através da 
+colaboração entre a auto-organização e multifuncionabilidade das equipas, promovendo o planeamento adaptativo,
+o desenvolvimento evolutivo, melhoria contínua, e incentiva a respostas rápidas e flexiveis a alterações.
+Todas estas caracteristicas, de certa forma, são encontradas neste projecto.
 
-Também é de se notar que este projecto tem algumas caracteristicas semelhantes com Agile XP Programing visto, que segue os quatro valores fundamentais da XP programing:
+Também é de se notar que este projecto tem algumas caracteristicas semelhantes com Agile XP Programing visto, 
+que, segue os quatro valores fundamentais da XP programing:
+
 * Comunicação
 * Simplicidade
 * Comentários
@@ -29,31 +54,36 @@ Também é de se notar que este projecto tem algumas caracteristicas semelhantes
 
 ### Comunicação
 
-Visto que a colaboração é remota e, por vezes, os colaboradores não se conhecem pessoalmente, a comunicação entre é feita através de foruns e redes sociais e email.
-Notando-se por isso uma forte componente comunicativa entre elementos como no caso do forum.
+Visto que a colaboração é remota e, por vezes, os colaboradores não se conhecem pessoalmente, a comunicação entre os elementos é feita através de foruns e redes sociais bem como por email. Notando-se por isso, uma forte componente comunicativa entre elementos, como no caso do forum.
 
 ### Simplicidade
 
-Como o projecto é de código aberto verifica-se a simplicidade do código desenvolvido pelos colaboradores, mantendo uniformidade do código, código comentado e organização do repositório.
+Como o projecto é *open source*, verifica-se a simplicidade do código desenvolvido pelos colaboradores, 
+mantendo a uniformidade do mesmo, código comentado e organização do repositório.
 
 
 ### Comentários
 
-O Terasology dispões de um [forum](http://forum.movingblocks.org/) onde podem ser discutidas os novos tópicos de desenvolvimento, assim como uma página no [github](https://github.com/MovingBlocks/Terasology/wiki/Community-Suggestions) onde os colaboradores podem dar sugestões de funcionabilidades a incorporar no jogo, 
-e por fim uma página onde os utilizadores e os colaboradores podem espor problemas com as diferentes versões, como por exemplo *bugs*.
+O Terasology dispões de um [forum](http://forum.movingblocks.org/) onde podem ser discutidos os novos tópicos de
+desenvolvimento, assim como uma página no [github](https://github.com/MovingBlocks/Terasology/wiki/Community-Suggestions) 
+onde os colaboradores podem dar sugestões de funcionabilidades a incorporar no jogo, 
+e por fim uma página onde os utilizadores e os colaboradores podem expor problemas com as 
+diferentes versões, como por exemplo *bugs*.
 
 ### Coragem
 
-Os desenvolvedore de *software* quando desenvolvem programas em código aberto tem a coragem de comunicação e de receber comentários ao seu código
-o que facilita a aceitação por parte dos colaboradores a alterações ao seu código.
+Os *software developers* quando desenvolvem programas em ambiente *open source* têm maior à-vontade de comunicação e de 
+receber comentários ao seu código, o que facilita a aceitação por parte dos colaboradores possíveis e necessárias 
+alterações ao seu código.
 
 
-É de se notar que este projecto não só segue os quatro valores do XP Programing, mas também algumas das práticas do XP Programing, como por exemplo: 
-* Pequenos lançamentos - *Pre Alpha-Releases*
-* *Simple Design* - Este projecto mantem um um *design* e uma interface de usuário simples
-* *Test-driven Development* - São feitos alguns testes a pedaços de funcionalidades
+É de se notar que este projecto não só segue os quatro valores do XP Programing, mas também algumas das suas práticas,
+como por exemplo: 
+* *Small Releases* - *Pre Alpha-Releases*
+* *Simple Design* - Este projecto mantem um *design* e uma interface de utilizador simples
+* *Test-driven Development* - São feitos alguns testes a partes de funcionalidades
 * *Refactoring* - É de se notar a não duplicidade do código
-* *Collective Code Ownership* - Neste projecto qualquer desenvolvedor pode trabalhar em qualquer parte da base de código
+* *Collective Code Ownership* - Neste projecto qualquer *developer* pode trabalhar em qualquer parte da base de código
 
 
 ## Análise Critica
