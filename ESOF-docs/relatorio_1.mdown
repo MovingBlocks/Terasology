@@ -86,7 +86,7 @@ como por exemplo:
 * *Collective Code Ownership* - Neste projecto qualquer *developer* pode trabalhar em qualquer parte da base de código
 
 
-## Análise Critica
+## Análise Crítica
 
 A decisão do processo  a utilizar no desenvolvimento de um projeto de software tem uma grande importância no futuro e crescimento sustentável do próprio projeto, pois tem de ter em conta vários objetivos e limitações tais como o âmbito, o tempo, o orçamento e a qualidade. Tendo em conta todas as características e problemas inerentes ao desenvolvimento do Terasology e à composição do grupo de colaboradores o modo ágil de desenvolvimento é de facto o mais correto.
 
@@ -94,5 +94,14 @@ As vantagens que mais saltam à vista na utilização deste método e que se man
 
 O planeamento segundo o método ágil é extremamente flexível, permitindo a adição de novas funcionalidades  à lista de afazeres com regularidade e tratamento de issues e bugs com bastante frequência. O Terasology procura manter-se em constante desenvolvimento, como tal têm várias milestones, já em desenvimento, sem prazo de finalização devido à forma volátil como é constituída a equipa. A não existência de prazos de entrega suporta este planeamento muito flexível e faz com que seja possível a correção de bugs e issues sem grandes contrapartidas. 
 
-O design do projeto procura manter-se simples, tanto que os developers mais ativos procuram manter uma lista de issues atualizada que permita a novos colaboradores lançarem-se no projeto e a conhecer o código e o formato ao desenvolver soluções para estes problemas mais simples. Isto também diminui o risco inerente à inexpriência destes novos elementos pois trabalham com uma pequena parte do projeto. Tendo isto em conta a o desenvolvimento de código também segue um plano simples pois os objetivos são primeiramente traçados pelos elementos da equipa com mais experiencia e só depois se passa para uma fase de programação, possivelmente por colaboradores interessados a juntarem-se à equipa. Os commits são feitos muito regularmente para diminuir o risco e colmatar  a pouca comunicação entre os elementos da equipa
+O design do projeto procura manter-se simples, tanto que os developers mais ativos procuram manter uma lista de issues atualizada que permita a novos colaboradores lançarem-se no projeto e a conhecer o código e o formato ao desenvolver soluções para estes problemas mais simples. Isto também diminui o risco inerente à inexpriência destes novos elementos pois trabalham com uma pequena parte do projeto. Tendo isto em conta a o desenvolvimento de código também segue um plano simples pois os objetivos são primeiramente traçados pelos elementos da equipa com mais experiência e só depois se passa para uma fase de programação, possivelmente por colaboradores interessados a juntarem-se à equipa. Os commits são feitos muito regularmente para diminuir o risco e colmatar  a pouca comunicação entre os elementos da equipa
 
+
+
+#### Lista dos contribuidores 
+#####Grupo 6
+* Francisco Veiga
+* Paulo Peixoto
+* Vasco Pereira
+
+###### FEUP 2016 MIEIC
