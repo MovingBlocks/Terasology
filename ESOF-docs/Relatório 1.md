@@ -19,14 +19,11 @@ O projeto está licenciado sob a [licença Apache 2.0](http://www.apache.org/lic
 
 ![Terasology Gameplay 2](/ESOF-docs/resources/gameplay2.png)
 
-## Processo
+## Processo de desenvolvimento
 
-### Processo de software
+### Desenvolvimento do projeto
 
-O Terasology usa um modelo de prototipagem de software.
-Os contribuidores estão divididos em equipas: arquitetura, arte, design, geral, GUI, logística, mundo.
-
-Através da análise do repositório é percetível que os contribuidores se dividem em equipas dedicadas a certas partes do projeto, sendo possível que o mesmo contribuidor trabalhe para mais do que uma equipa. As diferentes equipas são:
+Os contribuidores do projeto dividem-se entre equipas dedicadas a certas partes do projeto, sendo possível que o mesmo contribuidor trabalhe para mais do que uma equipa. As diferentes equipas são:
  - Arquitetura
  - Arte
  - Design
@@ -34,10 +31,22 @@ Através da análise do repositório é percetível que os contribuidores se div
  - GUI
  - Logística
  - Mundo
- 
-Para além disso, o projeto utiliza o modelo de prototipagem de software uma vez que são feitas várias *pre-alpha releases* que podem ser consideradas como protótipos uma vez que apresentam estabilidade crescente e refletem as funcionalidades entretanto adicionadas/melhoradas.
 
 O sistema de *issues* do GitHub é amplamente utilizado para controlar tarefas, melhorias e bugs. Algumas dessas *issues* estão incluidas em *milestones* do projeto, que definem objetivos a atingir como, por exemplo, um estado considerável *alpha* e um estado considerável *beta* do desenvolvimento jogo.
+
+### Contribuições
+
+Existem duas formas principais de se contribuir para o *Terasology*.
+
+A primeira consiste em criar um *fork* do repositório original, escrevendo-se o código no novo repositório criado. Quando se considerar que foi implementada ou corrigida uma funcionalidade que deve ser adicionada ao projeto original inicia-se uma *pull request* para que o dono do repositório de origem decida se pretende juntar as alterações ao seu projeto.
+
+A segunda forma de contribuir é semelhante à anterior mas não requer que se faça *fork* do repositório. Para contribuir, é possível que um utilizador crie um *branch* seu na sua máquina, trabalhando nesse *branch*. No final, inicia-se uma *pull request* para fundir o seu *branch* com o de destino, deixando ao dono do repositório a decisão de aceitar a junção ou não.
+
+### Processo de software
+
+O projeto utiliza o modelo **Behavior Driven Development** (BDD) por vários motivos. Por um lado, pretende-se estimular a participação de contribuidores externos para promover a comunicação entre eles e a prática de Desenvolvimento de Fora para Dentro (*Outside-In Development*). O objetivo é que os diversos contribuidores desenvolvam diferentes módulos da aplicação final com base em padrões pré-estabelecidos de comunicação entre módulos. Por exemplo, se o fundador do projeto estipula que o input dos controlos do utilizador deve ser feito de uma certa forma, qualquer contribuidor externo deve desenvolver o seu módulo tendo em conta esta informação.
+
+Para além disso, consideramos que o modelo **Incremental Development and Delivery** (IDD) é também utilizado uma vez que à medida que novas funcionalidades são adicionadas é feito o lançamento de [*pre-alpha releases*](https://github.com/MovingBlocks/Terasology/releases) que permitem a qualquer utilizador testar o jogo e experimentar o que foi desenvolvido.
 
 ### Estrutura do repositório
 
