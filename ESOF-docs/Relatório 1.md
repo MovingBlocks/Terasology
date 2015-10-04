@@ -36,11 +36,7 @@ O sistema de *issues* do GitHub é amplamente utilizado para controlar tarefas, 
 
 ### Contribuições
 
-Existem duas formas principais de se contribuir para o *Terasology*.
-
-A primeira consiste em criar um *fork* do repositório original, escrevendo-se o código no novo repositório criado. Quando se considerar que foi implementada ou corrigida uma funcionalidade que deve ser adicionada ao projeto original inicia-se uma *pull request* para que o dono do repositório de origem decida se pretende juntar as alterações ao seu projeto.
-
-A segunda forma de contribuir é semelhante à anterior mas não requer que se faça *fork* do repositório. Para contribuir, é possível que um utilizador crie um *branch* seu na sua máquina, trabalhando nesse *branch*. No final, inicia-se uma *pull request* para fundir o seu *branch* com o de destino, deixando ao dono do repositório a decisão de aceitar a junção ou não.
+Para contribuir é necessário criar um *fork* do repositório original, escrevendo-se o código no novo repositório criado. Quando se considerar que foi implementada ou corrigida uma funcionalidade que deve ser adicionada ao projeto original inicia-se uma *pull request* para que o dono do repositório de origem decida se pretende juntar as alterações ao seu projeto.
 
 ### Processo de software
 
@@ -57,17 +53,22 @@ Como foi dito, as [*releases*](https://github.com/MovingBlocks/Terasology/releas
 ## Análise Crítica
 
 ### Atividade
+
 O projeto encontra-se ativo, com uma média diária de *commits* superior a 2.
 
 Existem cerca de 300 *issues* abertas, algumas das quais possuem a tag *Contributor-friendly*, o que significa que são de resolução relativamente acessível por qualquer contribuidor com alguns conhecimentos técnicos das ferramentas utilizadas. Isto é, na opinião do grupo, uma ótima forma de incentivar às contribuições por parte de terceiros, independentemente das suas capacidades.
 
 Além disso, a 1 de Outubro foi criado um [*post*](http://forum.terasology.org/threads/contribute-to-open-source-get-a-free-shirt.1384/#post-12439) no fórum do Terasology a divulgar uma campanha de incentivo às contribuições em projetos open-source, organizada pelo GitHub e pela DigitalOcean.
 
+### Estrutura do Repositório
+
+Tendo em conta o projeto em análise, a estrutura de branches do repositório é, para nós, adequada, visto permitir o desenvolvimento paralelo de diferentes partes do projeto de uma forma organizada e independente.
+
 ### Desenvolvimento
 
 Um dos problemas do processo de software usado neste projeto é o facto de não haver um plano bem delineado em relação ao futuro, apesar da utilização do sistema de *Milestones*. Uma prova disso pode ser obtida comparando o objetivo inicial do projeto com aquilo em que se tornou atualmente. No ínicio, o Terasology foi criado como ferramenta de investigação de geração procedimental de terreno e de técninas de *rendering* em Java. Neste momento, uma grande parte do desenvolvimento é focado em torná-lo num jogo atrativo para o jogador final.
 
-O projeto tem vindo a alterar o seu processo de software para um do tipo *Behavior-driven Development* (BDD). Nesse sentido, a ferramenta *Jenkins* é utilizada para automatizar os testes aos *pull requests*, correndo os testes *JUnit* e verificando a existência de erros e *warnings*.
+O projeto tem vindo a alterar o seu processo de software para um do tipo *Behavior-driven Development* (BDD). Nesse sentido, a ferramenta *Jenkins* é utilizada para automatizar os testes aos *pull requests*, correndo os testes *JUnit* e verificando a existência de erros e *warnings*. Na nossa opinião a adoção deste modelo é benéfica para o projeto porque não só ajuda a estruturar a forma como ele é desenvolvido, organizando os objetivos de cada contribuidor, mas também apela à participação de programadores externos permitindo não só uma maior variedade de ideias como um alargamento da comunidade envolvente.
 
 ## Links externos
 
