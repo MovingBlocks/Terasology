@@ -28,7 +28,6 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIImage;
@@ -48,25 +47,33 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private final List<Color> colors = CieCamColors.L65C65;
 
+    private UIText nametext;
     private UISlider slider;
     private UIImage img;
 
     @Override
-    public void initialise() {
-        UIText nametext = find("playername", UIText.class);
+    public void onOpened() {
+        super.onOpened();
         if (nametext != null) {
-            nametext.bindText(BindHelper.bindBeanProperty("name", config.getPlayer(), String.class));
+            nametext.setText(config.getPlayer().getName());
         }
+        if (slider != null) {
+            Color color = config.getPlayer().getColor();
+            slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
+        }
+        updateImage();
+    }
 
-        Color color = config.getPlayer().getColor();
-
+    @Override
+    public void initialise() {
+        nametext = find("playername", UIText.class);
         img = find("image", UIImage.class);
-
         slider = find("tone", UISlider.class);
-        slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
-        slider.setIncrement(0.01f);
-        Function<Object, String> constant = Functions.constant("  ");   // ensure a certain width
-        slider.setLabelFunction(constant);
+        if (slider != null) {
+            slider.setIncrement(0.01f);
+            Function<Object, String> constant = Functions.constant("  ");   // ensure a certain width
+            slider.setLabelFunction(constant);
+        }
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -75,7 +82,13 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             }
         });
 
-        updateImage();
+        WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                savePlayerSettings();
+                getManager().popScreen();
+            }
+        });
     }
 
     private float findClosestIndex(Color color) {
@@ -107,14 +120,29 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     }
 
     private void updateImage() {
-        float index = slider.getValue();
-        Color color = findClosestColor(index);
-
-        config.getPlayer().setColor(color);
-
+        Color color = getColor();
         ResourceUrn uri = TextureUtil.getTextureUriForColor(color);
         Texture tex = Assets.get(uri, Texture.class).get();
-        img.setImage(tex);
+        if (img != null) {
+            img.setImage(tex);
+        }
+    }
+
+    private Color getColor() {
+        if (slider != null) {
+            float index = slider.getValue();
+            return findClosestColor(index);
+        } else {
+            return config.getPlayer().getColor();
+        }
+    }
+
+    private void savePlayerSettings() {
+        Color color = getColor();
+        config.getPlayer().setColor(color);
+        if (nametext != null) {
+            config.getPlayer().setName(nametext.getText());
+        }
     }
 
     /**
