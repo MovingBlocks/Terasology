@@ -16,13 +16,12 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.asset.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -66,7 +65,7 @@ public class UIButton extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (enabled.get() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 down = true;
                 return true;
             }
@@ -75,7 +74,7 @@ public class UIButton extends CoreWidget {
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (enabled.get() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (isMouseOver()) {
                     if (getClickSound() != null) {
                         getClickSound().play(getClickVolume());
@@ -110,10 +109,7 @@ public class UIButton extends CoreWidget {
             canvas.drawTexture(image.get());
         }
         canvas.drawText(text.get());
-
-        if (enabled.get()) {
-            canvas.addInteractionRegion(interactionListener);
-        }
+        canvas.addInteractionRegion(interactionListener);
     }
 
     @Override

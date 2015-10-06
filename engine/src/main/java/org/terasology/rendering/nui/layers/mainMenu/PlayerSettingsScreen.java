@@ -17,10 +17,12 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
@@ -29,7 +31,9 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -44,6 +48,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+    @In
+    private TranslationSystem translationSystem;
 
     private final List<Color> colors = CieCamColors.L65C65;
 
@@ -67,6 +73,15 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         nametext = find("playername", UIText.class);
+        if (nametext != null) {
+            nametext.setTooltipDelay(0);
+            nametext.bindTooltipString(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return validateScreen();
+                }
+            });
+        }
         img = find("image", UIImage.class);
         slider = find("tone", UISlider.class);
         if (slider != null) {
@@ -82,13 +97,36 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                savePlayerSettings();
-                getManager().popScreen();
-            }
-        });
+        UIButton okButton = find("ok", UIButton.class);
+        if (okButton != null) {
+            okButton.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    savePlayerSettings();
+                    getManager().popScreen();
+                }
+            });
+            okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return Strings.isNullOrEmpty(validateScreen());
+                }
+            });
+            okButton.setTooltipDelay(0);
+            okButton.bindTooltipString(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return validateScreen();
+                }
+            });
+        }
+    }
+
+    private String validateScreen() {
+        if (nametext != null && Strings.isNullOrEmpty(nametext.getText())) {
+            return translationSystem.translate("${engine:menu#missing-name-message}");
+        }
+        return null;
     }
 
     private float findClosestIndex(Color color) {
