@@ -1,0 +1,5 @@
+#Topicos para 2 trabalho
+Diagramas de use case
+Diagramas de dominio
+Requisitos do projecto:	Capacidades Tecnicas(menos importantes)
+						Sistema de Forum(ver link) -> Novas ideias/Desenho inicil/teste/implementacao
