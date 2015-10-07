@@ -168,7 +168,17 @@ public class ChunkRelevanceRegion {
         return Objects.hashCode(entity);
     }
 
-    public void chunkReady(Chunk chunk) {
+    /**
+     * Checks if the chunk belongs to this relevance region and adds it to it if it is relevant.
+     *
+     * This method does explictly not care for the readyness of the chunk (light calcualted) or not: The light
+     * calculation gets only performed once the adjacent chunks got loaded. So if wait for the light calculation
+     * before we mark a chunk as relevant for a client then we would transfer less chunks to the client then the
+     * relevance region is large. the client would then again perform the light calculation too based on that
+     * reduced chunk count and would reduce the view distance again. That is why it makes sense to detect
+     * chunks as relevant even when no light calculation has been performed yet.
+     */
+    public void checkIfChunkIsRelevant(Chunk chunk) {
         if (currentRegion.encompasses(chunk.getPosition()) && !relevantChunks.contains(chunk.getPosition())) {
             relevantChunks.add(chunk.getPosition());
             sendChunkRelevant(chunk);
