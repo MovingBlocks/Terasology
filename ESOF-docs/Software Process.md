@@ -74,6 +74,13 @@ O projeto tem vindo a alterar o seu processo de software para um do tipo *Behavi
 
 Página oficial do projeto: http://terasology.org/
 
+## Contribuição do Grupo
+
+André Machado: 2 horas
+André Lago: 8 horas
+Gustavo Silva: 8 horas
+Marina Camilo: 2 horas
+
 Grupo:
  - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt)
  - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt)
