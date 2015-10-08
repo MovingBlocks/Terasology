@@ -82,7 +82,7 @@ André Lago: 8 horas;
 
 Gustavo Silva: 8 horas;
 
-Marina Camilo: 2 horas;
+Marina Camilo: 2.5 horas;
 
 ## Identificação do Grupo
 
