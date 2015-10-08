@@ -63,7 +63,11 @@ Existem cerca de 300 *issues* abertas, algumas das quais possuem a tag *Contribu
 
 Além disso, a 1 de Outubro foi criado um [*post*](http://forum.terasology.org/threads/contribute-to-open-source-get-a-free-shirt.1384/#post-12439) no fórum do Terasology a divulgar uma campanha de incentivo às contribuições em projetos open-source, organizada pelo GitHub e pela DigitalOcean.
 
-### Desenvolvimento e Milestones
+### Desenvolvimento
+
+Um dos problemas do processo de software usado neste projeto é o facto de não haver um plano bem delineado em relação ao futuro, apesar da utilização do sistema de *Milestones*. Uma prova disso pode ser obtida comparando o objetivo inicial do projeto com aquilo em que se tornou atualmente. No ínicio, o Terasology foi criado como ferramenta de investigação de geração procedimental de terreno e de técninas de *rendering* em Java. Neste momento, uma grande parte do desenvolvimento é focado em torná-lo num jogo atrativo para o jogador final.
+
+O projeto tem vindo a alterar o seu processo de software para um do tipo *Behavior-driven Development* (BDD). Nesse sentido, a ferramenta *Jenkins* é utilizada para automatizar os testes aos *pull requests*, correndo os testes *JUnit* e verificando a existência de erros e *warnings*.
 
 ## Links externos
 
