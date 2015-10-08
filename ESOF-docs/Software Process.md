@@ -19,9 +19,9 @@ O projeto está licenciado sob a [licença Apache 2.0](http://www.apache.org/lic
 
 ![Terasology Gameplay 2](/ESOF-docs/resources/gameplay2.png)
 
-## Processo de desenvolvimento
+## Processo de Desenvolvimento
 
-### Desenvolvimento do projeto
+### Desenvolvimento do Projeto
 
 Os contribuidores do projeto dividem-se entre equipas dedicadas a certas partes do projeto, sendo possível que o mesmo contribuidor trabalhe para mais do que uma equipa. As diferentes equipas são:
  - Arquitetura
@@ -38,13 +38,13 @@ O sistema de *issues* do GitHub é amplamente utilizado para controlar tarefas, 
 
 Para contribuir é necessário criar um *fork* do repositório original, escrevendo-se o código no novo repositório criado. Quando se considerar que foi implementada ou corrigida uma funcionalidade que deve ser adicionada ao projeto original inicia-se uma *pull request* para que o dono do repositório de origem decida se pretende juntar as alterações ao seu projeto.
 
-### Processo de software
+### Processo de Software
 
 O projeto utiliza o modelo **Behavior Driven Development** (BDD) por vários motivos. Por um lado, pretende-se estimular a participação de contribuidores externos para promover a comunicação entre eles e a prática de Desenvolvimento de Fora para Dentro (*Outside-In Development*). O objetivo é que os diversos contribuidores desenvolvam diferentes módulos da aplicação final com base em padrões pré-estabelecidos de comunicação entre módulos. Por exemplo, se o fundador do projeto estipula que o input dos controlos do utilizador deve ser feito de uma certa forma, qualquer contribuidor externo deve desenvolver o seu módulo tendo em conta esta informação.
 
 Para além disso, consideramos que o modelo **Software Prototyping** (IDD) é também utilizado uma vez são frequentemente divulgadas [*pre-alpha releases*](https://github.com/MovingBlocks/Terasology/releases) que permitem a qualquer utilizador testar o jogo e experimentar o que foi desenvolvido.
 
-### Estrutura do repositório
+### Estrutura do Repositório
 
 O repositório tem diversos *branches*, mas apenas alguns estão ainda ativos (["*develop*"](https://github.com/andrelago13/Terasology/tree/develop) e ["*weblate*"](https://github.com/andrelago13/Terasology/tree/weblate)). Pelo que podemos observar os *developers* envolvidos adicionam o seu código ao *branch* "*develop*". Mais tarde, os gerentes do repositório fundem esse *branch* com o *branch* "*master*" aquando do lançamento de uma nova *release* ou protótipo estável.
 
@@ -70,16 +70,21 @@ Um dos problemas do processo de software usado neste projeto é o facto de não 
 
 O projeto tem vindo a alterar o seu processo de software para um do tipo *Behavior-driven Development* (BDD). Nesse sentido, a ferramenta *Jenkins* é utilizada para automatizar os testes aos *pull requests*, correndo os testes *JUnit* e verificando a existência de erros e *warnings*. Na nossa opinião a adoção deste modelo é benéfica para o projeto porque não só ajuda a estruturar a forma como ele é desenvolvido, organizando os objetivos de cada contribuidor, mas também apela à participação de programadores externos permitindo não só uma maior variedade de ideias como um alargamento da comunidade envolvente.
 
-## Links externos
+## Links Externos
 
 Página oficial do projeto: http://terasology.org/
 
 ## Contribuição do Grupo
 
-André Machado: 2 horas
-André Lago: 8 horas
-Gustavo Silva: 8 horas
-Marina Camilo: 2 horas
+André Machado: 2 horas;
+
+André Lago: 8 horas;
+
+Gustavo Silva: 8 horas;
+
+Marina Camilo: 2 horas;
+
+## Identificação do Grupo
 
 Grupo:
  - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt)
