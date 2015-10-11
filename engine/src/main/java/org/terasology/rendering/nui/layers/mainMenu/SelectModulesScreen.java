@@ -360,6 +360,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
         LinkedHashMap<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
 
+        ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
+        confirmPopup.setMessage("Confirm Download", modulesToDownload.size()  +" modules will be downloaded");
+        confirmPopup.setOkHandler(() -> downloadModules(urlToTargetMap));
+    }
+
+    private void downloadModules(LinkedHashMap<URL, Path> urlToTargetMap) {
         final WaitPopup<List<Path>> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
@@ -382,7 +388,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
         progressListener.onProgress(0);
         MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, progressListener);
         popup.startOperation(operation, true);
-
     }
 
     private LinkedHashMap<URL, Path> determineDownloadUrlsFor(List<ModuleSelectionInfo> modulesToDownload) {
