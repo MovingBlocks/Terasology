@@ -58,6 +58,15 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         }
     }
 
+    @Override
+    public void removeWidget(UIWidget widget) {
+        String id = widget.getId();
+        WidgetInfo info = contentLookup.get(id);
+        contentLookup.remove(id);
+        contents.remove(info);
+        cachedRegions.remove(info);
+    }
+
     public void addWidget(UIWidget widget, HorizontalHint horizontal, VerticalHint vertical) {
         addWidget(widget, new RelativeLayoutHint(horizontal, vertical));
     }

@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.widgets.UIScrollbar;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * @author Immortius
@@ -197,6 +198,13 @@ public class ScrollableArea extends CoreLayout {
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
         content = element;
+    }
+
+    @Override
+    public void removeWidget(UIWidget element) {
+        if (Objects.equals(element, content)) {
+            content = null;
+        }
     }
 
     public boolean isStickToBottom() {
