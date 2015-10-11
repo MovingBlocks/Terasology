@@ -722,7 +722,21 @@ public class SelectModulesScreen extends CoreScreenLayer {
             if (latestVersion == null) {
                 return true;
             }
-            return onlineVersion.getVersion().compareTo(latestVersion.getVersion()) > 0;
+            int versionCompare = onlineVersion.getVersion().compareTo(latestVersion.getVersion());
+            if (versionCompare > 0) {
+                return true;
+            } else if (versionCompare == 0) {
+                /*
+                 * Multiple binaries get released as the same snapshot version, A version name match thus does not
+                 * gurantee that we have the newest version already if it is a snapshot version.
+                 *
+                 * Having the user redownload the same binary again is not ideal, but it is better then ahving the user
+                 * being stuck on an outdated snapshot binary.
+                 */
+                return onlineVersion.getVersion().isSnapshot();
+            } else {
+                return false;
+            }
         }
     }
 }
