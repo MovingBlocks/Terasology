@@ -1,1 +1,21 @@
+# ESOF
+# RELATÓRIO 2 - Gestão de Requesitos
+## Terasology
 
+## Requesitos do Projecto
+
+#### Introdução
+
+#### Níveis de Requesitos
+
+#### Tipos de Requesitos
+
+## Processo de Engenharia de Requesitos
+
+#### Elicitação de Requesitos
+
+#### Análise de Requesitos e Negociação
+
+#### Especificação de Requesitos
+
+#### Validação de Requesitos
