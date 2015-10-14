@@ -1,22 +1,25 @@
 # ESOF
-# RELATÓRIO 2 - Gestão de Requisitos
+# RELATÓRIO 2 - Engenharia de Requisitos
 ## Terasology
 
 ## Requisitos do Projecto
 
 #### Introdução
-Este relatório tem em vista analisar como é feita a Gestão de Requisitos do projeto Terasology.
+
+Este relatório tem em vista analisar como é feita a Engenharia de Requisitos do projeto Terasology.
+Este processo engloba todas as actividades que contribuem para a produção de um documento de requesitos e sua manutenção ao 
+longo prazo.
 
 
 
 ## Processo de Engenharia de Requisitos
 
-#### Elicitação de Requisitos
+#### Identificação de Requisitos
 
 #### Análise de Requisitos e Negociação
 
 #### Especificação de Requisitos
-ghgdf
+
 #### Validação de Requisitos
 
 #### Conclusão
