@@ -12,13 +12,12 @@ Este relatório tem em vista analisar como é feita a Gestão de Requisitos do p
 ## Processo de Engenharia de Requisitos
 
 #### Elicitação de Requisitos
-Quero ficar com esta parte. - PAULO
+
 #### Análise de Requisitos e Negociação
 
 #### Especificação de Requisitos
-filipe
 
 #### Validação de Requisitos
 
 #### Conclusão
-jfgjhgDJHFGL
+
