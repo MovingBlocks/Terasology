@@ -76,7 +76,7 @@ public class LightMerger<T> {
                 resultFuture = null;
                 return result;
             } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException("Error completing lighting merge");
+                throw new RuntimeException("Error completing lighting merge", e);
             }
         }
         return null;
