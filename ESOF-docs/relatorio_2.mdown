@@ -5,6 +5,11 @@
 ## Requesitos do Projecto
 
 #### Introdução
+Este relatório tem em vista uma analisar com é feita a Gestão de Requesitos do projecto Terasology.
+
+A Gestão de Requesitos estuda o processo das necessidades dos clientes e utilizadores para obter uma definição clara de 
+sistemas, *hardware* e de requerimentos de *software*. Requerimentos de *software* são determinadas características
+que um *software* deve ter, ou têm em vista resolver um problema em particular.
 
 #### Níveis de Requesitos
 
