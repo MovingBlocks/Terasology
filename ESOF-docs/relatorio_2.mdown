@@ -6,6 +6,8 @@
 
 #### Introdução
 Este relatório tem em vista analisar como é feita a Gestão de Requisitos do projeto Terasology.
+A engenharia de requisitos é um processo que engloba todas as atividades que contribuem para a produção de
+um documento de requisitos e sua manutenção ao longo do tempo.
 
 
 
