@@ -6,9 +6,38 @@
 
 #### Introdução
 
-Este relatório tem em vista analisar como é feita a Engenharia de Requisitos do projeto Terasology.
-Este processo engloba todas as actividades que contribuem para a produção de um documento de requesitos e sua manutenção ao 
-longo prazo.
+Este relatório tem em vista analisar como é feita a Gestão de Requisitos do projeto Terasology.
+A Engenharia de Requisitos é um processo que engloba todas as actividades de definição, decomentação e manutenção de
+requisitos. Este processo é composto por quatro actividades:
+* Identificação de Requisitos
+* Análise de Requisitos
+* Especificação de Requisitos
+* Validação de requisitos
+
+Este processo deve ser precedido de um estudos de viabilidade que, a partir das restrições do projecto, determinão 
+se o mesmo é viável e se deve seguir para a identificação de requisitos.
+No *waterfall model*, a engenharia de requisitos é feita na primeira fase do processo de desenvolvimento. Outros métodos
+de desenvolvimento de software com o XP e Scrum assumem que engenharia de requisitos continua ao longo do ciclo de 
+vida de sofware.
+
+#### Estudos de Viabilidade
+
+Os Estudos de Viabilidade pretendem avaliar se do ponto de vista tecnológico e organizacional o projecto é viável.
+
+Tendo em conta que este projecto, o Terasology, é *open source* e sem fim lucrativos, e pelas palavras do Organizador
+de Projectos,
+
+> This makes following traditional processes from a work setting difficult. Methodologies like Waterfall, XP, Scrum, and 
+any kind of structured planning with objectives, deadlines, and so on is nearly impossible to apply. In agile terms the 
+"focus factor" for us as an overall team is exceedingly low, probably in the single digits (0-9%). We simply never know who 
+will be available, when, for how long.
+
+o que significa existirem poucas restrições neste projecto, visto não haver um plano extruturado.
+
+Apesar de este projecto não seguir nenhuma metedologia, disse-mos no primeiro relatório que este projecto tinha algumas 
+características semelhantes às dos métodos usados em *Agile*, faremos uma analogia semelhante neste relatório ao tópico
+Engenharia de Requisitos, tendo em conta que neste método a engenharia de requisitos continua ao longo do ciclo de vida 
+do software.
 
 
 
@@ -22,5 +51,21 @@ longo prazo.
 
 #### Validação de Requisitos
 
+#### Gestão de Requisitos
+
 #### Conclusão
-Teste
+
+##### Referências
+[Wikipédia](https://pt.wikipedia.org/wiki/Engenharia_de_requisitos)
+
+Slides das aulas teóricas
+
+#### Lista dos contribuidores 
+
+#####Grupo 6
+* Francisco Veiga
+* Paulo Peixoto
+* Vasco Pereira
+* Filipe Galvão
+
+###### FEUP 2016 MIEIC
