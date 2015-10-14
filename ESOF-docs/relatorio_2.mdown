@@ -22,7 +22,7 @@ vida de sofware.
 
 #### Estudos de Viabilidade
 
-Os Estudos de Viabilidade pretendem avaliar se do ponto de vista tecnológico e organizacional o projecto é viável.
+Os Estudos de Viabilidade pretendem avaliar se do ponto de vista tecnológico e organizacional se o projecto é viável.
 
 Tendo em conta que este projecto, o Terasology, é *open source* e sem fim lucrativos, e pelas palavras do Organizador
 de Projectos,
@@ -39,7 +39,19 @@ características semelhantes às dos métodos usados em *Agile*, faremos uma ana
 Engenharia de Requisitos, tendo em conta que neste método a engenharia de requisitos continua ao longo do ciclo de vida 
 do software.
 
+Podemos avaliar a viabilidade do projecto através da interação dos *stakeholders* (utilizadores e colaboradores)
+com o mesmo. Podemos afirmar que o objetivo de investigar e testar técnicas procedimentais de geração de terreno e
+técnicas de renderização eficientes em Java são evidentes pois existem *Alpha-Releases*, apesar de o jogo 
+ainda não estar em produção, esse é o objectivo, o que significa, o sistema estar a contribuir para os objectivos do projecto.
 
+Da mesma forma podemos afirmar que os objectivos podem ser implementados visto existirem poucas restrições (tecnológicas 
+temporais, organizacionais etc), não havendo por isso um processo formal, desta maneira os organizadores do projecto
+não interferem com os colaboradores que querem trabalhar no projecto, sendo possível, por exemplo, para um colaborador 
+apresentar uma nova *feature* sem antes a ter mencionado (introduzida por Pull Request).
+
+Do ponto de vista tecnológico é possível a integração com outros sistemas já que a linguagem utilizada é JAVA.
+Estudados estes aspectos o Terasology indica ser um projecto viável, podendo passar a verificar como é feita a 
+Identificação de Requesitos.
 
 ## Processo de Engenharia de Requisitos
 
