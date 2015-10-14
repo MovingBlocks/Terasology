@@ -16,6 +16,7 @@ Quero ficar com esta parte. - PAULO
 #### Análise de Requisitos e Negociação
 
 #### Especificação de Requisitos
+filipe
 
 #### Validação de Requisitos
 
