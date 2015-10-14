@@ -12,7 +12,7 @@ Este relatório tem em vista analisar como é feita a Gestão de Requisitos do p
 ## Processo de Engenharia de Requisitos
 
 #### Elicitação de Requisitos
-dasdsadadsadsadsad
+
 #### Análise de Requisitos e Negociação
 
 #### Especificação de Requisitos
