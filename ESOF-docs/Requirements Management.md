@@ -1,12 +1,18 @@
 # Requirements Management
 
-## Elicitation
+## Elicitação
 
-  O processo de evolução do projecto não é nada de muito formal. No entanto tens algumas regras para que ninguém se atrapalhe. Os developers contêm uma lista de problemas para identificar os erros e funcionalidades que precisam de ser corrigidos, um forum de sugestões para registar as ideias (http://forum.terasology.org/forum/suggestions.21/), e outros foruns para levar as sugestões à sua implementação. Normalmente isto acontece quando um novo contribuidor aparece e quer fazer alguma coisa. O ideal seria ele seguir estes passos:
- - Alguém faz uma sugestão no forum. Se for uma boa ideia passa para o ponto seguinte.
- - Alguém pega na ideia e começa a estruturá-la, escrevendo mais notas técnicas e detalhes da sua implementação.
- - Alguém começa a escrever o seu código. Normalmente costuma ser a mesma pessoa. Este é o ponto onde o processo realmente começa.
- - Move-se o conceito para um fórum de um modulo se este se relacionar com algum (é o que acontece normalmente). Se for para enriquecer o jogo a nível de apresentação, o fórum indicado será o art forum. Se não, se for para ajudar na arquitetura na mecânima de jogo em si ou se for uma funcionalidade ao nível de bibliotecas, é encaminhado para o Core Projects fórum.
+  O processo de evolução do projeto no que diz respeito a requesitos é bastante simples, envolvendo não só a equipa de desenvolvimento como a comunidade envolvente.
+
+  Os *developers* associados ao projeto trabalham para implementar funcionalidades relacionadas com os requesitos estabelecidos ou para corrigir [*issues*](https://github.com/MovingBlocks/Terasology/issues) que estejam listadas no repositório do projeto.
+ 
+ Para além dos requisitos pré-estabelecidos no início do desenvolvimento do projeto (provavelmente, a maior parte destes foi já cumprido), muitos vão sendo adicionados à medida que são sugeridos por contribuidores ou por membros da comunidade. O processo de adição de um novo requesito é o seguinte:
+ - Quando uma pessoa tem uma ideia para um novo requesito/funcionalidade para o projeto, faz uma sugestão no [fórum de sugestões](http://forum.terasology.org/forum/suggestions.21/) do **Terasology**. Se, nesta altura, perceber que essa funcionalidade já foi proposta anteriormente nesse fórum, deve perceber o estado atual dela antes de decidir como proceder.
+ - Algum membro da comunidade (que pode ser o mesmo que fez a proposta de funcionalidade) faz uma estruturação preliminar da ideia no fórum, de forma a se perceber mais detalhes técnicos sobre a ideia em questão.
+ - É possível que surja nesta fase inicial algum código elementar necessário para a ideia se tornar viável, sendo este código partilhado no fórum.
+ - Quando a ideia ganha estrutura e viabilidade, move-se para o fórum de um dos [módulos do projeto](http://forum.terasology.org/forum/modules.55/). Se for para enriquecer o jogo a nível de apresentação, o fórum indicado será o [*art forum*](http://forum.terasology.org/forum/art-media.25/). Se não, se for para ajudar na arquitetura na mecânica de jogo em si ou se for uma funcionalidade ao nível de bibliotecas, é encaminhado para o [*Core Projects fórum*](http://forum.terasology.org/forum/core-projects.54/).
+
+ ====CONTINUAR
  - A nova funcionalidade acaba por ficar suficientemente completa para se colocar em uso. Todos os modulos vivem nos seus próprios repositorios no GitHub, assim os autores podem fazer push directamente sem fazer um pull requests (PRs). Quando chega ao nível dos pull requests (PRs), estas funcionalidades passam por uma revisão e são incluidas no projecto (merged). 
  - Lançamos a nova funcionalidade no lançamento da versão seguinte do Jogo.
   
@@ -17,7 +23,7 @@
   Quanto aos erros, toda a gente pode reportá-los no GitHub. Ocasionalmente eles tentam encarregar uma pessoa para analisá-los e ás vezes corrigi-los. O que costuma acontecer é precisamente o contrário. Os erros ficam lá até alguém se lembrar e querer corrigi-los. 
   Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no código e realiza testes para se certificar que funciona. Depois, ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalment os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer.  
 
-## Validation
+## Validação
 
 O desenvolvimento do jogo é amplamente baseado em módulos que são constituidos por equipas reduzidas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos vive no seu próprio repositório no GitHub, por isso os seus autores podem fazer push diretamente sem a necessidade de um *pull request*.
 
@@ -25,3 +31,16 @@ No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tend
 
   A equipa consegue normalmente lançar uma nova versão a cada 2-4 semanas, mas não é constante uma vez que depende do que cada pessoa faz. Será que existe conteudo suficiente para sair uma versão do jogo? Quando sai uma nova versão do jogo, esta contem uma grande lista de modulos considerados estáveis e inclui a base do jogo, mas é melhorado por diferentes pessoas o que torna dificil realizar updates nesse nível.
   Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no código e realiza testes para se certificar que funciona. Depois, ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalmente os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader(Cervator) testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer. 
+
+## Contribuição do Grupo
+
+André Machado: 2 horas
+André Lago: 8 horas
+Gustavo Silva: 8 horas
+Marina Camilo: 2 horas
+
+Grupo:
+ - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt)
+ - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt)
+ - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt)
+ - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt)
