@@ -18,3 +18,6 @@
   Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no ódigo e realiza testes para se certificar que funciona. Depois ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalment os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer.  
 
 ## Validation
+O desenvolvimento do jogo é amplamente baseado em módulos que são constituidos por equipas reduzidas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos vive no seu próprio repositório no GitHub, por isso os seus autores podem fazer push diretamente sem a necessidade de um *pull request*.
+
+No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de vários contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações.
