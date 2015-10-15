@@ -21,10 +21,18 @@
 
 O desenvolvimento do jogo é amplamente baseado em módulos que são constituidos por equipas reduzidas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos vive no seu próprio repositório no GitHub, por isso os seus autores podem fazer push diretamente sem a necessidade de um *pull request*.
 
-Os *pull requests* associados a esses módulos são revistos por uma ou mais pessoas familiares com a funcionalidade sem ser o autor, realizando testes para se certificar que o código funciona. Depois, ou reporta erros ao autor ou realiza o *merge* para um nivel superior. Normalmente, os *pull requests* são feitos onde o autor é a única pessoa associada, o que torna o raciocínio anterior dificil de implementar. Nestes casos, o próprio *team leader* [(*Cervator*)](https://github.com/Cervator) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer.
+Os *pull requests* associados a esses módulos são revistos por uma ou mais pessoas familiares com a funcionalidade sem ser o autor, realizando testes para se certificar que o código funciona. Depois, ou reporta erros ao autor ou realiza o *merge* para um nivel superior. Normalmente, os *pull requests* são feitos onde o autor é a única pessoa associada, o que torna o raciocínio anterior dificil de implementar. Nestes casos, o próprio *team leader* ([*Cervator*](https://github.com/Cervator)) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer.
 
 No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de vários contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações.
 
 ### Controlo de versão
 
 Por se tratar de um projeto *open-source* em que os contribuidores são voluntários dispostos a ajudar, torna-se díficil lançar novas *releases* a um ritmo bem definido. Apesar disso, o *team leader* tenta fazê-lo a cada 2-4 semanas.
+
+A nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org) que se resume ao seguinte:
+>Dado um número de versão MAJOR.MINOR.PATCH, incremente a:
+
+>- versão Maior(MAJOR): quando fizer mudanças incompatíveis na API,
+- versão Menor(MINOR): quando adicionar funcionalidades mantendo compatibilidade, e
+- versão de Correção(PATCH): quando corrigir falhas mantendo compatibilidade.
+Rótulos adicionais para pré-lançamento(pre-release) e metadados de construção(build) estão disponíveis como extensão ao formato MAJOR.MINOR.PATCH."
