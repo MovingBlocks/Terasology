@@ -27,10 +27,12 @@
 
 O desenvolvimento do jogo é amplamente baseado em módulos que são constituidos por equipas reduzidas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos vive no seu próprio repositório no GitHub, por isso os seus autores podem fazer push diretamente sem a necessidade de um *pull request*.
 
-No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de vários contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações.
+Os *pull requests* associados a esses módulos são revistos por uma ou mais pessoas familiares com a funcionalidade sem ser o autor, realizando testes para se certificar que o código funciona. Depois, ou reporta erros ao autor ou realiza o *merge* para um nivel superior. Normalmente, os *pull requests* são feitos onde o autor é a única pessoa associada, o que torna o raciocínio anterior dificil de implementar. Nestes casos, o próprio *team leader* [(*Cervator*)](https://github.com/Cervator) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer.
 
   A equipa consegue normalmente lançar uma nova versão a cada 2-4 semanas, mas não é constante uma vez que depende do que cada pessoa faz. Será que existe conteudo suficiente para sair uma versão do jogo? Quando sai uma nova versão do jogo, esta contem uma grande lista de modulos considerados estáveis e inclui a base do jogo, mas é melhorado por diferentes pessoas o que torna dificil realizar updates nesse nível.
-  Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no código e realiza testes para se certificar que funciona. Depois, ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalmente os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader(Cervator) testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer. 
+  Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no código e realiza testes para se certificar que funciona. Depois, ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalmente os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader(Cervator) testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer.
+  
+  No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de vários contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações. 
 
 ## Contribuição do Grupo
 
@@ -44,3 +46,4 @@ Grupo:
  - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt)
  - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt)
  - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt)
+
