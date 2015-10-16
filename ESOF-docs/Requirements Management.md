@@ -25,9 +25,9 @@
 
 ## Validação
 
-O desenvolvimento do jogo é amplamente baseado em módulos que são constituidos por equipas reduzidas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos vive no seu próprio repositório no GitHub, por isso os seus autores podem fazer push diretamente sem a necessidade de um *pull request*.
+O desenvolvimento do jogo é dividido em módulos que são distribuidos por pequena equipas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos tem o seu próprio repositório no GitHub, permitindo aos seus autores fazer push diretamente sem a necessidade de um *pull request*.
 
-Os *pull requests* associados a esses módulos são revistos por uma ou mais pessoas familiares com a funcionalidade sem ser o autor, realizando testes para se certificar que o código funciona. Depois, ou reporta erros ao autor ou realiza o *merge* para um nivel superior. Normalmente, os *pull requests* são feitos onde o autor é a única pessoa associada, o que torna o raciocínio anterior dificil de implementar. Nestes casos, o próprio *team leader* ([*Cervator*](https://github.com/Cervator)) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer.
+Os *pull requests* associados a esses módulos são revistos por uma ou mais pessoas familiares com a funcionalidade que analisam a atualização em questão e realizam testes para garantir que o código funciona. Posteriormente, ou é feito *merge* do novo código ou os erros são reportados ao autor do *pull request*. Na maior parte dos casos os *pull requests* são feitos pelo autor, que é a unica pessoa associada/ a trabalhar nesse módulo. Nestes casos, o próprio *team leader* [(*Cervator*)](https://github.com/Cervator) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer.
 
 No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de vários contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações.
 
@@ -55,5 +55,3 @@ Grupo:
  - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt)
  - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt)
  - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt)
-
->>>>>>> refs/remotes/origin/master
