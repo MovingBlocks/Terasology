@@ -1,11 +1,16 @@
 # Relatório 2 - ESOF
 ## Terasology - Requirements Management
 
-###Requirements Elicitation
+###Elicitation and analysis
 
 New requirements are suggested by everyone who wants to, through the [suggestions forum](http://forum.terasology.org/forum/suggestions.21/). From there, the original author of the suggestion (or someone else, provided they are interested in the suggestion), specifying what needs to be done in order to accomplish that requirement. After that, the topic is moved to the [modules forum](http://forum.terasology.org/forum/modules.55/), integrating it in a new module (or in one of the already existing modules). These modules are in independent repositories. When the code is implemented, tested, and working, it is merged into the repository of the module (without resorting to a pull request). A list of these modules (to which they refer as the Omega Distribution) can be seen [here](https://github.com/MovingBlocks/Terasology/blob/develop/README.markdown#modules).
 
 In case the new requirement belongs to the game's core, the process is slightly different. The sugestor forks a project, and when he is finished coding the requirement, a pull requests is issued.
+
+###Specification
+
+In this phase, some documentation like a SRS document should be produced in order to specify the requisites to be fulfilled. On a volunteer, suggestion-based project like Terasology, such documentation is hard to create due to the fact that the contributors are in constant change and there is no specific documentation model to be followed by the collaborators when creating new features.
+In our opinion, a documentation model for each feature would be a good asset because it would provide a solid reference not only for developing a document like the SRS document, but also for testing purposes.
 
 ### Validation
 
@@ -29,4 +34,9 @@ The aim of this document is to present a detailed description of the Terasology 
 
 ####Scope
 
-[Terasology](http://terasology.org/) is a voxel based, that tries to impose a NPC-helper gameplay. It was started in order to research procedural terrain generation and efficient rendering techniques in Java using [LWJGL](http://www.lwjgl.org/), a lightweight Java open-source library for game development.
+[Terasology](http://terasology.org/) is a voxel based, that tries to impose a NPC-helper gameplay. It was started in order to research procedural terrain generation and efficient rendering techniques in Java using [LWJGL](http://www.lwjgl.org/), a lightweight Java open-source library for game development.terayo
+
+###Overall description
+
+####Product perspective
+
