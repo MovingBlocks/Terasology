@@ -92,6 +92,33 @@ forum(http://forum.terasology.org/threads/development-methodology-and-hi-student
 onde obtivemos diversas ajudas sobre o projeto. E assim, tendo continuidade, ainda atual, de pessoas voluntárias para
 evolução do jogo.
 
+#### Análise de Requisitos e Negociação II
+
+(eu fiz esta parte de novo porque achei o texto do filipe um pouco confuso. Francisco)
+
+##### Actividades Envolvidas
+
+* Classificação - O agrupamento de requisitos (sugestões) é feito em fóruns.
+
+* Resolução de comflitos - Visto este projecto ser *open source* e os requisitos serem sugestões da comunidade
+do Terasology, poder-se-à dizer que a resolução de conflitos é de certa forma feita através de discussões nos mesmos fóruns.
+
+* Priorização - Algumas das melhores sugetões nestes fóruns podem passar a ser implementadas por algum dos contribuidores, mas 
+sem priorização obrigatória, fica a cargo do contribuidor que quiser desenvolver esta *feature* a priorização.
+
+* Confirmação - É feita do mesmo modo como nos casos anteriores nos fóruns, depois de uma sugestão num fórum uma ideia que seja 
+considerada como possível *feature* é movida para outro fórum, por exmplo: fórum módulo.
+
+##### Dificuldades
+
+A dificuldade neste tipo de análise de requisitos são do tipo orgazicional, não existem métodos de análise é tudo 
+feito de forma liberal a base de discuções em fóruns.
+
+##### Negociações
+
+As negociações são feitas num ambiente *open source* relaxado em que se conduz em direção a um obejctivo, que é a criação
+um jogo a base de contribuidores e de ideias obtidas através de uma comunidade que cresce ao memo ritmo do desenvolvimento
+do jogo, à exploração de tecnologias de desenvolvimento de aplicações gráficas.
 
 #### Especificação de Requisitos
 
@@ -114,9 +141,9 @@ Alguém começa a codificá-lo, pode ser a mesma pessoa e muitas vezes este é o
 pega-se no conceito e move-se para o fórum do módulo e verifica-se o enquadramento com algum módulo (a maior parte dos conceitos encaixam-se
 nesta categoria), ou move-se para o fórum de *Art* para verificar se acrescenta valor ao jogo em vez de código, ou move-se para o fórum
 de projectos básicos caso seja para a arquitetura de suporte do jogo, motor de jogo ou outra funcionalidade a nível de biblioteca
-(não conteúdo).
+(não conteúdo). O recurso torna-se suficientemente completo para ser colocada em uso. 
 
-O recurso torna-se suficientemente completo para ser colocada em uso. Os módulos todos ficam situados nos seus próprios
+Os módulos todos ficam situados nos seus próprios
 repositórios no GitHub, os colaboradores muitas vezes colocam diretamente no repositório sem efectuarem pedidos de *Pull Request*.
 As características do motor jogo que atingem a fase de *Pull Request* são analisadas e fundidas ao projecto. 
 O novo recurso é liberado na próxima versão do jogo.
