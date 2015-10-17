@@ -1,6 +1,6 @@
 # Requirements elicitation
 
-Since that the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance it's achieved through the issue tracker (GitHub), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea, they are also developper foruns where are discussed the suggestions on it's implementation and maintenance.
+Since that the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance it's achieved through the issue tracker (GitHub), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea and there are also developer forums where they discuss the suggestions on it's implementation and maintenance.
 To the project lead Cervator, *«the ideal setup»* to build up new requisits  would be to perform the following steps:
 
 1. Suggestioning:
@@ -22,7 +22,7 @@ To the project lead Cervator, *«the ideal setup»* to build up new requisits  w
     * Soon as the feature is complete-ready it's validated and released. The validation of this feature is explained on the validation section (####linkar para a secção da validação "Modules all live in their own repos on GitHub so authors often push directly without pull requests (PRs). Engine features hit the PR stage, get reviewed, and merged"####).
 
 in relation to the method used:
->As for the why to our process: well, it gives what little structure to the process we can apply without getting in the way of people wanting to do work  As noted often it gets short-cut when somebody is excited about a feature and shows up with it out of nowhere.
+>As for the why to our process: well, it gives what little structure to the process we can apply without getting in the way of people wanting to do work. (...)  As noted often it gets short-cut when somebody is excited about a feature and shows up with it out of nowhere.
 Cervator - Project lead
 
 As quoted above, the process used is the best-fit for this type of project because it allows everyone to give it's contribute and to work at his pace and at the same it's all organized and structured. On the other and it makes planning and estimating hard because the project is dependent of all conributors, which all work at their own way.
