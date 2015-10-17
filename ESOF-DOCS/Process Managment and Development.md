@@ -1,14 +1,20 @@
-# Análise dos métodos de desenvolvimento e gestão do projeto Terasology
+# Analysis of the software developing process of Terasology
 
 ## 1. Terasology
 
 ![Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/terasology.png?raw=true)
 
-**Terasology** é um jogo de tributo ao *Minecraft* que se mantém fiel ao original a nível de aspecto e de alguns dos modos de jogo. Este projecto open-source inicialmente chamado de “Blockmania” foi desenvolvido com o intuito de estudar os procedimentos de criação de terreno 3D bem como a eficiência de técnicas de renderização em Java recorrendo à biblioteca **[LWJGL](http://www.lwjgl.org/)**. Posteriormente surgiu uma equipa responsável pela criação do jogo em si, mudando o nome do mesmo para “Terasology”, o qual se encontra atualmente em pré-alpha.
+**Terasology** is a game that pays tribute to *Minecraft* keeping the aspect level and some of the game mods from the original. 
+This open-source project was inicially called "Blockmania" and was developed 
+with the main objective of studying the procedures involved in creating 3D terrain as well as the rendering techniques 
+in Java using the game development library **[LWJGL](http://www.lwjgl.org/)** .
+Afterwards, a team took responsability of the game itself changing the name to **Terasology**, which is currently in pre-alpha.
 
-##2. Análise do método de desenvolvimento
+##2. Software developing process
+Given the fact that **Terasology** has dozens of developers, in order to efficiently manage the project contributions the administers chose to use the [issue tracking](https://github.com/MovingBlocks/Terasology/issues) system and Github's pull request. Each contributor participates according to a very well refined methodology. Firstly, it is urgent to fork the principal project. Secondly, when the contributor sees fit
+he can issue a pull request to the main repository. These pull requests are avaliated by the administers - they use the 
+*[Jenkins](https://wiki.jenkins-ci.org/display/JENKINS/Meet+Jenkins)* tool in order to automate the testing procedure and verification of the issue.
 
-Dado que o Terasology conta com dezenas de contribuidores e de modo a permitir uma gestão eficaz das contribuições do projecto, os administradores optaram por usar sistemas de [issue tracking](https://github.com/MovingBlocks/Terasology/issues) e pull request do Github. Cada contribuidor participa de acordo com um método bem definido. O primeiro passo consiste em fazer fork do projecto principal. Posteriormente, sempre que o contribuidor achar conveniente poderá fazer um pull request para o repositório principal. Os pull requests serão avaliados pelos administradores do projecto que, caso aceitem, recorrerão em seguida à ferramenta *[Jenkins](https://wiki.jenkins-ci.org/display/JENKINS/Meet+Jenkins)* a fim de automatizar todo o processo de teste e verificação do pedido.
-O projecto não tem um modelo bem definido devido ao número elevado de voluntários e à constante actividade/inactividade dos contribuidores, mencionada por um dos administradores. O fundador e head developer insiste em adotar o modelo BDD (Behaviour Driven-Development) - indicação dada pelo mesmo no guia de [Unit Testing](https://github.com/MovingBlocks/Terasology/wiki/Unit-Testing) para novos contribuidores. Este modelo permite maior flexibilidade e facilidade em adquirir novos colaboradores e também uma melhor comunicação entre as diferentes equipas presentes no projecto, tais como a a equipa de teste (beta-testers) e de desenvolvimento (implementação da lógica de jogo). 
+The project does not have a pre defined model due to the elevated number of volunteers and the constant spikes of activity/inactivity of the contribuitors as one of the administers points out. The funder and head developer insists in adopting the BDD (Behaviour Driven-Development) model - indication given by the latter in the [Unit Testing](https://github.com/MovingBlocks/Terasology/wiki/Unit-Testing) guide for new contributors. This model allows more flexibility and eases the process of aquiring new colaborators as well as it betters the communication between the varied teams working on the project such as the test team (beta-testers) and the developing team (implementation of the game's logic).
 
 ![Screenshot do website Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/site.png?raw=true)
