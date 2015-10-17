@@ -14,19 +14,19 @@
 1. Purpose:
 
     The main purpose of this document is to give a detailed description about **Terasology**. 
-    We intent to illustrate the purpose, features and goals of the game, what we can do with it. This document is directed for both the developers and users of Terasology.
+    We intent to illustrate the purpose, features and goals of the game; what we can do with it. This document is directed to both the developers and users of Terasology.
 
 
 2. Scope:
 
     Terasology was developed with the purpose of studying the procedures involved in creating 3D terrain as well as the rendering 
     techniques in Java using the game development library LWJGL. Terasology, which is currently in pre-alpha,
-    is a game where the main key will be building up an estate of some sort and managing specialized minions to climb up the ladder of discovery, 
+    is a game where the main key is building an estate of some sort and managing specialized minions to climb up the ladder of discovery, 
     while surviving in a world that might just be full of things that want to kill you.
  
 3.  Definitions, acronyms and abbreviations:
 
-    LWJGL -  is a Java library that enables cross-platform access to popular native APIs useful in the development of graphics, audio and parallel computing applications. It is an enabling technology and provides low-level access. It is not a framework and does not provide higher-level utilities than what the native libraries expose. LWJGL is open source software and freely available at no charge.
+    LWJGL -  is a Java library that enables cross-platform access to popular native APIs useful in the development of graphics, audio and parallel computing applications. It is an enabling technology and provides low-level access. It is not a framework and does not provide higher-level utilities than what the native libraries expose. LWJGL is an open source software and freely available with no charge.
 
 4. References:
 
@@ -39,7 +39,7 @@
 <a name="Elicitation"/>
 ## Requirements elicitation
 
-Since that the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance is achieved through the [issue tracker](https://github.com/MovingBlocks/Terasology/issues), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea and there are also [developer forums](http://forum.terasology.org/forum/developer-portal.5/) where they discuss the suggestions about their implementation and maintenance.
+Since the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance is achieved through the [issue tracker](https://github.com/MovingBlocks/Terasology/issues), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea. There are also [developer forums](http://forum.terasology.org/forum/developer-portal.5/) where they discuss the suggestions about their implementation and maintenance.
 To the project leader Cervator, *«the ideal setup»* to build up new requisits would be to perform the following steps:
 
 1. Suggestioning:
@@ -54,18 +54,18 @@ To the project leader Cervator, *«the ideal setup»* to build up new requisits 
     * Module 
         * If the concept can be integrated into a module it's moved to the [module forum](http://forum.terasology.org/forum/modules.55/).
     * Art
-        * If the main goal is to make assets for the game instead of code itself, is moved to the [art forum](http://forum.terasology.org/forum/art-media.25/).
+        * If the main goal is to make assets for the game instead of code itself, it is moved to the [art forum](http://forum.terasology.org/forum/art-media.25/).
     * Architecture
         * If the goal is to support the game engine or other support library-level functionality, the concept is moved to the [Core Projects forum](http://forum.terasology.org/forum/core-projects.54/).
 6. "Release"
-    * As soon as the feature is completely ready is validated and released. The validation of this feature is explained on the validation section (<a name="index"/>[Validation](#validation)).
+    * As soon as the feature is completely ready it is validated and released. The validation of this feature is explained on the validation section (<a name="index"/>[Validation](#validation)).
 
-in relation to the method used:
+In relation to the method used:
 >As for the why to our process: well, it gives what little structure to the process we can apply without getting in the way of people wanting to do work. (...)  As noted often it gets short-cut when somebody is excited about a feature and shows up with it out of nowhere.
 Cervator - Project lead
 
-As quoted above, the process used is the best-fit for this type of project because it allows everyone to give their contribute and to work at their pace and at the same time it's all organized and structured. On the other hand it makes planning and estimating hard because the project is dependent of all conributors, which all work at their own way.
-The project leader mention in the forum that he aims to get releases out every 2-4 weeks but as it's been said it's dependent on the contributors and on the stability of the modules up to realease.
+As quoted above, the process used is the best-fit for this type of project because it allows everyone to give their contribute and to work at their pace and at the same time it's all organized and structured. On the other hand, it makes planning and estimating hard because the project depends on contributors, which all have in their own specific method of work.
+The project leader mentions in the forum that he aims to get releases out every 2-4 weeks but as it's been said it's dependent on the contributors and on the stability of the modules up to realease.
 
 <a name="Validation"/>
 ## Validation
@@ -74,7 +74,7 @@ The project leader mention in the forum that he aims to get releases out every 2
 
 <a name="Versioning"/>
 ##Versioning usage
-As mentioned before, the project leader tries to get out a release every 2-4 weeks. In order to make easier to deal with the interconnection of small parts of the project as well as being able to tell the scope of a changed library based on it's version the lead team tries to use [Semantic Versioning](http://semver.org/).  
+As mentioned before, the project leader tries to get out a release every 2-4 weeks. In order to make it easier to deal with the intertwined small parts of the project as well as being able to tell the scope of a changed library based on it's version the leading team tries to use [Semantic Versioning](http://semver.org/).  
 
 <a name="Use Cases"/>
 ##Use Cases
