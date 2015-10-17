@@ -19,4 +19,3 @@ The project does not have a pre defined model due to the elevated number of volu
 
 ![Screenshot do website Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/site.png?raw=true)
 
-

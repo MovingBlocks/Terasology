@@ -15,6 +15,10 @@
  */
 package org.terasology.engine.bootstrap;
 
+import java.lang.reflect.Type;
+import java.util.Optional;
+
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -31,6 +35,8 @@ import org.terasology.entitySystem.prefab.internal.PrefabDeltaFormat;
 import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.persistence.typeHandling.RegisterTypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
@@ -39,6 +45,8 @@ import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.InjectionHelper;
+import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
@@ -89,8 +97,10 @@ public final class EnvironmentSwitchHandler {
         ComponentLibrary componentLibrary = library.getComponentLibrary();
         context.put(ComponentLibrary.class, componentLibrary);
         context.put(EventLibrary.class, library.getEventLibrary());
+        context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
 
         registerComponents(componentLibrary, moduleManager.getEnvironment());
+        registerTypeHandlers(context, typeSerializationLibrary, moduleManager.getEnvironment());
 
         BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
         loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
@@ -186,6 +196,21 @@ public final class EnvironmentSwitchHandler {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
                 library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+            }
+        }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void registerTypeHandlers(Context context, TypeSerializationLibrary library, ModuleEnvironment environment) {
+        for (Class<? extends TypeHandler> handler : environment.getSubtypesOf(TypeHandler.class)) {
+            RegisterTypeHandler register = handler.getAnnotation(RegisterTypeHandler.class);
+            if (register != null) {
+                Optional<Type> opt = GenericsUtil.getTypeParameterBindingForInheritedClass(handler, TypeHandler.class, 0);
+                if (opt.isPresent()) {
+                    TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
+                    InjectionHelper.inject(instance, context);
+                    library.add((Class) opt.get(), instance);
+                }
             }
         }
     }
