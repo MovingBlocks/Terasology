@@ -1,6 +1,6 @@
 
 #Requirements
-## Indice
+## Index
 1. [Introduction](#Introduction)
 2. [Elicitation](#Elicitation)
 3. [Validation](#Validation)
@@ -39,7 +39,7 @@
 <a name="Elicitation"/>
 ## Requirements elicitation
 
-Since that the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance it's achieved through the issue tracker (GitHub), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea and there are also developer forums where they discuss the suggestions on it's implementation and maintenance.
+Since that the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance it's achieved through the [issue tracker](https://github.com/MovingBlocks/Terasology/issues), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea and there are also developer forums where they discuss the suggestions on it's implementation and maintenance.
 To the project lead Cervator, *«the ideal setup»* to build up new requisits  would be to perform the following steps:
 
 1. Suggestioning:
