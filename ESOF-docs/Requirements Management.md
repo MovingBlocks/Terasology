@@ -34,12 +34,13 @@ No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tend
 Por se tratar de um projeto *open-source* em que os contribuidores são voluntários dispostos a ajudar, torna-se díficil lançar novas *releases* a um ritmo bem definido. Apesar disso, o *team leader* tenta fazê-lo a cada 2-4 semanas.
 
 A nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org) que se resume ao seguinte:
->Dado um número de versão MAJOR.MINOR.PATCH, incremente a:
+> Dado um número de versão MAJOR.MINOR.PATCH, incremente a:
 
->- versão Maior(MAJOR): quando fizer mudanças incompatíveis na API,
-- versão Menor(MINOR): quando adicionar funcionalidades mantendo compatibilidade, e
-- versão de Correção(PATCH): quando corrigir falhas mantendo compatibilidade.
-Rótulos adicionais para pré-lançamento(pre-release) e metadados de construção(build) estão disponíveis como extensão ao formato MAJOR.MINOR.PATCH."
+>- versão maior (MAJOR):sempre que forem feitas mudanças incompatíveis na API;
+- versão menor (MINOR): quando forem adicionadas funcionalidades, mantendo compatibilidade;
+- versão de correção (PATCH): quando forem corrigidas falhas, mantendo compatibilidade.
+
+> Rótulos adicionais para pré-lançamento (*pre-release*) e meta-dados de construção (*build*) estão disponíveis como extensão ao formato MAJOR.MINOR.PATCH."
 
 ## Contribuição do Grupo
 
