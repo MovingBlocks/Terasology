@@ -59,6 +59,34 @@ Identificação de Requesitos.
 
 #### Análise de Requisitos e Negociação
 
+Após a identificação dos requisitos do sistema, seguem-se as suas analises e posteriormente, negociações.
+
+Atividades envolvidas. Podemos classificar em modulos alguns requisitos, como um conjunto de etapas para o jogo,
+onde são divididas, apos alguma ajuda - voluntária - postada no forum, onde são verificadas por um dos autores de 
+cada sessão(categoria de determinada parte do jogo, como  AlterationEffects - módulo para armazenar alguns
+lustre/efeitos tipo debuff, ou ComputerMonitors - permite a criação de monitores multi-blocos funcionais no jogo
+e etc.). Juntam-se as "ajudas", cada uma com seus autores(responsáveis, podendo ser um ou vários) e analisam para 
+posteriormente ser verificado pelo responsável principal e a depender, esse confiando poderes a alguém para validar
+determinado codigo. Consequentemente, existem diversos conflitos nesse sistema. Sendo o principal conflito o tempo, ou
+seja, todos os participantes são voluntários e não são obrigados a fazer nada num determinado tempo. E assim, 
+atrapalhando muito na evolução do projeto. Posteriormente, existem muitas pessoas(autores, na mesma situação) onde
+a validação secundária, apos enviarem algo no forum, pode demorar e dando cargo maior para o validador superior que
+também não tem muita disponibilidade. Por seguinte, a troca de infomação por internet cria por vezes confusões na
+interpretação e consequentemente uma demora na resolução de algum problema. neste caso, a priorização teria que ser
+em tentar organizar os tempos, submissões e prazos para entrega de validações de codigos de cada categoria, por exemplo.
+Confirmando tudo o que é solicitado, analisando e futuramente incrementando.
+As dificulades, nesse sitema que já já começam por não ter nenhuma base com Waltefall e etc.., terão sempre, se
+continuarem assim agindo. só em as pessoas serem voluntárias, já surge uma dificuldade, pois nem sempre estão aptas a 
+fazerem o que era suposto de se fazer. Outra dificuldade é em administrar em um local fisico e em tempo todos os que
+contribuem, por morarem distantes e até por não quererem, talvez.
+Chegando a fase de negociação, o autor principal com toda a sua carisma e educação, tende a contribuir, no seu tempo 
+disponivel e que já é grande, com todos os outros ajudantes, assim gerindo e/ou tentando, o jogo. Este fornece ajuda 
+em vários sentidos, sempre que possivel. Até em programação como foi salientado no 
+forum(http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/), local 
+onde obtivemos diversas ajudas sobre o projeto. E assim, tendo continuidade, ainda atual, de pessoas voluntárias para
+evolução do jogo.
+
+
 #### Especificação de Requisitos
 
 A especificação de requisitos neste projecto é feita de forma informal, não existe um documento de especificação 
