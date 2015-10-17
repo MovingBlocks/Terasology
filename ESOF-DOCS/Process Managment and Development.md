@@ -18,3 +18,4 @@ he can issue a pull request to the main repository. These pull requests are aval
 The project does not have a pre defined model due to the elevated number of volunteers and the constant spikes of activity/inactivity of the contribuitors as one of the administers points out. The funder and head developer insists in adopting the BDD (Behaviour Driven-Development) model - indication given by the latter in the [Unit Testing](https://github.com/MovingBlocks/Terasology/wiki/Unit-Testing) guide for new contributors. This model allows more flexibility and eases the process of aquiring new colaborators as well as it betters the communication between the varied teams working on the project such as the test team (beta-testers) and the developing team (implementation of the game's logic).
 
 ![Screenshot do website Terasology](https://github.com/dimamo5/Terasology/blob/Filipa/ESOF-DOCS/images/site.png?raw=true)
+
