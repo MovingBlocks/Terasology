@@ -20,13 +20,14 @@
 2. Scope:
 
     Terasology was developed with the purpose of studying the procedures involved in creating 3D terrain as well as the rendering 
-    techniques in Java using the game development library LWJGL. Terasology, which is currently in pre-alpha,
-    is a game where the main key is building an estate of some sort and managing specialized minions to climb up the ladder of discovery, 
-    while surviving in a world that might just be full of things that want to kill you.
+    techniques in Java using the game development library LWJGL. > Terasology, which is currently in pre-alpha,
+    >is a game where the main key is building an estate of some sort and managing specialized minions to climb up the ladder >of discovery, 
+ >   while surviving in a world that might just be full of things that want to kill you.
+  >  Forum Terasology
  
 3.  Definitions, acronyms and abbreviations:
 
-    LWJGL -  is a Java library that enables cross-platform access to popular native APIs useful in the development of graphics, audio and parallel computing applications. It is an enabling technology and provides low-level access. It is not a framework and does not provide higher-level utilities than what the native libraries expose. LWJGL is an open source software and freely available with no charge.
+    LWJGL -  is a Java library that enables cross-platform access to popular native APIs useful in the development of graphics, audio and parallel computing applications. It is an enabling technology and provides low-level access. It is not a framework and does not provide higher-level utilities than what the native libraries expose. LWJGL is an open source software and available with no charge.
 
 4. References:
 
