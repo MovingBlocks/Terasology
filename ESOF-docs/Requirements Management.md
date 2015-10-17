@@ -1,5 +1,5 @@
 # Relatório 2 - ESOF
-## Terasology - Gestão de Requisitos
+## Terasology - Requirements Management
 
 ###Requirements Elicitation
 
@@ -19,3 +19,14 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 - MINOR version when you add functionality in a backwards-compatible manner, and
 - PATCH version when you make backwards-compatible bug fixes.
 Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+## Requirements documentation
+
+###Introduction
+####Purpose
+
+The aim of this document is to present a detailed description of the Terasology game. It will illustrate the purpose and features of the system, what it will do and it's constraints.
+
+####Scope
+
+[Terasology](http://terasology.org/) is a voxel based, that tries to impose a NPC-helper gameplay. It was started in order to research procedural terrain generation and efficient rendering techniques in Java using [LWJGL](http://www.lwjgl.org/), a lightweight Java open-source library for game development.
