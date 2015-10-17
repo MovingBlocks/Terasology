@@ -29,6 +29,12 @@
   Quanto aos erros, toda a gente pode reportá-los no GitHub. Ocasionalmente eles tentam encarregar uma pessoa para analisá-los e ás vezes corrigi-los. O que costuma acontecer é precisamente o contrário. Os erros ficam lá até alguém se lembrar e querer corrigi-los. 
   Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no código e realiza testes para se certificar que funciona. Depois, ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalment os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer.  
 
+<a name="use_cases"/>
+### Casos de Uso
+O diagrama que se segue mostra os principais casos de uso do jogo Terasology.
+
+![Terasology Use Cases](/ESOF-docs/resources/usecasediagram.jpg)
+
 <a name="validation"/>
 ## Validação
 
