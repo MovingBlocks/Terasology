@@ -14,17 +14,17 @@ requisitos. Este processo é composto por quatro actividades:
 * Especificação de Requisitos
 * Validação de requisitos
 
-Este processo deve ser precedido de um estudos de viabilidade que, a partir das restrições do projecto, determinão 
+Este processo deve ser precedido de um estudos de viabilidade que, a partir das restrições do projecto, determinam 
 se o mesmo é viável e se deve seguir para a identificação de requisitos.
 No *waterfall model*, a engenharia de requisitos é feita na primeira fase do processo de desenvolvimento. Outros métodos
-de desenvolvimento de software com o XP e Scrum assumem que engenharia de requisitos continua ao longo do ciclo de 
-vida de sofware.
+de desenvolvimento de software como o XP e Scrum assumem que a engenharia de requisitos continua ao longo do ciclo de 
+vida do sofware.
 
 #### Estudos de Viabilidade
 
 Os Estudos de Viabilidade pretendem avaliar se do ponto de vista tecnológico e organizacional se o projecto é viável.
 
-Tendo em conta que este projecto, o Terasology, é *open source* e sem fim lucrativos, e pelas palavras do Organizador
+Tendo em conta que o projecto Terasology, é *open source* e sem fim lucrativos, e pelas palavras do Organizador
 de Projectos,
 
 > This makes following traditional processes from a work setting difficult. Methodologies like Waterfall, XP, Scrum, and 
@@ -32,20 +32,20 @@ any kind of structured planning with objectives, deadlines, and so on is nearly 
 "focus factor" for us as an overall team is exceedingly low, probably in the single digits (0-9%). We simply never know who 
 will be available, when, for how long.
 
-o que significa existirem poucas restrições neste projecto, visto não haver um plano extruturado.
+o que significa existirem poucas restrições neste projecto, visto não haver um plano estruturado.
 
-Apesar de este projecto não seguir nenhuma metedologia, disse-mos no primeiro relatório que este projecto tinha algumas 
+Apesar de este projecto não seguir nenhuma metedologia, dissemos no primeiro relatório, que este projecto tinha algumas 
 características semelhantes às dos métodos usados em *Agile*, faremos uma analogia semelhante neste relatório ao tópico
 Engenharia de Requisitos, tendo em conta que neste método a engenharia de requisitos continua ao longo do ciclo de vida 
 do software.
 
 Podemos avaliar a viabilidade do projecto através da interação dos *stakeholders* (utilizadores e colaboradores)
 com o mesmo. Podemos afirmar que o objetivo de investigar e testar técnicas procedimentais de geração de terreno e
-técnicas de renderização eficientes em Java são evidentes pois existem *Alpha-Releases*, apesar de o jogo 
-ainda não estar em produção, esse é o objectivo, o que significa, o sistema estar a contribuir para os objectivos do projecto.
+técnicas de renderização eficientes em Java são evidentes, pois existem *Alpha-Releases*, apesar de o jogo 
+ainda não estar em produção, esse é o objectivo, o que significa que o sistema está a contribuir para os objectivos do projecto.
 
-Da mesma forma podemos afirmar que os objectivos podem ser implementados visto existirem poucas restrições (tecnológicas 
-temporais, organizacionais etc), não havendo por isso um processo formal, desta maneira os organizadores do projecto
+Da mesma forma, podemos afirmar que os objectivos podem ser implementados visto existirem poucas restrições (tecnológicas 
+temporais, organizacionais etc), não havendo por isso um processo formal, deste modo os organizadores do projecto
 não interferem com os colaboradores que querem trabalhar no projecto, sendo possível, por exemplo, para um colaborador 
 apresentar uma nova *feature* sem antes a ter mencionado (introduzida por Pull Request).
 
@@ -62,29 +62,29 @@ Identificação de Requesitos.
 #### Especificação de Requisitos
 
 A especificação de requisitos neste projecto é feita de forma informal, não existe um documento de especificação 
-de requisitos no entanto à outras vias de documentação e comunicação entre *stakeholders* do projecto.
+de requisitos no entanto há outras vias de documentação e comunicação entre *stakeholders* do projecto.
 
 ##### Especificação de requisitos do usuário
 
-A especificação de requesitos dos usuários, neste projecto é realizada através de um *issue tracker* que se econtra no 
-GitHub que serve para identificar problemas ou indicar possíveis melhorias ao sistema, existe também um fórum de sugestões
-para partilhar novas ideias e muitos outros fórum de assuntos derivados que cobrem desde a implementação até a manutenção.
+A especificação de requisitos dos usuários, neste projecto é realizada através de um *issue tracker* que se encontra no 
+GitHub e que serve para identificar problemas ou indicar possíveis melhorias ao sistema, existe também um fórum de sugestões
+para partilhar novas ideias e muitos outros fóruns de assuntos derivados que cobrem desde a implementação até a manutenção.
 
 ##### Especificação de requisitos do sistema
 
 A especificação de requisitos do sistema, além das mencionadas anteriormente, conta também com um fórum módulo, fórum *art*
-e core projects fórum. A configuração ideal nesta especificação seria, alguém fazer uma sugestão no fórum de sugestões, algum
+e *core projects* fórum. A configuração ideal nesta especificação seria, alguém fazer uma sugestão no fórum de sugestões, algum
 colaborador pegar nessa ideia para um *design* inicial, e escreve notas técnicas e mais detalhes sobre como implementá-lo. 
 Alguém começa a codificá-lo, pode ser a mesma pessoa e muitas vezes este é o ponto onde o processo realmente começa 
-(pulando a fase sugestão porque uma pessoa mostrou-se animada para fazer algo específico). Uma vez realizada esta tarefa
-pega-se no conceito e move-se para o fórum do módulo se ele se encaixa em um módulo (a maior parte dos conceitos encaixam-se
-nesta categoria), ou move-se para o fórum de *Art* se acrescenta valor ao jogo em vez de código, ou move-se para o fórum
-de projectos básicos, se é para a arquitetura de suporte do jogo, motor de jogo ou outra funcionalidade a nível de biblioteca
+(saltando a fase sugestão porque uma pessoa mostrou-se animada para fazer algo específico). Uma vez realizada esta tarefa
+pega-se no conceito e move-se para o fórum do módulo e verifica-se o enquadramento com algum módulo (a maior parte dos conceitos encaixam-se
+nesta categoria), ou move-se para o fórum de *Art* para verificar se acrescenta valor ao jogo em vez de código, ou move-se para o fórum
+de projectos básicos caso seja para a arquitetura de suporte do jogo, motor de jogo ou outra funcionalidade a nível de biblioteca
 (não conteúdo).
 
 O recurso torna-se suficientemente completo para ser colocada em uso. Os módulos todos ficam situados nos seus próprios
-repositórios no GitHub colaboradores muitas vezes empurram diretamente, sem pedidos de *Pull Request*.
-Características do motor jogo que atingem a fase de *Pull Request* são analisadas e fundidas ao projecto. 
+repositórios no GitHub, os colaboradores muitas vezes colocam diretamente no repositório sem efectuarem pedidos de *Pull Request*.
+As características do motor jogo que atingem a fase de *Pull Request* são analisadas e fundidas ao projecto. 
 O novo recurso é liberado na próxima versão do jogo.
 
 ##### Especificação de *design* da aplicação
@@ -105,6 +105,54 @@ capaz de "se situar" quando precisar de começar a codificar, compreendendo a fo
 em um nível global, está a ser feita, mas sem conhecer necessariamente os detalhes de implementação aprofundados.
 
 #### Validação de Requisitos
+
+Nesta fase do processo pretende-se demonstrar que o documento de requisitos elaborado define de forma exacta 
+o sistema que o cliente pretende.
+Esse passo é extremamente importante, porque permite evitar o aparecimento de custos económicos/financeiros 
+para a empresa, que poderão ser muito elevados de corrigir a posteriori.
+À semelhança do que sucede na análise dos requisitos, pretende-se encontrar problemas/conflitos na especificação. 
+Porém ao contrário das fases anteriores, esta fase lida com uma especificação completa dos requisitos.
+Para tornar a validação mais eficaz, existe um conjunto de técnicas empregues, entre os quais podemos destacar nomeadamente:
+
+* Revisões dos Requisitos
+
+* Prototipicação
+
+* Geração de Casos Teste
+
+* Análise de Consistência Automática
+
+Relativamente ao projecto Terasology, dado ser um projecto *open source*, em que os participantes 
+são todos voluntários sem remuneração e o projecto em si não tem qualquer fim lucrativo, 
+podemos afirmar que o processo de validação em relação às técnicas formais:
+
+Revisões dos Requisitos: 
+As revisões são feitas um pouco por cada elemento que contribui para o projecto através dos *foruns* disponíveis, 
+apresentam ideias novas a acrescentar ao desenvolvimento do jogo, desde modulos sobre *design até ao motor do jogo.
+
+Prototipação:
+A utilização desta técnica não é patente neste projecto, visto que o desenvolvimento do jogo resultou 
+da evolução de técnicas de criação de terreno, o que se pode concluir que o que está a ser desenvolvido 
+não é algo que se possa conceber com um protótipo. Os colaboradores lançam ideias que posteriormente são 
+aceites e juntas, onde as mesmas vão modelando o próprio jogo.
+
+Geração de Casos Teste: 
+Cada requisito deve ser passível de testes, no entanto, como não existe formalismo de requisitos a especificar, 
+o modo de realizar testes acontece quando um colaborador faz um *pull request* e um outro colaborador familiarizado
+com o conteúdo, elabora testes sobre esse conteúdo e verifica se está de acordo com o que é pretendido para o jogo. 
+Caso exista nesse momento apenas um colaborador a desenvolver e a realizar *pull requests*, neste caso 
+o *Project Leader* faz os testes necessários, na eventualidade de estar disponível.
+
+Análise de Consistência Automática: 
+O jogo Terasology na sua concepção não utiliza quaisquer tipo de modelos de teste que possa de forma automática
+avaliar a consistência dos modelos, dado estes não existirem formalmente.
+
+Pode-se concluir que em geral tópico da validação dos requisitos é de extrema importância no desenvolvimento 
+da Engenharia de Requisitos, pois permite evitar potenciais erros que poderiam por em causa retornos financeiros 
+importantes para a empresa, bem como evitar perante o cliente, utilizadores e outros *stakeholders* discordâncias 
+que possam afectar de forma grave a competência da empresa e a sua imagem externa. Neste caso em concreto, 
+a falta deste formalismo não afecta de forma grave o desenvolvimento do projecto, contudo a sua aplicação 
+com algum rigor poderia trazer vantagens importante para o sucesso do projecto.
 
 #### Gestão de Requisitos
 
