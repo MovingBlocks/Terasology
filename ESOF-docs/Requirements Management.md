@@ -32,9 +32,13 @@
 
 <a name="use_cases"/>
 ### Casos de Uso
-O diagrama que se segue mostra os principais casos de uso do jogo Terasology.
+O diagrama que se segue mostra os principais casos de uso do executável do jogo Terasology.
 
-![Terasology Use Cases](/ESOF-docs/resources/usecasediagram.png)
+![Terasology executable use case diagram](/ESOF-docs/resources/usecasediagram-executable.png)
+
+A nível do *engine*, sem contar com os módulos extra, as principais interações que um jogador pode efetuar com o jogo em si estão representadas no seguinte diagrama:
+
+![Terasology game use case diagram](/ESOF-docs/resources/usecasediagram-game.png)
 
 <a name="validation"/>
 ## Validação
