@@ -57,6 +57,12 @@ Identificação de Requesitos.
 
 #### Identificação de Requisitos
 
+O processo de identificação de requisitos num projeto é uma parte importante do seu desenvolvimento. Esta realidade verifica-se de forma mais acentuada num projeto com as características do Terasology em que o futuro passa por acrescentar funcionalidades novas e integrar novas realidades no jogo.
+
+Os requisitos no Terasology surgem de forma pouco estruturada. Não existe um cliente estabelecido portanto as sugestões surgem através de contribuidores atuais do projeto, novos contribuidores que se queiram juntar à equipa, ou até mesmo de jogadores.
+O primeiro passo é a apresentação ou identificação do requisito, qualquer membro da comunidade pode apresentar a sua ideia no forum de sugestões do Terasology. Depois disso, quando alguém despertar interesse nessa sugestão, é feito um desenho inicial e são escritas notas técnicas e mais detalhes sobre como implementar.
+
+Estando concluída esta parte pode dizer-se que o requisito está completamente identificado, detalhado e pronto a ser implementado por um contribuidor. No entanto, esta fase inicial pode ser completamente ignorada caso um desenvolvedor se mostre muito entusiasmado com uma ideia própria e parta imediatamente para a escrita de código de forma a implementar a sua ideia.
 #### Análise de Requisitos e Negociação
 
 #### Especificação de Requisitos
