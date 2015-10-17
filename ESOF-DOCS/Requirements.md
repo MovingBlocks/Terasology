@@ -1,6 +1,11 @@
+Indice [Introduction](#Introduction)
+
+
 #Requirements
 
-##Introduction
+
+<a name="Introduction"/></a>
+## Introduction
 
 1. Purpose:
 
@@ -27,6 +32,7 @@
     
     https://github.com/MovingBlocks/Terasology/wiki - Terasologys wiki.
 
+<a name="Elicitation"/>
 ## Requirements elicitation
 
 Since that the development process is mentioned by one of the head developers as being *«Nothing formal»*, the requirement maintenance it's achieved through the issue tracker (GitHub), where all the issues as well as necessary improvements are identified. Through the [suggestion forum](http://forum.terasology.org/forum/suggestions.21/) anyone can post an idea and there are also developer forums where they discuss the suggestions on it's implementation and maintenance.
@@ -48,7 +54,7 @@ To the project lead Cervator, *«the ideal setup»* to build up new requisits  w
     * Architecture
         * If the goal is to support the game engine or other support library-level functionality, the concept is moved to the [Core Projects forum](http://forum.terasology.org/forum/core-projects.54/).
 6. "Release"
-    * Soon as the feature is complete-ready it's validated and released. The validation of this feature is explained on the validation section (####linkar para a secção da validação "Modules all live in their own repos on GitHub so authors often push directly without pull requests (PRs). Engine features hit the PR stage, get reviewed, and merged"####).
+    * Soon as the feature is complete-ready it's validated and released. The validation of this feature is explained on the validation section (<a name="index"/>[Validation](#validation)).
 
 in relation to the method used:
 >As for the why to our process: well, it gives what little structure to the process we can apply without getting in the way of people wanting to do work. (...)  As noted often it gets short-cut when somebody is excited about a feature and shows up with it out of nowhere.
@@ -57,12 +63,15 @@ Cervator - Project lead
 As quoted above, the process used is the best-fit for this type of project because it allows everyone to give it's contribute and to work at his pace and at the same it's all organized and structured. On the other and it makes planning and estimating hard because the project is dependent of all conributors, which all work at their own way.
 The project lead mention at the forum that he aims to get releases out every 2-4 weeks but as it's been said it's dependent on the contributors and on the stability of the modules up to realease.
 
+<a name="Validation"/>
 ## Validation
 
 *Terasology* is developed by small groups in which one of them forks the project and the group works on that specific fork. Every time a contributor wishes to merge code into the main repository an issue is created derived from a pull request. These issues are reviewed normally by the user [Cervator](https://github.com/Cervator) (ideally by at least more than one person other than the author) and either approved, in which case the code is merged into the main repository, or denied when the code has errors. The code is tested locally to make sure it works and does what is advertised. If it is accepted, the main programmers still discuss whether it is a valuable adition to the project and only in this case is the code merged ([example issue](https://github.com/MovingBlocks/Terasology/pull/1760)). When it is denied the errors are reported on the issue back to the author of the pull request and after everything is settled the issue is closed. Often pull requests are specific and inherent to its direct author. When this occurs, the team leader reviews it himself or tries to find someone more familiar with the code to test it.
 
+<a name="Versioning"/>
 ##Versioning
 
+<a name="Use Cases"/>
 ##Use Cases
 
 ![Use Case 1](https://github.com/dimamo5/Terasology/blob/develop/ESOF-DOCS/UseCase1.png?raw=true)
