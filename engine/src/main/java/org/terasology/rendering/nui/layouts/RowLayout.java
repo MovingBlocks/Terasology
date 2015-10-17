@@ -69,6 +69,12 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     @Override
+    public void removeWidget(UIWidget widget) {
+        contents.remove(widget);
+        hints.remove(widget);
+    }
+
+    @Override
     public void onDraw(Canvas canvas) {
         TIntList widths = calcWidths(canvas);
 
