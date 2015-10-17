@@ -78,8 +78,8 @@ The project lead mention at the forum that he aims to get releases out every 2-4
 <a name="Use Cases"/>
 ##Use Cases
 
-![Use Case 1](https://github.com/dimamo5/Terasology/blob/develop/ESOF-DOCS/Requirements/images/game.png?raw=true)
+![Use Case 1](https://github.com/dimamo5/Terasology/blob/Diogo/ESOF-DOCS/Requirements/images/game.png)
 
-![Use Case 2](https://github.com/dimamo5/Terasology/blob/develop/ESOF-DOCS/Requirements/images/options.png?raw=true)
+![Use Case 2](https://github.com/dimamo5/Terasology/blob/Diogo/ESOF-DOCS/Requirements/images/options.png)
 
-![Use Case 3](https://github.com/dimamo5/Terasology/blob/develop/ESOF-DOCS/Requirements/images/network.png?raw=true)
+![Use Case 3](https://github.com/dimamo5/Terasology/blob/Diogo/ESOF-DOCS/Requirements/images/network.png)
