@@ -42,11 +42,11 @@ A nível do *engine*, sem contar com os módulos extra, as principais interaçõ
 
   Uma vez que não há *deadlines* para o projeto, o desenvolvimento pode ser feito de forma cuidada, pelo que é importante o processo de validação dos requesitos para manter a estrutura sólida do código.
 
-  Como já foi referido, o desenvolvimento do jogo é dividido em módulos que são distribuidos por pequenas equipas (1 a 3 pessoas) ou, muitas vezes, apenas pelo autor do módulo. Cada um destes módulos tem o seu próprio repositório no GitHub, permitindo aos seus autores fazer push diretamente sem a necessidade de um *pull request*.
+  Como já foi referido, o desenvolvimento do jogo é dividido em módulos que são distribuidos por pequenas equipas (1 a 3 pessoas) ou, muitas vezes, apenas pelo autor do módulo. Cada um destes módulos tem o seu próprio repositório no GitHub, permitindo aos seus autores fazer *push* ou *merge* diretamente sem a necessidade de um *pull request* ou de algum tipo de autorização.
 
-  Os *pull requests* associados a esses módulos são revistos por uma ou mais pessoas familiarizadas com a funcionalidade em questão e realizam testes para garantir que o código funciona. Posteriormente, ou é feito *merge* do novo código ou os erros são reportados ao autor do *pull request*. Na maior parte dos casos os *pull requests* são feitos pelo autor, que é a unica pessoa a trabalhar nesse módulo. Nestes casos, o próprio *team leader* [(*Cervator*)](https://github.com/Cervator) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer.
+  Ainda assim, em casos de módulos maiores em que há necessidade de *pull requests*, estes são revistos por uma ou mais pessoas familiarizadas com o módulo em questão e realizam testes para garantir que o código funciona. Normalmente, esta tarefa é executada pelo autor original do módulo. No caso de existirem erros, estes podem ser reportados nas [issues](#issues) do *Terasology*. Em algumas situações excecionais o próprio *team leader* [(*Cervator*)](https://github.com/Cervator) testa o código ou nomeia alguém mais familiar com o módulo em questão para o fazer. Mesmo havendo esta "liberdade" no desenvolvimento independente dos módulos, por vezes o *team leader* do projeto arranja algum tempo para rever as modificações feitas nos módulos mais próximos e importantes do projeto (os 80 módulos referidos no [*readme*](https://github.com/MovingBlocks/Terasology/blob/develop/README.markdown#modules) do projeto, podendo assim reportar erros aos seus autores e certificar-se da sua qualidade quando é lançada uma nova *release*.
 
-  No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de equipas grandes de contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações. Estes *pull requests* são revistos pelo [*team leader*](https://github.com/Cervator) num espaço de algumas semanas para prevenir que código incompleto ou errado vaze para alguma *release* do jogo. Assim, é da responsabilidade do *team leader* a escolha de quais modificações aceitar ou não para o jogo, bem como o lançamento de novas *releases*.
+  Por sua vez, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de equipas grandes de contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações. Estes *pull requests* são revistos pelo [*team leader*](https://github.com/Cervator) num espaço de algumas semanas para prevenir que código incompleto ou errado vaze para alguma *release* do jogo. Assim, é da responsabilidade do *team leader* a escolha de quais modificações aceitar ou não para o jogo, bem como o lançamento de novas *releases*.
 
 <a name="version_control"/>
 ### Controlo de versão
@@ -65,13 +65,13 @@ O nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org)
 <a name="group_contribution"/>
 ## Contribuição do Grupo
 
-André Machado: 2 horas
+André Machado: 3 horas
 
-André Lago: 8 horas
+André Lago: 6 horas
 
-Gustavo Silva: 8 horas
+Gustavo Silva: 6 horas
 
-Marina Camilo: 2 horas
+Marina Camilo: 5 horas
 
 Grupo:
  - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt)
