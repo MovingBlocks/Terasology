@@ -146,6 +146,9 @@ A partir deste documento, um elemento que entre para a equipa de desenvolvimento
 capaz de "se situar" quando precisar de começar a codificar, compreendendo a forma como a implementação, 
 em um nível global, está a ser feita, mas sem conhecer necessariamente os detalhes de implementação aprofundados.
 
+##### Diagrama de casos de utilização do Terasology
+![Use cases Terasology](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/useCases.png.PNG)
+
 #### Validação de Requisitos
 
 Nesta fase do processo pretende-se demonstrar que o documento de requisitos elaborado define de forma exacta 
