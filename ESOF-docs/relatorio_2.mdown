@@ -57,43 +57,13 @@ Identificação de Requesitos.
 
 #### Identificação de Requisitos
 
-Após a determinação sobre a viabilidade do projecto, o passo seguinte centra-se na identificação dos requisitos.
-O processo de identificação de requisitos num projeto é uma componente importante para seu desenvolvimento. 
-Esta realidade encontra-se presente num projeto com as características do jogo Terasology.
+O processo de identificação de requisitos num projeto é uma parte importante do seu desenvolvimento. Esta realidade verifica-se de forma mais acentuada num projeto com as características do Terasology em que o futuro passa por acrescentar funcionalidades novas e integrar novas realidades no jogo.
 
-##### Actividades Envolvidas
+Os requisitos no Terasology surgem de forma pouco estruturada. Não existe um cliente estabelecido portanto as sugestões surgem através de contribuidores atuais do projeto, novos contribuidores que se queiram juntar à equipa, ou até mesmo de jogadores.
+O primeiro passo é a apresentação ou identificação do requisito, qualquer membro da comunidade pode apresentar a sua ideia no forum de sugestões do Terasology. Depois disso, quando alguém despertar interesse nessa sugestão, é feito um desenho inicial e são escritas notas técnicas e mais detalhes sobre como implementar.
 
-Poderemos enunciar como actividades presentes nesta fase as seguintes:
+Estando concluída esta parte pode dizer-se que o requisito está completamente identificado, detalhado e pronto a ser implementado por um contribuidor. No entanto, esta fase inicial pode ser completamente ignorada caso um desenvolvedor se mostre muito entusiasmado com uma ideia própria e parta imediatamente para a escrita de código de forma a implementar a sua ideia.
 
-* Classificação - O agrupamento de requisitos (sugestões) é feito em fóruns.
-
-* Resolução de conflitos - Visto este projecto ser *open source* e os requisitos serem sugestões da comunidade
-do Terasology, poder-se-à dizer que a resolução de conflitos é de certa forma feita através de discussões nos mesmos fóruns.
-
-* Priorização - Algumas das melhores sugetões nestes fóruns podem passar a ser implementadas por algum dos contribuidores, mas 
-sem priorização obrigatória, fica a cargo do contribuidor que quiser desenvolver esta *feature* a priorização.
-
-* Confirmação - É feita do mesmo modo como nos casos anteriores nos fóruns, depois de uma sugestão num fórum uma ideia que seja 
-considerada como possível *feature* é movida para outro fórum, por exmplo: fórum módulo.
-
-##### Dificuldades 
-
-A dificuldade neste tipo de análise de requisitos são do tipo organizacional, não existem métodos de análise concretos,
-é tudo realizado de forma liberal à base de discussões em fóruns. 
-No entanto, poderá apresentar alguma facilidade de compreensão, visto que o produto que se pretende ver desenvolvido usa 
-técnicas que os colaboradores conhecem, ao contrário do que poderia ser, se eventualmente houvesse um cliente directamente 
-interessado sem conhecimentos técnicos, que pretendesse definir um projecto para os seus propósitos e os *Requirements Managers*
-tivessem dissecar as suas ideias em concreto, por forma a clarificar a mensagem passada e identificar os requisitos necessários.
-
-##### Negociações
-
-As negociações são feitas num ambiente *open source* de forma "relaxada", que se conduz em direção a um obejctivo unanimemente tolerado, 
-que se centra na criação de um jogo à base de colaboradores com as ideias obtidas através de uma comunidade voluntária, que cresce 
-à medida que o jogo se desenvolve, à exploração de tecnologias de desenvolvimento de aplicações gráficas.
-
-Assim, os requisitos no Terasology surgem de forma pouco estruturada. Não existe um cliente concreto, as 
-sugestões e as ideias surgem através dos colaboradores atuais bem como pelos novos colaboradores que se
-queiram juntar à equipa, ou até mesmo de utilizadores do jogo.
 
 #### Análise de Requisitos e Negociação
 
