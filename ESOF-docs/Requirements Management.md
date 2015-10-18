@@ -11,7 +11,7 @@ In case the new requirement belongs to the game's core, the process is slightly 
 
 In order to clearly understand what an application is capable of doing and the requirements that may be deemed applicable, use cases should be listed.
 The following diagrams reveal the most important use cases of Terasology.
-![Terasology base use case diagram]("UML Models/Package_Use_Case_Model.png")
+![Terasology base use case diagram](UML Models/Package_Use_Case_Model.png)
 
 
 
