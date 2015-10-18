@@ -81,16 +81,7 @@ O nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org)
 <a name="group_contribution"/>
 ## Contribuição do Grupo
 
-André Machado: 3 horas
-
-André Lago: 6 horas
-
-Gustavo Silva: 6 horas
-
-Marina Camilo: 5 horas
-
-Grupo:
- - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt)
- - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt)
- - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt)
- - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt)
+ - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt): 3 horas
+ - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt): 6 horas
+ - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt): 6 horas
+ - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt): 5 horas
