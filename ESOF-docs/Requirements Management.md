@@ -1,4 +1,4 @@
-# Requirements Management
+# Gestão de Requisitos
 
 <a name="index"/>
 ## Índice
@@ -11,7 +11,7 @@
 <a name="elicitation"/>
 ## Elicitação
 
-  O processo de evolução do projeto no que diz respeito a requisitos é bastante simples, envolvendo não só a equipa de desenvolvimento como a comunidade envolvente.
+  O processo de evolução do projeto no que diz respeito a requisitos é bastante simples e informal, envolvendo não só a equipa de desenvolvimento como a comunidade envolvente.
 
   Os *developers* associados ao projeto trabalham para implementar funcionalidades relacionadas com os requisitos estabelecidos ou para corrigir <a name="issues"/>[*issues*](https://github.com/MovingBlocks/Terasology/issues) que estejam listadas no repositório do projeto.
  
