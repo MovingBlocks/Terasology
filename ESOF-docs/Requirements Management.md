@@ -25,7 +25,7 @@
   
   Este processo permite estruturar o projeto de forma a que cada *developer* possa fazer o trabalho que considerar melhor sem atrapalhar o que outros estão a fazer. Apesar de não ser um projeto com muitos colaboradores ativos, sem este método o desenvolvimento poderia tornar-se caótico em muitas situações. Por exemplo, se um colaborador externo se lembrar de uma funcionalidade que até pode ter interesse para si mas não para os restantes elementos do projeto, pode simplesmente propôr a ideia no fórum como forma de angariar apoio e começar a desenvolvê-la no repositório do seu módulo, visto que isso não implica que todos os utilizadores utilizem esse módulo.
 
-  Em relação às [*issues*](#issues) referidas acima, é importante referir que estas podem ser reportadas por qualquer utilizador do GitHub. Isto permite criar uma espécie de *task list* de erros a corrigir, sendo também possível uma escolha de quais as *issues* a resolver primeiro tendo em conta a sua gravidade.
+  Em relação às *issues* referidas [acima](#issues), é importante referir que estas podem ser reportadas por qualquer utilizador do GitHub. Isto permite criar uma espécie de *task list* de erros a corrigir, sendo também possível uma escolha de quais as *issues* a resolver primeiro tendo em conta a sua gravidade.
 
 <a name="use_cases"/>
 ### Casos de Uso
@@ -66,8 +66,11 @@ O nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org)
 ## Contribuição do Grupo
 
 André Machado: 2 horas
+
 André Lago: 8 horas
+
 Gustavo Silva: 8 horas
+
 Marina Camilo: 2 horas
 
 Grupo:
