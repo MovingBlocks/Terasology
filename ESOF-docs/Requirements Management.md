@@ -9,6 +9,7 @@ In case the new requirement belongs to the game's core, the process is slightly 
 
 ###Requirements
 After the requirements' elicitation, these can be provided in a model similar to the one found here. The following diagram shows the mais requirements that define Terasology.
+
 ![Requirements diagram](UML Models/Requirements_Model.png)
 
 ####Use cases
