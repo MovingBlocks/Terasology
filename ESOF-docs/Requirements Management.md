@@ -29,7 +29,7 @@
 
 <a name="use_cases"/>
 ### Casos de Uso
-O diagrama que se segue mostra os principais casos de uso do executável do jogo Terasology.
+Muitas vezes é importante perceber o tipo de utilização que uma determinada aplicação vai ter para determinar quais os requesitos que se podem aplicar. Assim, diagrama que se segue mostra os principais casos de uso do executável do jogo *Terasology*.
 
 ![Terasology executable use case diagram](/ESOF-docs/resources/usecasediagram-executable.png)
 
