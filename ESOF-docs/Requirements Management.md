@@ -5,7 +5,7 @@
 
 New requirements are suggested by everyone who wants to, through the [suggestions forum](http://forum.terasology.org/forum/suggestions.21/). From there, the original author of the suggestion (or someone else, provided they are interested in the suggestion), specifying what needs to be done in order to accomplish that requirement. After that, the topic is moved to the [modules forum](http://forum.terasology.org/forum/modules.55/), integrating it in a new module (or in one of the already existing modules). These modules are in independent repositories. When the code is implemented, tested, and working, it is merged into the repository of the module (without resorting to a pull request). A list of these modules (to which they refer as the Omega Distribution) can be seen [here](https://github.com/MovingBlocks/Terasology/blob/develop/README.markdown#modules).
 
-In case the new requirement belongs to the game's core, the process is slightly different. The sugestor forks a project, and when he is finished coding the requirement, a pull requests is issued.
+In case the new requirement belongs to the game's core, the process is slightly different, mainly due to the fact that there are much more contributors involved in this part of the project. The sugestor starts by forking the project, and when he is finished coding the requirement, a pull request is issued. This method makes it possible for all the contributors to work on their part, without compromising the others' work and without the need to be constantly merging conflicts.
 
 ####Use cases
 
