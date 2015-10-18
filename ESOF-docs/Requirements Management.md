@@ -6,7 +6,8 @@
   1. [Casos de Uso](#use_cases)
 2. [Validação](#validation)
   1. [Controlo de versão](#version_control)
-3. [Contribuição do Grupo](#group_contribution)
+3. [Análise Crítica](#analysis)
+4. [Contribuição do Grupo](#group_contribution)
 
 <a name="elicitation"/>
 ## Elicitação
@@ -61,6 +62,21 @@ O nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org)
 - versão de correção (PATCH): quando forem corrigidas falhas, mantendo compatibilidade.
 
 > Rótulos adicionais para pré-lançamento (*pre-release*) e meta-dados de construção (*build*) estão disponíveis como extensão ao formato MAJOR.MINOR.PATCH.
+
+<a name="analysis"/>
+## Análise Crítica
+
+  A nossa análise à gestão de requesitos do *Terasology* é feita tendo em conta a dimensão do projeto e a finalidade dele. Em primeiro lugar, é necessário considerar que apesar de o projeto ter listados várias dezenas de contribuidores, o seu "núcleo" principal e "efetivo" resume-se a cerca de 4 pessoas. Para além disso, é importante referir que o projeto não possui um *deadline* final ou um objetivo definido para um produto final acabado. Em vez disso, e tal como o jogo que lhe serviu de motivação ([*Minecraft*](https://minecraft.net/)), é um jogo em constante evolução tendo em conta que novos módulos ou funcionalidades são desenvolvidos à medida que são pensados. De certa forma, o *Terasology* serve como um *playground* onde contribuidores podem implementar funcionalidades que considerem úteis sem que causem implicações para o restante projeto.
+  
+  Desta forma, consideramos que a abordagem utilizada é boa em muitos aspetos, embora possua algumas desvantagens.
+  
+  Por um lado, é excelente colocar os diferentes módulos em repositórios separados que são importados com uso do *Gradle* pois isso facilita imenso o trabalho dos contribuidores, na medida em que torna as coisas independentes. Por outras palavras, se uma pessoa quer fazer um módulo seu pode fazê-lo e testá-lo sem a "obrigatoriedade" de o incluir no projeto. Para além disso, se um módulo estiver incompleto ou não funcional é perfeitamente possível e fácil não o utilizar para que possam ser testados outros módulos sem nenhum compromisso ao seu correto funcionamento.
+  
+  Por outro lado, o facto de se centralizar a maior parte das decisões de aceitação de *pull requests* numa só pessoa permite que essa pessoa faça uma melhor gestão do projeto na medida em que está mais consciente da evolução do projeto e das funcionalidades adicionadas. Isso dá origem a uma maior estabilidade das *releases* no que diz respeito ao *core* do jogo e aos módulos principais.
+  
+  Contudo, o facto de qualquer pessoa poder reportar *issues* pode atrasar o desenvolvimento pois há sempre a necessidade de se verificar a veracidade das *issues* reportadas e atribuir alguém para as resolver, o que as impede de continuar a trabalhar naquilo que estavam a trabalhar. Para além disso, a não existência de *deadlines* ou objetivos concretos e definitivos pode originar desleixo e prolongamento na execução das tarefas em mãos.
+  
+  No geral, consideramos que a técnica adotada é boa mesmo não sendo perfeita.
 
 <a name="group_contribution"/>
 ## Contribuição do Grupo
