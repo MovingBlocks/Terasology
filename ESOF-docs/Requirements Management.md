@@ -1,4 +1,3 @@
-# Relatório 2 - ESOF
 ## Terasology - Requirements Management
 
 ###Elicitation and analysis
