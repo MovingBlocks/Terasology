@@ -7,6 +7,10 @@ New requirements are suggested by everyone who wants to, through the [suggestion
 
 In case the new requirement belongs to the game's core, the process is slightly different. The sugestor forks a project, and when he is finished coding the requirement, a pull requests is issued.
 
+####Use cases
+
+In order to clearly understand what an application is capable of doing and the requirements that may be deemed applicable, use cases should be listed. The following diagrams reveal the most important use cases of Terasology.
+
 ###Specification
 
 In this phase, some documentation like a SRS document should be produced in order to specify the requisites to be fulfilled. On a volunteer, suggestion-based project like Terasology, such documentation is hard to create due to the fact that the contributors are in constant change and there is no specific documentation model to be followed by the collaborators when creating new features.
@@ -27,19 +31,3 @@ Additional labels for pre-release and build metadata are available as extensions
 
 However, while on pre-alpha, the team is diverging from this model as described in [this page](https://github.com/MovingBlocks/Terasology/wiki/Versioning-Guideline). While MAJOR is 0, an increment on MINOR indicates an API incompatibility and
 an increment on PATCH represents and additional functionality or bug-fix. For each MINOR increment there can also be more than one API breaking change.
-
-## Requirements documentation
-
-###Introduction
-####Purpose
-
-The aim of this document is to present a detailed description of the Terasology game. It will illustrate the purpose and features of the system, what it will do and it's constraints.
-
-####Scope
-
-[Terasology](http://terasology.org/) is a voxel based, that tries to impose a NPC-helper gameplay. It was started in order to research procedural terrain generation and efficient rendering techniques in Java using [LWJGL](http://www.lwjgl.org/), a lightweight Java open-source library for game development.terayo
-
-###Overall description
-
-####Product perspective
-
