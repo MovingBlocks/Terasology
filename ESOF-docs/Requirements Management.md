@@ -7,9 +7,27 @@ New requirements are suggested by everyone who wants to, through the [suggestion
 
 In case the new requirement belongs to the game's core, the process is slightly different, mainly due to the fact that there are much more contributors involved in this part of the project. The sugestor starts by forking the project, and when he is finished coding the requirement, a pull request is issued. This method makes it possible for all the contributors to work on their part, without compromising the others' work and without the need to be constantly merging conflicts.
 
+###Requirements
+![Requirements diagram](UML Models/Requirements_Model.png)
+
 ####Use cases
 
-In order to clearly understand what an application is capable of doing and the requirements that may be deemed applicable, use cases should be listed. The following diagrams reveal the most important use cases of Terasology.
+In order to clearly understand what an application is capable of doing and the requirements that may be deemed applicable, use cases should be listed.
+The following diagrams reveal the most important use cases of Terasology.
+
+![Base use case diagram](UML Models/Package_Use_Case_Model.png)
+
+This use case diagram allows us to visualize the 3 user roles on this software: player, host and client.
+
+![Singleplayer use case diagram](UML Models/Singleplayer_Use_Case_Model.png) ![World Interaction use case diagram](UML Models/World_Interaction_Use_Case_Model.png)
+
+As a singleplayer, these are some of the expected actions to be available to the player. These use cases can be grouped as needed, like it's pictured on these models for
+the "World Interaction" use case.
+
+![Multiplayer use case diagram](UML Models/Multiplayer_Use_Case_Model.png)
+
+Like depicted on this diagram, the host must be able to setup a game server so that the clients can connect to it and interact with each other.
+
 
 ###Specification
 
