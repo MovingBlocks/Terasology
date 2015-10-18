@@ -228,6 +228,10 @@ com algum rigor poderia trazer vantagens importante para o sucesso do projecto.
 
 #### Gestão de Requisitos
 
+O Terasology possui duas características muito especiais que servem para explicar a sua gestão de requisitos. São elas o facto de estar em constante evolução (com a adição de modos de jogo, por exemplo) e de não ter deadlines estabelecidas. Isto traduz-se numa grande flexibilidade neste aspeto o que torna possível a adição de qualquer tipo de requisito em qualquer fase do desenvolvimento do projeto. 
+
+Existem também requisitos que são mais voláteis do que outros (como por exemplo requisitos que surjam com uma nova lei ou protocolo), neste caso a equipa do Terasology teria de tomar uma atitude diferente e mais ativa na sua resolução mas tal ainda não se verificou.
+
 #### Conclusão
 
 Foram analisados ao longo deste trabalho os vários aspectos de um processo que engloba as actividades mais 
