@@ -25,7 +25,7 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 - PATCH version when you make backwards-compatible bug fixes.
 Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
 
-However, while on pre-alpha, the team is diverging from this model. While MAJOR is 0, an increment on MINOR indicates an API incompatibility and
+However, while on pre-alpha, the team is diverging from this model as described in [this page](https://github.com/MovingBlocks/Terasology/wiki/Versioning-Guideline). While MAJOR is 0, an increment on MINOR indicates an API incompatibility and
 an increment on PATCH represents and additional functionality or bug-fix. For each MINOR increment there can also be more than one API breaking change.
 
 ## Requirements documentation
