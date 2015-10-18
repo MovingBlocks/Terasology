@@ -16,7 +16,7 @@ In our opinion, a documentation model for each feature would be a good asset bec
 
 As previously stated, the game development is split into several modules, each of them having an independent repository. Every few weeks, the main developer, [Cervator](https://github.com/Cervator), will go through the modules, tests them, and adds them to the main repository and, consequentely, to the next release. If it was added to the game's core (which is in the main repository), he will test and eventually accept the pull request.
 Eventually, a new release will be made. Being an open-source project, with volunteers as contributors, it is difficult to get new releases in stable periods of time. However, they try to do it every 2-4 weeks. 
-They use the [Semantic Versioning](http://semver.org/) norm to name their releases. It works as follows:
+They chose to follow the [Semantic Versioning](http://semver.org/) norm to name their releases. It works as follows:
 
 Given a version number MAJOR.MINOR.PATCH, increment the:
 
@@ -24,6 +24,9 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 - MINOR version when you add functionality in a backwards-compatible manner, and
 - PATCH version when you make backwards-compatible bug fixes.
 Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+However, while on pre-alpha, the team is diverging from this model as described in [this page](https://github.com/MovingBlocks/Terasology/wiki/Versioning-Guideline). While MAJOR is 0, an increment on MINOR indicates an API incompatibility and
+an increment on PATCH represents and additional functionality or bug-fix. For each MINOR increment there can also be more than one API breaking change.
 
 ## Requirements documentation
 
