@@ -219,6 +219,22 @@ com algum rigor poderia trazer vantagens importante para o sucesso do projecto.
 
 #### Conclusão
 
+Foram analisados ao longo deste trabalho os vários aspectos de um processo que engloba as actividades mais 
+relevantes para a definição, documentação e manutenção dos requisitos de engenharia de software.
+A engenharia de requisitos é uma fase importante para o desenvolvimento de software, que pela relevância 
+que apresenta é transversal nos modelos mais relevantes que hoje conhecemos.
+É de considerar, que a engenharia de requisitos apresenta maior ou menor ênfase consoante o(s) modelo(s) de software utilizado(s), 
+o que por este facto, poderá permitir uma maior ou menor gestão de tempo disponível para esta fase, mediante
+a possibilidade ou não de ajustar possíveis erros de análise numa fase de desenvolvimento do projecto mais avançada.
+No nosso caso em concreto, o Terasology pela falta de formalismo do projecto, quer em termos de modelo(s) ou 
+de *Requirements Documentation*, apresenta-se como um sistema com metodoligias um pouco aleatórias, i. é, não toma 
+em consideração *standards* de desenvolvimeto de software presentes na literatura mundial. 
+Como apreciação final sobre o projecto, poderemos considerar que qualquer projecto, independente do sistema 
+que se pretenda desenvolver e implementar, deveria ter presente sempre a engenharia de requisitos como algo fundamental, para que, 
+a início do projecto se possa realçar de imediato factores importantes para estabelecer uma base, que torne de certa forma o projecto 
+em algo que seja minimamente visível ou que apresente no horizonte pontos claros de viabilidade, bem potenciais 
+custos inerentes, dado que os recursos a gerir são escassos inclusivé na Engenharia de Software.
+
 ##### Referências
 [Wikipédia](https://pt.wikipedia.org/wiki/Engenharia_de_requisitos)
 
