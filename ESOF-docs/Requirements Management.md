@@ -1,5 +1,14 @@
 # Requirements Management
 
+<a name="index"/>
+## Índice
+1. [Elicitação](#elicitation)
+  1. [Casos de Uso](#use_cases)
+2. [Validação](#validation)
+  1. [Controlo de versão](#version_control)
+3. [Contribuição do Grupo](#group_contribution)
+
+<a name="elicitation"/>
 ## Elicitação
 
   O processo de evolução do projeto no que diz respeito a requesitos é bastante simples, envolvendo não só a equipa de desenvolvimento como a comunidade envolvente.
@@ -21,6 +30,17 @@
   Quanto aos erros, toda a gente pode reportá-los no GitHub. Ocasionalmente eles tentam encarregar uma pessoa para analisá-los e ás vezes corrigi-los. O que costuma acontecer é precisamente o contrário. Os erros ficam lá até alguém se lembrar e querer corrigi-los. 
   Os pull requests são revistos pelo menos por uma pessoa que seja familiar com a funcionalidade sem ser o autor. Essa pessoa pega no código e realiza testes para se certificar que funciona. Depois, ou reporta erros ao autor ou realiza o merge para um nivel superior. Normalment os pull requests são feitos onde o autor é a única pessoa associada, o que torna o raciocinio anterior dificil de implementar. Nestes casos, o próprio team leader testa o código ou arranja alguem que seja mais familiar com aquele modulo para o fazer.  
 
+<a name="use_cases"/>
+### Casos de Uso
+O diagrama que se segue mostra os principais casos de uso do executável do jogo Terasology.
+
+![Terasology executable use case diagram](/ESOF-docs/resources/usecasediagram-executable.png)
+
+A nível do *engine*, sem contar com os módulos extra, as principais interações que um jogador pode efetuar com o jogo em si estão representadas no seguinte diagrama:
+
+![Terasology game use case diagram](/ESOF-docs/resources/usecasediagram-game.png)
+
+<a name="validation"/>
 ## Validação
 
 O desenvolvimento do jogo é dividido em módulos que são distribuidos por pequena equipas, muitas vezes apenas pelo autor do módulo. Cada um destes módulos tem o seu próprio repositório no GitHub, permitindo aos seus autores fazer push diretamente sem a necessidade de um *pull request*.
@@ -29,18 +49,21 @@ Os *pull requests* associados a esses módulos são revistos por uma ou mais pes
 
 No entanto, o desenvolvimento do *engine* e de outros *frameworks* centrais tende a ser da responsabilidade de vários contribuidores, pelo que é habitual a utilização de *pull requests* para revisão e decisão de como fazer o *merge* das alterações.
 
+<a name="version_control"/>
 ### Controlo de versão
 
 Por se tratar de um projeto *open-source* em que os contribuidores são voluntários dispostos a ajudar, torna-se díficil lançar novas *releases* a um ritmo bem definido. Apesar disso, o *team leader* tenta fazê-lo a cada 2-4 semanas.
 
-A nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org) que se resume ao seguinte:
->Dado um número de versão MAJOR.MINOR.PATCH, incremente a:
+O nome dado a cada versão segue o padrão ["*Semantic Versioning*"](semver.org) que se resume ao seguinte:
+> Dado um número de versão MAJOR.MINOR.PATCH, incremente a:
 
->- versão Maior(MAJOR): quando fizer mudanças incompatíveis na API,
-- versão Menor(MINOR): quando adicionar funcionalidades mantendo compatibilidade, e
-- versão de Correção(PATCH): quando corrigir falhas mantendo compatibilidade.
-Rótulos adicionais para pré-lançamento(pre-release) e metadados de construção(build) estão disponíveis como extensão ao formato MAJOR.MINOR.PATCH."
+>- versão maior (MAJOR):sempre que forem feitas mudanças incompatíveis na API;
+- versão menor (MINOR): quando forem adicionadas funcionalidades, mantendo compatibilidade;
+- versão de correção (PATCH): quando forem corrigidas falhas, mantendo compatibilidade.
 
+> Rótulos adicionais para pré-lançamento (*pre-release*) e meta-dados de construção (*build*) estão disponíveis como extensão ao formato MAJOR.MINOR.PATCH.
+
+<a name="group_contribution"/>
 ## Contribuição do Grupo
 
 André Machado: 2 horas
