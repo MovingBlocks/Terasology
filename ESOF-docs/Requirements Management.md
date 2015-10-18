@@ -7,6 +7,9 @@ New requirements are suggested by everyone who wants to, through the [suggestion
 
 In case the new requirement belongs to the game's core, the process is slightly different, mainly due to the fact that there are much more contributors involved in this part of the project. The sugestor starts by forking the project, and when he is finished coding the requirement, a pull request is issued. This method makes it possible for all the contributors to work on their part, without compromising the others' work and without the need to be constantly merging conflicts.
 
+###Requirements
+![Requirements diagram](UML Models/Requirements_Model.png)
+
 ####Use cases
 
 In order to clearly understand what an application is capable of doing and the requirements that may be deemed applicable, use cases should be listed.
