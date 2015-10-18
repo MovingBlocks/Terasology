@@ -24,7 +24,7 @@ To the project lead Cervator, *«the ideal setup»* to build up new requisits  wou
 
 
 in relation to the method used:
->As for the why to our process: well, it gives what little structure to the process we can apply without getting in the way of people wanting to do work  As noted often it gets short-cut when somebody is excited about a feature and shows up with it out of nowhere.
+>As for the why to our process: well, it gives what little structure to the process we can apply without getting in the way of people wanting to do work. (...)  As noted often it gets short-cut when somebody is excited about a feature and shows up with it out of nowhere.
 Cervator - Project lead
 
 As quoted above, the process used is the best-fit for this type of project because it allows everyone to give it's contribute and to work at his pace and at the same it's all organized and structured. On the other and it makes planning and estimating hard because the project is dependent of all conributors, which all work at their own way.
