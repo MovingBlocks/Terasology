@@ -11,12 +11,12 @@
 <a name="elicitation"/>
 ## Elicitação
 
-  O processo de evolução do projeto no que diz respeito a requesitos é bastante simples, envolvendo não só a equipa de desenvolvimento como a comunidade envolvente.
+  O processo de evolução do projeto no que diz respeito a requisitos é bastante simples, envolvendo não só a equipa de desenvolvimento como a comunidade envolvente.
 
-  Os *developers* associados ao projeto trabalham para implementar funcionalidades relacionadas com os requesitos estabelecidos ou para corrigir [*issues*](https://github.com/MovingBlocks/Terasology/issues) que estejam listadas no repositório do projeto.
+  Os *developers* associados ao projeto trabalham para implementar funcionalidades relacionadas com os requisitos estabelecidos ou para corrigir [*issues*](https://github.com/MovingBlocks/Terasology/issues) que estejam listadas no repositório do projeto.
  
- Para além dos requisitos pré-estabelecidos no início do desenvolvimento do projeto (provavelmente, a maior parte destes foi já cumprido), muitos vão sendo adicionados à medida que são sugeridos por contribuidores ou por membros da comunidade. O processo de adição de um novo requesito é o seguinte:
- - Quando uma pessoa tem uma ideia para um novo requesito/funcionalidade para o projeto, faz uma sugestão no [fórum de sugestões](http://forum.terasology.org/forum/suggestions.21/) do **Terasology**. Se, nesta altura, perceber que essa funcionalidade já foi proposta anteriormente nesse fórum, deve perceber o estado atual dela antes de decidir como proceder.
+ Para além dos requisitos pré-estabelecidos no início do desenvolvimento do projeto (provavelmente, a maior parte destes foi já cumprido), muitos vão sendo adicionados à medida que são sugeridos por contribuidores ou por membros da comunidade. O processo de adição de um novo requisito é o seguinte:
+ - Quando uma pessoa tem uma ideia para um novo requisito/funcionalidade para o projeto, faz uma sugestão no [fórum de sugestões](http://forum.terasology.org/forum/suggestions.21/) do **Terasology**. Se, nesta altura, perceber que essa funcionalidade já foi proposta anteriormente nesse fórum, deve perceber o estado atual dela antes de decidir como proceder.
  - Algum membro da comunidade (que pode ser o mesmo que fez a proposta de funcionalidade) faz uma estruturação preliminar da ideia no fórum, de forma a se perceber mais detalhes técnicos sobre a ideia em questão.
  - É possível que surja nesta fase inicial algum código elementar necessário para a ideia se tornar viável, sendo este código partilhado no fórum.
  - Quando a ideia ganha estrutura e viabilidade, move-se para o fórum de um dos [módulos do projeto](http://forum.terasology.org/forum/modules.55/). Se for para enriquecer o jogo a nível de apresentação, o fórum indicado será o [*Art forum*](http://forum.terasology.org/forum/art-media.25/). Se não, se for para ajudar na arquitetura na mecânica de jogo em si ou se for uma funcionalidade ao nível de bibliotecas, é encaminhado para o [*Core Projects forum*](http://forum.terasology.org/forum/core-projects.54/).
