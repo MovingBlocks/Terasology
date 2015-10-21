@@ -1,9 +1,10 @@
 4 Diagramas a apresentar no proximo relatorio
 1. Logical view
-	UML class diagram/component diagram
+	UML package  diagram
 2. Deployment/physical
-	UML deployment
+	UML diagram/component
 3.Process view
 	UML activity /state diagram
 4. Deployment view
-	ML Packege Diagram
+	UML Deployment Diagram
+5. 4+1 
