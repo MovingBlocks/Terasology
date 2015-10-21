@@ -15,8 +15,11 @@
  */
 package org.terasology.input;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
@@ -53,8 +56,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
@@ -190,6 +193,36 @@ public class InputSystem extends BaseComponentSystem {
         } else if (direction < 0) {
             mouseWheelUpBind = buttonLookup.get(bindId);
         }
+    }
+
+    /**
+     * Enumerates all active input bindings for a given binding.
+     * @param bindId the ID
+     * @return a list of keyboard/mouse inputs that trigger the binding.
+     */
+    public List<Input> getInputsForBindButton(SimpleUri bindId) {
+        List<Input> inputs = new ArrayList<>();
+        for (Entry<Integer, BindableButtonImpl> entry : keyBinds.entrySet()) {
+            if (entry.getValue().getId().equals(bindId)) {
+                inputs.add(InputType.KEY.getInput(entry.getKey()));
+            }
+        }
+
+        for (Entry<MouseInput, BindableButtonImpl> entry : mouseButtonBinds.entrySet()) {
+            if (entry.getValue().getId().equals(bindId)) {
+                inputs.add(entry.getKey());
+            }
+        }
+
+        if (mouseWheelUpBind.getId().equals(bindId)) {
+            inputs.add(MouseInput.WHEEL_UP);
+        }
+
+        if (mouseWheelDownBind.getId().equals(bindId)) {
+            inputs.add(MouseInput.WHEEL_DOWN);
+        }
+
+        return inputs;
     }
 
     public BindableAxis registerBindAxis(String id, BindableButton positiveButton, BindableButton negativeButton) {

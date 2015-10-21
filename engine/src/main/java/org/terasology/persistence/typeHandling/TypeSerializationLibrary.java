@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,11 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
-import org.terasology.persistence.GenericObject;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.GenericObjectHandler;
 import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ListTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
@@ -157,7 +155,6 @@ public class TypeSerializationLibrary {
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));
         serializationLibrary.add(IntegerRange.class, new IntegerRangeHandler());
-        serializationLibrary.add(GenericObject.class, new GenericObjectHandler());
         return serializationLibrary;
     }
 

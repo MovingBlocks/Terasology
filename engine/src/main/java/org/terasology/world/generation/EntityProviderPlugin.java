@@ -14,31 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence;
+package org.terasology.world.generation;
 
-import org.terasology.module.sandbox.API;
-import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.world.generator.plugin.WorldGeneratorPlugin;
 
 /**
- * Holds persisted data in raw form for later interpretation and conversion.
+ * A marker interface that combines {@link EntityProvider} and {@link WorldGeneratorPlugin}.
  */
-@API
-public class GenericObject {
-
-    private final PersistedData data;
-
-    /**
-     * @param data
-     */
-    public GenericObject(PersistedData data) {
-        this.data = data;
-    }
-
-    /**
-     * @return
-     */
-    public PersistedData getData() {
-        return data;
-    }
-
+public interface EntityProviderPlugin extends EntityProvider, WorldGeneratorPlugin {
+    // marker interface
 }

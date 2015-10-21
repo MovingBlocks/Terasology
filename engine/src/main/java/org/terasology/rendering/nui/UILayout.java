@@ -16,15 +16,21 @@
 package org.terasology.rendering.nui;
 
 /**
- * @author Immortius
+ * @param <T> the class type of the layout hint
  */
 public interface UILayout<T extends LayoutHint> extends UIWidget {
 
     /**
      * Adds a widget with an optional layout hint
      *
-     * @param element
+     * @param element the element to add
      * @param hint    A hint as to how the widget should be laid out - may be null (and null values should be handled).
      */
     void addWidget(UIWidget element, T hint);
+
+    /**
+     * Removes a widget from the layout.
+     * @param element the element to remove
+     */
+    void removeWidget(UIWidget element);
 }

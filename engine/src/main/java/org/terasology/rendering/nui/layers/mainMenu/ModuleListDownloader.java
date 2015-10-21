@@ -16,13 +16,7 @@
 
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
+import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.NetworkConfig;
@@ -31,7 +25,12 @@ import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 
-import com.google.gson.stream.JsonReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Downloads module meta-info from a given URL.
@@ -123,12 +122,6 @@ class ModuleListDownloader {
 
                 int count = modules.size();
                 status = String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries");
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    // ignore - this is just to create an animation anyway
-                }
             }
 
             reader.endArray();

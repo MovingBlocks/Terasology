@@ -211,7 +211,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         for (Vector3i pos : region.getCurrentRegion()) {
             Chunk chunk = getChunk(pos);
             if (chunk != null) {
-                region.chunkReady(chunk);
+                region.checkIfChunkIsRelevant(chunk);
             } else {
                 createOrLoadChunk(pos);
             }
@@ -300,9 +300,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));
                 }
                 worldEntity.send(new OnChunkLoaded(readyChunkInfo.getPos()));
-                for (ChunkRelevanceRegion region : regions.values()) {
-                    region.chunkReady(chunk);
-                }
             } finally {
                 chunk.writeUnlock();
             }
@@ -342,6 +339,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             nearCache.put(readyChunkInfo.getPos(), readyChunkInfo.getChunk());
             preparingChunks.remove(readyChunkInfo.getPos());
         }
+        updateRelevanceRegionsWithNewChunks(newReadyChunks);
         if (!newReadyChunks.isEmpty()) {
             sortedReadyChunks.addAll(newReadyChunks);
             Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
@@ -356,6 +354,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     loaded = true;
                 }
                 PerformanceMonitor.endActivity();
+            }
+        }
+    }
+
+    private void updateRelevanceRegionsWithNewChunks(List<ReadyChunkInfo> newReadyChunks) {
+        for (ReadyChunkInfo readyChunkInfo : newReadyChunks) {
+            for (ChunkRelevanceRegion region : regions.values()) {
+                region.checkIfChunkIsRelevant(readyChunkInfo.getChunk());
             }
         }
     }
@@ -479,9 +485,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             if (chunkRelevanceRegion.isDirty()) {
                 for (Vector3i pos : chunkRelevanceRegion.getNeededChunks()) {
                     Chunk chunk = nearCache.get(pos);
-                    if (chunk != null && chunk.isReady()) {
-                        chunkRelevanceRegion.chunkReady(chunk);
-                    } else if (chunk == null) {
+                    if (chunk != null) {
+                        chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
+                    } else{
                         createOrLoadChunk(pos);
                     }
                 }
