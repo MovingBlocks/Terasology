@@ -1,0 +1,32 @@
+# ESOF
+# RELATÓRIO 3 - *Architectural Design*
+## Terasology
+
+#### Introdução
+
+Neste relatótio iremos abordar o tema de *Architecture Design* em engenharia de *software*, e identificar
+os vários aspectos de organização que o sistema deste projecto engloba.
+
+*Architectural dsign* consiste na organização de um sistema de *software*, criando estruturas e decomentação
+para essas estruturas. Cada estrutura é composta por elementos de *software*, relações entre esses elementos e 
+propriedades entre esses elementos.
+
+
+
+##### Referências
+[Wikipédia](https://en.wikipedia.org/wiki/Software_architecture)
+
+[Fórum](http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/)
+ criado para o fim deste projecto pelo Organizador de Projectos do Terasology
+
+Slides das aulas teóricas
+
+#### Lista dos contribuidores 
+
+#####Grupo 6
+* Francisco Veiga
+* Paulo Peixoto
+* Vasco Pereira
+* Filipe Galvão
+
+###### FEUP 2016 MIEIC
