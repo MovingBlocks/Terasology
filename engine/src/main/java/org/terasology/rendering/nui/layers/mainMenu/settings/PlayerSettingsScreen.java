@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.engine.SimpleUri;
+import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -34,12 +37,15 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
 
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Martin Steiger
@@ -56,6 +62,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UIText nametext;
     private UISlider slider;
     private UIImage img;
+    private UIDropdown<Locale> language;
 
     @Override
     public void onOpened() {
@@ -66,6 +73,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         if (slider != null) {
             Color color = config.getPlayer().getColor();
             slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
+        }
+        if (language != null) {
+            language.setSelection(config.getSystem().getLocale());
         }
         updateImage();
     }
@@ -88,6 +98,15 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             slider.setIncrement(0.01f);
             Function<Object, String> constant = Functions.constant("  ");   // ensure a certain width
             slider.setLabelFunction(constant);
+        }
+
+        language = find("language", UIDropdown.class);
+        if (language != null) {
+            SimpleUri menuUri = new SimpleUri("engine:menu");
+            TranslationProject menuProject = translationSystem.getProject(menuUri);
+            List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
+            language.setOptions(Lists.newArrayList(locales));
+            language.setOptionRenderer(new LocaleRenderer(translationSystem));
         }
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
@@ -180,6 +199,10 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         config.getPlayer().setColor(color);
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText());
+        }
+        if (!config.getSystem().getLocale().equals(language.getSelection())) {
+            config.getSystem().setLocale(language.getSelection());
+            getManager().invalidate();
         }
     }
 

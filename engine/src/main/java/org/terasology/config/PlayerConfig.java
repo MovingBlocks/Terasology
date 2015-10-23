@@ -19,7 +19,7 @@ package org.terasology.config;
 import java.util.List;
 
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.layers.mainMenu.CieCamColors;
+import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
