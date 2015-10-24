@@ -16,8 +16,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
+
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.world.generation.Border3D;
 
 /**
