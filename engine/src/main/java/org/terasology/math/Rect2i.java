@@ -17,6 +17,8 @@ package org.terasology.math;
 
 import java.util.Iterator;
 
+import org.terasology.math.geom.Vector2i;
+
 /**
  * 2D Rectangle
  * @deprecated Use {@link org.terasology.math.geom.Rect2i} instead.
