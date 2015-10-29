@@ -4,12 +4,12 @@
 
 #### Introdução
 
-Neste relatótio iremos abordar o tema de *Architecture Design* em engenharia de *software*, e identificar
+Neste relatório iremos abordar o tema de *Architecture Design* em engenharia de *software*, e identificar
 os vários aspectos de organização que o sistema deste projecto engloba.
 
-*Architectural dsign* consiste na organização de um sistema de *software*, criando estruturas e decomentação
-para essas estruturas. Cada estrutura é composta por elementos de *software*, relações entre esses elementos e 
-propriedades entre esses elementos.
+*Architectural design* consiste na organização de um sistema de *software*, criando estruturas e documentação
+para essas estruturas. Cada estrutura é composta por elementos de *software*, as relações entre esses elementos e 
+propriedades entre os mesmos.
 
 
 
