@@ -7,6 +7,7 @@
 3. [Vista de Implementação](#implementationview)
 4. [Vista de Processo](#processview)
 5. [Vista de Distribuição](#deploymentview)
+6. [Contribuição do Grupo](#group_contribution)
 
 <a name="introduction"/>
 ## Introdução
@@ -27,3 +28,11 @@ Para isso, os responsáveis pelo projeto publicaram vários documentos e *thread
 
 <a name="deploymentview"/>
 ## Vista de Distribuição
+
+<a name="group_contribution"/>
+## Contribuição do Grupo
+
+ - [André Machado](https://github.com/andremachado94) (up201202865@fe.up.pt): 2 horas
+ - [André Lago](https://github.com/andrelago13) (up201303313@fe.up.pt): 2 horas
+ - [Gustavo Silva](https://github.com/gtugablue) (up201304143@fe.up.pt): 2 horas
+ - [Marina Camilo](https://github.com/Aniiram) (up201307722@fe.up.pt): 2 horas
