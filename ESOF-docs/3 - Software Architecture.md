@@ -16,6 +16,9 @@ Para isso, os responsáveis pelo projeto publicaram vários documentos e *thread
 
 É detalhada mais profundamente [nesta página](https://github.com/MovingBlocks/Terasology/wiki/Entity-System-Architecture) a arquitetura do sistema de entidades do jogo que é importante para programar módulos ou *resources* do jogo. Para além disso, [nesta página](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) é explicada em detalhe a importação do código dos diferentes módulos através da tecnologia [*Gradle*](http://gradle.org/).
 
+<a name="logicalview"/>
+## Vista Lógica
+
 <a name="implementationview"/>
 ## Vista de Implementação
 
