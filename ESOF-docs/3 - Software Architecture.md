@@ -17,6 +17,10 @@ Para isso, os responsáveis pelo projeto publicaram vários documentos e *thread
 
 É detalhada mais profundamente [nesta página](https://github.com/MovingBlocks/Terasology/wiki/Entity-System-Architecture) a arquitetura do sistema de entidades do jogo que é importante para programar módulos ou *resources* do jogo. Para além disso, [nesta página](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) é explicada em detalhe a importação do código dos diferentes módulos através da tecnologia [*Gradle*](http://gradle.org/).
 
+A nossa abordagem à arquitetura do *Terasology* será baseada no modelo de 4+1 vistas de arquitetura de software. As 4 vistas representam a vista lógica, vista de implementação, vista de processo e vista de distribuição, sendo que a vista adicional (+1) se trata da vista de casos de utilização, cujo diagrama foi já apresentado no [último relatório](https://github.com/andrelago13/Terasology/blob/master/ESOF-docs/2%20-%20Requirements%20Management.md) apresentado.
+
+Para além disso é necessário referir que nos vamos focar apenas no [*engine*](https://github.com/andrelago13/Terasology/tree/master/engine/src/main/java/org/terasology) do jogo porque esse era o propósito inicial do projeto e porque consideramos desnecessário fazer análise dos diferentes módulos existentes não só pela sua diversidade como pela sua "simplicidade" face ao *engine* em si.
+
 <a name="logicalview"/>
 ## Vista Lógica
 
