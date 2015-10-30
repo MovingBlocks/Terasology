@@ -2,7 +2,7 @@
     "id" : "CoreSampleGameplay",
     "version" : "0.54.4-SNAPSHOT",
     "displayName" : "Core Gameplay",
-    "description" : "This module introduces the core Terasology content",
+    "description" : "Minimal gameplay template. Little content but a few starting items.",
     "dependencies" :
     [
         {"id": "Core", "minVersion": "0.1.0", "maxVersion": "1.0.0"}
