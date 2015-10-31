@@ -33,6 +33,9 @@ Para além disso é necessário referir que nos vamos focar apenas no [*engine*]
 <a name="deploymentview"/>
 ## Vista de Distribuição
 
+O diagrama de distribuição em UML modela a distribuição física de artefatos em nós.
+![Terasology deployment diagram](/ESOF-docs/resources/deploymentdiagram.png)
+
 <a name="group_contribution"/>
 ## Contribuição do Grupo
 
