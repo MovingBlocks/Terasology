@@ -49,5 +49,7 @@ Component diagram describes how components are wired together to form larger com
 
 The following diagram represents our implementation view of the project:
 
+![Component diagram](https://github.com/dimamo5/Terasology/blob/Sergio/ESOF-DOCS/Software Architecture/images/component diagram v1.0.png)
+
 
 
