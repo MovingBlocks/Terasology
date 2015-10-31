@@ -16,14 +16,12 @@
 package org.terasology.registry;
 
 import org.terasology.context.Context;
-import org.terasology.module.sandbox.API;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
  *
  * @author Immortius
  */
-@API
 public final class CoreRegistry {
     private static Context context;
 
