@@ -18,7 +18,7 @@ package org.terasology.core.world.generator.worldGenerators;
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
-import org.terasology.core.world.generator.facetProviders.EnsureSpawnableChunkZeroProvider;
+import org.terasology.core.world.generator.facetProviders.PlateauProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinBaseSurfaceProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHillsAndMountainsProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
@@ -32,6 +32,10 @@ import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.spawner.FixedSpawner;
+import org.terasology.math.geom.ImmutableVector2i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
@@ -44,19 +48,29 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 @RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin", description = "Faceted world generator")
 public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
+    private final FixedSpawner spawner = new FixedSpawner(0, 0);
+
     public PerlinFacetedWorldGenerator(SimpleUri uri) {
         super(uri);
     }
-
 
     @In
     private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
 
     @Override
+    public Vector3f getSpawnPosition(EntityRef entity) {
+        return spawner.getSpawnPosition(getWorld(), entity);
+    }
+
+    @Override
     protected WorldBuilder createWorld() {
+        int seaLevel = 32;
+        ImmutableVector2i spawnPos = new ImmutableVector2i(0, 0); // as used by the spawner
+
         return new WorldBuilder(worldGeneratorPluginLibrary)
+                .setSeaLevel(seaLevel)
                 .addProvider(new World2dPreviewProvider())
-                .addProvider(new SeaLevelProvider())
+                .addProvider(new SeaLevelProvider(seaLevel))
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinSurfaceTemperatureProvider())
                 .addProvider(new PerlinBaseSurfaceProvider())
@@ -67,7 +81,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new DefaultFloraProvider())
                 .addProvider(new DefaultTreeProvider())
-                .addProvider(new EnsureSpawnableChunkZeroProvider())
+                .addProvider(new PlateauProvider(spawnPos, seaLevel + 4, 10, 30))
                         //.addRasterizer(new GroundRasterizer(blockManager))
                 .addRasterizer(new SolidRasterizer())
                 .addPlugins()
