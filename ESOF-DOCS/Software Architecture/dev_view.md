@@ -34,10 +34,12 @@ The engine (as well in most of the projects) it's the most important module, tha
 
 In this report we will work on the first 4 views given that the last view(+1) it's the Use Case View which has already been discussed on the previous report.
 
+<a name="Implementação"/>
 ## Implementation view
 
 This view is also known as the **development view** and illustrates the software components and their dependencies from a programmer's perspective concerning to the software management. It uses the UML Component diagram to show how the software is decomposed (into software components) for development.
 
+<a name="Component"/>
 ### Component Diagram
 
 Component diagram describes how components are wired together to form larger components and or software systems. 
@@ -50,6 +52,14 @@ Component diagram describes how components are wired together to form larger com
 The following diagram represents our implementation view of the project:
 
 ![Component diagram](https://github.com/dimamo5/Terasology/blob/Sergio/ESOF-DOCS/Software Architecture/images/component diagram v1.0.png)
+
+
+<a name="Conclusao"/>
+# Conclusion and critical analysis
+
+**(...)**
+
+In respect to the [Implementation view](#Implementação) it should be noted that the [component diagram](#Component) presented in that section it's our interpretation of the system decomposition into software components and it's subjective, therefore likely to have different views from other people analysis. Part of our interpretation was based on the analysis of the reverse engineering diagrams used to have a more accurate perspective of the project's architecture. 
 
 
 
