@@ -11,10 +11,60 @@ os vários aspectos de organização que o sistema deste projecto engloba.
 para essas estruturas. Cada estrutura é composta por elementos de *software*, as relações entre esses elementos e 
 propriedades entre os mesmos.
 
+#### *Architectural Design* do Terasology
+
+Alguns dos principais objectivos da arquitetura do terasology são:
+* Uma forte componente para supote de [*modding*](https://en.wikipedia.org/wiki/Mod_(video_gaming)), existindo um número de
+razões para tal:
+ * Evitar conflitos.
+ * Permitir a introdução de novas funcionakidades fora da *engine* (não havendo necessidade de alterar o ficheiro .jar).
+ * Permite *modding* sem codificação em java.
+ * Codificar em modulos de maneira a que seja fácil de usar, poderoso e fácil de conectar a sistemas existentes.
+ * Reseliente a erros e mudança. Um erro ocurrido num *mod* não deverá interrumper o funcionamento do jogo. Se um *mod*
+ for atualizado com componentes alterados, se exitirem *saves* não deveram sufrer roturas.
+ * Ser rasoavelmente seguro.
+ 
+* Separação entre as preocupações da *engine* e da lógica do jogo/*assets*. A *engine* deve-se preocupar com as *core features* 
+como *rendering*, som e *world support*. A lógica do jogo vem através dos modulos, o que significa que qualquer modulo pode ser 
+alterado para alcançar um objectivo diferente no jogo.
+
+#### Modelo de vistas 4 + 1
+
+Iremos usar o modelo de vistas 4 + 1, para descrever a organização deste projecto.
+
+* Vista Lógica
+* Vista de Implementação
+* Vista do Processo
+* Vista de *Deployment*
+* Vista de Casos de Utilização (foi entregue no 2º relatório)
+
+#### Vista Lógica
+A vista lógica mostra as abstrações-chave no sistema como
+objetos ou classes de objetos, ou seus *packages*.
+
+![Packages Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/packages.PNG)
+
+O *package* principal no Terasology é o *Engine* e todas as *facades* e *modules* dependem dele.
+O *core engine* está focado em recursos como: *Entity System*, *Renderimg*, *Physics*, etc.
+
+A maior peça de arquitetura da *engine* é a *Entity System* que é o motor de quase tudo no Terasology.
+
+Os outros *packages* são PC Facades e Core Module.
+
+A *engine* por si só não é executável. Precisa de ser executada num determinado contexto - *"facades"* (front-ends) fornecem 
+esse contexto. A mais basica de todas é a *"PC Facade"* que executa o jogo como uma aplicação nos diversos sitemas operativos.
+
+*"Mods"* são modificações feitas a um jogo pelo utilizador, os *modules* são um pouco mais fundamentais. *Modules* são
+*containers* para código e *assets* que podem ser usados por *game types*, *mods* ou outros conceitos de alto nível.
+
+*Modules* tem acesso a uma parte limitada da *engine* através da *Modding API*. 
+
+
+
 
 
 ##### Referências
-[Wikipédia](https://en.wikipedia.org/wiki/Software_architecture)
+[Wikipédia](https://en.wikipedia.org/wiki/4%2B1_architectural_view_model)
 
 [Fórum](http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/)
  criado para o fim deste projecto pelo Organizador de Projectos do Terasology
