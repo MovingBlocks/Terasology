@@ -93,10 +93,6 @@ public class BlockShapeImpl extends BlockShape {
         rollSymmetric = data.isRollSymmetric();
     }
 
-    @Override
-    protected void doDispose() {
-    }
-
     public CollisionShape getCollisionShape(Rotation rot) {
         Rotation simplifiedRot = applySymmetry(rot);
         CollisionShape result = collisionShape.get(simplifiedRot);

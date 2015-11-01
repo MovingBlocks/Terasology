@@ -50,10 +50,6 @@ public class Atlas extends Asset<AtlasData> {
             subtextures.put(subtextureUrn, entry.getValue());
         }
     }
-    @Override
-    protected void doDispose() {
-        subtextures.clear();
-    }
 
     public Optional<SubtextureData> getSubtexture(ResourceUrn name) {
         return Optional.ofNullable(subtextures.get(name));

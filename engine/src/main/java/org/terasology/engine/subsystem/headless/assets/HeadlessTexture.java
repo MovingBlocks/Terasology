@@ -33,10 +33,12 @@ public class HeadlessTexture extends Texture {
 
     private TextureData textureData;
     private int id;
-    private final List<Runnable> disposalListeners = Lists.newArrayList();
+    private final DisposalAction disposalAction;
 
     public HeadlessTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
         super(urn, assetType);
+        disposalAction = new DisposalAction();
+        getDisposalHook().setDisposeAction(disposalAction);
         reload(data);
         id = ID_COUNTER.getAndIncrement();
     }
@@ -73,12 +75,6 @@ public class HeadlessTexture extends Texture {
     @Override
     public TextureData getData() {
         return new TextureData(textureData);
-    }
-
-    @Override
-    protected void doDispose() {
-        disposalListeners.forEach(java.lang.Runnable::run);
-        this.textureData = null;
     }
 
     @Override
@@ -128,11 +124,21 @@ public class HeadlessTexture extends Texture {
 
     @Override
     public synchronized void subscribeToDisposal(Runnable subscriber) {
-        disposalListeners.add(subscriber);
+        disposalAction.disposalListeners.add(subscriber);
     }
 
     @Override
     public synchronized void unsubscribeToDisposal(Runnable subscriber) {
-        disposalListeners.remove(subscriber);
+        disposalAction.disposalListeners.remove(subscriber);
+    }
+
+    private static class DisposalAction implements Runnable {
+
+        private final List<Runnable> disposalListeners = Lists.newArrayList();
+
+        @Override
+        public void run() {
+            disposalListeners.forEach(java.lang.Runnable::run);
+        }
     }
 }

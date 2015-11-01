@@ -32,6 +32,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.internal.PrefabFormat;
+import org.terasology.entitySystem.stubs.ListOfObjectComponent;
 import org.terasology.entitySystem.stubs.MappedContainerComponent;
 import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -143,5 +144,12 @@ public class PrefabTest {
         MappedContainerComponent.Cont cont = mappedContainer.containers.iterator().next();
         assertNotNull(cont);
         assertEquals("a", cont.value);
+    }
+    @Test
+    public void prefabWithListOfMappedContainers() {
+        Prefab prefab = prefabManager.getPrefab("unittest:withListContainer");
+        ListOfObjectComponent mappedContainer = prefab.getComponent(ListOfObjectComponent.class);
+        assertEquals(2, mappedContainer.elements.size());
+        assertEquals("returnHome", mappedContainer.elements.get(1).id);
     }
 }

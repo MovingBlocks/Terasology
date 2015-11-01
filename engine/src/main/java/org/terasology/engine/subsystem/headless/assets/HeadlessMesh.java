@@ -40,11 +40,6 @@ public class HeadlessMesh extends Mesh {
     }
 
     @Override
-    protected void doDispose() {
-        data = null;
-    }
-
-    @Override
     public AABB getAABB() {
         return aabb;
     }

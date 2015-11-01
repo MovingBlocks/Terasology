@@ -129,5 +129,6 @@
     "water-reflections": "Water Reflections", 
     "water-reflections-global": "Global", 
     "water-reflections-sky": "Sky Only", 
-    "water-reflections-ssr": "SSR (experimental)"
+    "water-reflections-ssr": "SSR (experimental)",
+    "missing-name-message": "You must enter a name"
 }

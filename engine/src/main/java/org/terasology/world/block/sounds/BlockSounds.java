@@ -39,7 +39,9 @@ public class BlockSounds extends Asset<BlockSoundsData> {
 
     @Override
     protected void doReload(BlockSoundsData blockSoundsData) {
-        doDispose();
+        stepSounds.clear();
+        digSounds.clear();
+        destroySounds.clear();
         stepSounds.addAll(blockSoundsData.getStepSounds());
         digSounds.addAll(blockSoundsData.getDigSounds());
         destroySounds.addAll(blockSoundsData.getDestroySounds());
@@ -55,12 +57,5 @@ public class BlockSounds extends Asset<BlockSoundsData> {
 
     public List<StaticSound> getDestroySounds() {
         return Collections.unmodifiableList(destroySounds);
-    }
-
-    @Override
-    protected void doDispose() {
-        stepSounds.clear();
-        digSounds.clear();
-        destroySounds.clear();
     }
 }

@@ -122,7 +122,7 @@ public class StateLoading implements GameState {
 
         EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(true);
-        time.setGameTime(0);
+        time.setGameTime(gameManifest.getTime());
 
         context.get(Game.class).load(gameManifest);
         switch (netMode) {

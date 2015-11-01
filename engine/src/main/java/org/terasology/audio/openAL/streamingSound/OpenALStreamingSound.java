@@ -27,6 +27,7 @@ import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.engine.GameThread;
 
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 
@@ -39,21 +40,23 @@ public final class OpenALStreamingSound extends StreamingSound {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenALStreamingSound.class);
 
-    protected int[] buffers = new int[0];
-    protected int lastUpdatedBuffer;
-
     private final OpenALManager audioManager;
     private StreamingSoundData stream;
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
+    private InternalResources internalResources;
+    private int lastUpdatedBuffer;
+
     public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager) {
         super(urn, assetType);
+        this.internalResources = new InternalResources(urn, this);
         this.audioManager = audioManager;
+        getDisposalHook().setDisposeAction(internalResources);
         reload(data);
     }
 
     public int[] getBuffers() {
-        return this.buffers;
+        return this.internalResources.buffers;
     }
 
     public boolean updateBuffer(int buffer) {
@@ -75,15 +78,15 @@ public final class OpenALStreamingSound extends StreamingSound {
     }
 
     private void initializeBuffers() {
-        if (buffers.length == 0) {
-            buffers = new int[BUFFER_POOL_SIZE];
+        if (internalResources.buffers.length == 0) {
+            internalResources.buffers = new int[BUFFER_POOL_SIZE];
 
-            for (int i = 0; i < buffers.length; i++) {
-                buffers[i] = AL10.alGenBuffers();
+            for (int i = 0; i < internalResources.buffers.length; i++) {
+                internalResources.buffers[i] = AL10.alGenBuffers();
                 OpenALException.checkState("Creating buffer");
             }
 
-            this.lastUpdatedBuffer = buffers[0];
+            lastUpdatedBuffer = internalResources.buffers[0];
         }
     }
 
@@ -140,23 +143,39 @@ public final class OpenALStreamingSound extends StreamingSound {
         return Optional.of(new OpenALStreamingSound(copyUrn, parentAssetType, stream, audioManager));
     }
 
-    @Override
-    protected void doDispose() {
-        try {
-            GameThread.synch(() -> {
-                audioManager.purgeSound(this);
+    private static class InternalResources implements Runnable {
 
-                // TODO: Fix this - probably failing if sound is playing
-                for (int buffer : buffers) {
-                    if (buffer != 0) {
-                        AL10.alDeleteBuffers(buffer);
+        protected int[] buffers = new int[0];
+
+        private final ResourceUrn urn;
+        private final WeakReference<OpenALStreamingSound> asset;
+
+        public InternalResources(ResourceUrn urn, OpenALStreamingSound asset) {
+            this.urn = urn;
+            this.asset = new WeakReference<>(asset);
+        }
+
+        @Override
+        public void run() {
+            try {
+                GameThread.synch(() -> {
+                    OpenALStreamingSound sound = asset.get();
+                    if (sound != null) {
+                        sound.audioManager.purgeSound(sound);
                     }
-                }
-                OpenALException.checkState("Deleting buffer data");
-                buffers = new int[0];
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to dispose {}", getUrn(), e);
+
+                    // TODO: Fix this - probably failing if sound is playing
+                    for (int buffer : buffers) {
+                        if (buffer != 0) {
+                            AL10.alDeleteBuffers(buffer);
+                        }
+                    }
+                    OpenALException.checkState("Deleting buffer data");
+                    buffers = new int[0];
+                });
+            } catch (InterruptedException e) {
+                logger.error("Failed to dispose {}", urn, e);
+            }
         }
     }
 }

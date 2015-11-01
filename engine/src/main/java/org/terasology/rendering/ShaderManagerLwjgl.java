@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering;
 
+import com.google.common.collect.Sets;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
@@ -51,6 +52,7 @@ import org.terasology.rendering.shader.ShaderParametersSky;
 import org.terasology.rendering.shader.ShaderParametersSobel;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -66,6 +68,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
     private GLSLMaterial activeMaterial;
     private GLSLMaterial defaultShaderProgram;
     private GLSLMaterial defaultTexturedShaderProgram;
+
+    private Set<GLSLMaterial> progamaticShaders = Sets.newHashSet();
 
     public ShaderManagerLwjgl() {
         logger.info("Loading Terasology shader manager...");
@@ -176,6 +180,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         shader.get().recompile();
         GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn("engine:prog." + title), new MaterialData(shader.get()), Material.class);
         material.setShaderParameters(params);
+        progamaticShaders.add(material);
 
         return material;
     }

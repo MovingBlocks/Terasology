@@ -45,12 +45,6 @@ public class HeadlessSkeletalMesh extends SkeletalMesh {
     }
 
     @Override
-    protected void doDispose() {
-        data = null;
-    }
-
-
-    @Override
     public int getVertexCount() {
         return data.getVertexCount();
     }

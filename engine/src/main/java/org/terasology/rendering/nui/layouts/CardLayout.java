@@ -48,6 +48,14 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         widgets.put(id, widget);
     }
 
+    @Override
+    public void removeWidget(UIWidget widget) {
+        String id = widget.getId();
+        if (id != null) {
+            widgets.remove(id);
+        }
+    }
+
     public void setDisplayedCard(String id) {
         defaultCard = id;
     }

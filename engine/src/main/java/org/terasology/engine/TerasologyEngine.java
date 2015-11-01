@@ -423,6 +423,7 @@ public class TerasologyEngine implements GameEngine {
                     subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
                 }
             }
+            assetTypeManager.disposedUnusedAssets();
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");

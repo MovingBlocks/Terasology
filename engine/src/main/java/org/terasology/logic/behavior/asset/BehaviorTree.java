@@ -21,6 +21,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.module.sandbox.API;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ import java.util.List;
  *
  * @author synopia
  */
+@API
 public class BehaviorTree extends Asset<BehaviorTreeData> {
     private BehaviorTreeData data;
 
@@ -83,11 +85,6 @@ public class BehaviorTree extends Asset<BehaviorTreeData> {
     @Override
     protected void doReload(BehaviorTreeData newData) {
         this.data = newData;
-    }
-
-    @Override
-    protected void doDispose() {
-        this.data = null;
     }
 
     public RenderableNode createNode(Node node, BehaviorNodeFactory factory) {

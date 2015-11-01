@@ -42,11 +42,6 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    protected void doDispose() {
-        data = null;
-    }
-
-    @Override
     public boolean isRenderable() {
         return true;
     }

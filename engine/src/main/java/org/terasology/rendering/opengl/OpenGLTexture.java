@@ -28,7 +28,6 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,19 +37,17 @@ public class OpenGLTexture extends Texture {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLTexture.class);
 
-    private final LwjglGraphics graphicsManager;
-    private transient int id;
-    private transient LoadedTextureInfo loadedTextureInfo;
-    private final List<Runnable> disposalSubscribers = Lists.newArrayList();
+    private final TextureResources resources;
 
     public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, LwjglGraphics graphicsManager) {
         super(urn, assetType);
-        this.graphicsManager = graphicsManager;
+        this.resources = new TextureResources(graphicsManager);
+        getDisposalHook().setDisposeAction(resources);
         reload(data);
     }
 
     public void setId(int id) {
-        this.id = id;
+        resources.id = id;
     }
 
     @Override
@@ -83,84 +80,74 @@ public class OpenGLTexture extends Texture {
                 }
                 alignedBuffer.flip();
 
-                loadedTextureInfo = new LoadedTextureInfo(size, size, size, data);
+                resources.loadedTextureInfo = new LoadedTextureInfo(size, size, size, data);
 
-                if (id == 0) {
-                    graphicsManager.createTexture3D(alignedBuffer, getWrapMode(), getFilterMode(),
+                if (resources.id == 0) {
+                    resources.graphicsManager.createTexture3D(alignedBuffer, getWrapMode(), getFilterMode(),
                             size, (newId) -> {
                                 synchronized (this) {
-                                    if (id != 0) {
-                                        graphicsManager.disposeTexture(id);
+                                    if (resources.id != 0) {
+                                        resources.graphicsManager.disposeTexture(resources.id);
                                     }
                                     if (isDisposed()) {
-                                        graphicsManager.disposeTexture(newId);
+                                        resources.graphicsManager.disposeTexture(newId);
                                     } else {
-                                        id = newId;
-                                        logger.debug("Bound texture '{}' - {}", getUrn(), id);
+                                        resources.id = newId;
+                                        logger.debug("Bound texture '{}' - {}", getUrn(), resources.id);
                                     }
                                 }
                             });
                 } else {
-                    graphicsManager.reloadTexture3D(id, alignedBuffer, getWrapMode(), getFilterMode(), size);
+                    resources.graphicsManager.reloadTexture3D(resources.id, alignedBuffer, getWrapMode(), getFilterMode(), size);
                 }
                 break;
             default:
                 int width = data.getWidth();
                 int height = data.getHeight();
-                loadedTextureInfo = new LoadedTextureInfo(width, height, 1, data);
-                if (id == 0) {
-                    graphicsManager.createTexture2D(data.getBuffers(), getWrapMode(), getFilterMode(), width, height, (newId) -> {
+                resources.loadedTextureInfo = new LoadedTextureInfo(width, height, 1, data);
+                if (resources.id == 0) {
+                    resources.graphicsManager.createTexture2D(data.getBuffers(), getWrapMode(), getFilterMode(), width, height, (newId) -> {
                         synchronized (this) {
-                            if (id != 0) {
-                                graphicsManager.disposeTexture(id);
+                            if (resources.id != 0) {
+                                resources.graphicsManager.disposeTexture(resources.id);
                             }
                             if (isDisposed()) {
-                                graphicsManager.disposeTexture(newId);
+                                resources.graphicsManager.disposeTexture(newId);
                             } else {
-                                id = newId;
-                                logger.debug("Bound texture '{}' - {}", getUrn(), id);
+                                resources.id = newId;
+                                logger.debug("Bound texture '{}' - {}", getUrn(), resources.id);
                             }
                         }
                     });
                 } else {
-                    graphicsManager.reloadTexture2D(id, data.getBuffers(), getWrapMode(), getFilterMode(), width, height);
+                    resources.graphicsManager.reloadTexture2D(resources.id, data.getBuffers(), getWrapMode(), getFilterMode(), width, height);
                 }
                 break;
         }
     }
 
-    @Override
-    protected void doDispose() {
-        if (loadedTextureInfo != null) {
-            disposalSubscribers.forEach(java.lang.Runnable::run);
-            graphicsManager.disposeTexture(id);
-            loadedTextureInfo = null;
-            id = 0;
-        }
-    }
-
     public int getId() {
-        return id;
+        return resources.id;
     }
 
     @Override
     public int getDepth() {
-        if (loadedTextureInfo != null) {
-            return loadedTextureInfo.getDepth();
+        if (resources.loadedTextureInfo != null) {
+            return resources.loadedTextureInfo.getDepth();
         }
         return 0;
     }
 
     public int getWidth() {
-        if (loadedTextureInfo != null) {
-            return loadedTextureInfo.getWidth();
+        if (resources.loadedTextureInfo != null) {
+            return resources.loadedTextureInfo.getWidth();
         }
         return 0;
     }
 
     public int getHeight() {
-        if (loadedTextureInfo != null) {
-            return loadedTextureInfo.getHeight();
+        if (resources.loadedTextureInfo != null) {
+            return resources.loadedTextureInfo.getHeight();
         }
         return 0;
     }
@@ -171,16 +158,16 @@ public class OpenGLTexture extends Texture {
     }
 
     public Texture.WrapMode getWrapMode() {
-        return loadedTextureInfo.getWrapMode();
+        return resources.loadedTextureInfo.getWrapMode();
     }
 
     public FilterMode getFilterMode() {
-        return loadedTextureInfo.getFilterMode();
+        return resources.loadedTextureInfo.getFilterMode();
     }
 
     @Override
     public TextureData getData() {
-        return new TextureData(loadedTextureInfo.getTextureData());
+        return new TextureData(resources.loadedTextureInfo.getTextureData());
     }
 
     @Override
@@ -200,20 +187,20 @@ public class OpenGLTexture extends Texture {
 
     @Override
     public synchronized void subscribeToDisposal(Runnable subscriber) {
-        disposalSubscribers.add(subscriber);
+        resources.disposalSubscribers.add(subscriber);
     }
 
     @Override
     public synchronized void unsubscribeToDisposal(Runnable subscriber) {
-        disposalSubscribers.remove(subscriber);
+        resources.disposalSubscribers.remove(subscriber);
     }
 
     @Override
     public boolean isLoaded() {
-        return id != 0;
+        return resources.id != 0;
     }
 
-    private class LoadedTextureInfo {
+    private static class LoadedTextureInfo {
         private final int width;
         private final int height;
         private final int depth;
@@ -255,4 +242,27 @@ public class OpenGLTexture extends Texture {
         }
     }
 
+    private static class TextureResources implements Runnable {
+
+        private final LwjglGraphics graphicsManager;
+        private volatile int id;
+        private volatile LoadedTextureInfo loadedTextureInfo;
+
+        private final List<Runnable> disposalSubscribers = Lists.newArrayList();
+
+        public TextureResources(LwjglGraphics graphicsManager) {
+            this.graphicsManager = graphicsManager;
+        }
+
+
+        @Override
+        public void run() {
+            if (loadedTextureInfo != null) {
+                disposalSubscribers.forEach(java.lang.Runnable::run);
+                graphicsManager.disposeTexture(id);
+                loadedTextureInfo = null;
+                id = 0;
+            }
+        }
+    }
 }
