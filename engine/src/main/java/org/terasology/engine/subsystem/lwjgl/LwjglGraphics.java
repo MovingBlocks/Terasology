@@ -113,11 +113,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void initialise(GameEngine gameEngine, Context rootContext) {
+        logger.info("Starting initialization of LWJGL");
         this.engine = gameEngine;
         this.context = rootContext;
         this.config = context.get(Config.class).getRendering();
         lwjglDisplay = new LwjglDisplayDevice(context);
         context.put(DisplayDevice.class, lwjglDisplay);
+        logger.info("Initial initialization complete");
     }
 
     @Override
@@ -211,6 +213,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     private void initDisplay() {
+        logger.info("Initializing display");
         try {
             lwjglDisplay.setFullscreen(config.isFullscreen(), false);
 
@@ -259,6 +262,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     private void initOpenGL(Context currentContext) {
+        logger.info("Initializing OpenGL");
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
