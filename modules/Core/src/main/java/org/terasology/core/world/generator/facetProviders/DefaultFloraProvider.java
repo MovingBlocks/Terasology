@@ -15,10 +15,12 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
+
 import org.terasology.core.world.CoreBiome;
+import org.terasology.core.world.generator.facetProviders.PositionFilters;
+import org.terasology.core.world.generator.facetProviders.SurfaceObjectProvider;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.core.world.generator.rasterizers.FloraType;
@@ -36,8 +38,9 @@ import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * Determines where plants can be placed.  Will put plants one block above the surface if it is in the correct biome.
@@ -97,18 +100,24 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         BiomeFacet biomeFacet = region.getRegionFacet(BiomeFacet.class);
-        SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
         FloraFacet facet = new FloraFacet(region.getRegion(), region.getBorderForFacet(FloraFacet.class));
 
-        List<Predicate<Vector3i>> filters = Lists.newArrayList();
-
-        filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
-        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density));
-
+        List<Predicate<Vector3i>> filters = getFilters(region);
         populateFacet(facet, surface, biomeFacet, filters);
 
         region.setRegionFacet(FloraFacet.class, facet);
+    }
+
+    protected List<Predicate<Vector3i>> getFilters(GeneratingRegion region) {
+        List<Predicate<Vector3i>> filters = Lists.newArrayList();
+
+        SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
+        filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
+
+        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density));
+
+        return filters;
     }
 
     @Override
@@ -126,7 +135,7 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
         this.configuration = (DensityConfiguration) configuration;
     }
 
-    private static class DensityConfiguration implements Component {
+    protected static class DensityConfiguration implements Component {
         @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall flora density")
         private float density = 0.4f;
 

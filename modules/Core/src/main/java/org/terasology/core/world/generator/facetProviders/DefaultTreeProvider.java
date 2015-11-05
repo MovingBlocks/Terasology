@@ -15,9 +15,11 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
+import java.util.List;
+
 import org.terasology.core.world.CoreBiome;
+import org.terasology.core.world.generator.facetProviders.PositionFilters;
+import org.terasology.core.world.generator.facetProviders.SurfaceObjectProvider;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;
@@ -38,7 +40,8 @@ import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import java.util.List;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 
 /**
  * Determines where trees can be placed.  Will put trees one block above the surface.
@@ -84,13 +87,8 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         BiomeFacet biome = region.getRegionFacet(BiomeFacet.class);
-        SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
-        List<Predicate<Vector3i>> filters = Lists.newArrayList();
-
-        filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
-        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density * 0.05f));
-        filters.add(PositionFilters.flatness(surface, 1, 0));
+        List<Predicate<Vector3i>> filters = getFilters(region);
 
         // these value are derived from the maximum tree extents as
         // computed by the TreeTests class. Birch is the highest with 32
@@ -104,6 +102,20 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
         populateFacet(facet, surface, biome, filters);
 
         region.setRegionFacet(TreeFacet.class, facet);
+    }
+
+    protected List<Predicate<Vector3i>> getFilters(GeneratingRegion region) {
+        List<Predicate<Vector3i>> filters = Lists.newArrayList();
+
+        SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
+        filters.add(PositionFilters.minHeight(seaLevel.getSeaLevel()));
+
+        filters.add(PositionFilters.probability(densityNoiseGen, configuration.density * 0.05f));
+
+        SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
+        filters.add(PositionFilters.flatness(surface, 1, 0));
+
+        return filters;
     }
 
     @Override
@@ -121,7 +133,7 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
         this.configuration = (TreeProviderConfiguration) configuration;
     }
 
-    private static class TreeProviderConfiguration implements Component {
+    protected static class TreeProviderConfiguration implements Component {
         @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall tree density")
         private float density = 0.4f;
 
