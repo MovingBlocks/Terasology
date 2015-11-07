@@ -41,7 +41,7 @@ Iremos usar o modelo de vistas 4 + 1, para descrever a organização deste proje
 #### Vista Lógica
 A vista lógica mostra as abstrações-chave no sistema como
 objetos ou classes de objetos, ou seus *packages*.
-
+##### Diagrama de *packages*
 ![Packages Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/packages.PNG)
 
 O *package* principal no Terasology é o *Engine* e todas as *facades* e *modules* dependem dele.
@@ -61,8 +61,36 @@ esse contexto. A mais basica de todas é a *"PC Facade"* que executa o jogo como
 
 #### Vista de Implementação
 A vista de implementação mostra os componentes de *software* e as dependências entre eles.
-
+##### Diagrama de componentes
 ![Component Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/vista_implementacao.PNG)
+
+O *Entity System* é no Terasology o *core framework* para a lógica de jogo, sendo quase tudo no jogo uma *entity*.
+Este sistema foi escolhido pois fornece flexibilidade e suporte para extensão, e permite suporte para *mods* sem necessidade
+de escrita de código.
+
+A a maior parte das *Entity System* são definidas como interfaces sendo depois implementadas como um conjunto de classes.
+
+No *core* da *Entity System* temos *entities* ("objetos", que podemos identificar no jogo), uma *entity* por si só não faz nada,
+é apenas um contentor lógico para um ou mais *Components* (fornecem *data* e comportamento através da sua interação com *Systems*).
+
+Um *Component* é um conjunto de dados, com a intensão de ser usado para fornecer comportamentos, que pode ser ligado a uma 
+*entity*. Tipicamente um *component* é um objecto em Java com um conjunto de valores e funcionalidade minimal. Podem 
+existir metodos relacionados a dados, mas não deveram conter nenhuma lógica de jogo, isto deverá ser fornecido por *Systems*.
+
+Uma *entity* só pode ter no máximo um *Component* de um determinado tipo.
+
+*ComponentSystems*, ou *Systems*, fornecem comportamento as *entities*. Isto é feito de duas maneira:
+* Processando *entities* com um conjunto de *components* em resposta a uma chamada de um método.
+* Resposta a *entity events* mandados a *entities*
+
+Este sistema de *Entities* compostas por *Components* com *Systems* a fornecerem comportamento permitem flexibilidade
+e extensibilidade. Frequentemente novos comportamentos podem ser introduzidos através de novos *components* e *systems*.
+Um comportamento pode ser mudado removedo um *system* e colocar outro no seu lugar. E *entities* podem ser criadas através 
+de *components* existentes, sem escrever código.
+
+*Events* são um mecanismo usado que permite que *systems* interajam entre eles. *Events* são mandados as *entities*.
+A vantagem de usar *events* entre *systems* em vez de chamada a métodos, é que, desconecta *systems* e permite adicionar novos *systems* no futuro que reajam 
+ao mesmo *event*.
 
 #### Vista do Processo
 
