@@ -59,6 +59,17 @@ esse contexto. A mais basica de todas é a *"PC Facade"* que executa o jogo como
 
 *Modules* tem acesso a uma parte limitada da *engine* através da *Modding API*. 
 
+#### Vista de Implementação
+A vista de implementação mostra os componentes de *software* e as dependências entre eles.
+
+![Component Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/vista_implementacao.PNG)
+
+#### Vista do Processo
+
+#### Vista de *Deployment*
+
+#### Conclusão
+
 
 
 
@@ -75,8 +86,8 @@ Slides das aulas teóricas
 
 #####Grupo 6
 * Francisco Veiga
-* Paulo Peixoto
-* Vasco Pereira
-* Filipe Galvão
+* Paulo Peixoto (0 horas)
+* Vasco Pereira (0 horas)
+* Filipe Galvão (0 horas)
 
 ###### FEUP 2016 MIEIC
