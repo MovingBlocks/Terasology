@@ -234,9 +234,9 @@ Slides das aulas teóricas
 #### Lista dos contribuidores 
 
 #####Grupo 6
-* Francisco Veiga
-* Paulo Peixoto
-* Vasco Pereira
-* Filipe Galvão
+* Francisco Veiga (5 horas)
+* Paulo Peixoto (2 Horas)
+* Vasco Pereira (3 horas)
+* Filipe Galvão (1 hora)
 
 ###### FEUP 2016 MIEIC
