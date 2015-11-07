@@ -100,8 +100,9 @@ O design do projeto procura manter-se simples, tanto que os developers mais ativ
 
 #### Lista dos contribuidores 
 #####Grupo 6
-* Francisco Veiga
-* Paulo Peixoto
-* Vasco Pereira
+* Francisco Veiga (4 horas)
+* Paulo Peixoto (2 horas)
+* Vasco Pereira (1 hora)
+* Filipe Galvão (0 horas)
 
 ###### FEUP 2016 MIEIC
