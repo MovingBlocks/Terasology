@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -27,8 +28,8 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rect2f;
-import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;

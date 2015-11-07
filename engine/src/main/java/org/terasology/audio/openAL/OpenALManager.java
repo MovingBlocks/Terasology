@@ -272,7 +272,11 @@ public class OpenALManager implements AudioManager {
             if (!entry.getKey().isPlaying()) {
                 iterator.remove();
 
-                entry.getValue().onAudioEnd();
+                try {
+                    entry.getValue().onAudioEnd();
+                } catch (Exception e) {
+                    logger.error("onAudioEnd() notification failed for {}", entry.getValue(), e);
+                }
             }
         }
     }

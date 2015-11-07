@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import org.terasology.config.Config;
 import org.terasology.registry.In;

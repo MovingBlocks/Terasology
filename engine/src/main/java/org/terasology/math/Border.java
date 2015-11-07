@@ -17,6 +17,8 @@ package org.terasology.math;
 
 import java.util.Objects;
 
+import org.terasology.math.geom.Vector2i;
+
 /**
  * The size of a border, supporting independent widths on each side.
  * <br><br>

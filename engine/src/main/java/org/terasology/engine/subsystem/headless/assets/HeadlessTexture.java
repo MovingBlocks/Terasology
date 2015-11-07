@@ -16,11 +16,12 @@
 package org.terasology.engine.subsystem.headless.assets;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 

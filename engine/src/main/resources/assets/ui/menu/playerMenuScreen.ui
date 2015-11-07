@@ -72,6 +72,14 @@
                                     "id" : "image"
                                 }
                             ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#settings-language}:"
+                        },
+                        {
+                            "type": "UIDropdown",
+                            "id": "language"
                         }
                     ]
                 },
