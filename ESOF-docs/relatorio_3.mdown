@@ -17,10 +17,10 @@ Alguns dos principais objectivos da arquitetura do terasology são:
 * Uma forte componente para supote de [*modding*](https://en.wikipedia.org/wiki/Mod_(video_gaming)), existindo um número de
 razões para tal:
  * Evitar conflitos.
- * Permitir a introdução de novas funcionakidades fora da *engine* (não havendo necessidade de alterar o ficheiro .jar).
+ * Permitir a introdução de novas funcionalidades fora da *engine* (não havendo necessidade de alterar o ficheiro .jar).
  * Permite *modding* sem codificação em java.
  * Codificar em modulos de maneira a que seja fácil de usar, poderoso e fácil de conectar a sistemas existentes.
- * Reseliente a erros e mudança. Um erro ocurrido num *mod* não deverá interrumper o funcionamento do jogo. Se um *mod*
+ * Resiliente a erros e mudança. Um erro ocurrido num *mod* não deverá interrumper o funcionamento do jogo. Se um *mod*
  for atualizado com componentes alterados, se exitirem *saves* não deveram sufrer roturas.
  * Ser rasoavelmente seguro.
  
@@ -39,9 +39,10 @@ Iremos usar o modelo de vistas 4 + 1, para descrever a organização deste proje
 * Vista de Casos de Utilização (foi entregue no 2º relatório)
 
 #### Vista Lógica
-A vista lógica mostra as abstrações-chave no sistema como
-objetos ou classes de objetos, ou seus *packages*.
 ##### Diagrama de *packages*
+Mostra as abstrações-chave no sistema como
+objetos ou classes de objetos, ou seus *packages*.
+
 ![Packages Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/packages.PNG)
 
 O *package* principal no Terasology é o *Engine* e todas as *facades* e *modules* dependem dele.
@@ -60,8 +61,9 @@ esse contexto. A mais basica de todas é a *"PC Facade"* que executa o jogo como
 *Modules* tem acesso a uma parte limitada da *engine* através da *Modding API*. 
 
 #### Vista de Implementação
-A vista de implementação mostra os componentes de *software* e as dependências entre eles.
 ##### Diagrama de componentes
+Mostra os componentes de *software* e as dependências entre eles.
+
 ![Component Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/vista_implementacao.PNG)
 
 O *Entity System* é no Terasology o *core framework* para a lógica de jogo, sendo quase tudo no jogo uma *entity*.
@@ -95,6 +97,11 @@ ao mesmo *event*.
 #### Vista do Processo
 
 #### Vista de *Deployment*
+##### Diagrama de *Deployment*
+Mostra *harware nodes*, relações de comunicação e *software artifacts* implementados neles.
+
+![Deployment Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/deployment_diagram.PNG)
+
 
 #### Conclusão
 
