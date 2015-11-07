@@ -102,11 +102,15 @@ Mostra *harware nodes*, relações de comunicação e *software artifacts* imple
 
 ![Deployment Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/deployment_diagram.PNG)
 
+Este diagrama mostra as relações de comunicação entre *harware*, e *software* implementados neles.
+
+Como já tinhamos descrito no relatório anterior além do modo de *single plyer* também é posivél a ligação a outros Pc's, para 
+jogar em rede, podendo ser qualque um dos despositivos ligados à rede o servidor local.
+
+Também é possível jogar o terasology no PC do utilizador através do web browser.
+
 
 #### Conclusão
-
-
-
 
 
 ##### Referências
