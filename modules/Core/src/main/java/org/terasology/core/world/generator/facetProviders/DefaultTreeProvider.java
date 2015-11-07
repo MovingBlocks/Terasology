@@ -55,7 +55,7 @@ import com.google.common.collect.Lists;
 public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenerator> implements ConfigurableFacetProvider {
 
     private Noise densityNoiseGen;
-    private TreeProviderConfiguration configuration = new TreeProviderConfiguration();
+    private Configuration configuration = new Configuration();
 
     public DefaultTreeProvider() {
         register(CoreBiome.MOUNTAINS, Trees.oakTree(), 0.04f);
@@ -74,6 +74,14 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
         register(CoreBiome.PLAINS, Trees.oakTree(), 0.02f);
 
         register(CoreBiome.DESERT, Trees.cactus(), 0.04f);
+    }
+
+    /**
+     * @param configuration the default configuration to use
+     */
+    public DefaultTreeProvider(Configuration configuration) {
+        this();
+        this.configuration = configuration;
     }
 
     @Override
@@ -130,12 +138,11 @@ public class DefaultTreeProvider extends SurfaceObjectProvider<Biome, TreeGenera
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (TreeProviderConfiguration) configuration;
+        this.configuration = (Configuration) configuration;
     }
 
-    protected static class TreeProviderConfiguration implements Component {
+    public static class Configuration implements Component {
         @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall tree density")
-        private float density = 0.4f;
-
+        public float density = 0.2f;
     }
 }

@@ -56,7 +56,7 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
 
     private Noise densityNoiseGen;
 
-    private DensityConfiguration configuration = new DensityConfiguration();
+    private Configuration configuration = new Configuration();
 
     private Map<FloraType, Float> typeProbs = ImmutableMap.of(
             FloraType.GRASS, 0.85f,
@@ -87,6 +87,14 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
         register(CoreBiome.BEACH, FloraType.FLOWER, 0);
         register(CoreBiome.DESERT, FloraType.MUSHROOM, 0);
         register(CoreBiome.SNOW, FloraType.MUSHROOM, 0);
+    }
+
+    /**
+     * @param configuration the default configuration to use
+     */
+    public DefaultFloraProvider(Configuration configuration) {
+        this();
+        this.configuration = configuration;
     }
 
     @Override
@@ -132,13 +140,12 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (DensityConfiguration) configuration;
+        this.configuration = (Configuration) configuration;
     }
 
-    protected static class DensityConfiguration implements Component {
+    public static class Configuration implements Component {
         @Range(min = 0, max = 1.0f, increment = 0.05f, precision = 2, description = "Define the overall flora density")
-        private float density = 0.4f;
-
+        public float density = 0.4f;
     }
 
 }

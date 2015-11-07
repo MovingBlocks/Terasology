@@ -41,6 +41,17 @@ public class PerlinHumidityProvider implements ConfigurableFacetProvider {
 
     private long seed;
 
+    public PerlinHumidityProvider() {
+        // use default values
+    }
+
+    /**
+     * @param config the config to use
+     */
+    public PerlinHumidityProvider(Configuration config) {
+        this.config = config;
+    }
+
     @Override
     public void setSeed(long seed) {
         this.seed = seed;
@@ -83,11 +94,11 @@ public class PerlinHumidityProvider implements ConfigurableFacetProvider {
         humidityNoise = new SubSampledNoise(brown, scale, SAMPLE_RATE);
     }
 
-    private static class Configuration implements Component {
+    public static class Configuration implements Component {
         @Range(min = 0, max = 10.0f, increment = 1f, precision = 0, description = "The number of noise octaves")
-        private int octaves = 8;
+        public int octaves = 8;
 
         @Range(min = 0.01f, max = 5f, increment = 0.01f, precision = 2, description = "The noise scale")
-        private float scale = 0.05f;
+        public float scale = 0.05f;
     }
 }
