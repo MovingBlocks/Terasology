@@ -1,6 +1,6 @@
 #Software Architecture
 
-### Introduction
+## Introduction
 
 The aim of this report is to describe some aspects regarding Terasology's software architecture, following the 4+1 view model.
 
@@ -24,7 +24,7 @@ The game logic (which depends on the physics package) deal with the game logic a
 
 In our opinion, this approach is a correct one because each functionality is independent from the others, which means that each can be worked on easily without compromising the other packages.
 
-### Implementation View
+## Implementation View
 
 The implementation view (also known as development view) focuses on decomposing software into components (program libraries, or subsystems) that are then developed by a small number of developers. These components are split into a hierarchy of layers, with the higher layers depending from the lower layers. The following component diagram depicts Terasology's layer hierarchy and dependencies:
 
@@ -38,7 +38,7 @@ During the game, the engine communicates with its core to send to the game compo
 
 In our opinion, this is an optimal approach since, as said, new modules can be added without compromising the entire system. This approach also allows each part of the system to be easily improved.
 
-### Deployment View
+## Deployment View
 
 The deployment view (also know as the physical view) takes into account more hardware-related requirements of the system, such as availability, reliabilty, performance and scalability. The development view is concerned not only with the computational resources (depicted as nodes) and the connections between them, but also with the manifestation of said computational resources, in the form of artifacts. The following deployment diagram shows these connections regarding Terasology:
 
@@ -50,7 +50,7 @@ Terasology is a computer game, which means that a PC is required in order to pla
 
 Terasology supports multiplayer. This is supported through two ways: Through a local server or through a dedicated server. A local server is a server hosted by one of the players, and the others can connect through LAN to the local server. A dedicated server is a device exlusively dedicated to hosting the server, to which the other players connect through the Internet.  
 
-### Process View
+## Process View
 
 The process view, acts as a linking bridge between de development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view may be viewed as set of independently executing programs, each of them consisting in a group of tasks forming an executable unit (in other words, a process). The following analysis diagram depicts this in a sequential manner.
 
@@ -61,3 +61,7 @@ The process view, acts as a linking bridge between de development and logical vi
 The game starts by initializing its engine, which will be held responsible for communicating with all the game components, like the audio, network and the game entities. After the engine is initialized, the game initializes the main menu GUI, in which the user will select the game mode he wants to play and modules he wants the use (among other things, like changing the settings or quitting the game). These modules are also requested by the engine to the module loader, which will then import the selected ones and send their code to the engine.
 
 With all the required steps done, the game will start. The engine will take control of the game cycle, receiving information from the components, and sending them to the game, with which the user will interact. From the game, one can return to the main menu (and restart the cycle) or leave the game, ending the process. 
+
+## Conclusion
+
+The architectural approach taken by the Terasology developers is correct, since it allows them to easily add new features and modify existing ones without compromising the whole system. The information provided deemed enough in order to create the diagrams, and studying Terasology helped us consolidate and enlarge our knowledge regarding the 4+1 view model.
