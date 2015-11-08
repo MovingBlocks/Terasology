@@ -65,7 +65,7 @@ The **game engine** represents the main process which initiates the game and cal
 <a name="Conclusao"/>
 # Conclusion and critical analysis
 
-**(...)**
+To sum up, it is relevant to conclude that the game itself works in a efficient way although there is room for improvement. After exploring the architecture of Terasology, it is noticeable the impact of each piece in such a high level project. Actually, we have learned that it is far harder to organize such a project and if the planning is not done right then the project will never be functional.
 
 In respect to the [Implementation view](#Implementação) it should be noted that the [component diagram](#Component) presented in that section it's our interpretation of the system decomposition into software components and it's subjective, therefore likely to have different views from other people analysis. Part of our interpretation was based on the analysis of the reverse engineering diagrams used to have a more accurate perspective of the project's architecture. 
 
