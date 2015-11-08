@@ -32,7 +32,9 @@ The implementation view (also known as development view) focuses on decomposing 
 
 #### Interpretation
 
-The game interacts with the engine through an interface made available by the engine. The engine deals with everything else. The user, in the game settings, defines which modules they want to be loaded. After that, the engine asks the module loader for those modules, using an interface made available by the module loader. Each of these modules contains a feature, meaning that any features that are added to the game do not put in danger the program functionality. The module loader then makes those modules available to the engine, then being those modules passed by the engine to the game.During the game, the engine communicates with its core to send to the game component the information regarding the world, entities, configurations, audio, etc.
+The game interacts with the engine through an interface made available by the engine. The engine deals with everything else. The user, in the game settings, defines which modules they want to be loaded. After that, the engine asks the module loader for those modules, using an interface made available by the module loader. Each of these modules contains a feature, meaning that any features that are added to the game do not put in danger the program functionality. The module loader then makes those modules available to the engine, then being those modules passed by the engine to the game.
+
+During the game, the engine communicates with its core to send to the game component the information regarding the world, entities, configurations, audio, etc.
 
 In our opinion, this is an optimal approach since, as said, new modules can be added without compromising the entire system. This approach also allows each part of the system to be easily improved.
 
@@ -42,7 +44,9 @@ The deployment view (also know as the physical view) takes into account more har
 
 ![Deployment Diagram](UML Models/Deployment_Diagram.png)
 
-[Inserir interpretação do diagrama de desdobramento aqui]
+#### Interpretation
+
+Terasology is a computer game, which means that a PC is required in order to play the game. Being developed in Java, it requires either the Java Runtime Environment or the Java Development Kit, more specifically, version 1.7 or higher. Regarding the OS, any operative system that can run Java 7 or higher is sufficient to play the game. A list of the OS's that run Java can be found [here](https://blogs.oracle.com/henrik/entry/supported_platforms_for_jdk_7). 
 
 ### Process View
 
