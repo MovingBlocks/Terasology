@@ -26,7 +26,7 @@ The game logic (which depends on the physics package) deal with the game logic a
 
 The implementation view (also known as development view) focuses on decomposing software into components (program libraries, or subsystems) that are then developed by a small number of developers. These components are split into a hierarchy of layers, with the higher layers depending from the lower layers. The following component diagram depicts Terasology's layer hierarchy and dependencies:
 
-[Inserir diagrama de componentes aqui]
+![Package Diagram](UML Models/Component_Diagram.png)
 
 [Inserir interpretação do diagrama de componentes aqui]
 
@@ -34,7 +34,7 @@ The implementation view (also known as development view) focuses on decomposing 
 
 The deployment view (also know as the physical view) takes into account more hardware-related requirements of the system, such as availability, reliabilty, performance and scalability. The development view is concerned not only with the computational resources (depicted as nodes) and the connections between them, but also with the manifestation of said computational resources, in the form of artifacts. The following deployment diagram shows these connections regarding Terasology:
 
-[Inserir diagrama de desdobramento aqui]
+![Package Diagram](UML Models/Deployment_Diagram.png)
 
 [Inserir interpretação do diagrama de desdobramento aqui]
 
