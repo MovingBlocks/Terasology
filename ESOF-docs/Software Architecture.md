@@ -8,9 +8,9 @@ Said model is split into four views, the logical view (accompanied by a package 
 
 All these views are linked through the use case view (the +1), whose diagram was developed in the last report.
 
-### Logical View 
+## Logical View 
 
-The logical view mainly focuses on the functional requirements and what the system (in another words, Terasology as a whole) should provide to its users. With this in mind, the system is decomposed in several abstractions and depicted as packages, object and object classes. The following package diagram describes this decomposition:
+The logical view mainly focuses on the functional requirements and what the system (in another words, Terasology as a whole) should provide to its users. With this in mind, the system is decomposed in several abstractions and depicted as packages. The following package diagram describes this decomposition:
 
 <center> ![Package Diagram](UML Models/Package_Diagram.png) </center>
 
@@ -52,7 +52,7 @@ Terasology supports multiplayer. This is supported through two ways: Through a l
 
 ## Process View
 
-The process view, acts as a linking bridge between de development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view may be viewed as set of independently executing programs, each of them consisting in a group of tasks forming an executable unit (in other words, a process). The following analysis diagram depicts this in a sequential manner.
+The process view, acts as a linking bridge between the development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view depicts this in a sequential manner, describing the system from the beggining of its execution to the end.
 
 ![Activity Diagram](UML Models/Activity_Diagram.png)
 
