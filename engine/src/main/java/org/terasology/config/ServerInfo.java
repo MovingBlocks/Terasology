@@ -18,8 +18,6 @@ package org.terasology.config;
 
 import com.google.common.base.Preconditions;
 
-import java.util.Optional;
-
 
 /**
  * @author Immortius
@@ -29,7 +27,7 @@ public class ServerInfo {
     private String address;
     private String owner;
     private int port;
-    private boolean active;
+    private boolean active = true;
 
     ServerInfo() {
         // for serialization purposes
