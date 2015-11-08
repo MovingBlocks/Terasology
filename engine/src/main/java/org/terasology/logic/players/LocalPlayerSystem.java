@@ -33,7 +33,6 @@ import org.terasology.input.binds.movement.StrafeMovementAxis;
 import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
@@ -51,7 +50,6 @@ import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -75,8 +73,6 @@ import org.terasology.world.block.regions.BlockRegionComponent;
 public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
     @In
     private LocalPlayer localPlayer;
-    @In
-    private CameraTargetSystem cameraTargetSystem;
     @In
     private WorldProvider worldProvider;
     private Camera playerCamera;
@@ -108,6 +104,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
+
+    private AABB aabb;
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -235,17 +233,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @Override
-    public void renderOverlay() {
-        // TODO: Don't render if not in first person?
-        // Display the block the player is aiming at
-        if (config.getRendering().isRenderPlacingBox()) {
-            EntityRef target = cameraTargetSystem.getTarget();
-            Vector3i blockPos = cameraTargetSystem.getTargetBlockPosition();
-            AABB aabb = null;
+    @ReceiveEvent
+    public void onTargetChanged(PlayerTargetChangedEvent event, EntityRef entity) {
+        EntityRef target = event.getNewTarget();
+        if (target.exists()) {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
             if (blockComp != null || blockRegion != null) {
+                Vector3f blockPos = target.getComponent(LocationComponent.class).getWorldPosition();
                 Block block = worldProvider.getBlock(blockPos);
                 aabb = block.getBounds(blockPos);
             } else {
@@ -256,6 +251,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                     aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
                 }
             }
+        } else {
+            aabb = null;
+        }
+    }
+
+    @Override
+    public void renderOverlay() {
+        // Display the block the player is aiming at
+        if (config.getRendering().isRenderPlacingBox()) {
             if (aabb != null) {
                 aabbRenderer.setAABB(aabb);
                 aabbRenderer.render(2f);
