@@ -52,7 +52,7 @@ Terasology supports multiplayer. This is supported through two ways: Through a l
 
 ## Process View
 
-The process view, acts as a linking bridge between the development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view depicts this in a sequential manner, describing the system from the beggining of its execution to the end.
+The process view, acts as a linking bridge between the development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view depicts this in a sequential manner, describing the system from the beggining of its execution to the end. We can see this in the following activity diagram:
 
 ![Activity Diagram](UML Models/Activity_Diagram.png)
 
