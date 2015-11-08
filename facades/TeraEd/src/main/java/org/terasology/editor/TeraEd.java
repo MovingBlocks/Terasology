@@ -15,7 +15,10 @@
  */
 package org.terasology.editor;
 
-import com.google.common.collect.Lists;
+import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
+import javax.swing.UIManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.properties.SceneProperties;
@@ -25,15 +28,12 @@ import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.TerasologyEngineBuilder;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglPortlet;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import javax.swing.*;
-import java.util.Collection;
 
 /**
  * TeraEd main class.

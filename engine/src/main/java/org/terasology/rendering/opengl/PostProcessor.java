@@ -25,17 +25,16 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.ByteBuffer;
-import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -79,25 +78,25 @@ public class PostProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
 
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposure = 8.0f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposureNight = 8.0f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float hdrMinExposure = 1.0f;
-    @EditorRange(min = 0.0f, max = 4.0f)
+    @Range(min = 0.0f, max = 4.0f)
     private float hdrTargetLuminance = 1.0f;
-    @EditorRange(min = 0.0f, max = 0.5f)
+    @Range(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
-    @EditorRange(min = 0.0f, max = 5.0f)
+    @Range(min = 0.0f, max = 5.0f)
     private float bloomHighPassThreshold = 0.75f;
-    @EditorRange(min = 0.0f, max = 32.0f)
+    @Range(min = 0.0f, max = 32.0f)
     private float bloomBlurRadius = 12.0f;
 
-    @EditorRange(min = 0.0f, max = 16.0f)
+    @Range(min = 0.0f, max = 16.0f)
     private float overallBlurRadiusFactor = 0.8f;
 
     private float currentExposure = 2.0f;
