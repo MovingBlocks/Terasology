@@ -56,4 +56,8 @@ The process view, acts as a linking bridge between de development and logical vi
 
 ![Activity Diagram](UML Models/Activity_Diagram.png)
 
-[Inserir interpretação do diagrama de análise aqui]
+#### Interpretation
+
+The game starts by initializing its engine, which will be held responsible for communicating with all the game components, like the audio, network and the game entities. After the engine is initialized, the game initializes the main menu GUI, in which the user will select the game mode he wants to play and modules he wants the use (among other things, like changing the settings or quitting the game). These modules are also requested by the engine to the module loader, which will then import the selected ones and send their code to the engine.
+
+With all the required steps done, the game will start. The engine will take control of the game cycle, receiving information from the components, and sending them to the game, with which the user will interact. From the game, one can return to the main menu (and restart the cycle) or leave the game, ending the process. 
