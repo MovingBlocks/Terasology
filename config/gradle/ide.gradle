@@ -80,8 +80,8 @@ ext {
         // Set Terasology "facades" to use Git (except the bundled "PC" facade - that's covered by the root project)
         rootProject.project(':facades').childProjects.each { child ->
 
-            if (child.value.path == ':facades:PC') {
-                println "Skipping IntelliJ Git setup for 'PC' facade (internal)"
+            if (child.value.path == ':facades:PC' || child.value.path == ':facades:TeraEd') {
+                println "Skipping IntelliJ Git setup for 'PC' or 'TeraEd' facade (internal)"
             } else {
                 println "Preparing IntelliJ Git setup for facade $child.value.name"
                 vcsMappings.appendNode('mapping', [
@@ -390,6 +390,38 @@ ext {
               <option name="ENV_VARIABLES"/>
               <option name="PASS_PARENT_ENVS" value="true"/>
               <module name="PC"/>
+              <envs/>
+              <RunnerSettings RunnerId="Debug">
+                <option name="DEBUG_PORT" value=""/>
+                <option name="TRANSPORT" value="0"/>
+                <option name="LOCAL" value="true"/>
+              </RunnerSettings>
+              <RunnerSettings RunnerId="Run"/>
+              <ConfigurationWrapper RunnerId="Debug"/>
+              <ConfigurationWrapper RunnerId="Run"/>
+              <method/>
+            </configuration>
+        '''))
+
+        // Run config for TeraEd
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="TeraEd (rendering editor)" type="Application" factoryName="Application">
+              <extension name="coverage" enabled="false" merge="false" runner="idea">
+                <pattern>
+                  <option name="PATTERN" value="org.terasology.editor.TeraEd.*"/>
+                  <option name="ENABLED" value="true"/>
+                </pattern>
+              </extension>
+              <option name="MAIN_CLASS_NAME" value="org.terasology.editor.TeraEd"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="PROGRAM_PARAMETERS" value="-homedir"/>
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
+              <option name="ALTERNATIVE_JRE_PATH" value=""/>
+              <option name="ENABLE_SWING_INSPECTOR" value="false"/>
+              <option name="ENV_VARIABLES"/>
+              <option name="PASS_PARENT_ENVS" value="true"/>
+              <module name="TeraEd"/>
               <envs/>
               <RunnerSettings RunnerId="Debug">
                 <option name="DEBUG_PORT" value=""/>
