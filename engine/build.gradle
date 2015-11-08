@@ -98,8 +98,7 @@ dependencies {
     compile group: 'io.netty', name: 'netty', version: '3.10.4.Final'
 
     // Java magic
-    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
-    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'jna-platform', version: '4.2.1'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
     compile group: 'org.javassist', name: 'javassist', version: '3.20.0-GA'
     compile group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.0'
