@@ -22,19 +22,25 @@ During game execution, information flows between the packages. Again, most of th
 
 The game logic (which depends on the physics package) deal with the game logic and are used by the world and entitySystem packages, for example, for calculating gravity effect on the world and entities' elements.
 
+In our opinion, this approach is a correct one because each functionality is independent from the others, which means that each can be worked on easily without compromising the other packages.
+
 ### Implementation View
 
 The implementation view (also known as development view) focuses on decomposing software into components (program libraries, or subsystems) that are then developed by a small number of developers. These components are split into a hierarchy of layers, with the higher layers depending from the lower layers. The following component diagram depicts Terasology's layer hierarchy and dependencies:
 
-![Package Diagram](UML Models/Component_Diagram.png)
+![Component Diagram](UML Models/Component_Diagram.png)
 
-[Inserir interpretação do diagrama de componentes aqui]
+#### Interpretation
+
+The game interacts with the engine through an interface made available by the engine. The engine deals with everything else. The user, in the game settings, defines which modules they want to be loaded. After that, the engine asks the module loader for those modules, using an interface made available by the module loader. Each of these modules contains a feature, meaning that any features that are added to the game do not put in danger the program functionality. The module loader then makes those modules available to the engine, then being those modules passed by the engine to the game.During the game, the engine communicates with its core to send to the game component the information regarding the world, entities, configurations, audio, etc.
+
+In our opinion, this is an optimal approach since, as said, new modules can be added without compromising the entire system. This approach also allows each part of the system to be easily improved.
 
 ### Deployment View
 
 The deployment view (also know as the physical view) takes into account more hardware-related requirements of the system, such as availability, reliabilty, performance and scalability. The development view is concerned not only with the computational resources (depicted as nodes) and the connections between them, but also with the manifestation of said computational resources, in the form of artifacts. The following deployment diagram shows these connections regarding Terasology:
 
-![Package Diagram](UML Models/Deployment_Diagram.png)
+![Deployment Diagram](UML Models/Deployment_Diagram.png)
 
 [Inserir interpretação do diagrama de desdobramento aqui]
 
@@ -42,6 +48,6 @@ The deployment view (also know as the physical view) takes into account more har
 
 The process view, acts as a linking bridge between de development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view may be viewed as set of independently executing programs, each of them consisting in a group of tasks forming an executable unit (in other words, a process). The following analysis diagram depicts this in a sequential manner.
 
-![Package Diagram](UML Models/Activity_Diagram.png)
+![Activity Diagram](UML Models/Activity_Diagram.png)
 
 [Inserir interpretação do diagrama de análise aqui]
