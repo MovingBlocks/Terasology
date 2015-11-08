@@ -46,7 +46,9 @@ The deployment view (also know as the physical view) takes into account more har
 
 #### Interpretation
 
-Terasology is a computer game, which means that a PC is required in order to play the game. Being developed in Java, it requires either the Java Runtime Environment or the Java Development Kit, more specifically, version 1.7 or higher. Regarding the OS, any operative system that can run Java 7 or higher is sufficient to play the game. A list of the OS's that run Java can be found [here](https://blogs.oracle.com/henrik/entry/supported_platforms_for_jdk_7). 
+Terasology is a computer game, which means that a PC is required in order to play the game. Being developed in Java, it requires either the Java Runtime Environment or the Java Development Kit, more specifically, version 1.7 or higher. Regarding the OS, any operative system that can run Java 7 or higher is sufficient to play the game. A list of the OS's that run Java can be found [here](https://blogs.oracle.com/henrik/entry/supported_platforms_for_jdk_7).
+
+Terasology supports multiplayer. This is supported through two ways: Through a local server or through a dedicated server. A local server is a server hosted by one of the players, and the others can connect through LAN to the local server. A dedicated server is a device exlusively dedicated to hosting the server, to which the other players connect through the Internet.  
 
 ### Process View
 
