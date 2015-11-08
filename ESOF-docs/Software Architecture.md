@@ -12,7 +12,7 @@ All these views are linked through the use case view (the +1), whose diagram was
 
 The logical view mainly focuses on the functional requirements and what the system (in another words, Terasology as a whole) should provide to its users. With this in mind, the system is decomposed in several abstractions and depicted as packages, object and object classes. The following package diagram describes this decomposition:
 
--> ![Package Diagram](UML Models/Package_Diagram.png) <-
+<center> ![Package Diagram](UML Models/Package_Diagram.png) </center>
 
 #### Interpretation
 
