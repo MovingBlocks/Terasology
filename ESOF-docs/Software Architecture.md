@@ -42,6 +42,6 @@ The deployment view (also know as the physical view) takes into account more har
 
 The process view, acts as a linking bridge between de development and logical views. It takes into account requirements such as availability and performance, adressing issues such as the system's integrity and fault tolerance, and tries to fit the logical view's main abstractions into those requirements. The process view may be viewed as set of independently executing programs, each of them consisting in a group of tasks forming an executable unit (in other words, a process). The following analysis diagram depicts this in a sequential manner.
 
-[Inserir diagrama de análise aqui]
+![Package Diagram](UML Models/Activity_Diagram.png)
 
 [Inserir interpretação do diagrama de análise aqui]
