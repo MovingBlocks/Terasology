@@ -1,3 +1,7 @@
 #Arquitetura de Software
-##titulo2
-###titulo3
+##Introdução
+##Vista Lógica
+##Vista de Distribuição
+##Vista de Processo
+##Vista de Implementação
+##Conclusão
