@@ -45,7 +45,7 @@ The following package diagram is our interpretation of the project system accord
 
 ![Logical View](https://github.com/dimamo5/Terasology/blob/sergio/ESOF-DOCS/Software%20Architecture/images/pack.png)
 
-In the above diagram the Game package abstracts the game information and user settings needed to begin the game. This package is dependent on the EngineAPI which deals with the game loop, communication between all the core elements (show on the left in the diagram) and with module managing. The ModuleLoader is responsible for loading the modules selected by the user. Each Module may depend on other modules and have access to a limited part of the EngineAPI, the access is limited through the ModdingAPI and all modules are sandboxed for security.
+In the above diagram the Game package abstracts the game information and user settings needed to begin the game. This package is dependent on the EngineAPI which deals with the game loop, communication between all the core elements (show on the left side of the diagram) and with module managing. <br>The ModuleLoader is responsible for loading the modules selected by the user.<br> Each module may depend on other modules and all modules are sandboxed for security. Modules have access to a limited part of the EngineAPI through the ModdingAPI.
 
 
 <a name="Implementação"/>
