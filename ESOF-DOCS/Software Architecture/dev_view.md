@@ -43,7 +43,7 @@ The following package diagram is our interpretation of the project system accord
 <a name="Package"/>
 ### Package Diagram
 
-****>>inserir diagrama
+![Logical View](https://github.com/dimamo5/Terasology/blob/sergio/ESOF-DOCS/images/pack.png)
 
 In the above diagram the Game package abstracts the game information and user settings needed to begin the game. This package is dependent on the EngineAPI which deals with the game loop, communication between all the core elements (show on the left in the diagram) and with module managing. The ModuleLoader is responsible for loading the modules selected by the user. Each Module may depend on other modules and have access to a limited part of the EngineAPI, the access is limited through the ModdingAPI and all modules are sandboxed for security.
 
@@ -65,7 +65,7 @@ Component diagram describes how components are wired together to form larger com
 
 The following diagram represents our implementation view of the project:
 
-diagram here >>>><>
+![Implementation View](https://github.com/dimamo5/Terasology/blob/sergio/ESOF-DOCS/images/cmp.png)
 
 The game runs the engine resorting to the use of the **EngineAPI** interface. The EngineAPI is the main component and it's responsible for managing modules and core elements such as Logic, Network, Rendering, World, entre outros.<br>
 The EngineAPI use the **Core** interface to access the Core related components mentioned above and also uses the **ModuleManagement** Interface to interact with the Module Loader that have access to the modules through the **ModuleAPI** interface. 
