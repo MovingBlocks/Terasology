@@ -29,7 +29,8 @@ O modelo pelo qual decidimos abordar a arquitectura do *Terasology* será atrav�
 * Vista de Implementação - Diagrama de Componentes
 * Vista do Processo - Diagrama de Atividades
 * Vista de *Deployment* - Diagrama de *Deployment*
-* Vista de Casos de Utilização (definido no 2º relatório).
+* Vista de Casos de Utilização (definido no 2º relatório)
+
 ##Vista Lógica
 ##Vista de Distribuição
 ##Vista de Processo
