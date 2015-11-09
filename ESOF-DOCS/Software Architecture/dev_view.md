@@ -69,5 +69,7 @@ To sum up, it is relevant to conclude that the game itself works in a efficient 
 
 In respect to the [Implementation view](#Implementação) it should be noted that the [component diagram](#Component) presented in that section it's our interpretation of the system decomposition into software components and it's subjective, therefore likely to have different views from other people analysis. Part of our interpretation was based on the analysis of the reverse engineering diagrams used to have a more accurate perspective of the project's architecture. 
 
+When it comes to the process view, it is important to refer that the chosen implementation turns out to be very efficient. Actually, due to the fact that each process deals with a different section of the code the sequence of called functions works very well when it comes to communicate between processes. 
+
 
 
