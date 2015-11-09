@@ -79,16 +79,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 
-        UIDropdown<Locale> language = find("language", UIDropdown.class);
-        if (language != null) {
-            SimpleUri menuUri = new SimpleUri("engine:menu");
-            TranslationProject menuProject = translationSystem.getProject(menuUri);
-            List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
-            language.setOptions(Lists.newArrayList(locales));
-            language.setOptionRenderer(new LocaleRenderer(translationSystem));
-            language.bindSelection(new LocaleBinding(getManager(), config.getSystem()));
-        }
-
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);
         if (environmentalEffects != null) {
             environmentalEffects.setOptions(Lists.newArrayList(EnvironmentalEffects.OFF, EnvironmentalEffects.LOW, EnvironmentalEffects.HIGH));

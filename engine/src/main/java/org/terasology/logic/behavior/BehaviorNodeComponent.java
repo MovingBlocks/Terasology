@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.Color;
 
 /**
@@ -23,6 +24,7 @@ import org.terasology.rendering.nui.Color;
  *
  * @author synopia
  */
+@API
 public class BehaviorNodeComponent implements Component {
     public static final BehaviorNodeComponent DEFAULT = new BehaviorNodeComponent();
 
