@@ -69,8 +69,6 @@ The following diagram represents our implementation view of the project:
 
 The game runs the engine resorting to the use of the **EngineAPI** interface. The EngineAPI is the main component and it's responsible for managing modules and core elements such as Logic, Network, Rendering, World, among others.<br>
 The EngineAPI use the **Core** interface to access the Core related components mentioned above and also uses the **ModuleManagement** Interface to interact with the Module Loader that have access to the modules through the **ModuleAPI** interface. 
-<br>It should be noted that this is our interpretation and may not be entirely accurate with the reality of the project.
-
 
 <a name="Process"/>
 # Process View
