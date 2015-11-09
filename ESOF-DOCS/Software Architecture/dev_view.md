@@ -34,6 +34,20 @@ The engine (as well in most of the projects) it's the most important module, tha
 
 In this report we will work on the first 4 views given that the last view(+1) it's the Use Case View which has already been discussed on the previous report.
 
+<a name="Logical"/>
+## Logical view
+
+The logical view is used to represent the most important abstractions in a system. The target of this view is to represent the system functionalities provided to users. 
+The following package diagram is our interpretation of the project system according to the architecture sections from the forum.
+
+<a name="Package"/>
+### Package Diagram
+
+****>>inserir diagrama
+
+In the above diagram the Game package abstracts the game information and user settings needed to begin the game. This package is dependent on the EngineAPI which deals with the game loop, communication between all the core elements (show on the left in the diagram) and with module managing. The ModuleLoader is responsible for loading the modules selected by the user. Each Module may depend on other modules and have access to a limited part of the EngineAPI, the access is limited through the ModdingAPI and all modules are sandboxed for security.
+
+
 <a name="Implementação"/>
 ## Implementation view
 
@@ -51,7 +65,12 @@ Component diagram describes how components are wired together to form larger com
 
 The following diagram represents our implementation view of the project:
 
-![Component diagram](https://github.com/dimamo5/Terasology/blob/sergio/ESOF-DOCS/Software Architecture/images/component diagram v1.0.png)
+diagram here >>>><>
+
+The game runs the engine resorting to the use of the **EngineAPI** interface. The EngineAPI is the main component and it's responsible for managing modules and core elements such as Logic, Network, Rendering, World, entre outros.<br>
+The EngineAPI use the **Core** interface to access the Core related components mentioned above and also uses the **ModuleManagement** Interface to interact with the Module Loader that have access to the modules through the **ModuleAPI** interface. 
+<br>It should be noted that this is our interpretation and may not be entirely accurate with the reality of the project.
+
 
 <a name="Process"/>
 # Process View
