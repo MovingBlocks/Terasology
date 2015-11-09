@@ -17,9 +17,6 @@ techniques in Java using the game development library LWJGL. Terasology, which i
 
 LWJGL -  is a Java library that enables cross-platform access to popular native APIs useful in the development of graphics, audio and parallel computing applications. It is an enabling technology and provides low-level access. It is not a framework and does not provide higher-level utilities than what the native libraries expose. LWJGL is open source software and freely available at no charge.
 
-
-
-
 	4. References:
 
 http://forum.terasology.org/ - Terasologys  forum webpage.
