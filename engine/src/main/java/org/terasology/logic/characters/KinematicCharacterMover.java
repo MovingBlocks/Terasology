@@ -183,53 +183,26 @@ public class KinematicCharacterMover implements CharacterMover {
         final boolean newDiving = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
 
-        //TODO: refactor this knot of if-else statements into something easy to read. Some sub-methods and switch statements would be nice.
-        if (!newSwimming && !newDiving) { //TODO: generalize to isClimbingAllowed() or similar
-            Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
-                    worldPos), new Vector3f(worldPos)};
-            float factor = 1.0f;
-            sides[0].x += factor * movementComp.radius;
-            sides[1].x -= factor * movementComp.radius;
-            sides[2].z += factor * movementComp.radius;
-            sides[3].z -= factor * movementComp.radius;
-            sides[4].y -= movementComp.height;
-
-            float distance = 100f;
-
-            for (Vector3f side : sides) {
-                Block block = worldProvider.getBlock(side);
-                if (block.isClimbable()) {
-                    //If any of our sides are near a climbable block, check if we are near to the side
-                    Vector3i myPos = new Vector3i(worldPos, 0.5f);
-                    Vector3i climbBlockPos = new Vector3i(side, 0.5f);
-                    Vector3i dir = new Vector3i(block.getDirection().getVector3i());
-                    float currentDistance = 10f;
-
-                    if (dir.x != 0 && Math.abs(worldPos.x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
-                        newClimbing = true;
-                        if (myPos.x < climbBlockPos.x) {
-                            dir.x = -dir.x;
-                        }
-                        currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
-
-                    } else if (dir.z != 0 && Math.abs(worldPos.z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
-                        newClimbing = true;
-                        if (myPos.z < climbBlockPos.z) {
-                            dir.z = -dir.z;
-                        }
-                        currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
-                    }
-
-                    // if there are multiple climb blocks, choose the nearest one. This can happen when there are two
-                    // adjacent ledges around a corner.
-                    if (currentDistance < distance) {
-                        distance = currentDistance;
-                        state.setClimbDirection(dir);
-                    }
-                }
+        if (isClimbingAllowed(newSwimming, newDiving)) {
+            Vector3i finalDir;
+            finalDir = findClimbable(movementComp, worldPos, newSwimming, newDiving);
+            if (finalDir != null) {
+                newClimbing = true;
+                state.setClimbDirection(finalDir);
             }
         }
 
+        updateMode(state, newSwimming, newDiving, newClimbing);
+    }
+
+    /**
+     * Updates a character's movement mode and changes his vertical velocity accordingly.
+     * @param state The current state of the character.
+     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
+     * @param newDiving True if the character's body is fully inside liquid blocks.
+     * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
+     */
+    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
         if (newDiving) {
             if (state.getMode() != MovementMode.DIVING) {
                 state.setMode(MovementMode.DIVING);
@@ -239,7 +212,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 state.setMode(MovementMode.SWIMMING);
             }
             state.getVelocity().y += 0.02;
-        } else if (state.getMode() == MovementMode.SWIMMING) {
+        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
                 state.getVelocity().y = 0;
@@ -254,6 +227,56 @@ public class KinematicCharacterMover implements CharacterMover {
             state.getVelocity().y = 0;
             state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
         }
+    }
+
+    private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos, boolean swimming, boolean diving) {
+        Vector3i finalDir = null;
+        Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
+                worldPos), new Vector3f(worldPos)};
+        float factor = 1.0f;
+        sides[0].x += factor * movementComp.radius;
+        sides[1].x -= factor * movementComp.radius;
+        sides[2].z += factor * movementComp.radius;
+        sides[3].z -= factor * movementComp.radius;
+        sides[4].y -= movementComp.height;
+
+        float distance = 100f;
+
+        for (Vector3f side : sides) {
+            Block block = worldProvider.getBlock(side);
+            if (block.isClimbable()) {
+                //If any of our sides are near a climbable block, check if we are near to the side
+                Vector3i myPos = new Vector3i(worldPos, 0.5f);
+                Vector3i climbBlockPos = new Vector3i(side, 0.5f);
+                Vector3i dir = new Vector3i(block.getDirection().getVector3i());
+                float currentDistance = 10f;
+
+                if (dir.x != 0 && Math.abs(worldPos.x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
+                    if (myPos.x < climbBlockPos.x) {
+                        dir.x = -dir.x;
+                    }
+                    currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
+
+                } else if (dir.z != 0 && Math.abs(worldPos.z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
+                    if (myPos.z < climbBlockPos.z) {
+                        dir.z = -dir.z;
+                    }
+                    currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
+                }
+
+                // if there are multiple climb blocks, choose the nearest one. This can happen when there are two
+                // adjacent ledges around a corner.
+                if (currentDistance < distance) {
+                    distance = currentDistance;
+                    finalDir = dir;
+                }
+            }
+        }
+        return finalDir;
+    }
+
+    private boolean isClimbingAllowed(boolean swimming, boolean diving) {
+        return !swimming && !diving;
     }
 
     /**
