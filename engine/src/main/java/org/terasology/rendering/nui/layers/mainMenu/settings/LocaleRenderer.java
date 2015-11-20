@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
+package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import java.util.Locale;
 

@@ -21,13 +21,13 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.editor.EditorRange;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -45,7 +45,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
     private Random rand = new FastRandom();
 
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     private float filmGrainIntensity = 0.05f;
 
     @Override

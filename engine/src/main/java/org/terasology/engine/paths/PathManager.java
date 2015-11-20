@@ -17,10 +17,11 @@
 package org.terasology.engine.paths;
 
 import com.google.common.collect.ImmutableList;
-import org.lwjgl.LWJGLUtil;
-import org.terasology.engine.paths.windows.SavedGamesPathFinder;
+import com.sun.jna.platform.win32.KnownFolders;
+import com.sun.jna.platform.win32.Shell32Util;
 
-import javax.swing.*;
+import org.lwjgl.LWJGLUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,6 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import javax.swing.JFileChooser;
 
 /**
  * @author Immortius
@@ -137,9 +140,9 @@ public final class PathManager {
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                String savedGamesPath = SavedGamesPathFinder.findSavedGamesPath();
+                String savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
                 if (savedGamesPath == null) {
-                    savedGamesPath = SavedGamesPathFinder.findDocumentsPath();
+                    savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents);
                 }
                 Path rawPath;
                 if (savedGamesPath != null) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import org.terasology.rendering.nui.Color;
 

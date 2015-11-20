@@ -18,12 +18,12 @@ package org.terasology.rendering.backdrop;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.asset.Assets;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.sun.CelestialSystem;
 
 import static org.lwjgl.opengl.GL11.GL_BACK;
@@ -45,9 +45,9 @@ public class Skysphere implements BackdropProvider, BackdropRenderer{
 
     private static int displayListSphere = -1;
 
-    @EditorRange(min = 0.01f, max = 100.0f)
+    @Range(min = 0.01f, max = 100.0f)
     private float colorExp = 0.01f;
-    @EditorRange(min = 2.0f, max = 32.0f)
+    @Range(min = 2.0f, max = 32.0f)
     private float turbidity = 9.0f;
 
     private final CelestialSystem celSystem;

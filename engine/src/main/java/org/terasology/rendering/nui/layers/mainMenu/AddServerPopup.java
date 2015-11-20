@@ -37,8 +37,6 @@ public class AddServerPopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:addServerPopup!instance");
 
-    @In
-    private Config config;
     private UIText nameText;
     private UIText ownerText;
     private UIText addressText;
@@ -72,8 +70,6 @@ public class AddServerPopup extends CoreScreenLayer {
                     // create new
                     serverInfo = new ServerInfo(name, address, port);
                     serverInfo.setOwner(owner);
-
-                    config.getNetwork().add(serverInfo);
                 } else {
                     // update existing
                     serverInfo.setName(name);

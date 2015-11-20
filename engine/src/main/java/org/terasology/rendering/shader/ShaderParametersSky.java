@@ -18,13 +18,13 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.WorldProvider;
 
 /**
@@ -34,13 +34,13 @@ import org.terasology.world.WorldProvider;
  */
 public class ShaderParametersSky extends ShaderParametersBase {
 
-    @EditorRange(min = 1.0f, max = 8192.0f)
+    @Range(min = 1.0f, max = 8192.0f)
     private float sunExponent = 512.0f;
-    @EditorRange(min = 1.0f, max = 8192.0f)
+    @Range(min = 1.0f, max = 8192.0f)
     private float moonExponent = 256.0f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float skyDaylightBrightness = 1.3f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float skyNightBrightness = 1.0f;
 
     public static Vector3d getAllWeatherZenith(float thetaSunAngle, float turbidity) {

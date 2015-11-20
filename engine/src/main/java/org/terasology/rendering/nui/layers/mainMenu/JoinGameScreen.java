@@ -42,7 +42,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
@@ -86,9 +85,10 @@ public class JoinGameScreen extends CoreScreenLayer {
     private UIList<ServerInfo> visibleList;
 
     private List<ServerInfo> listedServers = new ArrayList<>();
-    private List<ServerInfo> customServers = new ArrayList<>();
 
-    private boolean updateComplete = false;
+    private Predicate<ServerInfo> activeServersOnly = server -> server.isActive();
+
+    private boolean updateComplete;
 
     @Override
     public void initialise() {
@@ -99,12 +99,14 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         UIList<ServerInfo> customServerList = find("customServerList", UIList.class);
         if (customServerList != null) {
-            configureServerList(customServerList, customServers);
+            customServerList.setList(config.getNetwork().getServerInfos());
+            configureServerList(customServerList);
         }
 
         UIList<ServerInfo> onlineServerList = find("onlineServerList", UIList.class);
         if (onlineServerList != null) {
-            configureServerList(onlineServerList, listedServers);
+            onlineServerList.setList(listedServers);
+            configureServerList(onlineServerList);
         }
 
         ActivateEventListener activateCustom = e -> {
@@ -154,13 +156,8 @@ public class JoinGameScreen extends CoreScreenLayer {
                 updateComplete = true;
             }
 
-            Predicate<ServerInfo> onlyActive = server -> server.isActive();
-
-            customServers.clear();
-            customServers.addAll(Collections2.filter(config.getNetwork().getServers(), onlyActive));
-
             listedServers.clear();
-            listedServers.addAll(Collections2.filter(downloader.getServers(), onlyActive));
+            listedServers.addAll(Collections2.filter(downloader.getServers(), activeServersOnly));
         }
     }
 
@@ -200,9 +197,8 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     }
 
-    private void configureServerList(final UIList<ServerInfo> serverList, List<ServerInfo> servers) {
+    private void configureServerList(final UIList<ServerInfo> serverList) {
 
-        serverList.bindList(new DefaultBinding<List<ServerInfo>>(servers));
         serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
             @Override
             public void onItemActivated(UIWidget widget, ServerInfo item) {
@@ -314,17 +310,29 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private void bindCustomButtons() {
 
+        UIList<?> customServerList = find("customServerList", UIList.class);
+        ReadOnlyBinding<Boolean> localSelectedServerOnly = new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return customServerList.getSelection() != null;
+            }
+        };
+
         UIButton add = find("add", UIButton.class);
         if (add != null) {
             add.subscribe(button -> {
                 AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
                 // select the entry if added successfully
-                popup.onSuccess(item -> visibleList.setSelection(item));
+                popup.onSuccess(item -> {
+                    config.getNetwork().addServerInfo(item);
+                    visibleList.setSelection(item);
+                });
             });
         }
 
         UIButton edit = find("edit", UIButton.class);
         if (edit != null) {
+            edit.bindEnabled(localSelectedServerOnly);
             edit.subscribe(button -> {
               AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
               ServerInfo info = visibleList.getSelection();
@@ -337,10 +345,11 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         UIButton removeButton = find("remove", UIButton.class);
         if (removeButton != null) {
+            removeButton.bindEnabled(localSelectedServerOnly);
             removeButton.subscribe(button -> {
                 ServerInfo info = visibleList.getSelection();
                 if (info != null) {
-                    config.getNetwork().remove(info);
+                    config.getNetwork().removeServerInfo(info);
                     extInfo.remove(info);
                     visibleList.setSelection(null);
                 }
