@@ -20,7 +20,11 @@ From this, we can easily assume that it is very easy to observe test results, si
 
 ###Isolateability
 
-Terasology doesn't implement unit tests in all modules, mostly because 
+Terasology doesn't implement unit tests in all modules, mostly because some modules really have not much of a reason to be tested (for instance, art-related modules) and because tests must be implemented by the module creators, and some don't implement them. This makes testing module components in isolation much more difficult.
+
+Regarding the engine, the tests are implemented in a separate folder (called engine-tests). Although tests are usually kept in the same module, the fact that Terasology has some utility test classes that can be used by the modules, they decided to split them out in order to get the dependency resolution right (more specifically, module unit tests depend on engine tests which depends on the engine).
+
+
 - Isolateability: The degree to which the component under test (CUT) can be tested in isolation.
 All components are tested on their own. 
 
