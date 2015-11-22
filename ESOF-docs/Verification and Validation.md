@@ -54,6 +54,8 @@ Most of Terasology's tests are unit tests, although some performance tests can a
 
 In what concerns integration tests, they are made on average every few weeks by one of the main developers, [Cervator](https://github.com/Cervator), but this is highly erratic, since he only does that when he has spare time.
 
+In order to ensure that the product is being built with the intended puropse and needs of the stakeholders (in other words, validation), everytime a release is made, the forum is used for them to provide feedback on what they think that needs to be made, what needs to be improved and what is following the correct path. The github [issue page](https://github.com/MovingBlocks/Terasology/issues/) is somewhat also used for this purpose, although its main use is for contributors to report bugs.
+
 ### Test case design strategy
 
 Regarding test case design strategies, Terasology uses a white-box testing design stategy, since tests are gradually added to the project, with several kinds of tests to increase test strength (refer to the [observability](#observability) subsection of the previous section to see some of these tests). In our opinion, this is a correct approach due to constant changing of current contributors and the fact that contributions itself are made from their free time.
