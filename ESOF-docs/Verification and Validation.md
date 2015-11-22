@@ -33,11 +33,22 @@ The separation of concerns between engine/modules was already adressed in the [p
 
 Both Terasology's engine and its modules' code is well documented or self explanatory. The fact that Terasology keeps attracting new contributors, who need to understand the code in order to develop new features in the form of new modules, improve the current code or fix bugs, is a proof of the code's high understandability.
 
-###Heterogenety
+###Heterogeneity
 
-- Heterogeneity: The degree to which the use of diverse technologies requires to use diverse test methods and tools in parallel.
+Terasology uses several external libraries to run the game. One of the main advantages of using external libraries is that their code is usually already tested and working, decreasing the need to produce code and consequently test it. The external libraries used can be seen in the [gradle build file](https://github.com/MovingBlocks/Terasology/blob/develop/engine/build.gradle#L94), used to compile the code. The main ones are:
 
-(são só usados unitários)
+- [LWJGL](https://www.lwjgl.org/). Stands for Lightweight Java Game Library, and it's exactly that - a library used to make games in Java.
+- [JUnit](http://junit.org/). JUnit is the library used for unit testing.
+
+Other libraries used, as seen in the build file above, are as follows:
+
+- Storage and networking - "guava", "gson", "protobuf-java", "trove4j", "netty".
+- Java-related libraries - "jna-platform", "reflections", "javassist", "reflectasm".
+- Graphics, 3D, UI, etc - "lwjgl_util", "java3d", "abego.treelayout.core", "miglayout-core", "PNGDecoder".
+- Logging and audio - "slf4j-api", "jorbis".
+- Small-time 3rd party libraries - "MersenneTwister", "eaxy".
+
+Besides those, other libraries created by MovingBlocks, the organization behind Terasology, are used: "gestalt-module", "gestalt-asset-core", "TeraMath", "tera-bullet", "splash-screen".
 
 ## Test Statistics
 
