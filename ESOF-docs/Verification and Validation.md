@@ -27,8 +27,7 @@ Regarding the engine, the tests are implemented in a separate folder (called eng
 
 ###Separation of concerns
 
-- Separation of concerns: The degree to which the component under test has a single, well defined responsibility.
-Terasology is pretty organized in this aspect. It is separated into several different folders and files, each one has with its own responsibility.
+The separation of concerns between engine/modules was already adressed in the [previous report](Software%20Architecture.md). Each module's function is well defined, and they are pretty much independent from each other (except when a module's function is really complex, and therefore depends on other modules). This approach is in our opinion correct since it allows for easier testing of a specific functionality.
 
 ###Understandability
 
