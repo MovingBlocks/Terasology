@@ -2,7 +2,7 @@
 
 ## Degree of Testability
 
-In the following topics Terasology's degree of testability will be discussing, focusing mainly on verification (which consists in ensuring that the product is being well built with the requirements obtained in mind) and validation (which consists in ensuring that the product will meet the intended purpose and the needs of its stakeholers).
+In the following topics Terasology's degree of testability will be discussed, focusing mainly on verification (which consists in ensuring that the product is being well built with the requirements obtained in mind) and validation (which consists in ensuring that the product will meet the intended purpose and the needs of its stakeholers).
 
 ###Controllability
 
@@ -82,15 +82,15 @@ Regarding test case design strategies, Terasology uses a white-box testing desig
 ## Bug Report Solution
 
 In order to further enhance our experience with the testing of Terasology, our group started to work in the [issue #1030](https://github.com/MovingBlocks/Terasology/issues/1030),
-which was then considered obsolet by a Terasology developer and closed. But, while working on it we found a possible software
+which was then considered obsolete by a Terasology developer and closed. But, while working on it we found a possible software
 fault on the code and took advantage of Github's issue tracker to report it as [issue #2014](https://github.com/MovingBlocks/Terasology/issues/2014) and focused on solving it.
 
 ### Approach
 
-Althoug fixing the software fault for this issue was relatively simple, in order to test it we developed a test suite which
+Although fixing the software fault for this issue was relatively simple, in order to test it we developed a test suite which
 not only tested the purposed of our fix but also other methods of the same class which weren't being tested.
 
 ### Submission
 
-After solving the issue and pass all the tests, we created a [Pull Request](https://github.com/MovingBlocks/Terasology/pull/2017) to the original repository of Terasology and
+After solving the issue and ensuring that it passed all the tests, we created a [Pull Request](https://github.com/MovingBlocks/Terasology/pull/2017) to the original repository of Terasology and
 associated it with the corresponding issue. As this report is being written the PR is waiting for acceptance.
