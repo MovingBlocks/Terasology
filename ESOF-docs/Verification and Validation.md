@@ -8,11 +8,12 @@ Terasology implements unit testing to test both the engine and module components
 
 While controlling the component under test, when said component is a module, is rather easy, since most modules are not dependant of anything else in order to run, and even those that do depend, usually have no more that one or two dependencies, making their controllability not much of a problem. However, in what concerns the engine component, the controllability is significantly lower, since it depends on several modules in order to successfully run - and consequently, be tested.
 
+<a name="observability"/>
 ###Observability
 
 As said in previous reports, Terasology uses [Jenkins](http://jenkins.terasology.org/) in order to automatically build and test every time a pull request is issued. If we check the [statistics](http://jenkins.terasology.org/view/Statistics/) page, we can see the test results of the various modules, namely which modules had failed tests, information regarding recent build history test results, and information regarding tests that are not directly related to JUnit tests, but also involve detecting eventual functional and structural defects in the modules. It also displays information regarding compiler warnings and line coverage on the JUnit tests.
 
-The tests that are not direclty related to JUnit tests include a "checkstyle" test, which evaluates the style/conventions used in the various modules, to ensure that the entire code is using the same style, a "findbugs" test, which scans for some common code drawbacks that may lead to bugs, PMD testing (which checks for common programming flaws, such as unused variables, unnecessary object creation, empty catch blocks when handling exceptions, among other things) and open task checking (which simply looks for TODO keywords in the code indicating what needs to be done).
+The tests that are not directly related to JUnit tests include a "checkstyle" test, which evaluates the style/conventions used in the various modules, to ensure that the entire code is using the same style, a "findbugs" test, which scans for some common code drawbacks that may lead to bugs, PMD testing (which checks for common programming flaws, such as unused variables, unnecessary object creation, empty catch blocks when handling exceptions, among other things) and open task checking (which simply looks for TODO keywords in the code indicating what needs to be done).
 
 In what regards the game's engine, the test results can be seen in [this](http://jenkins.terasology.org/job/Terasology/) page, more specifically in the graphs to the right. These graphs depict the trend for the latest builds in what concerns the tests described above in this subsection. If we click in a build number in the graph, we will get more detailed information for that test, in that build.
 
@@ -22,7 +23,7 @@ From this, we can easily assume that it is very easy to observe test results, si
 
 Terasology doesn't implement unit tests in all modules, mostly because some modules really have not much of a reason to be tested (for instance, art-related modules) and because tests must be implemented by the module creators, and some don't implement them. This makes testing module components in isolation much more difficult.
 
-Regarding the engine, the tests are implemented in a separate folder (called engine-tests). Although tests are usually kept in the same module, the fact that Terasology has some utility test classes that can be used by the modules, they decided to split them out in order to get the dependency resolution right (more specifically, module unit tests depend on engine tests which depends on the engine).
+Regarding the engine, the tests are implemented in a separate folder (called engine-tests). Although tests are usually kept in the same module, the fact that Terasology has some utility test classes that can be used by the modules, they decided to split them out in order to get the dependency resolution right (more specifically, module unit tests depend on engine tests which depends on the engine)
 
 
 - Isolateability: The degree to which the component under test (CUT) can be tested in isolation.
@@ -40,3 +41,21 @@ When it comes to the code itself, it’s easily readable because it can be self-
 - Heterogeneity: The degree to which the use of diverse technologies requires to use diverse test methods and tools in parallel.
 
 (são só usados unitários)
+
+## Test Statistics
+
+The test statistics can be found in [Terasology's Jenkins statistics page](http://jenkins.terasology.org/view/Statistics/). As stated earlier, this page displays information regarding the game's engine and its modules. With this in mind, we get the following statistics:
+
+- Number of unit tests: 2047.
+- Engine line coverage: 25.96%
+- Module with best line coverage: 93.65% (NanoMarkovChains).
+- Module with worst line coverage (excluding modules without tests): 19.72% (TerasologyStable).
+- Percentage of modules with implemented tests: 8.4%
+
+Most of Terasology's tests are unit tests, although some performance tests can also be found. However, as we can see in the statistics above, a very significant part of the modules doesn't even implement tests. The main developers are aware of this and know that such low implementation of tests is harmful for the project (as we can see in [this](http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/) post), and have even set up an [issue](https://github.com/MovingBlocks/Terasology/issues/135) on Github regarding this problem, but it hasn't been sucessful until now, mostly because the contributors are constantly changing and most of them are not sufficiently familiarized with unit testing in order to develop tests for their modules.
+
+In what concerns integration tests, they are made on average every few weeks by one of the main developers, [Cervator](https://github.com/Cervator), but this is highly erratic, since he only does that when he has spare time.
+
+### Test case design strategy
+
+Regarding test case design strategies, Terasology uses a white-box testing design stategy, since tests are gradually added to the project, with several kinds of tests to increase test strength (refer to the [observability](#observability) subsection of the previous section to see some of these tests). In our opinion, this is a correct approach due to constant changing of current contributors and the fact that contributions itself are made from their free time.
