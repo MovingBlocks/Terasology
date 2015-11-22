@@ -1,3 +1,5 @@
+#Verification and validation
+
 ## Degree of Testability
 
 In the following topics Terasology's degree of testability will be discussing, focusing mainly on verification (which consists in ensuring that the product is being well built with the requirements obtained in mind) and validation (which consists in ensuring that the product will meet the intended purpose and the needs of its stakeholers).
