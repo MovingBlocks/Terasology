@@ -17,7 +17,7 @@ package org.terasology.utilities;
 
 
 import org.junit.Test;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -32,13 +32,13 @@ public class Rect2iTest {
     @Test
     public void testEncompass() {
         // encompass self
-        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(5, 5, 47, 57)));
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).contains(Rect2i.createFromMinAndSize(5, 5, 47, 57)));
 
-        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(45, 35, 5, 20)));
-        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(50, 60, 2, 2)));
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).contains(Rect2i.createFromMinAndSize(45, 35, 5, 20)));
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).contains(Rect2i.createFromMinAndSize(50, 60, 2, 2)));
 
-        assertFalse(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(50, 60, 3, 2)));
-        assertFalse(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(50, 60, 2, 3)));
+        assertFalse(Rect2i.createFromMinAndSize(5, 5, 47, 57).contains(Rect2i.createFromMinAndSize(50, 60, 3, 2)));
+        assertFalse(Rect2i.createFromMinAndSize(5, 5, 47, 57).contains(Rect2i.createFromMinAndSize(50, 60, 2, 3)));
     }
 
     @Test

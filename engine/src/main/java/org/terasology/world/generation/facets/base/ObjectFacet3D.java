@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.world.generation.WorldFacet3D;
 
 /**
@@ -25,17 +25,17 @@ public interface ObjectFacet3D<T> extends WorldFacet3D {
 
     T get(int x, int y, int z);
 
-    T get(Vector3i pos);
+    T get(BaseVector3i pos);
 
     T getWorld(int x, int y, int z);
 
-    T getWorld(Vector3i pos);
+    T getWorld(BaseVector3i pos);
 
     void set(int x, int y, int z, T value);
 
-    void set(Vector3i pos, T value);
+    void set(BaseVector3i pos, T value);
 
     void setWorld(int x, int y, int z, T value);
 
-    void setWorld(Vector3i pos, T value);
+    void setWorld(BaseVector3i pos, T value);
 }

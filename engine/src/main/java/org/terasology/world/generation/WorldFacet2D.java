@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 
 /**
  * @author Immortius

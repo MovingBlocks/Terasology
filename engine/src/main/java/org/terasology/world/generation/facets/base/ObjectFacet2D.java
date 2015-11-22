@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
@@ -25,17 +25,17 @@ public interface ObjectFacet2D<T> extends WorldFacet2D {
 
     T get(int x, int y);
 
-    T get(Vector2i pos);
+    T get(BaseVector2i pos);
 
     T getWorld(int x, int y);
 
-    T getWorld(Vector2i pos);
+    T getWorld(BaseVector2i pos);
 
     void set(int x, int y, T value);
 
-    void set(Vector2i pos, T value);
+    void set(BaseVector2i pos, T value);
 
     void setWorld(int x, int y, T value);
 
-    void setWorld(Vector2i pos, T value);
+    void setWorld(BaseVector2i pos, T value);
 }

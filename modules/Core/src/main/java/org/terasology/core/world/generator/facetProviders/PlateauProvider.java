@@ -74,7 +74,7 @@ public class PlateauProvider implements FacetProvider {
             SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
 
             // update the surface height
-            for (Vector2i pos : facet.getWorldRegion()) {
+            for (BaseVector2i pos : facet.getWorldRegion().contents()) {
                 float originalValue = facet.getWorld(pos);
                 int distSq = pos.distanceSquared(centerPos);
 
