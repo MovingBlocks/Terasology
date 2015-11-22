@@ -58,6 +58,7 @@ One of the main advantages of using external libraries is that their code is usu
 
 However, in what concerns Terasology, that doesn't seem to be a problem, since all the libraries used work without flaws and don't need testing in order to ensure they are doing its job properly.
 
+
 ## Test Statistics
 
 The test statistics can be found in [Terasology's Jenkins statistics page](http://jenkins.terasology.org/view/Statistics/). As stated earlier, this page displays information regarding the game's engine and its modules. With this in mind, we get the following statistics:
