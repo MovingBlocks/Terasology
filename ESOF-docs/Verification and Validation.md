@@ -88,7 +88,7 @@ fault on the code and took advantage of Github's issue tracker to report it as [
 ### Approach
 
 Although fixing the software fault for this issue was relatively simple, in order to test it we developed a test suite which
-not only tested the purposed of our fix but also other methods of the same class which weren't being tested.
+not only tested the purpose of our fix but also other methods of the same class which weren't being tested.
 
 ### Submission
 
