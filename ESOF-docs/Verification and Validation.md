@@ -33,8 +33,7 @@ All components are tested on their own.
 Terasology is pretty organized in this aspect. It is separated into several different folders and files, each one has with its own responsibility.
 
 ###Understandability
-- Understandability: The degree to which the component under test is documented or self-explaining.
-When it comes to the code itself, it’s easily readable because it can be self-explanatory and often commentaries can be found.
+Both Terasology's engine and its modules' code is well documented or self explanatory. The fact that Terasology keeps attracting new contributors, who need to understand the code in order to develop new features in the form of new modules, improve the current code or fix bugs, is a proof of the code's high understandability.
 
 ###Heterogenety
 - Heterogeneity: The degree to which the use of diverse technologies requires to use diverse test methods and tools in parallel.
