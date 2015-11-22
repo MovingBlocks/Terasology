@@ -23,21 +23,19 @@ From this, we can easily assume that it is very easy to observe test results, si
 
 Terasology doesn't implement unit tests in all modules, mostly because some modules really have not much of a reason to be tested (for instance, art-related modules) and because tests must be implemented by the module creators, and some don't implement them. This makes testing module components in isolation much more difficult.
 
-Regarding the engine, the tests are implemented in a separate folder (called engine-tests). Although tests are usually kept in the same module, the fact that Terasology has some utility test classes that can be used by the modules, they decided to split them out in order to get the dependency resolution right (more specifically, module unit tests depend on engine tests which depends on the engine)
-
-
-- Isolateability: The degree to which the component under test (CUT) can be tested in isolation.
-All components are tested on their own. 
+Regarding the engine, the tests are implemented in a separate folder (called engine-tests). Although tests are usually kept in the same module, the fact that Terasology has some utility test classes that can be used by the modules, they decided to split them out in order to get the dependency resolution right (more specifically, module unit tests depend on engine tests which depends on the engine). This, coupled with the fact that the engine is heavily dependant on the modules to function, makes isolating the engine's components for testing rather difficult.
 
 ###Separation of concerns
+
 - Separation of concerns: The degree to which the component under test has a single, well defined responsibility.
 Terasology is pretty organized in this aspect. It is separated into several different folders and files, each one has with its own responsibility.
 
 ###Understandability
-- Understandability: The degree to which the component under test is documented or self-explaining.
-When it comes to the code itself, it’s easily readable because it can be self-explanatory and often commentaries can be found.
+
+Both Terasology's engine and its modules' code is well documented or self explanatory. The fact that Terasology keeps attracting new contributors, who need to understand the code in order to develop new features in the form of new modules, improve the current code or fix bugs, is a proof of the code's high understandability.
 
 ###Heterogenety
+
 - Heterogeneity: The degree to which the use of diverse technologies requires to use diverse test methods and tools in parallel.
 
 (são só usados unitários)
