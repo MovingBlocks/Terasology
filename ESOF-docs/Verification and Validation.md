@@ -58,3 +58,20 @@ In order to ensure that the product is being built with the intended puropse and
 ### Test case design strategy
 
 Regarding test case design strategies, Terasology uses a white-box testing design stategy, since tests are gradually added to the project, with several kinds of tests to increase test strength (refer to the [observability](#observability) subsection of the previous section to see some of these tests). In our opinion, this is a correct approach due to constant changing of current contributors and the fact that contributions itself are made from their free time.
+
+
+## Bug Report Solution
+
+In order to further enhance our experience with the testing of Terasology, our group started to work in the [issue #1030](https://github.com/MovingBlocks/Terasology/issues/1030),
+which was then considered obsolet by a Terasology developer and closed. But, while working on it we found a possible software
+fault on the code and took advantage of Github's issue tracker to report it as [issue #2014](https://github.com/MovingBlocks/Terasology/issues/2014) and focused on solving it.
+
+### Approach
+
+Althoug fixing the software fault for this issue was relatively simple, in order to test it we developed a test suite which
+not only tested the purposed of our fix but also other methods of the same class which weren't being tested.
+
+### Submission
+
+After solving the issue and pass all the tests, we created a [Pull Request](https://github.com/MovingBlocks/Terasology/pull/2017) to the original repository of Terasology and
+associated it with the corresponding issue. As this report is being written the PR is waiting for acceptance.
