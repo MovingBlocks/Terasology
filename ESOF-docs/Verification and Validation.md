@@ -6,7 +6,9 @@ In the following topics Terasology's degree of testability will be discussing, f
 
 Terasology implements unit testing to test both the engine and module components.
 
-While controlling the component under test, when said component is a module, is rather easy, since most modules are not dependant of anything else in order to run, and even those that do depend, usually have no more that one or two dependencies, making their controllability not much of a problem. However, in what concerns the engine component, the controllability is significantly lower, since it depends on several modules in order to successfully run - and consequently, be tested.
+When the component under test is a module it's rather easy to control, since most modules are not dependant of anything else in order to run (even those that do, usually have no more that one or two dependencies), making their controllability not a problem.
+ 
+However, in what concerns the engine component, the controllability is significantly lower, since it depends on several modules in order to successfully run - and consequently, be tested.
 
 <a name="observability"/>
 ###Observability
