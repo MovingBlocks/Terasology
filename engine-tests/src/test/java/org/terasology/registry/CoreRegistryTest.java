@@ -92,7 +92,7 @@ public class CoreRegistryTest {
     }
 
 
-    private class ContextImplementation implements Context {
+    private static class ContextImplementation implements Context {
         private final Map<Class<?>, Object> map = Maps.newConcurrentMap();
 
         @Override
