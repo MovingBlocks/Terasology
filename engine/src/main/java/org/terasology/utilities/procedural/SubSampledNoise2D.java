@@ -17,7 +17,7 @@ package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;

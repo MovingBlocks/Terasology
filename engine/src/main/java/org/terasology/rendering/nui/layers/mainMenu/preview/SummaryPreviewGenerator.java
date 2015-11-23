@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.preview;
 
 import java.nio.ByteBuffer;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;

@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layouts;
 import com.google.common.collect.Lists;
 
 import org.terasology.input.Keyboard;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector2f;

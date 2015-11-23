@@ -16,7 +16,7 @@
 package org.terasology.world.generation;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 

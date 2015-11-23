@@ -18,6 +18,7 @@ package org.terasology.core.world.generator.rasterizers;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
@@ -49,24 +50,24 @@ public class TreeRasterizer implements WorldRasterizer {
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         TreeFacet facet = chunkRegion.getFacet(TreeFacet.class);
 
-        for (Map.Entry<Vector3i, TreeGenerator> entry : facet.getRelativeEntries().entrySet()) {
-            Vector3i pos = entry.getKey();
+        for (Map.Entry<BaseVector3i, TreeGenerator> entry : facet.getRelativeEntries().entrySet()) {
+            BaseVector3i pos = entry.getKey();
             TreeGenerator treeGen = entry.getValue();
             int seed = relativeToWorld(facet, pos).hashCode();
             Random random = new FastRandom(seed);
-            treeGen.generate(blockManager, chunk, random, pos.x, pos.y, pos.z);
+            treeGen.generate(blockManager, chunk, random, pos.x(), pos.y(), pos.z());
         }
     }
 
     // TODO: JAVA8 - move the two conversion methods from SparseFacet3D to default methods in WorldFacet3D
-    protected final Vector3i relativeToWorld(SparseFacet3D facet, Vector3i pos) {
+    protected final Vector3i relativeToWorld(SparseFacet3D facet, BaseVector3i pos) {
 
         Region3i worldRegion = facet.getWorldRegion();
         Region3i relativeRegion = facet.getRelativeRegion();
 
         return new Vector3i(
-                pos.x - relativeRegion.minX() + worldRegion.minX(),
-                pos.y - relativeRegion.minY() + worldRegion.minY(),
-                pos.z - relativeRegion.minZ() + worldRegion.minZ());
+                pos.x() - relativeRegion.minX() + worldRegion.minX(),
+                pos.y() - relativeRegion.minY() + worldRegion.minY(),
+                pos.z() - relativeRegion.minZ() + worldRegion.minZ());
     }
 }

@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generator;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.nui.Color;
 
 public interface WorldGenerator2DPreview {

@@ -17,7 +17,7 @@ package org.terasology.world.generation;
 
 import com.google.common.collect.Sets;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.nui.Color;

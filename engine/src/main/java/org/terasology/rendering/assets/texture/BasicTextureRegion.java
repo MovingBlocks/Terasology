@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.texture;
 
 import org.terasology.math.Rect2f;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;

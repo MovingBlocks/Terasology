@@ -15,12 +15,14 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import com.google.common.base.Preconditions;
+import java.lang.reflect.Array;
+
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 
-import java.lang.reflect.Array;
+import com.google.common.base.Preconditions;
 
 /**
  * Base class for storing objects of the specified type in a 3D grid for a facet.
@@ -42,8 +44,8 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public T get(Vector3i pos) {
-        return get(pos.x, pos.y, pos.z);
+    public T get(BaseVector3i pos) {
+        return get(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -52,8 +54,8 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public T getWorld(Vector3i pos) {
-        return getWorld(pos.x, pos.y, pos.z);
+    public T getWorld(BaseVector3i pos) {
+        return getWorld(pos.x(), pos.y(), pos.z());
     }
 
     public T[] getInternal() {
@@ -66,8 +68,8 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public void set(Vector3i pos, T value) {
-        set(pos.x, pos.y, pos.z, value);
+    public void set(BaseVector3i pos, T value) {
+        set(pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -76,8 +78,8 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public void setWorld(Vector3i pos, T value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(BaseVector3i pos, T value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     public void set(T[] newData) {

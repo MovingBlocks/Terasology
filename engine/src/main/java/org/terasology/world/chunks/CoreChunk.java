@@ -16,6 +16,7 @@
 package org.terasology.world.chunks;
 
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.biomes.Biome;
@@ -38,23 +39,23 @@ import org.terasology.world.liquid.LiquidData;
 public interface CoreChunk {
     Vector3i getPosition();
 
-    Block getBlock(Vector3i pos);
+    Block getBlock(BaseVector3i pos);
 
     Block getBlock(int x, int y, int z);
 
     Block setBlock(int x, int y, int z, Block block);
 
-    Block setBlock(Vector3i pos, Block block);
+    Block setBlock(BaseVector3i pos, Block block);
 
     Biome setBiome(int x, int y, int z, Biome biome);
 
     Biome getBiome(int x, int y, int z);
 
-    void setLiquid(Vector3i pos, LiquidData state);
+    void setLiquid(BaseVector3i pos, LiquidData state);
 
     void setLiquid(int x, int y, int z, LiquidData newState);
 
-    LiquidData getLiquid(Vector3i pos);
+    LiquidData getLiquid(BaseVector3i pos);
 
     LiquidData getLiquid(int x, int y, int z);
 
@@ -66,7 +67,7 @@ public interface CoreChunk {
 
     int getChunkWorldOffsetZ();
 
-    Vector3i chunkToWorldPosition(Vector3i blockPos);
+    Vector3i chunkToWorldPosition(BaseVector3i blockPos);
 
     Vector3i chunkToWorldPosition(int x, int y, int z);
 
