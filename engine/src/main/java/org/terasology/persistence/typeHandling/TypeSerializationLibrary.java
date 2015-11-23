@@ -28,7 +28,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.Rect2f;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector2i;

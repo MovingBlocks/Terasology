@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.math.Rect2f;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.naming.Name;
