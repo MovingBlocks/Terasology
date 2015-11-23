@@ -1,3 +1,15 @@
+
+The testability of software components (modules) can be determined by many factors such as:
+
+1. Controllability: The degree to which it is possible to control the state of the component under test (CUT) as required for testing.
+2. Observability: The degree to which it is possible to observe (intermediate and final) test results.
+3. Isolateability: The degree to which the component under test (CUT) can be tested in isolation.
+4. Separation of concerns: The degree to which the component under test has a single, well defined responsibility.
+5. Understandability: The degree to which the component under test is documented or self-explaining.
+6. Heterogeneity: The degree to which the use of diverse technologies requires to use diverse test methods and tools in parallel.
+
+
+
 **Controllability** is related to the degree to which the **Component Under Test** has a single, well defined responsibility. 
 All software components are part of a module that can be connected to a lot of other modules. Controllability is defined as the effort it takes to provide 
 a program with the needed inputs, in terms of values, operations and behaviors. As mention in the [forum] (http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/) if we take a look into 
