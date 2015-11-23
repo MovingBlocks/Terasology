@@ -29,6 +29,6 @@ Other modules just don't have any unit tests because the author hasn't added any
 
 **Isolateability** is related to the degree to which the component under test (CUT) can be tested in isolation.
 Once modules aren't independent from each other it is hard to separate Isolateability from Controllability, what we are trying to say
- is that a lot of the components behaviour is related to how he interacts with the rest of the system. For example depending on how the component interacts with 
- the rest of the modules and even with other components the test can be right or wrong without necessarily be actually right or wrong. 
+ is that a lot of the components behaviour is related to how it interacts with the rest of the system. For example depending on how the component interacts with 
+ the rest of the modules and even with other components the test can be right or wrong without necessarily be right or wrong. 
  So it is hard to look at a component as being isolated from the rest. So it wouldn't make sense to calculate the Isolateability’s degree for Terasology.
