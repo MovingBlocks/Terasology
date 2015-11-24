@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.debug;
 
-import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.layers.hud.CoreHudWidget;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
@@ -28,7 +27,7 @@ import org.terasology.rendering.nui.layouts.PropertyLayout;
  *
  * @author synopia
  */
-public class DebugProperties extends CoreHudWidget implements ControlWidget {
+public class DebugProperties extends CoreHudWidget {
     private ColumnLayout container;
     private PropertyLayout propertyLayout;
 

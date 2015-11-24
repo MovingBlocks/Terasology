@@ -40,7 +40,6 @@ public final class CommandParameter<T> implements Parameter {
     private final boolean required;
     private final ParameterAdapterManager parameterAdapterManager;
 
-    @SuppressWarnings("unchecked")
     private CommandParameter(String name, Class<T> typeParam, boolean required, CommandParameterSuggester<T> suggester,
                              ParameterAdapterManager parameterAdapterManager) {
         Preconditions.checkNotNull(name, "The parameter name must not be null!");
@@ -217,7 +216,6 @@ public final class CommandParameter<T> implements Parameter {
         return parameterAdapterManager.convertToString(object, (Class<? super Object>) getType());
     }
 
-    @SuppressWarnings("unchecked")
     public Set<T> suggest(EntityRef sender, Object... parameters) {
         return suggester.suggest(sender, parameters);
     }

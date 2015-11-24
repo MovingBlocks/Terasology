@@ -35,9 +35,6 @@ public class Border {
     private int top;
     private int bottom;
 
-    private Border() {
-    }
-
     public Border(int left, int right, int top, int bottom) {
         this.left = left;
         this.right = right;

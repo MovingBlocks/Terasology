@@ -46,19 +46,16 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
-import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
-import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshComponent;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -78,9 +75,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Camera playerCamera;
 
     @In
-    private Physics physics;
-
-    @In
     private Config config;
     private float bobFactor;
     private float lastStepDelta;
@@ -95,9 +89,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private Time time;
-
-    @In
-    private NUIManager nuiManager;
 
     private long lastItemUse;
 
@@ -140,14 +131,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         switch (characterMovementComponent.mode) {
             case WALKING:
                 viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
-                QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+                viewRot.rotate(relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
                 break;
             default:
                 viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
-                QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+                viewRot.rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }
@@ -283,7 +274,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = Direction.FORWARD.getVector3f();
-        QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
+        rotation.rotate(viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {

@@ -23,7 +23,7 @@ import org.terasology.rendering.FontColor;
 /**
  * Utility class. Currently only used as container for getColoredPlayerName.
  */
-public class PlayerUtil {
+public final class PlayerUtil {
 
     private PlayerUtil() {
         // utility class

@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.players;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -128,7 +126,7 @@ public class LocalPlayer {
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
         Vector3f dir = Direction.FORWARD.getVector3f();
-        return QuaternionUtil.quatRotate(rot, dir, dir);
+        return rot.rotate(dir, dir);
     }
 
     public Vector3f getVelocity() {

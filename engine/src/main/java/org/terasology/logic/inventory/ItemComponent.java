@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
 
 /**

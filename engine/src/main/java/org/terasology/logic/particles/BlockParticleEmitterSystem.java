@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.particles;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -47,11 +46,10 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.tiles.WorldAtlas;
 
-import java.nio.FloatBuffer;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -93,9 +91,6 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
     @In
     private WorldAtlas worldAtlas;
-
-    @In
-    private BlockManager blockManager;
 
     // TODO: lose dependency on worldRenderer?
     @In
@@ -288,7 +283,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
     private void renderBlockParticles(Vector3f worldPos, Vector3f cameraPosition, BlockParticleEffectComponent particleEffect) {
 
-        Vector3i worldPos3i = new Vector3i(worldPos, 0.5f);
+        Vector3i worldPos3i = new Vector3i(worldPos, RoundingMode.HALF_UP);
         Biome biome = worldProvider.getBiome(worldPos3i);
 
         glPushMatrix();

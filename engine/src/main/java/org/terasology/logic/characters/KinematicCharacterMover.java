@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.characters;
 
+import java.math.RoundingMode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -25,7 +27,6 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Quat4f;
@@ -66,14 +67,14 @@ public class KinematicCharacterMover implements CharacterMover {
     public static final float HORIZONTAL_PENETRATION = 0.03f;
 
     /**
-     * The amount of extra distance added to horizontal movement to allow for penetration.
-     */
-    private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
-
-    /**
      * The amount of vertical penetration to allow.
      */
     public static final float VERTICAL_PENETRATION = 0.04f;
+
+    /**
+     * The amount of extra distance added to horizontal movement to allow for penetration.
+     */
+    private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
 
     /**
      * The amount of extra distance added to vertical movement to allow for penetration.
@@ -81,7 +82,7 @@ public class KinematicCharacterMover implements CharacterMover {
     private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
-    private final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
+    private static final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
     private boolean stepped;
 
     // Processing state variables
@@ -103,7 +104,10 @@ public class KinematicCharacterMover implements CharacterMover {
             updatePosition(characterMovementComponent, result, input, entity);
 
             if (input.isFirstRun()) {
-                checkBlockEntry(entity, new Vector3i(initial.getPosition(), 0.5f), new Vector3i(result.getPosition(), 0.5f), characterMovementComponent.height);
+                checkBlockEntry(entity,
+                        new Vector3i(initial.getPosition(), RoundingMode.HALF_UP),
+                        new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
+                        characterMovementComponent.height);
             }
 
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
@@ -674,6 +678,11 @@ public class KinematicCharacterMover implements CharacterMover {
                         case SWIMMING:
                             entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
                             break;
+                        case CLIMBING:
+                        case FLYING:
+                        case GHOSTING:
+                        case NONE:
+                            break;
                     }
                 }
             }
@@ -691,7 +700,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         Quat4f rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
         tmp = new Vector3f(0.0f, 0.0f, -1.0f);
-        QuaternionUtil.quatRotate(rotation, tmp, tmp);
+        rotation.rotate(tmp, tmp);
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
         boolean clearMovementToDirection = !state.isGrounded();
@@ -701,24 +710,24 @@ public class KinematicCharacterMover implements CharacterMover {
             float pitchAmount = state.isGrounded() ? 45f : 90f;
             float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
             rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
-            QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
+            rotation.rotate(desiredVelocity, desiredVelocity);
 
             // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
-            QuaternionUtil.quatRotate(rotation, climbDir3f, tmp);
+            rotation.rotate(climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                     TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
             );
-            QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
+            rotation.rotate(desiredVelocity, desiredVelocity);
 
             // facing away from ladder
         } else {
             rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
-            QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
+            rotation.rotate(desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
         }
 

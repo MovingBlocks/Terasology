@@ -24,6 +24,9 @@ import org.terasology.math.geom.Vector3f;
  */
 public final class QuaternionUtil {
 
+    private QuaternionUtil() {
+        // no instances
+    }
 
     /**
      * @deprecated Use {@link Quat4f#rotate(Vector3f)} or {@link Quat4f#rotate(Vector3f, Vector3f)} instead

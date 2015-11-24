@@ -22,8 +22,8 @@ public interface PermissionManager {
     /**
      * Allows the player to use chat commands.
      */
-    static final String CHAT_PERMISSION = "chat";
-    
+    String CHAT_PERMISSION = "chat";
+
     /**
      * Allows the player to use cheats that
      * <ul>
@@ -33,29 +33,29 @@ public interface PermissionManager {
      * The intention is that the permission can be given to all players on a server where players focus on building and
      * not mining.
      */
-    static final String CHEAT_PERMISSION = "cheat";
+    String CHEAT_PERMISSION = "cheat";
 
     /**
      * Used to indicate that something requires no permission.
      */
-    static final String NO_PERMISSION = "";
+    String NO_PERMISSION = "";
 
     /**
      * Allows the player to edit settings of other users.
      *
      * e.g. adding permissions, renaming them etc.
      */
-    static final String USER_MANAGEMENT_PERMISSION = "userManagement";
+    String USER_MANAGEMENT_PERMISSION = "userManagement";
 
     /**
      * Allows the player to perform server maintenance tasks like stopping the server.
      */
-    static final String SERVER_MANAGEMENT_PERMISSION = "serverManagement";
+    String SERVER_MANAGEMENT_PERMISSION = "serverManagement";
 
     /**
      * Allows the player to use debug commands which are not intended to be used on a real server.
      */
-    static final String DEBUG_PERMISSION = "debug";
+    String DEBUG_PERMISSION = "debug";
 
     /**
      * Adds specified permission to the player (client info entity).

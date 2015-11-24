@@ -25,7 +25,6 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
 import org.terasology.engine.ComponentFieldUri;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -70,8 +69,6 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     private Map<String, List<BehaviorNodeComponent>> categoryComponents = Maps.newHashMap();
     private List<String> categories;
 
-    @In
-    private ModuleManager moduleManager;
     @In
     private EntityManager entityManager;
     @In

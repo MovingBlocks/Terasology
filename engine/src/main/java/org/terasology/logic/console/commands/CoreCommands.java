@@ -35,7 +35,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
@@ -89,9 +88,6 @@ public class CoreCommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @In
-    private CameraTargetSystem cameraTargetSystem;
-
-    @In
     private WorldRenderer worldRenderer;
 
     @In
@@ -137,25 +133,28 @@ public class CoreCommands extends BaseComponentSystem {
         pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
     }
 
-    @Command(shortDescription = "Search commands/prefabs/assets", helpText = "Displays commands, prefabs, and assets with matching name, description, help text, usage or required permission")
+    @Command(shortDescription = "Search commands/prefabs/assets",
+            helpText = "Displays commands, prefabs, and assets with matching name, description, "
+                    + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
         List<String> commands = findCommandMatches(searchLowercase);
         List<String> prefabs = findPrefabMatches(searchLowercase);
         List<String> blocks = findBlockMatches(searchLowercase);
-        String result = "Found " + commands.size() + " command matches, " + prefabs.size() + " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
+        String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
+                " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
-        if(commands.size() > 0) {
+        if (commands.size() > 0) {
             result += "\nCommands:";
             result = commands.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
-        if(prefabs.size() > 0) {
+        if (prefabs.size() > 0) {
             result += "\nPrefabs:";
             result = prefabs.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
-        if(blocks.size() > 0) {
+        if (blocks.size() > 0) {
             result += "\nBlocks:";
             result = blocks.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }

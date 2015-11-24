@@ -22,6 +22,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.registry.In;
 
+import com.google.common.collect.Iterables;
+
 /**
  * @author Immortius
  */
@@ -32,14 +34,8 @@ public class AICommands extends BaseComponentSystem {
 
     @Command(runOnServer = true, shortDescription = "Count all AIs in the world")
     public String countAI() {
-        int simpleAIs = 0;
-        for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
-            simpleAIs++;
-        }
-        int hierarchical = 0;
-        for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
-            hierarchical++;
-        }
+        int simpleAIs = Iterables.size(entityManager.getEntitiesWith(SimpleAIComponent.class));
+        int hierarchical = Iterables.size(entityManager.getEntitiesWith(HierarchicalAIComponent.class));
         return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
     }
 

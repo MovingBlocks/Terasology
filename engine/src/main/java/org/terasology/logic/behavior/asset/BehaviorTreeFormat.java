@@ -26,8 +26,6 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
@@ -216,7 +214,7 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
                         }
                     }
 
-                    private TypeAdapter<T> getDelegateAdapter(Class cls) {
+                    private TypeAdapter<T> getDelegateAdapter(Class<?> cls) {
                         return (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
                     }
                 };

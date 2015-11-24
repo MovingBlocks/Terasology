@@ -50,21 +50,16 @@ import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.world.WorldProvider;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-    private Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
 
     @In
     private Physics physics;
-
-    @In
-    private WorldProvider worldProvider;
 
     @In
     private NetworkSystem networkSystem;
@@ -74,10 +69,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private InventoryManager inventoryManager;
-
-    @In
-    private NUIManager nuiManager;
-
 
     private PickupBuilder pickupBuilder;
 

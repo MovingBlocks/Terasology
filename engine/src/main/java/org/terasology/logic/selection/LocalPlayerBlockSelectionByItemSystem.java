@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.selection;
 
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -39,8 +38,6 @@ import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
-    @In
-    private EntityManager entityManager;
     @In
     private LocalPlayer localPlayer;
 

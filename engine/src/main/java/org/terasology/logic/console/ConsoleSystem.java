@@ -25,7 +25,6 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
@@ -38,9 +37,6 @@ import java.util.List;
 public class ConsoleSystem extends BaseComponentSystem {
     @In
     private Console console;
-
-    @In
-    private NetworkSystem networkSystem;
 
     @In
     private NUIManager nuiManager;
