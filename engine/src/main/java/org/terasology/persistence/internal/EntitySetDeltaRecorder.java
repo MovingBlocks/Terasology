@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  *
- * Records changes made to all entities. It gets used by {@link }StorageManagerInternal} to determine which changes
+ * Records changes made to all entities. It gets used by {@link ReadWriteStorageManager} to determine which changes
  * have been made since the last auto save. This save delta can then be applied to a copy the entities as they were at
  * the point of the last auto save. By doing so the auto save can access a snapshot of all entities on
  * off the main thread.
@@ -72,7 +72,7 @@ class EntitySetDeltaRecorder {
         }
     }
 
-    public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component){
+    public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
         if (entity.isPersistent()) {
             EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
             entityDelta.removeComponent(component);

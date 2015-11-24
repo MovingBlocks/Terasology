@@ -35,7 +35,6 @@ public interface DeserializeFieldCheck {
         private NullCheck() {
         }
 
-        @SuppressWarnings("unchecked")
         public static NullCheck newInstance() {
             return INSTANCE;
         }

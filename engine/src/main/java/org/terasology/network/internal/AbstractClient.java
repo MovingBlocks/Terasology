@@ -118,7 +118,7 @@ public abstract class AbstractClient implements Client {
 
         String name = preferredName;
         int nextSuffix = 2;
-        while(usedNames.contains(name)) {
+        while (usedNames.contains(name)) {
             name = preferredName + nextSuffix;
             nextSuffix++;
         }

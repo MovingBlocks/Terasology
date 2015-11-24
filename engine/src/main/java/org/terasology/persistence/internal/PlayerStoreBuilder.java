@@ -39,7 +39,7 @@ class PlayerStoreBuilder {
         this.relevanceLocation = relevanceLocation;
     }
 
-    public EntityData.PlayerStore build (EngineEntityManager entityManager) {
+    public EntityData.PlayerStore build(EngineEntityManager entityManager) {
         EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
         playerEntityStore.setCharacterPosX(relevanceLocation.x);
         playerEntityStore.setCharacterPosY(relevanceLocation.y);

@@ -18,7 +18,6 @@ package org.terasology.network;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.rendering.nui.Color;

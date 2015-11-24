@@ -21,6 +21,8 @@ package org.terasology.persistence.typeHandling;
  */
 public class DeserializationException extends RuntimeException {
 
+    private static final long serialVersionUID = -6211402729551315020L;
+
     public DeserializationException() {
     }
 

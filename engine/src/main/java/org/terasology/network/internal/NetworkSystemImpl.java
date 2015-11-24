@@ -47,7 +47,6 @@ import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.engine.subsystem.common.hibernation.HibernationManager;
-import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -662,6 +661,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 if (server != null) {
                     return server.getMetrics().getReceivedMessagesSinceLastCall();
                 }
+                return 0;
             default:
                 return 0;
         }
@@ -684,6 +684,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 if (server != null) {
                     return server.getMetrics().getReceivedBytesSinceLastCall();
                 }
+                return 0;
             default:
                 return 0;
         }
@@ -703,6 +704,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 if (server != null) {
                     return server.getMetrics().getSentMessagesSinceLastCall();
                 }
+                return 0;
             default:
                 return 0;
         }
@@ -722,6 +724,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 if (server != null) {
                     return server.getMetrics().getSentBytesSinceLastCall();
                 }
+                return 0;
             default:
                 return 0;
         }
@@ -863,7 +866,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
                     .setName(metadata.getUri().toString());
-            for (FieldMetadata field : metadata.getFields()) {
+            for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
             }
@@ -880,7 +883,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
                     .setName(metadata.getUri().toString());
-            for (FieldMetadata field : metadata.getFields()) {
+            for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
             }
@@ -906,7 +909,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             result.put(metadata.getType(), index);
 
             int fieldId = 0;
-            for (FieldMetadata field : metadata.getFields()) {
+            for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 if (fieldId >= 256) {
                     logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getUri());
                     break;
@@ -931,7 +934,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {
-                    FieldMetadata field = metadata.getField(info.getFieldName(i));
+                    FieldMetadata<?, ?> field = metadata.getField(info.getFieldName(i));
                     if (field != null) {
                         field.setId(info.getFieldIds().byteAt(i));
                     } else {

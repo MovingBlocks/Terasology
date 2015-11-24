@@ -53,8 +53,8 @@ public class SaveTransactionHelper {
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
-                Files.delete(directory);
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }
         });
