@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -63,7 +62,7 @@ import java.util.Set;
  *
  * @author Immortius
  */
-public class PojoEntityManager implements LowLevelEntityManager, EngineEntityManager {
+public class PojoEntityManager implements EngineEntityManager {
     public static final long NULL_ID = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);

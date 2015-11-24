@@ -64,7 +64,7 @@ public final class OwnershipHelper {
 
     @SuppressWarnings("unchecked")
     private void addOwnedEntitiesFor(Component comp, ComponentMetadata<?> componentMetadata, Collection<EntityRef> outEntityList) {
-        for (ComponentFieldMetadata field : componentMetadata.getFields()) {
+        for (ComponentFieldMetadata<?, ?> field : componentMetadata.getFields()) {
             if (field.isOwnedReference()) {
                 Object value = field.getValue(comp);
                 if (value instanceof Collection) {

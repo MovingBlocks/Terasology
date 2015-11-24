@@ -16,8 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.input.InputSystem;
@@ -28,8 +26,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
  * @author Immortius
  */
 public class RegisterInputSystem extends SingleStepLoadProcess {
-
-    private static final Logger logger = LoggerFactory.getLogger(RegisterInputSystem.class);
 
     private final Context context;
 

@@ -18,7 +18,6 @@ package org.terasology.engine.bootstrap;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -74,7 +73,7 @@ public final class EnvironmentSwitchHandler {
             if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
                 continue;
             }
-            Class targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
+            Class<?> targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
             if (targetType != null) {
                 try {
                     copyStrategyLibrary.register(targetType, copyStrategy.newInstance());

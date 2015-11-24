@@ -28,7 +28,7 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleMetadataReader;
+import org.terasology.module.ModuleMetadataJsonAdapter;
 import org.terasology.module.ModulePathScanner;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.TableModuleRegistry;
@@ -59,10 +59,10 @@ public class ModuleManagerImpl implements ModuleManager {
 
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
-    private ModuleMetadataReader metadataReader;
+    private ModuleMetadataJsonAdapter metadataReader;
 
     public ModuleManagerImpl() {
-        metadataReader = new ModuleMetadataReader();
+        metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
         }
@@ -198,7 +198,7 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     @Override
-    public ModuleMetadataReader getModuleMetadataReader() {
+    public ModuleMetadataJsonAdapter getModuleMetadataReader() {
         return metadataReader;
     }
 }

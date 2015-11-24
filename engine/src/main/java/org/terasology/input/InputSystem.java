@@ -346,6 +346,11 @@ public class InputSystem extends BaseComponentSystem {
                     }
                     break;
                 case KEY:
+                case CONTROLLER_1:
+                case CONTROLLER_2:
+                case CONTROLLER_3:
+                case CONTROLLER_4:
+                case NONE:
                     break;
             }
         }

@@ -16,8 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;

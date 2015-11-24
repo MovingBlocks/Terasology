@@ -15,13 +15,9 @@
  */
 package org.terasology.engine.subsystem.headless;
 
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.headless.device.TimeSystem;
 

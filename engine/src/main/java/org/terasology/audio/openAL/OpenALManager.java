@@ -40,7 +40,6 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
-import org.terasology.math.QuaternionUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -246,8 +245,8 @@ public class OpenALManager implements AudioManager {
 
         OpenALException.checkState("Setting listener velocity");
 
-        Vector3f dir = QuaternionUtil.quatRotate(orientation, Direction.FORWARD.getVector3f(), new Vector3f());
-        Vector3f up = QuaternionUtil.quatRotate(orientation, Direction.UP.getVector3f(), new Vector3f());
+        Vector3f dir = orientation.rotate(Direction.FORWARD.getVector3f(), new Vector3f());
+        Vector3f up = orientation.rotate(Direction.UP.getVector3f(), new Vector3f());
 
         FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{dir.x, dir.y, dir.z, up.x, up.y, up.z});
         listenerOri.flip();
