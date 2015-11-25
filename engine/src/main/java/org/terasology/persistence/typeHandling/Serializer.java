@@ -44,7 +44,6 @@ public class Serializer {
      * @param field The metadata for a field of the type handled by this serializer.
      * @return The TypeHandler for the given field
      */
-    @SuppressWarnings("unchecked")
     public TypeHandler<?> getHandlerFor(FieldMetadata<?, ?> field) {
         return fieldHandlers.get(field);
     }

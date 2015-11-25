@@ -176,7 +176,7 @@ public class PerspectiveCamera extends Camera {
     }
 
     // TODO: Move the dependency on LWJGL (Display) elsewhere
-    public Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
+    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
         float aspectRatio = (float) Display.getWidth() / Display.getHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 

@@ -124,15 +124,21 @@ public class InventoryCell extends ItemCell {
     }
 
     private void swapItem() {
-        CoreRegistry.get(InventoryManager.class).switchItem(getTransferEntity(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, getTargetInventory(), getTargetSlot());
+        EntityRef characterEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+        inventoryManager.switchItem(getTransferEntity(), characterEntity, 0, getTargetInventory(), getTargetSlot());
     }
 
     private void giveAmount(int amount) {
-        CoreRegistry.get(InventoryManager.class).moveItem(getTargetInventory(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount);
+        EntityRef characterEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+        inventoryManager.moveItem(getTargetInventory(), characterEntity, getTargetSlot(), getTransferEntity(), 0, amount);
     }
 
     private void takeAmount(int amount) {
-        CoreRegistry.get(InventoryManager.class).moveItem(getTransferEntity(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
+        EntityRef characterEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+        inventoryManager.moveItem(getTransferEntity(), characterEntity, 0, getTargetInventory(), getTargetSlot(), amount);
     }
 
     private void moveItemSmartly() {

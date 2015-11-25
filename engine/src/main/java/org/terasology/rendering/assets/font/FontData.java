@@ -48,7 +48,9 @@ public class FontData implements AssetData {
         return lineHeight;
     }
 
-    public int getBaseHeight() { return baseHeight; }
+    public int getBaseHeight() {
+        return baseHeight;
+    }
 
     public Iterable<Map.Entry<Integer, FontCharacter>> getCharacters() {
         return characters.entrySet();

@@ -163,7 +163,8 @@ public class PostProcessor {
     }
 
     private Material getMaterial(String assetId) {
-        return Assets.getMaterial(assetId).orElseThrow(() -> new RuntimeException("Failed to resolve required asset: '" + assetId +"'"));
+        return Assets.getMaterial(assetId).orElseThrow(() ->
+                new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));
     }
 
     /**
@@ -218,7 +219,6 @@ public class PostProcessor {
         // initial post-processing
         buffers.lightShafts     = renderingProcess.getFBO("lightShafts");
         buffers.initialPost     = renderingProcess.getFBO("initialPost");
-        buffers.currentReadbackPBO = renderingProcess.getCurrentReadbackPBO();
         buffers.sceneToneMapped = renderingProcess.getFBO("sceneToneMapped");
 
         buffers.sceneHighPass   = renderingProcess.getFBO("sceneHighPass");
@@ -791,6 +791,8 @@ public class PostProcessor {
                 }
 
                 break;
+            case MONO:
+                break;
         }
     }
 
@@ -966,7 +968,6 @@ public class PostProcessor {
         public FBO lightShafts;
 
         public FBO[] downSampledScene = new FBO[5];
-        public PBO currentReadbackPBO;
 
         public FBO sceneToneMapped;
 

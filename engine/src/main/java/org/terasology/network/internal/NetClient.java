@@ -479,7 +479,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void sendInitialEntities(NetData.NetMessage.Builder message) {
-        TIntIterator initialIterator = netInitial.iterator();
         int[] initial = netInitial.toArray();
         netInitial.clear();
         Arrays.sort(initial);

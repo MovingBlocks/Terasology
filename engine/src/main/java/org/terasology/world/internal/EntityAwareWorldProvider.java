@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -55,6 +56,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -184,7 +186,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getBlockEntityAt(Vector3f position) {
-        Vector3i pos = new Vector3i(position, 0.5f);
+        Vector3i pos = new Vector3i(position, RoundingMode.HALF_UP);
         return getBlockEntityAt(pos);
     }
 
@@ -312,7 +314,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
         builder.addComponent(new BlockComponent(block, blockPosition));
         if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
-            // Block regen should always take the same amount of time,  regardless of its hardness 
+            // Block regen should always take the same amount of time,  regardless of its hardness
             builder.addComponent(new HealthComponent(block.getHardness(), block.getHardness() / BLOCK_REGEN_SECONDS, 1.0f));
         }
         boolean isTemporary = isTemporaryBlock(builder, block);

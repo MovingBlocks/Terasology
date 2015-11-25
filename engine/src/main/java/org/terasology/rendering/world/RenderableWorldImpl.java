@@ -250,7 +250,6 @@ public class RenderableWorldImpl implements RenderableWorld {
     public void generateVBOs() {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
         ChunkMesh pendingMesh;
-        ChunkMesh mesh;
         chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
         for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
 

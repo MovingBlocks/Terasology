@@ -17,8 +17,6 @@
 package org.terasology.world.block.tiles;
 
 import com.google.common.math.IntMath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;

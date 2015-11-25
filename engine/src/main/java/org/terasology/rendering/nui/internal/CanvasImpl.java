@@ -405,7 +405,8 @@ public class CanvasImpl implements CanvasControl {
 
     private void drawStyledWidget(UIWidget element) {
         if (element.getTooltip() != null) {
-            // Integrated tooltip support - without this, setting a tooltip value does not make a tooltip work unless an interaction listener is explicitly added by the widget.
+            // Integrated tooltip support - without this, setting a tooltip value does not make a tooltip work
+            // unless an interaction listener is explicitly added by the widget.
             addInteractionRegion(new BaseInteractionListener());
         }
         element.onDraw(this);

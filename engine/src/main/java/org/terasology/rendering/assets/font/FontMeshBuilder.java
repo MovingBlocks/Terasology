@@ -180,10 +180,10 @@ public class FontMeshBuilder {
         private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, int underlineThickness, Color color, float depth) {
             float bottom = (float) underlineTop + underlineThickness;
 
-            Vector3f v1 = new Vector3f((float) xStart, (float) underlineTop, depth);
-            Vector3f v2 = new Vector3f((float) xEnd, (float) underlineTop, depth);
-            Vector3f v3 = new Vector3f((float) xEnd, bottom, depth);
-            Vector3f v4 = new Vector3f((float) xStart, bottom, depth);
+            Vector3f v1 = new Vector3f(xStart, underlineTop, depth);
+            Vector3f v2 = new Vector3f(xEnd, underlineTop, depth);
+            Vector3f v3 = new Vector3f(xEnd, bottom, depth);
+            Vector3f v4 = new Vector3f(xStart, bottom, depth);
             builder.addPoly(v1, v2, v3, v4);
             builder.addColor(color, color, color, color);
             builder.addTexCoord(0, 0);

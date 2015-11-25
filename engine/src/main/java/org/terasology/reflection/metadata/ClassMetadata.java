@@ -174,7 +174,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
     public T copy(T object) {
         T result = constructor.construct();
         if (result != null) {
-            for (FieldMetadata field : fields.values()) {
+            for (FIELD field : fields.values()) {
                 field.setValue(result, field.getCopyOfValue(object));
             }
         }
@@ -187,7 +187,6 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param object The instance of this class to copy
      * @return A copy of the given object, or null if object is not of the type described by this metadata.
      */
-    @SuppressWarnings("unchecked")
     public T copyRaw(Object object) {
         if (getType().isInstance(object)) {
             return copy(getType().cast(object));
@@ -208,7 +207,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
             return true;
         }
         if (obj instanceof ClassMetadata) {
-            ClassMetadata other = (ClassMetadata) obj;
+            ClassMetadata<?, ?> other = (ClassMetadata<?, ?>) obj;
             return Objects.equal(other.clazz, clazz);
         }
         return false;

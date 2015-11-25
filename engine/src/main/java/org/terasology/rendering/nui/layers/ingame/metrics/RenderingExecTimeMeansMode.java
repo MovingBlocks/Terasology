@@ -51,12 +51,12 @@ public class RenderingExecTimeMeansMode extends MetricsMode {
         builder.append(getName());
         builder.append("\n");
 
-        processMetrics(PerformanceMonitor.getRunningMean(), builder);
+        processMetrics(PerformanceMonitor.getRunningMean());
 
         return builder.toString();
     }
 
-    private void processMetrics(TObjectDoubleMap<String> activitiesToMetricsMap, StringBuilder builder) {
+    private void processMetrics(TObjectDoubleMap<String> activitiesToMetricsMap) {
         activitiesToMetricsMap.retainEntries(matchingCriteria);
 
         processedEntries.clear();

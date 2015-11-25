@@ -16,20 +16,16 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.tiles.BlockTile;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Immortius

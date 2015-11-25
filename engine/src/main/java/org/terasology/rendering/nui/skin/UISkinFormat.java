@@ -22,7 +22,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,9 +190,9 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         }
     }
 
-    private static class OptionalTextureRegionTypeAdapter implements JsonDeserializer<Optional> {
+    private static class OptionalTextureRegionTypeAdapter implements JsonDeserializer<Optional<?>> {
         @Override
-        public Optional deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Optional<?> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return Assets.getTextureRegion(json.getAsString());
         }
     }

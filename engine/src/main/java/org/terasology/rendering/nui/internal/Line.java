@@ -167,7 +167,7 @@ public class Line {
         }
 
         //draw the line by triangle strip
-        float []lineVertex =
+        float[] lineVertex =
                 {
                         x1 - tx - rx, y1 - ty - ry,    //fading edge1
                         x2 - tx - rx, y2 - ty - ry,
@@ -181,7 +181,7 @@ public class Line {
         GL11.glVertexPointer(2, 0, wrap(lineVertex));
 
         if (!alphaBlend) {
-            float []lineColor =
+            float[] lineColor =
                     {
                             bRed, bGreen, bBlue,
                             bRed, bGreen, bBlue,
@@ -194,7 +194,7 @@ public class Line {
                     };
             GL11.glColorPointer(3, 0, wrap(lineColor));
         } else {
-            float []lineColor =
+            float[] lineColor =
                     {
                             cRed, cGreen, cBlue, 0,
                             cRed, cGreen, cBlue, 0,
@@ -231,7 +231,7 @@ public class Line {
             GL11.glVertexPointer(2, 0, wrap(lineVertex));
 
             if (!alphaBlend) {
-                float []lineColor =
+                float[] lineColor =
                         {
                                 bRed, bGreen, bBlue,    //cap1
                                 bRed, bGreen, bBlue,
@@ -244,7 +244,7 @@ public class Line {
                         };
                 GL11.glColorPointer(3, 0, wrap(lineColor));
             } else {
-                float []lineColor =
+                float[] lineColor =
                         {
                                 cRed, cGreen, cBlue, 0,    //cap1
                                 cRed, cGreen, cBlue, 0,

@@ -41,7 +41,7 @@ import static org.lwjgl.opengl.GL11.glNewList;
  * @author Anthony Kireev
  * @author Benjamin Glatzel
  */
-public class Skysphere implements BackdropProvider, BackdropRenderer{
+public class Skysphere implements BackdropProvider, BackdropRenderer {
 
     private static int displayListSphere = -1;
 

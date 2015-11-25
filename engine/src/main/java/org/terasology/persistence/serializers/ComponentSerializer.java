@@ -232,7 +232,7 @@ public class ComponentSerializer {
         serializeComponentType(componentMetadata, componentMessage);
 
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
+        for (ReplicatedFieldMetadata<?, ?> field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, component)) {
                 PersistedData result = serializer.serialize(field, component, serializationContext);
                 if (!result.isNull()) {

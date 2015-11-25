@@ -58,9 +58,9 @@ public final class ReflectionUtil {
 
     public static Class<?> getClassOfType(Type type) {
         if (type instanceof Class) {
-            return (Class) type;
+            return (Class<?>) type;
         } else if (type instanceof ParameterizedType) {
-            return (Class) ((ParameterizedType) type).getRawType();
+            return (Class<?>) ((ParameterizedType) type).getRawType();
         }
         return null;
     }
@@ -69,7 +69,7 @@ public final class ReflectionUtil {
         return findGetter(field.getName(), field.getDeclaringClass(), field.getType());
     }
 
-    public static Method findGetter(String propertyName, Class beanClass, Class propertyType) {
+    public static Method findGetter(String propertyName, Class<?> beanClass, Class<?> propertyType) {
         Method result = findGetter(propertyName, beanClass);
         if (result != null && propertyType.equals(result.getReturnType())) {
             return result;
@@ -77,7 +77,7 @@ public final class ReflectionUtil {
         return null;
     }
 
-    public static Method findGetter(String propertyName, Class beanClass) {
+    public static Method findGetter(String propertyName, Class<?> beanClass) {
         Method result = findMethod(beanClass, "get" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
         if (result != null) {
             result.setAccessible(true);
@@ -95,7 +95,7 @@ public final class ReflectionUtil {
         return findSetter(field.getName(), field.getDeclaringClass(), field.getType());
     }
 
-    public static Method findSetter(String propertyName, Class beanClass, Class propertyType) {
+    public static Method findSetter(String propertyName, Class<?> beanClass, Class<?> propertyType) {
         String setterName = "set" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
         Method result = findMethod(beanClass, setterName, propertyType);
         if (result != null) {

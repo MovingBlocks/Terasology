@@ -156,7 +156,6 @@ public class FieldMetadata<T, U> {
      * @param from The object to copy the field from
      * @return A safe to use copy of the value of this field in the given object
      */
-    @SuppressWarnings("unchecked")
     public U getCopyOfValue(Object from) {
         return copyStrategy.copy(getValue(from));
     }
@@ -206,7 +205,7 @@ public class FieldMetadata<T, U> {
             return true;
         }
         if (obj instanceof FieldMetadata) {
-            FieldMetadata other = (FieldMetadata) obj;
+            FieldMetadata<?, ?> other = (FieldMetadata<?, ?>) obj;
             return Objects.equal(field, other.field);
         }
         return false;

@@ -30,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
-import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 
 /**
@@ -46,7 +45,7 @@ import static org.lwjgl.opengl.GL11.glGenTextures;
  * This class simplifies the creation of FrameBuffers with specific attachments (see the create() method), the binding
  * and unbinding of both the FrameBuffer as a whole or its attachments, and the FrameBuffer's proper disposal.
  */
-public class FBO {
+public final class FBO {
 
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 

@@ -88,7 +88,6 @@ public class UISlider extends CoreWidget {
 
     private int sliderWidth;
     private boolean active;
-    private String formatString = "0.0";
     private Function<? super Float, String> labelFunction;
 
     public UISlider() {
@@ -180,7 +179,6 @@ public class UISlider extends CoreWidget {
 
     public void setMinimum(float min) {
         this.minimum.set(min);
-        generateFormatString();
     }
 
     public void bindRange(Binding<Float> binding) {
@@ -193,7 +191,6 @@ public class UISlider extends CoreWidget {
 
     public void setRange(float val) {
         range.set(val);
-        generateFormatString();
     }
 
     public void bindIncrement(Binding<Float> binding) {
@@ -226,26 +223,6 @@ public class UISlider extends CoreWidget {
 
     public void setPrecision(int precision) {
         this.precision = precision;
-        generateFormatString();
-    }
-
-    private void generateFormatString() {
-        float maxValue = getRange() + getMinimum();
-        int leadingValues = String.format("%.0f", maxValue).length();
-        StringBuilder newFormat = new StringBuilder();
-        if (getMinimum() < 0) {
-            newFormat.append('-');
-        }
-        for (int i = 0; i < leadingValues; ++i) {
-            newFormat.append('0');
-        }
-        if (precision > 0) {
-            newFormat.append('.');
-            for (int i = 0; i < precision; ++i) {
-                newFormat.append('0');
-            }
-        }
-        formatString = newFormat.toString();
     }
 
     private int pixelOffsetFor(float val, int width) {

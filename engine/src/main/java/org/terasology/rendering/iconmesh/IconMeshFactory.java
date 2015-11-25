@@ -38,7 +38,7 @@ public final class IconMeshFactory {
 
     public static Mesh getIconMesh(TextureRegion region) {
         if (region instanceof Asset) {
-            ResourceUrn urn = ((Asset) region).getUrn();
+            ResourceUrn urn = ((Asset<?>) region).getUrn();
             if (urn.getFragmentName().isEmpty()) {
                 return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, urn.getResourceName()), Mesh.class).get();
             } else {
@@ -92,7 +92,8 @@ public final class IconMeshFactory {
 
                 if (a > alphaLimit) {
                     Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
-                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f, 2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f, 0f);
+                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f,
+                            2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f, 0f);
 
                     if (withContour) {
                         int newX = 0;

@@ -250,18 +250,18 @@ public class KinematicCharacterMover implements CharacterMover {
             Block block = worldProvider.getBlock(side);
             if (block.isClimbable()) {
                 //If any of our sides are near a climbable block, check if we are near to the side
-                Vector3i myPos = new Vector3i(worldPos, 0.5f);
-                Vector3i climbBlockPos = new Vector3i(side, 0.5f);
+                Vector3i myPos = new Vector3i(worldPos, RoundingMode.HALF_UP);
+                Vector3i climbBlockPos = new Vector3i(side, RoundingMode.HALF_UP);
                 Vector3i dir = new Vector3i(block.getDirection().getVector3i());
                 float currentDistance = 10f;
 
-                if (dir.x != 0 && Math.abs(worldPos.x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
+                if (dir.x != 0 && Math.abs(worldPos.x - climbBlockPos.x + dir.x * .5f) < movementComp.radius + 0.1f) {
                     if (myPos.x < climbBlockPos.x) {
                         dir.x = -dir.x;
                     }
                     currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
 
-                } else if (dir.z != 0 && Math.abs(worldPos.z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
+                } else if (dir.z != 0 && Math.abs(worldPos.z - climbBlockPos.z + dir.z * .5f) < movementComp.radius + 0.1f) {
                     if (myPos.z < climbBlockPos.z) {
                         dir.z = -dir.z;
                     }

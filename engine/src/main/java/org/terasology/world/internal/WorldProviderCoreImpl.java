@@ -21,8 +21,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -67,7 +65,6 @@ import java.util.Map;
  * @author Immortius
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
-    private static final Logger logger = LoggerFactory.getLogger(WorldProviderCoreImpl.class);
 
     private String title;
     private String seed = "";

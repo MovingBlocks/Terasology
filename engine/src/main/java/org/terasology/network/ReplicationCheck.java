@@ -31,5 +31,5 @@ public interface ReplicationCheck {
      * @param toOwner Whether the component is being replicated to the owner or not
      * @return Whether to replicate the field
      */
-    boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner);
+    boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner);
 }

@@ -15,8 +15,6 @@
  */
 package org.terasology.world.block.shapes;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -114,8 +112,8 @@ public class BlockMeshPart {
         Vector3f[] newNormals = new Vector3f[normals.length];
 
         for (int i = 0; i < newVertices.length; ++i) {
-            newVertices[i] = QuaternionUtil.quatRotate(rotation, vertices[i], new Vector3f());
-            newNormals[i] = QuaternionUtil.quatRotate(rotation, normals[i], new Vector3f());
+            newVertices[i] = rotation.rotate(vertices[i], new Vector3f());
+            newNormals[i] = rotation.rotate(normals[i], new Vector3f());
             newNormals[i].normalize();
         }
 

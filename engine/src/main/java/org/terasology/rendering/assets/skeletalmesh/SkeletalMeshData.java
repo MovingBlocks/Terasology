@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
-import org.terasology.math.QuaternionUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -97,7 +96,7 @@ public class SkeletalMeshData implements AssetData {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
 
-                Vector3f current = QuaternionUtil.quatRotate(boneRotations.get(weight.getBoneIndex()), weight.getPosition(), new Vector3f());
+                Vector3f current = boneRotations.get(weight.getBoneIndex()).rotate(weight.getPosition(), new Vector3f());
                 current.add(bonePositions.get(weight.getBoneIndex()));
                 current.scale(weight.getBias());
                 vertexPos.add(current);
@@ -115,7 +114,7 @@ public class SkeletalMeshData implements AssetData {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
 
-                Vector3f current = QuaternionUtil.quatRotate(boneRotations.get(weight.getBoneIndex()), weight.getNormal(), new Vector3f());
+                Vector3f current = boneRotations.get(weight.getBoneIndex()).rotate(weight.getNormal(), new Vector3f());
                 current.scale(weight.getBias());
                 vertexNorm.add(current);
             }
@@ -172,7 +171,7 @@ public class SkeletalMeshData implements AssetData {
             for (int weightIndex = 0; weightIndex < vertexWeightCounts.get(vertIndex); ++weightIndex) {
                 BoneWeight weight = weights.get(weightIndex + vertexStartWeights.get(vertIndex));
                 inverseRot.inverse(bones.get(weight.getBoneIndex()).getObjectRotation());
-                QuaternionUtil.quatRotate(inverseRot, normal, norm);
+                inverseRot.rotate(normal, norm);
                 weight.setNormal(norm);
             }
         }

@@ -188,7 +188,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     @Override
-    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+    public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return initial || replicateChanges;
     }
 }

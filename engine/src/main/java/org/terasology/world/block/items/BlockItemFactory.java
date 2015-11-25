@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block.items;
 
-import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;

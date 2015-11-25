@@ -15,24 +15,20 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
-import com.google.common.collect.Lists;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 import org.terasology.rendering.nui.widgets.UIIconBar;
 
-import java.util.List;
-
 /**
  * @author Immortius
  */
-public class HudToolbar extends CoreHudWidget implements ControlWidget {
+public class HudToolbar extends CoreHudWidget {
 
     @In
     private LocalPlayer localPlayer;
@@ -40,7 +36,6 @@ public class HudToolbar extends CoreHudWidget implements ControlWidget {
     @In
     private Time time;
 
-    private List<InventoryCell> cells = Lists.newArrayList();
     private UICrosshair crosshair;
 
     @Override

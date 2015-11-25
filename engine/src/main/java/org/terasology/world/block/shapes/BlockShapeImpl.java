@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Pitch;
-import org.terasology.math.QuaternionUtil;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -108,7 +107,7 @@ public class BlockShapeImpl extends BlockShape {
         if (simplifiedRot.equals(Rotation.none())) {
             return new Vector3f(baseCollisionOffset);
         }
-        return QuaternionUtil.quatRotate(simplifiedRot.getQuat4f(), baseCollisionOffset, new Vector3f());
+        return simplifiedRot.getQuat4f().rotate(baseCollisionOffset, new Vector3f());
     }
 
     @Override

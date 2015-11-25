@@ -16,7 +16,6 @@
 
 package org.terasology.rendering.assets.skeletalmesh;
 
-import org.terasology.math.QuaternionUtil;
 import com.google.common.collect.Lists;
 
 import org.terasology.math.geom.Quat4f;
@@ -66,7 +65,7 @@ public class Bone {
             pos.sub(parent.getObjectPosition());
             Quat4f inverseParentRot = new Quat4f();
             inverseParentRot.inverse(parent.getObjectRotation());
-            QuaternionUtil.quatRotate(inverseParentRot, pos, pos);
+            inverseParentRot.rotate(pos, pos);
         }
         return pos;
     }

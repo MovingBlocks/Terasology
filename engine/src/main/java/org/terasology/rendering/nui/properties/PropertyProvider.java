@@ -229,7 +229,7 @@ public class PropertyProvider {
     private class OneOfEnumPropertyFactory implements PropertyFactory<OneOf.Enum> {
         @Override
         public Property create(Object target, final FieldMetadata<Object, ?> fieldMetadata, String id, OneOf.Enum info) {
-            Class cls = fieldMetadata.getType();
+            Class<?> cls = fieldMetadata.getType();
             Object[] items = cls.getEnumConstants();
             UIDropdown dropdown = new UIDropdown();
             dropdown.bindOptions(new DefaultBinding(Arrays.asList(items)));
