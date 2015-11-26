@@ -59,6 +59,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         this.aabb = aabb;
     }
 
+    @Override
     public void setAABB(AABB from) {
         if (from != null && !from.equals(this.aabb)) {
             this.aabb = from;
@@ -87,6 +88,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
      *
      * @param lineThickness The thickness of the line
      */
+    @Override
     public void render(float lineThickness) {
         CoreRegistry.get(ShaderManager.class).enableDefault();
 

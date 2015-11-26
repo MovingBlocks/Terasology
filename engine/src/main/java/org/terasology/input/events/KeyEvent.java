@@ -35,6 +35,7 @@ public class KeyEvent extends ButtonEvent {
         return input;
     }
 
+    @Override
     public ButtonState getState() {
         return state;
     }

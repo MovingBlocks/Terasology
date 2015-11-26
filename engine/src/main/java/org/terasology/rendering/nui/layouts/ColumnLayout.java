@@ -67,6 +67,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         widgetList.add(widget);
     }
 
+    @Override
     public void removeWidget(UIWidget widget) {
         widgetList.remove(widget);
     }

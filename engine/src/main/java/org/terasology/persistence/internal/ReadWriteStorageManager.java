@@ -467,6 +467,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
     }
 
+    @Override
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
         entitySetDeltaRecorder.onEntityComponentAdded(entity, component);
     }

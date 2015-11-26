@@ -52,6 +52,7 @@ public class UITextEntry<T> extends UIText {
         super.onDraw(canvas);
     }
 
+    @Override
     public void onLoseFocus() {
         super.onLoseFocus();
         try {

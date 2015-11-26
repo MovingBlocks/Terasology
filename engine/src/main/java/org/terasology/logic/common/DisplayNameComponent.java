@@ -31,6 +31,7 @@ public class DisplayNameComponent implements Component {
     public String description = "";
 
 
+    @Override
     public String toString() {
         return String.format("DisplayName(name = '%s', description = '%s')", name, description);
     }

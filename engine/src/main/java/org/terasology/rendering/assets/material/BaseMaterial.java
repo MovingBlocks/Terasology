@@ -34,48 +34,70 @@ public abstract class BaseMaterial extends Material {
         super(urn, assetType);
     }
 
+    @Override
     public abstract void recompile();
 
+    @Override
     public abstract void enable();
 
+    @Override
     public abstract void setFloat(String name, float f, boolean currentOnly);
 
+    @Override
     public abstract void setFloat1(String name, FloatBuffer buffer, boolean currentOnly);
 
+    @Override
     public abstract void setFloat2(String name, float f1, float f2, boolean currentOnly);
 
+    @Override
     public abstract void setFloat2(String name, FloatBuffer buffer, boolean currentOnly);
 
+    @Override
     public abstract void setFloat3(String name, float f1, float f2, float f3, boolean currentOnly);
 
+    @Override
     public abstract void setFloat3(String name, FloatBuffer buffer, boolean currentOnly);
 
+    @Override
     public abstract void setFloat4(String name, float f1, float f2, float f3, float f4, boolean currentOnly);
 
+    @Override
     public abstract void setFloat4(String name, FloatBuffer buffer, boolean currentOnly);
 
+    @Override
     public abstract void setInt(String name, int i, boolean currentOnly);
 
+    @Override
     public abstract void setBoolean(String name, boolean value, boolean currentOnly);
 
+    @Override
     public abstract void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
 
+    @Override
     public abstract void setMatrix3(String name, FloatBuffer buffer, boolean currentOnly);
 
+    @Override
     public abstract void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
 
+    @Override
     public abstract void setMatrix4(String name, FloatBuffer buffer, boolean currentOnly);
 
+    @Override
     public abstract void setTexture(String name, Texture texture);
 
+    @Override
     public abstract boolean supportsFeature(ShaderProgramFeature feature);
 
+    @Override
     public abstract void activateFeature(ShaderProgramFeature feature);
 
+    @Override
     public abstract void deactivateFeature(ShaderProgramFeature feature);
 
+    @Override
     public abstract void deactivateFeatures(ShaderProgramFeature... features);
 
+    @Override
     public abstract void bindTextures();
 
     @Override
@@ -118,6 +140,7 @@ public abstract class BaseMaterial extends Material {
         setFloat3(name, value.x, value.y, value.z);
     }
 
+    @Override
     public void setFloat3(String name, Vector3f value, boolean currentOnly) {
         setFloat3(name, value.x, value.y, value.z, currentOnly);
     }

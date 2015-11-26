@@ -92,6 +92,7 @@ public abstract class Port extends CoreWidget {
         return getSourceNode() + "[" + index() + "]";
     }
 
+    @Override
     public boolean isVisible() {
         return index() < getSourceNode().getMaxChildren();
     }

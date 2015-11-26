@@ -103,6 +103,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     private NearestSortingList sorter = new NearestSortingList();
     private int displayList;
 
+    @Override
     public void initialise() {
         if (displayList == 0) {
             displayList = glGenLists(1);
@@ -119,6 +120,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         sorter.stop();
     }
 
+    @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(BlockParticleEffectComponent.class, LocationComponent.class)) {
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
@@ -219,6 +221,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         particle.position.z += particle.velocity.z * delta;
     }
 
+    @Override
     public void renderAlphaBlend() {
         if (config.getRendering().isRenderNearest()) {
             render(Arrays.asList(sorter.getNearest(config.getRendering().getParticleEffectLimit())));
@@ -365,12 +368,15 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         glEnd();
     }
 
+    @Override
     public void renderOpaque() {
     }
 
+    @Override
     public void renderOverlay() {
     }
 
+    @Override
     public void renderFirstPerson() {
     }
 

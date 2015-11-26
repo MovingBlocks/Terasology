@@ -128,6 +128,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         return getTexCoords(getTileIndex(uri, warnOnError));
     }
 
+    @Override
     public void update() {
         if (!reloadQueue.isEmpty()) {
             List<BlockTile> reloadList = Lists.newArrayListWithExpectedSize(reloadQueue.size());

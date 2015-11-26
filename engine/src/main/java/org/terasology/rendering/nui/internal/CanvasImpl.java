@@ -708,6 +708,7 @@ public class CanvasImpl implements CanvasControl {
         addInteractionRegion(listener, tooltip, getCurrentStyle().getMargin().grow(applyStyleToSize(getRegion())));
     }
 
+    @Override
     public void addInteractionRegion(InteractionListener listener, UIWidget tooltip, Rect2i region) {
         Vector2i offset = state.drawRegion.min();
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));

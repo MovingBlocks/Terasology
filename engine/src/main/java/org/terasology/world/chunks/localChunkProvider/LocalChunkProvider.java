@@ -172,6 +172,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
+    @Override
     public void setWorldEntity(EntityRef worldEntity) {
         this.worldEntity = worldEntity;
     }
@@ -567,6 +568,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
 
+    @Override
     public void restart() {
         pipeline.restart();
         unloadRequestTaskMaster.restart();

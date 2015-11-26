@@ -552,6 +552,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         return metricSource;
     }
 
+    @Override
     public void setViewDistanceMode(ViewDistance distanceMode) {
         this.viewDistance = distanceMode;
     }

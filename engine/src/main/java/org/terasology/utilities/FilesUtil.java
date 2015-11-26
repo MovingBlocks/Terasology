@@ -33,6 +33,7 @@ public final class FilesUtil {
      */
     public static final DirectoryStream.Filter<Path> DIRECTORY_FILTER =
             new DirectoryStream.Filter<Path>() {
+                @Override
                 public boolean accept(Path file) throws IOException {
                     return Files.isDirectory(file);
                 }

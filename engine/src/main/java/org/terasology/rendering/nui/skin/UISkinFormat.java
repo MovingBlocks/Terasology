@@ -109,6 +109,7 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         public String inherit;
         public Map<String, FamilyInfo> families;
 
+        @Override
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
             if (inherit != null) {

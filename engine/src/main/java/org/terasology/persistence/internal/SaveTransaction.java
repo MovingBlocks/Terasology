@@ -121,6 +121,7 @@ public class SaveTransaction extends AbstractTask {
         return "Saving";
     }
 
+    @Override
     public void run() {
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
