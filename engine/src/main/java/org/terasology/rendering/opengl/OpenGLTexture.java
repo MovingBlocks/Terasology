@@ -127,6 +127,7 @@ public class OpenGLTexture extends Texture {
         }
     }
 
+    @Override
     public int getId() {
         return resources.id;
     }
@@ -139,6 +140,7 @@ public class OpenGLTexture extends Texture {
         return 0;
     }
 
+    @Override
     public int getWidth() {
         if (resources.loadedTextureInfo != null) {
             return resources.loadedTextureInfo.getWidth();
@@ -146,6 +148,7 @@ public class OpenGLTexture extends Texture {
         return 0;
     }
 
+    @Override
     public int getHeight() {
         if (resources.loadedTextureInfo != null) {
             return resources.loadedTextureInfo.getHeight();
@@ -158,10 +161,12 @@ public class OpenGLTexture extends Texture {
         return new Vector2i(getWidth(), getHeight());
     }
 
+    @Override
     public Texture.WrapMode getWrapMode() {
         return resources.loadedTextureInfo.getWrapMode();
     }
 
+    @Override
     public FilterMode getFilterMode() {
         return resources.loadedTextureInfo.getFilterMode();
     }

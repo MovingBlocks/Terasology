@@ -349,6 +349,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
         return helpText;
     }
 
+    @Override
     public String getUsage() {
         return usage;
     }
@@ -358,10 +359,12 @@ public abstract class AbstractCommand implements ConsoleCommand {
         return name;
     }
 
+    @Override
     public int getRequiredParameterCount() {
         return requiredParameterCount;
     }
 
+    @Override
     public boolean endsWithVarargs() {
         return commandParameters.size() > 0 && commandParameters.get(commandParameters.size() - 1).isArray();
     }

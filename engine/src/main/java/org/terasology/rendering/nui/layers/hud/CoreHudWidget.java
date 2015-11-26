@@ -57,6 +57,7 @@ public abstract class CoreHudWidget extends CoreWidget implements ControlWidget 
     public void onClosed() {
     }
 
+    @Override
     public void onDraw(Canvas canvas) {
         if (contents != null) {
             canvas.drawWidget(contents, canvas.getRegion());

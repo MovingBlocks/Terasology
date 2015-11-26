@@ -153,6 +153,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         }
     }
 
+    @Override
     public String toString() {
         Camera camera = worldRenderer.getActiveCamera();
         if (targetBlockPos != null) {

@@ -159,6 +159,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         dirty = true;
     }
 
+    @Override
     public void removeWidget(UIWidget element) {
         ComponentWrapper cw = wrappers.remove(element);
         ccMap.remove(cw);

@@ -35,6 +35,7 @@ public final class DefaultClassLibrary<T> extends AbstractClassLibrary<T> {
         super(context);
     }
 
+    @Override
     protected <C extends T> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {
         try {
             return new DefaultClassMetadata<>(uri, type, factory, copyStrategies);

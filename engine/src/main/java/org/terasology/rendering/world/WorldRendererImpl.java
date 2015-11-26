@@ -690,6 +690,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     }
 
+    @Override
     public boolean isHeadUnderWater() {
         Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
 

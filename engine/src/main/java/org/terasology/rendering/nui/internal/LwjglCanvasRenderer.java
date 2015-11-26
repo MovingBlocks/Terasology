@@ -265,6 +265,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         return frameBufferObject;
     }
 
+    @Override
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                             float ux, float uy, float uw, float uh, float alpha) {
         if (!texture.getTexture().isLoaded()) {
@@ -331,6 +332,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         mesh.render();
     }
 
+    @Override
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
                          Color color, Color shadowColor, float alpha, boolean underlined) {
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor, underlined);

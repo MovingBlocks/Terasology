@@ -403,6 +403,7 @@ public final class AABB {
         return false;
     }
 
+    @Override
     public int hashCode() {
         return Objects.hashCode(min, max);
     }

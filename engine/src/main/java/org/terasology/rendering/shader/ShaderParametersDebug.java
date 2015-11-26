@@ -30,6 +30,7 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class ShaderParametersDebug extends ShaderParametersBase {
 
+    @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
 

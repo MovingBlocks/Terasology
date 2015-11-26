@@ -42,18 +42,22 @@ public class TypeSetMultimap<T> extends TypeMultimap<T> {
         return new TypeSetMultimap<>(from);
     }
 
+    @Override
     public <U extends T> Set<U> get(Class<U> key) {
         return convertSet(key, inner.get(key));
     }
 
+    @Override
     public <U extends T> Set<U> removeAll(Class<U> key) {
         return convertSet(key, inner.removeAll(key));
     }
 
+    @Override
     public <U extends T> Set<U> replaceValues(Class<U> key, Iterable<? extends U> values) {
         return convertSet(key, inner.replaceValues(key, values));
     }
 
+    @Override
     public Set<Map.Entry<Class<? extends T>, T>> entries() {
         return inner.entries();
     }

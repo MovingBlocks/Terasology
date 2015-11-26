@@ -175,6 +175,7 @@ public class PojoEntityManager implements EngineEntityManager {
         return entity;
     }
 
+    @Override
     public void setEntityRefStrategy(RefStrategy strategy) {
         this.refStrategy = strategy;
     }
@@ -300,6 +301,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public Iterable<EntityRef> getAllEntities() {
         return new Iterable<EntityRef>() {
+            @Override
             public Iterator<EntityRef> iterator() {
                 return new EntityIterator(store.entityIdIterator());
             }
@@ -747,14 +749,17 @@ public class PojoEntityManager implements EngineEntityManager {
             this.value = value;
         }
 
+        @Override
         public EntityRef getKey() {
             return key;
         }
 
+        @Override
         public T getValue() {
             return value;
         }
 
+        @Override
         public T setValue(T newValue) {
             throw new UnsupportedOperationException();
         }
@@ -767,6 +772,7 @@ public class PojoEntityManager implements EngineEntityManager {
             this.list = list;
         }
 
+        @Override
         public Iterator<EntityRef> iterator() {
             return new EntityIterator(list.iterator());
         }
@@ -779,14 +785,17 @@ public class PojoEntityManager implements EngineEntityManager {
             this.idIterator = idIterator;
         }
 
+        @Override
         public boolean hasNext() {
             return idIterator.hasNext();
         }
 
+        @Override
         public EntityRef next() {
             return createEntityRef(idIterator.next());
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

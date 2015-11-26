@@ -73,6 +73,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     @Range(min = 0.0f, max = 0.50f)
     float parallaxScale = 0.05f;
 
+    @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
 

@@ -20,5 +20,6 @@ package org.terasology.rendering.nui;
  */
 public interface SubRegion extends AutoCloseable {
 
+    @Override
     void close();
 }

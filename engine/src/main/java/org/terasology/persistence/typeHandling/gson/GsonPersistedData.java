@@ -28,6 +28,7 @@ public class GsonPersistedData extends AbstractGsonPersistedData {
         this.element = element;
     }
 
+    @Override
     public JsonElement getElement() {
         return element;
     }

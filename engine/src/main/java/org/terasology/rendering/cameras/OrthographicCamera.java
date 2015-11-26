@@ -49,31 +49,37 @@ public class OrthographicCamera extends Camera {
         return false;
     }
 
+    @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(projectionMatrix));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
+    @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(viewMatrix));
     }
 
+    @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
     }
 
+    @Override
     public void update(float deltaT) {
         super.update(deltaT);
         updateMatrices();
     }
 
+    @Override
     public void updateMatrices() {
         updateMatrices(activeFov);
     }
 
+    @Override
     public void updateMatrices(float fov) {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
@@ -99,6 +105,7 @@ public class OrthographicCamera extends Camera {
         updateFrustum();
     }
 
+    @Override
     public ViewFrustum getViewFrustumReflected() {
         throw new RuntimeException("Not yet implemented!");
     }

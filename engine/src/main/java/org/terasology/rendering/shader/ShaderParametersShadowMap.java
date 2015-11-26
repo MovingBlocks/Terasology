@@ -24,6 +24,7 @@ import org.terasology.rendering.assets.material.Material;
  */
 public class ShaderParametersShadowMap extends ShaderParametersBase {
 
+    @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
     }

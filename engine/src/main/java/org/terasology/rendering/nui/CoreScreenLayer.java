@@ -57,6 +57,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         super(id);
     }
 
+    @Override
     public void setId(String id) {
         super.setId(id);
     }
@@ -69,6 +70,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         this.contents = contents;
     }
 
+    @Override
     public void onOpened() {
         if (!initialised) {
             initialise();
@@ -97,6 +99,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return contents;
     }
 
+    @Override
     public void onDraw(Canvas canvas) {
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener());
@@ -106,6 +109,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         }
     }
 
+    @Override
     public void update(float delta) {
         if (contents != null) {
             contents.update(delta);
