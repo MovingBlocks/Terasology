@@ -16,38 +16,18 @@
 package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetName;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
-import org.terasology.world.generation.facets.base.ColorSummaryFacet;
 
 /**
  * Values in between 0-1
  */
 @FacetName("Humidity")
-public class SurfaceHumidityFacet extends BaseFieldFacet2D implements ColorSummaryFacet {
+public class SurfaceHumidityFacet extends BaseFieldFacet2D {
     static int maxSamplesPerRegion = 5;
 
     public SurfaceHumidityFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
-    }
-
-    @Override
-    public Color getColor() {
-        float[] values = getInternal();
-        float total = 0;
-        int sampleRate = Math.max(1, values.length / maxSamplesPerRegion);
-        for (int i = 0; i < values.length; i++) {
-            if (i % sampleRate == 0) {
-                total += values[i];
-            }
-        }
-        float average = total / (values.length / sampleRate);
-        if (average > 1.0f) {
-            average = 1.0f;
-        }
-        return new Color(TeraMath.clamp(average * 0.2f, 0, 255), TeraMath.clamp(average * 0.2f), TeraMath.clamp(average, 0, 255));
     }
 }
