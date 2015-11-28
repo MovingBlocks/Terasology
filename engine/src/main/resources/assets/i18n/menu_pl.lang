@@ -1,9 +1,9 @@
 {
-    "exit-game": "Wyjście", 
+    "exit-game": "Wyjdź z Terasology", 
     "game-settings": "Ustawienia", 
-    "host-multiplayer-game": "Hostuj Grę", 
+    "host-multiplayer-game": "Hostuj grę", 
     "join-game-online": "Dołącz do gry", 
-    "start-singleplayer-game": "Singleplayer", 
+    "start-singleplayer-game": "Gra jednoosobowa", 
     "this-language-English": "Polish", 
     "this-language-native": "Polski"
 }
