@@ -72,20 +72,6 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public Map<String, Class<? extends WorldFacet>> getNamedFacets() {
-        Map<String, Class<? extends WorldFacet>> facets = Maps.newHashMap();
-
-        for (Class<? extends WorldFacet> facetClass : facetProviderChains.keySet()) {
-            FacetName facetName = facetClass.getAnnotation(FacetName.class);
-            if (facetName != null && !facets.containsKey(facetName.value())) {
-                facets.put(facetName.value(), facetClass);
-            }
-        }
-
-        return facets;
-    }
-
-    @Override
     public Set<Class<? extends WorldFacet>> getAllFacets() {
         return Sets.newHashSet(facetProviderChains.keySet());
     }

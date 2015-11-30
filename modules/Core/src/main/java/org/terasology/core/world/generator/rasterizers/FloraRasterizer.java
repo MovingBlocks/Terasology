@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.world.block.Block;
