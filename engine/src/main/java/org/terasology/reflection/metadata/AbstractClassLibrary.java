@@ -45,8 +45,9 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractClassLibrary.class);
 
-    private ModuleManager moduleManager;
     protected final CopyStrategyLibrary copyStrategyLibrary;
+
+    private ModuleManager moduleManager;
     private ReflectFactory reflectFactory;
 
     private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> classLookup = Maps.newHashMap();

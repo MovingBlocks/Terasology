@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -27,9 +28,10 @@ import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.Rect2f;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Matrix4f;
@@ -90,7 +92,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Line line = new Line();
 
     private Material textureMat;
-    private Material underlineMaterial;
 
     private final FontMeshBuilder fontMeshBuilder;
 
@@ -188,9 +189,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.scale(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f(Quat4f.IDENTITY, centerOffset, 1.0f);
+        Matrix4f centerTransform = new Matrix4f(BaseQuat4f.IDENTITY, centerOffset, 1.0f);
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(Quat4f.IDENTITY,
+        Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
                 new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
                         drawRegion.minY() + drawRegion.height() / 2, 0), 1);
 
@@ -264,6 +265,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         return frameBufferObject;
     }
 
+    @Override
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                             float ux, float uy, float uw, float uh, float alpha) {
         if (!texture.getTexture().isLoaded()) {
@@ -330,6 +332,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         mesh.render();
     }
 
+    @Override
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
                          Color color, Color shadowColor, float alpha, boolean underlined) {
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor, underlined);

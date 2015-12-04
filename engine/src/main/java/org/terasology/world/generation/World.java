@@ -41,10 +41,5 @@ public interface World {
      */
     Set<Class<? extends WorldFacet>> getAllFacets();
 
-    /**
-     * @return a <b>new</b> set containing all named facets
-     */
-    Map<String, Class<? extends WorldFacet>> getNamedFacets();
-
     void initialize();
 }

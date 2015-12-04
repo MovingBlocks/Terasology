@@ -54,7 +54,7 @@ public class SpawnPrefabAction extends BaseComponentSystem {
                     break;
             }
 
-            EntityRef newEntity = entityManager.create(spawnInfo.prefab, spawnLoc);
+            entityManager.create(spawnInfo.prefab, spawnLoc);
         }
     }
 }

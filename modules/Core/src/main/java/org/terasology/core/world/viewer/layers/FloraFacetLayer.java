@@ -26,7 +26,7 @@ import java.util.function.Function;
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.core.world.generator.rasterizers.FloraType;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;
 import org.terasology.world.viewer.color.ColorBlender;
@@ -56,7 +56,7 @@ public class FloraFacetLayer extends AbstractFacetLayer {
         ColorBlender blender = ColorBlenders.forColorModel(ColorModels.RGBA, colorModel);
         DataBufferInt dataBuffer = (DataBufferInt) img.getRaster().getDataBuffer();
 
-        for (Entry<Vector3i, FloraType> entry : treeFacet.getRelativeEntries().entrySet()) {
+        for (Entry<BaseVector3i, FloraType> entry : treeFacet.getRelativeEntries().entrySet()) {
             FloraType treeGen = entry.getValue();
             int wx = entry.getKey().getX();
             int wz = entry.getKey().getZ();
@@ -82,8 +82,8 @@ public class FloraFacetLayer extends AbstractFacetLayer {
         int rx = wx - worldRegion.minX() + relativeRegion.minX();
         int rz = wy - worldRegion.minZ() + relativeRegion.minZ();
 
-        for (Entry<Vector3i, FloraType> entry : floraFacet.getRelativeEntries().entrySet()) {
-            Vector3i treePos = entry.getKey();
+        for (Entry<BaseVector3i, FloraType> entry : floraFacet.getRelativeEntries().entrySet()) {
+            BaseVector3i treePos = entry.getKey();
 
             if (treePos.getX() == rx && treePos.getZ() == rz) {
                 FloraType flora = entry.getValue();

@@ -131,7 +131,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 environmentSwitchHandler.handleSwitchToPreviewEnvironment(subContext, environment);
                 genTexture();
 
-                worldGenerator = worldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
+                worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
                 worldGenerator.setWorldSeed(seed.getText());
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
                 configureProperties();

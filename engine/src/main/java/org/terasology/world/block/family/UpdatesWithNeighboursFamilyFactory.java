@@ -15,11 +15,14 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TByteObjectIterator;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
@@ -30,7 +33,6 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,27 +48,34 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
 
-    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of(NO_CONNECTIONS, ONE_CONNECTION, TWO_CONNECTIONS_LINE, TWO_CONNECTIONS_CORNER, THREE_CONNECTIONS_CORNER, THREE_CONNECTIONS_T, FOUR_CONNECTIONS_CROSS, FOUR_CONNECTIONS_SIDE, FIVE_CONNECTIONS, SIX_CONNECTIONS);
+    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of(
+            NO_CONNECTIONS,
+            ONE_CONNECTION,
+            TWO_CONNECTIONS_LINE,
+            TWO_CONNECTIONS_CORNER,
+            THREE_CONNECTIONS_CORNER,
+            THREE_CONNECTIONS_T,
+            FOUR_CONNECTIONS_CROSS,
+            FOUR_CONNECTIONS_SIDE,
+            FIVE_CONNECTIONS,
+            SIX_CONNECTIONS);
 
-    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING =
-            new HashMap<String, Byte>() {
-                {
-                    put(NO_CONNECTIONS, (byte) 0);
-                    put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK));
+    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
+            .put(NO_CONNECTIONS, (byte) 0)
+            .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
 
-                    put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT));
-                    put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK));
+            .put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT))
+            .put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK))
 
-                    put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP));
-                    put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT));
+            .put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP))
+            .put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT))
 
-                    put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT));
-                    put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP));
+            .put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT))
+            .put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP))
 
-                    put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM));
-                    put(SIX_CONNECTIONS, (byte) 63);
-                }
-            };
+            .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
+            .put(SIX_CONNECTIONS, (byte) 63)
+            .build();
 
     private ConnectionCondition connectionCondition;
     private byte connectionSides;

@@ -16,7 +16,6 @@
 
 package org.terasology.rendering.logic;
 
-import org.terasology.math.QuaternionUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -270,7 +269,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 if (boneLocation != null) {
                     Vector3f pos = boneLocation.getWorldPosition();
                     pos.sub(worldPos);
-                    QuaternionUtil.quatRotate(inverseWorldRot, pos, pos);
+                    inverseWorldRot.rotate(pos, pos);
                     bonePositions.add(pos);
                     Quat4f rot = new Quat4f(inverseWorldRot);
                     rot.mul(boneLocation.getWorldRotation());
@@ -349,7 +348,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         Vector3f worldPosA = loc.getWorldPosition();
         Quat4f worldRot = loc.getWorldRotation();
         Vector3f offset = new Vector3f(0, 0, 0.1f);
-        QuaternionUtil.quatRotate(worldRot, offset, offset);
+        worldRot.rotate(offset, offset);
         offset.add(worldPosA);
 
         glBegin(GL11.GL_LINES);

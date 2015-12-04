@@ -61,6 +61,7 @@ public class OculusStereoCamera extends Camera {
     protected Matrix4f viewTranslationLeftEye = new Matrix4f();
     protected Matrix4f viewTranslationRightEye = new Matrix4f();
 
+    @Override
     public void updateFrustum() {
         super.updateFrustum();
 
@@ -75,6 +76,7 @@ public class OculusStereoCamera extends Camera {
         return false;
     }
 
+    @Override
     public ViewFrustum getViewFrustum() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -87,6 +89,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     public ViewFrustum getViewFrustumReflected() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -99,6 +102,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     public Matrix4f getViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -111,6 +115,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     public Matrix4f getViewMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -129,6 +134,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     public Matrix4f getProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -141,6 +147,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     public Matrix4f getInverseProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -153,6 +160,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     public Matrix4f getInverseViewProjectionMatrix() {
         WorldRenderer.WorldRenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
@@ -165,6 +173,7 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
+    @Override
     @Deprecated
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
@@ -172,27 +181,32 @@ public class OculusStereoCamera extends Camera {
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
+    @Override
     @Deprecated
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
     }
 
+    @Override
     @Deprecated
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
     }
 
+    @Override
     public void update(float deltaT) {
         super.update(deltaT);
         updateMatrices();
     }
 
+    @Override
     public void updateMatrices() {
         updateMatrices(activeFov);
     }
 
+    @Override
     public void updateMatrices(float fov) {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 

@@ -17,6 +17,7 @@
 package org.terasology.input.cameraTarget;
 
 import com.google.common.base.Objects;
+
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -33,6 +34,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 
+import java.math.RoundingMode;
 import java.util.Arrays;
 
 /**
@@ -151,6 +153,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         }
     }
 
+    @Override
     public String toString() {
         Camera camera = worldRenderer.getActiveCamera();
         if (targetBlockPos != null) {
@@ -175,7 +178,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         if (targetBlockPos != null) {
             return new Vector3i(targetBlockPos);
         }
-        return new Vector3i(hitPosition, 0.5f);
+        return new Vector3i(hitPosition, RoundingMode.HALF_UP);
     }
 
     /**

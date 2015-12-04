@@ -57,7 +57,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +70,7 @@ import java.util.stream.Collectors;
 public class SelectModulesScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-    public static final Name ENGINE_MODULE_NAME = new Name("engine");
+    private static final Name ENGINE_MODULE_NAME = new Name("engine");
 
     @In
     private ModuleManager moduleManager;
@@ -359,14 +358,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return;
         }
 
-        LinkedHashMap<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
+        Map<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
 
         ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
-        confirmPopup.setMessage("Confirm Download", modulesToDownload.size()  +" modules will be downloaded");
+        confirmPopup.setMessage("Confirm Download", modulesToDownload.size()  + " modules will be downloaded");
         confirmPopup.setOkHandler(() -> downloadModules(urlToTargetMap));
     }
 
-    private void downloadModules(LinkedHashMap<URL, Path> urlToTargetMap) {
+    private void downloadModules(Map<URL, Path> urlToTargetMap) {
         final WaitPopup<List<Path>> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
@@ -385,14 +384,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
             });
         ProgressListener progressListener = progress ->
                 popup.setMessage("Downloading required modules", String.format("Please wait ... %d%%", (int) (progress * 100f)));
-        // to ensure that the intial message gets set:
+        // to ensure that the initial message gets set:
         progressListener.onProgress(0);
         MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, progressListener);
         popup.startOperation(operation, true);
     }
 
-    private LinkedHashMap<URL, Path> determineDownloadUrlsFor(List<ModuleSelectionInfo> modulesToDownload) {
-        LinkedHashMap<URL, Path> urlToTargetMap = Maps.newLinkedHashMap();
+    private Map<URL, Path> determineDownloadUrlsFor(List<ModuleSelectionInfo> modulesToDownload) {
+        Map<URL, Path> urlToTargetMap = Maps.newLinkedHashMap();
         for (ModuleSelectionInfo moduleSelectionInfo: modulesToDownload) {
             ModuleMetadata metaData = moduleSelectionInfo.getOnlineVersion().getMetadata();
             String version = metaData.getVersion().toString();
@@ -406,58 +405,19 @@ public class SelectModulesScreen extends CoreScreenLayer {
         return urlToTargetMap;
     }
 
-
-    private static final class DependencyResolutionFailed extends Exception {
-        DependencyResolutionFailed(String message) {
-            super(message);
-        }
-    }
-
-    private static class MultiFileDownloader implements Callable<List<Path>> {
-        private LinkedHashMap<URL, Path> urlToTargetMap;
-        private ProgressListener progressListener;
-
-        public MultiFileDownloader(LinkedHashMap<URL, Path> urlToTargetMap, ProgressListener progressListener) {
-            this.urlToTargetMap = urlToTargetMap;
-            this.progressListener = progressListener;
-        }
-
-        @Override
-        public List<Path> call() throws Exception {
-            List<Path> downloadedFiles = new ArrayList<>();
-            float fractionPerFile = (float) 1 / urlToTargetMap.size();
-            int index = 0;
-            for (Map.Entry<URL, Path> entry: urlToTargetMap.entrySet()) {
-                float progressWithFiles= fractionPerFile*index;
-                ProgressListener singleDownloadListener = new ProgressListener() {
-                    @Override
-                    public void onProgress(float fraction) {
-                        float totalPrecentDone = progressWithFiles + (fraction/urlToTargetMap.size());
-                        progressListener.onProgress(totalPrecentDone);
-                    }
-                };
-                FileDownloader fileDownloader = new FileDownloader(entry.getKey(), entry.getValue(),
-                        singleDownloadListener);
-                downloadedFiles.add(fileDownloader.call());
-                index++;
-            };
-            return downloadedFiles;
-        }
-    }
-
     /**
      * @return All modules that are required to play the online version of the specified module. The list contains the
      * passed module too.
      */
     private List<ModuleSelectionInfo> getModulesRequiredFor(ModuleSelectionInfo mainModuleInfo) throws DependencyResolutionFailed {
-        ModuleMetadata mainModuleMetadata=  mainModuleInfo.getOnlineVersion().getMetadata();
+        ModuleMetadata mainModuleMetadata = mainModuleInfo.getOnlineVersion().getMetadata();
         LinkedList<Name> idsToCheck = Lists.newLinkedList();
         idsToCheck.add(mainModuleMetadata.getId());
         Map<Name, ModuleSelectionInfo> requiredIdToMetaDataMap = Maps.newLinkedHashMap();
         requiredIdToMetaDataMap.put(mainModuleMetadata.getId(), mainModuleInfo);
         while (!idsToCheck.isEmpty()) {
             Name moduleToCheck = idsToCheck.removeFirst();
-            ModuleSelectionInfo moduleToCheckInfo =requiredIdToMetaDataMap.get(moduleToCheck);
+            ModuleSelectionInfo moduleToCheckInfo = requiredIdToMetaDataMap.get(moduleToCheck);
             ModuleMetadata metaDataOfModuleToCheck = moduleToCheckInfo.getOnlineVersion().getMetadata();
 
             for (DependencyInfo dependencyInfo : metaDataOfModuleToCheck.getDependencies()) {
@@ -469,7 +429,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
                         throw new DependencyResolutionFailed(String.format(
                                 "Module %s %s requires %s in version range %s, but you are using version %s",
-                                moduleToCheck,metaDataOfModuleToCheck.getVersion(),  depName, dependencyInfo.versionRange(),
+                                moduleToCheck, metaDataOfModuleToCheck.getVersion(), depName, dependencyInfo.versionRange(),
                                 depMetaData.getVersion()));
                     }
                 } else {
@@ -483,7 +443,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
                         throw new DependencyResolutionFailed(String.format(
                                 "Module %s %s requires %s in version range %s, but the online version has version %s",
-                                moduleToCheck,metaDataOfModuleToCheck.getVersion(),  depName, dependencyInfo.versionRange(),
+                                moduleToCheck, metaDataOfModuleToCheck.getVersion(), depName, dependencyInfo.versionRange(),
                                 depMetaData.getVersion()));
                     }
                     if (!requiredIdToMetaDataMap.containsKey(depName)) {
@@ -638,6 +598,46 @@ public class SelectModulesScreen extends CoreScreenLayer {
         updateValidToSelect();
     }
 
+    private static final class DependencyResolutionFailed extends Exception {
+
+        private static final long serialVersionUID = -2098680881126171195L;
+
+        DependencyResolutionFailed(String message) {
+            super(message);
+        }
+    }
+
+    private static class MultiFileDownloader implements Callable<List<Path>> {
+        private Map<URL, Path> urlToTargetMap;
+        private ProgressListener progressListener;
+
+        public MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
+            this.urlToTargetMap = urlToTargetMap;
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public List<Path> call() throws Exception {
+            List<Path> downloadedFiles = new ArrayList<>();
+            float fractionPerFile = (float) 1 / urlToTargetMap.size();
+            int index = 0;
+            for (Map.Entry<URL, Path> entry: urlToTargetMap.entrySet()) {
+                float progressWithFiles = fractionPerFile * index;
+                ProgressListener singleDownloadListener = new ProgressListener() {
+                    @Override
+                    public void onProgress(float fraction) {
+                        float totalPrecentDone = progressWithFiles + (fraction / urlToTargetMap.size());
+                        progressListener.onProgress(totalPrecentDone);
+                    }
+                };
+                FileDownloader fileDownloader = new FileDownloader(entry.getKey(), entry.getValue(),
+                        singleDownloadListener);
+                downloadedFiles.add(fileDownloader.call());
+                index++;
+            }
+            return downloadedFiles;
+        }
+    }
 
     private static final class ModuleSelectionInfo {
         private Module latestVersion;

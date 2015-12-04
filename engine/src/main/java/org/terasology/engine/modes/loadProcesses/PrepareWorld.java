@@ -16,8 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
@@ -28,7 +26,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * @author Immortius
  */
 public class PrepareWorld implements LoadProcess {
-    private static final Logger logger = LoggerFactory.getLogger(PrepareWorld.class);
 
     private final Context context;
     private long startTime;

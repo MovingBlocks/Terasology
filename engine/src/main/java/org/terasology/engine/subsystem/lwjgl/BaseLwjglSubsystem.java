@@ -35,7 +35,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     private static boolean initialised;
 
     @Override
-    public synchronized void preInitialise(Context context) {
+    public void preInitialise(Context context) {
         if (!initialised) {
             initLogger();
             LWJGLHelper.initNativeLibs();
@@ -48,19 +48,19 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
             try {
             // Pipes System.out and err to log, because that's where lwjgl writes it to.
             System.setOut(new PrintStream(System.out, false, Charsets.UTF_8.name()) {
-                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
+                private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
 
                 @Override
                 public void print(final String message) {
-                    logger.info(message);
+                    lwjglLogger.info(message);
                 }
             });
             System.setErr(new PrintStream(System.err, false, Charsets.UTF_8.name()) {
-                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
+                private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
 
                 @Override
                 public void print(final String message) {
-                    logger.error(message);
+                    lwjglLogger.error(message);
                 }
             });
             } catch (UnsupportedEncodingException e) {

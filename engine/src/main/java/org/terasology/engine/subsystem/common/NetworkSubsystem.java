@@ -22,7 +22,6 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.physics.CollisionGroupManager;
 
 /**
  *

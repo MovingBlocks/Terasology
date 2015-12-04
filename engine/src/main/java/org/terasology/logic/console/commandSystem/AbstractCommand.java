@@ -22,8 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
@@ -50,7 +48,6 @@ import java.util.Set;
  */
 public abstract class AbstractCommand implements ConsoleCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCommand.class);
     private final Name name;
     private final String requiredPermission;
     private final boolean runOnServer;
@@ -352,6 +349,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
         return helpText;
     }
 
+    @Override
     public String getUsage() {
         return usage;
     }
@@ -361,10 +359,12 @@ public abstract class AbstractCommand implements ConsoleCommand {
         return name;
     }
 
+    @Override
     public int getRequiredParameterCount() {
         return requiredParameterCount;
     }
 
+    @Override
     public boolean endsWithVarargs() {
         return commandParameters.size() > 0 && commandParameters.get(commandParameters.size() - 1).isArray();
     }

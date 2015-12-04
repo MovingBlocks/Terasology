@@ -27,7 +27,6 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.block.tiles.WorldAtlasImpl;

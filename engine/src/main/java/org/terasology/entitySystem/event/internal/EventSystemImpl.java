@@ -52,7 +52,6 @@ import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.world.block.BlockComponent;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -94,6 +93,7 @@ public class EventSystemImpl implements EventSystem {
         this.networkSystem = networkSystem;
     }
 
+    @Override
     public void process() {
         for (PendingEvent event = pendingEvents.poll(); event != null; event = pendingEvents.poll()) {
             if (event.getComponent() != null) {
@@ -419,6 +419,7 @@ public class EventSystemImpl implements EventSystem {
             this.priority = priority;
         }
 
+        @Override
         public boolean isValidFor(EntityRef entity) {
             for (Class<? extends Component> component : filterComponents) {
                 if (!entity.hasComponent(component)) {
@@ -428,6 +429,7 @@ public class EventSystemImpl implements EventSystem {
             return true;
         }
 
+        @Override
         public void invoke(EntityRef entity, Event event) {
             try {
                 Object[] params = new Object[2 + componentParams.size()];
@@ -442,6 +444,7 @@ public class EventSystemImpl implements EventSystem {
             }
         }
 
+        @Override
         public int getPriority() {
             return priority;
         }
@@ -478,6 +481,7 @@ public class EventSystemImpl implements EventSystem {
             this.priority = priority;
         }
 
+        @Override
         public boolean isValidFor(EntityRef entity) {
             for (Class<? extends Component> component : filterComponents) {
                 if (!entity.hasComponent(component)) {
@@ -487,6 +491,7 @@ public class EventSystemImpl implements EventSystem {
             return true;
         }
 
+        @Override
         public void invoke(EntityRef entity, Event event) {
             try {
                 Object[] params = new Object[2 + componentParams.size()];
@@ -510,6 +515,7 @@ public class EventSystemImpl implements EventSystem {
             }
         }
 
+        @Override
         public int getPriority() {
             return priority;
         }

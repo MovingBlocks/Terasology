@@ -18,8 +18,6 @@ package org.terasology.logic.players;
 
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -40,7 +38,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 
@@ -52,22 +49,10 @@ import org.terasology.world.WorldProvider;
 public class DebugControlSystem extends BaseComponentSystem {
 
     @In
-    private GameEngine engine;
-
-    @In
     private WorldProvider world;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private Config config;
-
-    @In
-    private Context context;
-
-    @In
-    private LocalPlayer localPlayer;
 
     @In
     private NUIManager nuiManager;

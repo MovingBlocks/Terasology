@@ -17,10 +17,8 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.primitives.Ints;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;

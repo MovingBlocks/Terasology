@@ -53,8 +53,10 @@ public final class HTMLLikeParser {
     public static String unencodeHTMLLike(String text) {
         StringBuilder result = new StringBuilder();
         char[] chars = text.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
+        int i = 0;
+        while (i < chars.length) {
             char c = chars[i];
+            i++;
             if (c == '&') {
                 if (chars[i + 1] == 'a' && chars[i + 2] == 'm' && chars[i + 3] == 'p' && chars[i + 4] == ';') {
                     result.append('&');

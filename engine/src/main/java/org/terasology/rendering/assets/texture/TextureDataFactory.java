@@ -25,8 +25,6 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import com.google.common.primitives.UnsignedBytes;
-
 /**
  * Creates TextureData objects based on specific criteria
  *

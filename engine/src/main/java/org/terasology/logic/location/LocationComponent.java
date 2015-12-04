@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.location;
 
-import org.terasology.math.QuaternionUtil;
 import com.google.common.collect.Lists;
 
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -102,7 +101,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
             output.scale(parentLoc.scale);
-            QuaternionUtil.quatRotate(parentLoc.getLocalRotation(), output, output);
+            parentLoc.getLocalRotation().rotate(output, output);
             output.add(parentLoc.position);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
@@ -141,7 +140,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
             this.position.scale(1f / parentLoc.getWorldScale());
             Quat4f rot = new Quat4f(0, 0, 0, 1);
             rot.inverse(parentLoc.getWorldRotation());
-            QuaternionUtil.quatRotate(rot, this.position, this.position);
+            rot.rotate(this.position, this.position);
         }
     }
 
@@ -189,7 +188,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     @Override
-    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+    public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return initial || replicateChanges;
     }
 }

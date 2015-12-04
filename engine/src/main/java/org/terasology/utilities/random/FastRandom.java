@@ -49,6 +49,7 @@ public class FastRandom extends Random {
      *
      * @return Random value
      */
+    @Override
     public int nextInt() {
         seed++;
         seed ^= (seed << 21);

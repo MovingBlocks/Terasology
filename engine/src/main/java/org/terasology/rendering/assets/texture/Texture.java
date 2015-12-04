@@ -18,7 +18,7 @@ package org.terasology.rendering.assets.texture;
 
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.Rect2f;
+import org.terasology.math.geom.Rect2f;
 
 /**
  * @author Immortius

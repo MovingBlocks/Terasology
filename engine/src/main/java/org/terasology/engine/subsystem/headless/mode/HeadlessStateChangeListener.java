@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.subsystem.headless.mode;
 
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.StateChangeSubscriber;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.modes.GameState;

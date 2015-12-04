@@ -26,7 +26,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
@@ -36,9 +35,9 @@ import org.terasology.rendering.nui.Color;
 
 
 /**
- * Creates name tags for chacters controlled by players based on their name.
+ * Creates name tags for characters controlled by players based on their name.
  *
- * Once there is the intention to implement multiple differnt name tag generation rules for players feel free to move
+ * Once there is the intention to implement multiple different name tag generation rules for players feel free to move
  * this system into a module so that it isn't always enabled.
  */
 @RegisterSystem(RegisterMode.CLIENT)
@@ -49,8 +48,8 @@ public class PlayerNameTagSystem extends BaseComponentSystem {
     private NetworkSystem networkSystem;
 
     /**
-     * Listening for {@link OnPlayerSpawnedEvent} does not work, as it is an authority event that does not get
-     * processed at clients. That is why we listen for the activation.
+     * Listening for {@link org.terasology.logic.players.event.OnPlayerSpawnedEvent} does not work, as it is an
+     * authority event that does not get processed at clients. That is why we listen for the activation.
      */
     @ReceiveEvent(components = CharacterComponent.class)
     public void onCharacterActivation(OnActivatedComponent event, EntityRef characterEntity,

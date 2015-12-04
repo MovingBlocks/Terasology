@@ -23,9 +23,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +69,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -250,7 +253,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
+                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
                 }
                 Vector3i pos = null;
                 int distance = Integer.MAX_VALUE;
@@ -476,7 +479,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void sendInitialEntities(NetData.NetMessage.Builder message) {
-        TIntIterator initialIterator = netInitial.iterator();
         int[] initial = netInitial.toArray();
         netInitial.clear();
         Arrays.sort(initial);
@@ -550,6 +552,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         return metricSource;
     }
 
+    @Override
     public void setViewDistanceMode(ViewDistance distanceMode) {
         this.viewDistance = distanceMode;
     }

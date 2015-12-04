@@ -30,7 +30,7 @@ public class ConfirmPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        WidgetUtil.trySubscribe(this, "ok",(button) -> {
+        WidgetUtil.trySubscribe(this, "ok", (button) -> {
             getManager().popScreen();
             okHandler.run();
         });

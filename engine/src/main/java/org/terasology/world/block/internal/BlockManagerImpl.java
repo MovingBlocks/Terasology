@@ -35,7 +35,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.WorldAtlas;
@@ -84,7 +83,7 @@ public class BlockManagerImpl extends BlockManager {
                             boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
-        this.blockBuilder = new BlockBuilder(assetManager, atlas);
+        this.blockBuilder = new BlockBuilder(atlas);
     }
 
     public void initialise(List<String> registeredBlockFamilies,

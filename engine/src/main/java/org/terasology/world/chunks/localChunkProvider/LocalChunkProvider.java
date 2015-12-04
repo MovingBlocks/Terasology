@@ -52,7 +52,6 @@ import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
@@ -87,7 +86,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Immortius
  * @author Florian
  */
-public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvider {
+public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
@@ -173,6 +172,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
+    @Override
     public void setWorldEntity(EntityRef worldEntity) {
         this.worldEntity = worldEntity;
     }
@@ -487,7 +487,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     Chunk chunk = nearCache.get(pos);
                     if (chunk != null) {
                         chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
-                    } else{
+                    } else {
                         createOrLoadChunk(pos);
                     }
                 }
@@ -568,6 +568,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
 
+    @Override
     public void restart() {
         pipeline.restart();
         unloadRequestTaskMaster.restart();

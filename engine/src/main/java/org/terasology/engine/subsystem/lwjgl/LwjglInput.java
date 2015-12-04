@@ -18,8 +18,6 @@ package org.terasology.engine.subsystem.lwjgl;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -30,7 +28,6 @@ import org.terasology.input.lwjgl.LwjglMouseDevice;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(LwjglInput.class);
     private Context context;
 
     @Override

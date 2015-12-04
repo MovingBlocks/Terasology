@@ -19,6 +19,7 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -46,6 +47,7 @@ import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -325,7 +327,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private int score(Vector3i chunk) {
-            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), 0.5f));
+            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), RoundingMode.HALF_UP));
             return playerChunk.distanceSquared(chunk);
         }
     }

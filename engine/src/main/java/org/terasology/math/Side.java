@@ -41,8 +41,8 @@ public enum Side {
     BACK(new Vector3i(0, 0, 1), true, true, false);
 
     private static EnumMap<Side, Side> reverseMap;
-    private static Side[] horizontalSides;
-    private static Side[] verticalSides;
+    private static ImmutableList<Side> horizontalSides;
+    private static ImmutableList<Side> verticalSides;
     private static EnumMap<Side, Side> clockwiseYawSide;
     private static EnumMap<Side, Side> anticlockwiseYawSide;
     private static EnumMap<Side, Side> clockwisePitchSide;
@@ -110,8 +110,8 @@ public enum Side {
         clockwiseRollSide.put(Side.RIGHT, Side.TOP);
         anticlockwiseRollSide.put(Side.RIGHT, Side.BOTTOM);
 
-        horizontalSides = new Side[]{LEFT, RIGHT, FRONT, BACK};
-        verticalSides = new Side[]{TOP, BOTTOM};
+        horizontalSides = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
+        verticalSides = ImmutableList.of(TOP, BOTTOM);
     }
 
     private Vector3i vector3iDir;
@@ -129,11 +129,14 @@ public enum Side {
     /**
      * @return The horizontal sides, for iteration
      */
-    public static Side[] horizontalSides() {
+    public static ImmutableList<Side> horizontalSides() {
         return horizontalSides;
     }
 
-    public static Side[] verticalSides() {
+    /**
+     * @return The vertical sides, for iteration
+     */
+    public static ImmutableList<Side> verticalSides() {
         return verticalSides;
     }
 

@@ -26,7 +26,6 @@ import org.terasology.input.binds.inventory.DropItemButton;
 import org.terasology.input.binds.inventory.ToolbarNextButton;
 import org.terasology.input.binds.inventory.ToolbarPrevButton;
 import org.terasology.input.binds.inventory.ToolbarSlotButton;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DropItemRequest;
@@ -53,12 +52,6 @@ public class PlayerInventorySystem extends BaseComponentSystem {
 
     @In
     private Time time;
-
-    @In
-    private CameraTargetSystem cameraTargetSystem;
-
-    @In
-    private WorldRenderer worldRenderer;
 
     @In
     private NUIManager nuiManager;
@@ -95,7 +88,6 @@ public class PlayerInventorySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
         localPlayer.getCharacterEntity().send(new SelectItemRequest(event.getSlot()));
         event.consume();
     }
@@ -184,7 +176,7 @@ public class PlayerInventorySystem extends BaseComponentSystem {
         if (lastTimeThrowInteraction == 0) {
             return 0;
         }
-        float dropPower = (float) (time.getGameTimeInMs() - lastTimeThrowInteraction) / 1200f;
+        float dropPower = (time.getGameTimeInMs() - lastTimeThrowInteraction) / 1200f;
         return Math.min(1.0f, dropPower);
     }
 

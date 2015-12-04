@@ -124,7 +124,7 @@ public final class TaskMaster<T extends Task> {
         if (!running) {
             executorService = Executors.newFixedThreadPool(threads);
             for (int i = 0; i < threads; ++i) {
-                executorService.execute(new TaskProcessor(name + "-" + i, taskQueue));
+                executorService.execute(new TaskProcessor<>(name + "-" + i, taskQueue));
             }
             running = true;
         }

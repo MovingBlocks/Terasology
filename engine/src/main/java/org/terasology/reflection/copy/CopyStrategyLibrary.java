@@ -50,7 +50,7 @@ public class CopyStrategyLibrary {
     private static final Logger logger = LoggerFactory.getLogger(CopyStrategyLibrary.class);
 
     private Map<Class<?>, CopyStrategy<?>> strategies = Maps.newHashMap();
-    private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy();
+    private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy<>();
     private ReflectFactory reflectFactory;
 
     public CopyStrategyLibrary(ReflectFactory reflectFactory) {

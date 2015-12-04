@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.math.Rect2f;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2f;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -127,6 +127,7 @@ public class OpenGLTexture extends Texture {
         }
     }
 
+    @Override
     public int getId() {
         return resources.id;
     }
@@ -139,6 +140,7 @@ public class OpenGLTexture extends Texture {
         return 0;
     }
 
+    @Override
     public int getWidth() {
         if (resources.loadedTextureInfo != null) {
             return resources.loadedTextureInfo.getWidth();
@@ -146,6 +148,7 @@ public class OpenGLTexture extends Texture {
         return 0;
     }
 
+    @Override
     public int getHeight() {
         if (resources.loadedTextureInfo != null) {
             return resources.loadedTextureInfo.getHeight();
@@ -158,10 +161,12 @@ public class OpenGLTexture extends Texture {
         return new Vector2i(getWidth(), getHeight());
     }
 
+    @Override
     public Texture.WrapMode getWrapMode() {
         return resources.loadedTextureInfo.getWrapMode();
     }
 
+    @Override
     public FilterMode getFilterMode() {
         return resources.loadedTextureInfo.getFilterMode();
     }

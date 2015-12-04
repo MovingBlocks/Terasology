@@ -16,8 +16,6 @@
 
 package org.terasology.rendering.md5;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -82,7 +80,7 @@ public final class MD5ParserCommon {
     }
 
     public static Vector3f correctOffset(Vector3f offset) {
-        return QuaternionUtil.quatRotate(CORRECTION_QUATERNION, offset, new Vector3f());
+        return CORRECTION_QUATERNION.rotate(offset, new Vector3f());
     }
 
 

@@ -17,7 +17,7 @@ package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
@@ -56,7 +56,7 @@ public class BiomeProvider implements FacetProvider {
 
         int seaLevel = seaLevelFacet.getSeaLevel();
 
-        for (Vector2i pos : biomeFacet.getRelativeRegion()) {
+        for (BaseVector2i pos : biomeFacet.getRelativeRegion().contents()) {
             float temp = temperatureFacet.get(pos);
             float hum = temp * humidityFacet.get(pos);
             float height = heightFacet.get(pos);

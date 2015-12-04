@@ -17,8 +17,6 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -32,7 +30,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglDisplayDevice implements DisplayDevice {
 
-    private static final Logger logger = LoggerFactory.getLogger(LwjglDisplayDevice.class);
     private RenderingConfig config;
 
     public LwjglDisplayDevice(Context context) {

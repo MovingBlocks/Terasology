@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.nameTags;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -40,7 +38,6 @@ import java.util.Map;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class NameTagClientSystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(NameTagClientSystem.class);
 
     private Map<EntityRef, EntityRef> nameTagEntityToFloatingTextMap = new HashMap<>();
 

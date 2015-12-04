@@ -218,7 +218,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             if (chunk.isReady()) {
                 // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
                 unloadedAndSavingChunkMap.remove(chunk.getPosition());
-                ChunkImpl chunkImpl = (ChunkImpl) chunk;// this storage manager can only work with ChunkImpls
+                ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
                 saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
             }
         }
@@ -467,6 +467,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
     }
 
+    @Override
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
         entitySetDeltaRecorder.onEntityComponentAdded(entity, component);
     }

@@ -41,6 +41,7 @@ public class BindButtonEvent extends ButtonEvent {
         return id;
     }
 
+    @Override
     public ButtonState getState() {
         return state;
     }

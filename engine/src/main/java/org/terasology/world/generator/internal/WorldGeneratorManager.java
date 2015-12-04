@@ -103,7 +103,7 @@ public class WorldGeneratorManager {
      * @param context objects from this context will be injected into the
      * @return The instantiated world generator.
      */
-    public WorldGenerator createGenerator(SimpleUri uri, Context context) throws UnresolvedWorldGeneratorException {
+    public static WorldGenerator createGenerator(SimpleUri uri, Context context) throws UnresolvedWorldGeneratorException {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Module module = moduleManager.getEnvironment().get(uri.getModuleName());
         if (module == null) {
@@ -130,7 +130,7 @@ public class WorldGeneratorManager {
      * @param environment to be searched for the world generator class.
      * @return a new world generator with the specified uri.
      */
-    public WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
+    public static WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
             SimpleUri generatorUri = new SimpleUri(environment.getModuleProviding(generatorClass), annotation.id());
@@ -143,7 +143,7 @@ public class WorldGeneratorManager {
         throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");
     }
 
-    private WorldGenerator loadGenerator(Class<?> generatorClass, SimpleUri uri) throws UnresolvedWorldGeneratorException {
+    private static WorldGenerator loadGenerator(Class<?> generatorClass, SimpleUri uri) throws UnresolvedWorldGeneratorException {
         if (isValidWorldGenerator(generatorClass)) {
             try {
                 return (WorldGenerator) generatorClass.getConstructor(SimpleUri.class).newInstance(uri);
@@ -155,7 +155,7 @@ public class WorldGeneratorManager {
         }
     }
 
-    private boolean isValidWorldGenerator(Class<?> generatorClass) {
+    private static boolean isValidWorldGenerator(Class<?> generatorClass) {
         try {
             if (WorldGenerator.class.isAssignableFrom(generatorClass)) {
                 if (generatorClass.getConstructor(SimpleUri.class) != null) {

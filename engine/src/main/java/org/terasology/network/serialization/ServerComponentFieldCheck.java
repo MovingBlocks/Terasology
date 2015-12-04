@@ -39,12 +39,12 @@ public class ServerComponentFieldCheck implements FieldSerializeCheck<Component>
     }
 
     @Override
-    public boolean shouldSerializeField(ReplicatedFieldMetadata field, Component object) {
+    public boolean shouldSerializeField(ReplicatedFieldMetadata<?, ?> field, Component object) {
         return shouldSerializeField(field, object, false);
     }
 
     @Override
-    public boolean shouldSerializeField(ReplicatedFieldMetadata field, Component component, boolean componentInitial) {
+    public boolean shouldSerializeField(ReplicatedFieldMetadata<?, ?> field, Component component, boolean componentInitial) {
         // The server will send fields that are replicated when
         // 1. It is the initial send of the component
         // 2. The field is replicated from Server to Client
@@ -64,9 +64,9 @@ public class ServerComponentFieldCheck implements FieldSerializeCheck<Component>
     }
 
     @Override
-    public boolean shouldDeserialize(ClassMetadata classMetadata, FieldMetadata fieldMetadata) {
+    public boolean shouldDeserialize(ClassMetadata<?, ?> classMetadata, FieldMetadata<?, ?> fieldMetadata) {
         // The server only accepts fields that are replicated from owner
-        ReplicatedFieldMetadata replicatedFieldMetadata = (ReplicatedFieldMetadata) fieldMetadata;
+        ReplicatedFieldMetadata<?, ?> replicatedFieldMetadata = (ReplicatedFieldMetadata<?, ?>) fieldMetadata;
         return replicatedFieldMetadata.isReplicated() && replicatedFieldMetadata.getReplicationInfo().value().isReplicateFromOwner();
     }
 }

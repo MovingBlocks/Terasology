@@ -22,9 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -41,10 +39,7 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import javax.imageio.ImageIO;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Immortius

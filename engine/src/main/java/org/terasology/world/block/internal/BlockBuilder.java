@@ -17,10 +17,7 @@ package org.terasology.world.block.internal;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector2f;
@@ -42,22 +39,16 @@ import java.util.Map;
  */
 public class BlockBuilder implements BlockBuilderHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(BlockBuilder.class);
-
-    private AssetManager assetManager;
     private WorldAtlas worldAtlas;
 
     private BlockShape cubeShape;
     private BlockShape loweredShape;
-    private BlockShape trimmedLoweredShape;
 
-    public BlockBuilder(AssetManager assetManager, WorldAtlas worldAtlas) {
-        this.assetManager = assetManager;
+    public BlockBuilder(WorldAtlas worldAtlas) {
         this.worldAtlas = worldAtlas;
 
         cubeShape = Assets.get("engine:cube", BlockShape.class).get();
         loweredShape = Assets.get("engine:loweredCube", BlockShape.class).get();
-        trimmedLoweredShape = Assets.get("engine:trimmedLoweredCube", BlockShape.class).get();
     }
 
     @Override

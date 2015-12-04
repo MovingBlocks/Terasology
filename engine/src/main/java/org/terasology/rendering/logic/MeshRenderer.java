@@ -38,7 +38,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.TeraMath;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
@@ -55,12 +54,6 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module

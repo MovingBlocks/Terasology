@@ -31,18 +31,18 @@ public class ClientComponentFieldCheck implements FieldSerializeCheck<Component>
 
 
     @Override
-    public boolean shouldSerializeField(ReplicatedFieldMetadata field, Component object) {
+    public boolean shouldSerializeField(ReplicatedFieldMetadata<?, ?> field, Component object) {
         return shouldSerializeField(field, object, false);
     }
 
     @Override
-    public boolean shouldSerializeField(ReplicatedFieldMetadata field, Component component, boolean componentInitial) {
+    public boolean shouldSerializeField(ReplicatedFieldMetadata<?, ?> field, Component component, boolean componentInitial) {
         // Clients only send fields that are replicated from the owner
         return field.isReplicated() && field.getReplicationInfo().value().isReplicateFromOwner();
     }
 
     @Override
-    public boolean shouldDeserialize(ClassMetadata classMetadata, FieldMetadata fieldMetadata) {
+    public boolean shouldDeserialize(ClassMetadata<?, ?> classMetadata, FieldMetadata<?, ?> fieldMetadata) {
         // Clients should use all replicated fields
         return true;
     }

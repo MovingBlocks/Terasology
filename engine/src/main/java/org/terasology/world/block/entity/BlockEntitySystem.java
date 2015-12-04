@@ -15,6 +15,8 @@
  */
 package org.terasology.world.block.entity;
 
+import java.math.RoundingMode;
+
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -119,12 +121,12 @@ public class BlockEntitySystem extends BaseComponentSystem {
                     }
                 } else {
                     // just drop the ActAsBlock block
-                    Vector3i location = new Vector3i(blockRegion.region.center(), 0.5f);
+                    Vector3i location = new Vector3i(blockRegion.region.center(), RoundingMode.HALF_UP);
                     commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
                 }
             } else if (entity.hasComponent(LocationComponent.class)) {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-                Vector3i location = new Vector3i(locationComponent.getWorldPosition(), 0.5f);
+                Vector3i location = new Vector3i(locationComponent.getWorldPosition(), RoundingMode.HALF_UP);
                 commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
             }
         }

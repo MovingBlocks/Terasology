@@ -93,6 +93,7 @@ public class SimpleUri implements Uri, Comparable<SimpleUri> {
         return objectName;
     }
 
+    @Override
     public boolean isValid() {
         return !moduleName.isEmpty() && !objectName.isEmpty();
     }

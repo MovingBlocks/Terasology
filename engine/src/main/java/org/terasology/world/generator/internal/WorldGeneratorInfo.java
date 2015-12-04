@@ -68,6 +68,7 @@ public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
         return Objects.hash(uri, displayName);
     }
 
+    @Override
     public String toString() {
         return displayName + " (" + uri + ")";
     }

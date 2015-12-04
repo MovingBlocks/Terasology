@@ -141,7 +141,16 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
                 } else {
                     //if(dir == Side.TOP) logger.info("Generating: " + (new Vector3i(x, y, z)).toString() + " " + view.getChunkRegion().toString() + " " + dir.toString());
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
+
+                    if (blockAppearance.getPart(BlockPart.fromSide(dir)) == null) {
+                        // TODO: This would catch something like water blocks attempting to render with a "fixed" trimmedLoweredCube shape
+                        // That shape has its top trimmed down a bit to let water sit slightly lower than land, however, underwater this shouldn't show
+                        // Normally we would configure that shape with CENTER instead of TOP, that way the trimmed part wouldn't occlude in a stack
+                        // But with that handling you don't get water blocks occluding tops underwater... and there's no TOP to retrieve below -> NPE
+                        logger.debug("Cannot render side '{}' for a block - no stored block appearance for it. renderType {}, vertexFlag {}", dir, renderType, vertexFlag);
+                    } else {
+                        blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
+                    }
                 }
             }
         }

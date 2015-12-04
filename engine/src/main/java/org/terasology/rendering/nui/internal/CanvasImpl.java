@@ -30,17 +30,18 @@ import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Border;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Rect2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.InteractionListener;
@@ -394,12 +395,21 @@ public class CanvasImpl implements CanvasControl {
             if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
                 try (SubRegion withMargin = subRegionForWidget(element, newStyle.getMargin().shrink(Rect2i.createFromMinAndSize(Vector2i.zero(), regionArea.size())), false)) {
-                    element.onDraw(this);
+                    drawStyledWidget(element);
                 }
             } else {
-                element.onDraw(this);
+                drawStyledWidget(element);
             }
         }
+    }
+
+    private void drawStyledWidget(UIWidget element) {
+        if (element.getTooltip() != null) {
+            // Integrated tooltip support - without this, setting a tooltip value does not make a tooltip work
+            // unless an interaction listener is explicitly added by the widget.
+            addInteractionRegion(new BaseInteractionListener());
+        }
+        element.onDraw(this);
     }
 
     private SubRegion subRegionForWidget(UIWidget widget, Rect2i region, boolean crop) {
@@ -698,6 +708,7 @@ public class CanvasImpl implements CanvasControl {
         addInteractionRegion(listener, tooltip, getCurrentStyle().getMargin().grow(applyStyleToSize(getRegion())));
     }
 
+    @Override
     public void addInteractionRegion(InteractionListener listener, UIWidget tooltip, Rect2i region) {
         Vector2i offset = state.drawRegion.min();
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));

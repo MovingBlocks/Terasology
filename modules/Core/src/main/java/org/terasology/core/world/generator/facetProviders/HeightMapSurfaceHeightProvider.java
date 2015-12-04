@@ -25,7 +25,7 @@ import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.properties.OneOf.List;
 import org.terasology.rendering.nui.properties.Range;
@@ -95,7 +95,7 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
         Border3D border = region.getBorderForFacet(SurfaceHeightFacet.class);
         SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), border);
 
-        for (Vector2i pos : facet.getWorldRegion()) {
+        for (BaseVector2i pos : facet.getWorldRegion().contents()) {
             int xzScale = configuration.terrainScale;
 
             int mapX0;

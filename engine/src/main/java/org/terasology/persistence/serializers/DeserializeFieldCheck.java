@@ -23,7 +23,7 @@ import org.terasology.reflection.metadata.FieldMetadata;
  */
 public interface DeserializeFieldCheck {
 
-    boolean shouldDeserialize(ClassMetadata classMetadata, FieldMetadata fieldMetadata);
+    boolean shouldDeserialize(ClassMetadata<?, ?> classMetadata, FieldMetadata<?, ?> fieldMetadata);
 
     /**
      * Null implementation, returns true for all fields
@@ -35,13 +35,12 @@ public interface DeserializeFieldCheck {
         private NullCheck() {
         }
 
-        @SuppressWarnings("unchecked")
         public static NullCheck newInstance() {
             return INSTANCE;
         }
 
         @Override
-        public boolean shouldDeserialize(ClassMetadata classMetadata, FieldMetadata fieldMetadata) {
+        public boolean shouldDeserialize(ClassMetadata<?, ?> classMetadata, FieldMetadata<?, ?> fieldMetadata) {
             return true;
         }
     }

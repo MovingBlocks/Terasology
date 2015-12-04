@@ -22,7 +22,7 @@ import org.terasology.math.geom.Vector2i;
 /**
  * See {@link NUIInputEvent}
  */
-public final class NUIMouseWheelEvent extends NUIMouseEvent{
+public final class NUIMouseWheelEvent extends NUIMouseEvent {
     private final int wheelTurns;
 
     public NUIMouseWheelEvent(MouseDevice mouse, KeyboardDevice keyboard, Vector2i relativeMousePosition,

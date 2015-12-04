@@ -27,7 +27,6 @@ import org.terasology.core.world.generator.facetProviders.PerlinRiverProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.facetProviders.World2dPreviewProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
@@ -69,7 +68,6 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
         return new WorldBuilder(worldGeneratorPluginLibrary)
                 .setSeaLevel(seaLevel)
-                .addProvider(new World2dPreviewProvider())
                 .addProvider(new SeaLevelProvider(seaLevel))
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinSurfaceTemperatureProvider())

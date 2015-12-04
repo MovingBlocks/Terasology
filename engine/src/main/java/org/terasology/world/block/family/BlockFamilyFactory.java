@@ -15,28 +15,18 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.SetMultimap;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public interface BlockFamilyFactory {
 
-
-    static final ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
+    ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
 
     BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder);
 

@@ -27,8 +27,8 @@ import org.terasology.config.Config;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.core.world.generator.trees.Trees;
-import org.terasology.math.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.MersenneRandom;
@@ -114,7 +114,7 @@ public class TreeTests {
         final Vector3i max = new Vector3i(pos);
 
         Rect2i chunks = Rect2i.createFromMinAndMax(-1, -1, 1, 1);
-        for (Vector2i chunkPos : chunks) {
+        for (BaseVector2i chunkPos : chunks.contents()) {
             Chunk chunk = new ChunkImpl(chunkPos.getX(), 0, chunkPos.getY(), blockManager, biomeManager) {
                 @Override
                 public Block setBlock(int x, int y, int z, Block block) {

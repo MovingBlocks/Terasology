@@ -20,7 +20,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -74,7 +73,7 @@ public class PlateauProvider implements FacetProvider {
             SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
 
             // update the surface height
-            for (Vector2i pos : facet.getWorldRegion()) {
+            for (BaseVector2i pos : facet.getWorldRegion().contents()) {
                 float originalValue = facet.getWorld(pos);
                 int distSq = pos.distanceSquared(centerPos);
 

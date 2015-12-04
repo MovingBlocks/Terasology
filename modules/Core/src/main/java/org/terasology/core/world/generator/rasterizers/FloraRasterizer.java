@@ -17,8 +17,9 @@ package org.terasology.core.world.generator.rasterizers;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+
 import org.terasology.core.world.generator.facets.FloraFacet;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.world.block.Block;
@@ -70,15 +71,15 @@ public class FloraRasterizer implements WorldRasterizer {
 
         WhiteNoise noise = new WhiteNoise(chunk.getPosition().hashCode());
 
-        Map<Vector3i, FloraType> entries = facet.getRelativeEntries();
-        for (Vector3i pos : entries.keySet()) {
+        Map<BaseVector3i, FloraType> entries = facet.getRelativeEntries();
+        for (BaseVector3i pos : entries.keySet()) {
 
             // check if some other rasterizer has already placed something here
             if (chunk.getBlock(pos).equals(air)) {
 
                 FloraType type = entries.get(pos);
                 List<Block> list = flora.get(type);
-                int blockIdx = Math.abs(noise.intNoise(pos.x, pos.y, pos.z)) % list.size();
+                int blockIdx = Math.abs(noise.intNoise(pos.x(), pos.y(), pos.z())) % list.size();
                 Block block = list.get(blockIdx);
                 chunk.setBlock(pos, block);
             }

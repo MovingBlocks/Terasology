@@ -42,7 +42,6 @@ import java.util.Set;
  * @author Martin Steiger, Limeth
  */
 public class CyclingTabCompletionEngine implements TabCompletionEngine {
-    private static final int MAX_CYCLES = 10;
     private final Console console;
     private int selectionIndex;
     private List<String> previousMatches; //Alphabetically ordered list of matches
@@ -94,8 +93,6 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             return command.suggest(currentValue, finishedParameters, sender);
         } catch (CommandSuggestionException e) {
             String causeMessage = e.getLocalizedMessage();
-
-            e.printStackTrace();
 
             if (causeMessage == null) {
                 Throwable cause = e.getCause();

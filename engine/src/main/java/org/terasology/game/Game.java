@@ -15,9 +15,6 @@
  */
 package org.terasology.game;
 
-import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.EngineTime;
-
 /**
  * @author Immortius
  */

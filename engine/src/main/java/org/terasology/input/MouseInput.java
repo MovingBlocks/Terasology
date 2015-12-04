@@ -62,14 +62,17 @@ public enum MouseInput implements Input {
         this.identifiers.add(toString().toUpperCase(Locale.ENGLISH));
     }
 
+    @Override
     public InputType getType() {
         return type;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }

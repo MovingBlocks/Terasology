@@ -19,8 +19,8 @@ import java.util.Iterator;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -62,9 +62,9 @@ public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvide
         SurfaceHumidityFacet humidityData = region.getRegionFacet(SurfaceHumidityFacet.class);
 
         float[] heightData = facet.getInternal();
-        Iterator<Vector2i> positionIterator = facet.getRelativeRegion().iterator();
+        Iterator<BaseVector2i> positionIterator = facet.getRelativeRegion().contents().iterator();
         for (int i = 0; i < heightData.length; ++i) {
-            Vector2i pos = positionIterator.next();
+            BaseVector2i pos = positionIterator.next();
             float temp = temperatureData.get(pos);
             float tempHumid = temp * humidityData.get(pos);
             Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, tempHumid - 0.35f);

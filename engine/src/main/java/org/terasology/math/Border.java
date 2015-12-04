@@ -18,6 +18,7 @@ package org.terasology.math;
 import java.util.Objects;
 
 import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.Rect2i;
 
 /**
  * The size of a border, supporting independent widths on each side.
@@ -33,9 +34,6 @@ public class Border {
     private int right;
     private int top;
     private int bottom;
-
-    private Border() {
-    }
 
     public Border(int left, int right, int top, int bottom) {
         this.left = left;

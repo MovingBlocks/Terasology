@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 

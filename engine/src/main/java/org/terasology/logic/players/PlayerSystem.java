@@ -19,8 +19,6 @@ package org.terasology.logic.players;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -66,8 +64,6 @@ import com.google.common.collect.Lists;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-
-    private static final Logger logger = LoggerFactory.getLogger(PlayerSystem.class);
 
     @In
     private EntityManager entityManager;

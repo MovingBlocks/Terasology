@@ -53,6 +53,7 @@ public class GsonPersistedDataArray extends AbstractGsonPersistedData implements
         return new GsonPersistedData(array.get(index));
     }
 
+    @Override
     public boolean isNumberArray() {
         for (JsonElement element : array) {
             if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isNumber()) {

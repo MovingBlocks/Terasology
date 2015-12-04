@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Pitch;
-import org.terasology.math.QuaternionUtil;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -66,10 +65,12 @@ public class BlockShapeImpl extends BlockShape {
         return displayName;
     }
 
+    @Override
     public BlockMeshPart getMeshPart(BlockPart part) {
         return meshParts.get(part);
     }
 
+    @Override
     public boolean isBlockingSide(Side side) {
         return fullSide.get(side);
     }
@@ -93,6 +94,7 @@ public class BlockShapeImpl extends BlockShape {
         rollSymmetric = data.isRollSymmetric();
     }
 
+    @Override
     public CollisionShape getCollisionShape(Rotation rot) {
         Rotation simplifiedRot = applySymmetry(rot);
         CollisionShape result = collisionShape.get(simplifiedRot);
@@ -103,12 +105,13 @@ public class BlockShapeImpl extends BlockShape {
         return result;
     }
 
+    @Override
     public Vector3f getCollisionOffset(Rotation rot) {
         Rotation simplifiedRot = applySymmetry(rot);
         if (simplifiedRot.equals(Rotation.none())) {
             return new Vector3f(baseCollisionOffset);
         }
-        return QuaternionUtil.quatRotate(simplifiedRot.getQuat4f(), baseCollisionOffset, new Vector3f());
+        return simplifiedRot.getQuat4f().rotate(baseCollisionOffset, new Vector3f());
     }
 
     @Override

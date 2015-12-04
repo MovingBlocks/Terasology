@@ -63,8 +63,8 @@ public class BehaviorTreeData implements AssetData {
     public RenderableNode createRenderable(Node node, BehaviorNodeFactory factory) {
         return node.visit(null, new Node.Visitor<RenderableNode>() {
             @Override
-            public RenderableNode visit(RenderableNode parent, Node node) {
-                RenderableNode self = createNode(node, factory);
+            public RenderableNode visit(RenderableNode parent, Node n) {
+                RenderableNode self = createNode(n, factory);
                 if (parent != null) {
                     parent.withoutModel().insertChild(-1, self);
                 }

@@ -50,6 +50,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     @In
     private org.terasology.engine.Time time;
 
+    @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);

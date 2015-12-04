@@ -203,8 +203,8 @@ public final class BindsConfig {
     }
 
     private void registerAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
-        for (Class registerBindClass : classes) {
-            RegisterBindAxis info = (RegisterBindAxis) registerBindClass.getAnnotation(RegisterBindAxis.class);
+        for (Class<?> registerBindClass : classes) {
+            RegisterBindAxis info = registerBindClass.getAnnotation(RegisterBindAxis.class);
             Name moduleId = environment.getModuleProviding(registerBindClass);
             SimpleUri id = new SimpleUri(moduleId, info.id());
             if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
@@ -232,8 +232,8 @@ public final class BindsConfig {
     }
 
     private void registerButtonBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
-        for (Class registerBindClass : classes) {
-            RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);
+        for (Class<?> registerBindClass : classes) {
+            RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
             SimpleUri bindUri = new SimpleUri(environment.getModuleProviding(registerBindClass), info.id());
             if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
                 try {

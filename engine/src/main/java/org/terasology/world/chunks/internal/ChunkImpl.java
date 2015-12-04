@@ -17,10 +17,12 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
@@ -182,8 +184,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public final Block getBlock(Vector3i pos) {
-        short id = (short) blockData.get(pos.x, pos.y, pos.z);
+    public final Block getBlock(BaseVector3i pos) {
+        short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
         return blockManager.getBlock(id);
     }
 
@@ -208,13 +210,13 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Block setBlock(Vector3i pos, Block block) {
-        return setBlock(pos.x, pos.y, pos.z, block);
+    public Block setBlock(BaseVector3i pos, Block block) {
+        return setBlock(pos.x(), pos.y(), pos.z(), block);
     }
 
     @Override
-    public byte getSunlight(Vector3i pos) {
-        return getSunlight(pos.x, pos.y, pos.z);
+    public byte getSunlight(BaseVector3i pos) {
+        return getSunlight(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -223,8 +225,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setSunlight(Vector3i pos, byte amount) {
-        return setSunlight(pos.x, pos.y, pos.z, amount);
+    public boolean setSunlight(BaseVector3i pos, byte amount) {
+        return setSunlight(pos.x(), pos.y(), pos.z(), amount);
     }
 
     @Override
@@ -234,8 +236,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getSunlightRegen(Vector3i pos) {
-        return getSunlightRegen(pos.x, pos.y, pos.z);
+    public byte getSunlightRegen(BaseVector3i pos) {
+        return getSunlightRegen(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -244,8 +246,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setSunlightRegen(Vector3i pos, byte amount) {
-        return setSunlightRegen(pos.x, pos.y, pos.z, amount);
+    public boolean setSunlightRegen(BaseVector3i pos, byte amount) {
+        return setSunlightRegen(pos.x(), pos.y(), pos.z(), amount);
     }
 
     @Override
@@ -255,8 +257,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getLight(Vector3i pos) {
-        return getLight(pos.x, pos.y, pos.z);
+    public byte getLight(BaseVector3i pos) {
+        return getLight(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -265,8 +267,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setLight(Vector3i pos, byte amount) {
-        return setLight(pos.x, pos.y, pos.z, amount);
+    public boolean setLight(BaseVector3i pos, byte amount) {
+        return setLight(pos.x(), pos.y(), pos.z(), amount);
     }
 
     @Override
@@ -276,8 +278,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setLiquid(Vector3i pos, LiquidData state) {
-        setLiquid(pos.x, pos.y, pos.z, state);
+    public void setLiquid(BaseVector3i pos, LiquidData state) {
+        setLiquid(pos.x(), pos.y(), pos.z(), state);
     }
 
     @Override
@@ -290,8 +292,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public LiquidData getLiquid(Vector3i pos) {
-        return getLiquid(pos.x, pos.y, pos.z);
+    public LiquidData getLiquid(BaseVector3i pos) {
+        return getLiquid(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -335,8 +337,8 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Vector3i chunkToWorldPosition(Vector3i blockPos) {
-        return chunkToWorldPosition(blockPos.x, blockPos.y, blockPos.z);
+    public Vector3i chunkToWorldPosition(BaseVector3i blockPos) {
+        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z());
     }
 
     @Override

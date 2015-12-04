@@ -19,7 +19,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.Replicate;
-import org.terasology.persistence.StorageManager;
 
 import javax.annotation.Nullable;
 

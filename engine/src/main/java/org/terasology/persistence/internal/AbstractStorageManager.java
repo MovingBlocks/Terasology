@@ -100,9 +100,9 @@ public abstract class AbstractStorageManager implements StorageManager {
     public PlayerStore loadPlayerStore(String playerId) {
         EntityData.PlayerStore store = loadPlayerStoreData(playerId);
         if (store != null) {
-            return new PlayerStoreInternal(playerId, store, this, entityManager);
+            return new PlayerStoreInternal(playerId, store, entityManager);
         }
-        return new PlayerStoreInternal(playerId, this, entityManager);
+        return new PlayerStoreInternal(playerId, entityManager);
     }
 
     @Override
@@ -113,7 +113,7 @@ public abstract class AbstractStorageManager implements StorageManager {
             ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
             try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
                 EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, this, entityManager, blockManager, biomeManager);
+                store = new ChunkStoreInternal(storeData, entityManager, blockManager, biomeManager);
             } catch (IOException e) {
                 logger.error("Failed to read existing saved chunk {}", chunkPos);
             }

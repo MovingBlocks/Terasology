@@ -15,10 +15,7 @@
  */
 package org.terasology.logic.players;
 
-import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.Asset;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -31,7 +28,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -43,12 +39,9 @@ import org.terasology.rendering.iconmesh.IconMeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
-
-import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -62,10 +55,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonRenderer extends BaseComponentSystem implements RenderSystem {
-    private static final Logger logger = LoggerFactory.getLogger(FirstPersonRenderer.class);
 
-    @In
-    private WorldProvider worldProvider;
     @In
     private LocalPlayer localPlayer;
     @In
@@ -73,8 +63,6 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
 
     private Mesh handMesh;
     private Texture handTex;
-
-    private Map<String, Mesh> iconMeshes = Maps.newHashMap();
 
     @Override
     public void initialise() {
@@ -194,7 +182,6 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
         Block activeBlock = blockFamily.getArchetypeBlock();
-        Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
         Material shader = Assets.getMaterial("engine:prog.block").get();

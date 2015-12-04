@@ -163,7 +163,7 @@ public class StateHeadlessSetup implements GameState {
 
     @Override
     public void update(float delta) {
-        eventSystem.process();;
+        eventSystem.process();
     }
 
     @Override

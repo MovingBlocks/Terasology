@@ -62,7 +62,7 @@ public final class LightComponent implements Component, ReplicationCheck {
 
 
     @Override
-    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+    public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         switch (field.getName()) {
             case "lightDiffuseIntensity":
             case "lightAmbientIntensity":

@@ -15,7 +15,6 @@
  */
 package org.terasology.utilities.procedural;
 
-import org.terasology.math.TeraMath;
 import org.terasology.utilities.random.FastRandom;
 
 /**

@@ -17,7 +17,6 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -33,7 +32,6 @@ import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -198,7 +196,8 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
         return true;
     }
 
-    private boolean moveItemAmountFillClientTempEntities(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count, Collection<EntityRef> clientTempEntities) {
+    private boolean moveItemAmountFillClientTempEntities(EntityRef fromInventory, EntityRef instigator, int slotFrom,
+            EntityRef toInventory, int slotTo, int count, Collection<EntityRef> clientTempEntities) {
         EntityRef itemAtBefore = InventoryUtils.getItemAt(toInventory, slotTo);
         boolean itemExisted = itemAtBefore.exists();
         if (!InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count)) {
@@ -227,7 +226,8 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
         return true;
     }
 
-    private boolean moveItemToSlotsFillClientTempEntities(EntityRef instigator, EntityRef fromInventory, int slotFrom, EntityRef toInventory, List<Integer> toSlots, Collection<EntityRef> clientTempEntities) {
+    private boolean moveItemToSlotsFillClientTempEntities(EntityRef instigator, EntityRef fromInventory, int slotFrom,
+            EntityRef toInventory, List<Integer> toSlots, Collection<EntityRef> clientTempEntities) {
         Set<Integer> emptySlotsBefore = new HashSet<>();
         for (Integer toSlot : toSlots) {
             if (!InventoryUtils.getItemAt(toInventory, toSlot).exists()) {
@@ -262,7 +262,8 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
         return true;
     }
 
-    private boolean moveItemFillClientTempEntities(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, Collection<EntityRef> clientTempEntities) {
+    private boolean moveItemFillClientTempEntities(EntityRef fromInventory, EntityRef instigator, int slotFrom,
+            EntityRef toInventory, int slotTo, Collection<EntityRef> clientTempEntities) {
         boolean slotFromEmpty = !InventoryUtils.getItemAt(fromInventory, slotFrom).exists();
         boolean slotToEmpty = !InventoryUtils.getItemAt(toInventory, slotTo).exists();
         if (!InventoryUtils.moveItem(instigator, fromInventory, slotFrom, toInventory, slotTo)) {

@@ -16,6 +16,9 @@
 package org.terasology.rendering.nui.widgets.browser.data.html;
 
 public class HTMLParseException extends RuntimeException {
+
+    private static final long serialVersionUID = -4027037623808771428L;
+
     public HTMLParseException(String message) {
         super(message);
     }

@@ -17,7 +17,6 @@ package org.terasology.logic.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -46,8 +45,8 @@ public class ModuleConfigSystem extends BaseComponentSystem implements ModuleCon
             String moduleName = moduleConfig.moduleName;
             Map<String, String> properties;
             if (propertiesPerModule.containsKey(moduleName)) {
-                logger.error("Encountered more than one Module Config for module - "+moduleName+", this is not recommended, " +
-                        "as the property values visible are not going to be well defined.");
+                logger.error("Encountered more than one Module Config for module - " + moduleName +
+                        ", this is not recommended, as the property values visible are not going to be well defined.");
                 properties = propertiesPerModule.get(moduleName);
             } else {
                 properties = new HashMap<>();

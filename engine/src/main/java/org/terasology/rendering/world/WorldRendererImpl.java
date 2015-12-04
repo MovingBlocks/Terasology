@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -64,8 +62,6 @@ import org.terasology.world.chunks.RenderableChunk;
  * @author Benjamin Glatzel
  */
 public final class WorldRendererImpl implements WorldRenderer {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
@@ -184,7 +180,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private Material getMaterial(String assetId) {
-        return Assets.getMaterial(assetId).orElseThrow(() -> new RuntimeException("Failed to resolve required asset: '" + assetId +"'"));
+        return Assets.getMaterial(assetId).orElseThrow(() ->
+                new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));
     }
 
     @Override
@@ -693,6 +690,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     }
 
+    @Override
     public boolean isHeadUnderWater() {
         Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
 

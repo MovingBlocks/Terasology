@@ -59,22 +59,26 @@ public class PerspectiveCamera extends Camera {
         return true;
     }
 
+    @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
+    @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
     }
 
+    @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getNormViewMatrix()));
     }
 
+    @Override
     public void update(float deltaT) {
         applyCinematicEffect();
 
@@ -115,10 +119,12 @@ public class PerspectiveCamera extends Camera {
         return new Vector3f(x / factorMult, y / factorMult, z / factorMult);
     }
 
+    @Override
     public void updateMatrices() {
         updateMatrices(activeFov);
     }
 
+    @Override
     public void updateMatrices(float fov) {
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
@@ -176,7 +182,7 @@ public class PerspectiveCamera extends Camera {
     }
 
     // TODO: Move the dependency on LWJGL (Display) elsewhere
-    public Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
+    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
         float aspectRatio = (float) Display.getWidth() / Display.getHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 

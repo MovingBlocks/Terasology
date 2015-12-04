@@ -16,7 +16,6 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.Direction;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
