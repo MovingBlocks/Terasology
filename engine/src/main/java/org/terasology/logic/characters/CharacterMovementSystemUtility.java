@@ -106,27 +106,27 @@ public final class CharacterMovementSystemUtility {
         setPhysicsLocation(entity, newPos);
     }
 
-	private void extrapolateLocationComponent(EntityRef entity, CharacterStateEvent state, Vector3f newPos) {
-		LocationComponent location = entity.getComponent(LocationComponent.class);
+    private void extrapolateLocationComponent(EntityRef entity, CharacterStateEvent state, Vector3f newPos) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(newPos);
         location.setWorldRotation(state.getRotation());
         entity.saveComponent(location);
-	}
-	
+    }
+
     private void extrapolateCharacterMovementComponent(EntityRef entity, CharacterStateEvent state) {
-		CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
+        CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
         movementComponent.mode = state.getMode();
         movementComponent.setVelocity(state.getVelocity());
         movementComponent.grounded = state.isGrounded();
         entity.saveComponent(movementComponent);
-	}
+    }
     
     private void extrapolateCharacterComponent(EntityRef entity, CharacterStateEvent state) {
-		CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
         characterComponent.pitch = state.getPitch();
         characterComponent.yaw = state.getYaw();
         entity.saveComponent(characterComponent);
-	}
+    }
 
     /**
      * Sets the location in the physics engine.

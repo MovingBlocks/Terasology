@@ -16,9 +16,6 @@
 
 package org.terasology.core.world.generator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Climate simulation based on weighted distances
  *
@@ -29,10 +26,10 @@ public class ClimateSimulator {
     private float[][] humidity;
     private ClimateSimulatorData climateDistanceData;
 
-	ClimateSimulator(float[][] hm) {
-        
+    ClimateSimulator(float[][] hm) {
+
         climateDistanceData = new ClimateSimulatorData(hm, hm.length);
-        
+
         //Ready the Climate Map
         climate = new float[climateDistanceData.getSize()][climateDistanceData.getSize()];
         float[][] t1 = climateDistanceData.distanceFrom("poles", 10);
