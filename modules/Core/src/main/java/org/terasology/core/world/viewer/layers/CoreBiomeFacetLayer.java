@@ -24,7 +24,6 @@ import org.terasology.world.viewer.layers.ZOrder;
 
 /**
  * Maps {@link CoreBiome} facet to corresponding colors.
- * @author Martin Steiger
  */
 @Renders(value = BiomeFacet.class, order = ZOrder.BIOME)
 public class CoreBiomeFacetLayer extends NominalFacetLayer<CoreBiome> {

@@ -22,7 +22,6 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 
 /**
- * @author Immortius
  */
 @Produces(SeaLevelFacet.class)
 public class SeaLevelProvider implements FacetProvider {

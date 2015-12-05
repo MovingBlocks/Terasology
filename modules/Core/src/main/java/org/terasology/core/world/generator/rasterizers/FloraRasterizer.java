@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class FloraRasterizer implements WorldRasterizer {
 

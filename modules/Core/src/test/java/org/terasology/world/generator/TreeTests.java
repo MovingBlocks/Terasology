@@ -44,7 +44,6 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * TODO: more flexibility for estimated extents
- * @author Martin Steiger
  */
 public class TreeTests {
 

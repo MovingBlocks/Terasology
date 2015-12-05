@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Climate simulation based on weighted distances
  *
- * @author Nym Traveel
  */
 public class ClimateSimulator {
     private static final Logger logger = LoggerFactory.getLogger(ClimateSimulator.class);

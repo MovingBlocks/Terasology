@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractBaseWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
     private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);
