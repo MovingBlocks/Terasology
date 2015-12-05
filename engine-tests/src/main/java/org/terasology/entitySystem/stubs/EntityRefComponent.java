@@ -19,7 +19,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * @author Immortius
  */
 public class EntityRefComponent implements Component {
 

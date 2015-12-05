@@ -23,7 +23,6 @@ import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 
 /**
  * Tests the {@link BaseBooleanFieldFacet3D} class.
- * @author Martin Steiger
  */
 public class BaseBooleanFacetTest extends BooleanFacetTest {
 

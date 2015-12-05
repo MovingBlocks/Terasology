@@ -54,7 +54,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Immortius
  */
 public class PrefabTest {
 

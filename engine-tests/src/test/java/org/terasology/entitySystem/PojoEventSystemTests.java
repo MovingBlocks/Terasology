@@ -48,7 +48,6 @@ import static org.mockito.Mockito.when;
 
 
 /**
- * @author Immortius
  */
 public class PojoEventSystemTests {
 

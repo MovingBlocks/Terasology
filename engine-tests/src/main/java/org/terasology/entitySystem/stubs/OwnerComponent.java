@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * @author Immortius
  */
 public class OwnerComponent implements Component {
     @Owns

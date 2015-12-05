@@ -42,7 +42,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Immortius
  */
 public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 

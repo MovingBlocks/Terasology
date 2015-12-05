@@ -24,7 +24,6 @@ import org.terasology.utilities.random.FastRandom;
 /**
  * A simple validity test for {@link org.terasology.utilities.procedural.WhiteNoise}
  *
- * @author Martin Steiger
  */
 public class WhiteNoiseTest {
 

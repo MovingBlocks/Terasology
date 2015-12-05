@@ -44,7 +44,6 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 

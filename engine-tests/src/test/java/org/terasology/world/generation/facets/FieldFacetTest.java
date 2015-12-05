@@ -27,7 +27,6 @@ import org.terasology.world.generation.facets.base.FieldFacet3D;
 /**
  * Tests different implementations of {@link FieldFacet3D}.
  *
- * @author Martin Steiger
  */
 public abstract class FieldFacetTest {
 

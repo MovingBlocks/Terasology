@@ -61,7 +61,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * @author Immortius
  */
 public class PojoEntityManagerTest {
 

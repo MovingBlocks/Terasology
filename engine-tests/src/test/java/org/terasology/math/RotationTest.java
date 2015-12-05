@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3f;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class RotationTest {
 

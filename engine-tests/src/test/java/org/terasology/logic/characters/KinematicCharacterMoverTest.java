@@ -22,7 +22,6 @@ import org.terasology.logic.behavior.tree.CounterNode;
 import org.terasology.logic.behavior.tree.Interpreter;
 
 /**
- * @author gtugablue
  */
 public class KinematicCharacterMoverTest {
 

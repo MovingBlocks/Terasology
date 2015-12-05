@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.Color;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author mkienenb@gmail.com
  */
 public class TextureUtilTest {
 
