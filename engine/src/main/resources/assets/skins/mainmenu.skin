@@ -32,7 +32,8 @@
             }
         },
         "title": {
-            "font": "title"
+            "font": "NotoSans-Regular-Large",
+            "text-color": "F0F0F0FF"
         },
         "error": {
             "text-color": "FF4444FF"

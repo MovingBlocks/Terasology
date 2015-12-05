@@ -28,7 +28,6 @@
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
-                        "offset" : 16,
                         "widget" : "title"
                     }
                 }
@@ -44,6 +43,7 @@
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
+                        "offset" : 16,
                         "widget" : "subtitle"
                     },
                     "position-bottom" : {

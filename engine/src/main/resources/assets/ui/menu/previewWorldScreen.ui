@@ -28,18 +28,19 @@
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
-                        "offset" : 16,
                         "widget" : "title"
                     }
                 }
             },
             {
                 "type" : "UIBox",
+                "id" : "container",
                 "layoutInfo" : {
                     "width" : 720,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
+                        "offset" : 16,
                         "widget" : "subtitle"
                     },
                     "position-bottom" : {
@@ -59,8 +60,8 @@
                     "width" : 704,
                     "position-horizontal-center" : {},
                     "position-top" : {
-                        "target" : "BOTTOM",
-                        "widget" : "subtitle",
+                        "target" : "TOP",
+                        "widget" : "container",
                         "offset" : 8
                     },
                     "position-bottom" : {
