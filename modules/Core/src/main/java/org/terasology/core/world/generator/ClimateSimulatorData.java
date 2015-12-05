@@ -46,42 +46,60 @@ public class ClimateSimulatorData {
     public float[][] initDist(String fromWhat) {
 
         float[][] distArr = new float[size][size];
-        if (fromWhat.equals("water")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
-                    float heightFactor = heightmap[height][width] - 1;
+        switch(fromWhat)
+        {
+        case "water":
+            distanceFromWater(distArr);
+            break;
+        case "poles":
+            distanceFromPoles(distArr);
+            break;
+        case "equator":
+            distanceFromEquator(distArr);
+            break;
+        }
 
-                    if (heightFactor < 0) {  // sea
-                        distArr[height][width] = 0;
-                    } else {  // land
-                        distArr[height][width] = size;
-                    }
-                }
-            }
-        } else if (fromWhat.equals("poles")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
+        return distArr;
+    }
 
-                    if (height == 0) {  // topOfTheMap
-                        distArr[height][width] = 0;
-                    } else {
-                        distArr[height][width] = size;
-                    }
-                }
-            }
-        } else if (fromWhat.equals("equator")) {
-            for (int width = 0; width < size; width++) {
-                for (int height = 0; height < size; height++) {
+    private void distanceFromWater(float[][] distArr) {
+        for (int width = 0; width < size; width++) {
+            for (int height = 0; height < size; height++) {
+                float heightFactor = heightmap[height][width] - 1;
 
-                    if (height == size / 2) {  // topOfTheMap
-                        distArr[height][width] = 0;
-                    } else {
-                        distArr[height][width] = size;
-                    }
+                if (heightFactor < 0) {  // sea
+                    distArr[height][width] = 0;
+                } else {  // land
+                    distArr[height][width] = size;
                 }
             }
         }
-        return distArr;
+    }
+
+    private void distanceFromPoles(float[][] distArr) {
+        for (int width = 0; width < size; width++) {
+            for (int height = 0; height < size; height++) {
+
+                if (height == 0) {  // topOfTheMap
+                    distArr[height][width] = 0;
+                } else {
+                    distArr[height][width] = size;
+                }
+            }
+        }
+    }
+
+    private void distanceFromEquator(float[][] distArr) {
+        for (int width = 0; width < size; width++) {
+            for (int height = 0; height < size; height++) {
+
+                if (height == size / 2) {  // topOfTheMap
+                    distArr[height][width] = 0;
+                } else {
+                    distArr[height][width] = size;
+                }
+            }
+        }
     }
 
     public float[][] distanceFrom(String fromWhat, float heightInfluence) {
