@@ -59,7 +59,6 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Provides support for loading and applying shaders.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderManagerLwjgl implements ShaderManager {
 

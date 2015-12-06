@@ -25,7 +25,6 @@ import java.text.NumberFormat;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public abstract class TimeMetricsMode extends MetricsMode {
 

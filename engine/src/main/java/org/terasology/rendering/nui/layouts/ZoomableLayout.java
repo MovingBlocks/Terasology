@@ -40,7 +40,6 @@ import java.util.List;
  * A layout that allows positioning to a virtual coordinate system, which is mapped to screen coordinates using a
  * viewport.
  *
- * @author synopia
  */
 public class ZoomableLayout extends CoreLayout {
     private List<PositionalWidget> widgets = Lists.newArrayList();

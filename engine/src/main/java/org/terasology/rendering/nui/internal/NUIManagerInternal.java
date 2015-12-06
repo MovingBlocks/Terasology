@@ -66,7 +66,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
     private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);

@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public abstract class CoreHudWidget extends CoreWidget implements ControlWidget {
 

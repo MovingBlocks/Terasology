@@ -21,7 +21,6 @@ import org.terasology.assets.AssetData;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class FontData implements AssetData {
     private int lineHeight;

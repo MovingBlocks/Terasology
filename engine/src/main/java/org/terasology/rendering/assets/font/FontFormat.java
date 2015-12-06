@@ -35,7 +35,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class FontFormat extends AbstractAssetFileFormat<FontData> {

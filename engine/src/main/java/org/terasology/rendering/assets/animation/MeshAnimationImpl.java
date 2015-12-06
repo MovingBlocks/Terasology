@@ -24,7 +24,6 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class MeshAnimationImpl extends MeshAnimation {
 

@@ -36,7 +36,6 @@ import org.terasology.rendering.nui.widgets.UILabel;
  * A popup message that is shown while a long-term background operation is running.
  * Some of them can be cancelled.
  *
- * @author Martin Steiger
  */
 public class WaitPopup<T> extends CoreScreenLayer {
 

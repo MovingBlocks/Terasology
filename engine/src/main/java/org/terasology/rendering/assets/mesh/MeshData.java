@@ -22,7 +22,6 @@ import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
 
 /**
- * @author Immortius
  */
 public class MeshData implements AssetData {
 

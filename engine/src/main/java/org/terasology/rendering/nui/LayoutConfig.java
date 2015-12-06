@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
 /**
  * This annotation is used to mark the properties of widgets that are available for setting in a UI layout file.
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

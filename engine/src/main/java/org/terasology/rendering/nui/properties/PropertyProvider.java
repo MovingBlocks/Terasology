@@ -46,7 +46,6 @@ import java.util.regex.Pattern;
 import static org.reflections.ReflectionUtils.getAllFields;
 
 /**
- * @author synopia
  *
  * Provides properties of a given object using annotations.
  *

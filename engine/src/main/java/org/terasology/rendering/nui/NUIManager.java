@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 /**
- * @author Immortius
  */
 public interface NUIManager extends ComponentSystem, FocusManager {
 

@@ -25,7 +25,6 @@ import org.terasology.rendering.opengl.LwjglRenderingProcess;
 /**
  * Shader parameters for the Post-processing shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
 

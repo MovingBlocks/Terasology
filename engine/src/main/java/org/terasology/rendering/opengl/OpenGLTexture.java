@@ -32,7 +32,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class OpenGLTexture extends Texture {
 

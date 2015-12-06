@@ -19,7 +19,6 @@ package org.terasology.rendering;
 import org.terasology.math.AABB;
 
 /**
- * @author Adeon
  */
 public interface BlockOverlayRenderer {
     void setAABB(AABB aabb);

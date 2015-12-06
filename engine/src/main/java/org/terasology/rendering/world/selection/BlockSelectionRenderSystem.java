@@ -36,7 +36,6 @@ import java.util.Map;
  * <br><br>
  * This system is not currently thread-safe.
  *
- * @author synopia mkienenb@gmail.com
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class BlockSelectionRenderSystem extends BaseComponentSystem implements RenderSystem {

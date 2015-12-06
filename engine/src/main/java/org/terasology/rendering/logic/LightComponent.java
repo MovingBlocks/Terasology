@@ -22,7 +22,6 @@ import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 
 /**
- * @author Benjamin Glatzel
  */
 // TODO: Split into multiple components? Point, Directional?
 public final class LightComponent implements Component, ReplicationCheck {

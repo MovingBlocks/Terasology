@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
- * @author Immortius
  */
 public class CursorAttachment extends CoreWidget {
     private static final int MOUSE_CURSOR_HEIGHT = 18;

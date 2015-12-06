@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.widgets.UIText;
 import java.util.function.Consumer;
 
 /**
- * @author Immortius
  */
 public class AddServerPopup extends CoreScreenLayer {
 

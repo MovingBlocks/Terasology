@@ -38,7 +38,6 @@ import com.google.gson.stream.JsonReader;
 
 /**
  * Downloads a list of servers from a given URL.
- * @author Martin Steiger
  */
 class ServerListDownloader {
 

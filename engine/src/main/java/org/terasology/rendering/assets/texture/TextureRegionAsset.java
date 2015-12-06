@@ -21,7 +21,6 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 
 /**
- * @author Immortius
  */
 public abstract class TextureRegionAsset<T extends AssetData> extends Asset<T> implements TextureRegion {
 

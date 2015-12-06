@@ -16,7 +16,6 @@
 package org.terasology.rendering.collada;
 
 /**
- * @author Immortius
  */
 public class ColladaParseException extends Exception {
     private static final long serialVersionUID = 1L;

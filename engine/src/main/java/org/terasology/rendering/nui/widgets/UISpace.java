@@ -21,7 +21,6 @@ import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 
 /**
- * @author Immortius
  */
 public class UISpace extends CoreWidget {
 

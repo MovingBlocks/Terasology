@@ -22,7 +22,6 @@ import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class AtlasData implements AssetData {
 

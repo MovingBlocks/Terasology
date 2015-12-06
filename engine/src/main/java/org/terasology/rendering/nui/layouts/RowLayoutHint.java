@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layouts;
 import org.terasology.rendering.nui.LayoutHint;
 
 /**
- * @author Immortius
  */
 public class RowLayoutHint implements LayoutHint {
     private float relativeWidth;

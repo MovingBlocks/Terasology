@@ -23,7 +23,6 @@ import org.terasology.rendering.opengl.LwjglRenderingProcess;
 /**
  * Shader parameters for the Combine shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersOcDistortion extends ShaderParametersBase {
 

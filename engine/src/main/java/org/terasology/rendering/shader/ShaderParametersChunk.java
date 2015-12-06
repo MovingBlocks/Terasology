@@ -33,7 +33,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the Chunk shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
     @Range(min = 0.0f, max = 2.0f)

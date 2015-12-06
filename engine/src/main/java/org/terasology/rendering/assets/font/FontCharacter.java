@@ -20,7 +20,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
- * @author Immortius
  */
 public class FontCharacter {
     private float x;

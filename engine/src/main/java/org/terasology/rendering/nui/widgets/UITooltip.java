@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets;
 
 /**
- * @author Immortius
  */
 public class UITooltip extends CursorAttachment {
 

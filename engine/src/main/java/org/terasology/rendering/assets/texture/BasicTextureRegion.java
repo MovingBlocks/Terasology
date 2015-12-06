@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 
 /**
- * @author Immortius
  */
 public class BasicTextureRegion implements TextureRegion {
     private Texture texture;

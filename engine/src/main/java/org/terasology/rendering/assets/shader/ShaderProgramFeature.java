@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 /**
- * @author Immortius
  */
 public enum ShaderProgramFeature {
     FEATURE_REFRACTIVE_PASS
