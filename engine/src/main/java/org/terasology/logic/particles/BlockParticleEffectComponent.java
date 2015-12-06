@@ -28,8 +28,6 @@ import org.terasology.world.block.family.BlockFamily;
 import java.util.List;
 
 /**
- * @author Immortius
- * @author Benjamin Glatzel
  */
 public final class BlockParticleEffectComponent implements Component {
 

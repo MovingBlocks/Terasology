@@ -20,7 +20,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * @author Immortius
  */
 public class DoDestroyEvent implements Event {
     private EntityRef instigator;

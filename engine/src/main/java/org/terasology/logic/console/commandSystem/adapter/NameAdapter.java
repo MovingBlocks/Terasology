@@ -18,7 +18,6 @@ package org.terasology.logic.console.commandSystem.adapter;
 import org.terasology.naming.Name;
 
 /**
- * @author Limeth
  */
 public class NameAdapter implements ParameterAdapter<Name> {
     @Override

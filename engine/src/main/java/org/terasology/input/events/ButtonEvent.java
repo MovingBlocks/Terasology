@@ -19,7 +19,6 @@ package org.terasology.input.events;
 import org.terasology.input.ButtonState;
 
 /**
- * @author Immortius
  */
 public abstract class ButtonEvent extends InputEvent {
 

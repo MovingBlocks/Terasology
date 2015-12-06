@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Marcin Sciesinski
  */
 public final class InventoryUtils {
     private InventoryUtils() {

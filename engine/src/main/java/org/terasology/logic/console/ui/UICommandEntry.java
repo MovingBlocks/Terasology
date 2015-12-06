@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.widgets.UIText;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class UICommandEntry extends UIText {
 

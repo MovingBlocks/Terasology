@@ -44,7 +44,6 @@ import org.terasology.world.chunks.ChunkProvider;
 /**
  * Commands to administer a remote server
  *
- * @author Martin Steiger
  */
 @RegisterSystem
 public class ServerCommands extends BaseComponentSystem {

@@ -39,8 +39,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Marcin Sciesinski
- * @author Florian
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 @Share(value = InventoryManager.class)

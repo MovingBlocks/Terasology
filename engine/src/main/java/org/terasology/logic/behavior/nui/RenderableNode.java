@@ -42,7 +42,6 @@ import java.util.List;
 /**
  * A widget to render and process inputs for a node of a behavior tree.
  *
- * @author synopia
  */
 public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, TreeAccessor<RenderableNode> {
     private TextureRegion texture = Assets.getTextureRegion("engine:button").get();

@@ -24,8 +24,6 @@ import org.terasology.network.ServerEvent;
 import java.util.Collection;
 
 /**
- * @author Immortius
- * @author Florian
  */
 @ServerEvent
 public abstract class AbstractMoveItemRequest implements Event {

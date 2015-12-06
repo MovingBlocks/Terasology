@@ -18,7 +18,6 @@ package org.terasology.logic.console.commandSystem.exceptions;
 /**
  * Thrown when a suggester fails instantiating via the newInstance command
  *
- * @author Limeth
  */
 public class SuggesterInstantiationException extends RuntimeException {
     private static final long serialVersionUID = 3151467068962337565L;

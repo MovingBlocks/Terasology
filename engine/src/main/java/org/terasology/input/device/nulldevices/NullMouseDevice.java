@@ -24,7 +24,6 @@ import org.terasology.math.geom.Vector2i;
 import java.util.Queue;
 
 /**
- * @author Immortius
  */
 public class NullMouseDevice implements MouseDevice {
     @Override

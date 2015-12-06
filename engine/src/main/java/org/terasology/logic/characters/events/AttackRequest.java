@@ -21,7 +21,6 @@ import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
 /**
- * @author Immortius
  */
 @ServerEvent(lagCompensate = true)
 public class AttackRequest extends NetworkEvent {

@@ -17,7 +17,6 @@
 package org.terasology.logic.characters;
 
 /**
- * @author Immortius
  */
 public enum MovementMode {
     WALKING(1f, 8f, true, true, true, 3f, false),

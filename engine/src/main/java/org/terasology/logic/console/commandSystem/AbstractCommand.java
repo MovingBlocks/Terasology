@@ -44,7 +44,6 @@ import java.util.Set;
 /**
  * The core ICommand implementation and command information
  *
- * @author Limeth
  */
 public abstract class AbstractCommand implements ConsoleCommand {
 

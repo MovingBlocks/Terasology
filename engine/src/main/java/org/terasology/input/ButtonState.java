@@ -17,7 +17,6 @@
 package org.terasology.input;
 
 /**
- * @author Immortius
  */
 public enum ButtonState {
     DOWN(true),

@@ -33,7 +33,6 @@ import java.util.Objects;
 /**
  * Component represent the location and facing of an entity in the world
  *
- * @author Immortius
  */
 public final class LocationComponent implements Component, ReplicationCheck {
 

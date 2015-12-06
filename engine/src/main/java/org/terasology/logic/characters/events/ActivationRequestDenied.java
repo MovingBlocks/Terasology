@@ -27,7 +27,6 @@ import org.terasology.entitySystem.event.Event;
  * This is an authority internal event. If a reaction should be sent the client is up to the systems that process this
  * event..
  *
- * @author Florian
  */
 public class ActivationRequestDenied implements Event {
     private int activationId;

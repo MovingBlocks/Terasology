@@ -34,7 +34,6 @@ import org.terasology.network.ClientComponent;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class MovementDebugCommands extends BaseComponentSystem {

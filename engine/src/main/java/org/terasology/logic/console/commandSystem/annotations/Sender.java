@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
 /**
  * Marks a method parameter to have the value of the commands' sender
  *
- * @author Limeth
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

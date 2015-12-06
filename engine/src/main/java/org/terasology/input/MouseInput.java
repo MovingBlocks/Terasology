@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public enum MouseInput implements Input {
     NONE(InputType.MOUSE_BUTTON, -1, "MOUSE_NONE", ""),

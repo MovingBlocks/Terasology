@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author synopia
  */
 public class BehaviorTreeData implements AssetData {
     private Map<Node, RenderableNode> renderableNodes = Maps.newHashMap();

@@ -16,7 +16,6 @@
 package org.terasology.logic.console.commandSystem.exceptions;
 
 /**
- * @author Limeth
  */
 public class CommandInitializationException extends IllegalArgumentException {
     private static final long serialVersionUID = 5345663512766407880L;

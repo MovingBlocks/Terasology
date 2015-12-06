@@ -19,7 +19,6 @@ package org.terasology.input;
 import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * @author Immortius
  */
 public interface BindAxisSubscriber {
     void update(float value, float delta, EntityRef target);

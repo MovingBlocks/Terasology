@@ -18,7 +18,6 @@ package org.terasology.logic.inventory.block;
 import org.terasology.entitySystem.Component;
 
 /**
- * @author Marcin Sciesinski
  */
 public final class RetainBlockInventoryComponent implements Component {
 }

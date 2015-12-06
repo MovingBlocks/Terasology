@@ -24,7 +24,6 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  * Toggles the display of ChatScreen (through ChatSystem)
- * @author Martin Steiger
  */
 @RegisterBindButton(id = "chat", description = "Toggle Chat", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.T)

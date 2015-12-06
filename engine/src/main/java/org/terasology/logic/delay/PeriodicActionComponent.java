@@ -26,7 +26,6 @@ import java.util.Set;
 
 /**
  * Not for public use. Use DelayManager instead.
- * @author Marcin Sciesinski
  */
 @ForceBlockActive
 public final class PeriodicActionComponent implements Component {

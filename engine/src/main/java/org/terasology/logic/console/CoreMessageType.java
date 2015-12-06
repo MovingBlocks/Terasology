@@ -19,7 +19,6 @@ import org.terasology.rendering.nui.Color;
 
 
 /**
- * @author Immortius
  */
 public enum CoreMessageType implements MessageType {
     CONSOLE(ConsoleColors.DEFAULT),

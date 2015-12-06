@@ -19,7 +19,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
  */
 public class SelectedItemChangedEvent implements Event {
     private EntityRef oldItem;

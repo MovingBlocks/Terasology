@@ -20,7 +20,6 @@ import org.terasology.rendering.nui.Color;
 
 /**
  * Defines a set of often-used color constants for the console
- * @author Martin Steiger
  */
 public final class ConsoleColors {
     

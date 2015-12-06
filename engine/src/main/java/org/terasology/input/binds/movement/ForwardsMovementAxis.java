@@ -21,7 +21,6 @@ import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.SendEventMode;
 
 /**
- * @author Immortius
  */
 @RegisterBindAxis(id = "forwardsMovement", positiveButton = "engine:forwards", negativeButton = "engine:backwards", eventMode = SendEventMode.WHEN_CHANGED)
 public class ForwardsMovementAxis extends BindAxisEvent {

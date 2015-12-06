@@ -37,7 +37,6 @@ import java.util.Set;
  * Finished nodes may create new tasks, which are placed to the active list.
  * <br><br>
  *
- * @author synopia
  */
 @API
 public class Interpreter {

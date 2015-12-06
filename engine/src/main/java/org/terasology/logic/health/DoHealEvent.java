@@ -21,7 +21,6 @@ import org.terasology.entitySystem.event.Event;
 /**
  * Send this event to an entity to heal it.
  *
- * @author Immortius
  */
 public class DoHealEvent implements Event {
     private int amount;

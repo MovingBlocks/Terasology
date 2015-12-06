@@ -21,7 +21,6 @@ import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.SendEventMode;
 
 /**
- * @author Immortius
  */
 @RegisterBindAxis(id = "verticalMovement", positiveButton = "engine:jump", negativeButton = "engine:crouch", eventMode = SendEventMode.WHEN_CHANGED)
 public class VerticalMovementAxis extends BindAxisEvent {

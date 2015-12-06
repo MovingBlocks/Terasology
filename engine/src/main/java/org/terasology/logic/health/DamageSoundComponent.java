@@ -22,7 +22,6 @@ import org.terasology.entitySystem.Component;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class DamageSoundComponent implements Component {
     public List<StaticSound> sounds = Lists.newArrayList();

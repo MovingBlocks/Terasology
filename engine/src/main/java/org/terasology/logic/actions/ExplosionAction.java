@@ -36,7 +36,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ExplosionAction extends BaseComponentSystem {

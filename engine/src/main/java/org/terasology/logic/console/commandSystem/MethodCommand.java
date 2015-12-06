@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Limeth
  */
 public final class MethodCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);

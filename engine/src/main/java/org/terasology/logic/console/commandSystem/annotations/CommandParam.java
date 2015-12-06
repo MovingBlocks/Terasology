@@ -29,7 +29,6 @@ import java.util.Set;
 /**
  * Used to specify information and behavior of a command parameter
  *
- * @author Immortius, Limeth
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

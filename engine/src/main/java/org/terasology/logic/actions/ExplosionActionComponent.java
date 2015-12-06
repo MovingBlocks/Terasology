@@ -18,7 +18,6 @@ package org.terasology.logic.actions;
 import org.terasology.entitySystem.Component;
 
 /**
- * @author Immortius
  */
 public class ExplosionActionComponent implements Component {
     public ActionTarget relativeTo = ActionTarget.Instigator;

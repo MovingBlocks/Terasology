@@ -17,7 +17,6 @@ package org.terasology.logic.console.commandSystem.exceptions;
 
 /**
  * Thrown while suggesting a command parameter
- * @author Limeth
  */
 public class CommandSuggestionException extends Exception {
     private static final long serialVersionUID = -7812918530930324881L;

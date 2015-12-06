@@ -27,7 +27,6 @@ import org.terasology.rendering.nui.widgets.UILabel;
 /**
  * The miniaturized chat console widget
  *
- * @author Martin Steiger
  */
 public class MiniChatOverlay extends CoreScreenLayer {
 

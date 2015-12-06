@@ -18,7 +18,6 @@ package org.terasology.logic.inventory.events;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Marcin Sciesinski
  */
 public class InventorySlotStackSizeChangedEvent implements Event {
     private int slot;
