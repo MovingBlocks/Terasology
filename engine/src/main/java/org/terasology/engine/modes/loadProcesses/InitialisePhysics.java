@@ -22,7 +22,6 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.world.WorldProvider;
 
 /**
- * @author Immortius
  */
 public class InitialisePhysics extends SingleStepLoadProcess {
     private final Context context;

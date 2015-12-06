@@ -22,7 +22,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public class PreBeginSystems extends StepBasedLoadProcess {
 

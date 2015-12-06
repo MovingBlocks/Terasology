@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.BroadcastEvent;
 
 /**
- * @author Immortius
  */
 @BroadcastEvent(skipInstigator = true)
 public class PlaySoundEvent extends AbstractPlaySoundEvent {

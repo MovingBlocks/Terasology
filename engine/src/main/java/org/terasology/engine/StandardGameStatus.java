@@ -16,7 +16,6 @@
 package org.terasology.engine;
 
 /**
- * @author Immortius
  */
 public enum StandardGameStatus implements EngineStatus {
     UNSTARTED("Unstarted"),

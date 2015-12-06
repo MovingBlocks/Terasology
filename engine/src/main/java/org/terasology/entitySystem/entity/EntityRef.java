@@ -25,7 +25,6 @@ import org.terasology.entitySystem.prefab.Prefab;
  * A wrapper around an entity id providing access to common functionality
  * *
  *
- * @author Immortius
  */
 public abstract class EntityRef implements MutableComponentContainer {
 

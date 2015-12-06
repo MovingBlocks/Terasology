@@ -25,7 +25,6 @@ import org.terasology.naming.Name;
  * <br><br>
  * All uris include a module name as part of their structure.
  *
- * @author Immortius
  */
 @API
 public interface Uri {

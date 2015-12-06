@@ -24,7 +24,6 @@ import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
 
 /**
- * @author Immortius
  */
 public class SetupLocalPlayer extends SingleStepLoadProcess {
 

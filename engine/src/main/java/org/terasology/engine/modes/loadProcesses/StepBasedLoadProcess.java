@@ -18,7 +18,6 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.modes.LoadProcess;
 
 /**
- * @author Immortius
  */
 public abstract class StepBasedLoadProcess implements LoadProcess {
 

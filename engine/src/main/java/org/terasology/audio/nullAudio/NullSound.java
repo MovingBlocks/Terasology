@@ -24,7 +24,6 @@ import org.terasology.audio.StaticSoundData;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class NullSound extends StaticSound {
 

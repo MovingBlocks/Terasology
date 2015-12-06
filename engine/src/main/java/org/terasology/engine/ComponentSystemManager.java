@@ -52,7 +52,6 @@ import java.util.Map;
  *
  * After a call of shutdown it should not be used anymore.
  *
- * @author Immortius
  */
 public class ComponentSystemManager {
 

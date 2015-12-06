@@ -16,7 +16,6 @@
 package org.terasology.entitySystem;
 
 /**
- * @author Immortius
  */
 public interface MutableComponentContainer extends ComponentContainer {
 

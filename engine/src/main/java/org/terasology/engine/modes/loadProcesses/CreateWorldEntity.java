@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class CreateWorldEntity extends SingleStepLoadProcess {
 

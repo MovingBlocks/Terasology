@@ -25,7 +25,6 @@ import org.terasology.world.WorldComponent;
  * Quick and dirty load step to create a dummy world entity on remote clients
  * TODO: The World Entity should be replicated, and the replicated entity linked.
  * TODO: Further from that each world will have a world entity, and it should drive the creation of the world classes in the first place.
- * @author Immortius
  */
 public class CreateRemoteWorldEntity extends SingleStepLoadProcess {
 

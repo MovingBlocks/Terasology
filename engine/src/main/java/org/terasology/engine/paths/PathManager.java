@@ -34,7 +34,6 @@ import java.util.List;
 import javax.swing.JFileChooser;
 
 /**
- * @author Immortius
  */
 public final class PathManager {
     public static final String TERASOLOGY_FOLDER_NAME = "Terasology";

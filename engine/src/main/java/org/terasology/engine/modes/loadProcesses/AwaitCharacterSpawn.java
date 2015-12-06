@@ -25,7 +25,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * @author Immortius
  */
 public class AwaitCharacterSpawn implements LoadProcess {
 

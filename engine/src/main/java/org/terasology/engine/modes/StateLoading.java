@@ -68,7 +68,6 @@ import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 import java.util.Queue;
 
 /**
- * @author Immortius
  */
 public class StateLoading implements GameState {
 

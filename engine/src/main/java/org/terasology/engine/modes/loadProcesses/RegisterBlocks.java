@@ -32,7 +32,6 @@ import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.block.tiles.WorldAtlasImpl;
 
 /**
- * @author Immortius
  */
 public class RegisterBlocks extends SingleStepLoadProcess {
     private final Context context;

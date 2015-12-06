@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.Locale.Category;
 
 /**
- * @author Immortius
  */
 public class SystemConfig {
     public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";

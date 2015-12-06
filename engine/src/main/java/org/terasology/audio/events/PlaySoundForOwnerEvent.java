@@ -20,7 +20,6 @@ import org.terasology.audio.StaticSound;
 import org.terasology.network.OwnerEvent;
 
 /**
- * @author Immortius
  */
 @OwnerEvent
 public class PlaySoundForOwnerEvent extends AbstractPlaySoundEvent {
