@@ -43,7 +43,7 @@
             "font" : "NotoSans-Bold"
         },
         "heading-input": {
-            "font": "title",
+            "font": "NotoSans-Regular-Large",
             "text-align-horizontal": "left"
         },
         "left-label": {
