@@ -25,7 +25,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.world.BlockEntityRegistry;
 
 /**
- * @author Immortius
  */
 public class InitialiseSystems extends SingleStepLoadProcess {
 

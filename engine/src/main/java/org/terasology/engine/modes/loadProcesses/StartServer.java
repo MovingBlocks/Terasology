@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
- * @author Immortius
  */
 public class StartServer extends SingleStepLoadProcess {
 

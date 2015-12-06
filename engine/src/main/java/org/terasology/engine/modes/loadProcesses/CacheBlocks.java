@@ -23,7 +23,6 @@ import org.terasology.world.block.family.BlockFamily;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public class CacheBlocks extends StepBasedLoadProcess {
 

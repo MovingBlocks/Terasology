@@ -20,8 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 /**
  * See {@link EngineEntityManager#subscribeForDestruction(EntityDestroySubscriber)}.
  *
- * @author Immortius
- * @author Florian
  */
 public interface EntityDestroySubscriber {
 

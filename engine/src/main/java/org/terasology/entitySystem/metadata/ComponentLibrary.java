@@ -33,7 +33,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 /**
  * The library for metadata about components (and their fields).
  *
- * @author Immortius
  */
 public class ComponentLibrary extends AbstractClassLibrary<Component> {
 

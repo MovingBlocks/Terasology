@@ -20,7 +20,6 @@ import org.terasology.context.Context;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 
 /**
- * @author Immortius
  */
 public class InitialiseEntitySystem extends SingleStepLoadProcess {
 

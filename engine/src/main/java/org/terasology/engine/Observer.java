@@ -21,7 +21,6 @@ import org.terasology.module.sandbox.API;
 /**
  * A general interface for observers
  * @param <T> the target object type
- * @author Martin Steiger
  */
 @API
 @FunctionalInterface

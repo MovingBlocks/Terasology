@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.NetworkEvent;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractPlaySoundEvent extends NetworkEvent {
     private StaticSound sound;

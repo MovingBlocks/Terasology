@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Florian
  */
 public class PermissionConfig {
     /**

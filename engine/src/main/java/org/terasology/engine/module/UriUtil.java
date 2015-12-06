@@ -18,7 +18,6 @@ package org.terasology.engine.module;
 import java.util.Locale;
 
 /**
- * @author Immortius
  */
 public final class UriUtil {
 

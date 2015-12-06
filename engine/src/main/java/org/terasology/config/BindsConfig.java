@@ -63,7 +63,6 @@ import java.util.Set;
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.
  *
- * @author Immortius
  */
 public final class BindsConfig {
     private static final Logger logger = LoggerFactory.getLogger(BindsConfig.class);

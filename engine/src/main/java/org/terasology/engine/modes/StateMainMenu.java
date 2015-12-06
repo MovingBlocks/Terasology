@@ -44,9 +44,6 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
  * The class implements the main game menu.
  * <br><br>
  *
- * @author Benjamin Glatzel
- * @author Anton Kireev
- * @author Marcel Lehwald
  * @version 0.3
  */
 public class StateMainMenu implements GameState {

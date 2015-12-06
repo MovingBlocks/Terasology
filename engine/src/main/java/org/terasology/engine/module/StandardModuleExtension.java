@@ -21,7 +21,6 @@ import org.terasology.module.Module;
 
 /**
  * A set of standard module extensions.
- * @author Martin Steiger
  */
 public enum StandardModuleExtension implements ModuleExtension {
 

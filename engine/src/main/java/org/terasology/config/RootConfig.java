@@ -25,7 +25,6 @@ import java.util.Map;
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
  * and loaded in a JSON format.
  *
- * @author Immortius
  */
 public final class RootConfig {
     private SystemConfig system = new SystemConfig();

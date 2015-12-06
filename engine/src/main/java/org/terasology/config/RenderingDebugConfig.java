@@ -16,7 +16,6 @@
 package org.terasology.config;
 
 /**
- * @author Immortius
  */
 public class RenderingDebugConfig {
 

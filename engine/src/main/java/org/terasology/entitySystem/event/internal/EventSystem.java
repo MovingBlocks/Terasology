@@ -24,7 +24,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 /**
  * Event system propagates events to registered handlers
  *
- * @author Immortius
  */
 public interface EventSystem {
 

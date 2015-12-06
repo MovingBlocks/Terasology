@@ -67,7 +67,6 @@ import java.util.concurrent.BlockingQueue;
 /**
  * An implementation of the EventSystem.
  *
- * @author Immortius
  */
 public class EventSystemImpl implements EventSystem {
 
