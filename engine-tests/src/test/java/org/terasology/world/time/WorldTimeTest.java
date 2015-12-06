@@ -22,7 +22,6 @@ import org.junit.Test;
 /**
  * Tests the world-time related classes
  *
- * @author Martin Steiger
  */
 public class WorldTimeTest {
 

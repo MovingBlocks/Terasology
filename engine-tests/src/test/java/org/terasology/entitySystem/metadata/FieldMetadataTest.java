@@ -26,7 +26,6 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Immortius
  */
 public class FieldMetadataTest {
 

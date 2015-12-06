@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.reflection.MappedContainer;
 
 /**
- * @author Immortius
  */
 public class MappedTypeComponent implements Component {
 

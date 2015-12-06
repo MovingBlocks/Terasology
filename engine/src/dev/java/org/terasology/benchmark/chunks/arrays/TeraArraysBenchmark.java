@@ -26,7 +26,6 @@ import java.util.List;
 /**
  * TeraArraysBenchmark simplifies the execution of the benchmarks for tera arrays.
  *
- * @author Manuel Brotz
  */
 @SuppressWarnings("unused")
 public final class TeraArraysBenchmark {

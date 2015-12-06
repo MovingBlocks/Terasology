@@ -75,8 +75,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @author Immortius
- * @author Florian
  */
 public class StorageManagerTest extends TerasologyTestingEnvironment {
 

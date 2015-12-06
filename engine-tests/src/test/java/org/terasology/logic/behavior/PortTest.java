@@ -34,7 +34,6 @@ import org.terasology.registry.CoreRegistry;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author synopia
  */
 public class PortTest extends TerasologyTestingEnvironment {
 

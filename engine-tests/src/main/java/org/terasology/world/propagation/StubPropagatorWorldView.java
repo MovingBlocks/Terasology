@@ -26,7 +26,6 @@ import org.terasology.world.block.BlockManager;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class StubPropagatorWorldView implements PropagatorWorldView {
     private TObjectByteMap<Vector3i> lightData = new TObjectByteHashMap<>();

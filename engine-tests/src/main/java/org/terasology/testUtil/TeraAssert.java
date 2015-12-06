@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 
 
 /**
- * @author Immortius
  */
 public final class TeraAssert {
     private TeraAssert() {

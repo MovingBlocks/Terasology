@@ -31,7 +31,6 @@ import java.util.Set;
 /**
  * Setup an empty Terasology environment
  *
- * @author Martin Steiger
  */
 public class Environment {
 

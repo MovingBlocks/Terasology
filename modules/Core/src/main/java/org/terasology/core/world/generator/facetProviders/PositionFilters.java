@@ -26,7 +26,6 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 /**
  * A collection of filters that restrict the placement of objects
  *
- * @author Martin Steiger
  */
 public final class PositionFilters {
 

@@ -26,7 +26,6 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 /**
- * @author Immortius
  */
 @Produces(SurfaceTemperatureFacet.class)
 public class PerlinSurfaceTemperatureProvider implements FacetProvider {

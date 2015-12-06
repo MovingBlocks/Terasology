@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
 
 /**
  * Maps {@link FloraType} to color.
- * @author Martin Steiger
  */
 public class CoreFloraColors implements Function<FloraType, Color> {
 

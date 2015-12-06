@@ -27,7 +27,6 @@ import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
 /**
- * @author Immortius
  */
 public class GroundRasterizer implements WorldRasterizer {
 

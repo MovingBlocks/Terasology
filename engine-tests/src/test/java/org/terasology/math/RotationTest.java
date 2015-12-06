@@ -24,7 +24,6 @@ import com.google.common.collect.Iterables;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class RotationTest {
 
