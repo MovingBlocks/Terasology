@@ -147,7 +147,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 VerticalHint.create().fixedHeight(48).alignTopRelativeTo("title", VerticalAlign.BOTTOM));
         layout.addWidget(area,
                 HorizontalHint.create().fixedWidth(640).center(),
-                VerticalHint.create().alignTopRelativeTo("subtitle", VerticalAlign.BOTTOM).alignBottomRelativeTo("footer", VerticalAlign.TOP, 48));
+                VerticalHint.create().alignTopRelativeTo("subtitle", VerticalAlign.BOTTOM, 16).alignBottomRelativeTo("footer", VerticalAlign.TOP, 48));
         layout.addWidget(footerGrid,
                 HorizontalHint.create().center().fixedWidth(400),
                 VerticalHint.create().fixedHeight(48).alignBottom(48));
