@@ -19,7 +19,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
 /**
- * @author Marcin Sciesinski
  */
 public class BeforeItemPutInInventory extends AbstractConsumableEvent {
     private EntityRef instigator;

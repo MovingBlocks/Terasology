@@ -31,7 +31,6 @@ import org.terasology.rendering.nui.NUIManager;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {

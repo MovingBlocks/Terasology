@@ -19,7 +19,6 @@ package org.terasology.input;
 /**
  * This enum determines which events a button will send
  *
- * @author Immortius
  */
 public enum ActivateMode {
     /**

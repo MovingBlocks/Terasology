@@ -53,7 +53,6 @@ import java.util.Map;
  * the correct renderable, additional ids are introduced (only in the json file).
  * <br><br>
  *
- * @author synopia
  */
 @RegisterAssetFileFormat
 public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData> {

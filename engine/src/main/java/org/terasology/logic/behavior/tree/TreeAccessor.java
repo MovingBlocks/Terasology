@@ -23,7 +23,6 @@ import java.util.List;
  * <br><br>
  * Using a ChainedTreeAccessor the modification made to a tree is reflected to all trees in the chain.
  *
- * @author synopia
  */
 public interface TreeAccessor<N> {
     void insertChild(int index, N child);

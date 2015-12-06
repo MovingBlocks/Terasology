@@ -23,7 +23,6 @@ import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 
 /**
- * @author Immortius
  */
 @BroadcastEvent
 public class CharacterStateEvent extends NetworkEvent {

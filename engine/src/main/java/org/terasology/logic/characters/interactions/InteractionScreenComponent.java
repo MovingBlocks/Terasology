@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Component;
 /**
  * Entities with this component will show an UI during interactions.
  *
- * @author Florian
  */
 public class InteractionScreenComponent implements Component {
     public String screen;

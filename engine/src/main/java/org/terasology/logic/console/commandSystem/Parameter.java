@@ -20,7 +20,6 @@ import java.util.Optional;
 /**
  * Classes extending this interface occur in command method parameter definition
  *
- * @author Limeth
  */
 interface Parameter {
     Optional<? extends Class<?>> getProvidedType();

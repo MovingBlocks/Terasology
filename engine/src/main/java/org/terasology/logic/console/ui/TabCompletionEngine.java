@@ -16,7 +16,6 @@
 package org.terasology.logic.console.ui;
 
 /**
- * @author Immortius
  */
 public interface TabCompletionEngine {
 

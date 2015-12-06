@@ -25,7 +25,6 @@ import org.terasology.network.OwnerEvent;
 
 /**
  * A notification message
- * @author Martin Steiger
  */
 @OwnerEvent
 public class NotificationMessageEvent implements MessageEvent {

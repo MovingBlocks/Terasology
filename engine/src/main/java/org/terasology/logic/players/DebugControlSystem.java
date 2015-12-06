@@ -42,8 +42,6 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 
 /**
- * @author Benjamin Glatzel
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class DebugControlSystem extends BaseComponentSystem {

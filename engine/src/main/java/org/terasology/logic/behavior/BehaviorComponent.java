@@ -22,7 +22,6 @@ import org.terasology.module.sandbox.API;
 /**
  * Entities with this component are handled by a behavior tree. Default tree to fetch may be set.
  *
- * @author synopia
  */
 @API
 public class BehaviorComponent implements Component {

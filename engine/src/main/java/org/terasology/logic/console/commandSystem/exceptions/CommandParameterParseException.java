@@ -16,7 +16,6 @@
 package org.terasology.logic.console.commandSystem.exceptions;
 
 /**
- * @author Limeth
  */
 public class CommandParameterParseException extends Exception {
     private static final long serialVersionUID = 4519046979318192019L;

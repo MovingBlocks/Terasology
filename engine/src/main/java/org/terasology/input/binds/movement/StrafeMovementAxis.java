@@ -21,7 +21,6 @@ import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.SendEventMode;
 
 /**
- * @author Immortius
  */
 @RegisterBindAxis(id = "strafe", positiveButton = "engine:left", negativeButton = "engine:right", eventMode = SendEventMode.WHEN_CHANGED)
 public class StrafeMovementAxis extends BindAxisEvent {

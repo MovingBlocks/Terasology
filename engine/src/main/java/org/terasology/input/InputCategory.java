@@ -22,7 +22,6 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to declare categories of inputs to display in any input binding screens.
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PACKAGE)

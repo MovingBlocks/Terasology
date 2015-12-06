@@ -21,7 +21,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Limeth
  */
 public class BlockFamilyAdapter implements ParameterAdapter<BlockFamily> {
     @Override

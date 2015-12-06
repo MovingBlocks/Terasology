@@ -75,7 +75,6 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * @author Immortius
  */
 // TODO: Generalise for non-block particles
 // TODO: Dispose display lists

@@ -28,7 +28,6 @@ import org.terasology.rendering.nui.properties.Range;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public final class CharacterMovementComponent implements Component {
 

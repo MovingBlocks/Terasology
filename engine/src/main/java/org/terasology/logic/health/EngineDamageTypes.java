@@ -21,7 +21,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 /**
  * Helper enum for getting engine damage type prefabs.
  *
- * @author Immortius
  */
 public enum EngineDamageTypes {
     /**

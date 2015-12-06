@@ -22,7 +22,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * @author Immortius
  */
 @RegisterBindButton(id = "toolbarSlot6", description = "Toolbar Slot 7")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.KEY_7)

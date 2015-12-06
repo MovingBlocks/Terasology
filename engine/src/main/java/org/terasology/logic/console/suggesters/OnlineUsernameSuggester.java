@@ -28,7 +28,6 @@ import java.util.Set;
  *
  * Suggests user names of all online users
  *
- * @author Limeth
  */
 public final class OnlineUsernameSuggester implements CommandParameterSuggester<String> {
     private final EntityManager entityManager;

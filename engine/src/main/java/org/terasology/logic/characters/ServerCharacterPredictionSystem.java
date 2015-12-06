@@ -44,7 +44,6 @@ import org.terasology.world.WorldProvider;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(PredictionSystem.class)

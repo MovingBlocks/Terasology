@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
  */
 public class CameraTargetChangedEvent implements Event {
     private EntityRef oldTarget;

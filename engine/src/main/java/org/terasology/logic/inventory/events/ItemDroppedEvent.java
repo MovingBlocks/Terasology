@@ -19,7 +19,6 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
  */
 public class ItemDroppedEvent implements Event {
 

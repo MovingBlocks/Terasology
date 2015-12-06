@@ -21,7 +21,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 /**
  * This event is sent after damage has been dealt to an entity.
  *
- * @author Immortius
  */
 public class OnDamagedEvent extends HealthChangedEvent {
     private Prefab damageType;

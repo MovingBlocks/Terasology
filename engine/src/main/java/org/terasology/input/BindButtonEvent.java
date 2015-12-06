@@ -20,7 +20,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.input.events.ButtonEvent;
 
 /**
- * @author Immortius
  */
 public class BindButtonEvent extends ButtonEvent {
 

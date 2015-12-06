@@ -28,7 +28,6 @@ import org.terasology.network.Replicate;
 /**
  * Information common to characters (the physical body of players and creatures)
  *
- * @author Immortius
  */
 public final class CharacterComponent implements Component {
     /**

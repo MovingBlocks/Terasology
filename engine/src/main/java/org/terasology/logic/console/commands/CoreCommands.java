@@ -79,7 +79,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class CoreCommands extends BaseComponentSystem {

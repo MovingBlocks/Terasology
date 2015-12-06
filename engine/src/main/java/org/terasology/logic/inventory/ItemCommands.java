@@ -31,7 +31,6 @@ import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class ItemCommands extends BaseComponentSystem {

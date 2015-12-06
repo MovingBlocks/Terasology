@@ -33,7 +33,6 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.CoreRegistry;
 
 /**
- * @author Immortius
  */
 public class LocalPlayer {
 

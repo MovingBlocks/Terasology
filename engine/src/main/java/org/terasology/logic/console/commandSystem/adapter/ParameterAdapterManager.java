@@ -25,7 +25,6 @@ import org.terasology.world.block.family.BlockFamily;
 import java.util.Map;
 
 /**
- * @author Limeth
  */
 @API
 public class ParameterAdapterManager {

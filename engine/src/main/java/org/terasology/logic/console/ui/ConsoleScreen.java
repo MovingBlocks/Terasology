@@ -34,7 +34,6 @@ import org.terasology.rendering.nui.widgets.UIText;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ConsoleScreen extends CoreScreenLayer {
 

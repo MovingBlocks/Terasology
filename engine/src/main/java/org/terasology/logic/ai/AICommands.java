@@ -25,7 +25,6 @@ import org.terasology.registry.In;
 import com.google.common.collect.Iterables;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class AICommands extends BaseComponentSystem {

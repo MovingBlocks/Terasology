@@ -54,7 +54,6 @@ import org.terasology.world.block.Block;
  * TODO: Refactor to allow additional movement modes.
  * TODO: Detect entry and exit from water while ghosting.
  *
- * @author Immortius
  */
 public class KinematicCharacterMover implements CharacterMover {
 

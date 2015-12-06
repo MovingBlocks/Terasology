@@ -34,7 +34,6 @@ import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
  * will see selections done by one player.  This system uses an item's activate event to both start and end a selection,
  * then triggers a ApplyBlockSelectionEvent event.
  *
- * @author synopia
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {

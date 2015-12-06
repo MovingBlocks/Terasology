@@ -28,7 +28,6 @@ import org.terasology.registry.In;
 
 /**
  * This system provides the ability to notify one or more client about certain events.
- * @author Martin Steiger
  */
 @RegisterSystem
 public class NotificationSystem extends BaseComponentSystem {

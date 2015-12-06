@@ -20,7 +20,6 @@ import org.terasology.module.sandbox.API;
 /**
  * A task run by an interpreter for an actor.
  *
- * @author synopia
  */
 @API
 public abstract class Task {
