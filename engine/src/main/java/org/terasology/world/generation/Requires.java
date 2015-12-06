@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
 /**
  * Used to denote that a Provider or Rasterizer requires a Provider
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

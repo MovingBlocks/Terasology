@@ -23,7 +23,6 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import java.util.Comparator;
 
 /**
- * @author Immortius
  */
 public class ChunkGenerationPipeline {
     private static final int NUM_TASK_THREADS = 8;

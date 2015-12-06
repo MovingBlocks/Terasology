@@ -24,7 +24,6 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
  * TeraDenseArray4Bit implements a dense array with elements of 4 bit size.
  * Its elements are in the range 0 - 15 and it increases memory efficiency by storing two elements per byte.
  *
- * @author Manuel Brotz
  */
 public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 

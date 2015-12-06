@@ -24,8 +24,6 @@ import org.terasology.world.generation.WorldFacet2D;
  * Its entries are accessible through both relative and world coordinates (in blocks).
  * <br><br>
  * All methods throw {@link IllegalArgumentException} if coordinates are not inside the respective region.
- * @author Immortius
- * @author Martin Steiger
  */
 public interface BooleanFieldFacet2D extends WorldFacet2D {
 

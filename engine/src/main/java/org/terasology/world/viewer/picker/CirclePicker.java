@@ -23,7 +23,6 @@ import org.terasology.math.geom.BaseVector2f;
 /**
  * Retrieves a set of circular objects in the proximity of a given anchor point.
  * @param <T> the object type
- * @author Martin Steiger
  */
 public interface CirclePicker<T> {
 

@@ -20,7 +20,6 @@ import org.terasology.engine.SimpleUri;
 import java.util.Objects;
 
 /**
- * @author Immortius
  */
 public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
 

@@ -29,7 +29,6 @@ import java.util.Map.Entry;
  * A sparse (map-based) implementation
  * of {@link ObjectFacet3D}.
  *
- * @author Martin Steiger
  */
 public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldFacet3D {
 

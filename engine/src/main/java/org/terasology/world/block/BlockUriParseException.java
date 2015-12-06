@@ -16,7 +16,6 @@
 package org.terasology.world.block;
 
 /**
- * @author Immortius
  */
 public class BlockUriParseException extends RuntimeException {
 

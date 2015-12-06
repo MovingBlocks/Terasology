@@ -58,7 +58,6 @@ import org.terasology.world.block.sounds.BlockSounds;
 /**
  * Event handler for events affecting block entities
  *
- * @author Immortius
  */
 @RegisterSystem
 public class BlockEntitySystem extends BaseComponentSystem {

@@ -22,7 +22,6 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
- * @author Immortius
  */
 public class LocalChunkView implements PropagatorWorldView {
     private PropagationRules rules;

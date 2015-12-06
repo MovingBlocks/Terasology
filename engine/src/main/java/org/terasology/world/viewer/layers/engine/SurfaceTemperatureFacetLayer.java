@@ -23,7 +23,6 @@ import org.terasology.world.viewer.layers.ZOrder;
 
 /**
  * Provides information about the surface temperature.
- * @author Martin Steiger
  */
 @Renders(value = SurfaceTemperatureFacet.class, order = ZOrder.SURFACE)
 public class SurfaceTemperatureFacetLayer extends FieldFacetLayer {

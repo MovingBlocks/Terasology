@@ -26,7 +26,6 @@ import org.terasology.world.chunks.LitChunk;
 /**
  * A base world view implementation sitting on ChunkProvider.
  *
- * @author Immortius
  */
 public abstract class AbstractFullWorldView implements PropagatorWorldView {
 

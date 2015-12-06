@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.Color;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class ColorTypeAdapter implements JsonDeserializer<Color> {
     @Override

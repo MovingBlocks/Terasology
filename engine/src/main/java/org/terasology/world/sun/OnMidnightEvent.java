@@ -20,7 +20,6 @@ import org.terasology.world.time.TimeEventBase;
 /**
  * Sent to a world at the middle of the night
  *
- * @author Immortius
  */
 public class OnMidnightEvent extends TimeEventBase {
 

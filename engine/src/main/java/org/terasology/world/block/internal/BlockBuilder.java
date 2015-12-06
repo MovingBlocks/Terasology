@@ -35,7 +35,6 @@ import org.terasology.world.block.tiles.WorldAtlas;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class BlockBuilder implements BlockBuilderHelper {
 

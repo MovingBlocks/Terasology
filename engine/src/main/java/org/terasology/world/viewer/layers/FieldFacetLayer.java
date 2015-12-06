@@ -38,7 +38,6 @@ import com.google.common.math.DoubleMath;
 
 /**
  * Provides info about an {@link FieldFacet2D}.
- * @author Martin Steiger
  */
 public abstract class FieldFacetLayer extends AbstractFacetLayer {
 

@@ -23,7 +23,6 @@ import org.terasology.world.viewer.layers.ZOrder;
 
 /**
  * Provides information about the surface humidity.
- * @author Martin Steiger
  */
 @Renders(value = SurfaceHumidityFacet.class, order = ZOrder.SURFACE)
 public class SurfaceHumidityFacetLayer extends FieldFacetLayer {

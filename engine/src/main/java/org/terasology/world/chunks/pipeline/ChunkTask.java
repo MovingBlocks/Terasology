@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.utilities.concurrency.Task;
 
 /**
- * @author Immortius
  */
 public interface ChunkTask extends Task {
 

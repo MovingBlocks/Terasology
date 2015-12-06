@@ -18,7 +18,6 @@ package org.terasology.world.generation;
 import org.terasology.world.chunks.CoreChunk;
 
 /**
- * @author Immortius
  */
 public interface WorldRasterizer {
     void initialize();

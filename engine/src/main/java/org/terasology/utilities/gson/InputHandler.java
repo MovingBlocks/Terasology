@@ -29,7 +29,6 @@ import org.terasology.input.InputType;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class InputHandler implements JsonSerializer<Input>, JsonDeserializer<Input> {
 

@@ -26,7 +26,6 @@ import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
  * <b>NOTE:</b> Currently it is optimized for chunks of size 16x256x16 blocks.<br>
  * TODO: Implement deflation for sparse arrays.
  *
- * @author Manuel Brotz
  */
 public class TeraStandardDeflator extends TeraVisitingDeflator {
 

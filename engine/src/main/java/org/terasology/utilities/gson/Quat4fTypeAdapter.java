@@ -27,7 +27,6 @@ import org.terasology.math.geom.Quat4f;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class Quat4fTypeAdapter implements JsonDeserializer<Quat4f> {
 

@@ -25,7 +25,6 @@ import java.util.List;
 /**
  * Interface for random number generators.
  *
- * @author Marcos Vives Del Sol
  */
 @API
 public abstract class Random {

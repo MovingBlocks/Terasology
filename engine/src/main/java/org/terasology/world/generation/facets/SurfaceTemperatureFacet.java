@@ -23,7 +23,6 @@ import org.terasology.world.generation.FacetName;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
- * @author Immortius
  */
 @FacetName("Temperature")
 public class SurfaceTemperatureFacet extends BaseFieldFacet2D {

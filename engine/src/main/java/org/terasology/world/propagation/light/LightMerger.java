@@ -39,7 +39,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Immortius
  */
 public class LightMerger<T> {
     private static final int CENTER_INDEX = 13;

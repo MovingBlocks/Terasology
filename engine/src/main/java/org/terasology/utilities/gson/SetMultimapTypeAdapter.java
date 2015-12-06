@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class SetMultimapTypeAdapter<V> implements JsonDeserializer<SetMultimap<String, V>>, JsonSerializer<SetMultimap<String, V>> {
 

@@ -26,7 +26,6 @@ import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 
 /**
- * @author Immortius
  */
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
 

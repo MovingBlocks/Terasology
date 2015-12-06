@@ -21,7 +21,6 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 
 /**
- * @author Immortius
  */
 public interface WorldChangeListener {
 

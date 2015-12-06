@@ -27,7 +27,6 @@ import java.util.Map;
 /**
  * A block's appearance.
  *
- * @author Immortius
  */
 public class BlockAppearance {
 

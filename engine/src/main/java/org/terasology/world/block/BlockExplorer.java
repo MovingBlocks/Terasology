@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author Immortius
  */
 public class BlockExplorer {
     private AssetManager assetManager;

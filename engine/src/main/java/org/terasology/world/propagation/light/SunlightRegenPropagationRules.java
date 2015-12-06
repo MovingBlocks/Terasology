@@ -23,7 +23,6 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.PropagationComparison;
 
 /**
- * @author Immortius
  */
 public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
 

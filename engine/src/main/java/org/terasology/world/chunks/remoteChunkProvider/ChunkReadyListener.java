@@ -19,7 +19,6 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * @author Immortius
  */
 public interface ChunkReadyListener {
     void onChunkReady(Vector3i pos);

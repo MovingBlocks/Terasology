@@ -20,7 +20,6 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
- * @author Immortius
  */
 public class SurfaceHeightFacet extends BaseFieldFacet2D {
 

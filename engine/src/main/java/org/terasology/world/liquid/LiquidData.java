@@ -21,7 +21,6 @@ import org.terasology.module.sandbox.API;
 /**
  * Describes the liquid state of a single block
  *
- * @author Immortius
  */
 @API
 public class LiquidData {

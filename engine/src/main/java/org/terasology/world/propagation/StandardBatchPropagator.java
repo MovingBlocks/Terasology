@@ -32,7 +32,6 @@ import java.util.Set;
 /**
  * Batch propagator that works on a set of changed blocks
  *
- * @author Immortius
  */
 public class StandardBatchPropagator implements BatchPropagator {
 

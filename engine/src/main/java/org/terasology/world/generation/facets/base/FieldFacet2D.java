@@ -19,7 +19,6 @@ import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
- * @author Immortius
  */
 public interface FieldFacet2D extends WorldFacet2D {
 

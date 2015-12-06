@@ -28,7 +28,6 @@ import org.terasology.world.liquid.LiquidData;
  * ChunkViews must be locked before write operations can be enacted - any write operations requested outside of a lock
  * are ignored.
  *
- * @author Immortius
  */
 public interface ChunkView {
     /**

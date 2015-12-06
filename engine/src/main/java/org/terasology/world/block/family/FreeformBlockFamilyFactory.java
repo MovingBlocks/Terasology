@@ -20,7 +20,6 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
 /**
- * @author Immortius
  */
 @RegisterBlockFamilyFactory("freeform")
 public class FreeformBlockFamilyFactory implements BlockFamilyFactory {

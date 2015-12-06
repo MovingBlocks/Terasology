@@ -24,7 +24,6 @@ import org.terasology.world.propagation.PropagatorWorldView;
 import org.terasology.world.propagation.SingleChunkView;
 
 /**
- * @author Immortius
  */
 public class SunlightPropagationRules extends CommonLightPropagationRules {
 

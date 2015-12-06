@@ -24,7 +24,6 @@ import org.terasology.world.block.internal.BlockPositionIterator;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public abstract class BlockLifecycleEvent implements Event {
     private TIntList positions;

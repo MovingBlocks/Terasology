@@ -24,7 +24,6 @@ import org.terasology.world.generation.WorldFacet;
 
 /**
  * A set of general implementations for {@link FacetLayer}.
- * @author Martin Steiger
  */
 public abstract class AbstractFacetLayer implements FacetLayer {
 

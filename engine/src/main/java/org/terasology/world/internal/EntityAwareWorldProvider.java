@@ -65,7 +65,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
 

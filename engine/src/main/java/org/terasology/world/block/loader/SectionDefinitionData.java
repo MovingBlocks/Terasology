@@ -29,7 +29,6 @@ import org.terasology.world.block.tiles.BlockTile;
 import java.util.EnumMap;
 
 /**
- * @author Immortius
  */
 @API
 public class SectionDefinitionData {

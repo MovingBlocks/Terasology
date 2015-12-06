@@ -24,7 +24,6 @@ import org.terasology.world.block.Block;
 /**
  * Manages creation and lookup of entities linked to blocks
  *
- * @author Immortius
  */
 public interface BlockEntityRegistry {
 

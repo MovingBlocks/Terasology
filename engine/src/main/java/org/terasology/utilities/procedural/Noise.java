@@ -19,7 +19,6 @@ package org.terasology.utilities.procedural;
 /**
  * Provides or generates noise
  *
- * @author Martin Steiger
  */
 public interface Noise {
 
