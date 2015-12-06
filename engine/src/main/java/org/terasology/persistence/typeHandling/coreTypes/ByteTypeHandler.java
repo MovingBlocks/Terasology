@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ByteTypeHandler implements TypeHandler<Byte> {
 

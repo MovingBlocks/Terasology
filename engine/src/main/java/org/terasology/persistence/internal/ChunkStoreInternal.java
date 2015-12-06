@@ -25,7 +25,6 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkSerializer;
 
 /**
- * @author Immortius
  */
 final class ChunkStoreInternal implements ChunkStore {
 

@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
 
 /**
- * @author Adeon
  */
 @BroadcastEvent
 public class ChangeVelocityEvent implements Event {

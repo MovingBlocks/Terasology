@@ -110,7 +110,6 @@ import java.util.concurrent.Executors;
 /**
  * Implementation of the Network System using Netty and TCP/IP
  *
- * @author Immortius
  */
 public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystemImpl.class);

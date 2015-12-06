@@ -23,7 +23,6 @@ import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 /**
  * Interface for providing serializers with a method to check whether a given field should be serialized.
  *
- * @author Immortius
  */
 public interface FieldSerializeCheck<T> extends DeserializeFieldCheck {
 

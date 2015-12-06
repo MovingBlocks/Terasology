@@ -41,7 +41,6 @@ import java.util.Set;
  * It is also possible to set whether entity ids will be handled or ignored - if ignored then deserialized entities will
  * be given new ids.
  *
- * @author Immortius
  */
 public class EntitySerializer {
     private EngineEntityManager entityManager;

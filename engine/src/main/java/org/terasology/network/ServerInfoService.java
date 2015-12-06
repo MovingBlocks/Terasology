@@ -31,7 +31,6 @@ import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactor
 
 /**
  * Performs temporary connections to one or more game servers.
- * @author Martin Steiger
  */
 public class ServerInfoService implements AutoCloseable {
 

@@ -35,7 +35,6 @@ import com.google.common.collect.Maps;
 /**
  * Default implementation of {@link ServerInfoMessage}.
  * Wraps the Protocol Buffer implementation
- * @author Martin Steiger
  */
 class ServerInfoMessageImpl implements ServerInfoMessage {
 

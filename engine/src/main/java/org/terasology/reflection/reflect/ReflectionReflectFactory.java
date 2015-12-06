@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 /**
  * Reflection based implementation of ReflectFactory. Uses standard Java reflection to provide the necessary reflection functionality.
  *
- * @author Immortius
  */
 public class ReflectionReflectFactory implements ReflectFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionReflectFactory.class);

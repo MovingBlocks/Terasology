@@ -27,7 +27,6 @@ import org.terasology.protobuf.NetData;
 /**
  * Checks if a {@link org.terasology.protobuf.NetData.ServerInfoMessage} was received
  * and disconnects.
- * @author Martin Steiger
  */
 public class ServerInfoRequestHandler extends SimpleChannelUpstreamHandler {
 

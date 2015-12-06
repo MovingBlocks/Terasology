@@ -37,7 +37,6 @@ import java.util.List;
  * This type handler encodes EntityRef for network transferals. For normal entities, the Network Id of the entity is used.
  * For block entities the block position is used instead (this allows overriding simulated block entities).
  *
- * @author Immortius
  */
 public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     private NetworkSystemImpl networkSystem;

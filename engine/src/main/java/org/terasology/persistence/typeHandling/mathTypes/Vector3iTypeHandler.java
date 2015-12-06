@@ -24,7 +24,6 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 /**
- * @author Immortius
  */
 public class Vector3iTypeHandler extends SimpleTypeHandler<Vector3i> {
 

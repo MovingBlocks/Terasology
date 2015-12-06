@@ -21,7 +21,6 @@ import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 
 /**
- * @author Immortius
  */
 public final class ModuleContext {
 

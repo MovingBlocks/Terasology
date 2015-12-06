@@ -52,9 +52,6 @@ import java.util.zip.GZIPInputStream;
  * An abstract implementation of {@link StorageManager} that is able
  * to read from a data store.
  *
- * @author Immortius
- * @author Florian
- * @author Martin Steiger
  */
 public abstract class AbstractStorageManager implements StorageManager {
 

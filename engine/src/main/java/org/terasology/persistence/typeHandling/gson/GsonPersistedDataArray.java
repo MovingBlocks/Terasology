@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class GsonPersistedDataArray extends AbstractGsonPersistedData implements PersistedDataArray {
 

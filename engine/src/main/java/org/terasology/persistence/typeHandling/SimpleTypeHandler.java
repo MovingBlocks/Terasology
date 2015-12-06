@@ -24,7 +24,6 @@ import java.util.List;
  * Abstract class for type handlers where collections of the type are simply handled by nesting individually serialized values into another value - that is there is
  * no special manner in which they are handled.
  *
- * @author Immortius
  */
 public abstract class SimpleTypeHandler<T> implements TypeHandler<T> {
 

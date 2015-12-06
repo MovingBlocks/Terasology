@@ -28,7 +28,6 @@ import org.terasology.world.block.ForceBlockActive;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @ForceBlockActive
 public class RigidBodyComponent implements Component {

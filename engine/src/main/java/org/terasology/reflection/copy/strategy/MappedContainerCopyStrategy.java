@@ -19,7 +19,6 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
 
 /**
- * @author Immortius
  */
 public class MappedContainerCopyStrategy<T> implements CopyStrategy<T> {
 

@@ -25,7 +25,6 @@ import org.terasology.world.chunks.ChunkConstants;
 /**
  * Collection of math functions.
  *
- * @author Benjamin Glatzel
  */
 public final class ChunkMath {
 

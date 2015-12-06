@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
 
 /**
- * @author Immortius
  */
 @BroadcastEvent
 public class PhysicsResynchEvent implements Event {

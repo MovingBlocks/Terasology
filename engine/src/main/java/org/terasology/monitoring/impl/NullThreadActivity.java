@@ -18,7 +18,6 @@ package org.terasology.monitoring.impl;
 import org.terasology.monitoring.ThreadActivity;
 
 /**
- * @author Immortius
  */
 public class NullThreadActivity implements ThreadActivity {
     @Override

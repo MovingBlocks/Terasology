@@ -37,7 +37,6 @@ import static org.jboss.netty.channel.Channels.pipeline;
 /**
  * Netty pipeline for Clients
  *
- * @author Immortius
  */
 public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 

@@ -26,7 +26,6 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class BorderTypeHandler extends SimpleTypeHandler<Border> {
     private static final String LEFT_FIELD = "left";

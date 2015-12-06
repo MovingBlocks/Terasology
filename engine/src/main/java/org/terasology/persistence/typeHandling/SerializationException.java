@@ -17,7 +17,6 @@ package org.terasology.persistence.typeHandling;
 
 /**
  * This exception is thrown when deserializing a type fails
- * @author Immortius
  */
 public class SerializationException extends RuntimeException {
 

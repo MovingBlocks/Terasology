@@ -55,7 +55,6 @@ import java.util.List;
  * translates output of the physics engine into events. It also calls the update
  * method of the PhysicsEngine every frame.
  *
- * @author Immortius
  */
 @RegisterSystem
 public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

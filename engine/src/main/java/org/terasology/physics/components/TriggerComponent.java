@@ -25,7 +25,6 @@ import org.terasology.world.block.ForceBlockActive;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @ForceBlockActive
 public class TriggerComponent implements Component {

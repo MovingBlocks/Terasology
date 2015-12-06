@@ -29,7 +29,6 @@ import org.terasology.physics.engine.SweepCallback;
  * The bullet implementation of SweepCallback, that holds the results of a collision sweep. (detect what
  * collisions would occur if something moved from a to b)
  *
- * @author Immortius
  */
 public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallback implements SweepCallback {
     protected CollisionObject me;

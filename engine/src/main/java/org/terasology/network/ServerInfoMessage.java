@@ -25,7 +25,6 @@ import java.util.Map;
 /**
  * TODO Type description
  *
- * @author Martin Steiger
  */
 public interface ServerInfoMessage {
 

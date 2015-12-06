@@ -21,7 +21,6 @@ import org.terasology.reflection.metadata.FieldMetadata;
 /**
  * Interface for providing a method to more tightly control when a field should be replicated.
  *
- * @author Immortius
  */
 public interface ReplicationCheck {
 

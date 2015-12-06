@@ -16,7 +16,6 @@
 package org.terasology.reflection.reflect;
 
 /**
- * @author Immortius
  */
 public class InaccessibleFieldException extends Exception {
 

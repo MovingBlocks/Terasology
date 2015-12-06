@@ -24,7 +24,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ListTypeHandler<T> extends SimpleTypeHandler<List<T>> {
     private TypeHandler<T> contentsType;

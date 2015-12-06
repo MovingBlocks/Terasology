@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class GsonSerializationContext implements SerializationContext {
 

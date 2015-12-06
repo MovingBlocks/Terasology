@@ -21,7 +21,6 @@ import org.terasology.reflection.copy.CopyStrategy;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class SetCopyStrategy<T> implements CopyStrategy<Set<T>> {
     private final CopyStrategy<T> contentStrategy;

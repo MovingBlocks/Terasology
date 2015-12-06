@@ -34,7 +34,6 @@ import org.terasology.protobuf.NetData;
 /**
  * A pipeline that requests {@link org.terasology.network.ServerInfoMessage} before it auto-disconnects.
  * This is similar to {@link TerasologyClientPipelineFactory}.
- * @author Martin Steiger
  */
 public class InfoRequestPipelineFactory implements ChannelPipelineFactory {
 

@@ -31,7 +31,6 @@ import java.nio.file.Path;
 /**
  * Used to create a dump of the current state of the world (specifically, entities)
  *
- * @author Immortius
  */
 public class WorldDumper {
 

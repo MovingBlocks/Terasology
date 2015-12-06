@@ -20,7 +20,6 @@ import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 /**
- * @author Immortius
  */
 public class NameTypeHandler extends StringRepresentationTypeHandler<Name> {
 

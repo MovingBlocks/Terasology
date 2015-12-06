@@ -16,7 +16,6 @@
 package org.terasology.network;
 
 /**
- * @author Immortius
  */
 public interface JoinStatus {
 
