@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractBlockFamily implements BlockFamily {
 

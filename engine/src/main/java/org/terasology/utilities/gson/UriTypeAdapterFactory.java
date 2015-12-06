@@ -33,7 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * A Gson Adapter factory for supporting enums in a case-insensitive manner
  *
- * @author Immortius
  */
 public class UriTypeAdapterFactory implements TypeAdapterFactory {
     private static final Logger logger = LoggerFactory.getLogger(UriTypeAdapterFactory.class);

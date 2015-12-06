@@ -25,7 +25,6 @@ import org.terasology.world.generation.Border3D;
 import java.lang.reflect.Array;
 
 /**
- * @author Immortius
  */
 public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements ObjectFacet2D<T> {
 

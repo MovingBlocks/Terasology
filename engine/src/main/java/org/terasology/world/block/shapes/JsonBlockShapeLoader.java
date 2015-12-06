@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData> {

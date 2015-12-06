@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);

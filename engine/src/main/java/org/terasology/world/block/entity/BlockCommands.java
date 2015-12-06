@@ -54,7 +54,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 @Share(BlockCommands.class)

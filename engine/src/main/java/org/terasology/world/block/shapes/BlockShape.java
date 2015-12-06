@@ -27,7 +27,6 @@ import org.terasology.world.block.BlockPart;
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.
  *
- * @author Immortius
  */
 public abstract class BlockShape extends Asset<BlockShapeData> {
 

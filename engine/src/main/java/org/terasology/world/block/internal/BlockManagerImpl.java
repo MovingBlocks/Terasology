@@ -49,7 +49,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author Immortius
  */
 public class BlockManagerImpl extends BlockManager {
 

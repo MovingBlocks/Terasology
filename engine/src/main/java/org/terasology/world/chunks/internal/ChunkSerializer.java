@@ -30,7 +30,6 @@ import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 
 /**
- * @author Immortius
  */
 public final class ChunkSerializer {
 

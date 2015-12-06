@@ -25,7 +25,6 @@ import ec.util.MersenneTwisterFast;
  * Reference: Makato Matsumoto and Takuji Nishimura: <br>
  * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator"
  *
- * @author Martin Steiger
  */
 @API
 public class MersenneRandom extends Random {

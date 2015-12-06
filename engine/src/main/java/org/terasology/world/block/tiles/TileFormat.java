@@ -31,7 +31,6 @@ import java.util.List;
 /**
  * Loader for block tiles
  *
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class TileFormat extends AbstractAssetFileFormat<TileData> {

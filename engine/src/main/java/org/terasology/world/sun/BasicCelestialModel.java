@@ -21,7 +21,6 @@ import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 /**
  * A simple implementations of {@link CelestialSystem} with constant daily events
  * and perfect radial movement of a single sun.
- * @author Martin Steiger
  */
 public class BasicCelestialModel implements CelestialModel {
 

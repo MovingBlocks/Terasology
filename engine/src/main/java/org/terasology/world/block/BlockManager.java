@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public abstract class BlockManager {
 

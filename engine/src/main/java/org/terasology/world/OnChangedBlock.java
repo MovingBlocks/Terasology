@@ -23,7 +23,6 @@ import org.terasology.world.block.Block;
 /**
  * Event when a block has changed
  *
- * @author Immortius
  */
 public class OnChangedBlock implements Event {
     private Block oldType;

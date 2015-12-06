@@ -31,7 +31,6 @@ import org.terasology.world.viewer.color.ColorModels;
 /**
  * Provides info about an {@link ObjectFacet2D}.
  * @param <E> the object type
- * @author Martin Steiger
  */
 public abstract class NominalFacetLayer<E> extends AbstractFacetLayer {
 

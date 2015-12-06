@@ -18,7 +18,6 @@ package org.terasology.world.block.entity.neighbourUpdate;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Marcin Sciesinski
  */
 public class LargeBlockUpdateFinished implements Event {
 }

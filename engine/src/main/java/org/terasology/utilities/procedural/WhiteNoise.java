@@ -19,7 +19,6 @@ package org.terasology.utilities.procedural;
 /**
  * This implementation is based on Robert Jenkins' 96 bit mix function as described in
  * in "Integer Hash Function" by Thomas Wang, Jan 1997. The original code is public domain.
- * @author Martin Steiger
  *
  */
 public class WhiteNoise implements Noise {

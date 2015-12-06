@@ -16,7 +16,6 @@
 package org.terasology.utilities.concurrency;
 
 /**
- * @author Immortius
  */
 public class ShutdownTask implements Task {
     @Override

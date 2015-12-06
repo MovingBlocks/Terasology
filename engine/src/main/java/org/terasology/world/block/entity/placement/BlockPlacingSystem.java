@@ -30,7 +30,6 @@ import org.terasology.world.block.Block;
 import java.util.Map;
 
 /**
- * @author Marcin Sciesinski
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockPlacingSystem extends BaseComponentSystem {

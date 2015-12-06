@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 @API
 public class BlockFamilyDefinitionData implements AssetData {

@@ -18,7 +18,6 @@ package org.terasology.world.sun;
 
 /**
  * An interface for celestial systems (with only one sun)
- * @author Martin Steiger
  */
 public interface CelestialSystem {
 

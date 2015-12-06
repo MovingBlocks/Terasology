@@ -25,7 +25,6 @@ import org.terasology.entitySystem.Component;
  * As an example - a chandelier would have topAllowed=true, most of building blocks for houses would be -
  * bottomAllowed=true, sideAllowed=true, table (furniture) would be bottomAllowed=true.
  *
- * @author Marcin Sciesinski
  */
 public class SideBlockSupportRequiredComponent implements Component {
     public boolean topAllowed;

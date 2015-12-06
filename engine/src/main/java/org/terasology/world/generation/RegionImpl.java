@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class RegionImpl implements Region, GeneratingRegion {
 

@@ -20,7 +20,6 @@ package org.terasology.utilities.procedural;
  * Computes Brownian noise based on some noise generator.
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
  *
- * @author Martin Steiger
  * @deprecated Use {@link BrownianNoise} instead and adjust the scale factor: the new impl. returns [-1..1].
  */
 @Deprecated

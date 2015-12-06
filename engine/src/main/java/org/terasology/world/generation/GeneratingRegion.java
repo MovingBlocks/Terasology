@@ -18,7 +18,6 @@ package org.terasology.world.generation;
 import org.terasology.math.Region3i;
 
 /**
- * @author Immortius
  */
 public interface GeneratingRegion {
 

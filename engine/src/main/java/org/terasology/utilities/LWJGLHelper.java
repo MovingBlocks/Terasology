@@ -25,7 +25,6 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 /**
  * Helper class to have LWJGL loading logic in a central spot
  *
- * @author Rasmus 'Cervator' Praestholm
  */
 public final class LWJGLHelper {
 

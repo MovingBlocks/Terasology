@@ -22,10 +22,8 @@ import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
- * @author mkienenb
  *         <br><br>
  *         Use this component to track and draw a region of selected blocks.
- * @author synopia
  *         <br><br>
  *         One example use is with the LocalPlayerBlockSelectionByItemSystem.
  *         Add this component to any item entity, to make the item to a selection item. When using such items, a temporary

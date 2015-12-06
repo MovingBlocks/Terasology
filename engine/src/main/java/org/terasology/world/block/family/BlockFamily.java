@@ -27,7 +27,6 @@ import org.terasology.world.block.BlockUri;
  * This will enable such effects as players picking up a block with one orientation and it grouping
  * with the same block with different orientations, and placing it in different directions.
  *
- * @author Immortius
  */
 public interface BlockFamily {
 

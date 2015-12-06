@@ -21,7 +21,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
 /**
- * @author Immortius
  */
 public class SingleChunkView implements PropagatorWorldView {
 

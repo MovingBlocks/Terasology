@@ -28,7 +28,6 @@ import java.util.Arrays;
  * Its elements are in the range -32'768 through +32'767 and it internally uses the short type to store its elements.
  * It can reduce memory consumption through sparse memory allocation.
  *
- * @author Manuel Brotz
  */
 public class TeraSparseArray16Bit extends TeraSparseArray {
 

@@ -19,7 +19,6 @@ import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.Chunk;
 
 /**
- * @author Immortius
  */
 public class ChunkUnloadRequest implements Task {
 

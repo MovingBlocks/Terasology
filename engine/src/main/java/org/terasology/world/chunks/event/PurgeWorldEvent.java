@@ -21,7 +21,6 @@ import org.terasology.entitySystem.event.Event;
 /**
  * This {@link Event} is fired when the chunk provider purges
  * all chunks. This can be triggered using the "purgeWorld" world command. 
- * @author Martin Steiger
  */
 public class PurgeWorldEvent implements Event {
     // empty

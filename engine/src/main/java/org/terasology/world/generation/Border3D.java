@@ -23,7 +23,6 @@ import org.terasology.math.geom.Vector3i;
 import java.util.Objects;
 
 /**
- * @author Immortius
  */
 public class Border3D {
     private final int top;

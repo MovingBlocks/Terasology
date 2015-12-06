@@ -21,7 +21,6 @@ import org.terasology.world.chunks.CoreChunk;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public interface ChunkGenerationPass {
 

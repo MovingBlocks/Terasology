@@ -20,7 +20,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractChunkView implements PropagatorWorldView {
 

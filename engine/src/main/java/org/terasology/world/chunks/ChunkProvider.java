@@ -23,7 +23,6 @@ import org.terasology.world.internal.ChunkViewCore;
 import java.util.Collection;
 
 /**
- * @author Immortius
  */
 public interface ChunkProvider {
 

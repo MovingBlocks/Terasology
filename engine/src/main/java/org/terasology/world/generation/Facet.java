@@ -20,7 +20,6 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * This is the sub-annotation for describing facets in Requires and Updates annotations
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Facet {

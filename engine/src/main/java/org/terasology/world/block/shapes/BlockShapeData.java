@@ -26,7 +26,6 @@ import org.terasology.world.block.BlockPart;
 import java.util.EnumMap;
 
 /**
- * @author Immortius
  */
 public class BlockShapeData implements AssetData {
     private String displayName = "";
