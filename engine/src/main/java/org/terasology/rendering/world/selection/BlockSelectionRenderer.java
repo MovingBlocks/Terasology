@@ -48,7 +48,6 @@ import static org.lwjgl.opengl.GL11.glTranslated;
  * <br><br>
  * TODO total overhaul of this class. its neither good code, nor optimized in any way!
  *
- * @author synopia
  */
 @API
 public class BlockSelectionRenderer {

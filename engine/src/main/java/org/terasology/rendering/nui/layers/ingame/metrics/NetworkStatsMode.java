@@ -22,7 +22,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 
 /**
- * @author Immortius
  */
 final class NetworkStatsMode extends MetricsMode {
     private long lastTime;

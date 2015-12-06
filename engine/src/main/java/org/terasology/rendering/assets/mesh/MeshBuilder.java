@@ -23,7 +23,6 @@ import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.Color;
 
 /**
- * @author Immortius
  */
 public class MeshBuilder {
     private static final float[] VERTICES = {

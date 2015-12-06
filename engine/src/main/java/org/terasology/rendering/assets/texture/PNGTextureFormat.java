@@ -28,7 +28,6 @@ import java.nio.file.PathMatcher;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class PNGTextureFormat extends AbstractAssetFileFormat<TextureData> {
 

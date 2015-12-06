@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * @author Martin Steiger
  */
 public class PlayerSettingsScreen extends CoreScreenLayer {
 

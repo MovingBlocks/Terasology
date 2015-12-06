@@ -20,7 +20,6 @@ import org.terasology.rendering.assets.material.Material;
 /**
  * Shader parameters for the Particle shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersParticle extends ShaderParametersBase {
 

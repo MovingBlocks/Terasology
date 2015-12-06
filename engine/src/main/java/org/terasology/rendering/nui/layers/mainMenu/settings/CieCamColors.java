@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableList;
  * Consecutive colors have a delta E distance of at least 1.
  * Delta E distance is defined in CAM02-UCS as published in "Uniform Colour Spaces Based on
  * CIECAM02 Colour Appearance Model" (Luo et al.)
- * @author Martin Steiger
  */
 public final class CieCamColors {
 

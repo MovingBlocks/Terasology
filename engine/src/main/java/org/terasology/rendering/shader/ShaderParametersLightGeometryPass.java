@@ -33,7 +33,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the LightBufferPass shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
 

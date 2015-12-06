@@ -23,7 +23,6 @@ import org.terasology.network.OwnerEvent;
 /**
  * The event is sent to the UI layer
  *
- * @author Florian
  */
 @OwnerEvent
 @API

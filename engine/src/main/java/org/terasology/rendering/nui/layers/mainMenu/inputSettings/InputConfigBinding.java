@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class InputConfigBinding implements Binding<Input> {
 

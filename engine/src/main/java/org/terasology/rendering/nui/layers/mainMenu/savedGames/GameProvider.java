@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.SortedMap;
 
 /**
- * @author Immortius
  */
 public final class GameProvider {
 

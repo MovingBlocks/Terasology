@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.Objects;
 
 /**
- * @author Immortius
  */
 public class ScrollableArea extends CoreLayout {
     private static final int SCROLL_MULTIPLIER = -42;

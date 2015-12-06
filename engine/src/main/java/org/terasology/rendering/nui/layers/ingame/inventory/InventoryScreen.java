@@ -24,8 +24,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 
 /**
- * @author Immortius
- * @author Florian
  */
 public class InventoryScreen extends CoreScreenLayer {
 

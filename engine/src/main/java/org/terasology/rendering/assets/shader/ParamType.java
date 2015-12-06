@@ -17,7 +17,6 @@
 package org.terasology.rendering.assets.shader;
 
 /**
- * @author Immortius
  */
 public enum ParamType {
     sampler2D(true),

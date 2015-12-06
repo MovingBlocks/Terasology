@@ -80,7 +80,6 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * @author Immortius
  */
 public class LwjglCanvasRenderer implements CanvasRenderer {
 

@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui;
 
 /**
- * @author Immortius
  */
 public interface SubRegion extends AutoCloseable {
 

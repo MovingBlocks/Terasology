@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ShaderMetadata {
     List<ShaderParameterMetadata> parameters = Lists.newArrayList();

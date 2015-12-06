@@ -26,7 +26,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the Block shader program.
  *
- * @author Benjamin Glatzel
  */
 // TODO: Put these values in a material and use that.
 public class ShaderParametersBlock extends ShaderParametersBase {

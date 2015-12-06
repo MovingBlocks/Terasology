@@ -23,7 +23,6 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 
 /**
- * @author Immortius
  */
 public final class WidgetUtil {
 

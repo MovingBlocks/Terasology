@@ -58,7 +58,6 @@ import java.util.Set;
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
  *
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MeshRenderer extends BaseComponentSystem implements RenderSystem {

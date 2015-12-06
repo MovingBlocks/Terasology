@@ -21,7 +21,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
- * @author Immortius
  */
 public class UISkin extends Asset<UISkinData> {
 

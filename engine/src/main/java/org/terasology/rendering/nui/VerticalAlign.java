@@ -19,7 +19,6 @@ import org.terasology.math.geom.Rect2i;
 
 /**
  * Possible vertical alignments. Provides support for determining where to position something vertically, given its size and the size of the space.
- * @author Immortius
  */
 public enum VerticalAlign {
     TOP {

@@ -19,7 +19,6 @@ import com.google.gson.annotations.SerializedName;
 import org.terasology.rendering.nui.LayoutHint;
 
 /**
- * @author Immortius
  */
 public class RelativeLayoutHint implements LayoutHint {
 

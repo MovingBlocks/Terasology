@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 /**
- * @author Immortius
  */
 public abstract class MetricsMode {
 

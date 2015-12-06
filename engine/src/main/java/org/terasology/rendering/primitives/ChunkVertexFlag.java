@@ -16,7 +16,6 @@
 package org.terasology.rendering.primitives;
 
 /**
- * @author Immortius
  */
 public enum ChunkVertexFlag {
     NORMAL(0, "BLOCK_HINT_NORMAL"),

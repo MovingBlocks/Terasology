@@ -20,7 +20,6 @@ import org.terasology.math.geom.Rect2f;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
- * @author Immortius
  */
 public class SubtextureData implements AssetData {
     private Texture texture;

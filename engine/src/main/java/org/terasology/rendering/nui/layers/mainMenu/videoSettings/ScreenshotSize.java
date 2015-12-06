@@ -19,7 +19,6 @@ import org.terasology.math.TeraMath;
 
 /**
  * An enum for different screenshot size presets
- * @author Sebastian Roidl
  */
 public enum ScreenshotSize {
 

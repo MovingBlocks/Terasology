@@ -64,7 +64,6 @@ import java.util.Set;
 /**
  * The UILoader handles loading UI widgets from json format files.
  *
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class UIFormat extends AbstractAssetFileFormat<UIData> {

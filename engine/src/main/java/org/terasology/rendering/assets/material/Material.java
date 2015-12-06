@@ -31,7 +31,6 @@ import org.terasology.rendering.cameras.Camera;
 import java.nio.FloatBuffer;
 
 /**
- * @author Immortius
  */
 public abstract class Material extends Asset<MaterialData> {
 

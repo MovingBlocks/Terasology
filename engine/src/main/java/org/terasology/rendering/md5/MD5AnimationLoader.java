@@ -39,7 +39,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationData> {

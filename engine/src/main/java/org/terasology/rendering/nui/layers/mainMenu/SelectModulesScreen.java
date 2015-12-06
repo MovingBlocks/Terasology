@@ -65,7 +65,6 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
- * @author Immortius
  */
 public class SelectModulesScreen extends CoreScreenLayer {
 

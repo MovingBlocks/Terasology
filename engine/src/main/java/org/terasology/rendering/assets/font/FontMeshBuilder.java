@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class FontMeshBuilder {
 

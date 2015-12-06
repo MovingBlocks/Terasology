@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 
 /**
- * @author Immortius
  */
 public interface CanvasControl extends Canvas {
 

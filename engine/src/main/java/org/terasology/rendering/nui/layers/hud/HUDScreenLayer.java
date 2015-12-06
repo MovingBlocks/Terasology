@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class HUDScreenLayer extends CoreScreenLayer {
 

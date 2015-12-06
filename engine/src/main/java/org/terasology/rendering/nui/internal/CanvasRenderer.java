@@ -33,7 +33,6 @@ import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.opengl.FrameBufferObject;
 
 /**
- * @author Immortius
  */
 public interface CanvasRenderer {
 

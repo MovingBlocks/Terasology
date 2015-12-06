@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * @author Immortius
  */
 @RegisterAssetSupplementalFileFormat
 public class TextureInfoFormat extends AbstractAssetAlterationFileFormat<TextureData> {

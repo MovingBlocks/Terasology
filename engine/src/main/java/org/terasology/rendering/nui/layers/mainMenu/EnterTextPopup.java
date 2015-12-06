@@ -23,7 +23,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
 /**
- * @author synopia
  */
 public class EnterTextPopup extends CoreScreenLayer {
     private Binding<String> inputBinding;

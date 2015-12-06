@@ -28,7 +28,6 @@ import org.terasology.utilities.random.Random;
 /**
  * Creates TextureData objects based on specific criteria
  *
- * @author mkienenb
  */
 public final class TextureDataFactory {
     // Lwjgl 2.x currently requires textures to be powers of 16, although this should change in 3.0.

@@ -23,7 +23,6 @@ import org.terasology.assets.ResourceUrn;
 import java.util.Collection;
 
 /**
- * @author Immortius
  */
 public abstract class SkeletalMesh extends Asset<SkeletalMeshData> {
 

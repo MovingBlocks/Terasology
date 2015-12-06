@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector2i;
 /**
  * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
  *
- * @author Immortius
  */
 public interface TextureRegion {
 

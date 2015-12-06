@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UISlider;
 
 /**
- * @author Immortius
  */
 public class AudioSettingsScreen extends CoreScreenLayer {
 

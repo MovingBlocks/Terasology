@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 

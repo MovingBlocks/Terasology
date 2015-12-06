@@ -21,7 +21,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2f;
 
 /**
- * @author Immortius
  */
 public abstract class Texture extends TextureRegionAsset<TextureData> {
 

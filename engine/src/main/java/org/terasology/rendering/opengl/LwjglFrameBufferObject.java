@@ -40,7 +40,6 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
  *
- * @author synopia
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;

@@ -20,7 +20,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 
 /**
- * @author Immortius
  */
 public class AnimEndEvent implements Event {
     private MeshAnimation animation;

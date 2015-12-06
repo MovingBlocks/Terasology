@@ -28,7 +28,6 @@ import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsS
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 
 /**
- * @author Immortius
  */
 public class SettingsMenuScreen extends CoreScreenLayer {
 

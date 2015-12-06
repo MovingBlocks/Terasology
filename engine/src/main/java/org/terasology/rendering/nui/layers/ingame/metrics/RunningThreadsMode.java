@@ -20,7 +20,6 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 
 /**
- * @author Immortius
  */
 final class RunningThreadsMode extends MetricsMode {
 

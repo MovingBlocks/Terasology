@@ -30,7 +30,6 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * Shader parameters for the Light Shaft shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersLightShaft extends ShaderParametersBase {
 

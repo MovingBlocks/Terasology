@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class Atlas extends Asset<AtlasData> {
     private Map<ResourceUrn, SubtextureData> subtextures = Maps.newHashMap();

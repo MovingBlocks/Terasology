@@ -47,7 +47,6 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 /**
  * The Default Rendering Process class.
  *
- * @author Benjamin Glatzel
  */
 public class LwjglRenderingProcess {
 

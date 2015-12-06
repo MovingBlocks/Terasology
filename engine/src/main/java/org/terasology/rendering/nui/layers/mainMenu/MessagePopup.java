@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
- * @author Immortius
  */
 public class MessagePopup extends CoreScreenLayer {
 

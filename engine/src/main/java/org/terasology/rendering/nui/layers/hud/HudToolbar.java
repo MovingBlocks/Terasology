@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 import org.terasology.rendering.nui.widgets.UIIconBar;
 
 /**
- * @author Immortius
  */
 public class HudToolbar extends CoreHudWidget {
 

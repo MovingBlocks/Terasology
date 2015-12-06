@@ -33,7 +33,6 @@ import org.terasology.rendering.nui.widgets.CursorAttachment;
 import org.terasology.world.block.items.BlockItemComponent;
 
 /**
- * @author Immortius
  */
 public class TransferItemCursor extends CursorAttachment implements ControlWidget {
 
