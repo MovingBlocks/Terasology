@@ -26,7 +26,6 @@ import java.nio.FloatBuffer;
 /**
  * Collection of matrix utilities.
  *
- * @author Benjamin Glatzel
  */
 public final class MatrixUtils {
 

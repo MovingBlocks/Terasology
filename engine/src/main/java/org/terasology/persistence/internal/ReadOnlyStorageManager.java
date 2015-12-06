@@ -31,7 +31,6 @@ import java.util.Collection;
 
 /**
  * A {@link org.terasology.persistence.StorageManager} that performs reading only.
- * @author Martin Steiger
  */
 public final class ReadOnlyStorageManager extends AbstractStorageManager {
 

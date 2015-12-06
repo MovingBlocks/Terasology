@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.AtomicDouble;
 import org.terasology.network.JoinStatus;
 
 /**
- * @author Immortius
  */
 public class JoinStatusImpl implements JoinStatus {
     private Status status = Status.IN_PROGRESS;

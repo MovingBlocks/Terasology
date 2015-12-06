@@ -25,7 +25,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 /**
- * @author Immortius
  */
 public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
     private WorldProvider world;

@@ -21,7 +21,6 @@ import org.terasology.reflection.copy.CopyStrategy;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ListCopyStrategy<T> implements CopyStrategy<List<T>> {
 

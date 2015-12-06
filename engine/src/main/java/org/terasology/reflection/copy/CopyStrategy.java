@@ -20,7 +20,6 @@ package org.terasology.reflection.copy;
  * This may be returning the object unchanged for immutable or otherwise safe to share types.
  * Copy strategies are deep-copies - contents should also be copied where appropriate.
  *
- * @author Immortius
  */
 public interface CopyStrategy<T> {
 

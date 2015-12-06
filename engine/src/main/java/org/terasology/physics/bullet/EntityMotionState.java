@@ -28,7 +28,6 @@ import org.terasology.math.VecMath;
  * Bullet reads the initial state of the rigid body out of the entity, and then updates its location and rotation
  * as it moves under physics.
  *
- * @author Immortius
  */
 public class EntityMotionState extends MotionState {
     private EntityRef entity;

@@ -29,7 +29,6 @@ import java.util.Map;
  * leave relevance over time, and may have a different Entity id each time. NetEntityRef links to them via their
  * network id, and survives them dropping in and out of relevance.
  *
- * @author Immortius
  */
 public class NetEntityRef extends BaseEntityRef {
 

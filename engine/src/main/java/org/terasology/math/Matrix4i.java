@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector3i;
 import java.util.Arrays;
 
 /**
- * @author Tobias 'skaldarnar' Nett Date: 17.11.12
  */
 public class Matrix4i {
 

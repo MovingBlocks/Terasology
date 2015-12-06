@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 /**
  * A standard class metadata implementation using FieldMetadata.
  *
- * @author Immortius
  */
 public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?>> {
 

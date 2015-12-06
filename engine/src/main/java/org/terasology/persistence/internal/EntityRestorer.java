@@ -26,7 +26,6 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 final class EntityRestorer {
 

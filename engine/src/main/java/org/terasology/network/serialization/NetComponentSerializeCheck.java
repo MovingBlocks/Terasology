@@ -23,7 +23,6 @@ import org.terasology.persistence.serializers.ComponentSerializeCheck;
 /**
  * Determines which components should be serialized over the network - only replicated components.
  *
- * @author Immortius
  */
 public class NetComponentSerializeCheck implements ComponentSerializeCheck {
 

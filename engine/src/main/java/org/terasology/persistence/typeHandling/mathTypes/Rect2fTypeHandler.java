@@ -28,7 +28,6 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class Rect2fTypeHandler extends SimpleTypeHandler<Rect2f> {
 

@@ -27,7 +27,6 @@ import org.terasology.persistence.serializers.FieldSerializeCheck;
 /**
  * Determines which fields should be sent and received by the server
  *
- * @author Immortius
  */
 public class ServerComponentFieldCheck implements FieldSerializeCheck<Component> {
     private boolean owned;

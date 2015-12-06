@@ -93,7 +93,6 @@ import java.util.Set;
  * This library should be initialised by adding a number of base type handlers, describing how to serialize each supported type.
  * It will then produce serializers for classes (through their ClassMetadata) on request.
  *
- * @author Immortius
  */
 public class TypeSerializationLibrary {
     private static final Logger logger = LoggerFactory.getLogger(TypeSerializationLibrary.class);

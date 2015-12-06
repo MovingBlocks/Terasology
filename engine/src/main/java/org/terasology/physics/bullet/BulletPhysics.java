@@ -94,7 +94,6 @@ import java.util.Set;
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet)
  *
- * @author Benjamin Glatzel
  */
 public class BulletPhysics implements PhysicsEngine {
 

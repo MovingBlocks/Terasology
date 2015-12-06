@@ -21,7 +21,6 @@ import org.terasology.reflection.copy.CopyStrategy;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class MapCopyStrategy<K, V> implements CopyStrategy<Map<K, V>> {
 

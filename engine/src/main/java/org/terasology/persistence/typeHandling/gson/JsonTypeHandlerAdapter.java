@@ -26,7 +26,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class JsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, JsonSerializer<T> {
 

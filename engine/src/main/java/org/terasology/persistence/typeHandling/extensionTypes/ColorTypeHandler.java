@@ -24,7 +24,6 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.rendering.nui.Color;
 
 /**
- * @author Immortius
  */
 public class ColorTypeHandler extends SimpleTypeHandler<Color> {
 

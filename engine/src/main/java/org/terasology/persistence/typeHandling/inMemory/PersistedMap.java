@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class PersistedMap extends AbstractPersistedData implements PersistedDataMap {
     private Map<String, PersistedData> map;

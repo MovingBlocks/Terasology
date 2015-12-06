@@ -26,7 +26,6 @@ import java.util.Iterator;
 /**
  * Describes an axis-aligned bounded space in 3D integer.
  *
- * @author Immortius
  */
 public final class Region3i implements Iterable<Vector3i> {
     public static final Region3i EMPTY = new Region3i();
