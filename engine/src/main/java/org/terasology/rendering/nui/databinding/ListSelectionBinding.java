@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.databinding;
 import org.terasology.rendering.nui.widgets.UIList;
 
 /**
- * @author Immortius
  */
 public class ListSelectionBinding<T> implements Binding<T> {
 

@@ -28,7 +28,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 
 /**
- * @author Immortius
  */
 public class WorldProviderWrapper extends AbstractWorldProviderDecorator implements WorldProvider {
     private WorldProviderCore core;

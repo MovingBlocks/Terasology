@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3f;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public interface Physics {
     /**

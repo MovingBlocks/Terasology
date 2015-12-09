@@ -19,7 +19,6 @@ package org.terasology.network;
 /**
  * The current multiplayer mode of the game.
  *
- * @author Immortius
  */
 public enum NetworkMode {
     /**

@@ -19,7 +19,6 @@ package org.terasology.world.chunks.blockdata;
 /**
  * TeraArrayUtils contains some methods used in some TeraArray implementations.
  *
- * @author Manuel Brotz
  */
 public final class TeraArrayUtils {
 

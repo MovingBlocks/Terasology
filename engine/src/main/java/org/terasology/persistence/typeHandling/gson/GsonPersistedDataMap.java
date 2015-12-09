@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class GsonPersistedDataMap extends AbstractGsonPersistedData implements PersistedDataMap {
 

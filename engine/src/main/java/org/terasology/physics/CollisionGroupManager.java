@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class CollisionGroupManager {
 

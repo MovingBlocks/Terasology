@@ -25,7 +25,6 @@ import java.util.List;
  * BenchmarkResult records the results and the errors of the execution of one particular benchmark.
  * It also maintains a list of columns which are very useful for pretty printing the results.
  *
- * @author Manuel Brotz
  */
 public abstract class BenchmarkResult {
 

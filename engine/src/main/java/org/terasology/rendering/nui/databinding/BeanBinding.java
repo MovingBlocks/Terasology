@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * @author Immortius
  */
 public final class BeanBinding<T> implements Binding<T> {
     private static final Logger logger = LoggerFactory.getLogger(BeanBinding.class);

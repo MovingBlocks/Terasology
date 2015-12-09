@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Marcin Sciesinski
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(value = DelayManager.class)

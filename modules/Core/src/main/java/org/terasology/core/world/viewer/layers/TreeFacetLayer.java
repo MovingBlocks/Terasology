@@ -42,7 +42,6 @@ import org.terasology.world.viewer.picker.CirclePickerAll;
 /**
  * Renders the tree coverage based on {@link TreeFacet}
  * and provides aggregating tool tips.
- * @author Martin Steiger
  */
 @Renders(value = TreeFacet.class, order = ZOrder.TREES)
 public class TreeFacetLayer extends AbstractFacetLayer {

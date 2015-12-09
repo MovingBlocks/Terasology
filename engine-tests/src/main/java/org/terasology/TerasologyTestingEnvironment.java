@@ -54,7 +54,6 @@ import static org.mockito.Mockito.mock;
 /**
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
  *
- * @author Immortius
  */
 public abstract class TerasologyTestingEnvironment {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);

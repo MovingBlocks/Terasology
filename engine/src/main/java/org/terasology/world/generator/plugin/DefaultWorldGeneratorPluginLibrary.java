@@ -26,7 +26,6 @@ import org.terasology.reflection.metadata.DefaultClassLibrary;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginLibrary {
 

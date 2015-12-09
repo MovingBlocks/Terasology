@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Generates tessellated chunk meshes from chunks.
  *
- * @author Benjamin Glatzel
  */
 public final class ChunkTessellator {
 

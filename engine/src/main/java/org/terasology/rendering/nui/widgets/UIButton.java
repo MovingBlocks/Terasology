@@ -36,7 +36,6 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";

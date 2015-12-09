@@ -27,7 +27,6 @@ import java.util.Set;
  *
  * Has all the data of a player to create save it with a copy of the entity manager.
  *
- * @author Florian
  */
 class PlayerStoreBuilder {
     private Long characterEntityId;

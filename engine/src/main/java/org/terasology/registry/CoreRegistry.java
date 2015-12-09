@@ -20,7 +20,6 @@ import org.terasology.context.Context;
 /**
  * Registry giving access to major singleton systems, via the interface they fulfill.
  *
- * @author Immortius
  */
 public final class CoreRegistry {
     private static Context context;

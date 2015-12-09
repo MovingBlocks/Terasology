@@ -21,7 +21,6 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.AbstractFullWorldView;
 
 /**
- * @author Immortius
  */
 public class SunlightWorldView extends AbstractFullWorldView {
 

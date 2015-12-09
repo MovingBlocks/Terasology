@@ -21,7 +21,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.NetworkComponent;
 
 /**
- * @author Immortius
  */
 public class PojoEntityRef extends BaseEntityRef {
     private long id;

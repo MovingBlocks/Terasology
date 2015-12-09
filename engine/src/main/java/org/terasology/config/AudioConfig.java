@@ -20,7 +20,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
- * @author Immortius
  */
 public class AudioConfig {
     public static final String SOUND_VOLUME = "soundVolume";

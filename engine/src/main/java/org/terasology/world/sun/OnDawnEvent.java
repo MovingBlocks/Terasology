@@ -20,7 +20,6 @@ import org.terasology.world.time.TimeEventBase;
 /**
  * Sent to a world on dawn (beginning of a new day)
  *
- * @author Immortius
  */
 public class OnDawnEvent extends TimeEventBase {
 

@@ -20,7 +20,6 @@ import java.util.Objects;
 /**
  * This ItemRenderer displays the result of the object's toString() method. If the object is null, 'null' is displayed.
  *
- * @author Immortius
  */
 public class ToStringTextRenderer<T> extends StringTextRenderer<T> {
 

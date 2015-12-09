@@ -22,7 +22,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 /**
  * This event should be sent to cause damage to an entity.
  *
- * @author Immortius
  */
 public class DoDamageEvent implements Event {
     private int amount;

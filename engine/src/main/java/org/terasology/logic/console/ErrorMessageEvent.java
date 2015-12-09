@@ -20,7 +20,6 @@ import org.terasology.network.OwnerEvent;
 /**
  * Use to send error messages to a client
  *
- * @author Martin Steiger
  */
 @OwnerEvent
 public class ErrorMessageEvent implements MessageEvent {

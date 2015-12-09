@@ -24,7 +24,6 @@ import org.terasology.world.generation.Region;
 
 /**
  * A visual representation of a facet class
- * @author Martin Steiger
  */
 public interface FacetLayer  {
 

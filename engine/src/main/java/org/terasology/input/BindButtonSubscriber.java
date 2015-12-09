@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 /**
  * Interface for subscribing to bind button events
  *
- * @author Immortius
  */
 public interface BindButtonSubscriber {
 

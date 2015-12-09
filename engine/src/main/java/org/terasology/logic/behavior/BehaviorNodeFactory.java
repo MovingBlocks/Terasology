@@ -58,7 +58,6 @@ import java.util.stream.Collectors;
 /**
  * Factory to create node instances from node entities.
  *
- * @author synopia
  */
 @RegisterSystem
 @Share(BehaviorNodeFactory.class)

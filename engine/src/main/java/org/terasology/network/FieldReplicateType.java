@@ -17,7 +17,6 @@
 package org.terasology.network;
 
 /**
- * @author Immortius
  */
 public enum FieldReplicateType {
     SERVER_TO_CLIENT(false),

@@ -39,7 +39,6 @@ import org.terasology.world.WorldProvider;
 /**
  * Hierarchical AI, idea from robotics
  *
- * @author Esa-Petri Tirkkonen
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HierarchicalAISystem extends BaseComponentSystem implements

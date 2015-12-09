@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.inMemory;
 
 /**
- * @author Immortius
  */
 public abstract class PersistedNumber extends AbstractPersistedData {
 

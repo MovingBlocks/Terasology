@@ -25,7 +25,6 @@ import org.terasology.assets.Asset;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class AssetTypeAdapter<V extends Asset> implements JsonDeserializer<V> {
 

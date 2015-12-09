@@ -38,7 +38,6 @@ import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class UIInputBind extends CoreWidget {
     public static final String HOVER_MODE = "hover";

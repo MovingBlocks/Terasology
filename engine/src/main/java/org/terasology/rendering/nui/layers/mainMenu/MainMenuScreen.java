@@ -27,7 +27,6 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
 /**
- * @author Immortius
  */
 public class MainMenuScreen extends CoreScreenLayer {
 

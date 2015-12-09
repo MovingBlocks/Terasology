@@ -16,7 +16,6 @@
 package org.terasology.utilities.reflection;
 
 /**
- * @author Limeth
  */
 
 import com.google.common.base.Preconditions;

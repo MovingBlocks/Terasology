@@ -40,7 +40,6 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class EventSerializer {
     private static final Logger logger = LoggerFactory.getLogger(ComponentSerializer.class);

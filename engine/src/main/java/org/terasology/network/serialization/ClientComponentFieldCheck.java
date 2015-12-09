@@ -25,7 +25,6 @@ import org.terasology.persistence.serializers.FieldSerializeCheck;
 /**
  * Determines which fields should be serialized and deserialized by the client.
  *
- * @author Immortius
  */
 public class ClientComponentFieldCheck implements FieldSerializeCheck<Component> {
 

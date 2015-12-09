@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 /**
  * Interface for the system that provides the ability to compensate for lag, by rewinding and replaying state
  *
- * @author Immortius
  */
 public interface PredictionSystem {
     /**

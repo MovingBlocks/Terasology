@@ -18,7 +18,6 @@ package org.terasology.persistence.typeHandling;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public interface DeserializationContext {
 

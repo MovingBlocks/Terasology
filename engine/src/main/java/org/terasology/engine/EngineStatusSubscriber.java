@@ -17,7 +17,6 @@ package org.terasology.engine;
 
 /**
  * Interface for subscribing to notification of engine status changes.
- * @author Immortius
  */
 @FunctionalInterface
 public interface EngineStatusSubscriber {

@@ -17,7 +17,6 @@ package org.terasology.persistence.internal;
 
 /**
  * Represents the result of a {@link SaveTransaction}
- * @author Florian
  */
 final class SaveTransactionResult {
     private final Throwable catchedThrowable;

@@ -38,8 +38,6 @@ import static org.lwjgl.opengl.GL11.glNewList;
 /**
  * Skysphere based on the Perez all weather luminance model.
  *
- * @author Anthony Kireev
- * @author Benjamin Glatzel
  */
 public class Skysphere implements BackdropProvider, BackdropRenderer {
 

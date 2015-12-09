@@ -20,7 +20,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius
  */
 public class BlockFamilyTypeHandler extends StringRepresentationTypeHandler<BlockFamily> {
 

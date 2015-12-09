@@ -21,7 +21,6 @@ import org.terasology.world.block.Block;
 /**
  * A view providing access to the world for batch propagation
  *
- * @author Immortius
  */
 public interface PropagatorWorldView {
 

@@ -24,7 +24,6 @@ import org.terasology.world.chunks.ChunkProvider;
  * Internal interface used within the chunk generation system, allows a chunk provider to manage "generation" (including
  * reloading) of a chunk. These methods may be called off of the main thread.
  *
- * @author Immortius
  */
 public interface GeneratingChunkProvider extends ChunkProvider {
 

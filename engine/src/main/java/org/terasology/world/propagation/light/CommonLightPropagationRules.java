@@ -21,7 +21,6 @@ import org.terasology.world.propagation.PropagationComparison;
 import org.terasology.world.propagation.PropagationRules;
 
 /**
- * @author Immortius
  */
 public abstract class CommonLightPropagationRules implements PropagationRules {
 

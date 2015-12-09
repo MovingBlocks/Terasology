@@ -18,7 +18,6 @@ package org.terasology.logic.inventory.block;
 import org.terasology.entitySystem.Component;
 
 /**
- * @author Marcin Sciesinski
  */
 public class DropBlockInventoryComponent implements Component {
 }

@@ -21,7 +21,6 @@ import org.terasology.network.Replicate;
 import org.terasology.world.block.items.AddToBlockBasedItem;
 
 /**
- * @author Immortius
  */
 @AddToBlockBasedItem
 public class DisplayNameComponent implements Component {

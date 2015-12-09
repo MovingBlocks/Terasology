@@ -26,7 +26,6 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.world.chunks.Chunk;
 
 /**
- * @author Immortius
  */
 public class ReadyChunkInfo {
     private Vector3i pos;

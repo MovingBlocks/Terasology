@@ -29,7 +29,6 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * Shader parameters for the Combine shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersCombine extends ShaderParametersBase {
     @Range(min = 0.001f, max = 0.005f)

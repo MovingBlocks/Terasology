@@ -23,7 +23,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * @author Immortius
  */
 @RegisterBindButton(id = "left", description = "Strafe Left")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.A)

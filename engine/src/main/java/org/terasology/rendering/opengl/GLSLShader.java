@@ -61,7 +61,6 @@ import java.util.Set;
  * Provides actual shader compilation and manipulation support.
  * </p>
  *
- * @author Benjamin Glatzel
  */
 public class GLSLShader extends Shader {
 

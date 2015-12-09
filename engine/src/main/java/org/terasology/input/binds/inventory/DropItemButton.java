@@ -22,7 +22,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * @author small-jeeper
  */
 
 @RegisterBindButton(id = "dropItem", description = "Drop Item", repeating = true)

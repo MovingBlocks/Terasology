@@ -28,7 +28,6 @@ import org.terasology.world.block.family.BlockFamily;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class BlockItemFactory {
     private EntityManager entityManager;

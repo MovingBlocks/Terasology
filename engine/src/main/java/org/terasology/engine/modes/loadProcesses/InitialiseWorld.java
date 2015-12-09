@@ -64,7 +64,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * @author Immortius
  */
 public class InitialiseWorld extends SingleStepLoadProcess {
 

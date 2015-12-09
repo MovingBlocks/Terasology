@@ -36,7 +36,6 @@ import java.util.Optional;
  * engine:brickstair.left for left-aligned stairs
  * engine:stone:engine:stair for the family of stone stairs generated from a multishape block definition
  *
- * @author Immortius
  */
 public class BlockUri implements Uri, Comparable<BlockUri> {
     public static final String IDENTIFIER_SEPARATOR = ".";

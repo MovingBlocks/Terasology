@@ -18,7 +18,6 @@ package org.terasology.rendering;
 import org.terasology.math.TeraMath;
 
 /**
- * @author Immortius
  */
 public final class RenderMath {
     private RenderMath() {

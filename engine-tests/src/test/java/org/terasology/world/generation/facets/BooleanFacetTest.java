@@ -27,7 +27,6 @@ import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 /**
  * Tests different implementations of {@link BooleanFieldFacet3D}.
  *
- * @author Martin Steiger
  */
 public abstract class BooleanFacetTest {
 

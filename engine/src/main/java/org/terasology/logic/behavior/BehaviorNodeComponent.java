@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.Color;
 /**
  * Defines a renderable node used to display behavior trees.
  *
- * @author synopia
  */
 @API
 public class BehaviorNodeComponent implements Component {

@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
  */
 class PendingEvent {
     private EntityRef entity;

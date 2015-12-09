@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * @author Immortius
  */
 public class PrefabDeltaFormat extends AbstractAssetAlterationFileFormat<PrefabData> {
 

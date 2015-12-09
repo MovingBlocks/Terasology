@@ -16,7 +16,6 @@
 package org.terasology.entitySystem.systems;
 
 /**
- * @author Immortius
  */
 public interface ComponentSystem {
     /**

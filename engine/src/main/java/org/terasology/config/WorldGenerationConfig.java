@@ -19,7 +19,6 @@ package org.terasology.config;
 import org.terasology.engine.SimpleUri;
 
 /**
- * @author Immortius
  */
 public class WorldGenerationConfig {
     private String worldTitle;

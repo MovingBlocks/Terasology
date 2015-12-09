@@ -21,7 +21,6 @@ import org.terasology.entitySystem.Component;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class BlockDamageModifierComponent implements Component {
 

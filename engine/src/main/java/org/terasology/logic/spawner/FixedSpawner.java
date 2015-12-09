@@ -23,7 +23,6 @@ import org.terasology.world.generation.World;
 
 /**
  * Spawns all entities at a fixed location.
- * @author Martin Steiger
  */
 public class FixedSpawner extends AbstractSpawner {
 

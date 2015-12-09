@@ -29,7 +29,6 @@ import org.terasology.rendering.logic.LightFadeComponent;
 import org.terasology.world.block.items.BlockItemComponent;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class HoldLuminousBlockSystem extends BaseComponentSystem {

@@ -19,7 +19,6 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * @author Limeth
  */
 public class PrefabAdapter implements ParameterAdapter<Prefab> {
     @Override

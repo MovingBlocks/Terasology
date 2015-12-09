@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * TeraArray is the base class used to store block related data in Chunks.
  *
- * @author Manuel Brotz
  */
 public abstract class TeraArray {
 

@@ -39,7 +39,6 @@ import java.nio.file.PathMatcher;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {

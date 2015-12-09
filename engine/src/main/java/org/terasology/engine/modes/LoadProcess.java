@@ -17,7 +17,6 @@
 package org.terasology.engine.modes;
 
 /**
- * @author Immortius
  */
 public interface LoadProcess {
 

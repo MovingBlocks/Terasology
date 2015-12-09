@@ -30,7 +30,6 @@ import java.util.Set;
  * <br><br>
  * TODO: Move physics methods that should only be used by the engine/physics implementing system into another interface that inherits this.
  *
- * @author Xanhou
  */
 public interface PhysicsEngine extends Physics {
 

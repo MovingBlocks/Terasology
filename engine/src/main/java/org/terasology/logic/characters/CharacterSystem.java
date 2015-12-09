@@ -52,7 +52,6 @@ import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

@@ -28,9 +28,6 @@ import java.util.EnumMap;
  * Note that the FRONT of the block faces towards the player - this means Left and Right are a player's right and left.
  * See Direction for an enumeration of directions in terms of the player's perspective.
  *
- * @author Immortius
- * @author Benjamin Glatzel
- * @author Rasmus 'Cervator' Praestholm
  */
 public enum Side {
     TOP(Vector3i.up(), true, false, true),

@@ -23,7 +23,6 @@ import org.terasology.reflection.copy.CopyStrategy;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class ReflectionUtilsTest {
 

@@ -27,7 +27,6 @@ import java.util.Map;
  * An entity builder provides the ability to set up an entity before creating it. This prevents events being sent
  * for components being added or modified before it is fully set up.
  *
- * @author Immortius
  */
 public class EntityBuilder implements MutableComponentContainer {
 

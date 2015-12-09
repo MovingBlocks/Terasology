@@ -25,7 +25,6 @@ import java.util.List;
  * The component gets currently only used as container for the walk animations,
  * but will in future also store the walk speed.
  *
- * @author Florian
  */
 public class WalkComponent implements Component {
     /**

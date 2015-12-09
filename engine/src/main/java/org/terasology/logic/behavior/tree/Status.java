@@ -18,7 +18,6 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author synopia
  */
 @API
 public enum Status {

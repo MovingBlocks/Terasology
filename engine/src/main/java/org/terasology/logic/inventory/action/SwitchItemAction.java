@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
 /**
- * @author Marcin Sciesinski
  * @deprecated Use InventoryManager method instead.
  */
 @API

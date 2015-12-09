@@ -21,7 +21,6 @@ import org.terasology.entitySystem.Component;
 
 /**
  * Allows for configuration of world generators.
- * @author Martin Steiger
  */
 public interface WorldConfigurator  {
 

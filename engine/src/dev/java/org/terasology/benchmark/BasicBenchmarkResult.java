@@ -19,7 +19,6 @@ package org.terasology.benchmark;
 /**
  * BasicBenchmarkResult extends BenchmarkResult and adds three basic columns for pretty printing.
  *
- * @author Manuel Brotz
  */
 public class BasicBenchmarkResult extends BenchmarkResult {
 

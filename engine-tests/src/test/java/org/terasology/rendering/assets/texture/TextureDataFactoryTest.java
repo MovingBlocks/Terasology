@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author mkienenb@gmail.com
  */
 public class TextureDataFactoryTest {
 

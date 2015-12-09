@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.databinding;
 
 /**
- * @author Immortius
  */
 public interface Binding<T> {
 

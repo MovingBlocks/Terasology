@@ -30,7 +30,6 @@ import java.util.concurrent.Semaphore;
  * <li>Some asset acquisition (if it involves a Display or Audio context)</li>
  * </ul>
  *
- * @author Immortius
  */
 public final class GameThread {
 

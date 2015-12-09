@@ -24,7 +24,6 @@ import org.terasology.module.sandbox.API;
  * <li>Game time (how long the world has been played in real time, starting at 0)</li>
  * </ol>
  *
- * @author Immortius
  */
 @API
 public interface Time {

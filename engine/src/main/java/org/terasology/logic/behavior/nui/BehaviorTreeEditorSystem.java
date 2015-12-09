@@ -27,7 +27,6 @@ import org.terasology.rendering.nui.NUIManager;
 /**
  * Opens the bt editor screen.
  *
- * @author synopia
  */
 @RegisterSystem
 public class BehaviorTreeEditorSystem extends BaseComponentSystem {

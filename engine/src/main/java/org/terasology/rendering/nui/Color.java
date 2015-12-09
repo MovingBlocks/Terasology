@@ -39,7 +39,6 @@ import java.util.Objects;
  * <li>awt - tempting, certainly feature-rich. Has some strange awt-specific functionality though (createContext) and native links</li>
  * </ul>
  *
- * @author Immortius
  */
 @API
 public class Color {

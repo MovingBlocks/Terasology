@@ -19,7 +19,6 @@ package org.terasology.input;
 import org.terasology.engine.SimpleUri;
 
 /**
- * @author Immortius
  */
 public interface BindableButton {
 

@@ -20,7 +20,6 @@ import org.terasology.rendering.nui.HorizontalAlign;
 /**
  * Information on how to horizontally position a widget.
  *
- * @author Immortius
  */
 public class HorizontalHint {
     private int width;

@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * @author Immortius
  */
 public class ServerInfo {
     private String name;

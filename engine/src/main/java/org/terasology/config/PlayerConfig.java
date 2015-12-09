@@ -24,7 +24,6 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 /**
- * @author Immortius
  */
 public class PlayerConfig {
     private String name = defaultPlayerName();

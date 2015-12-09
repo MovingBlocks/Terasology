@@ -19,7 +19,6 @@ package org.terasology.engine.modes;
 import org.terasology.engine.GameEngine;
 
 /**
- * @author Anton Kireev
  * @version 0.1
  *
  * A GameState encapsulates a different set of systems and managers being initialized

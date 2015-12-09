@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class Bone {
     private String name;

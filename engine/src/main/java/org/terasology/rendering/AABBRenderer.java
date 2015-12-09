@@ -46,7 +46,6 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 /**
  * Renderer for an AABB.
  *
- * @author Immortius
  */
 public class AABBRenderer implements BlockOverlayRenderer {
     private int displayListWire = -1;

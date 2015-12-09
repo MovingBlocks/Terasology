@@ -27,7 +27,6 @@ import org.terasology.math.geom.Vector3f;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class Vector3fTypeAdapter implements JsonDeserializer<Vector3f> {
     @Override

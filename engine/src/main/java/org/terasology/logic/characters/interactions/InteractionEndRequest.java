@@ -21,7 +21,6 @@ import org.terasology.network.ServerEvent;
 /**
  * Request the server to cancel the current interaction.
  *
- * @author Florian
  */
 @ServerEvent
 public class InteractionEndRequest implements Event {

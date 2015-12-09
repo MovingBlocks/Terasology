@@ -21,7 +21,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
 
 /**
- * @author Immortius
  */
 public class LightPropagationRules extends CommonLightPropagationRules {
 

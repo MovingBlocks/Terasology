@@ -23,7 +23,6 @@ import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
- * @author Immortius
  */
 public class GetterSetterAccessBenchmark extends AbstractBenchmark {
 

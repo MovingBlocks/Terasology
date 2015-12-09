@@ -30,7 +30,6 @@ import java.util.Map;
 /**
  * Tests the {@link SparseBooleanFieldFacet3D} class.
  *
- * @author Martin Steiger
  */
 public class SparseBooleanFacetTest extends BooleanFacetTest {
 

@@ -66,7 +66,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Immortius
  */
 public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 

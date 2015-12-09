@@ -22,7 +22,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 /**
  * This event is sent to trigger the creation of drops (if any) for a destroyed block.
  * TODO: Remove this when blocks are more configurable in the future, and allow drops to be generated off of the DoDestroyEvent.
- * @author Immortius
  */
 public class CreateBlockDropsEvent extends AbstractConsumableEvent {
     private EntityRef instigator;

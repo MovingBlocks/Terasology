@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector3f;
 /**
  * Provides the results from a CharacterCollider sweep()
  *
- * @author Xanhou
  */
 public interface SweepCallback {
 

@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 final class GlobalStoreLoader {
 

@@ -22,7 +22,6 @@ import org.terasology.entitySystem.event.Event;
 /**
  * Optional parent for events that are replicated over the network. Inherit this to make use of advanced features
  *
- * @author Immortius
  */
 public abstract class NetworkEvent implements Event {
 

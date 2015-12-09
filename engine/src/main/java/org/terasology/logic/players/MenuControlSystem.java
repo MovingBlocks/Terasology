@@ -43,7 +43,6 @@ import org.terasology.rendering.nui.layers.ingame.inventory.TransferItemCursor;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {

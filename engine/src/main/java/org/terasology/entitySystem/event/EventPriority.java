@@ -17,7 +17,6 @@
 package org.terasology.entitySystem.event;
 
 /**
- * @author Immortius
  */
 public final class EventPriority {
     public static final int PRIORITY_CRITICAL = 200;

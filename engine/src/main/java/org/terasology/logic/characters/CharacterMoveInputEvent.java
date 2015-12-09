@@ -21,7 +21,6 @@ import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
 /**
- * @author Immortius
  */
 @ServerEvent
 public class CharacterMoveInputEvent extends NetworkEvent {

@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector3i;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public final class Diamond3iIterator implements Iterator<Vector3i> {
 

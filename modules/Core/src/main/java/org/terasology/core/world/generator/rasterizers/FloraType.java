@@ -18,7 +18,6 @@ package org.terasology.core.world.generator.rasterizers;
 
 /**
  * Defines different, generic types of flora and fungi.
- * @author Martin Steiger
  */
 public enum FloraType {
     GRASS,

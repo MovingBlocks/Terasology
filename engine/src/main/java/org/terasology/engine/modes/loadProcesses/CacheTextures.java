@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class CacheTextures extends StepBasedLoadProcess {
     private Iterator<ResourceUrn> urns;

@@ -23,7 +23,6 @@ import org.terasology.assets.AssetData;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class MeshAnimationData implements AssetData {
 

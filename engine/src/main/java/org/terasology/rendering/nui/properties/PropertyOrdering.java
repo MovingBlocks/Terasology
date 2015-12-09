@@ -20,7 +20,6 @@ import com.google.common.collect.Ordering;
 
 /**
  * Provides different {@link java.util.Comparator}s for {@link Property} 
- * @author Martin Steiger
  */
 public final class PropertyOrdering {
 

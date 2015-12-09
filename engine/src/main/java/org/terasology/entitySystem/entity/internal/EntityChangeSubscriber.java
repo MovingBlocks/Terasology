@@ -24,7 +24,6 @@ import java.util.Collection;
 /**
  * Primarily for internal use, is informed of all component lifecycle events for all components.
  *
- * @author Immortius
  */
 public interface EntityChangeSubscriber {
 

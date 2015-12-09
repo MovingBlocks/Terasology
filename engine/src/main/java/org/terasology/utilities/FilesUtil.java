@@ -24,7 +24,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- * @author Immortius
  */
 public final class FilesUtil {
 

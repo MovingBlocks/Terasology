@@ -46,7 +46,6 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 /**
- * @author synopia
  */
 public class BehaviorEditorScreen extends CoreScreenLayer {
 

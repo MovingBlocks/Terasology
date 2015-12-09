@@ -28,7 +28,6 @@ import java.util.Collections;
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
  *
- * @author Immortius
  */
 public class SymmetricFamily extends AbstractBlockFamily {
 

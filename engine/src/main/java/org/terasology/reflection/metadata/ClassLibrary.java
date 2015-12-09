@@ -26,7 +26,6 @@ import java.util.List;
  * The interface for a class library. These store metadata on a type of class, and provide the ability to copy them.
  *
  * @param <T> The base type of all classes that belong to this library.
- * @author Immortius
  */
 public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>> {
 

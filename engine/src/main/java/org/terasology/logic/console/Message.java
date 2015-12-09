@@ -16,7 +16,6 @@
 package org.terasology.logic.console;
 
 /**
- * @author Immortius
  */
 public class Message {
     /**

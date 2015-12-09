@@ -38,7 +38,6 @@ import org.terasology.world.viewer.layers.ZOrder;
 
 /**
  * Renders the flora coverage based on {@link FloraFacet}.
- * @author Martin Steiger
  */
 @Renders(value = FloraFacet.class, order = ZOrder.FLORA)
 public class FloraFacetLayer extends AbstractFacetLayer {

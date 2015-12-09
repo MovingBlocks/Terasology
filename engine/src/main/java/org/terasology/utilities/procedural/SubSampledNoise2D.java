@@ -23,7 +23,6 @@ import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 
 /**
- * @author Immortius
  * @deprecated Use {@link SubSampledNoise} instead
  */
 @Deprecated

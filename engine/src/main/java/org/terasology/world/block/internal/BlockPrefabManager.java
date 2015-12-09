@@ -26,7 +26,6 @@ import org.terasology.world.block.family.BlockFamily;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class BlockPrefabManager implements BlockRegistrationListener {
 

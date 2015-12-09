@@ -33,7 +33,6 @@ import org.terasology.rendering.nui.skin.UIStyle;
 /**
  * Canvas provides primitive drawing operations for use by the UI.
  *
- * @author Immortius
  */
 public interface Canvas {
 

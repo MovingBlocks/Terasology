@@ -60,7 +60,6 @@ import org.terasology.world.generator.WorldGenerator;
 import com.google.common.collect.Lists;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

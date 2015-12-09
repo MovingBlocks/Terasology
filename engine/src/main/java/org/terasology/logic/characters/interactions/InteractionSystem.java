@@ -36,8 +36,6 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 
 /**
- * @author Immortius
- * @author Florian
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class InteractionSystem extends BaseComponentSystem {

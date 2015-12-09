@@ -19,7 +19,6 @@ import org.terasology.math.geom.BaseVector3i;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public interface LitChunk extends CoreChunk {

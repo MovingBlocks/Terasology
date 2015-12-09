@@ -26,7 +26,6 @@ import org.terasology.math.geom.Vector3f;
  * <br><br>
  * TODO: add the methods to apply forces
  *
- * @author Xanhou
  */
 public interface RigidBody {
 

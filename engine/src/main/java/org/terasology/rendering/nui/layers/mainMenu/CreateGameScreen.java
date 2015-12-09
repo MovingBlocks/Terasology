@@ -61,7 +61,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class CreateGameScreen extends CoreScreenLayer {
 

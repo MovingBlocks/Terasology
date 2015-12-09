@@ -22,8 +22,6 @@ import org.lwjgl.opengl.GL11;
 import java.nio.FloatBuffer;
 
 /**
- * @author Immortius <immortius@gmail.com>
- * @author Florian <florian@fkoeberle.de>.
 
  */
 public final class OpenGLUtil {

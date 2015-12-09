@@ -20,7 +20,6 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 public interface AudioManager {
     float MAX_DISTANCE = 100.0f;

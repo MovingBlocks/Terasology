@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public final class InjectionHelper {
     private static final Logger logger = LoggerFactory.getLogger(InjectionHelper.class);

@@ -19,7 +19,6 @@ import org.terasology.math.geom.BaseVector3i;
 import org.terasology.world.generation.WorldFacet3D;
 
 /**
- * @author Immortius
  */
 public interface ObjectFacet3D<T> extends WorldFacet3D {
 

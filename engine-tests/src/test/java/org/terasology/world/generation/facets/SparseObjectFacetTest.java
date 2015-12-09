@@ -30,7 +30,6 @@ import java.util.Map;
 /**
  * Tests the {@link SparseObjectFacet3D} class.
  *
- * @author Martin Steiger
  */
 public class SparseObjectFacetTest extends ObjectFacetTest {
 

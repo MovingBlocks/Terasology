@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
  * <br><br>
  * If the net owner is null, or a local player the event is run on the server.
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

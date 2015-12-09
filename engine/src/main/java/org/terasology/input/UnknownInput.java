@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * @author Immortius
  */
 public final class UnknownInput implements Input {
     public static final String UNKNOWN_PART = "_UNKNOWN_";

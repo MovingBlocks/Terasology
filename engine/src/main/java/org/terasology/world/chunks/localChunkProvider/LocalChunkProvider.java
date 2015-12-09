@@ -83,8 +83,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * @author Immortius
- * @author Florian
  */
 public class LocalChunkProvider implements GeneratingChunkProvider {
 

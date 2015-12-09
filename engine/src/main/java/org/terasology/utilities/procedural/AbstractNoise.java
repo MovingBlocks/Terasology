@@ -19,7 +19,6 @@ package org.terasology.utilities.procedural;
 /**
  * An abstract implementation of most methods.
  * The int-based methods delegate to float-bases ones.
- * @author Martin Steiger
  */
 public abstract class AbstractNoise implements Noise {
 

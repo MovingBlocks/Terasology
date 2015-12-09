@@ -29,7 +29,6 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class Region3iTypeHandler extends SimpleTypeHandler<Region3i> {
 

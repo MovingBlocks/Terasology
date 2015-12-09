@@ -27,7 +27,6 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author mkienenb
  */
 public class MapCopyStrategyTest {
 

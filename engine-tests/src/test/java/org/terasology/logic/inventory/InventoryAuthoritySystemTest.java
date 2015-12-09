@@ -43,7 +43,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Marcin Sciesinski
  */
 public class InventoryAuthoritySystemTest {
     private InventoryAuthoritySystem inventoryAuthoritySystem;

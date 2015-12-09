@@ -28,7 +28,6 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class UICrosshair extends CoreWidget {
 

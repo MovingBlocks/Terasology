@@ -23,7 +23,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.world.generation.Border3D;
 
 /**
- * @author Immortius
  */
 public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet2D {
 

@@ -28,7 +28,6 @@ import com.google.common.collect.Sets;
  * <p>
  * http://stackoverflow.com/questions/745415/regex-to-match-from-partial-or-camel-case-string
  * </p>
- * @author Martin Steiger
  */
 public final class CamelCaseMatcher {
 

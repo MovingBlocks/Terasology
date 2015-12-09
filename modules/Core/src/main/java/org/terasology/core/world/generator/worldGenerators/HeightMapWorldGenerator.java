@@ -34,7 +34,6 @@ import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
- * @author Immortius
  */
 @RegisterWorldGenerator(id = "heightMap", displayName = "Height Map", description = "Generates the world using a height map")
 public class HeightMapWorldGenerator extends BaseFacetedWorldGenerator {

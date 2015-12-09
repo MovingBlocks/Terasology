@@ -32,7 +32,6 @@ import java.util.Set;
 /**
  * The common behaviour of all clients - whether local or remote
  *
- * @author Immortius
  */
 public abstract class AbstractClient implements Client {
 

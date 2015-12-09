@@ -26,7 +26,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class LightFadeSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

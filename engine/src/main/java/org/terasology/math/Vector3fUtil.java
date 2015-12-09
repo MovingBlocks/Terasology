@@ -20,7 +20,6 @@ import com.bulletphysics.BulletGlobals;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 public final class Vector3fUtil {
     private Vector3fUtil() {

@@ -21,7 +21,6 @@ package org.terasology.reflection.reflect;
  * These types must provide a default constructor, which will be invoked.
  *
  * @param <T> The type of the class to construct instances of
- * @author Immortius
  */
 public interface ObjectConstructor<T> {
 

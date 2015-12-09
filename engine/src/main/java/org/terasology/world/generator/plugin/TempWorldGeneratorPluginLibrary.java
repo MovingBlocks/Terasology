@@ -21,7 +21,6 @@ import org.terasology.module.ModuleEnvironment;
 /**
  * A fake environment so that plugins can be loaded for configuration.
  *
- * @author Immortius
  */
 public class TempWorldGeneratorPluginLibrary extends DefaultWorldGeneratorPluginLibrary {
 

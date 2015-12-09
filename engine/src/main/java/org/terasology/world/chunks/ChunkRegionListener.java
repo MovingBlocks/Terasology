@@ -19,7 +19,6 @@ package org.terasology.world.chunks;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * @author Immortius
  */
 public interface ChunkRegionListener {
 

@@ -19,7 +19,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.logic.characters.MovementMode;
 
 /**
- * @author Adeon
  */
 public class SetMovementModeEvent implements Event {
     private MovementMode mode;

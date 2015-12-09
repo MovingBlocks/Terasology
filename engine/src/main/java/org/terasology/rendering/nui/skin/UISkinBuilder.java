@@ -35,7 +35,6 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class UISkinBuilder {
 

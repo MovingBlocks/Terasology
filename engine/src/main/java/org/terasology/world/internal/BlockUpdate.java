@@ -22,7 +22,6 @@ import org.terasology.world.block.Block;
 /**
  * A single requested block change.
  *
- * @author Immortius
  */
 public class BlockUpdate {
 

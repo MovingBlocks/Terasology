@@ -22,7 +22,6 @@ import org.terasology.persistence.PlayerStore;
 /**
  * Event notifying that a new client has connected - sent against the client by the network system.
  *
- * @author Immortius
  */
 public class ConnectedEvent implements Event {
 

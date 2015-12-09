@@ -28,7 +28,6 @@ import java.util.List;
  *
  * Usually triggered by a shift click on an item.
  *
- * @author Florian
  */
 @ServerEvent
 public class MoveItemToSlotsRequest extends AbstractMoveItemRequest {

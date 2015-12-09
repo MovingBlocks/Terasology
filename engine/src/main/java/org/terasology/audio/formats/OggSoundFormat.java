@@ -30,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class OggSoundFormat extends AbstractAssetFileFormat<StaticSoundData> {

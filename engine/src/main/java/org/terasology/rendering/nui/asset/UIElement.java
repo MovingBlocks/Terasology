@@ -26,7 +26,6 @@ import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
- * @author Immortius
  */
 @API
 public class UIElement extends Asset<UIData> {

@@ -44,7 +44,6 @@ import java.util.UUID;
 /**
  * Assets provides a collection of static methods for obtaining assets and registering procedural assets
  *
- * @author Immortius
  */
 public final class Assets {
 

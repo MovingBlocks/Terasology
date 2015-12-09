@@ -18,7 +18,6 @@ package org.terasology.world.generator.plugin;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public interface WorldGeneratorPluginLibrary {
 

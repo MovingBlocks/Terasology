@@ -38,7 +38,6 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 /**
- * @author Immortius
  */
 public class TestNetwork extends TerasologyTestingEnvironment {
 

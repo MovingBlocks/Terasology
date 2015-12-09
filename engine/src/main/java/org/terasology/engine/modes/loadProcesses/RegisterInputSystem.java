@@ -23,7 +23,6 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayerSystem;
 
 /**
- * @author Immortius
  */
 public class RegisterInputSystem extends SingleStepLoadProcess {
 

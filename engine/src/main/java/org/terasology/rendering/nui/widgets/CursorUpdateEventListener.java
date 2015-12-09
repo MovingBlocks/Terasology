@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets;
 
 /**
- * @author Limeth
  */
 public interface CursorUpdateEventListener {
     void onCursorUpdated(int oldPosition, int newPosition);

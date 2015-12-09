@@ -18,7 +18,6 @@ package org.terasology.entitySystem.entity;
 import org.terasology.entitySystem.Component;
 
 /**
- * @author Immortius
  */
 public interface LowLevelEntityManager extends EntityManager {
 

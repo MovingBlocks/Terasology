@@ -19,7 +19,6 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 
 /**
- * @author Immortius
  */
 public interface DeserializeFieldCheck {
 

@@ -19,7 +19,6 @@ package org.terasology.entitySystem.event;
 import org.terasology.network.NoReplicate;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractConsumableEvent implements ConsumableEvent {
     @NoReplicate

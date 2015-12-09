@@ -32,7 +32,6 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
- * @author JoeClacks
  */
 public class UIDoubleSlider extends CoreWidget {
     public static final String SLIDER_PART = "slider";

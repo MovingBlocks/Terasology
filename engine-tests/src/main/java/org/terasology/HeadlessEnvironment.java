@@ -122,7 +122,6 @@ import static org.mockito.Mockito.mock;
  * Setup a headless ( = no graphics ) environment.
  * Based on TerasologyTestingEnvironment code.
  *
- * @author Martin Steiger
  */
 public class HeadlessEnvironment extends Environment {
 

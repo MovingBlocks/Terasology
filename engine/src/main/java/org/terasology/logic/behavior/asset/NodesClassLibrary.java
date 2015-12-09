@@ -29,7 +29,6 @@ import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
- * @author synopia
  */
 public class NodesClassLibrary extends AbstractClassLibrary<Node> {
     private static final Logger logger = LoggerFactory.getLogger(NodesClassLibrary.class);

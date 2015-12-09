@@ -17,7 +17,6 @@
 package org.terasology.physics;
 
 /**
- * @author Immortius
  */
 public interface CollisionGroup {
     short getFlag();

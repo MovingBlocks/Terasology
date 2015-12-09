@@ -36,7 +36,6 @@ import org.terasology.utilities.random.Random;
 /**
  * A few tests for different {@link Noise} implementations.
  *
- * @author Martin Steiger
  */
 @RunWith(Parameterized.class)
 public class NoiseTest {

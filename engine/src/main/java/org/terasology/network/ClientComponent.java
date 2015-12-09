@@ -23,7 +23,6 @@ import org.terasology.entitySystem.entity.EntityRef;
  * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
  * client info entity (for replicated information) and character entity (their body).
  *
- * @author Immortius
  */
 public class ClientComponent implements Component {
     public boolean local;

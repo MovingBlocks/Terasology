@@ -49,7 +49,6 @@ import java.util.Map;
  * <br><br>
  * When serializing, a FieldSerializeCheck can be provided to determine whether each field should be serialized or not
  *
- * @author Immortius
  */
 public class ComponentSerializer {
 

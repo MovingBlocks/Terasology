@@ -21,7 +21,6 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
 
 /**
- * @author Immortius
  */
 public class InitialiseCommandSystem extends SingleStepLoadProcess {
 

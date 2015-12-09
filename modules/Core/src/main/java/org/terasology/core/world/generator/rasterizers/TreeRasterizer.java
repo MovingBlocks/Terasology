@@ -35,7 +35,6 @@ import java.util.Map;
  * Creates trees based on the {@link TreeGenerator} that is
  * defined by the {@link TreeFacet}.
  *
- * @author Martin Steiger
  */
 public class TreeRasterizer implements WorldRasterizer {
 

@@ -27,7 +27,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SpawnPrefabAction extends BaseComponentSystem {

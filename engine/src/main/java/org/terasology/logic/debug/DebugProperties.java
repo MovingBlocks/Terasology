@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.layouts.PropertyLayout;
  *
  * See DebugPropertySystem#addProperty
  *
- * @author synopia
  */
 public class DebugProperties extends CoreHudWidget {
     private ColumnLayout container;

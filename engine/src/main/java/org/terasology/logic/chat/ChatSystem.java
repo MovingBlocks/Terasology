@@ -43,7 +43,6 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class ChatSystem extends BaseComponentSystem {

@@ -21,7 +21,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 /**
- * @author Immortius
  */
 public class PrefabTypeHandler extends StringRepresentationTypeHandler<Prefab> {
 

@@ -27,7 +27,6 @@ import org.terasology.math.geom.Vector3f;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class Location extends BaseComponentSystem {

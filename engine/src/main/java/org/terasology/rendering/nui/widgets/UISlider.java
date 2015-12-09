@@ -33,7 +33,6 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
- * @author Immortius
  */
 public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";

@@ -22,7 +22,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 /**
- * @author Immortius
  */
 public abstract class MeshAnimation extends Asset<MeshAnimationData> {
 

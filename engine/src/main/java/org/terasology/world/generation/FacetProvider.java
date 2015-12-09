@@ -16,7 +16,6 @@
 package org.terasology.world.generation;
 
 /**
- * @author Immortius
  */
 public interface FacetProvider {
 

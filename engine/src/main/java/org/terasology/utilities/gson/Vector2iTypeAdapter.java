@@ -27,7 +27,6 @@ import org.terasology.math.geom.Vector2i;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class Vector2iTypeAdapter implements JsonDeserializer<Vector2i> {
     @Override

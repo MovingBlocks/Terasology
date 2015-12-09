@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class WorldProviderCoreStub implements WorldProviderCore {
 

@@ -19,7 +19,6 @@ package org.terasology.input;
 import org.terasology.input.events.AxisEvent;
 
 /**
- * @author Immortius
  */
 public class BindAxisEvent extends AxisEvent {
 

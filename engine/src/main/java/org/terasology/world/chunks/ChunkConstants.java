@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public final class ChunkConstants {

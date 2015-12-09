@@ -22,7 +22,6 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 /**
  * The set of metadata libraries used by the entity system
  *
- * @author Immortius
  */
 public class EntitySystemLibrary {
 

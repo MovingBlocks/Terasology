@@ -22,7 +22,6 @@ import org.terasology.world.BlockEntityRegistry;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public class BlockPositionIterator implements Iterator<Vector3i> {
     private BlockEntityRegistry registry;

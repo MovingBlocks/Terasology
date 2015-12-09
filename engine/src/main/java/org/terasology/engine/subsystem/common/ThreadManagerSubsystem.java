@@ -28,7 +28,6 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
- * @author Immortius
  */
 public class ThreadManagerSubsystem implements EngineSubsystem, ThreadManager {
 

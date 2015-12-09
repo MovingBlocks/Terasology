@@ -16,7 +16,6 @@
 package org.terasology.world.generator.plugin;
 
 /**
- * @author Immortius
  */
 public interface WorldGeneratorPlugin {
 }
