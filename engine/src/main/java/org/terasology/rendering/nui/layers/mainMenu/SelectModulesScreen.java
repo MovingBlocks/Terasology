@@ -225,7 +225,18 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleMetadata moduleMetadata = moduleInfoBinding.get();
                         if (moduleMetadata != null) {
-                            return moduleMetadata.getDescription().toString();
+                            String dependencies_names = "";
+                            List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
+                            if(dependencies != null && dependencies.size() > 0) {
+                                dependencies_names = "Module dependencies:" + '\n';
+                                for(DependencyInfo dependency : dependencies) {
+                                    dependencies_names += "   " + dependency.getId().toString() + '\n';
+                                }
+                            } else {
+                                dependencies_names = "This module has no dependencies.";
+                            }
+
+                            return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependencies_names;
                         }
                         return "";
                     }
