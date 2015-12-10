@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
@@ -226,17 +225,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleMetadata moduleMetadata = moduleInfoBinding.get();
                         if (moduleMetadata != null) {
-                            String dependencies_names = "";
+                            String dependenciesNames = "";
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
-                            if(dependencies != null && dependencies.size() > 0) {
-                                dependencies_names = "Module dependencies:" + '\n';
-                                for(DependencyInfo dependency : dependencies) {
-                                    dependencies_names += "   " + dependency.getId().toString() + '\n';
+                            if (dependencies != null && dependencies.size() > 0) {
+                                dependenciesNames = "Module dependencies:" + '\n';
+                                for (DependencyInfo dependency : dependencies) {
+                                    dependenciesNames += "   " + dependency.getId().toString() + '\n';
                                 }
                             } else {
-                                dependencies_names = "This module has no dependencies.";
+                                dependenciesNames = "This module has no dependencies.";
                             }
-                            return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependencies_names;
+                            return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
                         return "";
                     }
