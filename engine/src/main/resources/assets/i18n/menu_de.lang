@@ -18,6 +18,8 @@
     "server-port": "Port",
     "game-worlds": "Welten",
     "module-list": "Module",
+    "module-dependencies-exist": "Modulabhängigkeiten",
+    "module-dependencies-empty": "Dieses modul verfügt über keine abhängigkeiten",
     "listed-servers": "Listed",
     "custom-servers": "Custom",
     "edit-server": "Bearbeiten",

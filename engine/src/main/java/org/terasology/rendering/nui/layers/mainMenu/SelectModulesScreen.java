@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
@@ -235,7 +236,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             } else {
                                 dependencies_names = "This module has no dependencies.";
                             }
-
                             return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependencies_names;
                         }
                         return "";
