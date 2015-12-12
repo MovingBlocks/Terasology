@@ -22,6 +22,8 @@
     "custom-servers": "custom-servers",
     "download-module": "download-module",
     "activate-module": "activate-module",
+    "module-dependencies-exist": "module-dependencies-exist",
+    "module-dependencies-empty": "module-dependencies-empty",
     "module-status": "module-status",
     "module-version-available": "module-version-available",
     "module-version-installed": "module-version-installed",

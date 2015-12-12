@@ -1,6 +1,8 @@
 {
     "exit-game": "Esci", 
-    "game-settings": "Impostazioni", 
+    "game-settings": "Impostazioni",
+    "module-dependencies-exist": "Le dipendenze dei moduli",
+    "module-dependencies-empty": "Questo modulo non ha dipendenze",
     "host-multiplayer-game": "Ospita partita", 
     "join-game-online": "Unisciti alla partita", 
     "start-singleplayer-game": "Singleplayer", 
