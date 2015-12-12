@@ -14,7 +14,7 @@ dependencies {
     compile project(':engine')
 }
 
-task runEditor(type:JavaExec) {
+task editor(type:JavaExec) {
     description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
