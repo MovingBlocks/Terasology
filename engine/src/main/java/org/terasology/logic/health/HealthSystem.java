@@ -62,15 +62,25 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
             }
 
             int healAmount = 0;
-            while (time.getGameTimeInMs() >= health.nextRegenTick) {
-                healAmount++;
-                health.nextRegenTick = health.nextRegenTick + (long) (1000 / health.regenRate);
-            }
+            healAmount = regenerateHealth(health, healAmount);
 
-            if (healAmount > 0) {
-                checkHeal(entity, healAmount, entity, health);
-                entity.saveComponent(health);
-            }
+            checkHealed(entity, health, healAmount);
+        }
+    }
+
+    private int regenerateHealth(HealthComponent health, int healAmount) {
+        int newHeal = healAmount;
+        while (time.getGameTimeInMs() >= health.nextRegenTick) {
+            newHeal++;
+            health.nextRegenTick = health.nextRegenTick + (long) (1000 / health.regenRate);
+        }
+        return newHeal;
+    }
+
+    private void checkHealed(EntityRef entity, HealthComponent health, int healAmount) {
+        if (healAmount > 0) {
+            checkHeal(entity, healAmount, entity, health);
+            entity.saveComponent(health);
         }
     }
 
