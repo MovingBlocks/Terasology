@@ -1,7 +1,7 @@
 Terasology
 ==========
 
-![Terasology](/engine/src/main/resources/assets/textures/menuBackground.jpg "Terasology")
+![Terasology](/docs/images/menuBackground.jpg "Terasology")
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by aiming for the NPC-helper and caretaker focus from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
@@ -265,7 +265,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 
 Some of the modules in action:
 
-![Terasology](/engine/src/main/resources/assets/textures/PopulatedVillage.jpg "Terasology")
+![Terasology](/docs/images/PopulatedVillage.jpg "Terasology")
 
 Credits
 --------
