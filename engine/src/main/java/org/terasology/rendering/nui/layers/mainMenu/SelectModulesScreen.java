@@ -28,6 +28,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
@@ -79,6 +80,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @In
     private WorldGeneratorManager worldGenManager;
+
+    @In
+    private TranslationSystem translationSystem;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -228,12 +232,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             String dependenciesNames = "";
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && dependencies.size() > 0) {
-                                dependenciesNames = "Module dependencies:" + '\n';
+                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
                                 for (DependencyInfo dependency : dependencies) {
                                     dependenciesNames += "   " + dependency.getId().toString() + '\n';
                                 }
                             } else {
-                                dependenciesNames = "This module has no dependencies.";
+                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-empty}") + ".";
                             }
                             return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
