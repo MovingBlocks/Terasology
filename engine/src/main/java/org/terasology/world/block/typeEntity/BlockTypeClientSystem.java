@@ -28,7 +28,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class BlockTypeClientSystem extends BaseComponentSystem {

@@ -39,7 +39,6 @@ import java.util.Set;
 /**
  * Abstract base implement of ClassLibrary.
  *
- * @author Immortius
  */
 public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 

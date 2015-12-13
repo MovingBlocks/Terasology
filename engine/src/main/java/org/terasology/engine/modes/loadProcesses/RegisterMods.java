@@ -35,7 +35,6 @@ import org.terasology.naming.NameVersion;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class RegisterMods extends SingleStepLoadProcess {
 

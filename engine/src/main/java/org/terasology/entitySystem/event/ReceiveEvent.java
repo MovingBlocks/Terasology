@@ -29,7 +29,6 @@ import java.lang.annotation.Target;
  * These methods should have the form
  * <code>public void handlerMethod(EventType event, EntityRef entity)</code>
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

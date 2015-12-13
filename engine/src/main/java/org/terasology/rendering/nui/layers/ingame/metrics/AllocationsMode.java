@@ -20,7 +20,6 @@ import gnu.trove.map.TObjectDoubleMap;
 import org.terasology.monitoring.PerformanceMonitor;
 
 /**
- * @author Immortius
  */
 final class AllocationsMode extends TimeMetricsMode {
 

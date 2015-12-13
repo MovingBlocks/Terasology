@@ -19,7 +19,6 @@ package org.terasology.world.liquid;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public enum LiquidType {

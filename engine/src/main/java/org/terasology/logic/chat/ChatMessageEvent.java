@@ -26,7 +26,6 @@ import org.terasology.network.OwnerEvent;
 /**
  * A chat message
  *
- * @author Immortius
  */
 @OwnerEvent
 public class ChatMessageEvent implements MessageEvent {

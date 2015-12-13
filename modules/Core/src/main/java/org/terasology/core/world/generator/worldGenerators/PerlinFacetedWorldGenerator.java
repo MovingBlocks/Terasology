@@ -42,7 +42,6 @@ import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
- * @author Immortius
  */
 @RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin", description = "Faceted world generator")
 public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {

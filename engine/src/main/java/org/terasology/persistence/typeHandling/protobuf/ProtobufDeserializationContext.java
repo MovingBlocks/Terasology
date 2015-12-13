@@ -26,7 +26,6 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ProtobufDeserializationContext implements DeserializationContext {
 

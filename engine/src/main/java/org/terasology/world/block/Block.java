@@ -50,8 +50,6 @@ import java.util.Optional;
 /**
  * Stores all information for a specific block type.
  *
- * @author Benjamin Glatzel
- * @author Rasmus 'Cervator' Praestholm
  */
 public final class Block {
 

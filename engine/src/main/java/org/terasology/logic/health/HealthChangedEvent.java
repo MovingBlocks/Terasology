@@ -22,7 +22,6 @@ import org.terasology.entitySystem.event.Event;
 /**
  * This event (or a subtype) is sent whenever health changes
  *
- * @author Marcel Lehwald
  */
 public class HealthChangedEvent implements Event {
     private EntityRef instigator;

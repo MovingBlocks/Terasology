@@ -19,7 +19,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 
 /**
- * @author Immortius
  */
 public final class LightFadeComponent implements Component {
 

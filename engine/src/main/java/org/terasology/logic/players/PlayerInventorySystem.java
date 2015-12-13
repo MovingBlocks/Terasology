@@ -42,7 +42,6 @@ import org.terasology.rendering.nui.layers.hud.HudToolbar;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class PlayerInventorySystem extends BaseComponentSystem {

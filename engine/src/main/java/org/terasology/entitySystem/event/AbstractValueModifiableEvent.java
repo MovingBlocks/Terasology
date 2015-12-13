@@ -20,7 +20,6 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 
 /**
- * @author Marcin Sciesinski
  */
 public abstract class AbstractValueModifiableEvent implements Event {
     private float baseValue;

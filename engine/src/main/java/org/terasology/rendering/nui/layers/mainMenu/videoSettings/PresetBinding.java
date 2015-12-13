@@ -19,7 +19,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 
 /**
- * @author Immortius
  */
 public class PresetBinding implements Binding<Preset> {
     private RenderingConfig config;

@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
 /**
  * Marks a type or field to be replicated. For events, fields default to replicated so this isn't needed
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})

@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 
 /**
- * @author Immortius
  */
 @DoNotAutoRegister
 public class UnsupportedTypeComponent implements Component {

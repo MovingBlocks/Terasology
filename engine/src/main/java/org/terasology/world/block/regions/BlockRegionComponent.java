@@ -21,7 +21,6 @@ import org.terasology.math.Region3i;
 import org.terasology.network.Replicate;
 
 /**
- * @author Immortius
  */
 public class BlockRegionComponent implements Component {
     @Replicate

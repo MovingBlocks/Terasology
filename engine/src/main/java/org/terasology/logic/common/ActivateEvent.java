@@ -22,7 +22,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 // TODO: This should not be consumable. Instead have a consumable BeforeActivate event to allow cancellation
 public class ActivateEvent extends AbstractConsumableEvent {

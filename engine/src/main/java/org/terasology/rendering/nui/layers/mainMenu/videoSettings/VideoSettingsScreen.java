@@ -42,7 +42,6 @@ import javax.imageio.ImageIO;
 import java.util.Arrays;
 
 /**
- * @author Immortius
  */
 public class VideoSettingsScreen extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);

@@ -46,7 +46,6 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class ChunkViewTest extends TerasologyTestingEnvironment {
 

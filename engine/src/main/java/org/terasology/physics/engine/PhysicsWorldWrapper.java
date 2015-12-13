@@ -28,7 +28,6 @@ import org.terasology.world.block.Block;
 /**
  * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.
  *
- * @author Immortius
  */
 public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 

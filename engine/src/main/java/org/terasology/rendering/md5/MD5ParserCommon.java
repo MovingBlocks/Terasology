@@ -25,7 +25,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 /**
- * @author Immortius
  */
 public final class MD5ParserCommon {
 

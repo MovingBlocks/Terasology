@@ -56,10 +56,6 @@ import java.util.List;
 /**
  * The class is game selection menu replacement for the headless server.
  *
- * @author Benjamin Glatzel
- * @author Anton Kireev
- * @author Marcel Lehwald
- * @author Florian
  */
 public class StateHeadlessSetup implements GameState {
 

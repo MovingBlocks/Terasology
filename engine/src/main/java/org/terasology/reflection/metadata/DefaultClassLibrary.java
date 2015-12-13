@@ -26,7 +26,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
  * A simple implementation of ClassLibrary. It provides ClassMetadata for a type of class. These classes are identified through their simple name.
  *
  * @param <T> The base type of classes that can be registered in this library
- * @author Immortius
  */
 public final class DefaultClassLibrary<T> extends AbstractClassLibrary<T> {
     private static final Logger logger = LoggerFactory.getLogger(DefaultClassLibrary.class);

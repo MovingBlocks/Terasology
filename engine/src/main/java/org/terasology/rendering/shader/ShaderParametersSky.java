@@ -30,7 +30,6 @@ import org.terasology.world.WorldProvider;
 /**
  * Parameters for the sky shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersSky extends ShaderParametersBase {
 

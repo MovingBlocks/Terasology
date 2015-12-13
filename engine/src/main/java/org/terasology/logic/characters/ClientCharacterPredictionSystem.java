@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class ClientCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

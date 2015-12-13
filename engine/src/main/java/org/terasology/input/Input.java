@@ -20,7 +20,6 @@ package org.terasology.input;
  * The description of an input, whether key, mouse button or mouse wheel.
  * Immutable.
  *
- * @author Immortius
  */
 public interface Input {
 

@@ -23,7 +23,6 @@ import org.terasology.engine.modes.LoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * @author Immortius
  */
 public class PrepareWorld implements LoadProcess {
 

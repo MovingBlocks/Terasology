@@ -22,7 +22,6 @@ import org.terasology.network.Replicate;
 /**
  * Used for entities representing a block in the world
  *
- * @author Immortius
  */
 public final class BlockComponent implements Component {
     @Replicate

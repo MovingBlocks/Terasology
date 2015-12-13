@@ -39,7 +39,6 @@ import java.util.Set;
 /**
  * A text completion engine with cycle-through functionality
  *
- * @author Martin Steiger, Limeth
  */
 public class CyclingTabCompletionEngine implements TabCompletionEngine {
     private final Console console;

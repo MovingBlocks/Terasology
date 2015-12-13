@@ -37,7 +37,6 @@ import java.util.Set;
  * The color is parsed from the name of the asset, then TextureDataFactory is used to create
  * a TextureData object which is used to build the Texture.
  *
- * @author mkienenb
  */
 @RegisterAssetDataProducer
 public class ColorTextureProducer implements AssetDataProducer<TextureData> {

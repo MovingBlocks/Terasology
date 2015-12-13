@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * @author Immortius
  */
 public class UIStyleFamily {
     private UIStyle baseStyle;

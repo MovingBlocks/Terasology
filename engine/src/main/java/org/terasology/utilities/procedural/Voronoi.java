@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector2f;
 import java.util.Random;
 
 /**
- * @author Immortius
  */
 public class Voronoi {
 

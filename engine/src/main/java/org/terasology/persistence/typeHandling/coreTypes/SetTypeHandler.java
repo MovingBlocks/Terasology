@@ -26,7 +26,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class SetTypeHandler<T> extends SimpleTypeHandler<Set<T>> {
     private TypeHandler<T> contentsHandler;

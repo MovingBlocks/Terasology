@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 
 /**
- * @author Immortius
  */
 @RegisterCopyStrategy
 public class Vector2iCopyStrategy implements CopyStrategy<Vector2i> {

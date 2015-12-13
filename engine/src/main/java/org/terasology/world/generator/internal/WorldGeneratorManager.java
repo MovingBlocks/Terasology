@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class WorldGeneratorManager {
     private static final Logger logger = LoggerFactory.getLogger(WorldGeneratorManager.class);

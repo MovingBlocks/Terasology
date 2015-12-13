@@ -17,7 +17,6 @@
 package org.terasology.world.propagation;
 
 /**
- * @author Immortius
  */
 public enum PropagationComparison {
     /**

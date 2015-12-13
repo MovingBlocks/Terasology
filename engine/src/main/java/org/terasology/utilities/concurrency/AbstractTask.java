@@ -17,7 +17,6 @@
 package org.terasology.utilities.concurrency;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractTask implements Task {
 

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public final class OwnershipHelper {
     private ComponentLibrary componentLibrary;

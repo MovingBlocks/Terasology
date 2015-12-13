@@ -24,7 +24,6 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
  * TeraDenseArray8Bit implements a dense array with elements of 8 bit size.
  * Its elements are in the range -128 through +127 and it stores one element per byte.
  *
- * @author Manuel Brotz
  */
 public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
 

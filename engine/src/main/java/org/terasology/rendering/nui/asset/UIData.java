@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.UIWidget;
 /**
  * UIData contains a UI widget that has been loaded from a UI asset, ready to be added to the
  *
- * @author Immortius
  */
 @API
 public class UIData implements AssetData {

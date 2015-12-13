@@ -18,7 +18,6 @@ package org.terasology.world.generation;
 import org.terasology.math.geom.Rect2i;
 
 /**
- * @author Immortius
  */
 public interface WorldFacet2D extends WorldFacet {
 

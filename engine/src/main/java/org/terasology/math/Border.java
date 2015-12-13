@@ -25,7 +25,6 @@ import org.terasology.math.geom.Rect2i;
  * <br><br>
  * Immutable
  *
- * @author Immortius
  */
 public class Border {
     public static final Border ZERO = new Border(0, 0, 0, 0);

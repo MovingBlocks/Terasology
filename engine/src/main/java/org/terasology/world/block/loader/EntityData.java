@@ -19,7 +19,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public class EntityData {

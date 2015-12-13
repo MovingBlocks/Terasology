@@ -34,7 +34,6 @@ import java.lang.annotation.Target;
  * </pre>
  *
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

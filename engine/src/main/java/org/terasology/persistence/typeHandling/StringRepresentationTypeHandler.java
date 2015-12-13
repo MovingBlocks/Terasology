@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<T> {
 

@@ -38,7 +38,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 
 /**
- * @author Immortius
  */
 public class CameraTargetSystem extends BaseComponentSystem {
 

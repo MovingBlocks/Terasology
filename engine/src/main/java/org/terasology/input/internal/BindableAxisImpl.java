@@ -33,7 +33,6 @@ import java.util.List;
  * A Bind Axis is an simulated analog input axis, maintaining a value between -1 and 1.  It is linked to
  * a positive BindableButton (that pushes the axis towards 1) and a negative BindableButton (that pushes it towards -1)
  *
- * @author Immortius
  */
 public class BindableAxisImpl implements BindableAxis {
     private String id;

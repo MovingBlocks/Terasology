@@ -21,7 +21,6 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 
 /**
- * @author Immortius
  */
 public abstract class Shader extends Asset<ShaderData> {
 

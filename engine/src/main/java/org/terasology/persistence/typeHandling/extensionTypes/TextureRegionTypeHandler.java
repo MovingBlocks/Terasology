@@ -26,7 +26,6 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class TextureRegionTypeHandler extends StringRepresentationTypeHandler<TextureRegion> {
     private static final Logger logger = LoggerFactory.getLogger(TextureRegionTypeHandler.class);

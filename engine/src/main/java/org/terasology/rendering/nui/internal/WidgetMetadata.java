@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.UIWidget;
 import java.lang.reflect.Field;
 
 /**
- * @author Immortius
  */
 public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMetadata<T, ?>> {
 

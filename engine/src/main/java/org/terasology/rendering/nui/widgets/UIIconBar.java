@@ -28,7 +28,6 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
- * @author Immortius
  */
 public class UIIconBar extends CoreWidget {
 

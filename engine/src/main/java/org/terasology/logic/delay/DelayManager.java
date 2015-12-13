@@ -33,7 +33,6 @@ import org.terasology.entitySystem.entity.EntityRef;
  * For periodic action, the period starts counting from the invocation of the last PeriodicActionTriggeredEvent, so if
  * there is a delay on the system, there will be larger gaps between invocations.
  *
- * @author Marcin Sciesinski
  */
 public interface DelayManager {
     /**

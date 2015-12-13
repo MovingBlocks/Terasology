@@ -24,7 +24,6 @@ import org.terasology.module.sandbox.API;
  * Node properties may be stored in this class, while state properties for a specific interpreter run be placed in the
  * task class (i.e. actual/next children to evaluate).
  *
- * @author synopia
  */
 @API
 public abstract class Node implements TreeAccessor<Node> {

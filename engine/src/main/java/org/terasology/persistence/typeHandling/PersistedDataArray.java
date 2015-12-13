@@ -23,7 +23,6 @@ import gnu.trove.list.TLongList;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public interface PersistedDataArray extends PersistedData, Iterable<PersistedData> {
 

@@ -23,7 +23,6 @@ import org.terasology.world.block.family.BlockFamily;
 /**
  * Combined with ItemComponent, represents a held block
  *
- * @author Immortius
  */
 public final class BlockItemComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)

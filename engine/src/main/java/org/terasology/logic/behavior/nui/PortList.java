@@ -23,7 +23,6 @@ import org.terasology.rendering.nui.Canvas;
 import java.util.List;
 
 /**
- * @author synopia
  */
 public class PortList implements TreeAccessor<RenderableNode> {
     private List<Port> ports = Lists.newLinkedList();

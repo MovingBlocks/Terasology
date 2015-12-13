@@ -65,7 +65,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * @author Immortius
  */
 public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFamilyDefinitionData> {
 

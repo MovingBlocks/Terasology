@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector2i;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class GridDefinition {
 

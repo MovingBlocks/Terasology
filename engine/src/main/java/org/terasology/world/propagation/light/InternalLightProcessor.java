@@ -29,7 +29,6 @@ import org.terasology.world.propagation.StandardBatchPropagator;
 /**
  * For doing an initial lighting sweep during chunk generation - bound to the chunk and assumed blank slate
  *
- * @author Immortius
  */
 public final class InternalLightProcessor {
 

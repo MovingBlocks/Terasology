@@ -19,7 +19,6 @@ package org.terasology.logic.console;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
  */
 public interface MessageEvent extends Event {
 

@@ -19,7 +19,6 @@ import org.terasology.module.sandbox.API;
 import org.terasology.math.geom.Vector2i;
 
 /**
- * @author Immortius
  */
 @API
 public interface MouseDevice extends InputDevice {

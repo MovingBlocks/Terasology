@@ -25,7 +25,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.world.RelevanceRegionComponent;
 
 /**
- * @author Immortius
  */
 public class RelevanceSystem extends BaseComponentSystem {
 

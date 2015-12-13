@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * @author Immortius
  */
 public class DebugOverlay extends CoreScreenLayer {
 

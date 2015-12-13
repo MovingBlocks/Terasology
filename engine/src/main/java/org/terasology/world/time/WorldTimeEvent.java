@@ -22,8 +22,6 @@ import com.google.common.math.DoubleMath;
 
 /**
  * A timer event that represents a (world-based) time instant
- * @author Immortius
- * @author Martin Steiger
  */
 public class WorldTimeEvent extends TimeEventBase {
 

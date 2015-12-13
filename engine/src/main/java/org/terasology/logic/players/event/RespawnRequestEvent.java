@@ -20,7 +20,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
- * @author Immortius
  */
 @ServerEvent
 public class RespawnRequestEvent implements Event {

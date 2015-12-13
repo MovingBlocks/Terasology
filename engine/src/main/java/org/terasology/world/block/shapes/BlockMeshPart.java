@@ -28,7 +28,6 @@ import java.util.Arrays;
  * Describes the elements composing part of a block mesh. Multiple parts are patched together to define the mesh
  * for a block, or its appearance in the world.
  *
- * @author Immortius
  */
 public class BlockMeshPart {
     private static final float BORDER = 1f / 128f;

@@ -40,7 +40,6 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class BlockShapeImpl extends BlockShape {
 

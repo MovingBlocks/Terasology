@@ -31,7 +31,6 @@ import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.liquid.LiquidData;
 
 /**
- * @author Immortius
  */
 public class ChunkViewCoreImpl implements ChunkViewCore {
 

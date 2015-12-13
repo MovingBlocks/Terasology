@@ -16,7 +16,6 @@
 package org.terasology.utilities.procedural;
 
 /**
- * @author Immortius
  * @deprecated use {@link Noise} instead
  */
 @Deprecated

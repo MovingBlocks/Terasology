@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class WorldBuilder {
 

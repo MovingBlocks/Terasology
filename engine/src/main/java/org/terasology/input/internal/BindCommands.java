@@ -27,7 +27,6 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class BindCommands extends BaseComponentSystem {

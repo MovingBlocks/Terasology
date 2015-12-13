@@ -29,7 +29,6 @@ import org.terasology.rendering.assets.mesh.MeshData;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class SkeletalMeshDataBuilder {
 

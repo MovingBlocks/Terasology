@@ -60,7 +60,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 /**
- * @author Immortius
  */
 public class JoinGameScreen extends CoreScreenLayer {
 

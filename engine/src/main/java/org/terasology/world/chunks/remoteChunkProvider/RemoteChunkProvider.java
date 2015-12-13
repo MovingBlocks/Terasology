@@ -56,8 +56,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * @author Immortius
- * @author Florian
  */
 public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 

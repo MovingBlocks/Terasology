@@ -72,7 +72,6 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Used to interact with a remote server (from client end)
  *
- * @author Immortius
  */
 public class ServerImpl implements Server {
     private static final Logger logger = LoggerFactory.getLogger(ServerImpl.class);

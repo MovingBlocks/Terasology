@@ -25,7 +25,6 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 /**
  * Item data is stored using this component
  *
- * @author Immortius
  */
 public final class ItemComponent implements Component {
     /**

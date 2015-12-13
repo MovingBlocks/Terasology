@@ -18,7 +18,6 @@ package org.terasology.engine;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public interface EngineTime extends Time {
 

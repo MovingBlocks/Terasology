@@ -30,7 +30,6 @@ import java.util.Map;
 /**
  * Block group for blocks that can be oriented around the vertical axis.
  *
- * @author Immortius
  */
 public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
 

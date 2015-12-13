@@ -25,7 +25,6 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkMode;
 
 /**
- * @author Immortius
  */
 public class RegisterSystems extends SingleStepLoadProcess {
     private final Context context;

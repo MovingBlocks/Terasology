@@ -29,7 +29,6 @@ import java.util.Set;
 /**
  * Interface of commands used in a {@link org.terasology.logic.console.Console}
  *
- * @author Limeth
  */
 @API
 public interface ConsoleCommand extends Comparable<ConsoleCommand> {

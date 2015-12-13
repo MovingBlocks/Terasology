@@ -25,7 +25,6 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.biomes.BiomeRegistry;
 
 /**
- * @author Immortius
  */
 public class RegisterBiomes extends SingleStepLoadProcess {
 

@@ -23,7 +23,6 @@ import org.terasology.entitySystem.MutableComponentContainer;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class PrefabData implements MutableComponentContainer, AssetData {
 

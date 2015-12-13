@@ -26,7 +26,6 @@ import java.util.Map;
 /**
  * A serializer provides low-level serialization support for a type, using a mapping of type handlers for each field of that type.
  *
- * @author Immortius
  */
 public class Serializer {
 

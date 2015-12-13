@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
 
 /**
- * @author Immortius
  */
 public class SettingsMenuScreen extends CoreScreenLayer {
 

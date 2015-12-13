@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 /**
  * Component for storing entity system information on an entity
  *
- * @author Immortius
  */
 public class EntityInfoComponent implements Component {
     // TODO: Switch this to use Optional<Prefab>

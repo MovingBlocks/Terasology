@@ -35,7 +35,6 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
  * Input/Output ports may have a target. This is always of the opposite type.
  * When setting a target to a port, the node of the InputPort is added to the child list of the node of the OutputPort.
  *
- * @author synopia
  */
 public abstract class Port extends CoreWidget {
     protected RenderableNode node;

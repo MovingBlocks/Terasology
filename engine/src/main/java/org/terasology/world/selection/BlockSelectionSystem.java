@@ -30,7 +30,6 @@ import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 /**
  * This system updates block selections based on the sender's location and the state of the block selection.
  *
- * @author synopia, mkienenb@gmail.com
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockSelectionSystem extends BaseComponentSystem {

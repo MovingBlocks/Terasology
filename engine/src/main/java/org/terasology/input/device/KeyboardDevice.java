@@ -18,7 +18,6 @@ package org.terasology.input.device;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public interface KeyboardDevice extends InputDevice {

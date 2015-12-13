@@ -19,7 +19,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 public class CollisionEvent implements Event {
     private Vector3f velocity;

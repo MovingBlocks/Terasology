@@ -23,7 +23,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * @author Florian
  */
 @RegisterBindButton(id = "toggleSpeedPermanently", description = "Toggle Speed Permanently")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.CAPS_LOCK)

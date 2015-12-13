@@ -33,7 +33,6 @@ import org.terasology.engine.modes.GameState;
 
 /**
  * Configures the underlying logback logging framework.
- * @author Martin Steiger
  */
 public final class LoggingContext {
 

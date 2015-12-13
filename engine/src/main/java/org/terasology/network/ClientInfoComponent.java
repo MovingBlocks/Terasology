@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * The component that marks an entity as being a Client Info Entity.
- * @author Martin Steiger
  */
 @Replicate
 public final class ClientInfoComponent implements Component {

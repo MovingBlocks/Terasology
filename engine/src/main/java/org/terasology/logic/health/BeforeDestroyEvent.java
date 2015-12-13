@@ -20,7 +20,6 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * @author Immortius
  */
 public class BeforeDestroyEvent extends AbstractConsumableEvent {
     private EntityRef instigator;

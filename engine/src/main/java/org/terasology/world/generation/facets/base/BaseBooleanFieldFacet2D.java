@@ -25,8 +25,6 @@ import org.terasology.world.generation.Border3D;
  * An abstract, but complete implementation of {@link BooleanFieldFacet2D} that
  * is backed by a primitive boolean array.
  *
- * @author Martin Steiger
- * @author Immortius
  */
 public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements BooleanFieldFacet2D {
 

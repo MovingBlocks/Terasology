@@ -51,7 +51,6 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class ModuleManagerImpl implements ModuleManager {
 

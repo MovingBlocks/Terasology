@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests texture asset resolvers.
  *
- * @author Martin Steiger
  */
 public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
 

@@ -18,7 +18,6 @@ package org.terasology.entitySystem.entity.internal;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 
 /**
- * @author Immortius
  */
 public class DefaultRefStrategy implements RefStrategy {
     @Override

@@ -26,7 +26,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
- * @author Immortius
  */
 public class RenderingConfig {
     public static final String VIEW_DISTANCE = "viewDistance";

@@ -30,7 +30,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class IntMathTest {
     public IntMathTest() {

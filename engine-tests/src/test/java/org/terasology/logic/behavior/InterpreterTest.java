@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 
 
 /**
- * @author synopia
  */
 public class InterpreterTest {
     private Status result = Status.RUNNING;

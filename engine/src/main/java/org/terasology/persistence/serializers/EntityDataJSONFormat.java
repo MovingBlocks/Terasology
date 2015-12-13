@@ -49,7 +49,6 @@ import java.util.Map;
  * EntityData types than to dynamically build handlers for every component type (and have gson properly handle missing
  * types). This can be revisited in the future.
  *
- * @author Immortius
  */
 // TODO: More javadoc
 public final class EntityDataJSONFormat {

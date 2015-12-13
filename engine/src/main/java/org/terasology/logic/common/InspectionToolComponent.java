@@ -23,7 +23,6 @@ import org.terasology.network.Replicate;
  * Component of the inspection tool which can be used to view the json data of
  * entities. This component can also be used to test external references.
  * 
- * @author Florian
  */
 public class InspectionToolComponent implements Component {
     @Replicate

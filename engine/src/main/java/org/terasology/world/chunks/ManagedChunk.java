@@ -19,7 +19,6 @@ import org.terasology.module.sandbox.API;
 import org.terasology.protobuf.EntityData;
 
 /**
- * @author Immortius
  */
 @API
 public interface ManagedChunk extends CoreChunk {

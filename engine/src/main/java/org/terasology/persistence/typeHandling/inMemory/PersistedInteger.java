@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.inMemory;
 
 /**
- * @author Immortius
  */
 public class PersistedInteger extends PersistedNumber {
     private int data;

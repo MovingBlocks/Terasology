@@ -28,7 +28,6 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class Subtexture extends TextureRegionAsset<SubtextureData> {
 

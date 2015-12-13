@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class NetworkEntitySerializer {
     private static final Logger logger = LoggerFactory.getLogger(NetworkEntitySerializer.class);

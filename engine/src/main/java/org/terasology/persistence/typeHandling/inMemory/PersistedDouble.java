@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.inMemory;
 
 /**
- * @author Immortius
  */
 public class PersistedDouble extends PersistedNumber {
     private double data;

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class BlockSounds extends Asset<BlockSoundsData> {
     private final List<StaticSound> stepSounds = new ArrayList<>();

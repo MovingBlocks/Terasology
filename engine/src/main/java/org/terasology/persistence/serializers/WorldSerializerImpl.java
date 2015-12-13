@@ -43,7 +43,6 @@ import java.util.Map;
 /**
  * Implementation of WorldSerializer for EngineEntityManager.
  *
- * @author Immortius
  */
 public class WorldSerializerImpl implements WorldSerializer {
 

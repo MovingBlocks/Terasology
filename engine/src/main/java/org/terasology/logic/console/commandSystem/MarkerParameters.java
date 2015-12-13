@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import java.util.Optional;
 
 /**
- * @author Immortius, Limeth
  */
 public enum MarkerParameters implements Parameter {
     /**

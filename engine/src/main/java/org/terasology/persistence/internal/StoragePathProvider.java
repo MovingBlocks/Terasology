@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3i;
 import java.nio.file.Path;
 
 /**
- * @author Florian
  */
 public class StoragePathProvider {
     private static final String PLAYERS_PATH = "players";

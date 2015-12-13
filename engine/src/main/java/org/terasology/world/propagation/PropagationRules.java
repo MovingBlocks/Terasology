@@ -23,7 +23,6 @@ import org.terasology.world.chunks.LitChunk;
 /**
  * Rules to drive value propagation.
  *
- * @author Immortius
  */
 public interface PropagationRules {
 

@@ -21,7 +21,6 @@ import org.terasology.entitySystem.event.Event;
 /**
  * Event notifying of a client disconnecting.
  *
- * @author Immortius
  */
 public class DisconnectedEvent implements Event {
 

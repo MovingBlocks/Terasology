@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 /**
  * This event is sent after an entity is healed
  *
- * @author Immortius
  */
 public class OnHealedEvent extends HealthChangedEvent {
 

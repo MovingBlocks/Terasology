@@ -25,7 +25,6 @@ import java.util.Objects;
  * These URIs are always in the form: {@literal <module-name>:<object-name>.<fieldName>}. They are case-insensitive (using
  * English casing), and have a "normalized" form that is lower case.
  *
- * @author Florian
  */
 @API
 public final class ComponentFieldUri implements Uri {

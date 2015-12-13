@@ -49,7 +49,6 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * @author Immortius, Limeth
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

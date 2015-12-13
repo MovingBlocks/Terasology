@@ -32,7 +32,6 @@ import java.lang.reflect.Field;
 /**
  * Metadata on a component class and its fields.
  *
- * @author Immortius
  */
 public class ComponentMetadata<T extends Component> extends ClassMetadata<T, ComponentFieldMetadata<T, ?>> {
 

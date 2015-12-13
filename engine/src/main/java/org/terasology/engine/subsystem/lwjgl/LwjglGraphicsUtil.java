@@ -25,7 +25,6 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
 
 /**
- * @author Immortius
  */
 public final class LwjglGraphicsUtil {
     private LwjglGraphicsUtil() {

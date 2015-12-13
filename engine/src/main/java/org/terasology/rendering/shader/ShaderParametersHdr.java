@@ -25,7 +25,6 @@ import org.terasology.rendering.opengl.PostProcessor;
 /**
  * Shader parameters for the Post-processing shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersHdr extends ShaderParametersBase {
 

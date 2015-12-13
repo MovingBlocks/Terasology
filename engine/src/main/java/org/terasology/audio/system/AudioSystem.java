@@ -37,7 +37,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class AudioSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

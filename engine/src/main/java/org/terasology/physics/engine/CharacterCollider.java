@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3f;
  * A character collider is a non-blocking collider for use calculating character movement.
  * A character collider is always a vertically-aligned capsule.
  *
- * @author Xanhou
  */
 public interface CharacterCollider {
 

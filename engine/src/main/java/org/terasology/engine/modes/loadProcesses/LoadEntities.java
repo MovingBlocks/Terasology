@@ -26,7 +26,6 @@ import org.terasology.persistence.StorageManager;
 import java.io.IOException;
 
 /**
- * @author Immortius
  */
 public class LoadEntities extends SingleStepLoadProcess {
 

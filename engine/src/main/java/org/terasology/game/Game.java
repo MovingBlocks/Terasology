@@ -16,7 +16,6 @@
 package org.terasology.game;
 
 /**
- * @author Immortius
  */
 public class Game {
 

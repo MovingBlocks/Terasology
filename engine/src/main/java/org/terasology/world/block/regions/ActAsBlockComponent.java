@@ -22,7 +22,6 @@ import org.terasology.world.block.family.BlockFamily;
 /**
  * An entity with this component will act as that block - producing block style damage effects, take damage as that block would.
  *
- * @author Immortius
  */
 public final class ActAsBlockComponent implements Component {
     public BlockFamily block;

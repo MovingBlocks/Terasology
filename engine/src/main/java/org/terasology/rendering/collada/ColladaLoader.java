@@ -59,7 +59,6 @@ import org.terasology.math.geom.Vector3f;
  * <br><br>
  * http://docs.garagegames.com/torque-3d/official/content/documentation/Artist%20Guide/Formats/ColladaLoader.html
  *
- * @author mkienenb@gmail.com
  */
 
 public class ColladaLoader {

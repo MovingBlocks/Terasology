@@ -28,6 +28,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
@@ -65,7 +66,6 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
- * @author Immortius
  */
 public class SelectModulesScreen extends CoreScreenLayer {
 
@@ -80,6 +80,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @In
     private WorldGeneratorManager worldGenManager;
+
+    @In
+    private TranslationSystem translationSystem;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -226,7 +229,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleMetadata moduleMetadata = moduleInfoBinding.get();
                         if (moduleMetadata != null) {
-                            return moduleMetadata.getDescription().toString();
+                            String dependenciesNames = "";
+                            List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
+                            if (dependencies != null && dependencies.size() > 0) {
+                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
+                                for (DependencyInfo dependency : dependencies) {
+                                    dependenciesNames += "   " + dependency.getId().toString() + '\n';
+                                }
+                            } else {
+                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-empty}") + ".";
+                            }
+                            return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
                         return "";
                     }

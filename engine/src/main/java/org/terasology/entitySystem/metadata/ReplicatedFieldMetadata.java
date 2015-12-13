@@ -28,7 +28,6 @@ import java.lang.reflect.Field;
 /**
  * An extended FieldMetadata that provides information on whether a the field should be replicated, and under what conditions
  *
- * @author Immortius
  */
 public class ReplicatedFieldMetadata<T, U> extends FieldMetadata<T, U> {
 

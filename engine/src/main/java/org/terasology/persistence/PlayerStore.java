@@ -19,7 +19,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 public interface PlayerStore {
 

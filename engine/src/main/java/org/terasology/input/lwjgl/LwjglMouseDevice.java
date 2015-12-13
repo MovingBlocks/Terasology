@@ -27,7 +27,6 @@ import org.terasology.math.geom.Vector2i;
 import java.util.Queue;
 
 /**
- * @author Immortius
  */
 public class LwjglMouseDevice implements MouseDevice {
     private boolean mouseGrabbed;

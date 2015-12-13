@@ -36,7 +36,6 @@ import java.util.List;
  * The development of this loader was greatly influenced by
  * http://www.wazim.com/Collada_Tutorial_1.htm
  *
- * @author mkienenb@gmail.com
  */
 
 @RegisterAssetFileFormat

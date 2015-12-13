@@ -22,7 +22,6 @@ import org.terasology.naming.Name;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class ModuleConfig {
     private List<Name> modules = Lists.newArrayList();

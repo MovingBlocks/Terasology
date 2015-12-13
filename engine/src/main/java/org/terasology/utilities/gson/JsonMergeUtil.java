@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public final class JsonMergeUtil {
     private JsonMergeUtil() {

@@ -22,7 +22,6 @@ import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.blockdata.TeraArray;
 
 /**
- * @author Immortius
  */
 public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
 

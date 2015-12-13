@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 @RegisterAssetDataProducer
 public class IconMeshDataProducer implements AssetDataProducer<MeshData> {

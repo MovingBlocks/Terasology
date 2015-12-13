@@ -53,8 +53,6 @@ import java.util.Collections;
 /**
  * Play mode.
  *
- * @author Benjamin Glatzel
- * @author Anton Kireev
  * @version 0.1
  */
 public class StateIngame implements GameState {

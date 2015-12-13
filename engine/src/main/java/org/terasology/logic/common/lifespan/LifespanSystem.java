@@ -24,7 +24,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class LifespanSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

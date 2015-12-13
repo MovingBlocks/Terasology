@@ -28,7 +28,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 /**
  * The library for metadata about events (and their fields).
  *
- * @author Immortius
  */
 public class EventLibrary extends AbstractClassLibrary<Event> {
 

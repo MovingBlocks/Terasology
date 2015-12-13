@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public final class Keyboard {
     private Keyboard() {

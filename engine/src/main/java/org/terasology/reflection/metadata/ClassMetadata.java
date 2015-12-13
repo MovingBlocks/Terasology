@@ -47,7 +47,6 @@ import java.util.Map;
  * <br><br>
  * Consumed classes are required to have a default constructor (this may be private)
  *
- * @author Immortius
  */
 public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 

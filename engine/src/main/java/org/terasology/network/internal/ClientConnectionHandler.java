@@ -43,7 +43,6 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 

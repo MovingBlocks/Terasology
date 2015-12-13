@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 import org.terasology.config.RenderingConfig;
 
 /**
- * @author Immortius
  */
 public enum EnvironmentalEffects {
     OFF("Off") {

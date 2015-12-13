@@ -34,7 +34,6 @@ import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";

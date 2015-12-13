@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class BlockSoundsData implements AssetData {
     private List<StaticSound> stepSounds = new ArrayList<>();

@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector2f;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Martin Steiger
  */
 @API
 public interface WorldAtlas {

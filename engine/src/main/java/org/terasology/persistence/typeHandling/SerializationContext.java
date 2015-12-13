@@ -26,7 +26,6 @@ import java.util.Map;
 
 /**
  *
- * @author Immortius
  */
 public interface SerializationContext {
 

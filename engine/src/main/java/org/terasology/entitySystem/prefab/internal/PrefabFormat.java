@@ -32,7 +32,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
 

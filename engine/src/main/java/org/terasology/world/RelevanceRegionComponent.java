@@ -19,7 +19,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * @author Immortius
  */
 public class RelevanceRegionComponent implements Component {
 

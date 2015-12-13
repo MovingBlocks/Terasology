@@ -24,7 +24,6 @@ import org.terasology.entitySystem.prefab.Prefab;
  * <br><br>
  * Damage modifications are accumulated as additions/subtractions (modifiers) and multipliers.
  *
- * @author Immortius
  */
 public class BeforeDamagedEvent extends AbstractConsumableValueModifiableEvent {
     private Prefab damageType;

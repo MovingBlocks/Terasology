@@ -25,7 +25,6 @@ import org.terasology.network.OwnerEvent;
  * <br><br>
  * The event is sent by the server to the owner of the character..
  *
- * @author Florian
  */
 @OwnerEvent
 public class InteractionEndEvent implements Event {

@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.rendering.assets.mesh.Mesh;
 
 /**
- * @author Immortius
  */
 public class HullShapeComponent implements Component {
     public Mesh sourceMesh;

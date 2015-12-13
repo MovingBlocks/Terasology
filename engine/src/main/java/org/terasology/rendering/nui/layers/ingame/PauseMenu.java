@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 
 /**
- * @author Immortius
  */
 public class PauseMenu extends CoreScreenLayer {
 

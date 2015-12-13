@@ -24,7 +24,6 @@ import java.util.EnumMap;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public enum BlockPart {
     TOP(Side.TOP),

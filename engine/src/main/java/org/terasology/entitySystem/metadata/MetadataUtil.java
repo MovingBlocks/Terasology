@@ -20,7 +20,6 @@ import org.terasology.entitySystem.Component;
 import java.util.Locale;
 
 /**
- * @author Immortius
  */
 public final class MetadataUtil {
 

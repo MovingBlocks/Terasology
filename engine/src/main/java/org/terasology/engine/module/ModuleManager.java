@@ -25,7 +25,6 @@ import org.terasology.module.ModuleRegistry;
 
 /**
  * TODO Type description
- * @author Martin Steiger
  */
 public interface ModuleManager {
 

@@ -26,7 +26,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
- * @author Immortius
  */
 public class WidgetLibrary extends AbstractClassLibrary<UIWidget> {
 

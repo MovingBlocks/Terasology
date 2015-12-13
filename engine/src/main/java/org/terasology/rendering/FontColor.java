@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.Color;
  * Use {@link #getReset()} to reset the color back to the default.
  * <br> 
  * <b>Note:</b> The resolution is only 4 bit per channel (not 8 as usual). 
- * @author Martin Steiger
  */
 @API
 public final class FontColor {

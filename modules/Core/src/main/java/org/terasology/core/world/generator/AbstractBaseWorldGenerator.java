@@ -30,7 +30,6 @@ import org.terasology.world.generator.WorldGenerator;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractBaseWorldGenerator implements WorldGenerator {
     private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);

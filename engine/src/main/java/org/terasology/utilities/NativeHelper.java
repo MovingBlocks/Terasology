@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public final class NativeHelper {
 

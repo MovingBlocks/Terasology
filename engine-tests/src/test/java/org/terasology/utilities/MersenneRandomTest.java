@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests {@link MersenneRandom}.
  *
- * @author Martin Steiger
  */
 public class MersenneRandomTest {
     private static final Logger logger = LoggerFactory.getLogger(MersenneRandomTest.class);

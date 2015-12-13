@@ -23,7 +23,6 @@ import org.terasology.entitySystem.Component;
  *
  * Additional instances of the prefab may be created manually.
  *
- * @author Immortius
  */
 @API
 public class AutoCreateComponent implements Component {

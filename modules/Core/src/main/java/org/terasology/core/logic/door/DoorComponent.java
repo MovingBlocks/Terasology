@@ -22,7 +22,6 @@ import org.terasology.math.Side;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius
  */
 public class DoorComponent implements Component {
     public BlockFamily topBlockFamily;

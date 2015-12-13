@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * This event is used to convey commands marked as runOnServer to the server.
  *
- * @author Immortius
  */
 @ServerEvent
 final class CommandEvent implements Event {

@@ -27,7 +27,6 @@ import org.terasology.math.geom.Vector4f;
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class Vector4fTypeAdapter implements JsonDeserializer<Vector4f> {
 

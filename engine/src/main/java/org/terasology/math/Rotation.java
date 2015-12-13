@@ -33,7 +33,6 @@ import java.util.Map;
  * Uses the fly weight pattern to cache the 64 combinations of rotation.
  * Note (Marcin Sciesinski): there are actually only 24 possible combinations, the remaining 40 are just duplicates
  *
- * @author Immortius
  */
 public final class Rotation {
 

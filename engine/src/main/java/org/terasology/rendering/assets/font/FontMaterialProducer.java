@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 @RegisterAssetDataProducer
 public class FontMaterialProducer implements AssetDataProducer<MaterialData> {

@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Limeth
  */
 public final class CommandParameter<T> implements Parameter {
     private final String name;

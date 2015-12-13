@@ -27,7 +27,6 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 /**
- * @author Immortius
  */
 public abstract class BaseLwjglSubsystem implements EngineSubsystem {
 

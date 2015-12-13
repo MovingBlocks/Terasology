@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector2f;
 
 /**
  * Describes the possible methods drawing to a region of a different size to the image being drawn.
- * @author Immortius
  */
 public enum ScaleMode {
     /**

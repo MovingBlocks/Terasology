@@ -25,7 +25,6 @@ import org.terasology.naming.Name;
  * These URIs are always in the form: {@literal <module-name>:<object-name>}.
  * They are case-insensitive (using English casing), and have a "normalized" form that is lower case.
  *
- * @author synopia
  */
 @API
 public class SimpleUri implements Uri, Comparable<SimpleUri> {

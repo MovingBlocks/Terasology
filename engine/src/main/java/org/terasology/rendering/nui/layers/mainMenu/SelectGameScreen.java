@@ -38,7 +38,6 @@ import org.terasology.utilities.FilesUtil;
 import java.nio.file.Path;
 
 /**
- * @author Immortius
  */
 public class SelectGameScreen extends CoreScreenLayer {
 

@@ -24,7 +24,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.logic.health.HealthComponent;
 
 /**
- * @author Immortius
  */
 public class FieldAccessBenchmark extends AbstractBenchmark {
 

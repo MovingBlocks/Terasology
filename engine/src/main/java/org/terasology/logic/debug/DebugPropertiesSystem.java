@@ -29,7 +29,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * @author synopia
  *         <br><br>
  *         Debug property editor. Usage:
  *         <br><br>

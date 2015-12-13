@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 @ForceBlockActive
 public class SkeletalMeshComponent implements Component {

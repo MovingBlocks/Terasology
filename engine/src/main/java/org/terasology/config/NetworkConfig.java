@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class NetworkConfig {
 

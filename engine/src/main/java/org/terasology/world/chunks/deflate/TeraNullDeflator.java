@@ -21,7 +21,6 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 /**
  * TeraNullDeflator performs no deflation at all. It just returns the passed array.
  *
- * @author Manuel Brotz
  */
 public class TeraNullDeflator extends TeraDeflator {
 

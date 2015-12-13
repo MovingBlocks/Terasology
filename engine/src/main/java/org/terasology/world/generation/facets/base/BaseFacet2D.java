@@ -21,7 +21,6 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
- * @author Immortius
  */
 public class BaseFacet2D implements WorldFacet2D {
 
