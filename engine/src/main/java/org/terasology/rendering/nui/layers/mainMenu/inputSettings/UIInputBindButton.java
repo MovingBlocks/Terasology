@@ -15,33 +15,31 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
+import org.terasology.asset.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.Input;
-import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 
 import java.util.List;
 
-/**
- * @author Immortius
- */
-public class UIInputBind extends CoreWidget {
+public class UIInputBindButton extends CoreWidget {
     public static final String HOVER_MODE = "hover";
-    public static final String ACTIVE_MODE = "active";
 
-    private boolean capturingInput;
+    private static final ResourceUrn INPUT_CHANGING_SCREEN_URI = new ResourceUrn("engine:inputChangingScreen");
 
-    private Input newInput;
+    private NUIManager manager;
+    InputChangingScreen inputChangingScreen = new InputChangingScreen();
+
     private Binding<Input> input = new DefaultBinding<>();
     private Binding<StaticSound> clickSound = new DefaultBinding<>();
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
@@ -52,7 +50,7 @@ public class UIInputBind extends CoreWidget {
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
             if (event.isTopMostElement()) {
-                focusManager.setFocus(UIInputBind.this);
+                focusManager.setFocus(UIInputBindButton.this);
             }
         }
 
@@ -62,24 +60,23 @@ public class UIInputBind extends CoreWidget {
                 if (getClickSound() != null) {
                     getClickSound().play(getClickVolume());
                 }
-                capturingInput = true;
+                inputChangingScreen.setSkin(getManager().getScreen("engine:inputScreen").getSkin());
+                UIData inputScreenData = new UIData(inputChangingScreen);
+                Assets.generateAsset(INPUT_CHANGING_SCREEN_URI, inputScreenData, UIElement.class);
+                UIInputBindButton.this.getManager().pushScreen(UIInputBindButton.INPUT_CHANGING_SCREEN_URI);
                 return true;
             }
             return false;
         }
     };
 
-    public UIInputBind() {
+    public UIInputBindButton() {
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (!capturingInput) {
-            if (newInput != null) {
-                canvas.drawText(newInput.getDisplayName());
-            }
-        } else {
-            canvas.drawText("???");
+        if (input.get() != null) {
+            canvas.drawText(input.get().getDisplayName());
         }
         canvas.addInteractionRegion(interactionListener);
     }
@@ -88,44 +85,11 @@ public class UIInputBind extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
         String text = "";
-        if (capturingInput) {
-            text = "???";
-        } else if (newInput != null) {
-            text = newInput.getDisplayName();
+        if (input.get() != null) {
+            text = input.get().getDisplayName();
         }
         List<String> lines = TextLineBuilder.getLines(font, text, areaHint.getX());
         return font.getSize(lines);
-    }
-
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-        if (capturingInput && event.isDown()) {
-            setNewInput(InputType.MOUSE_BUTTON.getInput(event.getButton().getId()));
-            capturingInput = false;
-            event.consume();
-        }
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-        if (capturingInput) {
-            MouseInput mouseInput = MouseInput.find(InputType.MOUSE_WHEEL, event.getWheelTurns());
-            setNewInput(InputType.MOUSE_WHEEL.getInput(mouseInput.getId()));
-            capturingInput = false;
-            event.consume();
-        }
-    }
-
-    @Override
-    public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown()) {
-            if (capturingInput) {
-                setNewInput(InputType.KEY.getInput(event.getKey().getId()));
-                capturingInput = false;
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -136,17 +100,15 @@ public class UIInputBind extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (capturingInput) {
-            return ACTIVE_MODE;
-        } else if (interactionListener.isMouseOver()) {
+       if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
     }
 
-    public void bindInput(Binding<Input> binding) {
+    public void bindInput(InputConfigBinding binding) {
         input = binding;
-        newInput = input.get();
+        inputChangingScreen.bindInput(binding);
     }
 
     public Input getInput() {
@@ -157,39 +119,27 @@ public class UIInputBind extends CoreWidget {
         input.set(val);
     }
 
-    public void bindClickSound(Binding<StaticSound> binding) {
-        clickSound = binding;
-    }
-
     public StaticSound getClickSound() {
         return clickSound.get();
-    }
-
-    public void setClickSound(StaticSound val) {
-        clickSound.set(val);
-    }
-
-    public void bindClickVolume(Binding<Float> binding) {
-        clickVolume = binding;
     }
 
     public float getClickVolume() {
         return clickVolume.get();
     }
 
-    public void setClickVolume(float val) {
-        clickVolume.set(val);
+    public NUIManager getManager() {
+        return manager;
     }
 
-    public void setNewInput(Input newInput) {
-        this.newInput = newInput;
+    public void setManager(NUIManager manager) {
+        this.manager = manager;
     }
 
-    public Input getNewInput() {
-        return newInput;
+    public void setDescription(String description) {
+        inputChangingScreen.setDescription(description);
     }
 
-    public void saveInput() {
-        setInput(newInput);
+    public String getDescription() {
+        return inputChangingScreen.getDescription();
     }
 }
