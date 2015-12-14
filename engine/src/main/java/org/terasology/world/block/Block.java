@@ -616,7 +616,7 @@ public final class Block {
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {
-        if (isInvisible()) {
+        if (meshGenerator == null) {
             return;
         }
 
@@ -627,11 +627,10 @@ public final class Block {
         mat.setFloat("sunlight", sunlight);
         mat.setFloat("blockLight", blockLight);
 
-        if (meshGenerator != null) {
-            Mesh mesh = meshGenerator.getStandaloneMesh();
-            if (mesh != null) {
-                mesh.render();
-            }
+
+        Mesh mesh = meshGenerator.getStandaloneMesh();
+        if (mesh != null) {
+            mesh.render();
         }
 
         mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);

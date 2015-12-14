@@ -67,7 +67,7 @@ public class ItemPickupSystem extends BaseComponentSystem {
         BlockFamily blockFamily = blockItemComponent.blockFamily;
         if (builder.hasComponent(MeshComponent.class)) {
             MeshComponent mesh = builder.getComponent(MeshComponent.class);
-            mesh.mesh = blockFamily.getArchetypeBlock().getMesh();
+            mesh.mesh = blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
             mesh.material = Assets.getMaterial("engine:terrain").get();
         }
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {

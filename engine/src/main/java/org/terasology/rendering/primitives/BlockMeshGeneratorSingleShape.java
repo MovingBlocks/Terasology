@@ -32,9 +32,6 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 
 import java.util.Map;
 
-/**
- * Created by overminddl1 on 4/15/15.
- */
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     private static final Logger logger = LoggerFactory.getLogger(BlockMeshGeneratorSingleShape.class);
 
@@ -122,7 +119,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             Block blockToCheck = adjacentBlocks.get(Side.TOP);
             drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
-            if (bottomBlock.isLiquid() || bottomBlock.isInvisible()) {
+            if (bottomBlock.isLiquid() || bottomBlock.getMeshGenerator() == null) {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
@@ -169,7 +166,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             return false;
         }
 
-        return currentBlock.isWaving() != blockToCheck.isWaving() || blockToCheck.isInvisible()
+        return currentBlock.isWaving() != blockToCheck.isWaving() || blockToCheck.getMeshGenerator() == null
                 || !blockToCheck.isFullSide(side.reverse()) || (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
 
     }
