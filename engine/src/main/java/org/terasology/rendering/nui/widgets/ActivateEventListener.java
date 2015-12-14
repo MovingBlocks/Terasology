@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.widgets;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
- * @author Immortius
  */
 public interface ActivateEventListener {
 

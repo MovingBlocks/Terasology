@@ -19,7 +19,6 @@ package org.terasology.world.chunks.pipeline;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractChunkTask implements ChunkTask {
     private final Vector3i position;

@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
  * <br><br>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  *
- * @author synopia
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(BehaviorSystem.class)

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public interface World {
 
@@ -40,11 +39,6 @@ public interface World {
      * @return a <b>new</b> set containing all facet classes
      */
     Set<Class<? extends WorldFacet>> getAllFacets();
-
-    /**
-     * @return a <b>new</b> set containing all named facets
-     */
-    Map<String, Class<? extends WorldFacet>> getNamedFacets();
 
     void initialize();
 }

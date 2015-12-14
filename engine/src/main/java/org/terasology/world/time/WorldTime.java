@@ -18,7 +18,6 @@ package org.terasology.world.time;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
 /**
- * @author Immortius
  */
 public interface WorldTime extends ComponentSystem {
 

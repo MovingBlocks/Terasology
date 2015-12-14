@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
 
 /**
- * @author Florian
  */
 public class InspectionScreen extends BaseInteractionScreen {
     private UIText fullDescriptionLabel;

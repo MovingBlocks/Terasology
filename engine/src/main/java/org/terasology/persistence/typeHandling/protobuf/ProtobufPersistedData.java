@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class ProtobufPersistedData implements PersistedData, PersistedDataArray {
     private EntityData.Value data;

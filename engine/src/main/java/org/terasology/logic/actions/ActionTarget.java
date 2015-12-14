@@ -17,7 +17,6 @@
 package org.terasology.logic.actions;
 
 /**
- * @author Immortius
  */
 public enum ActionTarget {
     Instigator,

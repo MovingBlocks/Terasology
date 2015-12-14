@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 /**
  * A factory providing reflection abilities, such as object construction and field access.
  *
- * @author Immortius
  */
 public interface ReflectFactory {
 

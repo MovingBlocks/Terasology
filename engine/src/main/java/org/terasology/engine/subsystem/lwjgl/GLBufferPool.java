@@ -26,7 +26,6 @@ import org.terasology.rendering.VertexBufferObjectUtil;
 import java.nio.IntBuffer;
 
 /**
- * @author Immortius
  */
 public class GLBufferPool {
 

@@ -26,10 +26,10 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * Shader parameters for the Debug shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersDebug extends ShaderParametersBase {
 
+    @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
 

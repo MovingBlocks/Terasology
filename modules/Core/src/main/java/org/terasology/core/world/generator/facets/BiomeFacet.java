@@ -21,7 +21,6 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
 
 /**
- * @author Immortius
  */
 public class BiomeFacet extends BaseObjectFacet2D<CoreBiome> {
     public BiomeFacet(Region3i targetRegion, Border3D border) {

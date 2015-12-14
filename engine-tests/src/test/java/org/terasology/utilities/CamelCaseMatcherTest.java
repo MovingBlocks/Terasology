@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests {@link CamelCaseMatcher}
  *
- * @author Martin Steiger
  */
 public class CamelCaseMatcherTest {
 

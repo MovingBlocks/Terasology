@@ -28,7 +28,9 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.math.Vector2i;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.math.geom.Vector2i;
+import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleLoader;
@@ -53,19 +55,22 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
- * @author Immortius
  */
 public class SelectModulesScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
+    private static final Name ENGINE_MODULE_NAME = new Name("engine");
 
     @In
     private ModuleManager moduleManager;
@@ -75,6 +80,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @In
     private WorldGeneratorManager worldGenManager;
+
+    @In
+    private TranslationSystem translationSystem;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -219,8 +227,19 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 description.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
-                        if (moduleInfoBinding.get() != null) {
-                            return moduleInfoBinding.get().getDescription().toString();
+                        ModuleMetadata moduleMetadata = moduleInfoBinding.get();
+                        if (moduleMetadata != null) {
+                            String dependenciesNames = "";
+                            List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
+                            if (dependencies != null && dependencies.size() > 0) {
+                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
+                                for (DependencyInfo dependency : dependencies) {
+                                    dependenciesNames += "   " + dependency.getId().toString() + '\n';
+                                }
+                            } else {
+                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-empty}") + ".";
+                            }
+                            return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
                         return "";
                     }
@@ -300,46 +319,20 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (moduleList.getSelection() != null) {
 
                             ModuleSelectionInfo info = moduleList.getSelection();
-                            startDownload(info);
+                            startDownloadingNewestModulesRequiredFor(info);
                         }
                     }
                 });
 
-                Predicate<ModuleSelectionInfo> canDownload = info -> info != null && !info.isPresent();
-                Predicate<ModuleSelectionInfo> canUpdate = info -> {
-                    if (info != null) {
-                        Module online = info.getOnlineVersion();
-                        if (online != null) {
-                            return online.getVersion().compareTo(info.getLatestVersion().getVersion()) > 0;
-                        }
-                        return false;
-                    }
-                    return false;
-                };
-
-                downloadButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
-                    @Override
-                    public Boolean get() {
-                        ModuleSelectionInfo info = moduleList.getSelection();
-                        if (canDownload.test(info)) {
-                            return true;
-                        }
-
-                        return canUpdate.test(info);
-                    }
-                });
                 downloadButton.bindText(new ReadOnlyBinding<String>() {
-
                     @Override
                     public String get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
-                        if (canDownload.test(info)) {
+                        if (info != null && !info.isPresent()) {
                             return "Download";
-                        }
-                        if (canUpdate.test(info)) {
+                        } else {
                             return "Update";
                         }
-                        return "Download";  // button should be disabled
                     }
                 });
             }
@@ -368,36 +361,129 @@ public class SelectModulesScreen extends CoreScreenLayer {
         });
     }
 
-    private void startDownload(ModuleSelectionInfo info) {
-        final WaitPopup<Path> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage("Downloading Module", "Please wait ...");
+    private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
+        List<ModuleSelectionInfo> modulesToDownload;
+        try {
+            modulesToDownload = getModulesRequiredToDownloadFor(moduleMetadata);
+        } catch (DependencyResolutionFailed e) {
+            MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            messagePopup.setMessage("Depedency resolution failed", e.getMessage());
+            return;
+        }
 
+        Map<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
+
+        ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
+        confirmPopup.setMessage("Confirm Download", modulesToDownload.size()  + " modules will be downloaded");
+        confirmPopup.setOkHandler(() -> downloadModules(urlToTargetMap));
+    }
+
+    private void downloadModules(Map<URL, Path> urlToTargetMap) {
+        final WaitPopup<List<Path>> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
+        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        popup.onSuccess(paths -> {
+                for (Path filePath: paths) {
+                    try {
+                        Module module = loader.load(filePath);
+                        modulesLookup.get(module.getId()).setLocalVersion(module);
+                        moduleManager.getRegistry().add(module);
+                    } catch (IOException e) {
+                        logger.warn("Could not load module {}", filePath.getFileName(), e);
+                        return;
+                    }
+                    updateValidToSelect();
+                }
+            });
         ProgressListener progressListener = progress ->
-                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
-
-        ModuleMetadata meta = info.getOnlineVersion().getMetadata();
-        String version = meta.getVersion().toString();
-        String id = meta.getId().toString();
-        URL url = RemoteModuleExtension.getDownloadUrl(meta);
-        popup.onSuccess(filePath -> {
-            ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
-            loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-            try {
-                Module module = loader.load(filePath);
-                info.setLocalVersion(module);
-                moduleManager.getRegistry().add(module);
-                updateValidToSelect();
-            } catch (IOException e) {
-                logger.warn("Could not load module '{}:{}'", id, version, e);
-            }
-        });
-        String fileName = String.format("%s-%s.jar", id, version);
-        Path folder = PathManager.getInstance().getHomeModPath().normalize();
-        Path target = folder.resolve(fileName);
-
-        FileDownloader operation = new FileDownloader(url, target, progressListener);
+                popup.setMessage("Downloading required modules", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+        // to ensure that the initial message gets set:
+        progressListener.onProgress(0);
+        MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, progressListener);
         popup.startOperation(operation, true);
     }
+
+    private Map<URL, Path> determineDownloadUrlsFor(List<ModuleSelectionInfo> modulesToDownload) {
+        Map<URL, Path> urlToTargetMap = Maps.newLinkedHashMap();
+        for (ModuleSelectionInfo moduleSelectionInfo: modulesToDownload) {
+            ModuleMetadata metaData = moduleSelectionInfo.getOnlineVersion().getMetadata();
+            String version = metaData.getVersion().toString();
+            String id = metaData.getId().toString();
+            URL url = RemoteModuleExtension.getDownloadUrl(metaData);
+            String fileName = String.format("%s-%s.jar", id, version);
+            Path folder = PathManager.getInstance().getHomeModPath().normalize();
+            Path target = folder.resolve(fileName);
+            urlToTargetMap.put(url, target);
+        }
+        return urlToTargetMap;
+    }
+
+    /**
+     * @return All modules that are required to play the online version of the specified module. The list contains the
+     * passed module too.
+     */
+    private List<ModuleSelectionInfo> getModulesRequiredFor(ModuleSelectionInfo mainModuleInfo) throws DependencyResolutionFailed {
+        ModuleMetadata mainModuleMetadata = mainModuleInfo.getOnlineVersion().getMetadata();
+        LinkedList<Name> idsToCheck = Lists.newLinkedList();
+        idsToCheck.add(mainModuleMetadata.getId());
+        Map<Name, ModuleSelectionInfo> requiredIdToMetaDataMap = Maps.newLinkedHashMap();
+        requiredIdToMetaDataMap.put(mainModuleMetadata.getId(), mainModuleInfo);
+        while (!idsToCheck.isEmpty()) {
+            Name moduleToCheck = idsToCheck.removeFirst();
+            ModuleSelectionInfo moduleToCheckInfo = requiredIdToMetaDataMap.get(moduleToCheck);
+            ModuleMetadata metaDataOfModuleToCheck = moduleToCheckInfo.getOnlineVersion().getMetadata();
+
+            for (DependencyInfo dependencyInfo : metaDataOfModuleToCheck.getDependencies()) {
+                Name depName = dependencyInfo.getId();
+
+                ModuleMetadata depMetaData;
+                if (depName.equals(ENGINE_MODULE_NAME)) {
+                    depMetaData = moduleManager.getRegistry().getLatestModuleVersion(ENGINE_MODULE_NAME).getMetadata();
+                    if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
+                        throw new DependencyResolutionFailed(String.format(
+                                "Module %s %s requires %s in version range %s, but you are using version %s",
+                                moduleToCheck, metaDataOfModuleToCheck.getVersion(), depName, dependencyInfo.versionRange(),
+                                depMetaData.getVersion()));
+                    }
+                } else {
+                    ModuleSelectionInfo depInfo = modulesLookup.get(depName);
+                    if (depInfo == null) {
+                        throw new DependencyResolutionFailed(String.format("%s requires %s which is missing", moduleToCheck,
+                                depName));
+                    }
+                    depMetaData = depInfo.getOnlineVersion().getMetadata();
+
+                    if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
+                        throw new DependencyResolutionFailed(String.format(
+                                "Module %s %s requires %s in version range %s, but the online version has version %s",
+                                moduleToCheck, metaDataOfModuleToCheck.getVersion(), depName, dependencyInfo.versionRange(),
+                                depMetaData.getVersion()));
+                    }
+                    if (!requiredIdToMetaDataMap.containsKey(depName)) {
+                        idsToCheck.add(depName);
+                        requiredIdToMetaDataMap.put(depName, depInfo);
+                    }
+                }
+            }
+        }
+        List<ModuleSelectionInfo> sortedDependencies = Lists.newArrayList(requiredIdToMetaDataMap.values());
+        return sortedDependencies;
+    }
+
+    /**
+     *
+     * @return all modules that need to be downloaded to use the newest version of the specified module and all its
+     * dependencies.
+     */
+    private List<ModuleSelectionInfo> getModulesRequiredToDownloadFor(ModuleSelectionInfo mainModuleInfo)
+            throws DependencyResolutionFailed {
+        List<ModuleSelectionInfo> requiredModules = getModulesRequiredFor(mainModuleInfo);
+
+        List<ModuleSelectionInfo> modulesToDownload = requiredModules.stream().filter(m -> m.isOnlineVersionNewer())
+                .collect(Collectors.toList());
+        return modulesToDownload;
+    }
+
 
     private void updateValidToSelect() {
         List<Name> selectedModules = Lists.newArrayList();
@@ -429,7 +515,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private void updateModuleInformation() {
 
-        Set<Name> filtered = ImmutableSet.of(new Name("engine"), new Name("engine-test"));
+        Set<Name> filtered = ImmutableSet.of(ENGINE_MODULE_NAME, new Name("engine-test"));
         for (RemoteModule remote : metaDownloader.getModules()) {
             ModuleSelectionInfo info = modulesLookup.get(remote.getId());
             if (!filtered.contains(remote.getId())) {
@@ -525,6 +611,46 @@ public class SelectModulesScreen extends CoreScreenLayer {
         updateValidToSelect();
     }
 
+    private static final class DependencyResolutionFailed extends Exception {
+
+        private static final long serialVersionUID = -2098680881126171195L;
+
+        DependencyResolutionFailed(String message) {
+            super(message);
+        }
+    }
+
+    private static class MultiFileDownloader implements Callable<List<Path>> {
+        private Map<URL, Path> urlToTargetMap;
+        private ProgressListener progressListener;
+
+        public MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
+            this.urlToTargetMap = urlToTargetMap;
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public List<Path> call() throws Exception {
+            List<Path> downloadedFiles = new ArrayList<>();
+            float fractionPerFile = (float) 1 / urlToTargetMap.size();
+            int index = 0;
+            for (Map.Entry<URL, Path> entry: urlToTargetMap.entrySet()) {
+                float progressWithFiles = fractionPerFile * index;
+                ProgressListener singleDownloadListener = new ProgressListener() {
+                    @Override
+                    public void onProgress(float fraction) {
+                        float totalPrecentDone = progressWithFiles + (fraction / urlToTargetMap.size());
+                        progressListener.onProgress(totalPrecentDone);
+                    }
+                };
+                FileDownloader fileDownloader = new FileDownloader(entry.getKey(), entry.getValue(),
+                        singleDownloadListener);
+                downloadedFiles.add(fileDownloader.call());
+                index++;
+            }
+            return downloadedFiles;
+        }
+    }
 
     private static final class ModuleSelectionInfo {
         private Module latestVersion;
@@ -601,6 +727,30 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
         public void setValidToSelect(boolean validToSelect) {
             this.validToSelect = validToSelect;
+        }
+
+        public boolean isOnlineVersionNewer() {
+            if (onlineVersion == null) {
+                return false;
+            }
+            if (latestVersion == null) {
+                return true;
+            }
+            int versionCompare = onlineVersion.getVersion().compareTo(latestVersion.getVersion());
+            if (versionCompare > 0) {
+                return true;
+            } else if (versionCompare == 0) {
+                /*
+                 * Multiple binaries get released as the same snapshot version, A version name match thus does not
+                 * gurantee that we have the newest version already if it is a snapshot version.
+                 *
+                 * Having the user redownload the same binary again is not ideal, but it is better then ahving the user
+                 * being stuck on an outdated snapshot binary.
+                 */
+                return onlineVersion.getVersion().isSnapshot();
+            } else {
+                return false;
+            }
         }
     }
 }

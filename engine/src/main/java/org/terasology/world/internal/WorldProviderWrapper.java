@@ -24,10 +24,10 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 
+import java.math.RoundingMode;
 import java.util.Collection;
 
 /**
- * @author Immortius
  */
 public class WorldProviderWrapper extends AbstractWorldProviderDecorator implements WorldProvider {
     private WorldProviderCore core;
@@ -44,7 +44,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public boolean isBlockRelevant(Vector3f pos) {
-        return isBlockRelevant(new Vector3i(pos, 0.5f));
+        return isBlockRelevant(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public Block getBlock(Vector3f pos) {
-        return getBlock(new Vector3i(pos, 0.5f));
+        return getBlock(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
@@ -79,17 +79,17 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public byte getLight(Vector3f pos) {
-        return getLight(new Vector3i(pos, 0.5f));
+        return getLight(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
     public byte getSunlight(Vector3f pos) {
-        return getSunlight(new Vector3i(pos, 0.5f));
+        return getSunlight(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
     public byte getTotalLight(Vector3f pos) {
-        return getTotalLight(new Vector3i(pos, 0.5f));
+        return getTotalLight(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
 

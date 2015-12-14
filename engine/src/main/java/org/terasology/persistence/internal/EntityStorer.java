@@ -32,8 +32,6 @@ import java.util.Set;
 /**
  * Utility class for the construction of a EntityData.EntityStore structure for storing the entities on disk..
  *
- * @author Immortius
- * @author Florian
  */
 final class EntityStorer {
 

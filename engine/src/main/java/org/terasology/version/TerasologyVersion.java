@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * @author Mathias Kalb
  */
 public final class TerasologyVersion {
 

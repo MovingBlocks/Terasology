@@ -16,7 +16,6 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.Direction;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
@@ -31,7 +30,6 @@ import java.util.Map;
 /**
  * Block group for blocks that can be oriented around the vertical axis.
  *
- * @author Immortius
  */
 public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
 

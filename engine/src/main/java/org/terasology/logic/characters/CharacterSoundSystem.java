@@ -17,7 +17,6 @@ package org.terasology.logic.characters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.Time;
@@ -49,7 +48,6 @@ import org.terasology.world.block.Block;
 import java.util.List;
 
 /**
- * @author Immortius, Limeth
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {
@@ -64,9 +62,6 @@ public class CharacterSoundSystem extends BaseComponentSystem {
 
     @In
     private Time time;
-
-    @In
-    private AudioManager audioManager;
 
     @In
     private WorldProvider worldProvider;

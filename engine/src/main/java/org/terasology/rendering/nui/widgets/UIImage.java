@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
- * @author Immortius
  */
 public class UIImage extends CoreWidget {
     @LayoutConfig

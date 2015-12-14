@@ -20,7 +20,6 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet3D;
 
 /**
- * @author Immortius
  */
 public class DensityFacet extends BaseFieldFacet3D {
 

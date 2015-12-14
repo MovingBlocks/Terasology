@@ -19,7 +19,6 @@ package org.terasology.persistence.typeHandling;
 import java.nio.ByteBuffer;
 
 /**
- * @author Immortius
  */
 public interface PersistedData {
 

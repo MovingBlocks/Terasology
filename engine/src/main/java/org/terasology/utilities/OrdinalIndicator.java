@@ -18,7 +18,6 @@ package org.terasology.utilities;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author DizzyDragon
  *         Contains functions to get the ordinal indicator string for an integer.
  */
 @API

@@ -18,7 +18,6 @@ package org.terasology.input.events;
 
 
 /**
- * @author Immortius
  */
 public class MouseAxisEvent extends AxisEvent {
 

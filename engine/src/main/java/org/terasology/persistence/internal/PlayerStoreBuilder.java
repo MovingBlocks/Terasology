@@ -27,7 +27,6 @@ import java.util.Set;
  *
  * Has all the data of a player to create save it with a copy of the entity manager.
  *
- * @author Florian
  */
 class PlayerStoreBuilder {
     private Long characterEntityId;
@@ -39,7 +38,7 @@ class PlayerStoreBuilder {
         this.relevanceLocation = relevanceLocation;
     }
 
-    public EntityData.PlayerStore build (EngineEntityManager entityManager) {
+    public EntityData.PlayerStore build(EngineEntityManager entityManager) {
         EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
         playerEntityStore.setCharacterPosX(relevanceLocation.x);
         playerEntityStore.setCharacterPosY(relevanceLocation.y);

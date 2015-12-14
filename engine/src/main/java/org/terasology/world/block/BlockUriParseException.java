@@ -16,9 +16,11 @@
 package org.terasology.world.block;
 
 /**
- * @author Immortius
  */
 public class BlockUriParseException extends RuntimeException {
+
+    private static final long serialVersionUID = 5571599578432666018L;
+
     public BlockUriParseException() {
     }
 

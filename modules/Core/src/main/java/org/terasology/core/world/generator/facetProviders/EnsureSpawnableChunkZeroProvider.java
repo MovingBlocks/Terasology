@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Facet;
@@ -50,7 +51,7 @@ public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
 
             // update the surface height so that it spikes up to sea level
             Vector2i middlePos = new Vector2i(centerChunkPos.x, centerChunkPos.z);
-            for (Vector2i pos : facet.getWorldRegion()) {
+            for (BaseVector2i pos : facet.getWorldRegion().contents()) {
                 float originalValue = facet.getWorld(pos);
                 if (seaLevel > originalValue) {
                     // the surface is below sea level

@@ -37,7 +37,6 @@ import java.util.Map;
  * Besides the actual entity, a blackboard is stored for each actor. Every node may read or write to this blackboard,
  * to communicate their states or exchange variables with other nodes.
  *
- * @author synopia
  */
 @API
 public class Actor {

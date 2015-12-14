@@ -16,12 +16,13 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
+
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.world.generation.Border3D;
 
 /**
- * @author Immortius
  */
 public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet2D {
 
@@ -39,8 +40,8 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
     }
 
     @Override
-    public float get(Vector2i pos) {
-        return get(pos.x, pos.y);
+    public float get(BaseVector2i pos) {
+        return get(pos.x(), pos.y());
     }
 
     @Override
@@ -49,8 +50,8 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
     }
 
     @Override
-    public float getWorld(Vector2i pos) {
-        return getWorld(pos.x, pos.y);
+    public float getWorld(BaseVector2i pos) {
+        return getWorld(pos.x(), pos.y());
     }
 
     public float[] getInternal() {
@@ -63,8 +64,8 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
     }
 
     @Override
-    public void set(Vector2i pos, float value) {
-        set(pos.x, pos.y, value);
+    public void set(BaseVector2i pos, float value) {
+        set(pos.x(), pos.y(), value);
     }
 
     @Override
@@ -73,8 +74,8 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
     }
 
     @Override
-    public void setWorld(Vector2i pos, float value) {
-        setWorld(pos.x, pos.y, value);
+    public void setWorld(BaseVector2i pos, float value) {
+        setWorld(pos.x(), pos.y(), value);
     }
 
     public void set(float[] newData) {

@@ -22,17 +22,16 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public class PreBeginSystems extends StepBasedLoadProcess {
 
     private final Context context;
 
+    private Iterator<ComponentSystem> componentSystems;
+
     public PreBeginSystems(Context context) {
         this.context = context;
     }
-
-    private Iterator<ComponentSystem> componentSystems;
 
     @Override
     public String getMessage() {

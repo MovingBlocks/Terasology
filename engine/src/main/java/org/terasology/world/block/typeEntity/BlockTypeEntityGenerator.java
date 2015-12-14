@@ -30,7 +30,6 @@ import org.terasology.world.block.internal.BlockRegistrationListener;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class BlockTypeEntityGenerator implements BlockRegistrationListener {
 

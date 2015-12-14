@@ -19,7 +19,6 @@ package org.terasology.rendering.assets.skeletalmesh;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 public class BoneWeight {
     private Vector3f position = new Vector3f();

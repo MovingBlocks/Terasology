@@ -19,14 +19,12 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.Replicate;
-import org.terasology.persistence.StorageManager;
 
 import javax.annotation.Nullable;
 
 /**
  * Component for storing entity system information on an entity
  *
- * @author Immortius
  */
 public class EntityInfoComponent implements Component {
     // TODO: Switch this to use Optional<Prefab>

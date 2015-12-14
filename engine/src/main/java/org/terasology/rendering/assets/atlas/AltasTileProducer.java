@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 @RegisterAssetDataProducer
 public class AltasTileProducer extends AbstractFragmentDataProducer<SubtextureData, Atlas, AtlasData> {

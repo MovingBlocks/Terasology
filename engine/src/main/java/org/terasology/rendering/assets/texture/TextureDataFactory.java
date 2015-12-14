@@ -25,12 +25,9 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import com.google.common.primitives.UnsignedBytes;
-
 /**
  * Creates TextureData objects based on specific criteria
  *
- * @author mkienenb
  */
 public final class TextureDataFactory {
     // Lwjgl 2.x currently requires textures to be powers of 16, although this should change in 3.0.

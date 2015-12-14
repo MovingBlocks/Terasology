@@ -18,7 +18,7 @@ package org.terasology.core.world.generator.rasterizers;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
@@ -34,7 +34,6 @@ import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
 /**
- * @author Immortius
  */
 public class SolidRasterizer implements WorldRasterizer {
 

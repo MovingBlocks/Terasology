@@ -37,7 +37,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * <li>Notifies the network system when a client requests a change of view range</li>
  * </ul>
  *
- * @author Immortius
  */
 public class NetworkEntitySystem extends BaseComponentSystem {
 

@@ -22,7 +22,6 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 /**
  * BenchmarkTeraArray is the base class for benchmarking tera arrays.
  *
- * @author Manuel Brotz
  */
 public abstract class BenchmarkTeraArray implements Benchmark {
 

@@ -25,7 +25,6 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 /**
- * @author Immortius
  */
 public class Vector2fTypeHandler extends SimpleTypeHandler<Vector2f> {
 

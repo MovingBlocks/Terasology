@@ -22,8 +22,6 @@ import java.util.Collection;
 /**
  * A PrefabManager keep Prefabs organized and available to the game engine.
  *
- * @author Immortius
- * @author Rasmus 'Cervator' Praestholm
  */
 // TODO: This is basically unnecessary now, remove and just use Assets?
 public interface PrefabManager {

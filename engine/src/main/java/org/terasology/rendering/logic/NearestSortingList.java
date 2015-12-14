@@ -43,7 +43,6 @@ import java.util.TimerTask;
  * It it therefor use full for graphics purposes, to keep track of the nearest
  * entities to draw.
  *
- * @author XanHou
  */
 public class NearestSortingList implements Iterable<EntityRef> {
     private static final Logger logger = LoggerFactory.getLogger(NearestSortingList.class);

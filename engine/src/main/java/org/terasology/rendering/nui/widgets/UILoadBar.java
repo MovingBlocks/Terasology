@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.engine.Time;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.CoreRegistry;
@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
- * @author Immortius
  */
 public class UILoadBar extends CoreWidget {
 

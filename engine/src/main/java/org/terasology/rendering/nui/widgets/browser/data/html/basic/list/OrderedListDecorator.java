@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html.basic.list;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
@@ -79,7 +79,9 @@ public class OrderedListDecorator implements ListDecorator {
         }
 
         @Override
-        public void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace, int leftIndent, int rightIndent, ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister) {
+        public void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace,
+                int leftIndent, int rightIndent, ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign,
+                HyperlinkRegister hyperlinkRegister) {
             FallbackParagraphRenderStyle fallbackStyle = new FallbackParagraphRenderStyle(defaultStyle, paragraphData.getParagraphRenderStyle());
             Font font = fallbackStyle.getFont(false);
 
@@ -91,7 +93,8 @@ public class OrderedListDecorator implements ListDecorator {
             canvas.drawTextRaw(text, font, fallbackStyle.getColor(false), bounds);
 
             int maxIndent = getMaxIndent(font);
-            paragraphData.getParagraphContents().renderContents(canvas, startPos, containerRenderSpace, leftIndent + maxIndent, rightIndent, fallbackStyle, horizontalAlign, hyperlinkRegister);
+            paragraphData.getParagraphContents().renderContents(canvas, startPos, containerRenderSpace,
+                    leftIndent + maxIndent, rightIndent, fallbackStyle, horizontalAlign, hyperlinkRegister);
         }
     }
 }

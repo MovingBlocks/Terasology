@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Vector3i;

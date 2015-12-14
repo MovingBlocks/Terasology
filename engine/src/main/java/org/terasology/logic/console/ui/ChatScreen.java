@@ -38,7 +38,6 @@ import java.util.List;
 
 /**
  * The chat console widget
- * @author Martin Steiger
  */
 public class ChatScreen extends CoreScreenLayer {
 

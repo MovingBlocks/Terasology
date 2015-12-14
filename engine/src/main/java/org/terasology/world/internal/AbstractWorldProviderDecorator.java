@@ -28,7 +28,6 @@ import org.terasology.world.time.WorldTime;
 import java.util.Collection;
 
 /**
- * @author Immortius
  */
 public class AbstractWorldProviderDecorator implements WorldProviderCore {
 

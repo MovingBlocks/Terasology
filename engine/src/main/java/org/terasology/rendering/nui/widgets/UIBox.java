@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public class UIBox extends CoreWidget {
 

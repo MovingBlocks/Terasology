@@ -23,7 +23,6 @@ import org.terasology.engine.modes.GameState;
  * The game engine is the core of Terasology. It maintains a stack of game states, that drive the behaviour of
  * Terasology in different modes (Main Menu, ingame, dedicated server, etc)
  *
- * @author Immortius
  */
 public interface GameEngine {
 

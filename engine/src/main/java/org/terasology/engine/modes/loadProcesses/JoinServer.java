@@ -41,7 +41,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class JoinServer implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(JoinServer.class);

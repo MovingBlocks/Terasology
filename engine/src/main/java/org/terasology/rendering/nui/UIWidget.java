@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.skin.UISkin;
 import java.util.Collection;
 
 /**
- * @author Immortius
  */
 public interface UIWidget extends Iterable<UIWidget> {
 

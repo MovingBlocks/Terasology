@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -31,9 +31,9 @@ import org.terasology.rendering.nui.widgets.UIScrollbar;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
- * @author Immortius
  */
 public class ScrollableArea extends CoreLayout {
     private static final int SCROLL_MULTIPLIER = -42;
@@ -107,9 +107,9 @@ public class ScrollableArea extends CoreLayout {
         }
     }
 
-    private void layoutWithBothScrollbars(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarWidth, int scrollbarHeight) {
-        availableWidth -= scrollbarWidth;
-        availableHeight -= scrollbarHeight;
+    private void layoutWithBothScrollbars(Canvas canvas, Vector2i contentSize, int fullWidth, int fullHeight, int scrollbarWidth, int scrollbarHeight) {
+        int availableWidth = fullWidth - scrollbarWidth;
+        int availableHeight = fullHeight - scrollbarHeight;
 
         boolean atBottom = verticalBar.getRange() == verticalBar.getValue();
 
@@ -134,8 +134,8 @@ public class ScrollableArea extends CoreLayout {
         }
     }
 
-    private void layoutWithJustVertical(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarWidth) {
-        availableWidth -= scrollbarWidth;
+    private void layoutWithJustVertical(Canvas canvas, Vector2i contentSize, int fullWidth, int availableHeight, int scrollbarWidth) {
+        int availableWidth = fullWidth - scrollbarWidth;
 
         boolean atBottom = verticalBar.getRange() == verticalBar.getValue();
 
@@ -158,8 +158,8 @@ public class ScrollableArea extends CoreLayout {
         }
     }
 
-    private void layoutWithJustHorizontal(Canvas canvas, Vector2i contentSize, int availableWidth, int availableHeight, int scrollbarHeight) {
-        availableHeight -= scrollbarHeight;
+    private void layoutWithJustHorizontal(Canvas canvas, Vector2i contentSize, int availableWidth, int fullHeight, int scrollbarHeight) {
+        int availableHeight = fullHeight - scrollbarHeight;
 
         Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, availableWidth, availableHeight);
         horizontalBar.setRange(contentSize.x - contentRegion.width());
@@ -197,6 +197,13 @@ public class ScrollableArea extends CoreLayout {
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
         content = element;
+    }
+
+    @Override
+    public void removeWidget(UIWidget element) {
+        if (Objects.equals(element, content)) {
+            content = null;
+        }
     }
 
     public boolean isStickToBottom() {

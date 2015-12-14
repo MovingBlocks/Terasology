@@ -39,7 +39,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Immortius
  */
 public class LightMerger<T> {
     private static final int CENTER_INDEX = 13;
@@ -76,7 +75,7 @@ public class LightMerger<T> {
                 resultFuture = null;
                 return result;
             } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException("Error completing lighting merge");
+                throw new RuntimeException("Error completing lighting merge", e);
             }
         }
         return null;

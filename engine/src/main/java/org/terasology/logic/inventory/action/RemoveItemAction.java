@@ -26,7 +26,6 @@ import java.util.List;
  * Removed the specified item from the inventory of the entity it was sent to. If the remove was successful, the
  * event will be consumed.
  *
- * @author Marcin Sciesinski
  * @deprecated Use InventoryManager method instead.
  */
 @API

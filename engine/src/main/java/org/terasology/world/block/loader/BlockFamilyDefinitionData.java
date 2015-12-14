@@ -21,12 +21,10 @@ import org.terasology.assets.AssetData;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.family.BlockFamilyFactory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 @API
 public class BlockFamilyDefinitionData implements AssetData {

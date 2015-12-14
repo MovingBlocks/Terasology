@@ -47,7 +47,6 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
 /**
  * The Default Rendering Process class.
  *
- * @author Benjamin Glatzel
  */
 public class LwjglRenderingProcess {
 
@@ -70,10 +69,6 @@ public class LwjglRenderingProcess {
 
     private int overwriteRtWidth;
     private int overwriteRtHeight;
-
-    private String currentlyBoundFboName = "";
-    private FBO currentlyBoundFbo;
-    //private int currentlyBoundTextureId = -1;
 
     /* VARIOUS */
     private boolean isTakingScreenshot;
@@ -229,7 +224,7 @@ public class LwjglRenderingProcess {
 
         fboSceneFinal.bindTexture();
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        fboSceneFinal.unbindTexture();
+        FBO.unbindTexture();
 
         Runnable task = new Runnable() {
             @Override
@@ -284,7 +279,6 @@ public class LwjglRenderingProcess {
 
         if (fbo != null) {
             fbo.bind();
-            currentlyBoundFboName = title;
             return true;
         }
 
@@ -297,7 +291,6 @@ public class LwjglRenderingProcess {
 
         if (fbo != null) {
             fbo.unbind();
-            currentlyBoundFboName = "";
             return true;
         }
 

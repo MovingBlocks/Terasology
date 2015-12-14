@@ -20,7 +20,6 @@ import org.terasology.module.sandbox.API;
 import java.util.Queue;
 
 /**
- * @author Immortius
  */
 @API
 public interface InputDevice {

@@ -18,7 +18,6 @@ package org.terasology.network;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.rendering.nui.Color;
@@ -29,7 +28,6 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 /**
  * Interface for the network system
  *
- * @author Immortius
  */
 // TODO: Refactor the core gameplay components like the list of players into a separate system.
 public interface NetworkSystem extends BlockRegistrationListener {

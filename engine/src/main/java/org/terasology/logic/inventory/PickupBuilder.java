@@ -24,7 +24,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * @author Immortius
  */
 // TODO: This could be event driven (DropItemEvent)
 public final class PickupBuilder {

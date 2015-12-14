@@ -18,7 +18,6 @@ package org.terasology.persistence.typeHandling.gson;
 import com.google.gson.JsonElement;
 
 /**
- * @author Immortius
  */
 public class GsonPersistedData extends AbstractGsonPersistedData {
 
@@ -28,6 +27,7 @@ public class GsonPersistedData extends AbstractGsonPersistedData {
         this.element = element;
     }
 
+    @Override
     public JsonElement getElement() {
         return element;
     }

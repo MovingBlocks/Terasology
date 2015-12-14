@@ -44,13 +44,12 @@ import java.util.Set;
  * If there is any trouble generating a strategy for a type, or it is unknown and generation is not appropriate for the type, a default strategy of returning the value
  * to be copied unaltered is returned.
  *
- * @author Immortius
  */
 public class CopyStrategyLibrary {
     private static final Logger logger = LoggerFactory.getLogger(CopyStrategyLibrary.class);
 
     private Map<Class<?>, CopyStrategy<?>> strategies = Maps.newHashMap();
-    private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy();
+    private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy<>();
     private ReflectFactory reflectFactory;
 
     public CopyStrategyLibrary(ReflectFactory reflectFactory) {

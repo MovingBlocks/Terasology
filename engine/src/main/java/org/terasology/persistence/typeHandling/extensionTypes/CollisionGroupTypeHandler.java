@@ -21,7 +21,6 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
 
 /**
- * @author Immortius
  */
 public class CollisionGroupTypeHandler extends StringRepresentationTypeHandler<CollisionGroup> {
 

@@ -21,7 +21,6 @@ import org.terasology.util.Varargs;
 /**
  * A multi-section is a section that are loaded and applied to one or more other sections. Example: The Sides multi-section provides data that applies to the Left, Right,
  * Front and Back sections.
- * @author Immortius
  */
 public class MultiSection {
     private final String name;

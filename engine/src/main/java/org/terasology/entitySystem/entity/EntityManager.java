@@ -26,7 +26,6 @@ import org.terasology.math.geom.Vector3f;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public interface EntityManager {
 

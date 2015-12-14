@@ -21,7 +21,6 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 /**
- * @author Immortius
  */
 public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
 

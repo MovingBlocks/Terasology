@@ -22,7 +22,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -36,7 +36,6 @@ import java.util.Map;
  * <br><br>
  * This system is not currently thread-safe.
  *
- * @author synopia mkienenb@gmail.com
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class BlockSelectionRenderSystem extends BaseComponentSystem implements RenderSystem {

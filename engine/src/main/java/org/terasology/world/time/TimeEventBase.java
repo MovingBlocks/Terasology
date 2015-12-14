@@ -22,7 +22,6 @@ import com.google.common.math.LongMath;
 
 /**
  * A base class for different timer events
- * @author Martin Steiger
  */
 public abstract class TimeEventBase implements Event {
 

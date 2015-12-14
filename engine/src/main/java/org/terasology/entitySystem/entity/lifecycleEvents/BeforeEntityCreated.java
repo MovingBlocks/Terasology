@@ -27,7 +27,6 @@ import java.util.Set;
 
 /**
  * @deprecated Use the prefab delta system instead (create a json file under /deltas/moduleName/prefabs/prefabName.prefab with the desired changes)
- * @author Marcin Sciesinski
  */
 @Deprecated
 public class BeforeEntityCreated implements Event {

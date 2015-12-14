@@ -25,7 +25,6 @@ import java.lang.annotation.Target;
  * Used to mark a field or type not to be replicated. This is only needed for event fields (at the moment), since
  * everything else defaults to not be replicated.
  *
- * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})

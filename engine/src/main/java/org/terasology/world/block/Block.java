@@ -18,6 +18,7 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
+
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -42,14 +43,13 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.chunks.ChunkConstants;
 
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * Stores all information for a specific block type.
  *
- * @author Benjamin Glatzel
- * @author Rasmus 'Cervator' Praestholm
  */
 public final class Block {
 
@@ -279,7 +279,7 @@ public final class Block {
      * @return Whether this block needs to be rendered at all
      * @deprecated Use getMeshGenerator()==null instead.
      */
-    @Deprecated()
+    @Deprecated
     public boolean isInvisible() {
         return meshGenerator == null;
     }
@@ -612,7 +612,7 @@ public final class Block {
     }
 
     public AABB getBounds(Vector3f floatPos) {
-        return getBounds(new Vector3i(floatPos, 0.5f));
+        return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {

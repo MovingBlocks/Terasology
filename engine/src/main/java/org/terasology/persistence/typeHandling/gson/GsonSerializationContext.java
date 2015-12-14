@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class GsonSerializationContext implements SerializationContext {
 
@@ -209,7 +208,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public <T> PersistedData create(T data, Class<T> type) {
+    public <T> PersistedData create(T data, Class<? extends T> type) {
         return new GsonPersistedData(context.serialize(data, type));
     }
 

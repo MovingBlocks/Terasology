@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class MultiRowLayout extends CoreLayout<LayoutHint> {
 
@@ -61,6 +60,11 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
 
     public void addWidget(UIWidget widget) {
         widgetList.add(widget);
+    }
+
+    @Override
+    public void removeWidget(UIWidget widget) {
+        widgetList.remove(widget);
     }
 
     public int getRows() {

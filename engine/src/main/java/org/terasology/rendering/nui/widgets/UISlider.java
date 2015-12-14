@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Function;
 import org.terasology.input.MouseInput;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -33,7 +33,6 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
- * @author Immortius
  */
 public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
@@ -88,7 +87,6 @@ public class UISlider extends CoreWidget {
 
     private int sliderWidth;
     private boolean active;
-    private String formatString = "0.0";
     private Function<? super Float, String> labelFunction;
 
     public UISlider() {
@@ -180,7 +178,6 @@ public class UISlider extends CoreWidget {
 
     public void setMinimum(float min) {
         this.minimum.set(min);
-        generateFormatString();
     }
 
     public void bindRange(Binding<Float> binding) {
@@ -193,7 +190,6 @@ public class UISlider extends CoreWidget {
 
     public void setRange(float val) {
         range.set(val);
-        generateFormatString();
     }
 
     public void bindIncrement(Binding<Float> binding) {
@@ -226,26 +222,6 @@ public class UISlider extends CoreWidget {
 
     public void setPrecision(int precision) {
         this.precision = precision;
-        generateFormatString();
-    }
-
-    private void generateFormatString() {
-        float maxValue = getRange() + getMinimum();
-        int leadingValues = String.format("%.0f", maxValue).length();
-        StringBuilder newFormat = new StringBuilder();
-        if (getMinimum() < 0) {
-            newFormat.append('-');
-        }
-        for (int i = 0; i < leadingValues; ++i) {
-            newFormat.append('0');
-        }
-        if (precision > 0) {
-            newFormat.append('.');
-            for (int i = 0; i < precision; ++i) {
-                newFormat.append('0');
-            }
-        }
-        formatString = newFormat.toString();
     }
 
     private int pixelOffsetFor(float val, int width) {

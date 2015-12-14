@@ -30,7 +30,6 @@ import org.terasology.world.chunks.event.OnChunkLoaded;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class ChunkEventErrorLogger extends BaseComponentSystem {

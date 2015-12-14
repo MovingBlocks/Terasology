@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 /**
  * TeraDenseArrayByte is the base class used to implement dense arrays with elements of size 4 bit or 8 bit.
  *
- * @author Manuel Brotz
  */
 public abstract class TeraDenseArrayByte extends TeraDenseArray {
 

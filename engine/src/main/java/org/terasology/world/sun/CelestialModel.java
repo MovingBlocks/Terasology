@@ -18,7 +18,6 @@ package org.terasology.world.sun;
 
 /**
  * Describes the movement of celestial bodies.
- * @author Martin Steiger
  */
 public interface CelestialModel {
 

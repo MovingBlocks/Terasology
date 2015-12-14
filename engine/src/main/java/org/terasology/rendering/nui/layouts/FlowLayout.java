@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
@@ -36,6 +35,11 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
         contents.add(element);
+    }
+
+    @Override
+    public void removeWidget(UIWidget element) {
+        contents.remove(element);
     }
 
     @Override

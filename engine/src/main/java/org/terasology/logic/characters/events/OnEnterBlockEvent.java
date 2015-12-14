@@ -20,7 +20,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
- * @author Immortius
  */
 public class OnEnterBlockEvent implements Event {
     private Block oldBlock;

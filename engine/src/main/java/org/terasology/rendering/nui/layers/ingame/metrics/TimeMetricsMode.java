@@ -25,7 +25,6 @@ import java.text.NumberFormat;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public abstract class TimeMetricsMode extends MetricsMode {
 
@@ -46,6 +45,7 @@ public abstract class TimeMetricsMode extends MetricsMode {
         this.limit = limit;
     }
 
+    @Override
     public String getMetrics() {
         StringBuilder builder = new StringBuilder();
         builder.append(getName());
@@ -72,6 +72,7 @@ public abstract class TimeMetricsMode extends MetricsMode {
 
     private void sortMetrics(TObjectDoubleMap<String> metrics, final List<String> activities, final TDoubleList values) {
         metrics.forEachEntry(new TObjectDoubleProcedure<String>() {
+            @Override
             public boolean execute(String s, double v) {
                 boolean inserted = false;
                 for (int i = 0; i < values.size() && i < limit; i++) {

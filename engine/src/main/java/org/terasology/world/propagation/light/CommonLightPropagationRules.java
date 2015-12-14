@@ -21,10 +21,10 @@ import org.terasology.world.propagation.PropagationComparison;
 import org.terasology.world.propagation.PropagationRules;
 
 /**
- * @author Immortius
  */
 public abstract class CommonLightPropagationRules implements PropagationRules {
 
+    @Override
     public PropagationComparison comparePropagation(Block newBlock, Block oldBlock, Side side) {
         if (newBlock.isTranslucent() && oldBlock.isTranslucent()) {
             return PropagationComparison.IDENTICAL;
@@ -49,10 +49,12 @@ public abstract class CommonLightPropagationRules implements PropagationRules {
         return PropagationComparison.IDENTICAL;
     }
 
+    @Override
     public boolean canSpreadOutOf(Block block, Side side) {
         return block.getLuminance() > 0 || block.isTranslucent() || !block.isFullSide(side);
     }
 
+    @Override
     public boolean canSpreadInto(Block block, Side side) {
         return block.isTranslucent() || !block.isFullSide(side);
     }

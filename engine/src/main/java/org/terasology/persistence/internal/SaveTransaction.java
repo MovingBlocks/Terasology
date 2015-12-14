@@ -62,7 +62,6 @@ import java.util.concurrent.locks.Lock;
  * <br><br>
  * The result of this task can be obtained via {@link #getResult()}.
  *
- * @author Florian
  */
 public class SaveTransaction extends AbstractTask {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransaction.class);
@@ -121,6 +120,7 @@ public class SaveTransaction extends AbstractTask {
         return "Saving";
     }
 
+    @Override
     public void run() {
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {

@@ -22,7 +22,6 @@ import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.remoteChunkProvider.ChunkReadyListener;
 
 /**
- * @author Immortius
  */
 public interface Server extends ChunkReadyListener {
 

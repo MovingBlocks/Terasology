@@ -30,7 +30,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * Helper class for methods around {@link SaveTransaction}s that are also needed outside of the save transaction.
  *
- * @author Florian
  */
 public class SaveTransactionHelper {
     private static final Logger logger = LoggerFactory.getLogger(SaveTransactionHelper.class);
@@ -53,8 +52,8 @@ public class SaveTransactionHelper {
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
-                Files.delete(directory);
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }
         });

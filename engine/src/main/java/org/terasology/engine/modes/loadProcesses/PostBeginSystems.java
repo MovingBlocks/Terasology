@@ -22,17 +22,16 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import java.util.Iterator;
 
 /**
- * @author Immortius
  */
 public class PostBeginSystems extends StepBasedLoadProcess {
 
     private final Context context;
 
+    private Iterator<ComponentSystem> componentSystems;
+
     public PostBeginSystems(Context context) {
         this.context = context;
     }
-
-    private Iterator<ComponentSystem> componentSystems;
 
     @Override
     public String getMessage() {

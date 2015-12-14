@@ -17,13 +17,13 @@
 package org.terasology.config;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.engine.TerasologyConstants;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class NetworkConfig {
 
@@ -64,20 +64,16 @@ public class NetworkConfig {
         this.serverPort = serverPort;
     }
 
-    public void add(ServerInfo serverInfo) {
+    public void addServerInfo(ServerInfo serverInfo) {
         servers.add(serverInfo);
     }
 
-    public void remove(ServerInfo info) {
+    public void removeServerInfo(ServerInfo info) {
         servers.remove(info);
     }
 
-    public List<ServerInfo> getServers() {
-        return servers;
-    }
-
-    public void setServers(List<ServerInfo> servers) {
-        this.servers = servers;
+    public List<ServerInfo> getServerInfos() {
+        return Collections.unmodifiableList(servers);
     }
 
     public String getMasterServer() {

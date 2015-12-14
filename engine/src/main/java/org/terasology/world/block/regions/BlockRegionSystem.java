@@ -28,7 +28,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockRegionSystem extends BaseComponentSystem {

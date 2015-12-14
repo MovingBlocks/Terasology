@@ -25,7 +25,6 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class GsonDeserializationContext implements DeserializationContext {
 

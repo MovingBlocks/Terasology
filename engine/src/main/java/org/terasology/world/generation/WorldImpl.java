@@ -29,7 +29,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
- * @author Immortius
  */
 public class WorldImpl implements World {
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
@@ -69,20 +68,6 @@ public class WorldImpl implements World {
         for (EntityProvider entityProvider : entityProviders) {
             entityProvider.process(chunkRegion, buffer);
         }
-    }
-
-    @Override
-    public Map<String, Class<? extends WorldFacet>> getNamedFacets() {
-        Map<String, Class<? extends WorldFacet>> facets = Maps.newHashMap();
-
-        for (Class<? extends WorldFacet> facetClass : facetProviderChains.keySet()) {
-            FacetName facetName = facetClass.getAnnotation(FacetName.class);
-            if (facetName != null && !facets.containsKey(facetName.value())) {
-                facets.put(facetName.value(), facetClass);
-            }
-        }
-
-        return facets;
     }
 
     @Override

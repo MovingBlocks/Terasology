@@ -18,7 +18,6 @@ package org.terasology.benchmark;
 /**
  * BenchmarkCallback allows to watch the progress of the execution of one or many benchmarks.
  *
- * @author Manuel Brotz
  */
 public interface BenchmarkCallback {
 

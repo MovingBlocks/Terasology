@@ -64,7 +64,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * @author Immortius
  */
 public class InitialiseWorld extends SingleStepLoadProcess {
 
@@ -103,7 +102,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         WorldGeneratorManager worldGeneratorManager = context.get(WorldGeneratorManager.class);
         WorldGenerator worldGenerator;
         try {
-            worldGenerator = worldGeneratorManager.createGenerator(worldInfo.getWorldGenerator(), context);
+            worldGenerator = WorldGeneratorManager.createGenerator(worldInfo.getWorldGenerator(), context);
             // setting the world seed will create the world builder
             worldGenerator.setWorldSeed(worldInfo.getSeed());
             context.put(WorldGenerator.class, worldGenerator);

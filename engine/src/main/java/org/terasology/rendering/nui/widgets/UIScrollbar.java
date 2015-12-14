@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -31,7 +31,6 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
- * @author Immortius
  */
 public class UIScrollbar extends CoreWidget {
 

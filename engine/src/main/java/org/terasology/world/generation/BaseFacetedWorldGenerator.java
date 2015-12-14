@@ -15,22 +15,12 @@
  */
 package org.terasology.world.generation;
 
-import com.google.common.collect.Sets;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.generation.facets.base.ColorSummaryFacet;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.WorldGenerator2DPreview;
 
-import java.util.Map;
-import java.util.Set;
-
-public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
+public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
 
     private final SimpleUri uri;
 
@@ -97,28 +87,5 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator, World
             worldBuilder = createWorld();
         }
         return worldBuilder;
-    }
-
-
-
-    @Override
-    public Color get(String layerName, Rect2i area) {
-        Map<String, Class<? extends WorldFacet>> namedFacets = getWorld().getNamedFacets();
-        Class<? extends WorldFacet> facetType = namedFacets.get(layerName);
-        Region3i area3d = Region3i.createFromMinAndSize(new Vector3i(area.minX(), 0, area.minY()), new Vector3i(area.sizeX(), 1, area.sizeY()));
-        Region region = getWorld().getWorldData(area3d);
-        ColorSummaryFacet colorSummaryFacet = (ColorSummaryFacet) region.getFacet(facetType);
-        return colorSummaryFacet.getColor();
-    }
-
-    @Override
-    public Iterable<String> getLayers() {
-        Set<String> layerNames = Sets.newHashSet();
-        for (Map.Entry<String, Class<? extends WorldFacet>> namedFacet : getWorld().getNamedFacets().entrySet()) {
-            if (ColorSummaryFacet.class.isAssignableFrom(namedFacet.getValue())) {
-                layerNames.add(namedFacet.getKey());
-            }
-        }
-        return layerNames;
     }
 }

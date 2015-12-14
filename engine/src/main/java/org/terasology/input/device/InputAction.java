@@ -20,7 +20,6 @@ import org.terasology.input.Input;
 import org.terasology.math.geom.Vector2i;
 
 /**
- * @author Immortius
  */
 public final class InputAction {
     private final Input input;

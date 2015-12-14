@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class WorldBuilder {
 
@@ -71,6 +70,7 @@ public class WorldBuilder {
     public WorldBuilder addPlugins() {
         pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
         pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
+        pluginLibrary.instantiateAllOfType(EntityProviderPlugin.class).forEach(this::addEntities);
 
         return this;
     }

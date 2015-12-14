@@ -37,7 +37,7 @@ public class OggStreamingSoundData implements StreamingSoundData {
     private final AssetDataFile stream;
     private OggReader reader;
 
-    public OggStreamingSoundData(AssetDataFile stream) throws IOException {
+    public OggStreamingSoundData(AssetDataFile stream) {
         this.stream = stream;
         reset();
     }

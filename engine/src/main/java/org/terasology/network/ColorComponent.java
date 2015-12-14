@@ -21,7 +21,6 @@ import org.terasology.rendering.nui.Color;
 
 /**
  * A component that provides a color to describe an entity
- * @author Martin Steiger
  */
 public class ColorComponent implements Component {
 

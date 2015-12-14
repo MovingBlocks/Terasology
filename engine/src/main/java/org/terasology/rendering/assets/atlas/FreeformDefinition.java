@@ -15,10 +15,9 @@
  */
 package org.terasology.rendering.assets.atlas;
 
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 
 /**
- * @author Immortius
  */
 public class FreeformDefinition {
 

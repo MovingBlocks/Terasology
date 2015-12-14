@@ -17,10 +17,8 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.primitives.Ints;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -31,14 +29,11 @@ import org.terasology.rendering.nui.widgets.UIText;
 import java.util.function.Consumer;
 
 /**
- * @author Immortius
  */
 public class AddServerPopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:addServerPopup!instance");
 
-    @In
-    private Config config;
     private UIText nameText;
     private UIText ownerText;
     private UIText addressText;
@@ -72,8 +67,6 @@ public class AddServerPopup extends CoreScreenLayer {
                     // create new
                     serverInfo = new ServerInfo(name, address, port);
                     serverInfo.setOwner(owner);
-
-                    config.getNetwork().add(serverInfo);
                 } else {
                     // update existing
                     serverInfo.setName(name);

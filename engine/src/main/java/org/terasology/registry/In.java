@@ -16,8 +16,6 @@
 
 package org.terasology.registry;
 
-import org.terasology.module.sandbox.API;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -36,9 +34,7 @@ import java.lang.annotation.Target;
  * </pre>
  *
  *
- * @author Immortius
  */
-@API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface In {

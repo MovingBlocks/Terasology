@@ -19,7 +19,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.CoreRegistry;
 
 /**
- * @author Immortius
  */
 public final class Mouse {
 

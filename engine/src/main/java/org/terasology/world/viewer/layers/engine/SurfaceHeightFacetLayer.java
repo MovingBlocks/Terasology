@@ -23,7 +23,6 @@ import org.terasology.world.viewer.layers.ZOrder;
 
 /**
  * Provides information about the surface height level.
- * @author Martin Steiger
  */
 @Renders(value = SurfaceHeightFacet.class, order = ZOrder.SURFACE)
 public class SurfaceHeightFacetLayer extends FieldFacetLayer {

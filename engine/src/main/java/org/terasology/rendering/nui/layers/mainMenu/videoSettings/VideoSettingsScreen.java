@@ -22,9 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -41,13 +39,9 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import javax.imageio.ImageIO;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 /**
- * @author Immortius
  */
 public class VideoSettingsScreen extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
@@ -77,16 +71,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         if (videoQuality != null) {
             videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
-        }
-
-        UIDropdown<Locale> language = find("language", UIDropdown.class);
-        if (language != null) {
-            SimpleUri menuUri = new SimpleUri("engine:menu");
-            TranslationProject menuProject = translationSystem.getProject(menuUri);
-            List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
-            language.setOptions(Lists.newArrayList(locales));
-            language.setOptionRenderer(new LocaleRenderer(translationSystem));
-            language.bindSelection(new LocaleBinding(getManager(), config.getSystem()));
         }
 
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);

@@ -15,27 +15,26 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
- * @author Immortius
  */
 public interface FieldFacet2D extends WorldFacet2D {
 
     float get(int x, int y);
 
-    float get(Vector2i pos);
+    float get(BaseVector2i pos);
 
     float getWorld(int x, int y);
 
-    float getWorld(Vector2i pos);
+    float getWorld(BaseVector2i pos);
 
     void set(int x, int y, float value);
 
-    void set(Vector2i pos, float value);
+    void set(BaseVector2i pos, float value);
 
     void setWorld(int x, int y, float value);
 
-    void setWorld(Vector2i pos, float value);
+    void setWorld(BaseVector2i pos, float value);
 }

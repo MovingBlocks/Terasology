@@ -17,11 +17,11 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -29,19 +29,18 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * Shader parameters for the Combine shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersCombine extends ShaderParametersBase {
-    @EditorRange(min = 0.001f, max = 0.005f)
+    @Range(min = 0.001f, max = 0.005f)
     private float outlineDepthThreshold = 0.001f;
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     private float outlineThickness = 0.65f;
 
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     private float skyInscatteringLength = 1.0f;
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     private float skyInscatteringStrength = 0.25f;
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     private float skyInscatteringThreshold = 0.8f;
 
     @Override

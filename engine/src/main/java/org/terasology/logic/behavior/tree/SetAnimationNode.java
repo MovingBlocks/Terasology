@@ -71,8 +71,10 @@ public class SetAnimationNode extends Node {
             if (getNode().loop != null) {
                 skeletalMesh.animationPool.clear();
                 List<?> animationListToLoop = (List<?>) actor().getComponentField(getNode().loop);
-                for (Object object : animationListToLoop) {
-                    skeletalMesh.animationPool.add((MeshAnimation) object);
+                if (animationListToLoop != null) {
+                    for (Object object : animationListToLoop) {
+                        skeletalMesh.animationPool.add((MeshAnimation) object);
+                    }
                 }
             }
             skeletalMesh.loop = true;

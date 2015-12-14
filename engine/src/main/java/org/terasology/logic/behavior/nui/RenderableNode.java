@@ -42,7 +42,6 @@ import java.util.List;
 /**
  * A widget to render and process inputs for a node of a behavior tree.
  *
- * @author synopia
  */
 public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, TreeAccessor<RenderableNode> {
     private TextureRegion texture = Assets.getTextureRegion("engine:button").get();
@@ -216,6 +215,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         return getPortList().ports();
     }
 
+    @Override
     public void insertChild(int index, RenderableNode child) {
         if (index == -1) {
             children.add(child);
@@ -224,6 +224,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
     }
 
+    @Override
     public void setChild(int index, RenderableNode child) {
         if (children.size() == index) {
             children.add(null);
@@ -235,12 +236,14 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         children.set(index, child);
     }
 
+    @Override
     public RenderableNode removeChild(int index) {
         RenderableNode remove = children.remove(index);
         remove.getInputPort().setTarget(null);
         return remove;
     }
 
+    @Override
     public RenderableNode getChild(int index) {
         if (children.size() > index) {
             return children.get(index);
@@ -248,6 +251,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         return null;
     }
 
+    @Override
     public int getChildrenCount() {
         return children.size();
     }
@@ -291,6 +295,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         return status;
     }
 
+    @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         for (RenderableNode child : children) {

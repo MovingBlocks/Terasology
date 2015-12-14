@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.Canvas;
 /**
  * An item renderer draws an object of a given type as part of a UI.
  *
- * @author Immortius
  */
 public interface ItemRenderer<T> {
 

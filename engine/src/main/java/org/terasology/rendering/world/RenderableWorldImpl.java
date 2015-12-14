@@ -183,6 +183,7 @@ public class RenderableWorldImpl implements RenderableWorld {
      *
      * @return True if the list was changed
      */
+    @Override
     public boolean updateChunksInProximity(Region3i newRenderableRegion) {
         if (!newRenderableRegion.equals(renderableRegion)) {
             Vector3i chunkPosition;
@@ -222,6 +223,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         return false;
     }
 
+    @Override
     public boolean updateChunksInProximity(ViewDistance viewDistance) {
         logger.info("New Viewing Distance: {}", viewDistance);
         return updateChunksInProximity(calculateRenderableRegion(viewDistance));
@@ -250,7 +252,6 @@ public class RenderableWorldImpl implements RenderableWorld {
     public void generateVBOs() {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
         ChunkMesh pendingMesh;
-        ChunkMesh mesh;
         chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
         for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
 
@@ -384,6 +385,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         return playerCamera.getViewFrustumReflected().intersects(chunk.getAABB());
     }
 
+    @Override
     public RenderQueuesHelper getRenderQueues() {
         return renderQueues;
     }
@@ -393,6 +395,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         return chunkProvider;
     }
 
+    @Override
     public String getMetrics() {
         StringBuilder builder = new StringBuilder();
         builder.append("Dirty Chunks: ");

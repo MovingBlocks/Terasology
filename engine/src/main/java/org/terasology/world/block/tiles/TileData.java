@@ -20,7 +20,6 @@ import org.terasology.assets.AssetData;
 import java.awt.image.BufferedImage;
 
 /**
- * @author Immortius
  */
 public class TileData implements AssetData {
     private BufferedImage image;

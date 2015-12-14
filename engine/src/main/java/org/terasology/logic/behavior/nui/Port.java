@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.nui;
 
 import org.terasology.asset.Assets;
-import org.terasology.math.Rect2f;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -35,7 +35,6 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
  * Input/Output ports may have a target. This is always of the opposite type.
  * When setting a target to a port, the node of the InputPort is added to the child list of the node of the OutputPort.
  *
- * @author synopia
  */
 public abstract class Port extends CoreWidget {
     protected RenderableNode node;
@@ -92,6 +91,7 @@ public abstract class Port extends CoreWidget {
         return getSourceNode() + "[" + index() + "]";
     }
 
+    @Override
     public boolean isVisible() {
         return index() < getSourceNode().getMaxChildren();
     }

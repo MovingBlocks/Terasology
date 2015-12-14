@@ -16,24 +16,24 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.editor.EditorRange;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.opengl.PostProcessor;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersHdr extends ShaderParametersBase {
 
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float exposureBias = 1.0f;
-    @EditorRange(min = 0.0f, max = 100.0f)
+    @Range(min = 0.0f, max = 100.0f)
     private float whitePoint = 5.0f;
 
+    @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
 

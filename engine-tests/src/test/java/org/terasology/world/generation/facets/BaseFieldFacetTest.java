@@ -23,7 +23,6 @@ import org.terasology.world.generation.facets.base.FieldFacet3D;
 
 /**
  * Tests the {@link BaseFieldFacet3D} class.
- * @author Martin Steiger
  */
 public class BaseFieldFacetTest extends FieldFacetTest {
 

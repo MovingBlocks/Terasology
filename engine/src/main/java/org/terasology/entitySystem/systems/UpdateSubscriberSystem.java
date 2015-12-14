@@ -31,7 +31,6 @@ package org.terasology.entitySystem.systems;
  *       system update function at a specific times.
  *     </li>
  *   </ul>
- * @author Immortius
  */
 public interface UpdateSubscriberSystem extends ComponentSystem {
 

@@ -26,7 +26,6 @@ import java.util.List;
  * A freeform family is a pseudo block family that can be combined with any block shape to produce an actual block
  * family.
  *
- * @author Immortius
  */
 public class FreeformFamily {
     public BlockUri uri;

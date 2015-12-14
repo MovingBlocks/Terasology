@@ -20,35 +20,29 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 final class PlayerStoreInternal implements PlayerStore {
     static final String CHARACTER = "character";
 
     private final EngineEntityManager entityManager;
     private final String id;
-    private final StorageManager manager;
     private final Vector3f relevanceLocation = new Vector3f();
     private EntityRef character = EntityRef.NULL;
     private boolean hasCharacter;
     private EntityData.EntityStore entityStore;
 
-    PlayerStoreInternal(String id, StorageManager entityStoreManager, EngineEntityManager entityManager) {
+    PlayerStoreInternal(String id, EngineEntityManager entityManager) {
         this.id = id;
-        this.manager = entityStoreManager;
         this.entityManager = entityManager;
     }
 
-    PlayerStoreInternal(String id, EntityData.PlayerStore store, StorageManager entityStoreManager,
-                        EngineEntityManager entityManager) {
+    PlayerStoreInternal(String id, EntityData.PlayerStore store, EngineEntityManager entityManager) {
         this.id = id;
-        this.manager = entityStoreManager;
         this.entityManager = entityManager;
         this.entityStore = store.getStore();
         this.relevanceLocation.set(store.getCharacterPosX(), store.getCharacterPosY(), store.getCharacterPosZ());

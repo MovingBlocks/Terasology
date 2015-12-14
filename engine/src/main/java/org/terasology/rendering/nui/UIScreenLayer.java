@@ -16,9 +16,8 @@
 package org.terasology.rendering.nui;
 
 /**
- * @author Immortius
  */
-public interface UIScreenLayer extends UIWidget, ControlWidget {
+public interface UIScreenLayer extends ControlWidget {
 
     boolean isLowerLayerVisible();
 

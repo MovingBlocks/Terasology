@@ -39,7 +39,6 @@ import org.terasology.world.WorldProvider;
 /**
  * Hierarchical AI, idea from robotics
  *
- * @author Esa-Petri Tirkkonen
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HierarchicalAISystem extends BaseComponentSystem implements
@@ -166,21 +165,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                 if (ai.wild) {
                     if (distanceToPlayer > ai.panicDistance
                             && distanceToPlayer < ai.runDistance) {
-                        Vector3f tempTarget = localPlayer.getPosition();
-                        if (ai.forgiving != 0) {
-                            ai.movementTarget.set(new Vector3f(
-                                    -tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
-                                    -tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
-                                    -tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
-                            ));
-                        } else {
-                            ai.movementTarget
-                                    .set(new Vector3f(tempTarget.x * -1,
-                                            tempTarget.y * -1, tempTarget.z
-                                            * -1));
-                        }
-                        entity.saveComponent(ai);
-                        ai.inDanger = true;
+                        runAway(entity, ai);
                     }
                 }
                 ai.lastChangeOfDangerAt = time.getGameTimeInMs();
@@ -229,23 +214,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
             // check if time to change direction
             if (tempTime - ai.lastChangeOfDirectionAt > directionChangeTime) {
                 directionChangeTime = (long) (ai.moveUpdateTime * random.nextDouble() * ai.straightLined);
-                // if ai flies
-                if (ai.flying) {
-                    float targetY = 0;
-                    do {
-                        targetY = worldPos.y + random.nextFloat(-100.0f, 100.0f);
-                    } while (targetY > ai.maxAltitude);
-                    ai.movementTarget.set(
-                            worldPos.x + random.nextFloat(-500.0f, 500.0f),
-                            targetY,
-                            worldPos.z + random.nextFloat(-500.0f, 500.0f));
-                } else {
-                    ai.movementTarget.set(
-                            worldPos.x + random.nextFloat(-500.0f, 500.0f),
-                            worldPos.y,
-                            worldPos.z + random.nextFloat(-500.0f, 500.0f));
-                }
-                ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
+                randomWalk(worldPos, ai);
                 entity.saveComponent(ai);
                 // System.out.print("direction changed\n");
 
@@ -264,6 +233,44 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");
 
         ai.lastProgressedUpdateAt = time.getGameTimeInMs();
+    }
+
+    private void runAway(EntityRef entity, HierarchicalAIComponent ai) {
+        Vector3f tempTarget = localPlayer.getPosition();
+        if (ai.forgiving != 0) {
+            ai.movementTarget.set(new Vector3f(
+                    -tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
+                    -tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
+                    -tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
+            ));
+        } else {
+            ai.movementTarget
+                .set(new Vector3f(tempTarget.x * -1,
+                        tempTarget.y * -1, tempTarget.z
+                         * -1));
+        }
+        entity.saveComponent(ai);
+        ai.inDanger = true;
+    }
+
+    private void randomWalk(Vector3f worldPos, HierarchicalAIComponent ai) {
+        // if ai flies
+        if (ai.flying) {
+            float targetY = 0;
+            do {
+                targetY = worldPos.y + random.nextFloat(-100.0f, 100.0f);
+            } while (targetY > ai.maxAltitude);
+            ai.movementTarget.set(
+                    worldPos.x + random.nextFloat(-500.0f, 500.0f),
+                    targetY,
+                    worldPos.z + random.nextFloat(-500.0f, 500.0f));
+        } else {
+            ai.movementTarget.set(
+                    worldPos.x + random.nextFloat(-500.0f, 500.0f),
+                    worldPos.y,
+                    worldPos.z + random.nextFloat(-500.0f, 500.0f));
+        }
+        ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
     }
 
     private boolean foodInFront() {

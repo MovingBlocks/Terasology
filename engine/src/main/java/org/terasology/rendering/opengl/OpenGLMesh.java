@@ -28,7 +28,6 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
@@ -55,7 +54,6 @@ import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
- * @author Immortius
  */
 public class OpenGLMesh extends Mesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
@@ -172,6 +170,7 @@ public class OpenGLMesh extends Mesh {
         }
     }
 
+    @Override
     public void render() {
         if (!isDisposed()) {
             preRender();

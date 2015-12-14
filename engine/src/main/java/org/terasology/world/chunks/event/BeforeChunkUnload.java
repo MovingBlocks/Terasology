@@ -20,7 +20,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3i;
 
 /**
- * @author Immortius
  */
 public class BeforeChunkUnload implements Event {
 

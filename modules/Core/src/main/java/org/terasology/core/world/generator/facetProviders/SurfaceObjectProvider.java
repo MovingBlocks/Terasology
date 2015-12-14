@@ -39,7 +39,6 @@ import java.util.Map;
  * Places objects on the surface based on population densities
  * for a environmental variable (e.g. biome).
  *
- * @author Martin Steiger
  */
 @Requires(@Facet(SurfaceHeightFacet.class))
 public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {

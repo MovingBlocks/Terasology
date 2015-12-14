@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class DoorSystem extends BaseComponentSystem {

@@ -26,7 +26,6 @@ import java.util.Set;
  * TypeMap is a multimap-like class specialised for holding a set of objects by their class. So it is a {@code Multimap<Class<? extends T>, T>} where the value is guaranteed
  * to be of the type of the key.
  *
- * @author Immortius
  */
 public abstract class TypeMultimap<T> {
 

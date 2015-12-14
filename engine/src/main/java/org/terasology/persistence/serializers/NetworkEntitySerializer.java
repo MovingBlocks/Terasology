@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class NetworkEntitySerializer {
     private static final Logger logger = LoggerFactory.getLogger(NetworkEntitySerializer.class);
@@ -210,10 +209,11 @@ public class NetworkEntitySerializer {
     public void deserializeOnto(MutableComponentContainer entity, EntityData.PackedEntity entityData, FieldSerializeCheck<Component> fieldCheck) {
         int fieldPos = 0;
         for (int componentIndex = 0; componentIndex < entityData.getComponentIdCount(); ++componentIndex) {
-            Class<? extends Component> componentClass = idTable.inverse().get((Integer) entityData.getComponentId(componentIndex));
+            Integer componentId = Integer.valueOf(entityData.getComponentId(componentIndex));
+            Class<? extends Component> componentClass = idTable.inverse().get(componentId);
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentClass);
             if (metadata == null) {
-                logger.warn("Skipping unknown component {}", entityData.getComponentId(componentIndex));
+                logger.warn("Skipping unknown component {}", componentId);
                 fieldPos += UnsignedBytes.toInt(entityData.getComponentFieldCounts().byteAt(componentIndex));
                 continue;
             }

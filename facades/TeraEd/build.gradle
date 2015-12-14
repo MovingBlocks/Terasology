@@ -1,0 +1,46 @@
+// The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
+
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config
+apply from: "$rootDir/config/gradle/artifactory.gradle"
+
+// Base the engine tests on the same version number as the engine
+version = project(':engine').version
+println "TeraEd VERSION: $version"
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.facades'
+
+dependencies {
+    compile project(':engine')
+}
+
+task editor(type:JavaExec) {
+    description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    main = 'org.terasology.editor.TeraEd'
+    workingDir = rootDir
+    String[] runArgs = ["-homedir"]
+    args runArgs
+
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.resourcesDir
+    classpath project(':engine').sourceSets.main.output.classesDir
+    classpath project(':engine').configurations.runtime
+}
+
+// Prep an IntelliJ module for the facade
+idea {
+    module {
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+    }
+}

@@ -56,10 +56,6 @@ import java.util.List;
 /**
  * The class is game selection menu replacement for the headless server.
  *
- * @author Benjamin Glatzel
- * @author Anton Kireev
- * @author Marcel Lehwald
- * @author Florian
  */
 public class StateHeadlessSetup implements GameState {
 
@@ -163,7 +159,7 @@ public class StateHeadlessSetup implements GameState {
 
     @Override
     public void update(float delta) {
-        eventSystem.process();;
+        eventSystem.process();
     }
 
     @Override

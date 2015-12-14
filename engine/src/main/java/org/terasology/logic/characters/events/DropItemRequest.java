@@ -24,7 +24,6 @@ import org.terasology.network.ServerEvent;
 /**
  * A request for a player to drop an item. Is replicated onto the server
  *
- * @author Sdab
  */
 @ServerEvent(lagCompensate = true)
 public class DropItemRequest implements Event {

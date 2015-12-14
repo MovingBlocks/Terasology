@@ -19,7 +19,6 @@ package org.terasology.physics;
 import java.util.Locale;
 
 /**
- * @author Immortius
  */
 public enum StandardCollisionGroup implements CollisionGroup {
     DEFAULT((short) 0b00000001),

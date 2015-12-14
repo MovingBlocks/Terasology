@@ -29,7 +29,6 @@ import org.terasology.registry.In;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class AutoCreateSystem extends BaseComponentSystem {

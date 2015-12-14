@@ -41,7 +41,6 @@ import org.terasology.world.propagation.light.LightPropagationRules;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 

@@ -19,7 +19,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 
 /**
- * @author Immortius
  */
 public class WaterReflectionBinding implements Binding<WaterReflection> {
 

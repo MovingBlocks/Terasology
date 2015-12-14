@@ -60,7 +60,7 @@ configurations {
     }
 }
 
-task runPC(type:JavaExec) {
+task game(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
@@ -137,7 +137,7 @@ task setupServerModules(type: Sync) << {
 }
 
 // TODO: Make a task to reset server / game data
-task startServer(type:JavaExec) {
+task server(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)

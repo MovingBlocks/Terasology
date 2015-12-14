@@ -21,7 +21,6 @@ import org.terasology.world.biomes.Biome;
 /**
  * Used for notifying listeners that the biome at a spot in the world has changed.
  *
- * @author Immortius
  */
 public class BiomeChange {
 

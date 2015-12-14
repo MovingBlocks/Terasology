@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block.items;
 
-import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -29,7 +28,6 @@ import org.terasology.world.block.family.BlockFamily;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class BlockItemFactory {
     private EntityManager entityManager;

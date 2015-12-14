@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 
 /**
- * @author Immortius
  */
 public class BoxShapeComponent implements Component {
     @Replicate

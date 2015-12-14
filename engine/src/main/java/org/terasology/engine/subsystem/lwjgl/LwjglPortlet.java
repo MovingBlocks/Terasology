@@ -15,20 +15,13 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import java.awt.Canvas;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.modes.GameState;
-
-import java.awt.*;
 
 public class LwjglPortlet extends BaseLwjglSubsystem {
-
-    private static final Logger logger = LoggerFactory.getLogger(LwjglPortlet.class);
 
     private Canvas customViewPort;
 

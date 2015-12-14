@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
 
@@ -56,6 +55,15 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         } else if (widget != null) {
             logger.error("Attempted to add widget '{}' of type '{}' with no layout hint", widget.getId(), widget.getClass().getSimpleName());
         }
+    }
+
+    @Override
+    public void removeWidget(UIWidget widget) {
+        String id = widget.getId();
+        WidgetInfo info = contentLookup.get(id);
+        contentLookup.remove(id);
+        contents.remove(info);
+        cachedRegions.remove(info);
     }
 
     public void addWidget(UIWidget widget, HorizontalHint horizontal, VerticalHint vertical) {

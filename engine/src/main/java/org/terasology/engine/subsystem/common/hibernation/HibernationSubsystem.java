@@ -18,8 +18,6 @@ package org.terasology.engine.subsystem.common.hibernation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.Time;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;

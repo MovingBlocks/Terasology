@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class MeshAnimationFrame {
     private List<Vector3f> bonePositions;

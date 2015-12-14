@@ -15,7 +15,6 @@
  */
 package org.terasology.utilities.procedural;
 
-import org.terasology.math.TeraMath;
 import org.terasology.utilities.random.FastRandom;
 
 /**
@@ -23,7 +22,6 @@ import org.terasology.utilities.random.FastRandom;
  *
  * It is based off of the noisePermutation table used by Perlin noise.
  * @deprecated use {@link WhiteNoise} or {@link DiscreteWhiteNoise} instead
- * @author Immortius
  */
 @Deprecated
 public class NoiseTable {

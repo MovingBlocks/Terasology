@@ -18,7 +18,6 @@ package org.terasology.utilities.procedural;
 
 /**
  * Provides or generates 3D noise
- * @author Martin Steiger
  * @deprecated use {@link Noise} instead
  */
 @Deprecated

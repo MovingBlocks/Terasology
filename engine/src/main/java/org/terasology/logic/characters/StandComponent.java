@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * The component gets currently only used to define the idle stand animations.
  *
- * @author Florian
  */
 public class StandComponent implements Component {
     /**

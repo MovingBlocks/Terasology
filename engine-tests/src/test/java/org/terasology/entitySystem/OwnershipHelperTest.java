@@ -34,7 +34,6 @@ import static org.mockito.Mockito.mock;
 import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
 
 /**
- * @author Immortius
  */
 public class OwnershipHelperTest {
 

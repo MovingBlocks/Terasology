@@ -21,7 +21,6 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
@@ -29,6 +28,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -44,7 +44,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the Post-processing shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersSSAO extends ShaderParametersBase {
 
@@ -53,9 +52,9 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     private final Random random = new FastRandom();
 
-    @EditorRange(min = 0.01f, max = 12.0f)
+    @Range(min = 0.01f, max = 12.0f)
     private float ssaoStrength = 1.75f;
-    @EditorRange(min = 0.1f, max = 25.0f)
+    @Range(min = 0.1f, max = 25.0f)
     private float ssaoRad = 1.5f;
 
     private FloatBuffer ssaoSamples;

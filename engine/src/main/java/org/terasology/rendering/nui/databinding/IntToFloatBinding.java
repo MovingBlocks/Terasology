@@ -22,7 +22,6 @@ import com.google.common.math.DoubleMath;
 
 /**
  * Links a Integer-Binding to a Float-Binding
- * @author Martin Steiger
  */
 public final class IntToFloatBinding implements Binding<Float> {
 

@@ -23,7 +23,6 @@ import org.terasology.network.OwnerEvent;
  * Message to acknowledge an inventory change request as complete, to be sent back to the requester so they can stop
  * predicting the change.
  *
- * @author Immortius
  */
 @OwnerEvent
 public class InventoryChangeAcknowledgedRequest extends NetworkEvent {

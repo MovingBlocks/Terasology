@@ -16,12 +16,10 @@
 package org.terasology.world.block;
 
 import org.terasology.math.Rotation;
-import org.terasology.math.Side;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.SectionDefinitionData;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Map;
 
 public interface BlockBuilderHelper {
 

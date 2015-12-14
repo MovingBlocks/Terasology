@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class TextLineBuilder {
 

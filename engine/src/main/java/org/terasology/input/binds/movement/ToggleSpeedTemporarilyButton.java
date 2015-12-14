@@ -23,8 +23,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * @author Immortius
- * @author Florian
  */
 @RegisterBindButton(id = "toggleSpeedTemporarily", description = "Toggle Speed Temporarily")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.LEFT_SHIFT)

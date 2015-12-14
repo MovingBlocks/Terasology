@@ -20,7 +20,6 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UILoadBar;
 
 /**
- * @author Immortius
  */
 public class LoadingScreen extends CoreScreenLayer {
 

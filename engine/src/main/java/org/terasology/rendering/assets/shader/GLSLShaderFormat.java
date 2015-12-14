@@ -35,12 +35,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {

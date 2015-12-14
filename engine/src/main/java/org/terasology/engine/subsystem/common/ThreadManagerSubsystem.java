@@ -17,10 +17,7 @@ package org.terasology.engine.subsystem.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -31,7 +28,6 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
- * @author Immortius
  */
 public class ThreadManagerSubsystem implements EngineSubsystem, ThreadManager {
 

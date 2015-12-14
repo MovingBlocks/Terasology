@@ -20,7 +20,6 @@ import org.terasology.network.Replicate;
 import org.terasology.rendering.nui.properties.TextField;
 
 /**
- * @author Immortius
  */
 public final class HealthComponent implements Component {
     // Configuration options

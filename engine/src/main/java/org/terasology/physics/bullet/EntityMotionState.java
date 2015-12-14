@@ -22,15 +22,12 @@ import com.bulletphysics.linearmath.Transform;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.
  * Bullet reads the initial state of the rigid body out of the entity, and then updates its location and rotation
  * as it moves under physics.
  *
- * @author Immortius
  */
 public class EntityMotionState extends MotionState {
     private EntityRef entity;

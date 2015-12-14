@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public enum MouseInput implements Input {
     NONE(InputType.MOUSE_BUTTON, -1, "MOUSE_NONE", ""),
@@ -62,14 +61,17 @@ public enum MouseInput implements Input {
         this.identifiers.add(toString().toUpperCase(Locale.ENGLISH));
     }
 
+    @Override
     public InputType getType() {
         return type;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }

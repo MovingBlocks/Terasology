@@ -22,8 +22,6 @@ import org.terasology.network.ServerEvent;
 import java.util.Collection;
 
 /**
- * @author Immortius
- * @author Florian
  */
 @ServerEvent
 public class MoveItemAmountRequest extends AbstractMoveItemRequest {
@@ -33,7 +31,8 @@ public class MoveItemAmountRequest extends AbstractMoveItemRequest {
     protected MoveItemAmountRequest() {
     }
 
-    public MoveItemAmountRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount, int changeId, Collection<EntityRef> clientSideTempEntities) {
+    public MoveItemAmountRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory,
+            int toSlot, int amount, int changeId, Collection<EntityRef> clientSideTempEntities) {
         super(instigator, fromInventory, fromSlot, toInventory, changeId, clientSideTempEntities);
         this.toSlot = toSlot;
         this.amount = amount;

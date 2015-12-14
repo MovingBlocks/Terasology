@@ -21,6 +21,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.module.sandbox.API;
 
 import java.util.List;
 
@@ -30,8 +31,8 @@ import java.util.List;
  * This asset keeps track of the tree of Nodes and the associated RenderableNodes. If there are no RenderableNodes,
  * the helper class will generate and layout some.
  *
- * @author synopia
  */
+@API
 public class BehaviorTree extends Asset<BehaviorTreeData> {
     private BehaviorTreeData data;
 

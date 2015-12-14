@@ -21,7 +21,6 @@ import org.terasology.assets.AssetData;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class FontData implements AssetData {
     private int lineHeight;
@@ -48,7 +47,9 @@ public class FontData implements AssetData {
         return lineHeight;
     }
 
-    public int getBaseHeight() { return baseHeight; }
+    public int getBaseHeight() {
+        return baseHeight;
+    }
 
     public Iterable<Map.Entry<Integer, FontCharacter>> getCharacters() {
         return characters.entrySet();

@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * @author Marcos Vives Del Sol
  */
 public class CharSequenceIterator implements Iterator<Character> {
 
@@ -32,11 +31,13 @@ public class CharSequenceIterator implements Iterator<Character> {
         this.sequence = sequence;
     }
 
+    @Override
     public boolean hasNext() {
         return pos < sequence.length();
     }
 
     // The method nextChar is preferred over this one, as it does not create a wrapper for the primitive
+    @Override
     public Character next() {
         return Character.valueOf(nextChar());
     }
@@ -50,6 +51,7 @@ public class CharSequenceIterator implements Iterator<Character> {
         }
     }
 
+    @Override
     public void remove() {
         // Actually some character sequences are mutable, but for simplicity I am just omitting this method
         throw new UnsupportedOperationException("CharSequence objects are immutable");

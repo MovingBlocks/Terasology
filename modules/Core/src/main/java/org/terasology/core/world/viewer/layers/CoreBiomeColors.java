@@ -27,7 +27,6 @@ import com.google.common.collect.Maps;
 
 /**
  * TODO Type description
- * @author Martin Steiger
  */
 public class CoreBiomeColors implements Function<CoreBiome, Color> {
 

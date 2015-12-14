@@ -45,7 +45,6 @@ import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius
  */
 // TODO: Predict placement client-side (and handle confirm/denial)
 @RegisterSystem(RegisterMode.AUTHORITY)

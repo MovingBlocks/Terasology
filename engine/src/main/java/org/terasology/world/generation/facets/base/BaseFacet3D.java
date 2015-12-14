@@ -20,7 +20,6 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
 /**
- * @author Immortius
  */
 public class BaseFacet3D implements WorldFacet3D {
 

@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
- * @author Florian
  */
 final class GlobalStoreBuilder {
 

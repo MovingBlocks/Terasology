@@ -23,7 +23,6 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 
 /**
- * @author Immortius
  */
 public class BaseInteractionListener implements InteractionListener {
 

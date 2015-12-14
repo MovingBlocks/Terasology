@@ -32,7 +32,6 @@ import java.lang.reflect.Field;
 /**
  * Metadata on a component class and its fields.
  *
- * @author Immortius
  */
 public class ComponentMetadata<T extends Component> extends ClassMetadata<T, ComponentFieldMetadata<T, ?>> {
 
@@ -73,6 +72,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
         }
     }
 
+    @Override
     protected <U> ComponentFieldMetadata<T, U> createField(Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         return new ComponentFieldMetadata<>(this, field, copyStrategy, factory, false);
     }

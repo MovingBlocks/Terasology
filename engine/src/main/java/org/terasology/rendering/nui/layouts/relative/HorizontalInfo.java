@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layouts.relative;
 import org.terasology.rendering.nui.HorizontalAlign;
 
 /**
- * @author Immortius
  */
 public class HorizontalInfo {
     private HorizontalAlign target;

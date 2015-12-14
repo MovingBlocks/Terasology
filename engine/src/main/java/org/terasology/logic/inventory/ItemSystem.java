@@ -26,7 +26,6 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemSystem extends BaseComponentSystem {

@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class ProtobufSerializationContext implements SerializationContext {
 
@@ -199,7 +198,7 @@ public class ProtobufSerializationContext implements SerializationContext {
     }
 
     @Override
-    public <T> PersistedData create(T data, Class<T> type) {
+    public <T> PersistedData create(T data, Class<? extends T> type) {
         TypeHandler<T> handler = (TypeHandler<T>) library.getHandlerFor(type);
         return handler.serialize(data, this);
     }

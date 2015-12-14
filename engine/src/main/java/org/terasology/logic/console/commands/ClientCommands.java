@@ -26,7 +26,6 @@ import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
 /**
- * @author Immortius, Limeth
  */
 @RegisterSystem
 public class ClientCommands extends BaseComponentSystem {

@@ -24,8 +24,6 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import java.util.Objects;
 
 /**
- * @author Immortius
- * @author synopia
  */
 public class UITextEntry<T> extends UIText {
     private static final Logger logger = LoggerFactory.getLogger(UITextEntry.class);
@@ -52,6 +50,7 @@ public class UITextEntry<T> extends UIText {
         super.onDraw(canvas);
     }
 
+    @Override
     public void onLoseFocus() {
         super.onLoseFocus();
         try {

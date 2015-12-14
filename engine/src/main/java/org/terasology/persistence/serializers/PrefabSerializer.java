@@ -43,7 +43,6 @@ import java.util.Optional;
  * It is also possible to set whether entity ids will be handled or ignored - if ignored then deserialized entities will
  * be given new ids.
  *
- * @author Immortius
  */
 public class PrefabSerializer {
     private static final Logger logger = LoggerFactory.getLogger(PrefabSerializer.class);

@@ -27,7 +27,6 @@ import java.util.Arrays;
  * Its elements are in the range 0 - 15 and it increases memory efficiency by storing two elements per byte.
  * It can further reduce memory consumption through sparse memory allocation.
  *
- * @author Manuel Brotz
  */
 public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 

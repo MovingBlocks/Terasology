@@ -19,7 +19,6 @@ package org.terasology.world.chunks;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public interface Chunk extends ManagedChunk, RenderableChunk {

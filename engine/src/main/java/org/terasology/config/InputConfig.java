@@ -18,7 +18,6 @@ package org.terasology.config;
 import org.terasology.context.Context;
 
 /**
- * @author Immortius
  */
 public class InputConfig {
 

@@ -23,7 +23,6 @@ import java.util.NoSuchElementException;
 /**
  * A circular/cyclic/ring buffer. Adding elements is allowed only at the end of the buffer. 
  * Removing elements can be done through {@link #popFirst()} and {@link #popLast()} or {@link #remove(int)}.
- * @author Immortius
  */
 public final class CircularBuffer<T> extends AbstractList<T> {
     private final T[] buffer;

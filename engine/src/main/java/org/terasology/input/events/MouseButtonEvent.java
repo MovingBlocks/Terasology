@@ -32,6 +32,7 @@ public class MouseButtonEvent extends ButtonEvent {
         this.button = button;
     }
 
+    @Override
     public ButtonState getState() {
         return state;
     }

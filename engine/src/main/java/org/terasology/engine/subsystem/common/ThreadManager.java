@@ -18,7 +18,6 @@ package org.terasology.engine.subsystem.common;
 import org.terasology.module.sandbox.API;
 
 /**
- * @author Immortius
  */
 @API
 public interface ThreadManager {

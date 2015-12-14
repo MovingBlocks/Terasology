@@ -52,8 +52,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius
- * @author Benjamin Glatzel
  */
 public class GLSLMaterial extends BaseMaterial {
 

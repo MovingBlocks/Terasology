@@ -50,7 +50,6 @@ import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
- * @author Immortius
  */
 public class OpenGLSkeletalMesh extends SkeletalMesh {
 

@@ -23,7 +23,6 @@ import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.ImmutableVector2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -41,7 +40,6 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
  *
- * @author synopia
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;

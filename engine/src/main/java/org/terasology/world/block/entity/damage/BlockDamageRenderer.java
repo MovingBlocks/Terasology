@@ -56,7 +56,6 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class BlockDamageRenderer extends BaseComponentSystem implements RenderSystem {

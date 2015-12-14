@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class OggStreamingSoundFormat extends AbstractAssetFileFormat<StreamingSoundData> {

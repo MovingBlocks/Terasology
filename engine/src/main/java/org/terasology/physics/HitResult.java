@@ -23,7 +23,6 @@ import org.terasology.math.geom.Vector3i;
 /**
  * A HitResult holds the result of a ray-trace.
  *
- * @author Immortius
  */
 public class HitResult {
     private boolean hit;

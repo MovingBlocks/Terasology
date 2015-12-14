@@ -24,7 +24,6 @@ import org.terasology.math.TeraMath;
  * <br><br>
  * This implementation rounds float parameters to the closest integer value. Use it in combination
  * with BrownianNoise at lacunarity = 2.0.
- * @author Martin Steiger
  */
 public class DiscreteWhiteNoise extends WhiteNoise {
 

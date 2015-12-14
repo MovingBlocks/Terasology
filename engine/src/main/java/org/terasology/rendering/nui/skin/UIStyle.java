@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.VerticalAlign;
 
 /**
- * @author Immortius
  */
 public class UIStyle {
     private TextureRegion background;

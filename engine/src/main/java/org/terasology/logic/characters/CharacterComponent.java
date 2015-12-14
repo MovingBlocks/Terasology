@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.characters;
 
-import org.terasology.math.QuaternionUtil;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -30,7 +28,6 @@ import org.terasology.network.Replicate;
 /**
  * Information common to characters (the physical body of players and creatures)
  *
- * @author Immortius
  */
 public final class CharacterComponent implements Component {
     /**
@@ -100,7 +97,7 @@ public final class CharacterComponent implements Component {
 
     public Vector3f getLookDirection() {
         Vector3f result = Direction.FORWARD.getVector3f();
-        QuaternionUtil.quatRotate(getLookRotation(), result, result);
+        getLookRotation().rotate(result, result);
         return result;
     }
 }

@@ -24,7 +24,6 @@ import org.terasology.math.Region3i;
  * This event is fired once a player finished a selection using an item with a BlockSelectionComponent. The item used
  * is included in the event.
  *
- * @author synopia
  */
 @API
 public class ApplyBlockSelectionEvent implements Event {

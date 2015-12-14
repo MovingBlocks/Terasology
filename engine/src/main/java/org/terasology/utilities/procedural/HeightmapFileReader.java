@@ -31,7 +31,6 @@ import java.math.RoundingMode;
 /**
  * Reads a heightmap encoded in a textfile
  *
- * @author Nym Traveel
  */
 public final class HeightmapFileReader {
 

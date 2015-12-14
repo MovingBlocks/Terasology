@@ -36,7 +36,6 @@ import java.util.List;
 /**
  * Importer for Wavefront obj files. Supports core obj mesh data
  *
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {

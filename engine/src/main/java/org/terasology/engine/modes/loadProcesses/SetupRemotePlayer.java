@@ -23,7 +23,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 
 /**
- * @author Immortius
  */
 public class SetupRemotePlayer extends SingleStepLoadProcess {
 

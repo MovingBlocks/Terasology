@@ -212,6 +212,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     }
 
     private class DecayerOfActivityLargestExecutionTime implements TObjectDoubleProcedure<String> {
+        @Override
         public boolean execute(String activityName, double executionTime) {
             spikeData.put(activityName, executionTime * DECAY_RATE);
             return true;
@@ -221,6 +222,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private class UpdaterOfActivityExecutionTimeTotalAndSpikeData implements TObjectLongProcedure<String> {
         double latestSpike;
 
+        @Override
         public boolean execute(String activityName, long latestExecutionTime) {
             runningExecutionTotals.adjustOrPutValue(activityName, latestExecutionTime, latestExecutionTime);
             latestSpike = spikeData.get(activityName);
@@ -232,6 +234,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     }
 
     private class UpdaterOfActivityAllocatedMemoryTotal implements TObjectLongProcedure<String> {
+        @Override
         public boolean execute(String activityName, long latestAllocatedMemory) {
             runningAllocationTotals.adjustOrPutValue(activityName, latestAllocatedMemory, latestAllocatedMemory);
             return true;
@@ -239,6 +242,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     }
 
     private class RemoverFromTotalOfActivityExpiredExecutionTimeValue implements TObjectLongProcedure<String> {
+        @Override
         public boolean execute(String activityName, long expiredExecutionTime) {
             runningExecutionTotals.adjustValue(activityName, -expiredExecutionTime);
             return true;
@@ -247,6 +251,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
 
     private class RemoverFromTotalOfActivityExpiredAllocatedMemoryValue implements TObjectLongProcedure<String> {
+        @Override
         public boolean execute(String activityName, long expiredAllocatedMemory) {
             runningAllocationTotals.adjustValue(activityName, -expiredAllocatedMemory);
             return true;
@@ -267,6 +272,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             return this;
         }
 
+        @Override
         public boolean execute(String activityName, long total) {
             if (total > 0) {
                 activityToMeanMap.put(activityName, total * factor);

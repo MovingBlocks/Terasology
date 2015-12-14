@@ -21,7 +21,6 @@ import org.terasology.engine.SimpleUri;
 /**
  * Summary information on a world.
  *
- * @author Immortius
  */
 public class WorldInfo {
 

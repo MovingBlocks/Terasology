@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.databinding;
 
 /**
- * @author Immortius
  */
 public abstract class ReadOnlyBinding<T> implements Binding<T> {
 

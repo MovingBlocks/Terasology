@@ -23,7 +23,6 @@ import org.terasology.input.InputType;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * @author Immortius
  */
 @RegisterBindButton(id = "toolbarPrev", description = "Previous Toolbar Item", mode = ActivateMode.PRESS)
 @DefaultBinding(type = InputType.MOUSE_WHEEL, id = -1)

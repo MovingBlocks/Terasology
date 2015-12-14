@@ -22,7 +22,6 @@ import java.util.EnumSet;
  * EnumMap for storing primitive booleans against each enum value.
  * Values default to false
  *
- * @author Immortius
  */
 public class EnumBooleanMap<ENUM extends Enum<ENUM>> {
     private EnumSet<ENUM> store;

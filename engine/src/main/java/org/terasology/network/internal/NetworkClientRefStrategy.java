@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.internal.DefaultRefStrategy;
 import org.terasology.network.NetworkComponent;
 
 /**
- * @author Immortius
  */
 public class NetworkClientRefStrategy extends DefaultRefStrategy {
 

@@ -22,7 +22,6 @@ import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.internal.BlockPrefabManager;
 
 /**
- * @author Immortius
  */
 public class ProcessBlockPrefabs extends SingleStepLoadProcess {
 

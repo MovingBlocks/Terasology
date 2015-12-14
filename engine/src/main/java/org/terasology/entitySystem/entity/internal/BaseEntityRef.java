@@ -27,7 +27,6 @@ import org.terasology.persistence.serializers.EntitySerializer;
 import java.util.Collections;
 
 /**
- * @author Immortius
  */
 public abstract class BaseEntityRef extends EntityRef {
 

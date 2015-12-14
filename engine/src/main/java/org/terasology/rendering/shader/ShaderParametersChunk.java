@@ -19,11 +19,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 
 import java.util.Optional;
@@ -33,46 +33,46 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 /**
  * Shader parameters for the Chunk shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveIntens = 2.0f;
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveIntensFalloff = 0.85f;
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveSize = 0.1f;
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveSizeFalloff = 1.25f;
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveSpeed = 0.1f;
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveSpeedFalloff = 0.95f;
-    @EditorRange(min = 0.0f, max = 5.0f)
+    @Range(min = 0.0f, max = 5.0f)
     public float waterOffsetY;
 
-    @EditorRange(min = 0.0f, max = 2.0f)
+    @Range(min = 0.0f, max = 2.0f)
     public float waveOverallScale = 1.0f;
 
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     float waterRefraction = 0.04f;
-    @EditorRange(min = 0.0f, max = 0.1f)
+    @Range(min = 0.0f, max = 0.1f)
     float waterFresnelBias = 0.01f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     float waterFresnelPow = 2.5f;
-    @EditorRange(min = 1.0f, max = 100.0f)
+    @Range(min = 1.0f, max = 100.0f)
     float waterNormalBias = 10.0f;
-    @EditorRange(min = 0.0f, max = 1.0f)
+    @Range(min = 0.0f, max = 1.0f)
     float waterTint = 0.24f;
 
-    @EditorRange(min = 0.0f, max = 1024.0f)
+    @Range(min = 0.0f, max = 1024.0f)
     float waterSpecExp = 200.0f;
 
-    @EditorRange(min = 0.0f, max = 0.5f)
+    @Range(min = 0.0f, max = 0.5f)
     float parallaxBias = 0.05f;
-    @EditorRange(min = 0.0f, max = 0.50f)
+    @Range(min = 0.0f, max = 0.50f)
     float parallaxScale = 0.05f;
 
+    @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
 

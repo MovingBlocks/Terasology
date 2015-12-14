@@ -29,10 +29,8 @@ import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class CreateWorldEntity extends SingleStepLoadProcess {
 

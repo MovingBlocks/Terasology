@@ -25,7 +25,6 @@ import org.terasology.world.generation.WorldFacet3D;
  * A base class for sparse (map-based)
  * implementations of {@link WorldFacet3D}.
  *
- * @author Martin Steiger
  */
 public abstract class SparseFacet3D implements WorldFacet3D {
 

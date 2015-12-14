@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * @author Immortius
  */
 public class BlockTile extends Asset<TileData> {
     private BufferedImage image;

@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public interface InventoryManager {
 

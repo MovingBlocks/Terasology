@@ -22,7 +22,6 @@ import org.terasology.input.device.KeyboardDevice;
 import java.util.Queue;
 
 /**
- * @author Immortius
  */
 public class NullKeyboardDevice implements KeyboardDevice {
 

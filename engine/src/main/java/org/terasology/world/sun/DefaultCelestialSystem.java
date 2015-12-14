@@ -33,7 +33,6 @@ import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 /**
  * A base class that fires events at
  * different times of the day.
- * @author Martin Steiger
  */
 public class DefaultCelestialSystem extends BaseComponentSystem implements CelestialSystem, UpdateSubscriberSystem {
 

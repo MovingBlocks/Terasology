@@ -32,7 +32,6 @@ import java.util.Set;
 /**
  * The common behaviour of all clients - whether local or remote
  *
- * @author Immortius
  */
 public abstract class AbstractClient implements Client {
 
@@ -118,7 +117,7 @@ public abstract class AbstractClient implements Client {
 
         String name = preferredName;
         int nextSuffix = 2;
-        while(usedNames.contains(name)) {
+        while (usedNames.contains(name)) {
             name = preferredName + nextSuffix;
             nextSuffix++;
         }

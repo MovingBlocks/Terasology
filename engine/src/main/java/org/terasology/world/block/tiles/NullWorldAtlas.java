@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector2f;
 /**
  * Dummy implementation of WorldAtlas
  *
- * @author Martin Steiger
  */
 public class NullWorldAtlas implements WorldAtlas {
 

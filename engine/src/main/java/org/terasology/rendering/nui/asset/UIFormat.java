@@ -64,7 +64,6 @@ import java.util.Set;
 /**
  * The UILoader handles loading UI widgets from json format files.
  *
- * @author Immortius
  */
 @RegisterAssetFileFormat
 public class UIFormat extends AbstractAssetFileFormat<UIData> {
@@ -170,7 +169,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
             UIWidget element = elementMetadata.newInstance();
             if (id != null) {
-                FieldMetadata fieldMetadata = elementMetadata.getField(ID_FIELD);
+                FieldMetadata<?, ?> fieldMetadata = elementMetadata.getField(ID_FIELD);
                 if (fieldMetadata == null) {
                     logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
                 } else {
@@ -200,7 +199,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                         if (List.class.isAssignableFrom(field.getType())) {
                             Type contentType = ReflectionUtil.getTypeParameter(field.getField().getGenericType(), 0);
                             if (contentType != null) {
-                                List result = Lists.newArrayList();
+                                List<Object> result = Lists.newArrayList();
                                 JsonArray list = jsonObject.getAsJsonArray(field.getSerializationName());
                                 for (JsonElement item : list) {
                                     result.add(context.deserialize(item, contentType));
@@ -222,7 +221,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
             // Deserialize contents and layout hints
             if (UILayout.class.isAssignableFrom(elementMetadata.getType())) {
-                UILayout layout = (UILayout) element;
+                UILayout<LayoutHint> layout = (UILayout<LayoutHint>) element;
 
                 Class<? extends LayoutHint> layoutHintType = (Class<? extends LayoutHint>)
                         ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);

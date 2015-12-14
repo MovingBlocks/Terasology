@@ -40,7 +40,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HealthSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -50,6 +49,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     @In
     private org.terasology.engine.Time time;
 
+    @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
@@ -62,15 +62,25 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
             }
 
             int healAmount = 0;
-            while (time.getGameTimeInMs() >= health.nextRegenTick) {
-                healAmount++;
-                health.nextRegenTick = health.nextRegenTick + (long) (1000 / health.regenRate);
-            }
+            healAmount = regenerateHealth(health, healAmount);
 
-            if (healAmount > 0) {
-                checkHeal(entity, healAmount, entity, health);
-                entity.saveComponent(health);
-            }
+            checkHealed(entity, health, healAmount);
+        }
+    }
+
+    private int regenerateHealth(HealthComponent health, int healAmount) {
+        int newHeal = healAmount;
+        while (time.getGameTimeInMs() >= health.nextRegenTick) {
+            newHeal++;
+            health.nextRegenTick = health.nextRegenTick + (long) (1000 / health.regenRate);
+        }
+        return newHeal;
+    }
+
+    private void checkHealed(EntityRef entity, HealthComponent health, int healAmount) {
+        if (healAmount > 0) {
+            checkHeal(entity, healAmount, entity, health);
+            entity.saveComponent(health);
         }
     }
 

@@ -19,7 +19,6 @@ import org.terasology.monitoring.Activity;
 
 /**
  * An activity that does nothing when it is closed.
- * @author Immortius
  */
 public class NullActivity implements Activity {
     @Override

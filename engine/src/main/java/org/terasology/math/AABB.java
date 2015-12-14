@@ -36,7 +36,6 @@ import com.google.common.base.Objects;
  * An axis-aligned bounding box. Provides basic support for inclusion
  * and intersection tests.
  *
- * @author Benjamin Glatzel
  */
 public final class AABB {
 
@@ -403,6 +402,7 @@ public final class AABB {
         return false;
     }
 
+    @Override
     public int hashCode() {
         return Objects.hashCode(min, max);
     }

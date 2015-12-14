@@ -24,7 +24,6 @@ import org.terasology.monitoring.ThreadMonitor;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * @author Immortius
  */
 final class TaskProcessor<T extends Task> implements Runnable {
 

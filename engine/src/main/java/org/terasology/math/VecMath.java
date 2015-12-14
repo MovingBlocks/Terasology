@@ -20,10 +20,13 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * TODO Type description
- * @author Martin Steiger
+ * Some utilities for compatibility with VecMath.
  */
 public final class VecMath {
+
+    private VecMath() {
+        // no instances
+    }
 
     public static Vector3f from(javax.vecmath.Vector3f v) {
         return new Vector3f(v.x, v.y, v.z);
@@ -41,7 +44,4 @@ public final class VecMath {
         return new javax.vecmath.Quat4f(v.x, v.y, v.z, v.w);
     }
 
-    private VecMath() {
-
-    }
 }

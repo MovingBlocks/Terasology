@@ -17,9 +17,7 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.Side;
 
-import java.util.List;
 import java.util.Map;
 
 public class InventoryAccessComponent implements Component {

@@ -21,7 +21,6 @@ import org.terasology.reflection.metadata.FieldMetadata;
 /**
  * Interface for providing a method to more tightly control when a field should be replicated.
  *
- * @author Immortius
  */
 public interface ReplicationCheck {
 
@@ -31,5 +30,5 @@ public interface ReplicationCheck {
      * @param toOwner Whether the component is being replicated to the owner or not
      * @return Whether to replicate the field
      */
-    boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner);
+    boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner);
 }

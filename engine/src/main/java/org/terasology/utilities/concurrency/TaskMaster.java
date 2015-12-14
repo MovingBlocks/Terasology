@@ -31,7 +31,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Immortius
  */
 public final class TaskMaster<T extends Task> {
     private static final Logger logger = LoggerFactory.getLogger(TaskMaster.class);
@@ -124,7 +123,7 @@ public final class TaskMaster<T extends Task> {
         if (!running) {
             executorService = Executors.newFixedThreadPool(threads);
             for (int i = 0; i < threads; ++i) {
-                executorService.execute(new TaskProcessor(name + "-" + i, taskQueue));
+                executorService.execute(new TaskProcessor<>(name + "-" + i, taskQueue));
             }
             running = true;
         }

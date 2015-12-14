@@ -30,7 +30,6 @@ import java.util.List;
 /**
  * Allows an entity to store items.
  *
- * @author Immortius
  */
 @ForceBlockActive
 public final class InventoryComponent implements Component, ReplicationCheck {
@@ -51,7 +50,7 @@ public final class InventoryComponent implements Component, ReplicationCheck {
     }
 
     @Override
-    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+    public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return !privateToOwner || toOwner;
     }
 }

@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 /**
- * @author Immortius
  */
 public interface NUIManager extends ComponentSystem, FocusManager {
 
@@ -90,8 +89,10 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     ClassLibrary<UIWidget> getWidgetMetadataLibrary();
 
+    @Override
     void setFocus(UIWidget element);
 
+    @Override
     UIWidget getFocus();
 
     boolean isReleasingMouse();

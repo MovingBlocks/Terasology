@@ -25,7 +25,6 @@ import org.terasology.entitySystem.event.ConsumableEvent;
 /**
  * This event is sent to an entity to allow modification and cancellation of healing.
  *
- * @author Immortius
  */
 public class BeforeHealEvent implements ConsumableEvent {
     private int baseHeal;

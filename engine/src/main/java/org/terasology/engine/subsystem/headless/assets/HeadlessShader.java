@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.subsystem.headless.assets;
 
-import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.shader.Shader;

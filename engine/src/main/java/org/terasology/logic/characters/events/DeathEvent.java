@@ -20,7 +20,6 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**
- * @author Immortius
  */
 @OwnerEvent
 public class DeathEvent implements Event {

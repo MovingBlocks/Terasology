@@ -24,7 +24,6 @@ import org.terasology.rendering.assets.texture.Texture;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class FontDataBuilder {
 

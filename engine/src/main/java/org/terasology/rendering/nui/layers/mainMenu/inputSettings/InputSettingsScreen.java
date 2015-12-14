@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -27,7 +28,7 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
@@ -60,7 +61,6 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * @author Immortius
  */
 public class InputSettingsScreen extends CoreScreenLayer {
 
@@ -146,7 +146,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 VerticalHint.create().fixedHeight(48).alignTopRelativeTo("title", VerticalAlign.BOTTOM));
         layout.addWidget(area,
                 HorizontalHint.create().fixedWidth(640).center(),
-                VerticalHint.create().alignTopRelativeTo("subtitle", VerticalAlign.BOTTOM).alignBottomRelativeTo("footer", VerticalAlign.TOP, 48));
+                VerticalHint.create().alignTopRelativeTo("subtitle", VerticalAlign.BOTTOM, 16).alignBottomRelativeTo("footer", VerticalAlign.TOP, 48));
         layout.addWidget(footerGrid,
                 HorizontalHint.create().center().fixedWidth(400),
                 VerticalHint.create().fixedHeight(48).alignBottom(48));

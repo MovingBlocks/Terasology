@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.layouts;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;

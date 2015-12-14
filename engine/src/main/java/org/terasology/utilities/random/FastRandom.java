@@ -20,7 +20,6 @@ import org.terasology.module.sandbox.API;
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
  *
- * @author Benjamin Glatzel
  */
 @API
 public class FastRandom extends Random {
@@ -49,6 +48,7 @@ public class FastRandom extends Random {
      *
      * @return Random value
      */
+    @Override
     public int nextInt() {
         seed++;
         seed ^= (seed << 21);

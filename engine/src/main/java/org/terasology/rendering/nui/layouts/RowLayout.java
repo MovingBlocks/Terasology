@@ -21,7 +21,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Immortius
  */
 public class RowLayout extends CoreLayout<RowLayoutHint> {
 
@@ -66,6 +65,12 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
         if (hint != null) {
             hints.put(widget, hint);
         }
+    }
+
+    @Override
+    public void removeWidget(UIWidget widget) {
+        contents.remove(widget);
+        hints.remove(widget);
     }
 
     @Override

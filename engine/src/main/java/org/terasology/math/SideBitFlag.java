@@ -28,7 +28,6 @@ import java.util.Set;
 /**
  * Utility class for representing a set of sides as a byte
  *
- * @author Marcin Sciesinski
  */
 public final class SideBitFlag {
     private static TObjectByteMap<Side> sideBits = new TObjectByteHashMap<>();

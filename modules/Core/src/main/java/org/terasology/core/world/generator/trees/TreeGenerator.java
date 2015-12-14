@@ -23,7 +23,6 @@ import org.terasology.world.chunks.CoreChunk;
 /**
  * Object generators are used to generate objects like trees etc.
  *
- * @author Benjamin Glatzel
  */
 public interface TreeGenerator {
 

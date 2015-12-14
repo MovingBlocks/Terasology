@@ -46,7 +46,6 @@ import java.util.regex.Pattern;
 import static org.reflections.ReflectionUtils.getAllFields;
 
 /**
- * @author synopia
  *
  * Provides properties of a given object using annotations.
  *
@@ -229,7 +228,7 @@ public class PropertyProvider {
     private class OneOfEnumPropertyFactory implements PropertyFactory<OneOf.Enum> {
         @Override
         public Property create(Object target, final FieldMetadata<Object, ?> fieldMetadata, String id, OneOf.Enum info) {
-            Class cls = fieldMetadata.getType();
+            Class<?> cls = fieldMetadata.getType();
             Object[] items = cls.getEnumConstants();
             UIDropdown dropdown = new UIDropdown();
             dropdown.bindOptions(new DefaultBinding(Arrays.asList(items)));

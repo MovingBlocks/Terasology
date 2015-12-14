@@ -23,7 +23,6 @@ import java.util.List;
 /**
  * A composite node aka node with children. Provides methods to manipulate the children list.
  *
- * @author synopia
  */
 @API
 public abstract class CompositeNode extends Node {

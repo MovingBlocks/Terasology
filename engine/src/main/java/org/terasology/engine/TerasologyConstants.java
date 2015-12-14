@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * @author Immortius
  */
 public final class TerasologyConstants {
     public static final String ENTITY_DATA_FILE = "entity.dat";

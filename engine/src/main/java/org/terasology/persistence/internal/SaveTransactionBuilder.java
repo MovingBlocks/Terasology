@@ -28,7 +28,6 @@ import java.util.concurrent.locks.Lock;
 /**
  * Utility class for creating {@link SaveTransaction} instances.
  *
- * @author Florian
  */
 class SaveTransactionBuilder {
     private final Lock worldDirectoryWriteLock;

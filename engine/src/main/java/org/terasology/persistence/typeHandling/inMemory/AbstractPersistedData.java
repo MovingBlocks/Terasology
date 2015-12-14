@@ -23,7 +23,6 @@ import org.terasology.persistence.typeHandling.PersistedDataMap;
 import java.nio.ByteBuffer;
 
 /**
- * @author Immortius
  */
 public abstract class AbstractPersistedData implements PersistedData {
 

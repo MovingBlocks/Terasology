@@ -15,12 +15,11 @@
  */
 package org.terasology.rendering.assets.atlas;
 
-import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2i;
 
 import java.util.List;
 
 /**
- * @author Immortius
  */
 public class AtlasDefinition {
 

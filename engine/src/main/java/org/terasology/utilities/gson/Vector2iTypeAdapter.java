@@ -21,12 +21,12 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.terasology.math.Vector2i;
+
+import org.terasology.math.geom.Vector2i;
 
 import java.lang.reflect.Type;
 
 /**
- * @author Immortius
  */
 public class Vector2iTypeAdapter implements JsonDeserializer<Vector2i> {
     @Override

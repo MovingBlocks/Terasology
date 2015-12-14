@@ -20,12 +20,11 @@ import java.util.Set;
 
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleMetadataReader;
+import org.terasology.module.ModuleMetadataJsonAdapter;
 import org.terasology.module.ModuleRegistry;
 
 /**
  * TODO Type description
- * @author Martin Steiger
  */
 public interface ModuleManager {
 
@@ -35,5 +34,5 @@ public interface ModuleManager {
 
     ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary);
 
-    ModuleMetadataReader getModuleMetadataReader();
+    ModuleMetadataJsonAdapter getModuleMetadataReader();
 }

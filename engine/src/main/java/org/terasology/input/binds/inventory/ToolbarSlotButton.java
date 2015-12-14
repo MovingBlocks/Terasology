@@ -19,7 +19,6 @@ package org.terasology.input.binds.inventory;
 import org.terasology.input.BindButtonEvent;
 
 /**
- * @author Immortius
  */
 public class ToolbarSlotButton extends BindButtonEvent {
     private int slot;

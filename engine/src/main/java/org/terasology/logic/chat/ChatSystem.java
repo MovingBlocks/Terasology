@@ -27,7 +27,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ChatButton;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -44,7 +43,6 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 
 /**
- * @author Immortius
  */
 @RegisterSystem
 public class ChatSystem extends BaseComponentSystem {
@@ -53,9 +51,6 @@ public class ChatSystem extends BaseComponentSystem {
     private static final ResourceUrn CHAT_UI = new ResourceUrn("engine:chat");
     private static final ResourceUrn CONSOLE_UI = new ResourceUrn("engine:console");
     private static final ResourceUrn MINICHAT_UI = new ResourceUrn("engine:minichatOverlay");
-
-    @In
-    private Console console;
 
     @In
     private EntityManager entityManager;
@@ -166,7 +161,6 @@ public class ChatSystem extends BaseComponentSystem {
         }
 
         ClientComponent senderClientComponent = sender.getComponent(ClientComponent.class);
-        DisplayNameComponent senderDisplayNameComponent = senderClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
         ClientComponent targetClientComponent = targetClient.getComponent(ClientComponent.class);
         DisplayNameComponent targetDisplayNameComponent = targetClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
         String targetMessage = FontColor.getColored("*whispering* ", ConsoleColors.ERROR)

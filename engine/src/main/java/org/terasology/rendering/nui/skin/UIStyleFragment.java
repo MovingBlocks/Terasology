@@ -27,7 +27,6 @@ import org.terasology.rendering.nui.VerticalAlign;
 import java.util.Optional;
 
 /**
- * @author Immortius
  */
 public class UIStyleFragment {
     // This field is intentionally null, so it can represent no change (null), empty and a background

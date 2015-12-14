@@ -27,7 +27,6 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
 /**
- * @author Immortius
  */
 public class InitialiseGraphics extends SingleStepLoadProcess {
 

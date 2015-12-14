@@ -55,7 +55,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Immortius
  */
 public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 

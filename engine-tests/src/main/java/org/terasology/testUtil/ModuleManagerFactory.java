@@ -29,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
- * @author Immortius
  */
 public final class ModuleManagerFactory {
     private ModuleManagerFactory() {

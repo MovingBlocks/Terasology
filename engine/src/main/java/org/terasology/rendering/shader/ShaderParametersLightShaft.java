@@ -16,13 +16,13 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.editor.EditorRange;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.LwjglRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -30,17 +30,16 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * Shader parameters for the Light Shaft shader program.
  *
- * @author Benjamin Glatzel
  */
 public class ShaderParametersLightShaft extends ShaderParametersBase {
 
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float density = 1.0f;
-    @EditorRange(min = 0.0f, max = 0.01f)
+    @Range(min = 0.0f, max = 0.01f)
     private float exposure = 0.0075f;
-    @EditorRange(min = 0.0f, max = 10.0f)
+    @Range(min = 0.0f, max = 10.0f)
     private float weight = 8.0f;
-    @EditorRange(min = 0.0f, max = 0.99f)
+    @Range(min = 0.0f, max = 0.99f)
     private float decay = 0.95f;
 
     @Override

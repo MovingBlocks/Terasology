@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @author Immortius
  */
 public class GameInfo {
 
@@ -36,6 +35,7 @@ public class GameInfo {
         this.timestamp = timestamp;
     }
 
+    @Override
     public String toString() {
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         return manifest.getTitle() + "\n" + format.format(timestamp);
