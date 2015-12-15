@@ -81,7 +81,7 @@ public abstract class ItemCell extends CoreWidget {
             public Mesh get() {
                 BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
                 if (blockItemComp != null && blockItemComp.blockFamily != null) {
-                    return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
+                    return blockItemComp.blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
                 }
                 return null;
             }

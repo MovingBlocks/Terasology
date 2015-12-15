@@ -69,7 +69,7 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
                 public Mesh get() {
                     BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
                     if (blockItemComp != null && blockItemComp.blockFamily != null) {
-                        return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
+                        return blockItemComp.blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
                     }
                     return null;
                 }

@@ -20,6 +20,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
+import java.math.RoundingMode;
+
 /**
  * A HitResult holds the result of a ray-trace.
  *
@@ -51,7 +53,7 @@ public class HitResult {
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
         //This is the block were the hitPoint is inside:
-        this.blockPosition = new Vector3i(hitPoint, 0.5f);
+        this.blockPosition = new Vector3i(hitPoint, RoundingMode.HALF_UP);
         this.worldHit = false;
     }
 
