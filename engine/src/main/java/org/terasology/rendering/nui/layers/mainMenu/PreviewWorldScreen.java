@@ -15,12 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -38,7 +32,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -65,6 +58,12 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 
 /**
  * Shows a preview of the generated world and provides some
@@ -117,11 +116,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         super.onOpened();
 
         SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
-        Name moduleName = worldGenUri.getModuleName();
 
         try {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(moduleName);
+            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
             if (result.isSuccess()) {
                 subContext = new ContextImpl(context);
                 CoreRegistry.setContext(subContext);
