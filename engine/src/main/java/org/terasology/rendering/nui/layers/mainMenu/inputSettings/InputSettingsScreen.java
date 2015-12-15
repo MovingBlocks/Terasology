@@ -39,6 +39,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -46,7 +47,6 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.layouts.relative.HorizontalHint;
 import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
 import org.terasology.rendering.nui.layouts.relative.VerticalHint;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UIImage;
@@ -80,7 +80,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-
         ColumnLayout mainLayout = new ColumnLayout();
         mainLayout.setHorizontalSpacing(8);
         mainLayout.setVerticalSpacing(8);
@@ -190,9 +189,13 @@ public class InputSettingsScreen extends CoreScreenLayer {
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
-        UIInputBind inputBind = new UIInputBind();
+        UIInputBindButton inputBind = new UIInputBindButton();
+        inputBind.setManager(getManager());
+        inputBind.setDescription(bind.description());
         inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
-        UIInputBind secondaryInputBind = new UIInputBind();
+        UIInputBindButton secondaryInputBind = new UIInputBindButton();
+        secondaryInputBind.setManager(getManager());
+        inputBind.setDescription(bind.description());
         secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
         layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
     }
@@ -202,18 +205,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         super.setContents(contents);
         find("mouseSensitivity", UISlider.class).bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
         find("mouseYAxisInverted", UICheckbox.class).bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
-        find("reset", UIButton.class).subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                config.getInput().reset(context);
-            }
-        });
-        find("close", UIButton.class).subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
+        WidgetUtil.trySubscribe(this,"close", button -> getManager().popScreen());
     }
 
     @Override
