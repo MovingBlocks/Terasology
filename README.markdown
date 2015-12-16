@@ -62,7 +62,7 @@ If you include the "CheatsForAll" module in config for a server then you can byp
 
 Alternatively you can run from source and supply parameters for game configuration. For instance here is how you would launch with ThroughoutTheAges active, our most complete setting. Keep in mind the module list may change any day, check in the game client what modules highlight with TTA selected to confirm.
 
-`gradlew -PworldGen="WoodAndStone:throughoutTheAges" -PextraModules="AlterationEffects,AnotherWorld,AnotherWorldPlants,ClimateConditions,CopperAndBronze,Core,Crops,Fences,Fluid,Genome,GrowingFlora,Hunger,Journal,MarkovChains,MultiBlock,PlantPack,NameGenerator,Seasons,StructuralResources,ThroughoutTheAges,WoodAndStone,Workstation" startServer`
+`gradlew -PworldGen="WoodAndStone:throughoutTheAges" -PextraModules="AlterationEffects,AnotherWorld,AnotherWorldPlants,ClimateConditions,CopperAndBronze,Core,Crops,Fences,Fluid,Genome,GrowingFlora,Hunger,Journal,MarkovChains,MultiBlock,PlantPack,NameGenerator,Seasons,StructuralResources,ThroughoutTheAges,WoodAndStone,Workstation" server`
 
 This will all become easier as the project and especially the launcher mature further :-)
 
@@ -154,13 +154,13 @@ Run any commands in the project root directory
 * Download / clone the source from GitHub
 * To prepare for IntelliJ run: `gradlew idea`
 * To prepare for Eclipse run: `gradlew eclipse`
-* To run from the command line: `gradlew run`
-* Start a headless server: `gradlew start` (stores data in /terasology-server - the Gradle command blocks until server is killed)
+* To run from the command line: `gradlew game`
+* Start a headless server: `gradlew server` (stores data in /terasology-server - the Gradle command blocks until server is killed)
 * For more tasks: `gradlew tasks`
 
 You may also need to tweak IDE settings further for your convenience, in particular for Eclipse. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
 
-Note that by default stored data (config, saves, etc) is sent to a user profile directory like Saved Games under Windows. Add `-homedir` to a run configuration or command line execution to use the project dir instead (this is done automatically in some cases including IntelliJ and `gradlew run`)
+Note that by default stored data (config, saves, etc) is sent to a user profile directory like Saved Games under Windows. Add `-homedir` to a run configuration or command line execution to use the project dir instead (this is done automatically in some cases including IntelliJ and `gradlew game`)
 
 If you want to pull down the source code for a module you can easily do so via Gradle:
 
@@ -282,7 +282,7 @@ Contributors
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb, Gimpanse / shartte, Flo_K, emanuele3d
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, ChrisK, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe, Chridal
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon / LinusVanElswijk, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42, IWhoI, Calinou, Limeth, KokPok, unpause, qreeves, Rui914, OvermindDL1, prestidigitator, chessandgo, gtugablue, sk0ut, Netopya, andrelago13
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon / LinusVanElswijk, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42, IWhoI, Calinou, Limeth, KokPok, unpause, qreeves, Rui914, OvermindDL1, prestidigitator, chessandgo, gtugablue, sk0ut, Netopya, andrelago13, sergiomieic, MaloJaffre 
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro, Halamix2
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
 * World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias
