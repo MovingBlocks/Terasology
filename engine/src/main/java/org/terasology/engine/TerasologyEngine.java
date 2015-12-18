@@ -367,7 +367,7 @@ public class TerasologyEngine implements GameEngine {
             changeState(initialState);
 
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             logger.error("Uncaught exception, attempting clean game shutdown", e);
             throw e;
         } finally {
