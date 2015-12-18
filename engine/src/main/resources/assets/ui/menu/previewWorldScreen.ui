@@ -45,7 +45,7 @@
                     },
                     "position-bottom" : {
                         "target" : "TOP",
-                        "widget" : "close",
+                        "widget" : "actionsRow",
                         "offset" : 16
                     }
                 }
@@ -65,9 +65,9 @@
                         "offset" : 8
                     },
                     "position-bottom" : {
-                        "target" : "TOP",
-                        "widget" : "close",
-                        "offset" : 24
+                        "target" : "BOTTOM",
+                        "widget" : "container",
+                        "offset" : 8
                     }
                 },
                 "contents" : [
@@ -170,11 +170,23 @@
                 ]
             },
             {
-                "type" : "UIButton",
-                "text" : "${engine:menu#back}",
-                "id" : "close",
+                "type" : "RowLayout",
+                "id" : "actionsRow",
+                "horizontalSpacing" : 4,
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "text" : "${engine:menu#start-game}",
+                        "id" : "play"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "${engine:menu#back}",
+                        "id" : "close"
+                    }
+                ],
                 "layoutInfo" : {
-                    "width" : 128,
+                    "width" : 400,
                     "height" : 32,
                     "position-horizontal-center" : {},
                     "position-bottom" : {

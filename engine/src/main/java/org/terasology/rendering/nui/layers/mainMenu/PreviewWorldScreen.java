@@ -23,15 +23,21 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.game.GameManifest;
 import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
+import org.terasology.network.NetworkMode;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -42,6 +48,7 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
@@ -58,6 +65,8 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.time.WorldTime;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -88,6 +97,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private Config config;
 
     @In
+    private GameEngine gameEngine;
+
+    @In
     private Context context;
 
     private WorldGenerator worldGenerator;
@@ -99,7 +111,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private UIText seed;
 
     private PreviewGenerator previewGen;
-
+    private Binding<String> worldNameBinding = new DefaultBinding<>("Undefined World");
 
     private Context subContext;
     private ModuleEnvironment environment;
@@ -108,8 +120,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private boolean triggerUpdate;
 
-    public PreviewWorldScreen() {
-    }
+    private boolean loadingAsServer;
 
     @Override
     public void onOpened() {
@@ -250,6 +261,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             });
         }
 
+        WidgetUtil.trySubscribe(this, "play", this::startGame);
+
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
@@ -267,6 +280,41 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (seed != null) {
             seed.bindText(binding);
         }
+    }
+
+    public void bindWorldName(Binding<String> binding) {
+        worldNameBinding = binding;
+    }
+
+    public void setLoadingAsServer(boolean loadingAsServer) {
+        this.loadingAsServer = loadingAsServer;
+    }
+
+    private void startGame(UIWidget playButton) {
+        GameManifest gameManifest = new GameManifest();
+
+        gameManifest.setTitle(worldNameBinding.get());
+        gameManifest.setSeed(seed.getText());
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+        if (!result.isSuccess()) {
+            MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            if (errorMessagePopup != null) {
+                errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+            }
+            return;
+        }
+        for (Module module : result.getModules()) {
+            gameManifest.addModule(module.getId(), module.getVersion());
+        }
+
+        float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
+        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
+        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
+                (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenUri);
+        gameManifest.addWorld(worldInfo);
+
+        gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
     }
 
     private void updatePreview() {
@@ -373,5 +421,3 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 }
-
-

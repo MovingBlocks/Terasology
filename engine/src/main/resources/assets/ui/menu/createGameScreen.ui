@@ -42,12 +42,38 @@
                     "family" : "left-label",
                     "contents" : [
                         {
-                            "type" : "UILabel",
-                            "text" : "${engine:menu#game-name}:"
+                            "type" : "RowLayout",
+                            "horizontalSpacing" : 16,
+                            "contents" : [
+                                {
+                                    "type" : "UILabel",
+                                    "text" : "${engine:menu#game-name}:",
+                                    "layoutInfo" : {
+                                        "relativeWidth" : 0.6
+                                    }
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "text" : "${engine:menu#world-seed}:"
+                                }
+                            ]
                         },
                         {
-                            "type" : "UIText",
-                            "id" : "worldName"
+                            "type" : "RowLayout",
+                            "horizontalSpacing" : 16,
+                            "contents" : [
+                                {
+                                    "type" : "UIText",
+                                    "id" : "worldName",
+                                    "layoutInfo" : {
+                                        "relativeWidth" : 0.6
+                                    }
+                                },
+                                {
+                                    "type" : "UIText",
+                                    "id" : "seed"
+                                }
+                            ]
                         },
                         {
                             "type" : "UISpace",
@@ -89,46 +115,20 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#world-seed}:"
-                        },
-                        {
-                            "type" : "RowLayout",
-                            "horizontalSpacing" : 16,
-                            "contents" : [
-                                {
-                                    "type" : "UIText",
-                                    "id" : "seed",
-                                    "layoutInfo" : {
-                                        "relativeWidth" : 0.7
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "text" : "${engine:menu#world-config-preview}",
-                                    "id" : "previewSeed"
-                                }
-                            ]
-                        },
-                        {
-                            "type" : "UISpace",
-                            "size" : [1, 16]
-                        },
-                        {
-                            "type" : "UILabel",
                             "text" : "${engine:menu#select-world-gen} (${engine:menu#select-world-gen-info}):"
                         },
                         {
                             "type" : "RowLayout",
                             "horizontalSpacing" : 16,
                             "contents" : [
-	                            {
-		                            "type" : "UIDropdown",
-		                            "id" : "worldGenerator",
-		                            "layoutInfo" : {
+                                {
+                                    "type" : "UIDropdown",
+                                    "id" : "worldGenerator",
+                                    "layoutInfo" : {
                                         "relativeWidth" : 0.7
                                     }
-		                        }
-	                        ]
+                                }
+                            ]
                         }
                     ]
                 },
@@ -150,8 +150,8 @@
                 "contents" : [
                     {
                         "type" : "UIButton",
-                        "text" : "${engine:menu#start-game}",
-                        "id" : "play"
+                        "text" : "${engine:menu#world-config-preview}",
+                        "id" : "preview"
                     },
                     {
                         "type" : "UIButton",

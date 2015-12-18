@@ -103,7 +103,7 @@ public class CreateGameScreen extends CoreScreenLayer {
 
         final UIText seed = find("seed", UIText.class);
         if (seed != null) {
-            seed.setText(new FastRandom().nextString(32));
+            seed.setText(new FastRandom().nextString(16));
         }
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
@@ -210,43 +210,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "play", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (worldGenerator.getSelection() == null) {
-                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                    if (errorMessagePopup != null) {
-                        errorMessagePopup.setMessage("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
-                    }
-                } else {
-                    GameManifest gameManifest = new GameManifest();
-
-                    gameManifest.setTitle(worldName.getText());
-                    gameManifest.setSeed(seed.getText());
-                    DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-                    ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-                    if (!result.isSuccess()) {
-                        MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                        if (errorMessagePopup != null) {
-                            errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
-                        }
-                        return;
-                    }
-                    for (Module module : result.getModules()) {
-                        gameManifest.addModule(module.getId(), module.getVersion());
-                    }
-
-                    float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
-                    WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                            (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
-                    gameManifest.addWorld(worldInfo);
-
-                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
-                }
-            }
-        });
-
-        UIButton previewSeed = find("previewSeed", UIButton.class);
+        UIButton previewSeed = find("preview", UIButton.class);
         ReadOnlyBinding<Boolean> worldGeneratorSelected = new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
@@ -254,12 +218,14 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         };
         previewSeed.bindEnabled(worldGeneratorSelected);
-        WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "preview", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 PreviewWorldScreen screen = getManager().pushScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
                 if (screen != null) {
                     screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
+                    screen.bindWorldName(BindHelper.bindBeanProperty("text", worldName, String.class));
+                    screen.setLoadingAsServer(loadingAsServer);
                 }
             }
         });
@@ -356,10 +322,6 @@ public class CreateGameScreen extends CoreScreenLayer {
         });
 
         return gameplayModules;
-    }
-
-    public boolean isLoadingAsServer() {
-        return loadingAsServer;
     }
 
     public void setLoadingAsServer(boolean loadingAsServer) {
