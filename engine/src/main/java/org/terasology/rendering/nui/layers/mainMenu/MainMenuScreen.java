@@ -54,7 +54,7 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                UIScreenLayer screen = getManager().pushScreen("engine:joinGameScreen");
+                getManager().pushScreen("engine:joinGameScreen");
             }
         });
         WidgetUtil.trySubscribe(this, "settings", new ActivateEventListener() {
@@ -67,13 +67,6 @@ public class MainMenuScreen extends CoreScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 engine.shutdown();
-            }
-        });
-
-        WidgetUtil.trySubscribe(this, "migtest", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:migTestScreen");
             }
         });
     }
