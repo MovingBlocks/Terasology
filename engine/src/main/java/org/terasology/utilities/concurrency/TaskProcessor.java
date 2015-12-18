@@ -18,6 +18,7 @@ package org.terasology.utilities.concurrency;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.GameThread;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 
@@ -57,6 +58,10 @@ final class TaskProcessor<T extends Task> implements Runnable {
             } catch (RuntimeException e) {
                 ThreadMonitor.addError(e);
                 logger.error("Error in thread {}", Thread.currentThread().getName(), e);
+            } catch (Error e) {
+                GameThread.asynch(() -> {
+                    throw e;  // re-throw on game thread to terminate the entire application
+                });
             }
         }
         logger.debug("Thread shutdown safely");
