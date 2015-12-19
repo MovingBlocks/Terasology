@@ -17,8 +17,6 @@ package org.terasology.config;
 
 import org.terasology.context.Context;
 
-/**
- */
 public class InputConfig {
 
     private BindsConfig binds = new BindsConfig();
@@ -39,9 +37,13 @@ public class InputConfig {
 
     public void reset(Context context) {
         binds.setBinds(BindsConfig.createDefault(context));
-        InputConfig defaultConfig = new InputConfig();
-        setMouseSensitivity(defaultConfig.mouseSensitivity);
-        setMouseYAxisInverted(defaultConfig.mouseYAxisInverted);
+        
+        Config defaultConfig = new Config();
+        defaultConfig.loadDefaults();
+        InputConfig defaultInputConfig = defaultConfig.getInput();
+
+        setMouseSensitivity(defaultInputConfig.mouseSensitivity);
+        setMouseYAxisInverted(defaultInputConfig.mouseYAxisInverted);
     }
 
     public boolean isMouseYAxisInverted() {
