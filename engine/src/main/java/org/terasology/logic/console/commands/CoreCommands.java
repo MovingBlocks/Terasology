@@ -216,6 +216,11 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
+    @Command(shortDescription = "Shows a ui screen")
+    public String showScreen(@CommandParam("uri") String uri) {
+        return nuiManager.pushScreen(uri) != null ? "Success" : "Not found";
+    }
+
     @Command(shortDescription = "Reloads a ui screen")
     public String reloadScreen(@CommandParam("ui") String ui) {
         Optional<UIElement> uiData = assetManager.getAsset(ui, UIElement.class);
