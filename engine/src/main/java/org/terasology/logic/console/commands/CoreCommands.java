@@ -216,7 +216,7 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Shows a ui screen")
+    @Command(shortDescription = "Shows a ui screen", helpText = "Can be used for debugging/testing, example: \"showScreen migTestScreen\"")
     public String showScreen(@CommandParam("uri") String uri) {
         return nuiManager.pushScreen(uri) != null ? "Success" : "Not found";
     }
