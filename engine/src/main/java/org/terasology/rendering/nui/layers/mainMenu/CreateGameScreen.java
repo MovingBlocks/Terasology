@@ -15,8 +15,10 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,6 @@ import org.terasology.config.ModuleConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
@@ -34,7 +35,6 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -56,10 +56,8 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -253,6 +251,8 @@ public class CreateGameScreen extends CoreScreenLayer {
         GameManifest gameManifest = new GameManifest();
         gameManifest.setTitle(worldName.getText());
         gameManifest.setSeed(seedValue.getText());
+        // also bind the value so that changes in other menus are reflected in the text box
+        seedValue.bindText(BindHelper.bindBeanProperty("seed", gameManifest, String.class));
         for (Module module : result.getModules()) {
             gameManifest.addModule(module.getId(), module.getVersion());
         }

@@ -137,22 +137,6 @@ public final class EnvironmentSwitchHandler {
         moduleAwareAssetTypeManager.switchEnvironment(environment);
     }
 
-
-    public void handleSwitchToPreviewEnvironment(Context context, ModuleEnvironment environment) {
-        cheapAssetManagerUpdate(context, environment);
-        ComponentLibrary library = new ComponentLibrary(context);
-        context.put(ComponentLibrary.class, library);
-
-        registerComponents(library, environment);
-    }
-
-    public void handleSwitchBackFromPreviewEnvironment(Context context) {
-        // The newly created ComponentLibrary instance cannot be invalidated in context
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        cheapAssetManagerUpdate(context, environment);
-    }
-
-
     public void handleSwitchToEmptyEnivronment(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         cheapAssetManagerUpdate(context, environment);
