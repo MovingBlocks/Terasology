@@ -15,6 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -22,10 +28,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
@@ -34,12 +38,10 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.game.GameManifest;
 import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.network.NetworkMode;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -47,8 +49,8 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
@@ -65,14 +67,6 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.time.WorldTime;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Callable;
 
 /**
  * Shows a preview of the generated world and provides some
@@ -111,10 +105,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private UIText seed;
 
     private PreviewGenerator previewGen;
-    private Binding<String> worldNameBinding = new DefaultBinding<>("Undefined World");
-
-    private Context subContext;
-    private ModuleEnvironment environment;
 
     private Texture texture;
 
@@ -122,37 +112,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private boolean loadingAsServer;
 
+    private GameManifest gameManifest;
+
+    private ModuleEnvironment environment;
+
     @Override
     public void onOpened() {
         super.onOpened();
-
-        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
-
-        try {
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            if (result.isSuccess()) {
-                subContext = new ContextImpl(context);
-                CoreRegistry.setContext(subContext);
-                environment = moduleManager.loadEnvironment(result.getModules(), false);
-                subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
-                EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-                environmentSwitchHandler.handleSwitchToPreviewEnvironment(subContext, environment);
-                genTexture();
-
-                worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
-                worldGenerator.setWorldSeed(seed.getText());
-                previewGen = new FacetLayerPreview(environment, worldGenerator);
-                configureProperties();
-            } else {
-                logger.error("Could not resolve modules for: {}", worldGenUri);
-            }
-
-        } catch (Exception e) {
-            // if errors happen, don't enable this feature
-            worldGenerator = null;
-            logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
-        }
     }
 
     private void genTexture() {
@@ -196,7 +162,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
         }
 
-        ComponentLibrary compLib = subContext.get(ComponentLibrary.class);
+        ComponentLibrary compLib = context.get(ComponentLibrary.class);
 
         for (String label : params.keySet()) {
 
@@ -221,11 +187,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void onClosed() {
 
-        CoreRegistry.setContext(context);
-
         if (environment != null) {
             EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-            environmentSwitchHandler.handleSwitchBackFromPreviewEnvironment(subContext);
+            environmentSwitchHandler.handleSwitchBackFromPreviewEnvironment(context);
             environment.close();
             environment = null;
         }
@@ -261,14 +225,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             });
         }
 
-        WidgetUtil.trySubscribe(this, "play", this::startGame);
-
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "play", button -> startGame());
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
     }
 
     @Override
@@ -276,45 +234,46 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         return false;
     }
 
-    public void bindSeed(Binding<String> binding) {
-        if (seed != null) {
-            seed.bindText(binding);
-        }
+    public void setGameManifest(GameManifest gameManifest) {
+        this.gameManifest = gameManifest;
+        seed.bindText(BindHelper.bindBeanProperty("seed", gameManifest, String.class));
+
+        loadEnvironment();
     }
 
-    public void bindWorldName(Binding<String> binding) {
-        worldNameBinding = binding;
+    private void loadEnvironment() {
+        SimpleUri worldGenUri = gameManifest.getWorlds().iterator().next().getWorldGenerator(); // use first world only
+
+        try {
+            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+            if (!result.isSuccess()) {
+                throw new IllegalStateException("Impossible!");
+            }
+            environment = moduleManager.loadEnvironment(result.getModules(), true);
+            context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
+            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+            environmentSwitchHandler.handleSwitchToPreviewEnvironment(context, environment);
+
+            worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
+            worldGenerator.setWorldSeed(gameManifest.getSeed());
+            previewGen = new FacetLayerPreview(environment, worldGenerator);
+            configureProperties();
+        } catch (Exception e) {
+            // if errors happen, don't enable this feature
+            worldGenerator = null;
+            logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
+        }
+        genTexture();
     }
 
     public void setLoadingAsServer(boolean loadingAsServer) {
         this.loadingAsServer = loadingAsServer;
     }
 
-    private void startGame(UIWidget playButton) {
-        GameManifest gameManifest = new GameManifest();
-
-        gameManifest.setTitle(worldNameBinding.get());
-        gameManifest.setSeed(seed.getText());
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-        if (!result.isSuccess()) {
-            MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            if (errorMessagePopup != null) {
-                errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
-            }
-            return;
-        }
-        for (Module module : result.getModules()) {
-            gameManifest.addModule(module.getId(), module.getVersion());
-        }
-
-        float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
-        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
-        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenUri);
-        gameManifest.addWorld(worldInfo);
-
-        gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+    private void startGame() {
+        gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer)
+                ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
     }
 
     private void updatePreview() {

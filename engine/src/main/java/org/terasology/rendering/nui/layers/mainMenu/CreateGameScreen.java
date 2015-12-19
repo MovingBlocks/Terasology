@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -80,11 +81,13 @@ public class CreateGameScreen extends CoreScreenLayer {
     private Config config;
 
     private boolean loadingAsServer;
+    private UIText worldName;
+    private UIText seedValue;
 
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
-        final UIText worldName = find("worldName", UIText.class);
+        worldName = find("worldName", UIText.class);
         if (worldName != null) {
             int gameNum = 1;
             for (GameInfo info : GameProvider.getSavedGames()) {
@@ -101,9 +104,9 @@ public class CreateGameScreen extends CoreScreenLayer {
             worldName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
         }
 
-        final UIText seed = find("seed", UIText.class);
-        if (seed != null) {
-            seed.setText(new FastRandom().nextString(16));
+        seedValue = find("seed", UIText.class);
+        if (seedValue != null) {
+            seedValue.setText(new FastRandom().nextString(16));
         }
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
@@ -223,8 +226,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             public void onActivated(UIWidget button) {
                 PreviewWorldScreen screen = getManager().pushScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
                 if (screen != null) {
-                    screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
-                    screen.bindWorldName(BindHelper.bindBeanProperty("text", worldName, String.class));
+                    screen.setGameManifest(createManifest());
                     screen.setLoadingAsServer(loadingAsServer);
                 }
             }
@@ -236,6 +238,31 @@ public class CreateGameScreen extends CoreScreenLayer {
                 getManager().pushScreen("engine:selectModsScreen");
             }
         });
+    }
+
+    private GameManifest createManifest() {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+        if (!result.isSuccess()) {
+            MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            if (errorMessagePopup != null) {
+                errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+            }
+            throw new IllegalStateException("Invalid Module Selection");
+        }
+        GameManifest gameManifest = new GameManifest();
+        gameManifest.setTitle(worldName.getText());
+        gameManifest.setSeed(seedValue.getText());
+        for (Module module : result.getModules()) {
+            gameManifest.addModule(module.getId(), module.getVersion());
+        }
+
+        float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
+        long time = (long) (WorldTime.DAY_LENGTH * timeOffset);
+        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
+        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(), time, worldGenUri);
+        gameManifest.addWorld(worldInfo);
+        return gameManifest;
     }
 
     @Override
