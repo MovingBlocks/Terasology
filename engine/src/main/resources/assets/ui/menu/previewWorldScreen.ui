@@ -81,9 +81,23 @@
                         "family" : "description",
                         "contents" : [
                             {
-                                "type" : "UILabel",
-                                "text" : "${engine:menu#preview-zoom-factor}:",
-                                "id" : "zoomLabel",
+                                "type" : "RowLayout",
+                                "horizontalSpacing" : 16,
+                                "id" : "zoomSeedLabels",
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "${engine:menu#preview-zoom-factor}:",
+                                        "id" : "zoomLabel",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.4
+                                        }
+                                    },
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "${engine:menu#world-seed}:"
+                                    }
+                                ],
                                 "layoutInfo" : {
                                     "use-content-height" : true,
                                     "position-horizontal-center" : {},
@@ -93,42 +107,32 @@
                                 }
                             },
                             {
-                                "type" : "UISlider",
-                                "id" : "zoomSlider",
-                                "minimum" : 1.0,
-                                "range" : 7.0,
-                                "increment" : 1.0,
-                                "precision" : 0,
+                                "type" : "RowLayout",
+                                "horizontalSpacing" : 16,
+                                "id" : "zoomSeedRow",
+                                "contents" : [
+                                    {
+                                        "type" : "UISlider",
+                                        "id" : "zoomSlider",
+                                        "minimum" : 1.0,
+                                        "range" : 7.0,
+                                        "increment" : 1.0,
+                                        "precision" : 0,
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.4
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIText",
+                                        "id" : "seed"
+                                    }
+                                ],
                                 "layoutInfo" : {
                                     "use-content-height" : true,
                                     "position-horizontal-center" : {},
                                     "position-top" : {
                                         "target" : "BOTTOM",
-                                        "widget" : "zoomLabel"
-                                    }
-                                }
-                            },
-                            {
-                                "type" : "UILabel",
-                                "id" : "seedLabel",
-                                "text" : "${engine:menu#world-seed}:",
-                                "layoutInfo" : {
-                                    "use-content-height" : true,
-                                    "position-top" : {
-                                        "target" : "BOTTOM",
-                                        "widget" : "zoomSlider",
-                                        "offset" : 8
-                                    }
-                                }
-                            },
-                            {
-                                "type" : "UIText",
-                                "id" : "seed",
-                                "layoutInfo" : {
-                                    "use-content-height" : true,
-                                    "position-top" : {
-                                        "target" : "BOTTOM",
-                                        "widget" : "seedLabel"
+                                        "widget" : "zoomSeedLabels"
                                     }
                                 }
                             },
@@ -144,7 +148,7 @@
                                     "position-top" : {
                                         "target" : "BOTTOM",
                                         "offset" : 8,
-                                        "widget" : "seed"
+                                        "widget" : "zoomSeedRow"
                                     },
                                     "position-bottom" : {
                                         "target" : "TOP",
