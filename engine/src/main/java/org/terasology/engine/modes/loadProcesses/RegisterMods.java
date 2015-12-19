@@ -61,42 +61,7 @@ public class RegisterMods extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        if (applyModulesThread != null) {
-            if (!applyModulesThread.isAlive()) {
-                if (oldEnvironment != null) {
-                    oldEnvironment.close();
-                }
-                return true;
-            }
-            return false;
-        } else {
-            ModuleManager moduleManager = context.get(ModuleManager.class);
-            List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
-            for (NameVersion moduleInfo : gameManifest.getModules()) {
-                moduleIds.add(moduleInfo.getName());
-            }
-
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(moduleIds);
-            if (result.isSuccess()) {
-                oldEnvironment = moduleManager.getEnvironment();
-                ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
-
-                for (Module moduleInfo : env.getModulesOrderedByDependencies()) {
-                    logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
-                }
-
-                EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-                applyModulesThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
-                applyModulesThread.start();
-                return false;
-            } else {
-                logger.warn("Missing at least one required module or dependency: {}", moduleIds);
-                context.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
-                return true;
-            }
-        }
-
+        return true;
     }
 
     @Override

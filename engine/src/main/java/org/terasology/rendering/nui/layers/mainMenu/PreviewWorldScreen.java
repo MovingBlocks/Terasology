@@ -38,8 +38,11 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.game.GameManifest;
 import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
@@ -67,6 +70,8 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+
+import com.google.common.collect.Lists;
 
 /**
  * Shows a preview of the generated world and provides some
@@ -187,13 +192,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void onClosed() {
 
-        if (environment != null) {
-            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-            environmentSwitchHandler.handleSwitchBackFromPreviewEnvironment(context);
-            environment.close();
-            environment = null;
-        }
-
         previewGen.close();
 
         WorldConfigurator worldConfig = worldGenerator.getConfigurator();
@@ -226,7 +224,17 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "play", button -> startGame());
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", button -> backToMenu());
+    }
+
+    private void backToMenu() {
+        if (environment != null) {
+            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+            environmentSwitchHandler.handleSwitchToEmptyEnivronment(context);
+            environment.close();
+            environment = null;
+        }
+        getManager().popScreen();
     }
 
     @Override
@@ -245,15 +253,24 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         SimpleUri worldGenUri = gameManifest.getWorlds().iterator().next().getWorldGenerator(); // use first world only
 
         try {
+            List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
+            for (NameVersion moduleInfo : gameManifest.getModules()) {
+                moduleIds.add(moduleInfo.getName());
+            }
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+            ResolutionResult result = resolver.resolve(moduleIds);
             if (!result.isSuccess()) {
                 throw new IllegalStateException("Impossible!");
             }
             environment = moduleManager.loadEnvironment(result.getModules(), true);
+            for (Module moduleInfo : environment.getModulesOrderedByDependencies()) {
+                logger.info("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
+            }
+
             context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
+
             EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-            environmentSwitchHandler.handleSwitchToPreviewEnvironment(context, environment);
+            environmentSwitchHandler.handleSwitchToGameEnvironment(context);
 
             worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
             worldGenerator.setWorldSeed(gameManifest.getSeed());
