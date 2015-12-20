@@ -195,7 +195,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
         UIInputBindButton secondaryInputBind = new UIInputBindButton();
         secondaryInputBind.setManager(getManager());
-        inputBind.setDescription(bind.description());
+        secondaryInputBind.setDescription(bind.description());
         secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
         layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
     }
@@ -206,7 +206,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         find("mouseSensitivity", UISlider.class).bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
         find("mouseYAxisInverted", UICheckbox.class).bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
         WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
-        WidgetUtil.trySubscribe(this,"close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
     }
 
     @Override
