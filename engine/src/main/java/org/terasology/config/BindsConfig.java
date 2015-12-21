@@ -182,13 +182,11 @@ public final class BindsConfig {
 
     private void addBind(Name moduleName, Class<?> buttonEvent, RegisterBindButton info) {
         List<Input> defaultInputs = Lists.newArrayList();
-        for (Annotation annotation : buttonEvent.getAnnotations()) {
-            if (annotation instanceof DefaultBinding) {
-                DefaultBinding defaultBinding = (DefaultBinding) annotation;
-                Input input = defaultBinding.type().getInput(defaultBinding.id());
-                if (!data.values().contains(input)) {
-                    defaultInputs.add(input);
-                }
+        for (Annotation annotation : buttonEvent.getAnnotationsByType(DefaultBinding.class)) {
+            DefaultBinding defaultBinding = (DefaultBinding) annotation;
+            Input input = defaultBinding.type().getInput(defaultBinding.id());
+            if (!data.values().contains(input)) {
+                defaultInputs.add(input);
             }
         }
         SimpleUri bindUri = new SimpleUri(moduleName, info.id());
