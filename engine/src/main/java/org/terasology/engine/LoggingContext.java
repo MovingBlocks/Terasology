@@ -16,6 +16,9 @@
 
 package org.terasology.engine;
 
+import org.slf4j.MDC;
+import org.terasology.engine.modes.GameState;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -26,10 +29,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
-
-import org.slf4j.MDC;
-import org.terasology.engine.modes.GameState;
 
 /**
  * Configures the underlying logback logging framework.
@@ -74,7 +77,7 @@ public final class LoggingContext {
         System.setProperty(LOG_FILE_FOLDER, pathString);
 
         try {
-            deleteLogFiles(logFileFolder, 5 * 24 * 60 * 60); // JAVA8: Duration.ofDays(5).getSeconds();
+            deleteLogFiles(logFileFolder, ((int) Duration.ofDays(5).getSeconds()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -117,8 +120,7 @@ public final class LoggingContext {
 
                 try {
                     Date folderDate = TIMESTAMP_FORMAT.parse(relPath);
-                    // JAVA8: long ageInSecs = folderDate.toInstant().until(Instant.now(), ChronoUnit.SECONDS);
-                    long ageInSecs = (new Date().getTime() - folderDate.getTime()) / 1000;
+                    long ageInSecs = folderDate.toInstant().until(Instant.now(), ChronoUnit.SECONDS);
 
                     return ageInSecs > maxAgeInSecs ? FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
                 } catch (ParseException e) {
