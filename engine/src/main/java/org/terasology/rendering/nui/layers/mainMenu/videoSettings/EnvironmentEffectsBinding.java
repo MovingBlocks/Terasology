@@ -32,7 +32,7 @@ public class EnvironmentEffectsBinding implements Binding<EnvironmentalEffects> 
     public EnvironmentalEffects get() {
         if (config.isAnimateGrass() && !config.isAnimateWater()) {
             return EnvironmentalEffects.LOW;
-        } else if (config.isAnimateWater() && config.isAnimateWater()) {
+        } else if (config.isAnimateGrass() && config.isAnimateWater()) {
             return EnvironmentalEffects.HIGH;
         } else {
             return EnvironmentalEffects.OFF;
