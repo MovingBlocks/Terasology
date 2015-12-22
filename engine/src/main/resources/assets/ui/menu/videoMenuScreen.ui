@@ -41,7 +41,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "family": "heading-input",
+                            "family": "subheading",
                             "text": " ${engine:menu#video-graphic-settings}: "
                         },
                         {
@@ -99,7 +99,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "family": "heading-input",
+                            "family": "subheading",
                             "text": " ${engine:menu#camera-details-settings}: "
                         },
                         {
@@ -214,7 +214,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "family": "heading-input",
+                            "family": "subheading",
                             "text": " ${engine:menu#video-high-end-settings}: "
                         },
                         {
