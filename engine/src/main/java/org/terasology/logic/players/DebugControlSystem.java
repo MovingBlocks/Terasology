@@ -135,6 +135,7 @@ public class DebugControlSystem extends BaseComponentSystem {
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.K:
                     entity.send(new DoDamageEvent(9999, null));
+                    //TODO: Seems to be broken, which is probably not a terrible thing ... remove?
                     break;
                 case Keyboard.KeyId.F6:
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
@@ -159,7 +160,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
 
         switch (event.getKey().getId()) {
-            case Keyboard.KeyId.F1:
+            case Keyboard.KeyId.F2:
                 mouseGrabbed = !mouseGrabbed;
                 DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
                 debugProperties.setVisible(!mouseGrabbed);
