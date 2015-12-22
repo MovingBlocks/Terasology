@@ -63,13 +63,14 @@ public final class BindingScraper {
                 }
             } else {
                 // See if there is a multi-mapping for this button
-                DefaultBindings[] multiBinding = buttonEvent.getAnnotationsByType(DefaultBindings.class);
+                DefaultBindings multiBinding = buttonEvent.getAnnotation(DefaultBindings.class);
 
                 // Annotation math magic. We're expecting a DefaultBindings containing one DefaultBinding pair
-                if (multiBinding != null && multiBinding.length == 1 && multiBinding[0].value().length == 2) {
-                    String primaryKey = InputType.KEY.getInput(multiBinding[0].value()[0].id()).getDisplayName();
-                    String secondaryKey = InputType.KEY.getInput(multiBinding[0].value()[1].id()).getDisplayName();
-                    multiKeys.put(info.category(), "`" + primaryKey + "` OR `" + secondaryKey + "` : " + info.description());
+                if (multiBinding != null && multiBinding.value().length == 2) {
+                    DefaultBinding[] bindings = multiBinding.value();
+                    String primary = InputType.KEY.getInput(bindings[0].id()).getDisplayName();
+                    String secondary = InputType.KEY.getInput(bindings[1].id()).getDisplayName();
+                    multiKeys.put(info.category(), "`" + primary + "` OR `" + secondary + "` : " + info.description());
                 }
             }
         }
