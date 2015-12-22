@@ -86,12 +86,12 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [B] - Show infinite block inventory (requires "BlockPicker" module active)
 * [H] - Hide user interface
 * [T] - Toggle chat interface (effectively a mini-console that only does chat)
-* [`] - Toggle full developer console (the "grave" key, above tab)
 * [Tab] - Auto-completion in the console
 * [Home] - Increase viewing distance
 * [End] - Decrease viewing distance
 * [Escape] - Show/hide the game menu screen
-* [F1] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled)
+* [`] OR [F1] - Toggle full developer console (the "grave" key, usually above tab)
+* [F2] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled)
 * [F3] - Toggle debug mode and information
 * [F5] - Show behavior tree editor
 * [F12] - Take screenshot (goes to /screenshots in game data dir)
@@ -277,7 +277,7 @@ Apologies in advance for any omissions, contact [Cervator](http://forum.terasolo
 Contributors
 --------
 
-(Listed by primary team)
+(Listed by primary team in roughly chronological order)
 
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb, Gimpanse / shartte, Flo_K, emanuele3d
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, ChrisK, Maternal
@@ -285,7 +285,7 @@ Contributors
 * General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon / LinusVanElswijk, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42, IWhoI, Calinou, Limeth, KokPok, unpause, qreeves, Rui914, OvermindDL1, prestidigitator, chessandgo, gtugablue, sk0ut, Netopya, andrelago13, sergiomieic, MaloJaffre 
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro, Halamix2
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
-* World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias
+* World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MatthewPratt, msteiger, Josharias
 
 Soundtrack and Sound Effects
 --------
