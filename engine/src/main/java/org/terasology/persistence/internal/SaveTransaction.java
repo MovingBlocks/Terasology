@@ -18,6 +18,7 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sun.nio.zipfs.ZipFileSystemProvider;
 import gnu.trove.procedure.TLongObjectProcedure;
 import gnu.trove.procedure.TLongProcedure;
 import org.slf4j.Logger;
@@ -367,7 +368,7 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void writeChunkStores() throws IOException {
-        FileSystemProvider zipProvider = getZipFileSystemProvider();
+        FileSystemProvider zipProvider = new ZipFileSystemProvider();
 
         Path chunksPath = storagePathProvider.getWorldTempPath();
         Files.createDirectories(chunksPath);
@@ -425,22 +426,6 @@ public class SaveTransaction extends AbstractTask {
             }
         }
     }
-
-    private FileSystemProvider getZipFileSystemProvider() throws IOException {
-        // This is a little bit of a hack to get around a JAVA 7 bug (hopefully fixed in JAVA 8
-        FileSystemProvider zipProvider = null;
-        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
-            if ("jar".equalsIgnoreCase(provider.getScheme())) {
-                zipProvider = provider;
-            }
-        }
-
-        if (zipProvider == null) {
-            throw new IOException("Zip archive support missing! Unable to save chunks.");
-        }
-        return zipProvider;
-    }
-
 
     /**
      * @return the result if there is one yet or null. This method returns the value of a volatile variable and

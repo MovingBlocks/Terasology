@@ -87,7 +87,7 @@ public class ConsoleScreen extends CoreScreenLayer {
                 StringBuilder messageList = new StringBuilder();
                 for (Message message : console.getMessages()) {
                     messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
-                    messageList.append(Message.NEW_LINE);
+                    messageList.append(Console.NEW_LINE);
                 }
                 return messageList.toString();
             }
@@ -100,15 +100,15 @@ public class ConsoleScreen extends CoreScreenLayer {
         getManager().setFocus(commandLine);
 
         if (!welcomePrinted) {
-            console.addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
-                    Message.NEW_LINE +
-                    "Type 'help' to see a list with available commands or 'help <commandName>' for command details." + Message.NEW_LINE +
-                    "Text parameters do not need quotes, unless containing spaces. No commas between parameters." + Message.NEW_LINE +
-                    "You can use auto-completion by typing a partial command then hitting [tab] - examples:" + Message.NEW_LINE + Message.NEW_LINE +
-                    "gh + [tab] => 'ghost'" + Message.NEW_LINE +
-                    "help gh + [tab] => 'help ghost' (can auto complete commands fed to help)" + Message.NEW_LINE +
-                    "giv + [tab] => 'giveBlock giveItem givePermission' (use [tab] again to cycle between choices)" + Message.NEW_LINE +
-                    "lS + [tab] => 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
+            console.addMessage("Welcome to the wonderful world of Terasology!" + Console.NEW_LINE +
+                    Console.NEW_LINE +
+                    "Type 'help' to see a list with available commands or 'help <commandName>' for command details." + Console.NEW_LINE +
+                    "Text parameters do not need quotes, unless containing spaces. No commas between parameters." + Console.NEW_LINE +
+                    "You can use auto-completion by typing a partial command then hitting [tab] - examples:" + Console.NEW_LINE + Console.NEW_LINE +
+                    "gh + [tab] => 'ghost'" + Console.NEW_LINE +
+                    "help gh + [tab] => 'help ghost' (can auto complete commands fed to help)" + Console.NEW_LINE +
+                    "giv + [tab] => 'giveBlock giveItem givePermission' (use [tab] again to cycle between choices)" + Console.NEW_LINE +
+                    "lS + [tab] => 'listShapes' (camel casing abbreviated commands)" + Console.NEW_LINE);
             welcomePrinted = true;
         }
     }

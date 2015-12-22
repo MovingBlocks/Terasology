@@ -26,6 +26,12 @@ import java.util.List;
  */
 public interface Console {
     /**
+     * A newline constant for the console
+     * JAVA8: consider moving this to the {@link Console} interface as soon as Java 8 is around
+     */
+    String NEW_LINE = "\n";
+
+    /**
      * Registers a {@link org.terasology.logic.console.commandSystem.ConsoleCommand}.
      *
      * @param command
