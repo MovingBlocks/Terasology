@@ -24,7 +24,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.Message;
+import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
@@ -161,7 +161,7 @@ public class ServerCommands extends BaseComponentSystem {
             String line = String.format("%s - %s (%d)", playerText, dnc.description, nc.getNetworkId());
 
             stringBuilder.append(line);
-            stringBuilder.append(Message.NEW_LINE);
+            stringBuilder.append(Console.NEW_LINE);
         }
 
         return stringBuilder.toString();

@@ -25,6 +25,9 @@ import java.util.List;
 /**
  */
 public interface Console {
+
+    String NEW_LINE = "\n";
+
     /**
      * Registers a {@link org.terasology.logic.console.commandSystem.ConsoleCommand}.
      *

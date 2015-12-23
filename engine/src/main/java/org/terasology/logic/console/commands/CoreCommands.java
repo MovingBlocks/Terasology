@@ -37,7 +37,6 @@ import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
@@ -276,8 +275,7 @@ public class CoreCommands extends BaseComponentSystem {
 
             @Override
             public JoinStatus call() throws InterruptedException {
-                JoinStatus joinStatus = networkSystem.join(address, port);
-                return joinStatus;
+                return networkSystem.join(address, port);
             }
         };
 
@@ -374,7 +372,7 @@ public class CoreCommands extends BaseComponentSystem {
 
             for (ConsoleCommand cmd : commands) {
                 if (!msg.toString().isEmpty()) {
-                    msg.append(Message.NEW_LINE);
+                    msg.append(Console.NEW_LINE);
                 }
 
                 msg.append(FontColor.getColored(cmd.getUsage(), ConsoleColors.COMMAND));
@@ -391,21 +389,21 @@ public class CoreCommands extends BaseComponentSystem {
                 StringBuilder msg = new StringBuilder();
 
                 msg.append("=====================================================================================================================");
-                msg.append(Message.NEW_LINE);
+                msg.append(Console.NEW_LINE);
                 msg.append(cmd.getUsage());
-                msg.append(Message.NEW_LINE);
+                msg.append(Console.NEW_LINE);
                 msg.append("=====================================================================================================================");
-                msg.append(Message.NEW_LINE);
+                msg.append(Console.NEW_LINE);
                 if (!cmd.getHelpText().isEmpty()) {
                     msg.append(cmd.getHelpText());
-                    msg.append(Message.NEW_LINE);
+                    msg.append(Console.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(Message.NEW_LINE);
+                    msg.append(Console.NEW_LINE);
                 } else if (!cmd.getDescription().isEmpty()) {
                     msg.append(cmd.getDescription());
-                    msg.append(Message.NEW_LINE);
+                    msg.append(Console.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(Message.NEW_LINE);
+                    msg.append(Console.NEW_LINE);
                 }
 
                 return msg.toString();

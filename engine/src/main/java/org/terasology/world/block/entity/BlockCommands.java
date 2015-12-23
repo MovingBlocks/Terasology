@@ -27,7 +27,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Message;
+import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
@@ -108,7 +108,7 @@ public class BlockCommands extends BaseComponentSystem {
         StringBuilder items = new StringBuilder();
         for (String item : stringItems) {
             if (!items.toString().isEmpty()) {
-                items.append(Message.NEW_LINE);
+                items.append(Console.NEW_LINE);
             }
             items.append(item);
         }
@@ -121,24 +121,24 @@ public class BlockCommands extends BaseComponentSystem {
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         stringBuilder.append("-----------");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(Message.NEW_LINE);
+            stringBuilder.append(Console.NEW_LINE);
         }
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
 
         stringBuilder.append("Available Blocks");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         stringBuilder.append("----------------");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> availableBlocks = sortItems(blockExplorer.getAvailableBlockFamilies());
         for (BlockUri blockUri : availableBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(Message.NEW_LINE);
+            stringBuilder.append(Console.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -149,13 +149,13 @@ public class BlockCommands extends BaseComponentSystem {
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         stringBuilder.append("-----------");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
         for (ResourceUrn uri : sortedUris) {
             stringBuilder.append(uri.toString());
-            stringBuilder.append(Message.NEW_LINE);
+            stringBuilder.append(Console.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -167,13 +167,13 @@ public class BlockCommands extends BaseComponentSystem {
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         stringBuilder.append("-----------------");
-        stringBuilder.append(Message.NEW_LINE);
+        stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> sortedUris = sortItems(blockExplorer.getFreeformBlockFamilies());
         for (BlockUri uri : sortedUris) {
             stringBuilder.append(uri.toString());
-            stringBuilder.append(Message.NEW_LINE);
+            stringBuilder.append(Console.NEW_LINE);
         }
 
         return stringBuilder.toString();

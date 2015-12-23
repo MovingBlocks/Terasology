@@ -91,7 +91,7 @@ public class ChatScreen extends CoreScreenLayer {
                 StringBuilder messageList = new StringBuilder();
                 for (Message msg : console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION)) {
                     messageList.append(msg.getMessage());
-                    messageList.append(Message.NEW_LINE);
+                    messageList.append(Console.NEW_LINE);
                 }
                 return messageList.toString();
             }
