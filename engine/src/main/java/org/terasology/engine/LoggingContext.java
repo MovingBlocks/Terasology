@@ -77,7 +77,7 @@ public final class LoggingContext {
         System.setProperty(LOG_FILE_FOLDER, pathString);
 
         try {
-            deleteLogFiles(logFileFolder, ((int) Duration.ofDays(5).getSeconds()));
+            deleteLogFiles(logFileFolder, Duration.ofDays(5).getSeconds());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,7 +106,7 @@ public final class LoggingContext {
         return loggingPath;
     }
 
-    private static void deleteLogFiles(final Path rootPath, final int maxAgeInSecs) throws IOException {
+    private static void deleteLogFiles(final Path rootPath, final long maxAgeInSecs) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 
             @Override
