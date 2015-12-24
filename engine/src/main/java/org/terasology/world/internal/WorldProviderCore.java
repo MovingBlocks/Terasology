@@ -17,6 +17,7 @@ package org.terasology.world.internal;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
@@ -24,6 +25,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
+import java.math.RoundingMode;
 import java.util.Collection;
 
 /**
@@ -103,6 +105,17 @@ public interface WorldProviderCore {
      * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
      */
     Block setBlock(Vector3i pos, Block type);
+
+    /**
+     * Places a block of a specific type at a given position
+     *
+     * @param pos  The world position to change
+     * @param type The type of the block to set
+     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     */
+    default Block setBlock(Vector3f pos, Block type) {
+        return setBlock(new Vector3i(pos, RoundingMode.HALF_UP), type);
+    }
 
     /**
      * Changes the biome at the given position.
