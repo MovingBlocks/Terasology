@@ -42,7 +42,7 @@
             "text-color": "FFFF00FF",
             "font" : "NotoSans-Bold"
         },
-        "heading-input": {
+        "subheading": {
             "font": "NotoSans-Regular-Medium",
             "text-align-horizontal": "left"
         },

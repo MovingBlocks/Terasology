@@ -88,7 +88,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
-        mainLayout.addWidget(new UILabel("mouseLabel", "heading-input", "Mouse"));
+        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", "Mouse"));
         mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
         mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
 
@@ -158,7 +158,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
             layout.addWidget(new UISpace(new Vector2i(0, 16)));
 
             UILabel categoryHeader = new UILabel(category.displayName());
-            categoryHeader.setFamily("heading-input");
+            categoryHeader.setFamily("subheading");
             layout.addWidget(categoryHeader);
 
             Set<SimpleUri> processedBinds = Sets.newHashSet();
