@@ -12,14 +12,14 @@ ext {
         def option = builder.option(name: 'configuration') {
             map {
                 entry(key: 'active-configuration',
-                        value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
+                        value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml:Terasology CheckStyle')
                 entry(key: 'check-nonjava-files', value: false)
                 entry(key: 'check-test-classes', value: true)
                 entry(key: 'location-0',
                         value: 'CLASSPATH:/sun_checks.xml:The default CheckStyle rules')
                 entry(key: 'location-1',
-                        value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/checkstyle/checkstyle.xml:Terasology CheckStyle')
-                entry(key: 'property-1.samedir', value: 'config/checkstyle')
+                        value: 'PROJECT_RELATIVE:$PROJECT_DIR$/config/metrics/checkstyle/checkstyle.xml:Terasology CheckStyle')
+                entry(key: 'property-1.samedir', value: 'config/metrics/checkstyle')
                 entry(key: 'suppress-errors', value: false)
                 entry(key: 'thirdparty-classpath', value: '')
             }
