@@ -57,9 +57,7 @@ entityDump.txt
 
 # Ignore stuff we extract for use with Terasology
 /natives/
-config/checkstyle
-config/findbugs
-config/pmd
+config/metrics/
 
 # Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
 extensions
