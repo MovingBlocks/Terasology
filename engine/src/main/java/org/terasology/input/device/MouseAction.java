@@ -21,43 +21,24 @@ import org.terasology.math.geom.Vector2i;
 
 /**
  */
-public final class InputAction {
+public final class MouseAction {
     private final Input input;
     private final ButtonState state;
     private final int delta;
-    private final char inputChar;
     private final Vector2i mousePosition;
 
-    public InputAction(Input input, ButtonState state, Vector2i mousePosition) {
+    public MouseAction(Input input, ButtonState state, Vector2i mousePosition) {
         this.mousePosition = mousePosition;
         this.input = input;
         this.state = state;
         this.delta = 0;
-        this.inputChar = '\0';
     }
 
-    public InputAction(Input input, int delta, Vector2i mousePosition) {
+    public MouseAction(Input input, int delta, Vector2i mousePosition) {
         this.mousePosition = mousePosition;
         this.input = input;
         this.state = ButtonState.DOWN;
         this.delta = delta;
-        this.inputChar = '\0';
-    }
-
-    public InputAction(Input input, ButtonState state, char inputChar) {
-        this.mousePosition = null;
-        this.input = input;
-        this.state = state;
-        this.delta = 0;
-        this.inputChar = inputChar;
-    }
-
-    public InputAction(Input input, int delta, char inputChar) {
-        this.mousePosition = null;
-        this.input = input;
-        this.state = ButtonState.DOWN;
-        this.delta = delta;
-        this.inputChar = inputChar;
     }
 
     /**
@@ -88,16 +69,12 @@ public final class InputAction {
         return delta;
     }
 
-    public char getInputChar() {
-        return inputChar;
-    }
-
     public Vector2i getMousePosition() {
         return mousePosition;
     }
 
     @Override
     public String toString() {
-        return "InputAction [" + this.input + " \'" + inputChar + "' (" + state + "), mouse: " + mousePosition + "]";
+        return "InputAction [" + this.input + " \', mouse: " + mousePosition + "]";
     }
 }

@@ -15,6 +15,8 @@
  */
 package org.terasology.input.device;
 
+import java.util.Queue;
+
 import org.terasology.module.sandbox.API;
 import org.terasology.math.geom.Vector2i;
 
@@ -22,6 +24,9 @@ import org.terasology.math.geom.Vector2i;
  */
 @API
 public interface MouseDevice extends InputDevice {
+
+    @Override
+    Queue<MouseAction> getInputQueue();
 
     /**
      * @return The current position of the mouse in screen space

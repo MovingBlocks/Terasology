@@ -16,10 +16,12 @@
 package org.terasology.input.lwjgl;
 
 import com.google.common.collect.Queues;
+
 import org.lwjgl.input.Keyboard;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
 import org.terasology.input.InputType;
-import org.terasology.input.device.InputAction;
+import org.terasology.input.device.KeyboardAction;
 import org.terasology.input.device.KeyboardDevice;
 
 import java.util.Queue;
@@ -33,8 +35,8 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
     }
 
     @Override
-    public Queue<InputAction> getInputQueue() {
-        Queue<InputAction> result = Queues.newArrayDeque();
+    public Queue<KeyboardAction> getInputQueue() {
+        Queue<KeyboardAction> result = Queues.newArrayDeque();
 
         while (Keyboard.next()) {
             ButtonState state;
@@ -43,7 +45,8 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
             } else {
                 state = (Keyboard.getEventKeyState()) ? ButtonState.DOWN : ButtonState.UP;
             }
-            result.add(new InputAction(InputType.KEY.getInput(Keyboard.getEventKey()), state, Keyboard.getEventCharacter()));
+            Input input = InputType.KEY.getInput(Keyboard.getEventKey());
+            result.add(new KeyboardAction(input, state, Keyboard.getEventCharacter()));
         }
 
         return result;

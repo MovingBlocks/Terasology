@@ -27,5 +27,5 @@ public interface InputDevice {
     /**
      * @return A queue of all input actions that have occurred over the last update for this device
      */
-    Queue<InputAction> getInputQueue();
+    Queue<?> getInputQueue();
 }
