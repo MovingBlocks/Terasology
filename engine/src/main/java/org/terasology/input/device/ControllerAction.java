@@ -17,35 +17,35 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.ImmutableVector2f;
 
 /**
  */
-public final class MouseAction {
+public final class ControllerAction {
     private final Input input;
     private final ButtonState state;
-    private final int delta;
-    private final Vector2i mousePosition;
+    private final int controller;
+    private final ImmutableVector2f axis;
 
-    public MouseAction(Input input, ButtonState state, Vector2i mousePosition) {
-        this.mousePosition = mousePosition;
+    public ControllerAction(Input input, ButtonState state, int controller, float axisX, float axisY) {
         this.input = input;
         this.state = state;
-        this.delta = 0;
-    }
-
-    public MouseAction(Input input, int delta, Vector2i mousePosition) {
-        this.mousePosition = mousePosition;
-        this.input = input;
-        this.state = ButtonState.DOWN;
-        this.delta = delta;
+        this.controller = controller;
+        this.axis = new ImmutableVector2f(axisX, axisY);
     }
 
     /**
-     * @return Whether this is an axis action (e.g. a mouse wheel or volume knob)
+     * @return Whether this is an axis action
      */
     public boolean isAxisAction() {
-        return delta != 0;
+        return false;
+    }
+
+    /**
+     * @return the index of the controller that sent the event
+     */
+    public int getController() {
+        return controller;
     }
 
     /**
@@ -62,19 +62,12 @@ public final class MouseAction {
         return state;
     }
 
-    /**
-     * @return For axis actions, the change in value
-     */
-    public int getTurns() {
-        return delta;
-    }
-
-    public Vector2i getMousePosition() {
-        return mousePosition;
+    public ImmutableVector2f getAxisPosition() {
+        return axis;
     }
 
     @Override
     public String toString() {
-        return "MouseAction [" + this.input + ", mouse: " + mousePosition + " (" + state + ")]";
+        return "ControllerAction [" + this.input + ", axis: " + axis + " (" + state + ")]";
     }
 }
