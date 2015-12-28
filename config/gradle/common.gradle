@@ -30,7 +30,7 @@ repositories {
             url alternativeResolutionRepo
         } else {
             // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
-            url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            url "http://artifactoryupgrade.terasology.org:8081/artifactory/virtual-repo-live"
         }
     }
 }
