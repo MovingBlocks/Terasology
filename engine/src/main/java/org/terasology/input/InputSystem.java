@@ -29,7 +29,8 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.input.device.InputAction;
+import org.terasology.input.device.KeyboardAction;
+import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.input.device.nulldevices.NullKeyboardDevice;
@@ -287,7 +288,7 @@ public class InputSystem extends BaseComponentSystem {
         }
 
         //process mouse clicks
-        for (InputAction action : mouse.getInputQueue()) {
+        for (MouseAction action : mouse.getInputQueue()) {
             switch (action.getInput().getType()) {
                 case MOUSE_BUTTON:
                     int id = action.getInput().getId();
@@ -345,12 +346,7 @@ public class InputSystem extends BaseComponentSystem {
                         }
                     }
                     break;
-                case KEY:
-                case CONTROLLER_1:
-                case CONTROLLER_2:
-                case CONTROLLER_3:
-                case CONTROLLER_4:
-                case NONE:
+                default:
                     break;
             }
         }
@@ -363,7 +359,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     private void processKeyboardInput(float delta) {
-        for (InputAction action : keyboard.getInputQueue()) {
+        for (KeyboardAction action : keyboard.getInputQueue()) {
             boolean consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta);
 
             // Update bind
@@ -386,7 +382,6 @@ public class InputSystem extends BaseComponentSystem {
     private void processBindAxis(float delta) {
         for (BindableAxisImpl axis : axisBinds) {
             axis.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
-
                     targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }

@@ -16,7 +16,8 @@
 package org.terasology.input.device.nulldevices;
 
 import com.google.common.collect.Queues;
-import org.terasology.input.device.InputAction;
+
+import org.terasology.input.device.KeyboardAction;
 import org.terasology.input.device.KeyboardDevice;
 
 import java.util.Queue;
@@ -31,7 +32,7 @@ public class NullKeyboardDevice implements KeyboardDevice {
     }
 
     @Override
-    public Queue<InputAction> getInputQueue() {
+    public Queue<KeyboardAction> getInputQueue() {
         return Queues.newArrayDeque();
     }
 }
