@@ -17,35 +17,24 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector2i;
 
 /**
  */
-public final class MouseAction {
+public final class KeyboardAction {
     private final Input input;
     private final ButtonState state;
-    private final int delta;
-    private final Vector2i mousePosition;
+    private final char inputChar;
 
-    public MouseAction(Input input, ButtonState state, Vector2i mousePosition) {
-        this.mousePosition = mousePosition;
+    public KeyboardAction(Input input, ButtonState state, char inputChar) {
         this.input = input;
         this.state = state;
-        this.delta = 0;
+        this.inputChar = inputChar;
     }
 
-    public MouseAction(Input input, int delta, Vector2i mousePosition) {
-        this.mousePosition = mousePosition;
+    public KeyboardAction(Input input, int delta, char inputChar) {
         this.input = input;
         this.state = ButtonState.DOWN;
-        this.delta = delta;
-    }
-
-    /**
-     * @return Whether this is an axis action (e.g. a mouse wheel or volume knob)
-     */
-    public boolean isAxisAction() {
-        return delta != 0;
+        this.inputChar = inputChar;
     }
 
     /**
@@ -62,19 +51,12 @@ public final class MouseAction {
         return state;
     }
 
-    /**
-     * @return For axis actions, the change in value
-     */
-    public int getTurns() {
-        return delta;
-    }
-
-    public Vector2i getMousePosition() {
-        return mousePosition;
+    public char getInputChar() {
+        return inputChar;
     }
 
     @Override
     public String toString() {
-        return "MouseAction [" + this.input + ", mouse: " + mousePosition + " (" + state + ")]";
+        return "KeyboardAction [" + this.input + " '" + inputChar + "' (" + state + ")]";
     }
 }
