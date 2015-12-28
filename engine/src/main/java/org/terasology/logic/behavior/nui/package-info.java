@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.behavior.nui;
 
-import org.lwjgl.input.Keyboard;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
 
-/**
- */
-@RegisterBindButton(id = "behavior_editor", description = "Toggle Behavior editor", category = "behavior")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_F5)
-public class BTEditorButton extends BindButtonEvent {
-}
+@API
+@InputCategory(id = "behavior",
+        displayName = "Behavior"
+        ) package org.terasology.logic.behavior.nui;
+
+import org.terasology.module.sandbox.API;
+import org.terasology.input.InputCategory;
