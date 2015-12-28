@@ -25,7 +25,7 @@ buildscript {
 // This configures what we need to interact with the MovingBlocks Artifactory instance. It is primarily for local use.
 // In Jenkins the Artifactory plugin can supply overrides for the following values
 artifactory {
-    contextUrl = 'http://artifactory.terasology.org/artifactory'
+    contextUrl = 'http://artifactoryupgrade.terasology.org:8081/artifactory'
 
     // This is the target for publishing artifacts. Unless testing locally usually the setting in Jenkins is used
     publish {
