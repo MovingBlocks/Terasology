@@ -15,17 +15,28 @@
  */
 package org.terasology.documentation;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ArrayTable;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
+
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.DefaultBindings;
 import org.terasology.input.Input;
+import org.terasology.input.InputCategory;
 import org.terasology.input.InputType;
 import org.terasology.input.RegisterBindButton;
+import org.terasology.input.events.ButtonEvent;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -45,22 +56,44 @@ public final class BindingScraper {
         ModuleManager moduleManager = ModuleManagerFactory.create();
 
         // Holds normal input mappings where there is only one key
-        TreeBasedTable<String, Input, String> keyTable = TreeBasedTable.create(
-                String.CASE_INSENSITIVE_ORDER,
-                (i1, i2) -> Integer.compare(i1.getId(), i2.getId()));
+        Multimap<InputCategory, String> categories = ArrayListMultimap.create();
+        Multimap<String, Input> keys = ArrayListMultimap.create();
+        Map<String, String> desc = new HashMap<String, String>();
 
-        // Holds input mappings that have both a primary and secondary key
-        SetMultimap<String, String> multiKeys = HashMultimap.create();
+        for (Class<?> holdingType : moduleManager.getEnvironment().getTypesAnnotatedWith(InputCategory.class)) {
+            InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
+            categories.put(inputCategory, null);
+            for (String button : inputCategory.ordering()) {
+                categories.put(inputCategory, button);
+            }
+        }
 
         for (Class<?> buttonEvent : moduleManager.getEnvironment().getTypesAnnotatedWith(RegisterBindButton.class)) {
             DefaultBinding defBinding = buttonEvent.getAnnotation(DefaultBinding.class);
             RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
+
+            String cat = info.category();
+            String id = "engine:" + info.id();
+            desc.put(id, info.description());
+
+            if (cat.isEmpty()) {
+                InputCategory inputCategory = findEntry(categories, id);
+                if (inputCategory == null) {
+                    System.out.println("Invalid category for: " + info.id());
+                }
+            } else {
+                InputCategory inputCategory = findCategory(categories, cat);
+                if (inputCategory != null) {
+                    categories.put(inputCategory, id);
+                } else {
+                    System.out.println("Invalid category for: " + info.id());
+                }
+            }
+
             if (defBinding != null) {
                 // This handles bindings with just one key
-                if (defBinding.type() == InputType.KEY) {
-                    Input input = InputType.KEY.getInput(defBinding.id());
-                    keyTable.put(info.category(), input, info.description());
-                }
+                Input input = defBinding.type().getInput(defBinding.id());
+                keys.put(id, input);
             } else {
                 // See if there is a multi-mapping for this button
                 DefaultBindings multiBinding = buttonEvent.getAnnotation(DefaultBindings.class);
@@ -68,30 +101,40 @@ public final class BindingScraper {
                 // Annotation math magic. We're expecting a DefaultBindings containing one DefaultBinding pair
                 if (multiBinding != null && multiBinding.value().length == 2) {
                     DefaultBinding[] bindings = multiBinding.value();
-                    String primary = InputType.KEY.getInput(bindings[0].id()).getDisplayName();
-                    String secondary = InputType.KEY.getInput(bindings[1].id()).getDisplayName();
-                    multiKeys.put(info.category(), "`" + primary + "` OR `" + secondary + "` : " + info.description());
+                    Input primary = bindings[0].type().getInput(bindings[0].id());
+                    Input secondary = bindings[1].type().getInput(bindings[1].id());
+                    keys.put(id, primary);
+                    keys.put(id, secondary);
                 }
             }
         }
 
-        for (String row : keyTable.rowKeySet()) {
-            // Print the category. Some keys may not have one, group those as uncategorized
-            if (row.equals("")) {
-                System.out.println("# Uncategorized");
-            } else {
-                System.out.println("# " + row);
-            }
+        for (InputCategory row : categories.keySet()) {
+            System.out.println("# " + row.displayName());
 
-            // Print the single-key bindings
-            for (Entry<Input, String> entry : keyTable.row(row).entrySet()) {
-                System.out.println("`" + entry.getKey().getDisplayName() + "` : " + entry.getValue());
-            }
-
-            // Print the multi-key bindings
-            for (String multiKey : multiKeys.get(row)) {
-                System.out.println(multiKey);
+            for (String entry : categories.get(row)) {
+                if (entry != null) {
+                    System.out.println(desc.get(entry)+ ": " + keys.get(entry));
+                }
             }
         }
+    }
+
+    private static InputCategory findCategory(Multimap<InputCategory, String> categories, String id) {
+        for (InputCategory x : categories.keySet()) {
+            if (x.id().equals(id)) {
+                return x;
+            }
+        }
+        return null;
+    }
+
+    private static InputCategory findEntry(Multimap<InputCategory, String> categories, String id) {
+        for (InputCategory x : categories.keySet()) {
+            if (categories.get(x).contains(id)) {
+                return x;
+            }
+        }
+        return null;
     }
 }
