@@ -172,6 +172,7 @@ public class InputSystem extends BaseComponentSystem {
             case MOUSE_WHEEL:
                 linkBindButtonToMouseWheel(input.getId(), bindId);
                 break;
+            case CONTROLLER_AXIS:
             case CONTROLLER_BUTTON:
                 linkBindButtonToController((ControllerInput) input, bindId);
                 break;
@@ -492,6 +493,15 @@ public class InputSystem extends BaseComponentSystem {
 
     private EntityRef[] getInputEntities() {
         return new EntityRef[]{localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+    }
+
+    /**
+     * Drop all pending/unprocessed input events.
+     */
+    public void drainQueues() {
+        mouse.getInputQueue();
+        keyboard.getInputQueue();
+        controllers.getInputQueue();
     }
 }
 

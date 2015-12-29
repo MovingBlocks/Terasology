@@ -17,6 +17,7 @@
 package org.terasology.input.binds.interaction;
 
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ControllerId;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.RegisterBindButton;
@@ -25,5 +26,6 @@ import org.terasology.input.RegisterBindButton;
  */
 @RegisterBindButton(id = "attack", description = "Attack", repeating = true)
 @DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
+@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ZERO)
 public class AttackButton extends BindButtonEvent {
 }

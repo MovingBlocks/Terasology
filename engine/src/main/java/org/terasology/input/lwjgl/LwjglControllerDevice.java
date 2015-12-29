@@ -22,6 +22,7 @@ import java.util.Queue;
 import org.lwjgl.input.Controllers;
 import org.terasology.input.ButtonState;
 import org.terasology.input.ControllerDevice;
+import org.terasology.input.ControllerId;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.device.ControllerAction;
@@ -39,14 +40,23 @@ public class LwjglControllerDevice implements ControllerDevice {
         Queue<ControllerAction> result = new ArrayDeque<>();
 
         while (Controllers.next()) {
+            int controller = Controllers.getEventSource().getIndex();
+            float axisX = Controllers.getEventXAxisValue();
+            float axisY = Controllers.getEventYAxisValue();
+            Input input;
+            ButtonState state = ButtonState.UP;
+
             if (Controllers.isEventButton()) {
-                ButtonState state = Controllers.getEventButtonState() ? ButtonState.DOWN : ButtonState.UP;
-                Input input = InputType.CONTROLLER_BUTTON.getInput(Controllers.getEventControlIndex());
-                int controller = Controllers.getEventSource().getIndex();
-                float axisX = Controllers.getEventXAxisValue();
-                float axisY = Controllers.getEventYAxisValue();
-                result.add(new ControllerAction(input, state, controller, axisX, axisY));
+                state = Controllers.getEventButtonState() ? ButtonState.DOWN : ButtonState.UP;
+                input = InputType.CONTROLLER_BUTTON.getInput(Controllers.getEventControlIndex());
+            } else if (Controllers.isEventXAxis()) {
+                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.X_AXIS);
+            } else if (Controllers.isEventYAxis()) {
+                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Y_AXIS);
+            } else { //if (Controllers.isEventPovX() || Controllers.isEventPovY()) {
+                continue;
             }
+            result.add(new ControllerAction(input, state, controller, axisX, axisY));
         }
 
         return result;

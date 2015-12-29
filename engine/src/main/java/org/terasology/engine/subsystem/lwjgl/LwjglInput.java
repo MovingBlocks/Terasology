@@ -16,7 +16,6 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
