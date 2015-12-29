@@ -29,10 +29,12 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.input.device.ControllerAction;
 import org.terasology.input.device.KeyboardAction;
 import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
+import org.terasology.input.device.nulldevices.NullControllerDevice;
 import org.terasology.input.device.nulldevices.NullKeyboardDevice;
 import org.terasology.input.device.nulldevices.NullMouseDevice;
 import org.terasology.input.events.InputEvent;
@@ -88,6 +90,7 @@ public class InputSystem extends BaseComponentSystem {
 
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
+    private ControllerDevice controllers = new NullControllerDevice();
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<SimpleUri, BindableButtonImpl> buttonLookup = Maps.newHashMap();
@@ -98,6 +101,7 @@ public class InputSystem extends BaseComponentSystem {
     // Links between primitive inputs and bind buttons
     private Map<Integer, BindableButtonImpl> keyBinds = Maps.newHashMap();
     private Map<MouseInput, BindableButtonImpl> mouseButtonBinds = Maps.newHashMap();
+    private Map<ControllerInput, BindableButtonImpl> controllerBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
 
@@ -117,6 +121,10 @@ public class InputSystem extends BaseComponentSystem {
 
     public KeyboardDevice getKeyboard() {
         return keyboard;
+    }
+
+    public void setControllerDevice(ControllerDevice controllerDevice) {
+        this.controllers = controllerDevice;
     }
 
     public BindableButton registerBindButton(SimpleUri bindId, String displayName) {
@@ -142,6 +150,7 @@ public class InputSystem extends BaseComponentSystem {
         axisLookup.clear();
         axisBinds.clear();
         keyBinds.clear();
+        controllerBinds.clear();
         mouseButtonBinds.clear();
         mouseWheelUpBind = null;
         mouseWheelDownBind = null;
@@ -163,18 +172,11 @@ public class InputSystem extends BaseComponentSystem {
             case MOUSE_WHEEL:
                 linkBindButtonToMouseWheel(input.getId(), bindId);
                 break;
-            default:
+            case CONTROLLER_BUTTON:
+                linkBindButtonToController((ControllerInput) input, bindId);
                 break;
-        }
-    }
-
-    public void linkBindButtonToInput(InputEvent input, SimpleUri bindId) {
-        if (input instanceof KeyEvent) {
-            linkBindButtonToKey(((KeyEvent) input).getKey().getId(), bindId);
-        } else if (input instanceof MouseButtonEvent) {
-            linkBindButtonToMouse(((MouseButtonEvent) input).getButton(), bindId);
-        } else if (input instanceof MouseWheelEvent) {
-            linkBindButtonToMouseWheel(((MouseWheelEvent) input).getWheelTurns(), bindId);
+            case NONE:
+                break;
         }
     }
 
@@ -194,6 +196,11 @@ public class InputSystem extends BaseComponentSystem {
         } else if (direction < 0) {
             mouseWheelUpBind = buttonLookup.get(bindId);
         }
+    }
+
+    public void linkBindButtonToController(ControllerInput button, SimpleUri bindId) {
+        BindableButtonImpl bindInfo = buttonLookup.get(bindId);
+        controllerBinds.put(button, bindInfo);
     }
 
     /**
@@ -244,6 +251,7 @@ public class InputSystem extends BaseComponentSystem {
     public void update(float delta) {
         processMouseInput(delta);
         processKeyboardInput(delta);
+        processControllerInput(delta);
         processBindRepeats(delta);
         processBindAxis(delta);
     }
@@ -358,6 +366,28 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    private void processControllerInput(float delta) {
+        for (ControllerAction action : controllers.getInputQueue()) {
+            // TODO: send event to entity system
+            boolean consumed = false;
+
+            // Update bind
+            BindableButtonImpl bind = controllerBinds.get(action.getInput());
+            if (bind != null) {
+                bind.updateBindState(
+                        action.getInput(),
+                        (action.getState() == ButtonState.DOWN),
+                        delta, getInputEntities(),
+                        targetSystem.getTarget(),
+                        targetSystem.getTargetBlockPosition(),
+                        targetSystem.getHitPosition(),
+                        targetSystem.getHitNormal(),
+                        consumed
+                );
+            }
+        }
+    }
+
     private void processKeyboardInput(float delta) {
         for (KeyboardAction action : keyboard.getInputQueue()) {
             boolean consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta);
@@ -463,6 +493,5 @@ public class InputSystem extends BaseComponentSystem {
     private EntityRef[] getInputEntities() {
         return new EntityRef[]{localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
-
 }
 
