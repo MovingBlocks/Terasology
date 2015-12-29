@@ -77,6 +77,17 @@ public enum InputType {
         public Input getInput(String name) {
             return ControllerInput.find(name);
         }
+    },
+    CONTROLLER_AXIS {
+        @Override
+        public Input getInput(int id) {
+            return ControllerInput.find(this, id);
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return ControllerInput.find(name);
+        }
     };
 
     public abstract Input getInput(int id);

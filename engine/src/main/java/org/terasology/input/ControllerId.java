@@ -19,6 +19,7 @@ package org.terasology.input;
 public interface ControllerId {
 
     int NONE = -1;
+
     int ZERO = 0;
     int ONE = 1;
     int TWO = 2;
@@ -31,4 +32,7 @@ public interface ControllerId {
     int NINE = 9;
     int TEN = 10;
     int ELEVEN = 11;
+
+    int X_AXIS = 100;
+    int Y_AXIS = 200;
 }
