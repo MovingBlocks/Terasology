@@ -17,7 +17,6 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.ImmutableVector2f;
 
 /**
  */
@@ -25,20 +24,13 @@ public final class ControllerAction {
     private final Input input;
     private final ButtonState state;
     private final int controller;
-    private final ImmutableVector2f axis;
+    private final float axisValue;
 
-    public ControllerAction(Input input, ButtonState state, int controller, float axisX, float axisY) {
+    public ControllerAction(Input input, int controller, ButtonState state, float axisValue) {
         this.input = input;
         this.state = state;
         this.controller = controller;
-        this.axis = new ImmutableVector2f(axisX, axisY);
-    }
-
-    /**
-     * @return Whether this is an axis action
-     */
-    public boolean isAxisAction() {
-        return false;
+        this.axisValue = axisValue;
     }
 
     /**
@@ -62,12 +54,12 @@ public final class ControllerAction {
         return state;
     }
 
-    public ImmutableVector2f getAxisPosition() {
-        return axis;
+    public float getAxisValue() {
+        return axisValue;
     }
 
     @Override
     public String toString() {
-        return "ControllerAction [" + this.input + ", axis: " + axis + " (" + state + ")]";
+        return "ControllerAction [" + this.input + ", axis: " + axisValue + " (" + state + ")]";
     }
 }

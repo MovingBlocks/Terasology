@@ -29,6 +29,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -43,7 +44,10 @@ import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
+import org.terasology.input.RegisterRealBindAxis;
+import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.ButtonEvent;
+import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
@@ -133,7 +137,11 @@ public final class BindsConfig {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        config.addDefaultsFor(moduleId, environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId)));
+                        FromModule filter = new FromModule(environment, moduleId);
+                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
+                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
+                        config.addButtonDefaultsFor(moduleId, buttons);
+                        config.addAxisDefaultsFor(moduleId, axes);
                     }
                 }
             }
@@ -152,51 +160,78 @@ public final class BindsConfig {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        updateInputsFor(moduleId, environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId)));
+                        FromModule filter = new FromModule(environment, moduleId);
+                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
+                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
+                        updateButtonInputsFor(moduleId, buttons);
+                        updateAxisInputsFor(moduleId, axes);
                     }
                 }
             }
         }
     }
 
-    private void updateInputsFor(Name moduleId, Iterable<Class<?>> classes) {
+    private void updateButtonInputsFor(Name moduleId, Iterable<Class<?>> classes) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
                 RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
                 SimpleUri bindUri = new SimpleUri(moduleId, info.id());
                 if (!hasBinds(bindUri)) {
-                    addBind(moduleId, buttonEvent, info);
+                    addBind(moduleId, buttonEvent, info.id());
                 }
             }
         }
     }
 
-    private void addDefaultsFor(Name moduleId, Iterable<Class<?>> classes) {
-        for (Class<?> buttonEvent : classes) {
-            if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
-                addBind(moduleId, buttonEvent, info);
+    private void updateAxisInputsFor(Name moduleId, Iterable<Class<?>> classes) {
+        for (Class<?> axisEvent : classes) {
+            if (AxisEvent.class.isAssignableFrom(axisEvent)) {
+                RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
+                SimpleUri bindUri = new SimpleUri(moduleId, info.id());
+                if (!hasBinds(bindUri)) {
+                    addBind(moduleId, axisEvent, info.id());
+                }
             }
         }
     }
 
-    private void addBind(Name moduleName, Class<?> buttonEvent, RegisterBindButton info) {
+    private void addButtonDefaultsFor(Name moduleId, Iterable<Class<?>> classes) {
+        for (Class<?> buttonEvent : classes) {
+            if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
+                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
+                addBind(moduleId, buttonEvent, info.id());
+            }
+        }
+    }
+
+    private void addAxisDefaultsFor(Name moduleId, Iterable<Class<?>> classes) {
+        for (Class<?> axisEvent : classes) {
+            if (AxisEvent.class.isAssignableFrom(axisEvent)) {
+                RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
+                addBind(moduleId, axisEvent, info.id());
+            }
+        }
+    }
+
+    private void addBind(Name moduleName, Class<?> event, String id) {
         List<Input> defaultInputs = Lists.newArrayList();
-        for (Annotation annotation : buttonEvent.getAnnotationsByType(DefaultBinding.class)) {
+        for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
             DefaultBinding defaultBinding = (DefaultBinding) annotation;
             Input input = defaultBinding.type().getInput(defaultBinding.id());
             if (!data.values().contains(input)) {
                 defaultInputs.add(input);
             }
         }
-        SimpleUri bindUri = new SimpleUri(moduleName, info.id());
-        setBinds(bindUri, defaultInputs.toArray(new Input[defaultInputs.size()]));
+        SimpleUri bindUri = new SimpleUri(moduleName, id);
+        setBinds(bindUri, defaultInputs);
     }
 
     public void applyBinds(InputSystem inputSystem, ModuleManager moduleManager) {
         inputSystem.clearBinds();
-        registerButtonBinds(inputSystem, moduleManager.getEnvironment(), moduleManager.getEnvironment().getTypesAnnotatedWith(RegisterBindButton.class));
-        registerAxisBinds(inputSystem, moduleManager.getEnvironment(), moduleManager.getEnvironment().getTypesAnnotatedWith(RegisterBindAxis.class));
+        ModuleEnvironment env = moduleManager.getEnvironment();
+        registerButtonBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterBindButton.class));
+        registerAxisBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterBindAxis.class));
+        registerRealAxisBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterRealBindAxis.class));
     }
 
     private void registerAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
@@ -218,6 +253,29 @@ public final class BindsConfig {
                 try {
                     BindableAxis bindAxis = inputSystem.registerBindAxis(id.toString(), (BindAxisEvent) registerBindClass.newInstance(), positiveButton, negativeButton);
                     bindAxis.setSendEventMode(info.eventMode());
+                    logger.debug("Registered axis bind: {}", id);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    logger.error("Failed to register axis bind \"{}\"", id, e);
+                }
+            } else {
+                logger.error("Failed to register axis bind \"{}\", does not extend BindAxisEvent", id);
+            }
+        }
+    }
+
+    private void registerRealAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
+        for (Class<?> registerBindClass : classes) {
+            RegisterRealBindAxis info = registerBindClass.getAnnotation(RegisterRealBindAxis.class);
+            Name moduleId = environment.getModuleProviding(registerBindClass);
+            SimpleUri id = new SimpleUri(moduleId, info.id());
+            if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
+                try {
+                    BindAxisEvent instance = (BindAxisEvent) registerBindClass.newInstance();
+                    BindableAxis bindAxis = inputSystem.registerRealBindAxis(id.toString(), instance);
+                    bindAxis.setSendEventMode(info.eventMode());
+                    for (Input input : getBinds(id)) {
+                        inputSystem.linkAxisToInput(input, id);
+                    }
                     logger.debug("Registered axis bind: {}", id);
                 } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("Failed to register axis bind \"{}\"", id, e);

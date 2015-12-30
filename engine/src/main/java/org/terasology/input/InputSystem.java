@@ -53,8 +53,10 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.events.RightMouseDownButtonEvent;
 import org.terasology.input.events.RightMouseUpButtonEvent;
+import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
+import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
@@ -92,16 +94,17 @@ public class InputSystem extends BaseComponentSystem {
     private KeyboardDevice keyboard = new NullKeyboardDevice();
     private ControllerDevice controllers = new NullControllerDevice();
 
-    private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
+    private Map<String, BindableRealAxis> axisLookup = Maps.newHashMap();
     private Map<SimpleUri, BindableButtonImpl> buttonLookup = Maps.newHashMap();
 
-    private List<BindableAxisImpl> axisBinds = Lists.newArrayList();
+    private List<AbstractBindableAxis> axisBinds = Lists.newArrayList();
     private List<BindableButtonImpl> buttonBinds = Lists.newArrayList();
 
     // Links between primitive inputs and bind buttons
     private Map<Integer, BindableButtonImpl> keyBinds = Maps.newHashMap();
     private Map<MouseInput, BindableButtonImpl> mouseButtonBinds = Maps.newHashMap();
     private Map<ControllerInput, BindableButtonImpl> controllerBinds = Maps.newHashMap();
+    private Map<Input, BindableRealAxis> controllerAxisBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
 
@@ -172,13 +175,17 @@ public class InputSystem extends BaseComponentSystem {
             case MOUSE_WHEEL:
                 linkBindButtonToMouseWheel(input.getId(), bindId);
                 break;
-            case CONTROLLER_AXIS:
             case CONTROLLER_BUTTON:
                 linkBindButtonToController((ControllerInput) input, bindId);
                 break;
-            case NONE:
+            default:
                 break;
         }
+    }
+
+    public void linkAxisToInput(Input input, SimpleUri bindId) {
+        BindableRealAxis bindInfo = axisLookup.get(bindId.toString());
+        controllerAxisBinds.put(input, bindInfo);
     }
 
     public void linkBindButtonToKey(int key, SimpleUri bindId) {
@@ -244,6 +251,12 @@ public class InputSystem extends BaseComponentSystem {
 
     public BindableAxis registerBindAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
         BindableAxisImpl axis = new BindableAxisImpl(id, event, positiveButton, negativeButton);
+        axisBinds.add(axis);
+        return axis;
+    }
+
+    public BindableAxis registerRealBindAxis(String id, BindAxisEvent event) {
+        BindableRealAxis axis = new BindableRealAxis(id.toString(), event);
         axisBinds.add(axis);
         axisLookup.put(id, axis);
         return axis;
@@ -372,19 +385,27 @@ public class InputSystem extends BaseComponentSystem {
             // TODO: send event to entity system
             boolean consumed = false;
 
-            // Update bind
-            BindableButtonImpl bind = controllerBinds.get(action.getInput());
-            if (bind != null) {
-                bind.updateBindState(
-                        action.getInput(),
-                        (action.getState() == ButtonState.DOWN),
-                        delta, getInputEntities(),
-                        targetSystem.getTarget(),
-                        targetSystem.getTargetBlockPosition(),
-                        targetSystem.getHitPosition(),
-                        targetSystem.getHitNormal(),
-                        consumed
-                );
+            // Update button bind
+            Input input = action.getInput();
+            if (input.getType() == InputType.CONTROLLER_BUTTON) {
+                BindableButtonImpl bind = controllerBinds.get(input);
+                if (bind != null) {
+                    bind.updateBindState(
+                            input,
+                            (action.getState() == ButtonState.DOWN),
+                            delta, getInputEntities(),
+                            targetSystem.getTarget(),
+                            targetSystem.getTargetBlockPosition(),
+                            targetSystem.getHitPosition(),
+                            targetSystem.getHitNormal(),
+                            consumed
+                    );
+                }
+            } else if (input.getType() == InputType.CONTROLLER_AXIS) {
+                BindableRealAxis axis = controllerAxisBinds.get(input);
+                if (axis != null) {
+                    axis.setTargetValue(action.getAxisValue());
+                }
             }
         }
     }
@@ -411,7 +432,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     private void processBindAxis(float delta) {
-        for (BindableAxisImpl axis : axisBinds) {
+        for (AbstractBindableAxis axis : axisBinds) {
             axis.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
                     targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }

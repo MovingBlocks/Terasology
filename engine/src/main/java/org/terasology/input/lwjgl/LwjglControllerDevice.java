@@ -41,8 +41,7 @@ public class LwjglControllerDevice implements ControllerDevice {
 
         while (Controllers.next()) {
             int controller = Controllers.getEventSource().getIndex();
-            float axisX = Controllers.getEventXAxisValue();
-            float axisY = Controllers.getEventYAxisValue();
+            float axisValue = 0f;
             Input input;
             ButtonState state = ButtonState.UP;
 
@@ -50,13 +49,15 @@ public class LwjglControllerDevice implements ControllerDevice {
                 state = Controllers.getEventButtonState() ? ButtonState.DOWN : ButtonState.UP;
                 input = InputType.CONTROLLER_BUTTON.getInput(Controllers.getEventControlIndex());
             } else if (Controllers.isEventXAxis()) {
+                axisValue = Controllers.getEventXAxisValue();
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.X_AXIS);
             } else if (Controllers.isEventYAxis()) {
+                axisValue = Controllers.getEventYAxisValue();
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Y_AXIS);
             } else { //if (Controllers.isEventPovX() || Controllers.isEventPovY()) {
                 continue;
             }
-            result.add(new ControllerAction(input, state, controller, axisX, axisY));
+            result.add(new ControllerAction(input, controller, state, axisValue));
         }
 
         return result;
