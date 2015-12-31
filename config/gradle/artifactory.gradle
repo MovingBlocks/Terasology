@@ -2,25 +2,20 @@
 // It is a superset of the the stuff common to Java sub projects so we include the common.gradle here
 apply from: "$rootDir/config/gradle/common.gradle"
 
+// Dependencies needed for what our Gradle scripts themselves use
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
+    }
+}
+
 // Artifactory publishing requires these (without maven we'd get no .pom with dependency info published)
 apply plugin: 'maven'
 apply plugin: 'artifactory-publish'
 apply plugin: 'maven-publish'
-
-// Dependencies needed for what our Gradle scripts themselves use
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url 'http://dl.bintray.com/jfrog/jfrog-jars'
-        }
-    }
-
-    dependencies {
-        // This grabs the Artifactory plugin jars
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
-    }
-}
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance. It is primarily for local use.
 // In Jenkins the Artifactory plugin can supply overrides for the following values
@@ -103,4 +98,6 @@ publishing {
 // Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
 artifactoryPublish {
     dependsOn jar, sourceJar, javadocJar
+    // TODO: After Gradle 2.3 to 2.10 upgrade have to use `gradlew generatePomFileForMavenJavaPublication artifactoryPublish`
+    // The generation task doesn't happen on its own yet can't be set as a dependsOn as it isn't available yet?
 }

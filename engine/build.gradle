@@ -9,11 +9,9 @@ plugins {
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
-import org.apache.tools.ant.filters.FixCrLfFilter
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.text.SimpleDateFormat;
 
@@ -153,14 +151,14 @@ task cacheReflections {
     inputs.files project.classes.outputs.files
     dependsOn classes
     
-	doLast {
-		// Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-		file(sourceSets.main.output.classesDir.toString()).mkdirs()
-		Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-			.addUrls(configurations.compile.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL())
-			.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-		reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
-	}
+    doLast {
+        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+        file(sourceSets.main.output.classesDir.toString()).mkdirs()
+        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
+            .addUrls(configurations.compile.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL())
+            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    }
     
 }
 
