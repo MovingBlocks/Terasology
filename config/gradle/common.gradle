@@ -36,9 +36,9 @@ repositories {
 }
 
 dependencies {
-    checkstyle ('com.puppycrawl.tools:checkstyle:6.5')
-    pmd ('net.sourceforge.pmd:pmd-core:5.3.3')
-    pmd ('net.sourceforge.pmd:pmd-java:5.3.3')
+    checkstyle ('com.puppycrawl.tools:checkstyle:6.14.1')
+    pmd ('net.sourceforge.pmd:pmd-core:5.4.1')
+    pmd ('net.sourceforge.pmd:pmd-java:5.4.1')
     // the FindBugs version is set in the configuration
 }
 
