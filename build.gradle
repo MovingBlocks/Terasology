@@ -43,16 +43,9 @@ buildscript {
     }
 }
 
-/*
- * To Update Gradle Wrapper:
- * 1. Uncomment 'wrapper' task
- * 2. Change 'gradleVersion'
- * 3. Run "gradlew wrapper" TWICE (first upgrades the prop file, second the jar if needed)
- * 4. Comment 'wrapper' task
- */
-//task wrapper(type: Wrapper) {
-//    gradleVersion = '2.1'
-//}
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.10'
+}
 
 import org.apache.tools.ant.filters.FixCrLfFilter;
 
