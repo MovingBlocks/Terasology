@@ -79,7 +79,9 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     }
 
     private Texture generateTexture(ResourceUrn urn) {
-        TextureData data = new TextureData(size.x(), size.y(), new ByteBuffer[]{}, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(size.x() * size.y() * Integer.BYTES);
+        ByteBuffer[] mipmaps = new ByteBuffer[]{buffer};
+        TextureData data = new TextureData(size.x(), size.y(), mipmaps, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         return Assets.generateAsset(urn, data, Texture.class);
     }
 
