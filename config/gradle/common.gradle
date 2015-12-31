@@ -78,16 +78,16 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.7.4.201502262128"
+    toolVersion = "0.7.5.201505241946"
 }
 
 jacocoTestReport {
     dependsOn test // Despite doc saying this should be automatic we need to explicitly add it anyway :-(
     reports {
-        // We only use the .exec report for display in Jenkins and such. More could be enabled if desired.
-        xml.enabled false
+        // Used to be exec, but that had a binary incompatibility between JaCoCo 0.7.4 and 0.7.5 and issues with some plugins
+        xml.enabled true
         csv.enabled false
-        html.enabled false
+        html.enabled true
     }
 }
 
