@@ -16,9 +16,7 @@
 
 package org.terasology.logic.players;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -35,13 +33,11 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
-import org.terasology.logic.players.event.SelectedItemChangedEvent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -52,12 +48,13 @@ import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.registry.In;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.generator.WorldGenerator;
 
-import com.google.common.collect.Lists;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  */
@@ -250,7 +247,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         updateRelevanceEntity(clientEntity, distance);
         client.character = playerCharacter;
         clientEntity.saveComponent(client);
-        playerCharacter.send(new SelectedItemChangedEvent(EntityRef.NULL, InventoryUtils.getItemAt(playerCharacter, 0)));
         playerCharacter.send(new OnPlayerSpawnedEvent());
     }
 

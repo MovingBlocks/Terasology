@@ -17,8 +17,8 @@ package org.terasology.rendering.nui.layers.hud;
 
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.health.HealthComponent;
+import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -91,8 +91,8 @@ public class HudToolbar extends CoreHudWidget {
 
         @Override
         public Boolean get() {
-            CharacterComponent component = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
-            return component != null && component.selectedItem == slot;
+            SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
+            return component != null && component.slot == slot;
         }
     }
 }

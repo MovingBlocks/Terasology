@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,48 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.players;
+package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
-import org.terasology.logic.players.event.SelectedItemChangedEvent;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.characters.events.ChangeHeldItemRequest;
+import org.terasology.logic.characters.events.HeldItemChangedEvent;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.In;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.LightFadeComponent;
 import org.terasology.world.block.items.BlockItemComponent;
 
-/**
- */
 @RegisterSystem
-public class HoldLuminousBlockSystem extends BaseComponentSystem {
+public class CharacterHeldItemSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+    @In
+    private LocalPlayer localPlayer;
 
     @ReceiveEvent
-    public void onInventorySlotChanged(InventorySlotChangedEvent event, EntityRef entity, CharacterComponent character) {
-        if (character.selectedItem == event.getSlot()) {
-            updateLightFromItem(entity, event.getOldItem(), event.getNewItem());
-        }
+    public void onChangeHeldItemRequest(ChangeHeldItemRequest event, EntityRef character,
+                                        CharacterHeldItemComponent characterHeldItemComponent) {
+        EntityRef oldItem = characterHeldItemComponent.selectedItem;
+        characterHeldItemComponent.selectedItem = event.getItem();
+        character.saveComponent(characterHeldItemComponent);
+        character.send(new HeldItemChangedEvent(oldItem, event.getItem()));
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
-    public void onSelectedItemChanged(SelectedItemChangedEvent event, EntityRef entity) {
+    public void onHeldItemChanged(HeldItemChangedEvent event, EntityRef entity) {
         updateLightFromItem(entity, event.getOldItem(), event.getNewItem());
     }
 
     @ReceiveEvent
-    public void onBlockItemDestroyed(BeforeDeactivateComponent event, EntityRef item, BlockItemComponent blockItemComponent) {
+    public void onBlockItemDestroyedRemoveLight(BeforeDeactivateComponent event, EntityRef item, BlockItemComponent blockItemComponent) {
         if (blockItemComponent.blockFamily == null || blockItemComponent.blockFamily.getArchetypeBlock().getLuminance() == 0) {
             return;
         }
 
-        int slot = InventoryUtils.getSlotWithItem(item.getOwner(), item);
-        if (slot != -1 && item.getOwner().hasComponent(CharacterComponent.class)) {
-            CharacterComponent character = item.getOwner().getComponent(CharacterComponent.class);
-            if (slot == character.selectedItem) {
+        CharacterHeldItemComponent characterHeldItemComponent = item.getOwner().getComponent(CharacterHeldItemComponent.class);
+        if (characterHeldItemComponent != null) {
+            if (item == characterHeldItemComponent.selectedItem) {
                 item.getOwner().removeComponent(LightComponent.class);
             }
         }
@@ -119,4 +121,16 @@ public class HoldLuminousBlockSystem extends BaseComponentSystem {
     }
 
 
+    @Override
+    public void update(float delta) {
+        if (!localPlayer.isValid()) {
+            return;
+        }
+
+        EntityRef characterEntity = localPlayer.getCharacterEntity();
+
+        // Hand animation update
+        CharacterHeldItemComponent characterHeldItemComponent = characterEntity.getComponent(CharacterHeldItemComponent.class);
+        characterHeldItemComponent.handAnimation = Math.max(0, characterHeldItemComponent.handAnimation - 2.5f * delta);
+    }
 }

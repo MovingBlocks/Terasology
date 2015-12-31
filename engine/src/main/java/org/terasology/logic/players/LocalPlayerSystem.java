@@ -39,12 +39,12 @@ import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
@@ -115,12 +115,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         CharacterComponent characterComp = entity.getComponent(CharacterComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
 
-
         processInput(entity, characterComp, characterMovementComponent);
         updateCamera(characterComp, characterMovementComponent, characterComp, location);
-
-        // Hand animation update
-        characterComp.handAnimation = Math.max(0, characterComp.handAnimation - 2.5f * delta);
 
         entity.saveComponent(characterComp);
     }
@@ -340,12 +336,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
-    public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterComponent characterComponent) {
+    public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown() || time.getGameTimeInMs() - lastItemUse < 200) {
             return;
         }
 
-        EntityRef selectedItemEntity = InventoryUtils.getItemAt(entity, characterComponent.selectedItem);
+        EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
         if (!selectedItemEntity.exists()) {
             return;
         }
@@ -353,8 +349,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
 
         lastItemUse = time.getGameTimeInMs();
-        characterComponent.handAnimation = 0.5f;
-        entity.saveComponent(characterComponent);
+        characterHeldItemComponent.handAnimation = 0.5f;
+        entity.saveComponent(characterHeldItemComponent);
         event.consume();
     }
 

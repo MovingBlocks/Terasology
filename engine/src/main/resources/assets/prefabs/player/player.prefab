@@ -60,5 +60,9 @@
               0,0,0,0,0,0,0,0,0,0
             ]
     },
+    "SelectedInventorySlot": {
+    },
+    "CharacterHeldItem": {
+    },
     "Breather" : {}
 }

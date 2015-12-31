@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.players.event;
+package org.terasology.logic.characters;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.ServerEvent;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.network.Replicate;
 
-/**
- */
-@ServerEvent
-public class SelectItemRequest implements Event {
+public class CharacterHeldItemComponent implements Component {
 
-    private int slot;
+    @Replicate
+    public EntityRef selectedItem = EntityRef.NULL;
 
-    protected SelectItemRequest() {
-    }
-
-    public SelectItemRequest(int slot) {
-        this.slot = slot;
-    }
-
-    public int getSlot() {
-        return slot;
-    }
+    public float handAnimation;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.players.event;
+package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.network.ServerEvent;
 
-/**
- */
-public class SelectedItemChangedEvent implements Event {
-    private EntityRef oldItem;
-    private EntityRef newItem;
+@ServerEvent
+public class ChangeSelectedInventorySlotRequest implements Event {
 
-    public SelectedItemChangedEvent(EntityRef oldItem, EntityRef newItem) {
-        this.oldItem = oldItem;
-        this.newItem = newItem;
+    private int slot;
+
+    protected ChangeSelectedInventorySlotRequest() {
     }
 
-    public EntityRef getOldItem() {
-        return oldItem;
+    public ChangeSelectedInventorySlotRequest(int slot) {
+        this.slot = slot;
     }
 
-    public EntityRef getNewItem() {
-        return newItem;
+    public int getSlot() {
+        return slot;
     }
 }
