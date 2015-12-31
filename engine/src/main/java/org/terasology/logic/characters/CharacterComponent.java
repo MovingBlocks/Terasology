@@ -86,10 +86,6 @@ public final class CharacterComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public EntityRef controller = EntityRef.NULL;
 
-    // What inventory slot the character has selected (this currently also determines held item, will need to review based on gameplay)
-    public int selectedItem;
-    public float handAnimation;
-
     public Quat4f getLookRotation() {
         Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
         return lookRotation;

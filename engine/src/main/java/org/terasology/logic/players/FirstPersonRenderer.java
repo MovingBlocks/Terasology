@@ -23,9 +23,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector4f;
@@ -86,8 +85,8 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
 
     @Override
     public void renderFirstPerson() {
-        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character == null) {
+        CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
+        if (characterHeldItemComponent == null) {
             return;
         }
         CharacterMovementComponent charMoveComp = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
@@ -95,10 +94,9 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
             return;
         }
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta, (float) java.lang.Math.PI / 8f, 0.05f);
-        float handMovementAnimationOffset = character.handAnimation;
+        float handMovementAnimationOffset = characterHeldItemComponent.handAnimation;
 
-        int invSlotIndex = character.selectedItem;
-        EntityRef heldItem = InventoryUtils.getItemAt(localPlayer.getCharacterEntity(), invSlotIndex);
+        EntityRef heldItem = characterHeldItemComponent.selectedItem;
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {
