@@ -42,29 +42,28 @@ public class TextureData implements AssetData {
 
     public TextureData(int width, int height, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, Texture.Type type) {
         this(width, height, wrapMode, filterMode);
-        this.type = type;
 
+        if (mipmaps.length == 0) {
+            throw new IllegalArgumentException("Must supply at least one mipmap");
+        }
+
+        this.type = type;
         this.data = Arrays.copyOf(mipmaps, mipmaps.length);
 
-        if (data.length > 0) {
-            if (width <= 0 || height <= 0) {
-                throw new IllegalArgumentException("Width and height must be positive");
-            }
-            if (mipmaps.length == 0) {
-                throw new IllegalArgumentException("Must supply at least one mipmap");
-            }
-            if (mipmaps[0].limit() != width * height * BYTES_PER_PIXEL) {
-                throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height)");
-            }
-            if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height))) {
-                throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
-            }
-            for (int i = 1; i < mipmaps.length; ++i) {
-                int mipWidth = width >> i;
-                int mipHeight = height >> i;
-                if (mipWidth * mipHeight * BYTES_PER_PIXEL != mipmaps[i].limit()) {
-                    throw new IllegalArgumentException("Mipmap has wrong dimensions");
-                }
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Width and height must be positive");
+        }
+        if (mipmaps[0].limit() != width * height * BYTES_PER_PIXEL) {
+            throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height)");
+        }
+        if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height))) {
+            throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
+        }
+        for (int i = 1; i < mipmaps.length; ++i) {
+            int mipWidth = width >> i;
+            int mipHeight = height >> i;
+            if (mipWidth * mipHeight * BYTES_PER_PIXEL != mipmaps[i].limit()) {
+                throw new IllegalArgumentException("Mipmap has wrong dimensions");
             }
         }
     }
