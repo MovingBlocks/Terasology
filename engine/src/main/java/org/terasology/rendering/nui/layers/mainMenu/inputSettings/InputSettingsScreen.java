@@ -41,7 +41,9 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.BeanBinding;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -127,9 +129,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
         }
         mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
 
-        for (String name : inputSystem.getControllerDevice().getControllers()) {
+        List<String> controllers = inputSystem.getControllerDevice().getControllers();
+        for (int i = 0; i < controllers.size(); i++) {
+            String name = controllers.get(i);
             ControllerInfo cfg = config.getInput().getControllers().getController(name);
-            addInputSection(mainLayout, name, cfg);
+            addInputSection(mainLayout, name, i, cfg);
         }
 
         ScrollableArea area = new ScrollableArea();
@@ -194,7 +198,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         }
     }
 
-    private void addInputSection(ColumnLayout layout, String name, ControllerInfo info) {
+    private void addInputSection(ColumnLayout layout, String name, int index, ControllerInfo info) {
         UILabel categoryHeader = new UILabel(name);
         categoryHeader.setFamily("subheading");
         layout.addWidget(categoryHeader);
@@ -210,6 +214,28 @@ public class InputSettingsScreen extends CoreScreenLayer {
         UICheckbox invertY = new UICheckbox();
         invertY.bindChecked(BindHelper.bindBeanProperty("invertY", info, Boolean.TYPE));
         layout.addWidget(new RowLayout(new UILabel("Invert Y Axis"), invertY)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        UISlider deadZone = new UISlider();
+        deadZone.setIncrement(0.01f);
+        deadZone.setMinimum(0);
+        deadZone.setRange(1);
+        deadZone.setPrecision(2);
+        deadZone.bindValue(new Binding<Float>() {
+
+            @Override
+            public void set(Float value) {
+                info.setDeadZone(value);
+                inputSystem.getControllerDevice().setDeadZone(index, value);
+            }
+
+            @Override
+            public Float get() {
+                return info.getDeadZone();
+            }
+        });
+        layout.addWidget(new RowLayout(new UILabel("Dead Zone"), deadZone)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 

@@ -39,4 +39,9 @@ public class NullControllerDevice implements ControllerDevice {
         return Collections.emptyList();
     }
 
+    @Override
+    public void setDeadZone(int index, float deadZone) {
+        // ignore
+    }
+
 }
