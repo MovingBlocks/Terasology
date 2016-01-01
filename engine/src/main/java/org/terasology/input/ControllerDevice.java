@@ -16,6 +16,7 @@
 
 package org.terasology.input;
 
+import java.util.List;
 import java.util.Queue;
 
 import org.terasology.input.device.ControllerAction;
@@ -30,4 +31,9 @@ public interface ControllerDevice extends InputDevice {
 
     @Override
     Queue<ControllerAction> getInputQueue();
+
+    /**
+     * @return a list of currently connected controller IDs.
+     */
+    List<String> getControllers();
 }
