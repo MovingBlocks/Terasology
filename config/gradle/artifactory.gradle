@@ -2,19 +2,9 @@
 // It is a superset of the the stuff common to Java sub projects so we include the common.gradle here
 apply from: "$rootDir/config/gradle/common.gradle"
 
-// Dependencies needed for what our Gradle scripts themselves use
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
-    }
-}
-
 // Artifactory publishing requires these (without maven we'd get no .pom with dependency info published)
 apply plugin: 'maven'
-apply plugin: 'artifactory-publish'
+apply plugin: "com.jfrog.artifactory"
 apply plugin: 'maven-publish'
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance. It is primarily for local use.
@@ -28,10 +18,10 @@ artifactory {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryPublishRepo")) {
                 repoKey = artifactoryPublishRepo
-                //println "setting PUBLISH repoKey to $artifactoryPublishRepo"
+                println "Changing PUBLISH repoKey to $artifactoryPublishRepo"
             } else {
                 repoKey = 'terasology-snapshot-local'
-                //println "PUBLISH repoKey is terasology-snapshot-local"
+                println "PUBLISH repoKey is terasology-snapshot-local (default value)"
             }
 
             // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
@@ -56,10 +46,10 @@ artifactory {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryResolveRepo")) {
                 repoKey = artifactoryResolveRepo
-                //println "setting RESOLVE repoKey to $artifactoryResolveRepo"
+                println "Changing RESOLVE repoKey to $artifactoryResolveRepo"
             } else {
                 repoKey = 'virtual-repo-live'
-                //println "RESOLVE repoKey is repo"
+                println "RESOLVE repoKey is virtual-repo-live (default value)"
             }
         }
     }
