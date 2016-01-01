@@ -55,7 +55,7 @@ buildscript {
 import org.apache.tools.ant.filters.FixCrLfFilter;
 
 // Test for right version of Java in use for running this script
-assert org.gradle.api.JavaVersion.current().isJava7Compatible()
+assert org.gradle.api.JavaVersion.current().isJava8Compatible()
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {

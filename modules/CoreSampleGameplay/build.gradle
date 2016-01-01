@@ -28,7 +28,7 @@ buildscript {
         classpath 'org.ajoberstar:gradle-git:0.6.3'
 
         // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.9'
+        classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
     }
 }
