@@ -24,6 +24,8 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.EntitySerializer;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 
 /**
@@ -186,6 +188,7 @@ public abstract class BaseEntityRef extends EntityRef {
     public String toFullDescription() {
         EntitySerializer serializer = new EntitySerializer((EngineEntityManager) entityManager);
         serializer.setUsingFieldIds(false);
-        return EntityDataJSONFormat.write(serializer.serialize(this));
+        return AccessController.doPrivileged((PrivilegedAction<String>) () ->
+               EntityDataJSONFormat.write(serializer.serialize(this)));
     }
 }
