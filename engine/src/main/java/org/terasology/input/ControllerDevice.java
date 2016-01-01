@@ -36,4 +36,10 @@ public interface ControllerDevice extends InputDevice {
      * @return a list of currently connected controller IDs.
      */
     List<String> getControllers();
+
+    /**
+     * @param index the index of the controller
+     * @param deadZone the dead zone
+     */
+    void setDeadZone(int index, float deadZone);
 }

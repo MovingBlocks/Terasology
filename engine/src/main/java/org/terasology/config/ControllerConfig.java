@@ -38,6 +38,7 @@ public class ControllerConfig {
     public static class ControllerInfo {
         private boolean invertX = true;
         private boolean invertY = true;
+        private float deadZone = 0.05f;
 
         public boolean isInvertX() {
             return invertX;
@@ -53,6 +54,14 @@ public class ControllerConfig {
 
         public void setInvertY(boolean invertY) {
             this.invertY = invertY;
+        }
+
+        public float getDeadZone() {
+            return deadZone;
+        }
+
+        public void setDeadZone(float deadZone) {
+            this.deadZone = deadZone;
         }
     }
 }

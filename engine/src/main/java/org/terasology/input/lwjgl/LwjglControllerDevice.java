@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 import org.terasology.input.ButtonState;
 import org.terasology.input.ControllerDevice;
@@ -43,6 +44,14 @@ public class LwjglControllerDevice implements ControllerDevice {
         }
 
         return ids;
+    }
+
+    @Override
+    public void setDeadZone(int index, float deadZone) {
+        Controller controller = Controllers.getController(index);
+        for (int axis = 0; axis < controller.getAxisCount(); axis++) {
+            controller.setDeadZone(axis, deadZone);
+        }
     }
 
     @Override
