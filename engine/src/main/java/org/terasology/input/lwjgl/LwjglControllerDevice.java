@@ -17,6 +17,8 @@
 package org.terasology.input.lwjgl;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 import org.lwjgl.input.Controllers;
@@ -32,7 +34,15 @@ import org.terasology.input.device.ControllerAction;
  */
 public class LwjglControllerDevice implements ControllerDevice {
 
-    public LwjglControllerDevice() {
+    @Override
+    public List<String> getControllers() {
+        List<String> ids = new ArrayList<>();
+
+        for (int i = 0; i < Controllers.getControllerCount(); i++) {
+            ids.add(Controllers.getController(i).getName());
+        }
+
+        return ids;
     }
 
     @Override

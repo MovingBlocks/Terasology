@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
+import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
@@ -124,6 +125,10 @@ public class InputSystem extends BaseComponentSystem {
 
     public KeyboardDevice getKeyboard() {
         return keyboard;
+    }
+
+    public ControllerDevice getControllerDevice() {
+        return controllers;
     }
 
     public void setControllerDevice(ControllerDevice controllerDevice) {
@@ -404,7 +409,12 @@ public class InputSystem extends BaseComponentSystem {
             } else if (input.getType() == InputType.CONTROLLER_AXIS) {
                 BindableRealAxis axis = controllerAxisBinds.get(input);
                 if (axis != null) {
-                    axis.setTargetValue(action.getAxisValue());
+                    String id = controllers.getControllers().get(action.getController());
+                    ControllerInfo info = config.getInput().getControllers().getController(id);
+                    boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
+                    boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
+                    float fac = (isX && info.isInvertX() || isY && info.isInvertY()) ? -1 : 1;
+                    axis.setTargetValue(action.getAxisValue() * fac);
                 }
             }
         }

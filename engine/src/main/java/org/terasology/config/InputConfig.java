@@ -20,11 +20,16 @@ import org.terasology.context.Context;
 public class InputConfig {
 
     private BindsConfig binds = new BindsConfig();
+    private ControllerConfig controllers = new ControllerConfig();
     private float mouseSensitivity;
     private boolean mouseYAxisInverted;
 
     public BindsConfig getBinds() {
         return binds;
+    }
+
+    public ControllerConfig getControllers() {
+        return controllers;
     }
 
     public float getMouseSensitivity() {
@@ -51,9 +56,7 @@ public class InputConfig {
     }
 
     public void setMouseYAxisInverted(boolean mouseYAxisInverted) {
-
         this.mouseYAxisInverted = mouseYAxisInverted;
-
     }
 
 }

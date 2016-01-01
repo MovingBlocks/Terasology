@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -126,6 +127,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
         }
         mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
 
+        for (String name : inputSystem.getControllerDevice().getControllers()) {
+            ControllerInfo cfg = config.getInput().getControllers().getController(name);
+            addInputSection(mainLayout, name, cfg);
+        }
+
         ScrollableArea area = new ScrollableArea();
         area.setContent(mainLayout);
 
@@ -186,6 +192,28 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 addInputBindRow(extension.uri, extension.bind, layout);
             }
         }
+    }
+
+    private void addInputSection(ColumnLayout layout, String name, ControllerInfo info) {
+        UILabel categoryHeader = new UILabel(name);
+        categoryHeader.setFamily("subheading");
+        layout.addWidget(categoryHeader);
+
+        float columnRatio = 0.4f;
+
+        UICheckbox invertX = new UICheckbox();
+        invertX.bindChecked(BindHelper.bindBeanProperty("invertX", info, Boolean.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Invert X Axis"), invertX)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        UICheckbox invertY = new UICheckbox();
+        invertY.bindChecked(BindHelper.bindBeanProperty("invertY", info, Boolean.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Invert Y Axis"), invertY)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        layout.addWidget(new UISpace(new Vector2i(0, 16)));
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
