@@ -15,6 +15,7 @@ gradle.properties
 modules/Core/Core.iml
 modules/CoreSampleGameplay/CoreSampleGameplay.iml
 facades/PC/PC.iml
+facades/TeraEd/TeraEd.iml
 engine/engine.iml
 engine-tests/engine-tests.iml
 /*.iml
