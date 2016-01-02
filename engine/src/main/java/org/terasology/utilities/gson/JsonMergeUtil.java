@@ -24,8 +24,7 @@ public final class JsonMergeUtil {
     }
 
     public static void mergeOnto(JsonObject from, JsonObject to) {
-        from.entrySet().stream().filter(entry -> !to.has(entry.getKey())).forEach(entry -> {
-            to.add(entry.getKey(), entry.getValue());
-        });
+        from.entrySet().stream().filter(entry -> !to.has(entry.getKey())).forEach(entry ->
+                to.add(entry.getKey(), entry.getValue()));
     }
 }

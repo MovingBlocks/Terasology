@@ -17,11 +17,10 @@
 package org.terasology.audio.openAL;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -99,20 +98,13 @@ public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends Sound
 
     @Override
     public Set<SOURCE> getInactiveSources() {
-        Set<SOURCE> inactiveSources = Sets.newHashSet();
-
-        inactiveSources.addAll(soundSources.keySet().stream().filter(source -> !isActive(source)).collect(Collectors.toList()));
-
-        return inactiveSources;
+        return soundSources.keySet().stream().filter(source ->
+                !isActive(source)).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public Set<SOURCE> getActiveSources() {
-        Set<SOURCE> inactiveSources = Sets.newHashSet();
-
-        inactiveSources.addAll(soundSources.keySet().stream().filter(source -> isActive(source)).collect(Collectors.toList()));
-
-        return inactiveSources;
+        return soundSources.keySet().stream().filter(this::isActive).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -122,9 +114,7 @@ public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends Sound
 
     @Override
     public void update(float delta) {
-        soundSources.keySet().stream().filter(source -> source.isPlaying()).forEach(source -> {
-            source.update(delta);
-        });
+        soundSources.keySet().stream().filter(SoundSource::isPlaying).forEach(source -> source.update(delta));
     }
 
     @Override

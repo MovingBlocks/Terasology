@@ -36,7 +36,9 @@ import org.terasology.world.viewer.color.ColorModels;
 import org.terasology.world.viewer.layers.FacetLayer;
 import org.terasology.world.viewer.layers.FacetLayers;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DirectColorModel;
@@ -204,9 +206,7 @@ public class FacetLayerPreview implements PreviewGenerator {
         g.fillRect(0, 0, width, height);
 
         try {
-            facetLayers.stream().filter(layer -> layer.isVisible()).forEach(layer -> {
-                layer.render(image, region);
-            });
+            facetLayers.stream().filter(FacetLayer::isVisible).forEach(layer -> layer.render(image, region));
         } finally {
             g.dispose();
         }

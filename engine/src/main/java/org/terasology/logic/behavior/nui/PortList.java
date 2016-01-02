@@ -20,6 +20,7 @@ import org.terasology.logic.behavior.tree.TreeAccessor;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.nui.Canvas;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,9 +61,7 @@ public class PortList implements TreeAccessor<RenderableNode> {
     }
 
     public List<Port> ports() {
-        List<Port> list = Lists.newArrayList();
-        list.addAll(ports.stream().filter(port -> port.isVisible()).collect(Collectors.toList()));
-        return list;
+        return ports.stream().filter(Port::isVisible).collect(Collectors.toCollection(ArrayList::new));
     }
 
     int indexOfPort(Port port) {

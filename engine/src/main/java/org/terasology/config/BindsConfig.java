@@ -238,9 +238,8 @@ public final class BindsConfig {
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
 
-                    getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> {
-                        inputSystem.linkBindButtonToInput(input, bindUri);
-                    });
+                    getBinds(bindUri).stream().filter(input -> input != null).forEach(input ->
+                            inputSystem.linkBindButtonToInput(input, bindUri));
 
                     logger.debug("Registered button bind: {}", bindUri);
                 } catch (InstantiationException | IllegalAccessException e) {

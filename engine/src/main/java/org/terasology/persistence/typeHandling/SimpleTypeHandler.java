@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Abstract class for type handlers where collections of the type are simply handled by nesting individually serialized values into another value - that is there is
@@ -31,7 +30,9 @@ public abstract class SimpleTypeHandler<T> implements TypeHandler<T> {
     @Override
     public PersistedData serializeCollection(Collection<T> value, SerializationContext context) {
         List<PersistedData> rawList = Lists.newArrayList();
-        rawList.addAll(value.stream().map(item -> serialize(item, context)).collect(Collectors.toList()));
+        for (T item : value) {
+            rawList.add(serialize(item, context));
+        }
         return context.create(rawList);
     }
 

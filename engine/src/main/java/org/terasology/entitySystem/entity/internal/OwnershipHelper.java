@@ -18,6 +18,7 @@ package org.terasology.entitySystem.entity.internal;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.metadata.ComponentFieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 
@@ -62,7 +63,7 @@ public final class OwnershipHelper {
 
     @SuppressWarnings("unchecked")
     private void addOwnedEntitiesFor(Component comp, ComponentMetadata<?> componentMetadata, Collection<EntityRef> outEntityList) {
-        componentMetadata.getFields().stream().filter(field -> field.isOwnedReference()).forEach(field -> {
+        componentMetadata.getFields().stream().filter(ComponentFieldMetadata::isOwnedReference).forEach(field -> {
             Object value = field.getValue(comp);
             if (value instanceof Collection) {
                 for (EntityRef ref : ((Collection<EntityRef>) value)) {

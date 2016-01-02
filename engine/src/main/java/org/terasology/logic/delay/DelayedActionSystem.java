@@ -66,7 +66,7 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             scheduledOperationsIterator.remove();
         }
 
-        operationsToInvoke.stream().filter(delayedEntity -> delayedEntity.exists()).forEach(delayedEntity -> {
+        operationsToInvoke.stream().filter(EntityRef::exists).forEach(delayedEntity -> {
             final DelayedActionComponent delayedActions = delayedEntity.getComponent(DelayedActionComponent.class);
 
             final Set<String> actionIds = delayedActions.removeActionsUpTo(currentWorldTime);
@@ -95,7 +95,7 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             scheduledOperationsIterator.remove();
         }
 
-        operationsToInvoke.stream().filter(periodicEntity -> periodicEntity.exists()).forEach(periodicEntity -> {
+        operationsToInvoke.stream().filter(EntityRef::exists).forEach(periodicEntity -> {
             final PeriodicActionComponent periodicActionComponent = periodicEntity.getComponent(PeriodicActionComponent.class);
 
             final Set<String> actionIds = periodicActionComponent.getTriggeredActionsAndReschedule(currentWorldTime);

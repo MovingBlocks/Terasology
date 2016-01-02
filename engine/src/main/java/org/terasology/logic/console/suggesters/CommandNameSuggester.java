@@ -24,7 +24,6 @@ import org.terasology.naming.Name;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  */
@@ -40,7 +39,9 @@ public final class CommandNameSuggester implements CommandParameterSuggester<Nam
         Collection<ConsoleCommand> commands = console.getCommands();
         Set<Name> suggestions = Sets.newHashSetWithExpectedSize(commands.size());
 
-        suggestions.addAll(commands.stream().map(ConsoleCommand::getName).collect(Collectors.toList()));
+        for (ConsoleCommand command : commands) {
+            suggestions.add(command.getName());
+        }
 
         return suggestions;
     }

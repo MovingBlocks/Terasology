@@ -34,6 +34,7 @@ import org.terasology.utilities.reflection.SpecificAccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -315,11 +316,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
     }
 
     private static Set<String> convertToString(Set<Object> collection, CommandParameter parameter) {
-        Set<String> result = Sets.newHashSetWithExpectedSize(collection.size());
-
-        result.addAll(collection.stream().map(parameter::convertToString).collect(Collectors.toList()));
-
-        return result;
+        return collection.stream().map(parameter::convertToString).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
