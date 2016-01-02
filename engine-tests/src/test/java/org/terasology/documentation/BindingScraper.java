@@ -101,9 +101,8 @@ public final class BindingScraper {
         for (InputCategory row : categories.keySet()) {
             System.out.println("# " + row.displayName());
 
-            categories.get(row).stream().filter(entry -> entry != null).forEach(entry -> {
-                System.out.println(desc.get(entry) + ": " + keys.get(entry));
-            });
+            categories.get(row).stream().filter(entry -> entry != null).forEach(entry ->
+                    System.out.println(desc.get(entry) + ": " + keys.get(entry)));
         }
     }
 

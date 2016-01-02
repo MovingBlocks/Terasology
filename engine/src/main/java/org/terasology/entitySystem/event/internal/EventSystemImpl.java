@@ -263,10 +263,12 @@ public class EventSystemImpl implements EventSystem {
     }
 
     private void sendStandardEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
-        // Check isValid at each stage in case components were removed.
-        selectedHandlers.stream().filter(handler -> handler.isValidFor(entity)).forEach(handler -> {
-            handler.invoke(entity, event);
-        });
+        for (EventHandlerInfo handler : selectedHandlers) {
+            // Check isValid at each stage in case components were removed.
+            if (handler.isValidFor(entity)) {
+                handler.invoke(entity, event);
+            }
+        }
     }
 
     private void sendConsumableEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
@@ -350,9 +352,11 @@ public class EventSystemImpl implements EventSystem {
             if (handlers != null) {
                 List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
                 Collections.sort(eventHandlers, priorityComparator);
-                eventHandlers.stream().filter(eventHandler -> eventHandler.isValidFor(entity)).forEach(eventHandler -> {
-                    eventHandler.invoke(entity, event);
-                });
+                for (EventHandlerInfo eventHandler : eventHandlers) {
+                    if (eventHandler.isValidFor(entity)) {
+                        eventHandler.invoke(entity, event);
+                    }
+                }
             }
         }
     }
@@ -365,13 +369,15 @@ public class EventSystemImpl implements EventSystem {
             return result;
         }
 
-        handlers.keySet().stream().filter(compClass -> entity.hasComponent(compClass)).forEach(compClass -> {
-            for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
-                if (eventHandler.isValidFor(entity)) {
-                    result.add(eventHandler);
+        for (Class<? extends Component> compClass : handlers.keySet()) {
+            if (entity.hasComponent(compClass)) {
+                for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
+                    if (eventHandler.isValidFor(entity)) {
+                        result.add(eventHandler);
+                    }
                 }
             }
-        });
+        }
         return result;
     }
 

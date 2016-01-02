@@ -56,6 +56,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.IOException;
@@ -211,7 +212,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             unsavedEntryIterator.remove();
         }
 
-        chunkProvider.getAllChunks().stream().filter(chunk -> chunk.isReady()).forEach(chunk -> {
+        chunkProvider.getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
             unloadedAndSavingChunkMap.remove(chunk.getPosition());
             ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls

@@ -222,7 +222,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleMetadata moduleMetadata = moduleInfoBinding.get();
                         if (moduleMetadata != null) {
-                            String dependenciesNames = "";
+                            String dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && dependencies.size() > 0) {
                                 dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
@@ -326,9 +326,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
             UIButton disableAll = find("disableAll", UIButton.class);
             if (disableAll != null) {
-                disableAll.subscribe(button -> {
-                    sortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect);
-                });
+                disableAll.subscribe(button -> sortedModules.stream()
+                        .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
         }
 
@@ -462,11 +461,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private void updateValidToSelect() {
         List<Name> selectedModules = Lists.newArrayList();
-        selectedModules.addAll(sortedModules.stream().filter(info -> info.isSelected()).map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
+        selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
+                .map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
         Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info -> {
-            info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess());
-        });
+        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info ->
+                info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
     }
 
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
@@ -517,9 +516,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void onClosed() {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
-        sortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info -> {
-            moduleConfig.addModule(info.getMetadata().getId());
-        });
+        sortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
+                moduleConfig.addModule(info.getMetadata().getId()));
         SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
         ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
         if (info != null && !info.isSelected()) {
@@ -547,9 +545,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private List<Name> getExplicitlySelectedModules() {
-        List<Name> selectedModules = Lists.newArrayList();
-        selectedModules.addAll(sortedModules.stream().filter(info -> info.isExplicitSelection()).map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
-        return selectedModules;
+        return sortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection).map(info ->
+                info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void deselect(ModuleSelectionInfo target) {

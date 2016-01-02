@@ -704,9 +704,8 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunkEntries) {
-            chunkEntries.stream().filter(entry -> entry.getPosition().y == renderY).forEach(entry -> {
-                renderChunk(g, offsetx, offsety, entry.getPosition(), entry);
-            });
+            chunkEntries.stream().filter(entry -> entry.getPosition().y == renderY).forEach(entry ->
+                    renderChunk(g, offsetx, offsety, entry.getPosition(), entry));
         }
 
         private void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {

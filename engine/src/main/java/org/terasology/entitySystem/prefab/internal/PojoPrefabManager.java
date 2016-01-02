@@ -16,7 +16,6 @@
 package org.terasology.entitySystem.prefab.internal;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.Component;
@@ -24,6 +23,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 /**
@@ -75,10 +75,7 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public Collection<Prefab> listPrefabs(Class<? extends Component> comp) {
-        Collection<Prefab> prefabs = Sets.newHashSet();
-
-        prefabs.addAll(assetManager.getLoadedAssets(Prefab.class).stream().filter(p -> p.getComponent(comp) != null).collect(Collectors.toList()));
-
-        return prefabs;
+        return assetManager.getLoadedAssets(Prefab.class).stream().filter(p -> p.getComponent(comp) != null)
+                .collect(Collectors.toCollection(HashSet::new));
     }
 }

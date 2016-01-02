@@ -17,6 +17,7 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.monitoring.impl.SingleThreadMonitor;
 
 /**
  */
@@ -31,7 +32,7 @@ final class RunningThreadsMode extends MetricsMode {
         StringBuilder builder = new StringBuilder();
         builder.append(getName());
         builder.append("\n");
-        ThreadMonitor.getThreadMonitors(true).stream().filter(threads -> threads.isActive()).forEach(threads -> {
+        ThreadMonitor.getThreadMonitors(true).stream().filter(SingleThreadMonitor::isActive).forEach(threads -> {
             builder.append(threads.getName());
             builder.append(" - ");
             builder.append(threads.getLastTask());

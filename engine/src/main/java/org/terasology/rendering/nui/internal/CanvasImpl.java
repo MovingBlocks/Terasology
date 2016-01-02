@@ -178,9 +178,8 @@ public class CanvasImpl implements CanvasControl {
             }
         }
 
-        mouseOverRegions.stream().filter(region -> !newMouseOverRegions.contains(region)).forEach(region -> {
-            region.listener.onMouseLeave();
-        });
+        mouseOverRegions.stream().filter(region -> !newMouseOverRegions.contains(region)).forEach(region ->
+                region.listener.onMouseLeave());
 
         if (clickedRegion != null && !interactionRegions.contains(clickedRegion)) {
             clickedRegion = null;

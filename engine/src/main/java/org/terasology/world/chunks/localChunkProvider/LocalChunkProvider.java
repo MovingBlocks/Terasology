@@ -44,6 +44,7 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BeforeDeactivateBlocks;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
@@ -51,6 +52,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -515,9 +517,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private TShortObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
         TShortObjectMap<TIntList> batchBlockMap = new TShortObjectHashMap<>();
-        blockManager.listRegisteredBlocks().stream().filter(block -> block.isLifecycleEventsRequired()).forEach(block -> {
-            batchBlockMap.put(block.getId(), new TIntArrayList());
-        });
+        blockManager.listRegisteredBlocks().stream().filter(Block::isLifecycleEventsRequired).forEach(block ->
+                batchBlockMap.put(block.getId(), new TIntArrayList()));
 
         ChunkBlockIterator i = chunk.getBlockIterator();
         while (i.next()) {
@@ -603,7 +604,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         lightMerger.shutdown();
 
-        nearCache.values().stream().filter(chunk -> chunk.isReady()).forEach(chunk -> {
+        nearCache.values().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
             storageManager.deactivateChunk(chunk);
             chunk.dispose();

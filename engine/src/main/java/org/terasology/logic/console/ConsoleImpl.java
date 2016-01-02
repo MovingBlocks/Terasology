@@ -158,7 +158,6 @@ public class ConsoleImpl implements Console {
     public Iterable<Message> getMessages(MessageType... types) {
         final List<MessageType> allowedTypes = Arrays.asList(types);
 
-        // JAVA8: this can be simplified using Stream.filter()
         return Collections2.filter(messageHistory, input -> allowedTypes.contains(input.getType()));
     }
 

@@ -342,7 +342,7 @@ public class ColladaLoader {
 
         for (MD5Joint joint : md5JointList) {
             // We can probably skip unused end nodes
-            joint.childList.stream().filter(childJoint -> null != childJoint.bone).forEach(childJoint ->
+            joint.childList.stream().filter(childJoint -> childJoint.bone != null).forEach(childJoint ->
                     joint.bone.addChild(childJoint.bone));
         }
 

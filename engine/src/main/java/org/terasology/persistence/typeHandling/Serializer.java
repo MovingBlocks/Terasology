@@ -146,9 +146,11 @@ public class Serializer {
      * @param check  A check to filter which fields to deserialize
      */
     public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializationContext context, DeserializeFieldCheck check) {
-        values.entrySet().stream().filter(field -> check.shouldDeserialize(classMetadata, field.getKey())).forEach(field -> {
-            deserializeOnto(target, field.getKey(), field.getValue(), context);
-        });
+        for (Map.Entry<FieldMetadata<?, ?>, PersistedData> field : values.entrySet()) {
+            if (check.shouldDeserialize(classMetadata, field.getKey())) {
+                deserializeOnto(target, field.getKey(), field.getValue(), context);
+            }
+        }
     }
 
 

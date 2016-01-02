@@ -26,7 +26,6 @@ import org.terasology.monitoring.impl.ThreadMonitorEvent;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public final class ThreadMonitor {
 
@@ -46,7 +45,11 @@ public final class ThreadMonitor {
     public static synchronized List<SingleThreadMonitor> getThreadMonitors(List<SingleThreadMonitor> output, boolean aliveThreadsOnly) {
         Preconditions.checkNotNull(output, "The parameter 'output' must not be null");
         output.clear();
-        output.addAll(THREAD_INFO_BY_ID.values().stream().filter(entry -> !aliveThreadsOnly || entry.isAlive()).collect(Collectors.toList()));
+        for (SingleThreadMonitor entry : THREAD_INFO_BY_ID.values()) {
+            if (!aliveThreadsOnly || entry.isAlive()) {
+                output.add(entry);
+            }
+        }
         return output;
     }
 

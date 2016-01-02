@@ -25,6 +25,7 @@ import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -68,8 +69,7 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
 
     @Override
     public PersistedData serializeCollection(Collection<T> value, SerializationContext context) {
-        List<String> values = Lists.newArrayListWithCapacity(value.size());
-        values.addAll(value.stream().map(T::toString).collect(Collectors.toList()));
+        List<String> values = value.stream().map(T::toString).collect(Collectors.toCollection(ArrayList::new));
         return context.createStrings(values);
     }
 

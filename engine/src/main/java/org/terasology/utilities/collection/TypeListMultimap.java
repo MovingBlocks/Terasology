@@ -17,8 +17,8 @@ package org.terasology.utilities.collection;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +64,7 @@ public class TypeListMultimap<T> extends TypeMultimap<T> {
     }
 
     private <U extends T> List<U> convertList(Class<U> type, Collection<T> values) {
-        List<U> results = Lists.newArrayListWithCapacity(values.size());
-        results.addAll(values.stream().map(type::cast).collect(Collectors.toList()));
-        return results;
+        return values.stream().map(type::cast).collect(Collectors.toCollection(ArrayList::new));
     }
 
 }
