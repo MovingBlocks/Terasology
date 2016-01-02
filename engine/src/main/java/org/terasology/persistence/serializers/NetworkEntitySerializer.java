@@ -209,7 +209,7 @@ public class NetworkEntitySerializer {
     public void deserializeOnto(MutableComponentContainer entity, EntityData.PackedEntity entityData, FieldSerializeCheck<Component> fieldCheck) {
         int fieldPos = 0;
         for (int componentIndex = 0; componentIndex < entityData.getComponentIdCount(); ++componentIndex) {
-            Integer componentId = Integer.valueOf(entityData.getComponentId(componentIndex));
+            Integer componentId = entityData.getComponentId(componentIndex);
             Class<? extends Component> componentClass = idTable.inverse().get(componentId);
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentClass);
             if (metadata == null) {

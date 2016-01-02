@@ -20,9 +20,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -53,33 +51,30 @@ public class AddServerPopup extends CoreScreenLayer {
         okButton = find("ok", UIButton.class);
         cancelButton = find("cancel", UIButton.class);
 
-        okButton.subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
+        okButton.subscribe(button -> {
 
-                String name = nameText.getText();
-                String owner = ownerText.getText();
-                String address = addressText.getText();
-                Integer portBoxed = Ints.tryParse(portText.getText());
-                int port = (portBoxed != null) ? portBoxed.intValue() : TerasologyConstants.DEFAULT_PORT;
+            String name = nameText.getText();
+            String owner = ownerText.getText();
+            String address = addressText.getText();
+            Integer portBoxed = Ints.tryParse(portText.getText());
+            int port = (portBoxed != null) ? portBoxed : TerasologyConstants.DEFAULT_PORT;
 
-                if (serverInfo == null) {
-                    // create new
-                    serverInfo = new ServerInfo(name, address, port);
-                    serverInfo.setOwner(owner);
-                } else {
-                    // update existing
-                    serverInfo.setName(name);
-                    serverInfo.setAddress(address);
-                    serverInfo.setPort(port);
-                    serverInfo.setOwner(owner);
-                }
-
-                if (successFunc != null) {
-                    successFunc.accept(serverInfo);
-                }
-                getManager().popScreen();
+            if (serverInfo == null) {
+                // create new
+                serverInfo = new ServerInfo(name, address, port);
+                serverInfo.setOwner(owner);
+            } else {
+                // update existing
+                serverInfo.setName(name);
+                serverInfo.setAddress(address);
+                serverInfo.setPort(port);
+                serverInfo.setOwner(owner);
             }
+
+            if (successFunc != null) {
+                successFunc.accept(serverInfo);
+            }
+            getManager().popScreen();
         });
 
         okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
@@ -92,33 +87,22 @@ public class AddServerPopup extends CoreScreenLayer {
             }
         });
 
-        cancelButton.subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        cancelButton.subscribe(button -> getManager().popScreen());
 
         // copy name to address on ENTER if address is empty
-        nameText.subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget widget) {
-                if (addressText.getText().isEmpty()) {
-                    addressText.setText(nameText.getText());
-                    addressText.setCursorPosition(addressText.getText().length());
-                }
-
-                getManager().setFocus(addressText);
+        nameText.subscribe(widget -> {
+            if (addressText.getText().isEmpty()) {
+                addressText.setText(nameText.getText());
+                addressText.setCursorPosition(addressText.getText().length());
             }
+
+            getManager().setFocus(addressText);
         });
 
         // simulate tabbing behavior
         // TODO: replace with NUI tabbing, once available
-        addressText.subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget widget) {
-                getManager().setFocus(portText);
-            }
+        addressText.subscribe(widget -> {
+            getManager().setFocus(portText);
         });
 
     }

@@ -60,12 +60,7 @@ public class BeforeEntityCreated implements Event {
     }
 
     public Iterable<Component> getResultComponents() {
-        return new Iterable<Component>() {
-            @Override
-            public Iterator<Component> iterator() {
-                return new IteratorImpl();
-            }
-        };
+        return IteratorImpl::new;
     }
 
     private final class IteratorImpl implements Iterator<Component> {

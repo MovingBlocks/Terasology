@@ -135,15 +135,13 @@ public class EventSerializer {
 
         Serializer eventSerializer = typeSerializationLibrary.getSerializerFor(eventMetadata);
         ByteString.Output fieldIds = ByteString.newOutput();
-        for (ReplicatedFieldMetadata field : eventMetadata.getFields()) {
-            if (field.isReplicated()) {
-                EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer.serialize(field, event, serializationContext)).getValue();
-                if (serializedValue != null) {
-                    eventData.addFieldValue(serializedValue);
-                    fieldIds.write(field.getId());
-                }
+        eventMetadata.getFields().stream().filter(field -> field.isReplicated()).forEach(field -> {
+            EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer.serialize(field, event, serializationContext)).getValue();
+            if (serializedValue != null) {
+                eventData.addFieldValue(serializedValue);
+                fieldIds.write(field.getId());
             }
-        }
+        });
         eventData.setFieldIds(fieldIds.toByteString());
 
         return eventData.build();

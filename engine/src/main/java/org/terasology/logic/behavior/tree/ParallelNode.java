@@ -63,9 +63,7 @@ public class ParallelNode extends CompositeNode {
 
         @Override
         public void onInitialize() {
-            for (Node child : getNode().children()) {
-                start(child);
-            }
+            getNode().children().forEach(this::start);
             successCount = 0;
             failureCount = 0;
         }

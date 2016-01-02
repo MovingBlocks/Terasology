@@ -17,7 +17,6 @@ package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
@@ -34,6 +33,7 @@ import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +50,7 @@ public final class ChunkMeshUpdateManager {
     private static final Logger logger = LoggerFactory.getLogger(ChunkMeshUpdateManager.class);
 
     /* CHUNK UPDATES */
-    private final Set<RenderableChunk> chunksProcessing = Sets.newSetFromMap(new ConcurrentHashMap<RenderableChunk, Boolean>());
+    private final Set<RenderableChunk> chunksProcessing = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final BlockingDeque<RenderableChunk> chunksComplete = Queues.newLinkedBlockingDeque();
 

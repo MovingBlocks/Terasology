@@ -97,8 +97,8 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
         // Similar to guava's implementation of Predicates#all
         // According to google, using indices is superior to using an Iterator
         // This implementation also avoids duplicating the list
-        for (int i = 0; i < components.size(); i++) {
-            if (!components.get(i).apply(pos)) {
+        for (Predicate<Vector3i> component : components) {
+            if (!component.apply(pos)) {
                 return false;
             }
         }
@@ -117,7 +117,7 @@ public abstract class SurfaceObjectProvider<B, T> implements FacetProvider {
         Preconditions.checkArgument(probability >= 0, "probability must be >= 0");
         Preconditions.checkArgument(probability <= 1, "probability must be <= 1");
 
-        probsTable.put(biome, tree, Float.valueOf(probability));
+        probsTable.put(biome, tree, probability);
     }
 
     /**

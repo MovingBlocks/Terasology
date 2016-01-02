@@ -35,7 +35,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.procedure.TIntProcedure;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
@@ -295,14 +294,11 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
 
             // Check indices in bounds
-            indices.forEach(new TIntProcedure() {
-                @Override
-                public boolean execute(int value) {
-                    if (value < 0 || value >= vertices.length) {
-                        throw new JsonParseException("Face value out of range: " + value + ", max vertex is " + (vertices.length - 1));
-                    }
-                    return true;
+            indices.forEach(value -> {
+                if (value < 0 || value >= vertices.length) {
+                    throw new JsonParseException("Face value out of range: " + value + ", max vertex is " + (vertices.length - 1));
                 }
+                return true;
             });
 
             return new BlockMeshPart(vertices, normals, texCoords, indices.toArray());

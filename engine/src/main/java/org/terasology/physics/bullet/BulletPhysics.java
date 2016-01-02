@@ -634,7 +634,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entity.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            ObjectArrayList<Vector3f> verts = new ObjectArrayList<Vector3f>();
+            ObjectArrayList<Vector3f> verts = new ObjectArrayList<>();
             TFloatIterator iterator = hull.sourceMesh.getVertices().iterator();
             while (iterator.hasNext()) {
                 Vector3f newVert = new Vector3f();
@@ -677,7 +677,7 @@ public class BulletPhysics implements PhysicsEngine {
         List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
 
         DynamicsWorld world = discreteDynamicsWorld;
-        ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<PersistentManifold>();
+        ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<>();
         for (PairCachingGhostObject trigger : entityTriggers.values()) {
             EntityRef entity = (EntityRef) trigger.getUserPointer();
             for (BroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {

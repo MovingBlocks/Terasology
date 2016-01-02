@@ -50,7 +50,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -157,12 +156,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         categories = Lists.newArrayList(categoryComponents.keySet());
         Collections.sort(categories);
         for (String category : categories) {
-            Collections.sort(categoryComponents.get(category), new Comparator<BehaviorNodeComponent>() {
-                @Override
-                public int compare(BehaviorNodeComponent o1, BehaviorNodeComponent o2) {
-                    return o1.name.compareTo(o2.name);
-                }
-            });
+            Collections.sort(categoryComponents.get(category), (o1, o2) -> o1.name.compareTo(o2.name));
         }
     }
 

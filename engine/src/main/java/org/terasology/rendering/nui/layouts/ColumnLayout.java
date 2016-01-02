@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -124,9 +125,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
             List<List<UIWidget>> rows = Lists.newArrayList(getRowIterator());
             List<RowInfo> rowInfos = Lists.newArrayList();
-            for (List<UIWidget> row : rows) {
-                rowInfos.add(calculateRowSize(row, canvas, availableSize));
-            }
+            rowInfos.addAll(rows.stream().map(row -> calculateRowSize(row, canvas, availableSize)).collect(Collectors.toList()));
 
             int[] minWidths = new int[columns];
             int minRowWidth = 0;

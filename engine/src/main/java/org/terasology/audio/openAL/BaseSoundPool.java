@@ -24,6 +24,7 @@ import org.terasology.audio.Sound;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -100,11 +101,7 @@ public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends Sound
     public Set<SOURCE> getInactiveSources() {
         Set<SOURCE> inactiveSources = Sets.newHashSet();
 
-        for (SOURCE source : soundSources.keySet()) {
-            if (!isActive(source)) {
-                inactiveSources.add(source);
-            }
-        }
+        inactiveSources.addAll(soundSources.keySet().stream().filter(source -> !isActive(source)).collect(Collectors.toList()));
 
         return inactiveSources;
     }
@@ -113,37 +110,27 @@ public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends Sound
     public Set<SOURCE> getActiveSources() {
         Set<SOURCE> inactiveSources = Sets.newHashSet();
 
-        for (SOURCE source : soundSources.keySet()) {
-            if (isActive(source)) {
-                inactiveSources.add(source);
-            }
-        }
+        inactiveSources.addAll(soundSources.keySet().stream().filter(source -> isActive(source)).collect(Collectors.toList()));
 
         return inactiveSources;
     }
 
     @Override
     public void stopAll() {
-        for (SOURCE source : soundSources.keySet()) {
-            source.stop();
-        }
+        soundSources.keySet().forEach(SOURCE::stop);
     }
 
     @Override
     public void update(float delta) {
-        for (SOURCE source : soundSources.keySet()) {
-            if (source.isPlaying()) {
-                source.update(delta);
-            }
-        }
+        soundSources.keySet().stream().filter(source -> source.isPlaying()).forEach(source -> {
+            source.update(delta);
+        });
     }
 
     @Override
     public void setVolume(float volume) {
         this.volume = volume;
-        for (SOURCE soundSource : soundSources.keySet()) {
-            soundSource.updateGain();
-        }
+        soundSources.keySet().forEach(SOURCE::updateGain);
     }
 
     @Override
@@ -194,11 +181,7 @@ public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends Sound
 
     @Override
     public void purge(Sound<?> sound) {
-        for (SOURCE source : soundSources.keySet()) {
-            if (sound.equals(source.getAudio())) {
-                source.purge();
-            }
-        }
+        soundSources.keySet().stream().filter(source -> sound.equals(source.getAudio())).forEach(SOURCE::purge);
     }
 
 }

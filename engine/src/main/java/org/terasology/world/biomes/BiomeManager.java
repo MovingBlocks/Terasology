@@ -158,11 +158,9 @@ public class BiomeManager implements BiomeRegistry {
 
         ImmutableList.Builder<T> builder = ImmutableList.builder();
 
-        for (Biome biome : biomeIdMap.values()) {
-            if (biomeClass.isAssignableFrom(biome.getClass())) {
-                builder.add(biomeClass.cast(biome));
-            }
-        }
+        biomeIdMap.values().stream().filter(biome -> biomeClass.isAssignableFrom(biome.getClass())).forEach(biome -> {
+            builder.add(biomeClass.cast(biome));
+        });
 
         return builder.build();
 

@@ -43,7 +43,6 @@ import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -65,14 +64,11 @@ public class OpenALManager implements AudioManager {
 
     private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
-    private PropertyChangeListener configListener = new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(AudioConfig.MUSIC_VOLUME)) {
-                setMusicVolume((Float) evt.getNewValue());
-            } else if (evt.getPropertyName().equals(AudioConfig.SOUND_VOLUME)) {
-                setSoundVolume((Float) evt.getNewValue());
-            }
+    private PropertyChangeListener configListener = evt -> {
+        if (evt.getPropertyName().equals(AudioConfig.MUSIC_VOLUME)) {
+            setMusicVolume((Float) evt.getNewValue());
+        } else if (evt.getPropertyName().equals(AudioConfig.SOUND_VOLUME)) {
+            setSoundVolume((Float) evt.getNewValue());
         }
     };
 
@@ -124,9 +120,7 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public void stopAllSounds() {
-        for (SoundPool<?, ?> pool : pools.values()) {
-            pool.stopAll();
-        }
+        pools.values().forEach(SoundPool::stopAll);
     }
 
     @Override

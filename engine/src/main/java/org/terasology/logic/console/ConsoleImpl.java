@@ -17,7 +17,6 @@
 package org.terasology.logic.console;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -160,13 +159,7 @@ public class ConsoleImpl implements Console {
         final List<MessageType> allowedTypes = Arrays.asList(types);
 
         // JAVA8: this can be simplified using Stream.filter()
-        return Collections2.filter(messageHistory, new Predicate<Message>() {
-
-            @Override
-            public boolean apply(Message input) {
-                return allowedTypes.contains(input.getType());
-            }
-        });
+        return Collections2.filter(messageHistory, input -> allowedTypes.contains(input.getType()));
     }
 
     @Override

@@ -22,14 +22,13 @@ import com.google.common.math.IntMath;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.procedure.TObjectIntProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.math.geom.Rect2f;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -84,9 +83,7 @@ public class WorldAtlasImpl implements WorldAtlas {
      */
     public WorldAtlasImpl(int maxAtlasSize) {
         this.maxAtlasSize = maxAtlasSize;
-        for (ResourceUrn tile : Assets.list(BlockTile.class)) {
-            indexTile(tile);
-        }
+        Assets.list(BlockTile.class).forEach(this::indexTile);
         buildAtlas();
     }
 
@@ -232,21 +229,18 @@ public class WorldAtlasImpl implements WorldAtlas {
     private void createTextureAtlas(final Texture texture) {
         final Map<Name, Map<Name, SubtextureData>> textureAtlases = Maps.newHashMap();
         final Vector2f texSize = new Vector2f(getRelativeTileSize(), getRelativeTileSize());
-        tileIndexes.forEachEntry(new TObjectIntProcedure<ResourceUrn>() {
-            @Override
-            public boolean execute(ResourceUrn tileUri, int index) {
-                Vector2f coords = getTexCoords(index);
-                SubtextureData subtextureData = new SubtextureData(texture, Rect2f.createFromMinAndSize(coords, texSize));
+        tileIndexes.forEachEntry((tileUri, index) -> {
+            Vector2f coords = getTexCoords(index);
+            SubtextureData subtextureData = new SubtextureData(texture, Rect2f.createFromMinAndSize(coords, texSize));
 
-                Map<Name, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getModuleName());
-                if (textureAtlas == null) {
-                    textureAtlas = Maps.newHashMap();
-                    textureAtlases.put(tileUri.getModuleName(), textureAtlas);
-                }
-                textureAtlas.put(tileUri.getResourceName(), subtextureData);
-
-                return true;
+            Map<Name, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getModuleName());
+            if (textureAtlas == null) {
+                textureAtlas = Maps.newHashMap();
+                textureAtlases.put(tileUri.getModuleName(), textureAtlas);
             }
+            textureAtlas.put(tileUri.getResourceName(), subtextureData);
+
+            return true;
         });
 
         for (Map.Entry<Name, Map<Name, SubtextureData>> atlas : textureAtlases.entrySet()) {
@@ -289,9 +283,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     // 4.   The size of the atlas is always a power of two - as is the tile size
     private void calculateAtlasSizes() {
         tileSize = 16;
-        tiles.stream().filter(tile -> tile.getImage().getWidth() > tileSize).forEach(tile -> {
-            tileSize = tile.getImage().getWidth();
-        });
+        tiles.stream().filter(tile -> tile.getImage().getWidth() > tileSize).forEach(tile -> tileSize = tile.getImage().getWidth());
 
         atlasSize = 1;
         while (atlasSize * atlasSize < tiles.size()) {

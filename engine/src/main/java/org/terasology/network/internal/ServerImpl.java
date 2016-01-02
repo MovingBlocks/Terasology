@@ -177,9 +177,7 @@ public class ServerImpl implements Server {
     }
 
     private void sendEvents(NetData.NetMessage.Builder message) {
-        for (NetData.EventMessage event : queuedOutgoingEvents) {
-            message.addEvent(event);
-        }
+        queuedOutgoingEvents.forEach(message::addEvent);
         queuedOutgoingEvents.clear();
     }
 
@@ -259,12 +257,8 @@ public class ServerImpl implements Server {
             processBlockChanges(message);
             processBiomeChanges(message);
             processRemoveEntities(message);
-            for (NetData.CreateEntityMessage createEntity : message.getCreateEntityList()) {
-                createEntityMessage(createEntity);
-            }
-            for (NetData.UpdateEntityMessage updateEntity : message.getUpdateEntityList()) {
-                updateEntity(updateEntity);
-            }
+            message.getCreateEntityList().forEach(this::createEntityMessage);
+            message.getUpdateEntityList().forEach(this::updateEntity);
             for (NetData.EventMessage event : message.getEventList()) {
                 try {
                     processEvent(event);

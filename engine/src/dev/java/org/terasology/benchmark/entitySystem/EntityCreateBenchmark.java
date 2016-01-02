@@ -64,8 +64,6 @@ public class EntityCreateBenchmark extends AbstractBenchmark {
     @Override
     public void run() {
         PojoEntityManager entityManager = new PojoEntityManager();
-        for (List<Component> rawEntity : rawEntityData) {
-            entityManager.create(rawEntity);
-        }
+        rawEntityData.forEach(entityManager::create);
     }
 }

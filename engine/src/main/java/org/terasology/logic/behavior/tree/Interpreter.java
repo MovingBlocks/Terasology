@@ -107,12 +107,9 @@ public class Interpreter {
             subTasks.add(task);
         }
         tasks.addFirst(task);
-        return AccessController.doPrivileged(new PrivilegedAction<Task>() {
-            @Override
-            public Task run() {
-                InjectionHelper.inject(task);
-                return task;
-            }
+        return AccessController.doPrivileged((PrivilegedAction<Task>) () -> {
+            InjectionHelper.inject(task);
+            return task;
         });
     }
 

@@ -15,18 +15,16 @@
  */
 package org.terasology.world.generation;
 
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Sets;
+import org.terasology.math.Region3i;
+import org.terasology.world.chunks.CoreChunk;
+
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.terasology.math.Region3i;
-import org.terasology.world.chunks.CoreChunk;
-
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  */
@@ -80,16 +78,10 @@ public class WorldImpl implements World {
         // throw them all in a set to remove duplicates
         Collection<FacetProvider> facetProviders = new LinkedHashSet<>(facetProviderChains.values());
 
-        for (FacetProvider facetProvider : facetProviders) {
-            facetProvider.initialize();
-        }
+        facetProviders.forEach(FacetProvider::initialize);
 
-        for (WorldRasterizer rasterizer : worldRasterizers) {
-            rasterizer.initialize();
-        }
+        worldRasterizers.forEach(WorldRasterizer::initialize);
 
-        for (EntityProvider entityProvider : entityProviders) {
-            entityProvider.initialize();
-        }
+        entityProviders.forEach(EntityProvider::initialize);
     }
 }

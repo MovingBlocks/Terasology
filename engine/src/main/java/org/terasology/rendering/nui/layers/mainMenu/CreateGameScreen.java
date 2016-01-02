@@ -36,7 +36,6 @@ import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -44,7 +43,6 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -56,9 +54,9 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -150,9 +148,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
                     Set<Name> enabledModuleNames = Sets.newHashSet();
-                    for (Name moduleName : getAllEnabledModuleNames()) {
-                        enabledModuleNames.add(moduleName);
-                    }
+                    enabledModuleNames.addAll(getAllEnabledModuleNames().stream().collect(Collectors.toList()));
 
                     List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
@@ -203,46 +199,38 @@ public class CreateGameScreen extends CoreScreenLayer {
         }
 
 
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
 
-        WidgetUtil.trySubscribe(this, "play", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (worldGenerator.getSelection() == null) {
+        WidgetUtil.trySubscribe(this, "play", button -> {
+            if (worldGenerator.getSelection() == null) {
+                MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                if (errorMessagePopup != null) {
+                    errorMessagePopup.setMessage("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
+                }
+            } else {
+                GameManifest gameManifest = new GameManifest();
+
+                gameManifest.setTitle(worldName.getText());
+                gameManifest.setSeed(seed.getText());
+                DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+                ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+                if (!result.isSuccess()) {
                     MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     if (errorMessagePopup != null) {
-                        errorMessagePopup.setMessage("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
+                        errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
                     }
-                } else {
-                    GameManifest gameManifest = new GameManifest();
-
-                    gameManifest.setTitle(worldName.getText());
-                    gameManifest.setSeed(seed.getText());
-                    DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-                    ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-                    if (!result.isSuccess()) {
-                        MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                        if (errorMessagePopup != null) {
-                            errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
-                        }
-                        return;
-                    }
-                    for (Module module : result.getModules()) {
-                        gameManifest.addModule(module.getId(), module.getVersion());
-                    }
-
-                    float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
-                    WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                            (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
-                    gameManifest.addWorld(worldInfo);
-
-                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                    return;
                 }
+                for (Module module : result.getModules()) {
+                    gameManifest.addModule(module.getId(), module.getVersion());
+                }
+
+                float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
+                        (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
+                gameManifest.addWorld(worldInfo);
+
+                gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
             }
         });
 
@@ -254,22 +242,14 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         };
         previewSeed.bindEnabled(worldGeneratorSelected);
-        WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                PreviewWorldScreen screen = getManager().pushScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
-                if (screen != null) {
-                    screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
-                }
+        WidgetUtil.trySubscribe(this, "previewSeed", button -> {
+            PreviewWorldScreen screen = getManager().pushScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
+            if (screen != null) {
+                screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
             }
         });
 
-        WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:selectModsScreen");
-            }
-        });
+        WidgetUtil.trySubscribe(this, "mods", button -> getManager().pushScreen("engine:selectModsScreen"));
     }
 
     @Override
@@ -348,12 +328,8 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             }
         }
-        Collections.sort(gameplayModules, new Comparator<Module>() {
-            @Override
-            public int compare(Module o1, Module o2) {
-                return o1.getMetadata().getDisplayName().value().compareTo(o2.getMetadata().getDisplayName().value());
-            }
-        });
+        Collections.sort(gameplayModules, (o1, o2) ->
+                o1.getMetadata().getDisplayName().value().compareTo(o2.getMetadata().getDisplayName().value()));
 
         return gameplayModules;
     }

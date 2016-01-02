@@ -38,67 +38,58 @@ public final class InjectionHelper {
     }
 
     public static void inject(final Object object, Context context) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
-                    Object value = context.get(field.getType());
-                    if (value != null) {
-                        try {
-                            field.setAccessible(true);
-                            field.set(object, value);
-                        } catch (IllegalAccessException e) {
-                            logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
-                        }
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
+                Object value = context.get(field.getType());
+                if (value != null) {
+                    try {
+                        field.setAccessible(true);
+                        field.set(object, value);
+                    } catch (IllegalAccessException e) {
+                        logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
                     }
                 }
-
-                return null;
             }
+
+            return null;
         });
     }
 
     public static void inject(final Object object) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
-                    Object value = CoreRegistry.get(field.getType());
-                    if (value != null) {
-                        try {
-                            field.setAccessible(true);
-                            field.set(object, value);
-                        } catch (IllegalAccessException e) {
-                            logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
-                        }
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
+                Object value = CoreRegistry.get(field.getType());
+                if (value != null) {
+                    try {
+                        field.setAccessible(true);
+                        field.set(object, value);
+                    } catch (IllegalAccessException e) {
+                        logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
                     }
                 }
-
-                return null;
             }
+
+            return null;
         });
     }
 
     public static <T> void inject(final Object object, final Class<? extends Annotation> annotation, final Map<Class<? extends T>, T> source) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(annotation))) {
-                    Object value = source.get(field.getType());
-                    if (value != null) {
-                        try {
-                            field.setAccessible(true);
-                            field.set(object, value);
-                        } catch (IllegalAccessException e) {
-                            logger.error("Failed to inject value {} into field {}", value, field, e);
-                        }
-                    } else {
-                        logger.error("Failed to inject into field {}, nothing to inject", field);
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(annotation))) {
+                Object value = source.get(field.getType());
+                if (value != null) {
+                    try {
+                        field.setAccessible(true);
+                        field.set(object, value);
+                    } catch (IllegalAccessException e) {
+                        logger.error("Failed to inject value {} into field {}", value, field, e);
                     }
+                } else {
+                    logger.error("Failed to inject into field {}, nothing to inject", field);
                 }
-
-                return null;
             }
+
+            return null;
         });
     }
 

@@ -39,7 +39,6 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
@@ -48,7 +47,6 @@ import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
@@ -192,7 +190,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             PropertyProvider provider = new PropertyProvider() {
                 @Override
                 protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
-                    return new WorldConfigBinding<T>(worldConfig, label, compLib, fieldMetadata);
+                    return new WorldConfigBinding<>(worldConfig, label, compLib, fieldMetadata);
                 }
 
                 @Override
@@ -242,20 +240,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         applyButton = find("apply", UIButton.class);
         if (applyButton != null) {
-            applyButton.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget widget) {
-                    updatePreview();
-                }
-            });
+            applyButton.subscribe(widget -> updatePreview());
         }
 
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
     }
 
     @Override
@@ -342,10 +330,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         protected WorldConfigNumberBinding(WorldConfigurator config, String label, ComponentLibrary compLib, FieldMetadata<Object, ?> field) {
             Class<?> type = field.getType();
             if (type == Integer.TYPE || type == Integer.class) {
-                this.binding = new WorldConfigBinding<Integer>(config, label, compLib,
+                this.binding = new WorldConfigBinding<>(config, label, compLib,
                         (FieldMetadata<Object, Integer>) field);
             } else if (type == Float.TYPE || type == Float.class) {
-                this.binding = new WorldConfigBinding<Float>(config, label, compLib,
+                this.binding = new WorldConfigBinding<>(config, label, compLib,
                         (FieldMetadata<Object, Float>) field);
             }
         }
@@ -358,7 +346,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 return (Float) val;
             }
             // create a boxed instance otherwise
-            return Float.valueOf(val.floatValue());
+            return val.floatValue();
         }
 
         @Override
@@ -366,7 +354,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         public void set(Float value) {
             Class<? extends Number> type = binding.fieldMetadata.getType();
             if (type == Integer.TYPE || type == Integer.class) {
-                ((Binding<Integer>) binding).set(Integer.valueOf(value.intValue()));
+                ((Binding<Integer>) binding).set(value.intValue());
             } else if (type == Float.TYPE || type == Float.class) {
                 ((Binding<Float>) binding).set(value);
             }

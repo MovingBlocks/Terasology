@@ -24,7 +24,6 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
-import gnu.trove.procedure.TShortObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -45,7 +44,6 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BeforeDeactivateBlocks;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
@@ -258,9 +256,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
                 if (readyChunkInfo.isNewChunk()) {
                     PerformanceMonitor.startActivity("Generating queued Entities");
-                    for (EntityStore entity : readyChunkInfo.getEntities()) {
-                        generateQueuedEntities(entity);
-                    }
+                    readyChunkInfo.getEntities().forEach(this::generateQueuedEntities);
                     PerformanceMonitor.endActivity();
                 }
 
@@ -270,27 +266,21 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
                 if (!readyChunkInfo.isNewChunk()) {
                     PerformanceMonitor.startActivity("Sending OnAddedBlocks");
-                    readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TShortObjectProcedure<TIntList>() {
-                        @Override
-                        public boolean execute(short id, TIntList positions) {
-                            if (positions.size() > 0) {
-                                blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
-                            }
-                            return true;
+                    readyChunkInfo.getBlockPositionMapppings().forEachEntry((id, positions) -> {
+                        if (positions.size() > 0) {
+                            blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
                         }
+                        return true;
                     });
                     PerformanceMonitor.endActivity();
                 }
 
                 PerformanceMonitor.startActivity("Sending OnActivateBlocks");
-                readyChunkInfo.getBlockPositionMapppings().forEachEntry(new TShortObjectProcedure<TIntList>() {
-                    @Override
-                    public boolean execute(short id, TIntList positions) {
-                        if (positions.size() > 0) {
-                            blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
-                        }
-                        return true;
+                readyChunkInfo.getBlockPositionMapppings().forEachEntry((id, positions) -> {
+                    if (positions.size() > 0) {
+                        blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
                     }
+                    return true;
                 });
                 PerformanceMonitor.endActivity();
 
@@ -368,14 +358,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         List<TShortObjectMap<TIntList>> deactivatedBlockSets = Lists.newArrayListWithExpectedSize(deactivateBlocksQueue.size());
         deactivateBlocksQueue.drainTo(deactivatedBlockSets);
         for (TShortObjectMap<TIntList> deactivatedBlockSet : deactivatedBlockSets) {
-            deactivatedBlockSet.forEachEntry(new TShortObjectProcedure<TIntList>() {
-                @Override
-                public boolean execute(short id, TIntList positions) {
-                    if (positions.size() > 0) {
-                        blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
-                    }
-                    return true;
+            deactivatedBlockSet.forEachEntry((id, positions) -> {
+                if (positions.size() > 0) {
+                    blockManager.getBlock(id).getEntity().send(new BeforeDeactivateBlocks(positions, registry));
                 }
+                return true;
             });
         }
     }
@@ -528,11 +515,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private TShortObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
         TShortObjectMap<TIntList> batchBlockMap = new TShortObjectHashMap<>();
-        for (Block block : blockManager.listRegisteredBlocks()) {
-            if (block.isLifecycleEventsRequired()) {
-                batchBlockMap.put(block.getId(), new TIntArrayList());
-            }
-        }
+        blockManager.listRegisteredBlocks().stream().filter(block -> block.isLifecycleEventsRequired()).forEach(block -> {
+            batchBlockMap.put(block.getId(), new TIntArrayList());
+        });
 
         ChunkBlockIterator i = chunk.getBlockIterator();
         while (i.next()) {
@@ -618,13 +603,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         lightMerger.shutdown();
 
-        for (Chunk chunk : nearCache.values()) {
-            if (chunk.isReady()) {
-                worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
-                storageManager.deactivateChunk(chunk);
-                chunk.dispose();
-            }
-        }
+        nearCache.values().stream().filter(chunk -> chunk.isReady()).forEach(chunk -> {
+            worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
+            storageManager.deactivateChunk(chunk);
+            chunk.dispose();
+        });
         nearCache.clear();
         readyChunks.clear();
         sortedReadyChunks.clear();

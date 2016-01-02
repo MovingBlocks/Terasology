@@ -32,23 +32,20 @@ import java.util.Set;
  */
 @API
 public interface ConsoleCommand extends Comparable<ConsoleCommand> {
-    Comparator<ConsoleCommand> COMPARATOR = new Comparator<ConsoleCommand>() {
-        @Override
-        public int compare(ConsoleCommand o1, ConsoleCommand o2) {
-            int nameComparison = o1.getName().compareTo(o2.getName());
+    Comparator<ConsoleCommand> COMPARATOR = (o1, o2) -> {
+        int nameComparison = o1.getName().compareTo(o2.getName());
 
-            if (nameComparison != 0) {
-                return nameComparison;
-            }
-
-            if (!o1.endsWithVarargs() && o2.endsWithVarargs()) {
-                return -1;
-            } else if (o1.endsWithVarargs() && !o2.endsWithVarargs()) {
-                return 1;
-            }
-
-            return o2.getRequiredParameterCount() - o1.getRequiredParameterCount();
+        if (nameComparison != 0) {
+            return nameComparison;
         }
+
+        if (!o1.endsWithVarargs() && o2.endsWithVarargs()) {
+            return -1;
+        } else if (o1.endsWithVarargs() && !o2.endsWithVarargs()) {
+            return 1;
+        }
+
+        return o2.getRequiredParameterCount() - o1.getRequiredParameterCount();
     };
 
     /**

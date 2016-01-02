@@ -18,20 +18,17 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.registry.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
 
@@ -53,55 +50,36 @@ public class SelectGameScreen extends CoreScreenLayer {
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
-        gameList.subscribe(new ItemActivateEventListener<GameInfo>() {
-            @Override
-            public void onItemActivated(UIWidget widget, GameInfo item) {
-                loadGame(item);
+        gameList.subscribe((widget, item) -> loadGame(item));
+
+        WidgetUtil.trySubscribe(this, "create", button -> {
+            CreateGameScreen createGameScreen = getManager().pushScreen("engine:createGameScreen", CreateGameScreen.class);
+            createGameScreen.setLoadingAsServer(loadingAsServer);
+        });
+
+        WidgetUtil.trySubscribe(this, "load", button -> {
+            GameInfo gameInfo = gameList.getSelection();
+            if (gameInfo != null) {
+                loadGame(gameInfo);
             }
         });
 
-        WidgetUtil.trySubscribe(this, "create", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                CreateGameScreen createGameScreen = getManager().pushScreen("engine:createGameScreen", CreateGameScreen.class);
-                createGameScreen.setLoadingAsServer(loadingAsServer);
-            }
-        });
-
-        WidgetUtil.trySubscribe(this, "load", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                GameInfo gameInfo = gameList.getSelection();
-                if (gameInfo != null) {
-                    loadGame(gameInfo);
+        WidgetUtil.trySubscribe(this, "delete", button -> {
+            GameInfo gameInfo = gameList.getSelection();
+            if (gameInfo != null) {
+                Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
+                try {
+                    FilesUtil.recursiveDelete(world);
+                    gameList.getList().remove(gameInfo);
+                    gameList.setSelection(null);
+                } catch (Exception e) {
+                    logger.error("Failed to delete saved game", e);
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
                 }
             }
         });
 
-        WidgetUtil.trySubscribe(this, "delete", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                GameInfo gameInfo = gameList.getSelection();
-                if (gameInfo != null) {
-                    Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
-                    try {
-                        FilesUtil.recursiveDelete(world);
-                        gameList.getList().remove(gameInfo);
-                        gameList.setSelection(null);
-                    } catch (Exception e) {
-                        logger.error("Failed to delete saved game", e);
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
-                    }
-                }
-            }
-        });
-
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
     }
 
     @Override

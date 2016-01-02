@@ -49,6 +49,7 @@ import java.net.URISyntaxException;
 import java.security.Policy;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -86,11 +87,9 @@ public class ModuleManagerImpl implements ModuleManager {
         engineDep.setMinVersion(engineModule.getVersion());
         engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
 
-        for (Module mod : registry) {
-            if (mod != engineModule) {
-                mod.getMetadata().getDependencies().add(engineDep);
-            }
-        }
+        registry.stream().filter(mod -> mod != engineModule).forEach(mod -> {
+            mod.getMetadata().getDependencies().add(engineDep);
+        });
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
@@ -155,11 +154,7 @@ public class ModuleManagerImpl implements ModuleManager {
         permissionProviderFactory.getBasePermissionSet().addAPIClass(java.awt.datatransfer.UnsupportedFlavorException.class);
 
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        for (Module module : registry) {
-            if (module.isOnClasspath()) {
-                apiScanner.scan(module);
-            }
-        }
+        registry.stream().filter(module -> module.isOnClasspath()).forEach(apiScanner::scan);
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
@@ -184,11 +179,7 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
-        for (Module module : registry) {
-            if (module.isOnClasspath()) {
-                finalModules.add(module);
-            }
-        }
+        finalModules.addAll(registry.stream().filter(module -> module.isOnClasspath()).collect(Collectors.toList()));
         ModuleEnvironment newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.<BytecodeInjector>emptyList());
         if (asPrimary) {
             environment = newEnvironment;

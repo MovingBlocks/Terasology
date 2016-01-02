@@ -149,9 +149,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         while (textIterator.hasNext()) {
             Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
             if (!usedText.contains(entry.getKey())) {
-                for (Mesh mesh : entry.getValue().values()) {
-                    mesh.dispose();
-                }
+                entry.getValue().values().forEach(Mesh::dispose);
                 textIterator.remove();
             }
         }
@@ -354,16 +352,14 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
         offset.y += vAlign.getOffset(lines.size() * font.getLineHeight(), absoluteRegion.height());
 
-        for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
-            if (entry.getKey().isRenderable()) {
-                entry.getKey().bindTextures();
-                entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                        requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
-                entry.getKey().setFloat2("offset", offset.x, offset.y);
-                entry.getKey().setFloat("alpha", alpha);
-                entry.getValue().render();
-            }
-        }
+        fontMesh.entrySet().stream().filter(entry -> entry.getKey().isRenderable()).forEach(entry -> {
+            entry.getKey().bindTextures();
+            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+            entry.getKey().setFloat2("offset", offset.x, offset.y);
+            entry.getKey().setFloat("alpha", alpha);
+            entry.getValue().render();
+        });
     }
 
     @Override

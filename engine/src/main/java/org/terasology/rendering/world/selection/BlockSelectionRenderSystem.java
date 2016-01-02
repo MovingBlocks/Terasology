@@ -48,7 +48,7 @@ public class BlockSelectionRenderSystem extends BaseComponentSystem implements R
      * While it is possible that the number of cached renderers could grow out of control over time,
      * in practice most textures should be a standard size.
      */
-    private Map<Vector2i, BlockSelectionRenderer> cachedBlockSelectionRendererByTextureDimensionsMap = new HashMap<Vector2i, BlockSelectionRenderer>();
+    private Map<Vector2i, BlockSelectionRenderer> cachedBlockSelectionRendererByTextureDimensionsMap = new HashMap<>();
 
     @Override
     public void renderOverlay() {

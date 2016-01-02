@@ -225,7 +225,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes) {
-        EventHandlerInfo info = new ReceiverEventHandlerInfo<T>(eventReceiver, priority, componentTypes);
+        EventHandlerInfo info = new ReceiverEventHandlerInfo<>(eventReceiver, priority, componentTypes);
         addEventHandler(eventClass, info, Arrays.asList(componentTypes));
     }
 
@@ -233,7 +233,7 @@ public class EventSystemImpl implements EventSystem {
     public <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
         SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlerMap = componentSpecificHandlers.get(eventClass);
         if (eventHandlerMap != null) {
-            ReceiverEventHandlerInfo testReceiver = new ReceiverEventHandlerInfo<T>(eventReceiver, 0, componentTypes);
+            ReceiverEventHandlerInfo testReceiver = new ReceiverEventHandlerInfo<>(eventReceiver, 0, componentTypes);
             for (Class<? extends Component> c : componentTypes) {
                 eventHandlerMap.remove(c, testReceiver);
                 for (Class<? extends Event> childType : childEvents.get(eventClass)) {
@@ -263,12 +263,10 @@ public class EventSystemImpl implements EventSystem {
     }
 
     private void sendStandardEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
-        for (EventHandlerInfo handler : selectedHandlers) {
-            // Check isValid at each stage in case components were removed.
-            if (handler.isValidFor(entity)) {
-                handler.invoke(entity, event);
-            }
-        }
+        // Check isValid at each stage in case components were removed.
+        selectedHandlers.stream().filter(handler -> handler.isValidFor(entity)).forEach(handler -> {
+            handler.invoke(entity, event);
+        });
     }
 
     private void sendConsumableEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
@@ -352,11 +350,9 @@ public class EventSystemImpl implements EventSystem {
             if (handlers != null) {
                 List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
                 Collections.sort(eventHandlers, priorityComparator);
-                for (EventHandlerInfo eventHandler : eventHandlers) {
-                    if (eventHandler.isValidFor(entity)) {
-                        eventHandler.invoke(entity, event);
-                    }
-                }
+                eventHandlers.stream().filter(eventHandler -> eventHandler.isValidFor(entity)).forEach(eventHandler -> {
+                    eventHandler.invoke(entity, event);
+                });
             }
         }
     }
@@ -369,15 +365,13 @@ public class EventSystemImpl implements EventSystem {
             return result;
         }
 
-        for (Class<? extends Component> compClass : handlers.keySet()) {
-            if (entity.hasComponent(compClass)) {
-                for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
-                    if (eventHandler.isValidFor(entity)) {
-                        result.add(eventHandler);
-                    }
+        handlers.keySet().stream().filter(compClass -> entity.hasComponent(compClass)).forEach(compClass -> {
+            for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
+                if (eventHandler.isValidFor(entity)) {
+                    result.add(eventHandler);
                 }
             }
-        }
+        });
         return result;
     }
 

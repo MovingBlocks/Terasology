@@ -39,7 +39,7 @@ public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
-    private Binding<List<T>> options = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
+    private Binding<List<T>> options = new DefaultBinding<>(Lists.<T>newArrayList());
     private Binding<T> selection = new DefaultBinding<>();
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override

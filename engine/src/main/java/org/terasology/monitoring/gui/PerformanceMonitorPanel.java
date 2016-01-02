@@ -17,7 +17,6 @@ package org.terasology.monitoring.gui;
 
 import com.google.common.base.Preconditions;
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.procedure.TObjectDoubleProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -179,58 +178,40 @@ public class PerformanceMonitorPanel extends JPanel {
 
     private static final class PerformanceListModel extends AbstractListModel {
 
-        private final List<Entry> list = new ArrayList<Entry>();
-        private final Map<String, Entry> map = new HashMap<String, Entry>();
+        private final List<Entry> list = new ArrayList<>();
+        private final Map<String, Entry> map = new HashMap<>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
         private PerformanceListModel() {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    try {
-                        while (true) {
-                            Thread.sleep(1000);
-                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
-                                updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
-                            }
+            executor.execute(() -> {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                try {
+                    while (true) {
+                        Thread.sleep(1000);
+                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
+                            updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
                         }
-                    } catch (Exception e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Error executing performance monitor update", e);
                     }
+                } catch (Exception e) {
+                    ThreadMonitor.addError(e);
+                    logger.error("Error executing performance monitor update", e);
                 }
             });
         }
 
         private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalAdded(source, a, b);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireIntervalAdded(source, a, b));
         }
 
         private void invokeIntervalRemoved(final int a, final int b) {
             final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalRemoved(source, a, b);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireIntervalRemoved(source, a, b));
         }
 
         private void invokeContentsChanged(final int a, final int b) {
             final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireContentsChanged(source, a, b);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireContentsChanged(source, a, b));
         }
 
         private void updateEntries(TObjectDoubleMap<String> means, TObjectDoubleMap<String> spikes) {
@@ -238,30 +219,24 @@ public class PerformanceMonitorPanel extends JPanel {
                 for (final Entry entry : list) {
                     entry.active = false;
                 }
-                means.forEachEntry(new TObjectDoubleProcedure<String>() {
-                    @Override
-                    public boolean execute(String key, double value) {
-                        Entry entry = map.get(key);
-                        if (entry == null) {
-                            entry = new Entry(key);
-                            list.add(entry);
-                            map.put(key, entry);
-                            invokeIntervalAdded(list.size() - 1, list.size() - 1);
-                        }
-                        entry.active = true;
-                        entry.mean = value;
-                        return true;
+                means.forEachEntry((key, value) -> {
+                    Entry entry = map.get(key);
+                    if (entry == null) {
+                        entry = new Entry(key);
+                        list.add(entry);
+                        map.put(key, entry);
+                        invokeIntervalAdded(list.size() - 1, list.size() - 1);
                     }
+                    entry.active = true;
+                    entry.mean = value;
+                    return true;
                 });
-                spikes.forEachEntry(new TObjectDoubleProcedure<String>() {
-                    @Override
-                    public boolean execute(String key, double value) {
-                        Entry entry = map.get(key);
-                        if (entry != null) {
-                            entry.spike = value;
-                        }
-                        return true;
+                spikes.forEachEntry((key, value) -> {
+                    Entry entry = map.get(key);
+                    if (entry != null) {
+                        entry.spike = value;
                     }
+                    return true;
                 });
                 Collections.sort(list);
                 invokeContentsChanged(0, list.size() - 1);

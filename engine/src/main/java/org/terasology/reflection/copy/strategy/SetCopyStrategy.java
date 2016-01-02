@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import org.terasology.reflection.copy.CopyStrategy;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -33,9 +34,7 @@ public class SetCopyStrategy<T> implements CopyStrategy<Set<T>> {
     public Set<T> copy(Set<T> value) {
         if (value != null) {
             Set<T> result = Sets.newHashSetWithExpectedSize(value.size());
-            for (T item : value) {
-                result.add(contentStrategy.copy(item));
-            }
+            result.addAll(value.stream().map(contentStrategy::copy).collect(Collectors.toList()));
             return result;
         }
         return null;

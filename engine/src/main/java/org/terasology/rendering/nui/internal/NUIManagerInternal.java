@@ -353,14 +353,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void clear() {
-        for (ControlWidget overlay : overlays.values()) {
-            overlay.onClosed();
-        }
+        overlays.values().forEach(ControlWidget::onClosed);
         overlays.clear();
         hudScreenLayer.clear();
-        for (ControlWidget screen : screens) {
-            screen.onClosed();
-        }
+        screens.forEach(ControlWidget::onClosed);
         screens.clear();
         screenLookup.clear();
         focus = null;
@@ -563,9 +559,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void invalidate() {
         AssetManager assetManager = context.get(AssetManager.class);
-        for (UIElement element : assetManager.getLoadedAssets(UIElement.class)) {
-            element.dispose();
-        }
+        assetManager.getLoadedAssets(UIElement.class).forEach(UIElement::dispose);
 
         boolean hudVisible = isHUDVisible();
         if (hudVisible) {
@@ -582,9 +576,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         screens.clear();
         screenLookup.clear();
 
-        for (ResourceUrn urn : reverseUrns) {
-            pushScreen(urn);
-        }
+        reverseUrns.forEach(this::pushScreen);
 
         if (hudVisible) {
             setHUDVisible(true);

@@ -52,19 +52,19 @@ public final class TaskMaster<T extends Task> {
     }
 
     public static <T extends Task> TaskMaster<T> createFIFOTaskMaster(String name, int threads) {
-        return new TaskMaster<>(name, threads, new LinkedBlockingQueue<T>());
+        return new TaskMaster<>(name, threads, new LinkedBlockingQueue<>());
     }
 
     public static <T extends Task & Comparable<? super T>> TaskMaster<T> createPriorityTaskMaster(String name, int threads, int queueSize) {
-        return new TaskMaster<>(name, threads, new PriorityBlockingQueue<T>(queueSize));
+        return new TaskMaster<>(name, threads, new PriorityBlockingQueue<>(queueSize));
     }
 
     public static <T extends Task> TaskMaster<T> createPriorityTaskMaster(String name, int threads, int queueSize, Comparator<T> comparator) {
-        return new TaskMaster<>(name, threads, new PriorityBlockingQueue<T>(queueSize, comparator));
+        return new TaskMaster<>(name, threads, new PriorityBlockingQueue<>(queueSize, comparator));
     }
 
     public static <T extends Task> TaskMaster<T> createDynamicPriorityTaskMaster(String name, int threads, Comparator<T> comparator) {
-        return new TaskMaster<>(name, threads, new DynamicPriorityBlockingQueue<T>(comparator));
+        return new TaskMaster<>(name, threads, new DynamicPriorityBlockingQueue<>(comparator));
     }
 
     /**
@@ -100,21 +100,18 @@ public final class TaskMaster<T extends Task> {
                 logger.error("Failed to enqueue shutdown request", e);
             }
         }
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                executorService.shutdown();
-                try {
-                    if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
-                        logger.warn("Timed out awaiting thread termination");
-                        executorService.shutdownNow();
-                    }
-                } catch (InterruptedException e) {
-                    logger.warn("Interrupted awaiting chunk thread termination");
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
+                    logger.warn("Timed out awaiting thread termination");
                     executorService.shutdownNow();
                 }
-                return null;
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted awaiting chunk thread termination");
+                executorService.shutdownNow();
             }
+            return null;
         });
         running = false;
     }

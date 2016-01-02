@@ -16,28 +16,17 @@
 package org.terasology.documentation;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ArrayTable;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
-
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.DefaultBindings;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
-import org.terasology.input.InputType;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.input.events.ButtonEvent;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Enumerates all default key bindings and writes them sorted by ID to the console
@@ -58,7 +47,7 @@ public final class BindingScraper {
         // Holds normal input mappings where there is only one key
         Multimap<InputCategory, String> categories = ArrayListMultimap.create();
         Multimap<String, Input> keys = ArrayListMultimap.create();
-        Map<String, String> desc = new HashMap<String, String>();
+        Map<String, String> desc = new HashMap<>();
 
         for (Class<?> holdingType : moduleManager.getEnvironment().getTypesAnnotatedWith(InputCategory.class)) {
             InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
@@ -112,11 +101,9 @@ public final class BindingScraper {
         for (InputCategory row : categories.keySet()) {
             System.out.println("# " + row.displayName());
 
-            for (String entry : categories.get(row)) {
-                if (entry != null) {
-                    System.out.println(desc.get(entry)+ ": " + keys.get(entry));
-                }
-            }
+            categories.get(row).stream().filter(entry -> entry != null).forEach(entry -> {
+                System.out.println(desc.get(entry) + ": " + keys.get(entry));
+            });
         }
     }
 

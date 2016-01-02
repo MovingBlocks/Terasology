@@ -63,9 +63,7 @@ public final class ReadOnlyStorageManager extends AbstractStorageManager {
     public void deactivateChunk(Chunk chunk) {
         Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
 
-        for (EntityRef entity : entitiesOfChunk) {
-            deactivateOrDestroyEntityRecursive(entity);
-        }
+        entitiesOfChunk.forEach(this::deactivateOrDestroyEntityRecursive);
     }
 
     @Override

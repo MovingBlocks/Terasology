@@ -50,7 +50,7 @@ public final class TeraArraysBenchmark {
 
     public static void main(String[] args) {
 
-        final List<Benchmark> benchmarks = new LinkedList<Benchmark>();
+        final List<Benchmark> benchmarks = new LinkedList<>();
 
         benchmarks.add(new BenchmarkTeraArraySerializeObject(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
         benchmarks.add(new BenchmarkTeraArraySerializeToBuffer(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));

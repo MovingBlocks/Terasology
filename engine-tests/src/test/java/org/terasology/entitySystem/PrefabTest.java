@@ -109,7 +109,7 @@ public class PrefabTest {
         assertNotNull(component);
         Map<String, Long> orderedMap = component.orderedMap;
         Set<String> keySet = orderedMap.keySet();
-        List<String> keyList = new ArrayList<String>(keySet);
+        List<String> keyList = new ArrayList<>(keySet);
         assertEquals(4, keyList.size());
         assertEquals("one", keyList.get(0));
         assertEquals("two", keyList.get(1));

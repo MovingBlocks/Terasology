@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import gnu.trove.procedure.TByteObjectProcedure;
 import org.terasology.math.geom.Quat4f;
 
 import java.util.HashMap;
@@ -147,16 +146,13 @@ public final class Rotation {
         Side topResult = rotation.rotate(Side.TOP);
         byte[] result = new byte[]{127};
         NORMALIZED_ROTATIONS.forEachEntry(
-                new TByteObjectProcedure<Rotation>() {
-                    @Override
-                    public boolean execute(byte a, Rotation b) {
-                        if (b.rotate(Side.FRONT) == frontResult
-                                && b.rotate(Side.TOP) == topResult) {
-                            result[0] = a;
-                            return false;
-                        }
-                        return true;
+                (a, b) -> {
+                    if (b.rotate(Side.FRONT) == frontResult
+                            && b.rotate(Side.TOP) == topResult) {
+                        result[0] = a;
+                        return false;
                     }
+                    return true;
                 });
 
         if (result[0] != 127) {
