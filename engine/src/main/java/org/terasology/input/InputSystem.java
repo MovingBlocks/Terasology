@@ -408,8 +408,7 @@ public class InputSystem extends BaseComponentSystem {
             } else if (input.getType() == InputType.CONTROLLER_AXIS) {
                 BindableRealAxis axis = controllerAxisBinds.get(input);
                 if (axis != null) {
-                    String id = controllers.getControllers().get(action.getController());
-                    ControllerInfo info = config.getInput().getControllers().getController(id);
+                    ControllerInfo info = config.getInput().getControllers().getController(action.getController());
                     boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
                     boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
                     float fac = (isX && info.isInvertX() || isY && info.isInvertY()) ? -1 : 1;
