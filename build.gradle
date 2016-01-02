@@ -75,7 +75,7 @@ repositories {
     mavenCentral()
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
-        url "http://artifactoryupgrade.terasology.org:8081/artifactory/virtual-repo-live"
+        url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
     }
 }
 
