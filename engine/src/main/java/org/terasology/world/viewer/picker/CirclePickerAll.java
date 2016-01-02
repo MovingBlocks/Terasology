@@ -16,16 +16,16 @@
 
 package org.terasology.world.viewer.picker;
 
+import org.terasology.math.geom.BaseVector2f;
+import org.terasology.math.geom.Vector2f;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.terasology.math.geom.BaseVector2f;
-import org.terasology.math.geom.Vector2f;
-
 public class CirclePickerAll<T> implements CirclePicker<T> {
-    private final Set<T> hits = new HashSet<T>();
+    private final Set<T> hits = new HashSet<>();
 
     private final BaseVector2f cursor;
     private final Function<? super T, ? extends Number> radiusFunc;

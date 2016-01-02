@@ -20,8 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.InspectionToolComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionScreen;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -38,25 +36,21 @@ public class InspectionScreen extends BaseInteractionScreen {
         fullDescriptionLabel = find("fullDescriptionLabel", UIText.class);
         entityIdField = find("entityIdField", UIText.class);
         setEntityIdButton = find("setEntityIdButton", UIButton.class);
-        setEntityIdButton.subscribe(new ActivateEventListener() {
-
-            @Override
-            public void onActivated(UIWidget widget) {
-                String text = entityIdField.getText();
-                EntityRef interactionTarget = getInteractionTarget();
-                InspectionToolComponent inspectorComponent = interactionTarget.getComponent(InspectionToolComponent.class);
-                if (text.equals("this")) {
-                    inspectorComponent.inspectedEntity = interactionTarget;
-                } else {
-                    try {
-                        int id = Integer.parseInt(text);
-                        inspectorComponent.inspectedEntity = CoreRegistry.get(EntityManager.class).getEntity(id);
-                    } catch (NumberFormatException e) {
-                        fullDescriptionLabel.setText("Please specify a valid number");
-                    }
+        setEntityIdButton.subscribe(widget -> {
+            String text = entityIdField.getText();
+            EntityRef interactionTarget = getInteractionTarget();
+            InspectionToolComponent inspectorComponent = interactionTarget.getComponent(InspectionToolComponent.class);
+            if (text.equals("this")) {
+                inspectorComponent.inspectedEntity = interactionTarget;
+            } else {
+                try {
+                    int id1 = Integer.parseInt(text);
+                    inspectorComponent.inspectedEntity = CoreRegistry.get(EntityManager.class).getEntity(id1);
+                } catch (NumberFormatException e) {
+                    fullDescriptionLabel.setText("Please specify a valid number");
                 }
-                updateFields(interactionTarget);
             }
+            updateFields(interactionTarget);
         });
 
     }

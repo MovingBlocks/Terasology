@@ -79,9 +79,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             // Setup new collection for blocks changed in this pass
             blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
 
-            for (Vector3i blockLocation : blocksToUpdate) {
-                processUpdateForBlockLocation(blockLocation);
-            }
+            blocksToUpdate.forEach(this::processUpdateForBlockLocation);
         }
         largeBlockUpdateCount--;
     }

@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
-import gnu.trove.procedure.TObjectByteProcedure;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -75,15 +74,12 @@ public final class SideBitFlag {
     public static EnumSet<Side> getSides(final byte sidesBit) {
         final List<Side> result = Lists.newArrayList();
         sideBits.forEachEntry(
-                new TObjectByteProcedure<Side>() {
-                    @Override
-                    public boolean execute(Side a, byte b) {
-                        if ((b & sidesBit) > 0) {
-                            result.add(a);
-                        }
-
-                        return true;
+                (a, b) -> {
+                    if ((b & sidesBit) > 0) {
+                        result.add(a);
                     }
+
+                    return true;
                 });
         return Sets.newEnumSet(result, Side.class);
     }

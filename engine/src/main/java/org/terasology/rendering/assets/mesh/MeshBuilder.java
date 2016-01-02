@@ -155,8 +155,8 @@ public class MeshBuilder {
             addVertex(new Vector3f(offset.x + size.x * VERTICES[i * 3], offset.y + size.y * VERTICES[i * 3 + 1], offset.z + size.z * VERTICES[i * 3 + 2]));
             addTexCoord(textureMapper.map(i, u, v));
         }
-        for (int i = 0; i < INDICES.length; i++) {
-            addIndex(vertexId + INDICES[i]);
+        for (int i : INDICES) {
+            addIndex(vertexId + i);
         }
         return this;
     }

@@ -98,9 +98,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public void clear() {
-        for (BaseEntityRef entityRef : entityCache.values()) {
-            entityRef.invalidate();
-        }
+        entityCache.values().forEach(BaseEntityRef::invalidate);
         store.clear();
         nextEntityId = 1;
         loadedIds.clear();
@@ -299,12 +297,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public Iterable<EntityRef> getAllEntities() {
-        return new Iterable<EntityRef>() {
-            @Override
-            public Iterator<EntityRef> iterator() {
-                return new EntityIterator(store.entityIdIterator());
-            }
-        };
+        return () -> new EntityIterator(store.entityIdIterator());
     }
 
     @SafeVarargs
@@ -729,10 +722,10 @@ public class PojoEntityManager implements EngineEntityManager {
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
         TLongObjectIterator<T> iterator = store.componentIterator(componentClass);
         if (iterator != null) {
-            List<Map.Entry<EntityRef, T>> list = new ArrayList<Map.Entry<EntityRef, T>>();
+            List<Map.Entry<EntityRef, T>> list = new ArrayList<>();
             while (iterator.hasNext()) {
                 iterator.advance();
-                list.add(new EntityEntry<T>(createEntityRef(iterator.key()), iterator.value()));
+                list.add(new EntityEntry<>(createEntityRef(iterator.key()), iterator.value()));
             }
             return list;
         }

@@ -60,10 +60,8 @@ final class EntityStorer {
     public void store(EntityRef entity, String name) {
         if (entity.isActive()) {
             for (EntityRef ownedEntity : helper.listOwnedEntities(entity)) {
-                if (!ownedEntity.isAlwaysRelevant()) {
-                    if (ownedEntity.isPersistent()) {
-                        store(ownedEntity);
-                    }
+                if (!ownedEntity.isAlwaysRelevant() && ownedEntity.isPersistent()) {
+                    store(ownedEntity);
                 }
             }
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());

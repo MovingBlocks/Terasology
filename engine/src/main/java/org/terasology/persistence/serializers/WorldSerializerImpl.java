@@ -106,24 +106,20 @@ public class WorldSerializerImpl implements WorldSerializer {
         // Prefabs that still need to be created, by their required parent
         ListMultimap<String, EntityData.Prefab> pendingPrefabs = ArrayListMultimap.create();
 
-        for (EntityData.Prefab prefabData : world.getPrefabList()) {
-            if (!prefabManager.exists(prefabData.getName())) {
-                if (!prefabData.hasParentName()) {
-                    createPrefab(prefabData);
-                } else {
-                    pendingPrefabs.put(prefabData.getParentName(), prefabData);
-                }
+        world.getPrefabList().stream().filter(prefabData -> !prefabManager.exists(prefabData.getName())).forEach(prefabData -> {
+            if (!prefabData.hasParentName()) {
+                createPrefab(prefabData);
+            } else {
+                pendingPrefabs.put(prefabData.getParentName(), prefabData);
             }
-        }
+        });
 
         while (!pendingPrefabs.isEmpty()) {
             Iterator<Map.Entry<String, Collection<EntityData.Prefab>>> i = pendingPrefabs.asMap().entrySet().iterator();
             while (i.hasNext()) {
                 Map.Entry<String, Collection<EntityData.Prefab>> entry = i.next();
                 if (prefabManager.exists(entry.getKey())) {
-                    for (EntityData.Prefab prefabData : entry.getValue()) {
-                        createPrefab(prefabData);
-                    }
+                    entry.getValue().forEach(this::createPrefab);
                     i.remove();
                 }
             }

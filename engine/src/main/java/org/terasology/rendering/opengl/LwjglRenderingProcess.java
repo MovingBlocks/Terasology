@@ -226,32 +226,29 @@ public class LwjglRenderingProcess {
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         FBO.unbindTexture();
 
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
+        Runnable task = () -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String format = renderingConfig.getScreenshotFormat().toString();
-                final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width() + "x" + fboSceneFinal.height() + "." + format;
-                Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
-                BufferedImage image = new BufferedImage(fboSceneFinal.width(), fboSceneFinal.height(), BufferedImage.TYPE_INT_RGB);
+            final String format = renderingConfig.getScreenshotFormat().toString();
+            final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width() + "x" + fboSceneFinal.height() + "." + format;
+            Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
+            BufferedImage image = new BufferedImage(fboSceneFinal.width(), fboSceneFinal.height(), BufferedImage.TYPE_INT_RGB);
 
-                for (int x = 0; x < fboSceneFinal.width(); x++) {
-                    for (int y = 0; y < fboSceneFinal.height(); y++) {
-                        int i = (x + fboSceneFinal.width() * y) * 4;
-                        int r = buffer.get(i) & 0xFF;
-                        int g = buffer.get(i + 1) & 0xFF;
-                        int b = buffer.get(i + 2) & 0xFF;
-                        image.setRGB(x, fboSceneFinal.height() - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-                    }
+            for (int x = 0; x < fboSceneFinal.width(); x++) {
+                for (int y = 0; y < fboSceneFinal.height(); y++) {
+                    int i = (x + fboSceneFinal.width() * y) * 4;
+                    int r = buffer.get(i) & 0xFF;
+                    int g = buffer.get(i + 1) & 0xFF;
+                    int b = buffer.get(i + 2) & 0xFF;
+                    image.setRGB(x, fboSceneFinal.height() - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
                 }
+            }
 
-                try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
-                    ImageIO.write(image, format, out);
-                    logger.info("Screenshot '" + fileName + "' saved! ");
-                } catch (IOException e) {
-                    logger.warn("Failed to save screenshot!", e);
-                }
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
+                ImageIO.write(image, format, out);
+                logger.info("Screenshot '" + fileName + "' saved! ");
+            } catch (IOException e) {
+                logger.warn("Failed to save screenshot!", e);
             }
         };
 

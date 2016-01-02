@@ -424,9 +424,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         PerformanceMonitor.startActivity("Temp Blocks Cleanup");
         List<EntityRef> toRemove = Lists.newArrayList(temporaryBlockEntities);
         temporaryBlockEntities.clear();
-        for (EntityRef entity : toRemove) {
-            cleanUpTemporaryEntity(entity);
-        }
+        toRemove.forEach(this::cleanUpTemporaryEntity);
         PerformanceMonitor.endActivity();
     }
 

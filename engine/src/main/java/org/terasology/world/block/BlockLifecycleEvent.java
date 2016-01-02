@@ -21,8 +21,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.internal.BlockPositionIterator;
 
-import java.util.Iterator;
-
 /**
  */
 public abstract class BlockLifecycleEvent implements Event {
@@ -35,12 +33,7 @@ public abstract class BlockLifecycleEvent implements Event {
     }
 
     public Iterable<Vector3i> getBlockPositions() {
-        return new Iterable<Vector3i>() {
-            @Override
-            public Iterator<Vector3i> iterator() {
-                return new BlockPositionIterator(positions, registry);
-            }
-        };
+        return () -> new BlockPositionIterator(positions, registry);
     }
 
     public int blockCount() {

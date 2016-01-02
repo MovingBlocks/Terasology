@@ -44,30 +44,15 @@ public final class Diamond3iIterator implements Iterator<Vector3i> {
     }
 
     public static Iterable<Vector3i> iterate(final Vector3i origin, final int distance) {
-        return new Iterable<Vector3i>() {
-            @Override
-            public Iterator<Vector3i> iterator() {
-                return new Diamond3iIterator(origin, distance);
-            }
-        };
+        return () -> new Diamond3iIterator(origin, distance);
     }
 
     public static Iterable<Vector3i> iterate(final Vector3i origin, final int distance, final int startDistance) {
-        return new Iterable<Vector3i>() {
-            @Override
-            public Iterator<Vector3i> iterator() {
-                return new Diamond3iIterator(origin, distance, startDistance);
-            }
-        };
+        return () -> new Diamond3iIterator(origin, distance, startDistance);
     }
 
     public static Iterable<Vector3i> iterateAtDistance(final Vector3i origin, final int distance) {
-        return new Iterable<Vector3i>() {
-            @Override
-            public Iterator<Vector3i> iterator() {
-                return new Diamond3iIterator(origin, distance, distance - 1);
-            }
-        };
+        return () -> new Diamond3iIterator(origin, distance, distance - 1);
     }
 
     @Override

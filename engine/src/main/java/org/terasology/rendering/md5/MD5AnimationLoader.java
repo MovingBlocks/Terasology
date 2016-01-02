@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -120,9 +121,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             }
 
             List<Quat4f> rotations = Lists.newArrayListWithCapacity(rawRotations.size());
-            for (Vector3f rot : rawRotations) {
-                rotations.add(MD5ParserCommon.completeQuat4f(rot.x, rot.y, rot.z));
-            }
+            rotations.addAll(rawRotations.stream().map(rot -> MD5ParserCommon.completeQuat4f(rot.x, rot.y, rot.z)).collect(Collectors.toList()));
 
             // Rotate just the root bone to correct for coordinate system differences
             rotations.set(0, MD5ParserCommon.correctQuat4f(rotations.get(0)));

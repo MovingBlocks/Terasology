@@ -18,7 +18,6 @@ package org.terasology.entitySystem.entity.internal;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.metadata.ComponentFieldMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 
@@ -63,29 +62,27 @@ public final class OwnershipHelper {
 
     @SuppressWarnings("unchecked")
     private void addOwnedEntitiesFor(Component comp, ComponentMetadata<?> componentMetadata, Collection<EntityRef> outEntityList) {
-        for (ComponentFieldMetadata<?, ?> field : componentMetadata.getFields()) {
-            if (field.isOwnedReference()) {
-                Object value = field.getValue(comp);
-                if (value instanceof Collection) {
-                    for (EntityRef ref : ((Collection<EntityRef>) value)) {
-                        if (ref.exists()) {
-                            outEntityList.add(ref);
-                        }
-                    }
-                } else if (value instanceof Map) {
-                    for (EntityRef ref : ((Map<Object, EntityRef>) value).values()) {
-                        if (ref.exists()) {
-                            outEntityList.add(ref);
-                        }
-                    }
-                } else if (value instanceof EntityRef) {
-                    EntityRef ref = (EntityRef) value;
+        componentMetadata.getFields().stream().filter(field -> field.isOwnedReference()).forEach(field -> {
+            Object value = field.getValue(comp);
+            if (value instanceof Collection) {
+                for (EntityRef ref : ((Collection<EntityRef>) value)) {
                     if (ref.exists()) {
                         outEntityList.add(ref);
                     }
                 }
+            } else if (value instanceof Map) {
+                for (EntityRef ref : ((Map<Object, EntityRef>) value).values()) {
+                    if (ref.exists()) {
+                        outEntityList.add(ref);
+                    }
+                }
+            } else if (value instanceof EntityRef) {
+                EntityRef ref = (EntityRef) value;
+                if (ref.exists()) {
+                    outEntityList.add(ref);
+                }
             }
-        }
+        });
     }
 
 }

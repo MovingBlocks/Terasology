@@ -30,6 +30,7 @@ import org.terasology.rendering.nui.VerticalAlign;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -204,9 +205,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
     @Override
     public Iterator<UIWidget> iterator() {
         List<UIWidget> widgets = Lists.newArrayListWithCapacity(contents.size());
-        for (WidgetInfo info : contents) {
-            widgets.add(info.widget);
-        }
+        widgets.addAll(contents.stream().map(info -> info.widget).collect(Collectors.toList()));
         return widgets.iterator();
     }
 

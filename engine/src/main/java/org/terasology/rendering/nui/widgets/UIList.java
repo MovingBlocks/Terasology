@@ -39,7 +39,7 @@ public class UIList<T> extends CoreWidget {
 
     private Binding<Boolean> selectable = new DefaultBinding<>(true);
     private Binding<T> selection = new DefaultBinding<>();
-    private Binding<List<T>> list = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
+    private Binding<List<T>> list = new DefaultBinding<>(Lists.<T>newArrayList());
 
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 

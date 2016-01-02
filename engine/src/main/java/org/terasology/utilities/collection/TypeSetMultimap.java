@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -63,9 +64,7 @@ public class TypeSetMultimap<T> extends TypeMultimap<T> {
 
     private <U extends T> Set<U> convertSet(Class<U> type, Set<T> values) {
         Set<U> results = Sets.newLinkedHashSetWithExpectedSize(values.size());
-        for (T value : values) {
-            results.add(type.cast(value));
-        }
+        results.addAll(values.stream().map(type::cast).collect(Collectors.toList()));
         return results;
     }
 }

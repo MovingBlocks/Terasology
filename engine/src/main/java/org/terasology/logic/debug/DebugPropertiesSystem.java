@@ -54,12 +54,9 @@ public class DebugPropertiesSystem extends BaseComponentSystem {
 
     public void addProperty(final String group, final Object o) {
         PropertyProvider propertyProvider = new PropertyProvider();
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                properties.addProperties(group, propertyProvider.createProperties(o));
-                return null;
-            }
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            properties.addProperties(group, propertyProvider.createProperties(o));
+            return null;
         });
     }
 }

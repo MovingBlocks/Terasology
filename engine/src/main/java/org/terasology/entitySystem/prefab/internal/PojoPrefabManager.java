@@ -24,6 +24,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Basic implementation of PrefabManager.
@@ -76,11 +77,7 @@ public class PojoPrefabManager implements PrefabManager {
     public Collection<Prefab> listPrefabs(Class<? extends Component> comp) {
         Collection<Prefab> prefabs = Sets.newHashSet();
 
-        for (Prefab p : assetManager.getLoadedAssets(Prefab.class)) {
-            if (p.getComponent(comp) != null) {
-                prefabs.add(p);
-            }
-        }
+        prefabs.addAll(assetManager.getLoadedAssets(Prefab.class).stream().filter(p -> p.getComponent(comp) != null).collect(Collectors.toList()));
 
         return prefabs;
     }

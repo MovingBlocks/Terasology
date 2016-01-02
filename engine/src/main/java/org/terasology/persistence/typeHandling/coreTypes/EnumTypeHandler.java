@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -68,9 +69,7 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     @Override
     public PersistedData serializeCollection(Collection<T> value, SerializationContext context) {
         List<String> values = Lists.newArrayListWithCapacity(value.size());
-        for (T item : value) {
-            values.add(item.toString());
-        }
+        values.addAll(value.stream().map(T::toString).collect(Collectors.toList()));
         return context.createStrings(values);
     }
 

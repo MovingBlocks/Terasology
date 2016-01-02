@@ -271,13 +271,7 @@ public class CoreCommands extends BaseComponentSystem {
     public void join(@CommandParam("address") final String address, @CommandParam(value = "port", required = false) Integer portParam) {
         final int port = portParam != null ? portParam : TerasologyConstants.DEFAULT_PORT;
 
-        Callable<JoinStatus> operation = new Callable<JoinStatus>() {
-
-            @Override
-            public JoinStatus call() throws InterruptedException {
-                return networkSystem.join(address, port);
-            }
-        };
+        Callable<JoinStatus> operation = () -> networkSystem.join(address, port);
 
         final WaitPopup<JoinStatus> popup = nuiManager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");

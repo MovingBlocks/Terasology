@@ -211,15 +211,12 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             unsavedEntryIterator.remove();
         }
 
-
-        for (Chunk chunk : chunkProvider.getAllChunks()) {
-            if (chunk.isReady()) {
-                // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
-                unloadedAndSavingChunkMap.remove(chunk.getPosition());
-                ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
-                saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
-            }
-        }
+        chunkProvider.getAllChunks().stream().filter(chunk -> chunk.isReady()).forEach(chunk -> {
+            // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
+            unloadedAndSavingChunkMap.remove(chunk.getPosition());
+            ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
+            saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
+        });
 
         for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
             saveTransactionBuilder.addUnloadedChunk(entry.getKey(), entry.getValue());
@@ -312,9 +309,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         unloadedAndUnsavedChunkMap.put(chunk.getPosition(), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
                 entitiesOfChunk, true));
 
-        for (EntityRef entity : entitiesOfChunk) {
-            deactivateOrDestroyEntityRecursive(entity);
-        }
+        entitiesOfChunk.forEach(this::deactivateOrDestroyEntityRecursive);
     }
 
     @Override

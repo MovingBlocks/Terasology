@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -74,11 +75,7 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
     }
 
     private void destroyClientTempEntities(AbstractMoveItemRequest removedRequest) {
-        for (EntityRef tempEntity : removedRequest.getClientSideTempEntities()) {
-            if (tempEntity.exists()) {
-                tempEntity.destroy();
-            }
-        }
+        removedRequest.getClientSideTempEntities().stream().filter(tempEntity -> tempEntity.exists()).forEach(EntityRef::destroy);
     }
 
     private void recalculatePredictedState() {
@@ -226,12 +223,7 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
 
     private boolean moveItemToSlotsFillClientTempEntities(EntityRef instigator, EntityRef fromInventory, int slotFrom,
             EntityRef toInventory, List<Integer> toSlots, Collection<EntityRef> clientTempEntities) {
-        Set<Integer> emptySlotsBefore = new HashSet<>();
-        for (Integer toSlot : toSlots) {
-            if (!InventoryUtils.getItemAt(toInventory, toSlot).exists()) {
-                emptySlotsBefore.add(toSlot);
-            }
-        }
+        Set<Integer> emptySlotsBefore = toSlots.stream().filter(toSlot -> !InventoryUtils.getItemAt(toInventory, toSlot).exists()).collect(Collectors.toSet());
 
         if (!InventoryUtils.moveItemToSlots(instigator, fromInventory, slotFrom, toInventory, toSlots)) {
             return true;

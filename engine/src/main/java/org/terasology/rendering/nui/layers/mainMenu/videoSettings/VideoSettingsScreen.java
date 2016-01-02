@@ -15,9 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -38,7 +36,6 @@ import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import javax.imageio.ImageIO;
-
 import java.util.Arrays;
 
 /**
@@ -147,14 +144,11 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             frameLimitSlider.setMinimum(30);
             frameLimitSlider.setRange(175); // Goes up to 205 (which is off)
             // Frame limit > 200 is just displayed and treated as "off"
-            frameLimitSlider.setLabelFunction(new Function<Float, String>() {
-                @Override
-                public String apply(Float input) {
-                    if (input > 200) {
-                        return " Off "; // Spaces to get wider than "200" (otherwise the display jumps around)
-                    } else {
-                        return String.valueOf(input.intValue());
-                    }
+            frameLimitSlider.setLabelFunction(input -> {
+                if (input > 200) {
+                    return " Off "; // Spaces to get wider than "200" (otherwise the display jumps around)
+                } else {
+                    return String.valueOf(input.intValue());
                 }
             });
             frameLimitSlider.bindValue(new Binding<Float>() {
@@ -185,12 +179,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fboScaleSlider.setPrecision(0);
             fboScaleSlider.setMinimum(25);
             fboScaleSlider.setRange(200);
-            fboScaleSlider.setLabelFunction(new Function<Float, String>() {
-                @Override
-                public String apply(Float input) {
-                    return String.valueOf(input.intValue()) + "%";
-                }
-            });
+            fboScaleSlider.setLabelFunction(input -> String.valueOf(input.intValue()) + "%");
             fboScaleSlider.bindValue(new Binding<Float>() {
                 @Override
                 public Float get() {

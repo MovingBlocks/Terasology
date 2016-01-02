@@ -47,7 +47,7 @@ public final class FlowLineBuilder {
             FlowRenderable.SplitResult<T> splitResult = flowRenderable.splitAt(defaultRenderStyle, availableWidth - x);
             if (splitResult.before == null) {
                 // This is the end of the line, this renderable doesn't fit
-                result.add(new DefaultLaidFlowLine<T>(x, maxHeightInLine, renderablesInLine));
+                result.add(new DefaultLaidFlowLine<>(x, maxHeightInLine, renderablesInLine));
                 renderablesInLine = new LinkedList<>();
                 x = 0;
                 y += maxHeightInLine;
@@ -64,7 +64,7 @@ public final class FlowLineBuilder {
                 renderablesInLine.add(splitResult.before);
 
                 if (splitResult.rest != null) {
-                    result.add(new DefaultLaidFlowLine<T>(x, maxHeightInLine, renderablesInLine));
+                    result.add(new DefaultLaidFlowLine<>(x, maxHeightInLine, renderablesInLine));
                     renderablesInLine = new LinkedList<>();
                     x = 0;
                     y += maxHeightInLine;
@@ -75,7 +75,7 @@ public final class FlowLineBuilder {
             }
         }
 
-        result.add(new DefaultLaidFlowLine<T>(x, maxHeightInLine, renderablesInLine));
+        result.add(new DefaultLaidFlowLine<>(x, maxHeightInLine, renderablesInLine));
 
         return result;
     }

@@ -160,9 +160,7 @@ public class SkeletalMeshData implements AssetData {
             normals.get(indices.get(i * 3 + 2)).add(norm);
         }
 
-        for (Vector3f normal : normals) {
-            normal.normalize();
-        }
+        normals.forEach(Vector3f::normalize);
 
         Quat4f inverseRot = new Quat4f();
         for (int vertIndex = 0; vertIndex < vertices.size(); ++vertIndex) {

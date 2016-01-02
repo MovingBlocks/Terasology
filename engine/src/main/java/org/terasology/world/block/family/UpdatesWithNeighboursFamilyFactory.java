@@ -35,6 +35,7 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyFactory {
     public static final String NO_CONNECTIONS = "no_connections";
@@ -164,9 +165,7 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         Iterable<Rotation> rotations = horizontalOnly ? Rotation.horizontalRotations() : Rotation.values();
         for (Rotation rot : rotations) {
             Set<Side> transformedSides = Sets.newHashSet();
-            for (Side originalSide : originalSides) {
-                transformedSides.add(rot.rotate(originalSide));
-            }
+            transformedSides.addAll(originalSides.stream().map(rot::rotate).collect(Collectors.toList()));
 
             byte transformedSide = SideBitFlag.getSides(transformedSides);
             if (transformedSide == target) {

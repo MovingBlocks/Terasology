@@ -57,13 +57,9 @@ public final class PositionFilters {
      * @return a predicate that returns true only if (y &gt; minHeight) and (y &lt; maxHeight)
      */
     public static Predicate<Vector3i> heightRange(final int minHeight, final int maxHeight) {
-        return new Predicate<Vector3i>() {
-
-            @Override
-            public boolean apply(Vector3i input) {
-                int y = input.getY();
-                return y > minHeight && y < maxHeight;
-            }
+        return input -> {
+            int y = input.getY();
+            return y > minHeight && y < maxHeight;
         };
     }
 
@@ -74,15 +70,11 @@ public final class PositionFilters {
      * @return a predicate that returns true if (density &ge; 0) and (density &lt; 0) for the block at (y - 1)
      */
     public static Predicate<Vector3i> density(final DensityFacet density) {
-        return new Predicate<Vector3i>() {
-
-            @Override
-            public boolean apply(Vector3i input) {
-                // pass if the block on the surface is dense enough
-                float densBelow = density.getWorld(input.getX(), input.getY() - 1, input.getZ());
-                float densThis = density.getWorld(input);
-                return (densBelow >= 0 && densThis < 0);
-            }
+        return input -> {
+            // pass if the block on the surface is dense enough
+            float densBelow = density.getWorld(input.getX(), input.getY() - 1, input.getZ());
+            float densThis = density.getWorld(input);
+            return (densBelow >= 0 && densThis < 0);
         };
     }
 
@@ -140,13 +132,7 @@ public final class PositionFilters {
      * @return true if the noise value is <b>below</b> the threshold
      */
     public static Predicate<Vector3i> probability(final Noise noiseGen, final float density) {
-        return new Predicate<Vector3i>() {
-
-            @Override
-            public boolean apply(Vector3i input) {
-                return Math.abs(noiseGen.noise(input.getX(), input.getY(), input.getZ())) < density;
-            }
-        };
+        return input -> Math.abs(noiseGen.noise(input.getX(), input.getY(), input.getZ())) < density;
     }
 
 }

@@ -31,11 +31,9 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
@@ -108,21 +106,13 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             language.setOptionRenderer(new LocaleRenderer(translationSystem));
         }
 
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
 
         UIButton okButton = find("ok", UIButton.class);
         if (okButton != null) {
-            okButton.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    savePlayerSettings();
-                    getManager().popScreen();
-                }
+            okButton.subscribe(button -> {
+                savePlayerSettings();
+                getManager().popScreen();
             });
             okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                 @Override

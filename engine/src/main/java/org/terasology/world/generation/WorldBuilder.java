@@ -20,7 +20,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
@@ -227,26 +226,24 @@ public class WorldBuilder {
         }
 
         // then add all @Updates facet providers
-        for (FacetProvider provider : providersList) {
-            if (updatesFacet(provider, facet)) {
-                // add all required facets for updating provider
-                for (Facet requirement : requiredFacets(provider)) {
-                    determineProviderChainFor(requirement.value(), result);
-                    orderedProviders.addAll(result.get(requirement.value()));
-                }
-                // the provider updates this and other facets
-                // just add producers for the other facets
-                for (Facet updated : updatedFacets(provider)) {
-                    for (FacetProvider fp : providersList) {
-                        // only add @Produces providers to avoid infinite recursion
-                        if (producesFacet(fp, updated.value())) {
-                            orderedProviders.add(fp);
-                        }
+        providersList.stream().filter(provider -> updatesFacet(provider, facet)).forEach(provider -> {
+            // add all required facets for updating provider
+            for (Facet requirement : requiredFacets(provider)) {
+                determineProviderChainFor(requirement.value(), result);
+                orderedProviders.addAll(result.get(requirement.value()));
+            }
+            // the provider updates this and other facets
+            // just add producers for the other facets
+            for (Facet updated : updatedFacets(provider)) {
+                for (FacetProvider fp : providersList) {
+                    // only add @Produces providers to avoid infinite recursion
+                    if (producesFacet(fp, updated.value())) {
+                        orderedProviders.add(fp);
                     }
                 }
-                orderedProviders.add(provider);
             }
-        }
+            orderedProviders.add(provider);
+        });
         result.putAll(facet, orderedProviders);
         facetCalculationInProgress.remove(facet);
     }

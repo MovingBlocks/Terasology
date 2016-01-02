@@ -19,8 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.nio.zipfs.ZipFileSystemProvider;
-import gnu.trove.procedure.TLongObjectProcedure;
-import gnu.trove.procedure.TLongProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -232,64 +230,50 @@ public class SaveTransaction extends AbstractTask {
 
 
     private void applyDeltaToPrivateEntityManager() {
-        deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
-            @Override
-            public boolean execute(long entityId, EntityDelta delta) {
-                if (entityId >= privateEntityManager.getNextId()) {
-                    privateEntityManager.setNextId(entityId + 1);
-                }
-                return true;
+        deltaToSave.getEntityDeltas().forEachEntry((entityId, delta) -> {
+            if (entityId >= privateEntityManager.getNextId()) {
+                privateEntityManager.setNextId(entityId + 1);
             }
+            return true;
         });
-        deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
-            @Override
-            public boolean execute(long entityId) {
-                if (entityId >= privateEntityManager.getNextId()) {
-                    privateEntityManager.setNextId(entityId + 1);
-                }
-                return true;
+        deltaToSave.getDestroyedEntities().forEach(entityId -> {
+            if (entityId >= privateEntityManager.getNextId()) {
+                privateEntityManager.setNextId(entityId + 1);
             }
+            return true;
         });
-        deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
-            @Override
-            public boolean execute(long entityId, EntityDelta delta) {
-                if (privateEntityManager.isActiveEntity(entityId)) {
-                    EntityRef entity = privateEntityManager.getEntity(entityId);
-                    for (Component changedComponent : delta.getChangedComponents().values()) {
-                        entity.removeComponent(changedComponent.getClass());
-                        entity.addComponent(changedComponent);
-                    }
-                    for (Class<? extends Component> c : delta.getRemovedComponents()) {
-                        entity.removeComponent(c);
-                    }
-                } else {
-                    privateEntityManager.createEntityWithId(entityId, delta.getChangedComponents().values());
+        deltaToSave.getEntityDeltas().forEachEntry((entityId, delta) -> {
+            if (privateEntityManager.isActiveEntity(entityId)) {
+                EntityRef entity = privateEntityManager.getEntity(entityId);
+                for (Component changedComponent : delta.getChangedComponents().values()) {
+                    entity.removeComponent(changedComponent.getClass());
+                    entity.addComponent(changedComponent);
                 }
+                delta.getRemovedComponents().forEach(entity::removeComponent);
+            } else {
+                privateEntityManager.createEntityWithId(entityId, delta.getChangedComponents().values());
+            }
 
-                return true;
-            }
+            return true;
         });
         final List<EntityRef> entitiesToDestroy = Lists.newArrayList();
-        deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
-            @Override
-            public boolean execute(long entityId) {
-                EntityRef entityToDestroy;
-                if (privateEntityManager.isActiveEntity(entityId)) {
-                    entityToDestroy = privateEntityManager.getEntity(entityId);
-                } else {
-                    /**
-                     * Create the entity as theere could be a component that references a {@link DelayedEntityRef}
-                     * with the specified id. It is important that the {@link DelayedEntityRef} will reference
-                     * a destroyed {@link EntityRef} instance. That is why a entity will be created, potentially
-                     * bound to one or more {@link DelayedEntityRef}s and then destroyed.
-                     *
-                     */
-                    entityToDestroy = privateEntityManager.createEntityWithId(entityId,
-                            Collections.<Component>emptyList());
-                }
-                entitiesToDestroy.add(entityToDestroy);
-                return true;
+        deltaToSave.getDestroyedEntities().forEach(entityId -> {
+            EntityRef entityToDestroy;
+            if (privateEntityManager.isActiveEntity(entityId)) {
+                entityToDestroy = privateEntityManager.getEntity(entityId);
+            } else {
+                /**
+                 * Create the entity as theere could be a component that references a {@link DelayedEntityRef}
+                 * with the specified id. It is important that the {@link DelayedEntityRef} will reference
+                 * a destroyed {@link EntityRef} instance. That is why a entity will be created, potentially
+                 * bound to one or more {@link DelayedEntityRef}s and then destroyed.
+                 *
+                 */
+                entityToDestroy = privateEntityManager.createEntityWithId(entityId,
+                        Collections.<Component>emptyList());
             }
+            entitiesToDestroy.add(entityToDestroy);
+            return true;
         });
 
         /*
@@ -300,17 +284,12 @@ public class SaveTransaction extends AbstractTask {
          */
         deltaToSave.bindAllDelayedEntityRefsTo(privateEntityManager);
 
-        for (EntityRef entityRef : entitiesToDestroy) {
-            entityRef.destroy();
-        }
+        entitiesToDestroy.forEach(EntityRef::destroy);
 
-        deltaToSave.getDeactivatedEntities().forEach(new TLongProcedure() {
-            @Override
-            public boolean execute(long entityId) {
-                EntityRef entityRef = privateEntityManager.getEntity(entityId);
-                privateEntityManager.deactivateForStorage(entityRef);
-                return true;
-            }
+        deltaToSave.getDeactivatedEntities().forEach(entityId -> {
+            EntityRef entityRef = privateEntityManager.getEntity(entityId);
+            privateEntityManager.deactivateForStorage(entityRef);
+            return true;
         });
     }
 

@@ -45,9 +45,7 @@ final class EntityRestorer {
             }
         }
         serializer.setComponentIdMapping(idMap);
-        for (EntityData.Entity entity : store.getEntityList()) {
-            serializer.deserialize(entity);
-        }
+        store.getEntityList().forEach(serializer::deserialize);
 
         Map<String, EntityRef> namedEntities = Maps.newHashMap();
         for (int i = 0; i < store.getEntityNameCount() && i < store.getEntityNamedCount(); ++i) {

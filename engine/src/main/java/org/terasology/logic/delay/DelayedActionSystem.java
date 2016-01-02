@@ -66,22 +66,20 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             scheduledOperationsIterator.remove();
         }
 
-        for (EntityRef delayedEntity : operationsToInvoke) {
-            if (delayedEntity.exists()) {
-                final DelayedActionComponent delayedActions = delayedEntity.getComponent(DelayedActionComponent.class);
+        operationsToInvoke.stream().filter(delayedEntity -> delayedEntity.exists()).forEach(delayedEntity -> {
+            final DelayedActionComponent delayedActions = delayedEntity.getComponent(DelayedActionComponent.class);
 
-                final Set<String> actionIds = delayedActions.removeActionsUpTo(currentWorldTime);
-                saveOrRemoveComponent(delayedEntity, delayedActions);
+            final Set<String> actionIds = delayedActions.removeActionsUpTo(currentWorldTime);
+            saveOrRemoveComponent(delayedEntity, delayedActions);
 
-                if (!delayedActions.isEmpty()) {
-                    delayedOperationsSortedByTime.put(delayedActions.getLowestWakeUp(), delayedEntity);
-                }
-
-                for (String actionId : actionIds) {
-                    delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
-                }
+            if (!delayedActions.isEmpty()) {
+                delayedOperationsSortedByTime.put(delayedActions.getLowestWakeUp(), delayedEntity);
             }
-        }
+
+            for (String actionId : actionIds) {
+                delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
+            }
+        });
     }
 
     private void invokePeriodicOperations(long currentWorldTime) {
@@ -97,22 +95,20 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             scheduledOperationsIterator.remove();
         }
 
-        for (EntityRef periodicEntity : operationsToInvoke) {
-            if (periodicEntity.exists()) {
-                final PeriodicActionComponent periodicActionComponent = periodicEntity.getComponent(PeriodicActionComponent.class);
+        operationsToInvoke.stream().filter(periodicEntity -> periodicEntity.exists()).forEach(periodicEntity -> {
+            final PeriodicActionComponent periodicActionComponent = periodicEntity.getComponent(PeriodicActionComponent.class);
 
-                final Set<String> actionIds = periodicActionComponent.getTriggeredActionsAndReschedule(currentWorldTime);
-                saveOrRemoveComponent(periodicEntity, periodicActionComponent);
+            final Set<String> actionIds = periodicActionComponent.getTriggeredActionsAndReschedule(currentWorldTime);
+            saveOrRemoveComponent(periodicEntity, periodicActionComponent);
 
-                if (!periodicActionComponent.isEmpty()) {
-                    periodicOperationsSortedByTime.put(periodicActionComponent.getLowestWakeUp(), periodicEntity);
-                }
-
-                for (String actionId : actionIds) {
-                    periodicEntity.send(new PeriodicActionTriggeredEvent(actionId));
-                }
+            if (!periodicActionComponent.isEmpty()) {
+                periodicOperationsSortedByTime.put(periodicActionComponent.getLowestWakeUp(), periodicEntity);
             }
-        }
+
+            for (String actionId : actionIds) {
+                periodicEntity.send(new PeriodicActionTriggeredEvent(actionId));
+            }
+        });
     }
 
     @ReceiveEvent

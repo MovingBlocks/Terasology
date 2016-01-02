@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.reflection.copy.CopyStrategy;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -34,9 +35,7 @@ public class ListCopyStrategy<T> implements CopyStrategy<List<T>> {
     public List<T> copy(List<T> value) {
         if (value != null) {
             List<T> result = Lists.newArrayListWithCapacity(value.size());
-            for (T item : value) {
-                result.add(contentStrategy.copy(item));
-            }
+            result.addAll(value.stream().map(contentStrategy::copy).collect(Collectors.toList()));
             return result;
         }
         return null;

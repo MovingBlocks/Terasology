@@ -16,7 +16,6 @@
 package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
@@ -40,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The core ICommand implementation and command information
@@ -310,20 +310,14 @@ public abstract class AbstractCommand implements ConsoleCommand {
         Set<String> stringSuggestions = convertToString(result, suggestedParameter);
 
         //Only return results starting with currentValue
-        return Sets.filter(stringSuggestions, new Predicate<String>() {
-            @Override
-            public boolean apply(String input) {
-                return input != null && (currentValue == null || input.startsWith(currentValue));
-            }
-        });
+        return Sets.filter(stringSuggestions, input ->
+                input != null && (currentValue == null || input.startsWith(currentValue)));
     }
 
     private static Set<String> convertToString(Set<Object> collection, CommandParameter parameter) {
         Set<String> result = Sets.newHashSetWithExpectedSize(collection.size());
 
-        for (Object component : collection) {
-            result.add(parameter.convertToString(component));
-        }
+        result.addAll(collection.stream().map(parameter::convertToString).collect(Collectors.toList()));
 
         return result;
     }

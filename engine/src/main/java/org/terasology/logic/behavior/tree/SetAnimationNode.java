@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.properties.OneOf;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Plays a animation from a animation set and sets the animation pool to pick animation to play from.
@@ -72,9 +73,7 @@ public class SetAnimationNode extends Node {
                 skeletalMesh.animationPool.clear();
                 List<?> animationListToLoop = (List<?>) actor().getComponentField(getNode().loop);
                 if (animationListToLoop != null) {
-                    for (Object object : animationListToLoop) {
-                        skeletalMesh.animationPool.add((MeshAnimation) object);
-                    }
+                    skeletalMesh.animationPool.addAll(animationListToLoop.stream().map(object -> (MeshAnimation) object).collect(Collectors.toList()));
                 }
             }
             skeletalMesh.loop = true;

@@ -43,6 +43,7 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -361,9 +362,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
     public List<PersistedData> getAsValueArray() {
         List<PersistedData> result = Lists.newArrayList();
         if (data.getValueCount() > 0) {
-            for (EntityData.Value val : data.getValueList()) {
-                result.add(new ProtobufPersistedData(val));
-            }
+            result.addAll(data.getValueList().stream().map(ProtobufPersistedData::new).collect(Collectors.toList()));
         } else if (data.getFloatCount() > 0) {
             for (int i = 0; i < data.getFloatCount(); ++i) {
                 result.add(new PersistedFloat(data.getFloat(i)));

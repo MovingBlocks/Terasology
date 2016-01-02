@@ -33,6 +33,7 @@ import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -72,9 +73,7 @@ public class RegisterMods extends SingleStepLoadProcess {
         } else {
             ModuleManager moduleManager = context.get(ModuleManager.class);
             List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
-            for (NameVersion moduleInfo : gameManifest.getModules()) {
-                moduleIds.add(moduleInfo.getName());
-            }
+            moduleIds.addAll(gameManifest.getModules().stream().map(NameVersion::getName).collect(Collectors.toList()));
 
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(moduleIds);

@@ -435,11 +435,11 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         public List<EventInfo> receivedEvents = Lists.newArrayList();
 
         public LifecycleEventChecker(EventSystem eventSystem, Class<? extends Component> forComponent) {
-            eventSystem.registerEventReceiver(new LifecycleEventReceiver<OnAddedComponent>(), OnAddedComponent.class, forComponent);
-            eventSystem.registerEventReceiver(new LifecycleEventReceiver<OnActivatedComponent>(), OnActivatedComponent.class, forComponent);
-            eventSystem.registerEventReceiver(new LifecycleEventReceiver<OnChangedComponent>(), OnChangedComponent.class, forComponent);
-            eventSystem.registerEventReceiver(new LifecycleEventReceiver<BeforeDeactivateComponent>(), BeforeDeactivateComponent.class, forComponent);
-            eventSystem.registerEventReceiver(new LifecycleEventReceiver<BeforeRemoveComponent>(), BeforeRemoveComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<>(), OnAddedComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<>(), OnActivatedComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<>(), OnChangedComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<>(), BeforeDeactivateComponent.class, forComponent);
+            eventSystem.registerEventReceiver(new LifecycleEventReceiver<>(), BeforeRemoveComponent.class, forComponent);
         }
 
         private class LifecycleEventReceiver<T extends Event> implements EventReceiver<T> {

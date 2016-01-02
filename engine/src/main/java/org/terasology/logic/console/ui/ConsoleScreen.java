@@ -24,11 +24,9 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.List;
@@ -71,13 +69,10 @@ public class ConsoleScreen extends CoreScreenLayer {
                 return console.getPreviousCommands();
             }
         });
-        commandLine.subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget widget) {
-                console.execute(commandLine.getText(), localPlayer.getClientEntity());
-                commandLine.setText("");
-                scrollArea.moveToBottom();
-            }
+        commandLine.subscribe(widget -> {
+            console.execute(commandLine.getText(), localPlayer.getClientEntity());
+            commandLine.setText("");
+            scrollArea.moveToBottom();
         });
 
         final UIText history = find("messageHistory", UIText.class);

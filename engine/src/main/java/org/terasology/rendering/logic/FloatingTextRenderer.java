@@ -188,9 +188,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
 
     @Override
     public void shutdown() {
-        for (Map<Material, Mesh> meshMap: entityMeshCache.values()) {
-            diposeMeshMap(meshMap);
-        }
+        entityMeshCache.values().forEach(this::diposeMeshMap);
         entityMeshCache.clear();
     }
 }

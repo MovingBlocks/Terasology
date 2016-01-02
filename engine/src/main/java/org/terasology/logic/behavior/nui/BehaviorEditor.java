@@ -104,9 +104,7 @@ public class BehaviorEditor extends ZoomableLayout {
             selectionBinding.set(null);
         }
         removeAll();
-        for (RenderableNode widget : tree.getRenderableNodes(behaviorNodeFactory)) {
-            addWidget(widget);
-        }
+        tree.getRenderableNodes(behaviorNodeFactory).forEach(this::addWidget);
     }
 
     public BehaviorTree getTree() {

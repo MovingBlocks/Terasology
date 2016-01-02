@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.ui;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -61,12 +60,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             return false;
         }
 
-        commandNames = Collections2.transform(commands, new Function<ConsoleCommand, String>() {
-            @Override
-            public String apply(ConsoleCommand input) {
-                return input.getName().toString();
-            }
-        });
+        commandNames = Collections2.transform(commands, input -> input.getName().toString());
         return true;
     }
 

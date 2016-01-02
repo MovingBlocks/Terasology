@@ -164,7 +164,7 @@ public final class Benchmarks {
     public static List<BenchmarkResult> execute(List<Benchmark> benchmarks, BenchmarkCallback callback) {
         Preconditions.checkNotNull(benchmarks);
 
-        final List<BenchmarkResult> results = new LinkedList<BenchmarkResult>();
+        final List<BenchmarkResult> results = new LinkedList<>();
         final int benchmarkCount = benchmarks.size();
 
         try {

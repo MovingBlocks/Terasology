@@ -37,7 +37,7 @@ public final class OpenALException extends IllegalStateException {
 
             exception.fillInStackTrace();
 
-            List<StackTraceElement> stackTrace = new ArrayList<StackTraceElement>(Arrays.asList(exception.getStackTrace()));
+            List<StackTraceElement> stackTrace = new ArrayList<>(Arrays.asList(exception.getStackTrace()));
             stackTrace.remove(0); // remove first element in stack
             exception.setStackTrace(stackTrace.toArray(new StackTraceElement[stackTrace.size()]));
 

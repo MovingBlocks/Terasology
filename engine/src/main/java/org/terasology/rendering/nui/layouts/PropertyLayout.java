@@ -16,12 +16,10 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
@@ -30,9 +28,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Created by synopia on 03.01.14.
- */
 public class PropertyLayout extends MigLayout {
 
     private Comparator<? super Property<?, ?>> propertyComparator = PropertyOrdering.byLabel();
@@ -61,21 +56,17 @@ public class PropertyLayout extends MigLayout {
             layout.setColConstraints("[min][fill]");
             layout.setRowConstraints("[min]");
 
-            expand.subscribe(new ActivateEventListener() {
-
-                @Override
-                public void onActivated(UIWidget widget) {
-                    UIButton button = (UIButton) widget;
-                    if ("-".equals(button.getText())) {
-                        layout.clear();
-                        invalidate();
-                        button.setText("+");
-                        button.setTooltip("Click to expand");
-                    } else {
-                        expand(properties, layout);
-                        button.setText("-");
-                        button.setTooltip("Click to collapse");
-                    }
+            expand.subscribe(widget -> {
+                UIButton button = (UIButton) widget;
+                if ("-".equals(button.getText())) {
+                    layout.clear();
+                    invalidate();
+                    button.setText("+");
+                    button.setTooltip("Click to expand");
+                } else {
+                    expand(properties, layout);
+                    button.setText("-");
+                    button.setTooltip("Click to collapse");
                 }
             });
             addWidget(expand, new CCHint("newline, w 45!, h 22!"));
