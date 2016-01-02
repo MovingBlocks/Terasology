@@ -16,7 +16,6 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -25,7 +24,7 @@ import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
-import org.terasology.input.lwjgl.LwjglControllerDevice;
+import org.terasology.input.lwjgl.JinputControllerDevice;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
 
@@ -66,14 +65,13 @@ public class LwjglInput extends BaseLwjglSubsystem {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            Controllers.create();
             InputSystem inputSystem = new InputSystem();
             context.put(InputSystem.class, inputSystem);
             inputSystem.setMouseDevice(new LwjglMouseDevice());
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
             ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
-            LwjglControllerDevice controllerDevice = new LwjglControllerDevice();
+            JinputControllerDevice controllerDevice = new JinputControllerDevice();
             for (int idx = 0; idx < controllerDevice.getControllers().size(); idx++) {
                 String name = controllerDevice.getControllers().get(idx);
                 float deadZone = controllerConfig.getController(name).getDeadZone();

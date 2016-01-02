@@ -23,10 +23,10 @@ import org.terasology.input.Input;
 public final class ControllerAction {
     private final Input input;
     private final ButtonState state;
-    private final int controller;
+    private final String controller;
     private final float axisValue;
 
-    public ControllerAction(Input input, int controller, ButtonState state, float axisValue) {
+    public ControllerAction(Input input, String controller, ButtonState state, float axisValue) {
         this.input = input;
         this.state = state;
         this.controller = controller;
@@ -34,9 +34,9 @@ public final class ControllerAction {
     }
 
     /**
-     * @return the index of the controller that sent the event
+     * @return the name of the controller that sent the event
      */
-    public int getController() {
+    public String getController() {
         return controller;
     }
 

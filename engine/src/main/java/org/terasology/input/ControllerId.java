@@ -35,5 +35,11 @@ public interface ControllerId {
 
     int X_AXIS = 100;
     int Y_AXIS = 200;
-    int Z_AXIS = 400;
+    int Z_AXIS = 300;
+
+    int RX_AXIS = 500;
+    int RY_AXIS = 600;
+
+    int POVX_AXIS = 800;
+    int POVY_AXIS = 900;
 }
