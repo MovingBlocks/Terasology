@@ -47,7 +47,6 @@ import org.terasology.input.RegisterBindButton;
 import org.terasology.input.RegisterRealBindAxis;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.ButtonEvent;
-import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
