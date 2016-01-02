@@ -25,20 +25,18 @@ import org.ajoberstar.gradle.git.tasks.*
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url 'http://dl.bintray.com/jfrog/jfrog-jars'
-        }
+        jcenter()
     }
 
     dependencies {
         // Artifactory plugin
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.0.0')
 
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
 
         // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.9'
+        classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
     }
 }
@@ -51,13 +49,13 @@ buildscript {
  * 4. Comment 'wrapper' task
  */
 //task wrapper(type: Wrapper) {
-//    gradleVersion = '2.1'
+//    gradleVersion = '2.10'
 //}
 
 import org.apache.tools.ant.filters.FixCrLfFilter;
 
 // Test for right version of Java in use for running this script
-assert org.gradle.api.JavaVersion.current().isJava7Compatible()
+assert org.gradle.api.JavaVersion.current().isJava8Compatible()
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
@@ -77,7 +75,7 @@ repositories {
     mavenCentral()
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
-        url "http://artifactory.terasology.org:8081/artifactory/virtual-repo-live"
+        url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
     }
 }
 

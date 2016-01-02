@@ -2,18 +2,16 @@
 
 // Get the gradle versioneye plugin from the plugins.gradle.org repo
 plugins {
-    id "org.standardout.versioneye" version "1.0.0"
+    id "org.standardout.versioneye" version "1.1.0"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
-import org.apache.tools.ant.filters.FixCrLfFilter
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.text.SimpleDateFormat;
 
@@ -91,11 +89,11 @@ configurations.all {
 dependencies {
 
     // Storage and networking
-    compile group: 'com.google.guava', name: 'guava', version: '18.0'
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.5'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
     compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-    compile group: 'io.netty', name: 'netty', version: '3.10.4.Final'
+    compile group: 'io.netty', name: 'netty', version: '3.10.5.Final'
 
     // Java magic
     compile group: 'net.java.dev.jna', name: 'jna-platform', version: '4.2.1'
@@ -107,12 +105,12 @@ dependencies {
     compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
     compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
     compile group: 'java3d', name: 'vecmath', version: '1.3.1' // Note: Downgraded to this release until TeraMath ready
-    compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.2'
+    compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     compile group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     compile group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
     // Logging and audio
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.9'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.13'
     compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
 
     // Small-time 3rd party libs we've stored in our Artifactory for access
@@ -133,7 +131,7 @@ dependencies {
     compile group: 'org.terasology', name: 'CrashReporter', version: '2.1.0'
 
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.3'
-    runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.12'
+    runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.13'
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
@@ -155,14 +153,14 @@ task cacheReflections {
     inputs.files project.classes.outputs.files
     dependsOn classes
     
-	doLast {
-		// Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-		file(sourceSets.main.output.classesDir.toString()).mkdirs()
-		Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-			.addUrls(configurations.compile.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL())
-			.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-		reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
-	}
+    doLast {
+        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+        file(sourceSets.main.output.classesDir.toString()).mkdirs()
+        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
+            .addUrls(configurations.compile.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL())
+            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    }
     
 }
 

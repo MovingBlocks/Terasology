@@ -4,23 +4,8 @@ apply from: "$rootDir/config/gradle/common.gradle"
 
 // Artifactory publishing requires these (without maven we'd get no .pom with dependency info published)
 apply plugin: 'maven'
-apply plugin: 'artifactory-publish'
+apply plugin: "com.jfrog.artifactory"
 apply plugin: 'maven-publish'
-
-// Dependencies needed for what our Gradle scripts themselves use
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url 'http://dl.bintray.com/jfrog/jfrog-jars'
-        }
-    }
-
-    dependencies {
-        // This grabs the Artifactory plugin jars
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
-    }
-}
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance. It is primarily for local use.
 // In Jenkins the Artifactory plugin can supply overrides for the following values
@@ -33,10 +18,10 @@ artifactory {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryPublishRepo")) {
                 repoKey = artifactoryPublishRepo
-                //println "setting PUBLISH repoKey to $artifactoryPublishRepo"
+                println "Changing PUBLISH repoKey to $artifactoryPublishRepo"
             } else {
                 repoKey = 'terasology-snapshot-local'
-                //println "PUBLISH repoKey is terasology-snapshot-local"
+                println "PUBLISH repoKey is terasology-snapshot-local (default value)"
             }
 
             // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
@@ -61,10 +46,10 @@ artifactory {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryResolveRepo")) {
                 repoKey = artifactoryResolveRepo
-                //println "setting RESOLVE repoKey to $artifactoryResolveRepo"
+                println "Changing RESOLVE repoKey to $artifactoryResolveRepo"
             } else {
                 repoKey = 'virtual-repo-live'
-                //println "RESOLVE repoKey is repo"
+                println "RESOLVE repoKey is virtual-repo-live (default value)"
             }
         }
     }
@@ -103,4 +88,6 @@ publishing {
 // Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
 artifactoryPublish {
     dependsOn jar, sourceJar, javadocJar
+    // TODO: After Gradle 2.3 to 2.10 upgrade have to use `gradlew generatePomFileForMavenJavaPublication artifactoryPublish`
+    // The generation task doesn't happen on its own yet can't be set as a dependsOn as it isn't available yet?
 }

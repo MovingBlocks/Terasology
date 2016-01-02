@@ -17,20 +17,18 @@ import org.reflections.util.ConfigurationBuilder;
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url 'http://dl.bintray.com/jfrog/jfrog-jars'
-        }
+        jcenter()
     }
 
     dependencies {
         // Artifactory plugin
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.0.0')
 
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
 
         // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.9'
+        classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
     }
 }
