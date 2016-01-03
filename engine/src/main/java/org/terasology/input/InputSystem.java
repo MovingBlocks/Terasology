@@ -412,8 +412,9 @@ public class InputSystem extends BaseComponentSystem {
                     ControllerInfo info = config.getInput().getControllers().getController(action.getController());
                     boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
                     boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
-                    float fac = (isX && info.isInvertX() || isY && info.isInvertY()) ? -1 : 1;
-                    axis.setTargetValue(action.getAxisValue() * fac);
+                    boolean isZ = action.getInput().getId() == ControllerId.Z_AXIS;
+                    float f = (isX && info.isInvertX() || isY && info.isInvertY() || isZ && info.isInvertZ()) ? -1 : 1;
+                    axis.setTargetValue(action.getAxisValue() * f);
                 }
             }
         }
