@@ -1,11 +1,11 @@
 {
     "id" : "CoreSampleGameplay",
-    "version" : "0.54.6-SNAPSHOT",
+    "version" : "1.0.0-SNAPSHOT",
     "displayName" : "Core Gameplay",
     "description" : "Minimal gameplay template. Little content but a few starting items.",
     "dependencies" :
     [
-        {"id": "Core", "minVersion": "0.1.0", "maxVersion": "1.0.0"}
+        {"id": "Core", "minVersion": "1.0.0"}
     ],
     "isGameplay" : "true",
     "defaultWorldGenerator" : "Core:FacetedPerlin"
