@@ -24,7 +24,7 @@ import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
-import org.terasology.input.lwjgl.JinputControllerDevice;
+import org.terasology.input.lwjgl.JInputControllerDevice;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
 
@@ -71,7 +71,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
             ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
-            JinputControllerDevice controllerDevice = new JinputControllerDevice();
+            JInputControllerDevice controllerDevice = new JInputControllerDevice();
             for (String name : controllerDevice.getControllers()) {
                 float mvmtDeadZone = controllerConfig.getController(name).getMovementDeadZone();
                 controllerDevice.setMovementDeadZone(name, mvmtDeadZone);

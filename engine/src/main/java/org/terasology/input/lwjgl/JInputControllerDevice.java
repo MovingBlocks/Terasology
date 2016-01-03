@@ -49,11 +49,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * TODO Type description
+ * Retrieves information on connected controllers through JInput.
  */
-public class JinputControllerDevice implements ControllerDevice {
+public class JInputControllerDevice implements ControllerDevice {
 
-    private static final Logger logger = LoggerFactory.getLogger(JinputControllerDevice.class);
+    private static final Logger logger = LoggerFactory.getLogger(JInputControllerDevice.class);
 
     private Set<Type> filter = ImmutableSet.of(Type.KEYBOARD, Type.MOUSE, Type.UNKNOWN);
 
@@ -73,7 +73,7 @@ public class JinputControllerDevice implements ControllerDevice {
             .put(Button._11, ControllerId.ELEVEN)
             .build();
 
-    public JinputControllerDevice() {
+    public JInputControllerDevice() {
         ControllerEnvironment env = ControllerEnvironment.getDefaultEnvironment();
 
         // Unfortunately, no existing implementation

@@ -19,7 +19,7 @@ package org.terasology.input;
 import java.util.Locale;
 
 /**
- * TODO Type description
+ * Input information from controllers.
  */
 public enum ControllerInput implements Input {
 
