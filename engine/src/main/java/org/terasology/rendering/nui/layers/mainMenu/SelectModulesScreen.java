@@ -546,7 +546,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private List<Name> getExplicitlySelectedModules() {
         return sortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection).map(info ->
-                info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
+                info.getMetadata().getId()).collect(Collectors.toList());
     }
 
     private void deselect(ModuleSelectionInfo target) {
