@@ -304,6 +304,8 @@ public final class Terasology {
         System.out.println("    Don't start Terasology, just print this help:");
         System.out.println("    terasology " + PRINT_USAGE_FLAGS[1]);
         System.out.println();
+        System.out.println("Alternatively use our standalone Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases");
+        System.out.println();
 
         System.exit(0);
     }
