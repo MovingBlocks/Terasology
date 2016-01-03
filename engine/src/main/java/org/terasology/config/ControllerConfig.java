@@ -38,6 +38,7 @@ public class ControllerConfig {
     public static class ControllerInfo {
         private boolean invertX = true;
         private boolean invertY = true;
+        private boolean invertZ = true;
         private float movementDeadZone = 0.08f;
         private float rotationDeadZone = 0.08f;
 
@@ -55,6 +56,14 @@ public class ControllerConfig {
 
         public void setInvertY(boolean invertY) {
             this.invertY = invertY;
+        }
+
+        public boolean isInvertZ() {
+            return invertZ;
+        }
+
+        public void setInvertZ(boolean invertZ) {
+            this.invertZ = invertZ;
         }
 
         public float getMovementDeadZone() {

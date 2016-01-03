@@ -215,6 +215,12 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
+        UICheckbox invertZ = new UICheckbox();
+        invertZ.bindChecked(BindHelper.bindBeanProperty("invertZ", info, Boolean.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Invert Z Axis"), invertZ)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
         UISlider mvmtDeadZone = new UISlider();
         mvmtDeadZone.setIncrement(0.01f);
         mvmtDeadZone.setMinimum(0);
