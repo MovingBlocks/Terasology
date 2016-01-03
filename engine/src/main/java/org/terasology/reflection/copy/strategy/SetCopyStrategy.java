@@ -17,6 +17,7 @@ package org.terasology.reflection.copy.strategy;
 
 import org.terasology.reflection.copy.CopyStrategy;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class SetCopyStrategy<T> implements CopyStrategy<Set<T>> {
     @Override
     public Set<T> copy(Set<T> value) {
         if (value != null) {
-            return value.stream().map(contentStrategy::copy).collect(Collectors.toSet());
+            return value.stream().map(contentStrategy::copy).collect(Collectors.toCollection(HashSet::new));
         }
         return null;
     }
