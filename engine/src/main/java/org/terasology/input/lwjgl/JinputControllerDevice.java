@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.java.games.input.Component;
+import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.ControllerEvent;
@@ -45,6 +45,7 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.device.ControllerAction;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -57,6 +58,20 @@ public class JinputControllerDevice implements ControllerDevice {
     private Set<Type> filter = ImmutableSet.of(Type.KEYBOARD, Type.MOUSE, Type.UNKNOWN);
 
     private Map<String, Info> controllers = new LinkedHashMap<>();
+    private Map<Identifier, Integer> buttonMap = ImmutableMap.<Identifier, Integer>builder()
+            .put(Button._0, ControllerId.ZERO)
+            .put(Button._1, ControllerId.ONE)
+            .put(Button._2, ControllerId.TWO)
+            .put(Button._3, ControllerId.THREE)
+            .put(Button._4, ControllerId.FOUR)
+            .put(Button._5, ControllerId.FIVE)
+            .put(Button._6, ControllerId.SIX)
+            .put(Button._7, ControllerId.SEVEN)
+            .put(Button._8, ControllerId.EIGHT)
+            .put(Button._9, ControllerId.NINE)
+            .put(Button._10, ControllerId.TEN)
+            .put(Button._11, ControllerId.ELEVEN)
+            .build();
 
     public JinputControllerDevice() {
         ControllerEnvironment env = ControllerEnvironment.getDefaultEnvironment();
@@ -148,7 +163,7 @@ public class JinputControllerDevice implements ControllerDevice {
 
         if (id instanceof Identifier.Button) {
             state = event.getValue() != 0 ? ButtonState.DOWN : ButtonState.UP;
-            input = InputType.CONTROLLER_BUTTON.getInput(comp.getIdentifier().getName());
+            input = InputType.CONTROLLER_BUTTON.getInput(buttonMap.get(id));
         } else if (id instanceof Identifier.Axis) {
             if (id.equals(Identifier.Axis.X)) {
                 if (Math.abs(axisValue) < info.movementDeadZone) {
