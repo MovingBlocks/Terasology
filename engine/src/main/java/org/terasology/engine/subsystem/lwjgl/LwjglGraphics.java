@@ -218,7 +218,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             lwjglDisplay.setFullscreen(config.isFullscreen(), false);
 
             Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
-            Display.setTitle("Terasology" + " | " + "Pre Alpha");
+            Display.setTitle("Terasology" + " | " + "Alpha");
             try {
 
                 String root = "org/terasology/icons/";
