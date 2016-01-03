@@ -72,10 +72,11 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
             ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
             JinputControllerDevice controllerDevice = new JinputControllerDevice();
-            for (int idx = 0; idx < controllerDevice.getControllers().size(); idx++) {
-                String name = controllerDevice.getControllers().get(idx);
-                float deadZone = controllerConfig.getController(name).getDeadZone();
-                controllerDevice.setDeadZone(idx, deadZone);
+            for (String name : controllerDevice.getControllers()) {
+                float mvmtDeadZone = controllerConfig.getController(name).getMovementDeadZone();
+                controllerDevice.setMovementDeadZone(name, mvmtDeadZone);
+                float rotDeadZone = controllerConfig.getController(name).getRotationDeadZone();
+                controllerDevice.setMovementDeadZone(name, rotDeadZone);
             }
             inputSystem.setControllerDevice(controllerDevice);
         } catch (LWJGLException e) {

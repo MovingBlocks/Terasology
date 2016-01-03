@@ -18,7 +18,10 @@ package org.terasology.input.lwjgl;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -51,12 +54,9 @@ public class JinputControllerDevice implements ControllerDevice {
 
     private static final Logger logger = LoggerFactory.getLogger(JinputControllerDevice.class);
 
-    /**
-     * CopyOnWriteAL supports removing elements while iterating over the list.
-     */
-    private List<Controller> controllers = new CopyOnWriteArrayList<>();
-
     private Set<Type> filter = ImmutableSet.of(Type.KEYBOARD, Type.MOUSE, Type.UNKNOWN);
+
+    private Map<String, Info> controllers = new LinkedHashMap<>();
 
     public JinputControllerDevice() {
         ControllerEnvironment env = ControllerEnvironment.getDefaultEnvironment();
@@ -88,20 +88,29 @@ public class JinputControllerDevice implements ControllerDevice {
     public List<String> getControllers() {
         List<String> ids = new ArrayList<>();
 
-        for (Controller c : controllers) {
-            ids.add(c.getName());
+        for (Info info : controllers.values()) {
+            ids.add(info.controller.getName());
         }
 
         return ids;
     }
 
     @Override
-    public void setDeadZone(int index, float deadZone) {
-//        Controller controller = controllers.get(index);
-//        for (Component c = controller.getComponent(Identifier.Axis.X);
-//            if (c.getIdentifier() instanceof Identifier.Axis) {
-//            }
-//        }
+    public void setMovementDeadZone(String name, float deadZone) {
+        for (Info info : controllers.values()) {
+            if (info.controller.getName().equals(name)) {
+                info.movementDeadZone = deadZone;
+            }
+        }
+    }
+
+    @Override
+    public void setRotationDeadZone(String name, float deadZone) {
+        for (Info info : controllers.values()) {
+            if (info.controller.getName().equals(name)) {
+                info.rotationDeadZone = deadZone;
+            }
+        }
     }
 
     @Override
@@ -109,12 +118,15 @@ public class JinputControllerDevice implements ControllerDevice {
         Queue<ControllerAction> result = new ArrayDeque<>();
         Event event = new Event();
 
-        for (Controller c : controllers) {
+        Iterator<Info> it = controllers.values().iterator();
+        while (it.hasNext()) {
+            Info info = it.next();
+            Controller c = info.controller;
             if (c.poll()) {
                 EventQueue queue = c.getEventQueue();
 
                 while (queue.getNextEvent(event)) {
-                    ControllerAction action = convertEvent(c, event);
+                    ControllerAction action = convertEvent(info, event);
                     if (action != null) {
                         result.add(action);
                     }
@@ -127,7 +139,7 @@ public class JinputControllerDevice implements ControllerDevice {
         return result;
     }
 
-    private ControllerAction convertEvent(Controller c, Event event) {
+    private ControllerAction convertEvent(Info info, Event event) {
         Component comp = event.getComponent();
         Identifier id = comp.getIdentifier();
         float axisValue = comp.getPollData();
@@ -139,14 +151,29 @@ public class JinputControllerDevice implements ControllerDevice {
             input = InputType.CONTROLLER_BUTTON.getInput(comp.getIdentifier().getName());
         } else if (id instanceof Identifier.Axis) {
             if (id.equals(Identifier.Axis.X)) {
+                if (Math.abs(axisValue) < info.movementDeadZone) {
+                    axisValue = 0;
+                }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.X_AXIS);
             } else if (id.equals(Identifier.Axis.Y)) {
+                if (Math.abs(axisValue) < info.movementDeadZone) {
+                    axisValue = 0;
+                }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Y_AXIS);
             } else if (id.equals(Identifier.Axis.Z)) {
+                if (Math.abs(axisValue) < info.movementDeadZone) {
+                    axisValue = 0;
+                }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Z_AXIS);
             } else if (id.equals(Identifier.Axis.RX)) {
+                if (Math.abs(axisValue) < info.rotationDeadZone) {
+                    axisValue = 0;
+                }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.RX_AXIS);
             } else if (id.equals(Identifier.Axis.RY)) {
+                if (Math.abs(axisValue) < info.rotationDeadZone) {
+                    axisValue = 0;
+                }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.RY_AXIS);
             } else if (id.equals(Identifier.Axis.POV)) {
                 // the poll data float value is actually an ID in this case
@@ -170,7 +197,7 @@ public class JinputControllerDevice implements ControllerDevice {
             return null; // unrecognized id (e.g. Identifier.Key)
         }
 
-        return new ControllerAction(input, c.getName(), state, axisValue);
+        return new ControllerAction(input, info.controller.getName(), state, axisValue);
     }
 
     /**
@@ -178,7 +205,7 @@ public class JinputControllerDevice implements ControllerDevice {
      * @param controller the controller to remove
      */
     private void removeController(Controller controller) {
-        controllers.remove(controller);
+        controllers.remove(controller.getName());
         logger.info("Removed controller: " + controller.getName());
     }
 
@@ -189,7 +216,7 @@ public class JinputControllerDevice implements ControllerDevice {
         }
 
         if (c.getControllers().length == 0) {
-            controllers.add(c);
+            controllers.put(c.getName(), new Info(c));
             logger.info("Registered controller: " + c.getName());
         } else {
             for (Controller sub : c.getControllers()) {
@@ -198,4 +225,14 @@ public class JinputControllerDevice implements ControllerDevice {
         }
     }
 
+    private static final class Info {
+
+        private Controller controller;
+        private float movementDeadZone = 0.08f;
+        private float rotationDeadZone = 0.08f;
+
+        private Info(Controller c) {
+            this.controller = c;
+        }
+    }
 }
