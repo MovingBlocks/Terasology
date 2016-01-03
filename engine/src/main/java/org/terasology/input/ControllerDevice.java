@@ -38,8 +38,14 @@ public interface ControllerDevice extends InputDevice {
     List<String> getControllers();
 
     /**
-     * @param index the index of the controller
-     * @param deadZone the dead zone
+     * @param name the name of the controller
+     * @param deadZone the dead zone of the movement axes
      */
-    void setDeadZone(int index, float deadZone);
+    void setMovementDeadZone(String name, float deadZone);
+
+    /**
+     * @param name the name of the controller
+     * @param deadZone the dead zone of the rotation axes
+     */
+    void setRotationDeadZone(String name, float deadZone);
 }

@@ -40,8 +40,12 @@ public class NullControllerDevice implements ControllerDevice {
     }
 
     @Override
-    public void setDeadZone(int index, float deadZone) {
+    public void setMovementDeadZone(String name, float deadZone) {
         // ignore
     }
 
+    @Override
+    public void setRotationDeadZone(String name, float deadZone) {
+        // ignore
+    }
 }

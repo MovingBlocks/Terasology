@@ -159,6 +159,7 @@ public class InputSystem extends BaseComponentSystem {
         axisBinds.clear();
         keyBinds.clear();
         controllerBinds.clear();
+        controllerAxisBinds.clear();
         mouseButtonBinds.clear();
         mouseWheelUpBind = null;
         mouseWheelDownBind = null;
