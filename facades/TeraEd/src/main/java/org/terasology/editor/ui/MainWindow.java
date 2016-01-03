@@ -101,7 +101,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         verticalSplitPane.setResizeWeight(0.5);
         getContentPane().add(verticalSplitPane, BorderLayout.CENTER);
 
-        setTitle("TeraEd - Terasology" + " | " + "Pre Alpha");
+        setTitle("TeraEd - Terasology" + " | " + "Alpha");
 
         mainMenuBar = new JMenuBar();
         setJMenuBar(mainMenuBar);
