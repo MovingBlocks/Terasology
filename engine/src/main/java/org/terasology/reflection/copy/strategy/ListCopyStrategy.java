@@ -17,6 +17,7 @@ package org.terasology.reflection.copy.strategy;
 
 import org.terasology.reflection.copy.CopyStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class ListCopyStrategy<T> implements CopyStrategy<List<T>> {
     @Override
     public List<T> copy(List<T> value) {
         if (value != null) {
-            return value.stream().map(contentStrategy::copy).collect(Collectors.toList());
+            return value.stream().map(contentStrategy::copy).collect(Collectors.toCollection(ArrayList::new));
         }
         return null;
     }
