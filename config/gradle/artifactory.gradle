@@ -4,7 +4,7 @@ apply from: "$rootDir/config/gradle/common.gradle"
 
 // Artifactory publishing requires these (without maven we'd get no .pom with dependency info published)
 apply plugin: 'maven'
-apply plugin: "com.jfrog.artifactory"
+apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance. It is primarily for local use.
