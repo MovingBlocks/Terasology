@@ -71,13 +71,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
             ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
-            JInputControllerDevice controllerDevice = new JInputControllerDevice();
-            for (String name : controllerDevice.getControllers()) {
-                float mvmtDeadZone = controllerConfig.getController(name).getMovementDeadZone();
-                controllerDevice.setMovementDeadZone(name, mvmtDeadZone);
-                float rotDeadZone = controllerConfig.getController(name).getRotationDeadZone();
-                controllerDevice.setMovementDeadZone(name, rotDeadZone);
-            }
+            JInputControllerDevice controllerDevice = new JInputControllerDevice(controllerConfig);
             inputSystem.setControllerDevice(controllerDevice);
         } catch (LWJGLException e) {
             throw new RuntimeException("Could not initialize controls.", e);

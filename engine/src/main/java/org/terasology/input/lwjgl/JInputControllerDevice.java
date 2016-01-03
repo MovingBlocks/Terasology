@@ -38,6 +38,8 @@ import net.java.games.input.Controller.Type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.ControllerConfig;
+import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.input.ButtonState;
 import org.terasology.input.ControllerDevice;
 import org.terasology.input.ControllerId;
@@ -55,10 +57,9 @@ public class JInputControllerDevice implements ControllerDevice {
 
     private static final Logger logger = LoggerFactory.getLogger(JInputControllerDevice.class);
 
-    private Set<Type> filter = ImmutableSet.of(Type.KEYBOARD, Type.MOUSE, Type.UNKNOWN);
+    private final Set<Type> filter = ImmutableSet.of(Type.KEYBOARD, Type.MOUSE, Type.UNKNOWN);
 
-    private Map<String, Info> controllers = new LinkedHashMap<>();
-    private Map<Identifier, Integer> buttonMap = ImmutableMap.<Identifier, Integer>builder()
+    private final Map<Identifier, Integer> buttonMap = ImmutableMap.<Identifier, Integer>builder()
             .put(Button._0, ControllerId.ZERO)
             .put(Button._1, ControllerId.ONE)
             .put(Button._2, ControllerId.TWO)
@@ -73,7 +74,11 @@ public class JInputControllerDevice implements ControllerDevice {
             .put(Button._11, ControllerId.ELEVEN)
             .build();
 
-    public JInputControllerDevice() {
+    private ControllerConfig config;
+    private final List<Controller> controllers = new ArrayList<>();
+
+    public JInputControllerDevice(ControllerConfig config) {
+        this.config = config;
         ControllerEnvironment env = ControllerEnvironment.getDefaultEnvironment();
 
         // Unfortunately, no existing implementation
@@ -103,29 +108,11 @@ public class JInputControllerDevice implements ControllerDevice {
     public List<String> getControllers() {
         List<String> ids = new ArrayList<>();
 
-        for (Info info : controllers.values()) {
-            ids.add(info.controller.getName());
+        for (Controller controller : controllers) {
+            ids.add(controller.getName());
         }
 
         return ids;
-    }
-
-    @Override
-    public void setMovementDeadZone(String name, float deadZone) {
-        for (Info info : controllers.values()) {
-            if (info.controller.getName().equals(name)) {
-                info.movementDeadZone = deadZone;
-            }
-        }
-    }
-
-    @Override
-    public void setRotationDeadZone(String name, float deadZone) {
-        for (Info info : controllers.values()) {
-            if (info.controller.getName().equals(name)) {
-                info.rotationDeadZone = deadZone;
-            }
-        }
     }
 
     @Override
@@ -133,15 +120,14 @@ public class JInputControllerDevice implements ControllerDevice {
         Queue<ControllerAction> result = new ArrayDeque<>();
         Event event = new Event();
 
-        Iterator<Info> it = controllers.values().iterator();
+        Iterator<Controller> it = controllers.iterator();
         while (it.hasNext()) {
-            Info info = it.next();
-            Controller c = info.controller;
+            Controller c = it.next();
             if (c.poll()) {
                 EventQueue queue = c.getEventQueue();
 
                 while (queue.getNextEvent(event)) {
-                    ControllerAction action = convertEvent(info, event);
+                    ControllerAction action = convertEvent(c, event);
                     if (action != null) {
                         result.add(action);
                     }
@@ -154,7 +140,7 @@ public class JInputControllerDevice implements ControllerDevice {
         return result;
     }
 
-    private ControllerAction convertEvent(Info info, Event event) {
+    private ControllerAction convertEvent(Controller c, Event event) {
         Component comp = event.getComponent();
         Identifier id = comp.getIdentifier();
         float axisValue = comp.getPollData();
@@ -165,28 +151,29 @@ public class JInputControllerDevice implements ControllerDevice {
             state = event.getValue() != 0 ? ButtonState.DOWN : ButtonState.UP;
             input = InputType.CONTROLLER_BUTTON.getInput(buttonMap.get(id));
         } else if (id instanceof Identifier.Axis) {
+            ControllerInfo info = config.getController(c.getName());
             if (id.equals(Identifier.Axis.X)) {
-                if (Math.abs(axisValue) < info.movementDeadZone) {
+                if (Math.abs(axisValue) < info.getMovementDeadZone()) {
                     axisValue = 0;
                 }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.X_AXIS);
             } else if (id.equals(Identifier.Axis.Y)) {
-                if (Math.abs(axisValue) < info.movementDeadZone) {
+                if (Math.abs(axisValue) < info.getMovementDeadZone()) {
                     axisValue = 0;
                 }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Y_AXIS);
             } else if (id.equals(Identifier.Axis.Z)) {
-                if (Math.abs(axisValue) < info.movementDeadZone) {
+                if (Math.abs(axisValue) < info.getMovementDeadZone()) {
                     axisValue = 0;
                 }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Z_AXIS);
             } else if (id.equals(Identifier.Axis.RX)) {
-                if (Math.abs(axisValue) < info.rotationDeadZone) {
+                if (Math.abs(axisValue) < info.getRotationDeadZone()) {
                     axisValue = 0;
                 }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.RX_AXIS);
             } else if (id.equals(Identifier.Axis.RY)) {
-                if (Math.abs(axisValue) < info.rotationDeadZone) {
+                if (Math.abs(axisValue) < info.getRotationDeadZone()) {
                     axisValue = 0;
                 }
                 input = InputType.CONTROLLER_AXIS.getInput(ControllerId.RY_AXIS);
@@ -212,7 +199,7 @@ public class JInputControllerDevice implements ControllerDevice {
             return null; // unrecognized id (e.g. Identifier.Key)
         }
 
-        return new ControllerAction(input, info.controller.getName(), state, axisValue);
+        return new ControllerAction(input, c.getName(), state, axisValue);
     }
 
     /**
@@ -231,23 +218,12 @@ public class JInputControllerDevice implements ControllerDevice {
         }
 
         if (c.getControllers().length == 0) {
-            controllers.put(c.getName(), new Info(c));
+            controllers.add(c);
             logger.info("Registered controller: " + c.getName());
         } else {
             for (Controller sub : c.getControllers()) {
                 addController(sub);
             }
-        }
-    }
-
-    private static final class Info {
-
-        private Controller controller;
-        private float movementDeadZone = 0.08f;
-        private float rotationDeadZone = 0.08f;
-
-        private Info(Controller c) {
-            this.controller = c;
         }
     }
 }
