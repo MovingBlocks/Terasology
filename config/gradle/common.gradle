@@ -22,8 +22,14 @@ tasks.withType(JavaCompile) {
 
 // We use both Maven Central and our own Artifactory instance, which contains module builds, extra libs, and so on
 repositories {
+    // For development so you can publish binaries locally and have them grabbed from there
     mavenLocal()
+
+    // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
+    jcenter()
     mavenCentral()
+
+    // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         if (rootProject.hasProperty("alternativeResolutionRepo")) {
             // If the user supplies an alternative repo via gradle.properties then use that
