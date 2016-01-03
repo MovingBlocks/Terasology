@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ public class UIList<T> extends CoreWidget {
 
     private Binding<Boolean> selectable = new DefaultBinding<>(true);
     private Binding<T> selection = new DefaultBinding<>();
-    private Binding<List<T>> list = new DefaultBinding<>(Lists.<T>newArrayList());
+    private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
 
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 

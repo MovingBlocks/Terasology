@@ -147,8 +147,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                 @Override
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
-                    Set<Name> enabledModuleNames = Sets.newHashSet();
-                    enabledModuleNames.addAll(getAllEnabledModuleNames().stream().collect(Collectors.toList()));
+                    Set<Name> enabledModuleNames = getAllEnabledModuleNames().stream().collect(Collectors.toSet());
 
                     List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
