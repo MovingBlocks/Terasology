@@ -29,7 +29,7 @@ Direct download stable builds are uploaded to [our release section here on GitHu
 
 You can use the Windows executable or one of the default launch scripts to start the game. They will setup your Java Virtual Machine to allocate up to 1024 MB of memory. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x [scriptname].sh".
 
-The game auto-saves at regular intervals so it is decently crash-hardened at this point (no more playing for 20 minutes then poof lost world via crash). Still no guarantees though! Pre-Alpha :-)
+The game auto-saves at regular intervals so it is decently crash-hardened at this point (no more playing for 20 minutes then poof lost world via crash). Still no guarantees though! Alpha :-)
 
 Multiplayer
 --------
