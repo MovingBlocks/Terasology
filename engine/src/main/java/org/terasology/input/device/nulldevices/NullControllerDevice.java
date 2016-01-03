@@ -38,14 +38,4 @@ public class NullControllerDevice implements ControllerDevice {
     public List<String> getControllers() {
         return Collections.emptyList();
     }
-
-    @Override
-    public void setMovementDeadZone(String name, float deadZone) {
-        // ignore
-    }
-
-    @Override
-    public void setRotationDeadZone(String name, float deadZone) {
-        // ignore
-    }
 }

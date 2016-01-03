@@ -36,16 +36,4 @@ public interface ControllerDevice extends InputDevice {
      * @return a list of currently connected controller IDs.
      */
     List<String> getControllers();
-
-    /**
-     * @param name the name of the controller
-     * @param deadZone the dead zone of the movement axes
-     */
-    void setMovementDeadZone(String name, float deadZone);
-
-    /**
-     * @param name the name of the controller
-     * @param deadZone the dead zone of the rotation axes
-     */
-    void setRotationDeadZone(String name, float deadZone);
 }

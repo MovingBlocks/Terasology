@@ -226,20 +226,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mvmtDeadZone.setMinimum(0);
         mvmtDeadZone.setRange(1);
         mvmtDeadZone.setPrecision(2);
-        mvmtDeadZone.bindValue(new Binding<Float>() {
-
-            @Override
-            public void set(Float value) {
-                info.setMovementDeadZone(value);
-                inputSystem.getControllerDevice().setMovementDeadZone(name, value);
-            }
-
-            @Override
-            public Float get() {
-                return info.getMovementDeadZone();
-            }
-        });
-
+        mvmtDeadZone.bindValue(BindHelper.bindBeanProperty("movementDeadZone", info, Float.TYPE));
         layout.addWidget(new RowLayout(new UILabel("Movement Axis Dead Zone"), mvmtDeadZone)
             .setColumnRatios(columnRatio)
             .setHorizontalSpacing(horizontalSpacing));
@@ -249,19 +236,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         rotDeadZone.setMinimum(0);
         rotDeadZone.setRange(1);
         rotDeadZone.setPrecision(2);
-        rotDeadZone.bindValue(new Binding<Float>() {
-
-            @Override
-            public void set(Float value) {
-                info.setRotationDeadZone(value);
-                inputSystem.getControllerDevice().setMovementDeadZone(name, value);
-            }
-
-            @Override
-            public Float get() {
-                return info.getRotationDeadZone();
-            }
-        });
+        rotDeadZone.bindValue(BindHelper.bindBeanProperty("rotationDeadZone", info, Float.TYPE));
 
         layout.addWidget(new RowLayout(new UILabel("Rotation Axis Dead Zone"), rotDeadZone)
                 .setColumnRatios(columnRatio)
