@@ -50,7 +50,6 @@ import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
 import org.terasology.engine.modes.loadProcesses.RegisterBiomes;
 import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
-import org.terasology.engine.modes.loadProcesses.RegisterMods;
 import org.terasology.engine.modes.loadProcesses.RegisterSystems;
 import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
 import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
@@ -170,7 +169,6 @@ public class StateLoading implements GameState {
     }
 
     private void initHost() {
-        loadProcesses.add(new RegisterMods(context, gameManifest));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
