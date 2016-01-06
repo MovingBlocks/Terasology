@@ -1,0 +1,7 @@
+{
+  "Mesh": {
+    "mesh": "engine:testmonkey",
+    "material": "engine:monkeyHead9",
+    "hideFromOwner": true
+  }
+}

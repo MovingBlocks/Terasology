@@ -4,5 +4,6 @@
     },
     "Client" : {},
     "Network" : {
-    }
+    },
+    "AutoMountCamera": {}
 }

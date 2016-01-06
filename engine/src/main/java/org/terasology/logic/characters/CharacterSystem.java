@@ -98,15 +98,15 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             }
         }
 
-        LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
+        EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
+        LocationComponent location = camera.getComponent(LocationComponent.class);
+        Vector3f direction = location.getWorldDirection();
         Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
 
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
 
-        if (result.isHit()) {
+        if (result.isHit() && !result.getEntity().equals(character)) {
             int damage = 1;
             Prefab damageType = EngineDamageTypes.PHYSICAL.get();
             // Calculate damage from item
@@ -163,9 +163,10 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private boolean isPredictionOfEventCorrect(EntityRef character, ActivationRequest event) {
-        LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
+        EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
+        LocationComponent location = camera.getComponent(LocationComponent.class);
+        Vector3f direction = location.getWorldDirection();
         if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
@@ -173,7 +174,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         direction = event.getDirection();
 
         Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
         if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);

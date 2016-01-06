@@ -22,7 +22,6 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -102,26 +101,43 @@ public class LocalPlayer {
     public Quat4f getRotation() {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
-            return new Quat4f(0, 0, 0, 1);
+            return new Quat4f(Quat4f.IDENTITY);
         }
         return location.getWorldRotation();
     }
 
-    public Quat4f getViewRotation() {
-        CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character == null) {
-            return new Quat4f(0, 0, 0, 1);
+    public Vector3f getViewPosition() {
+        return getViewPosition(new Vector3f());
+    }
+
+    public Vector3f getViewPosition(Vector3f out) {
+        ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
+        if (clientComponent == null) {
+            return out;
         }
-        Quat4f rot = new Quat4f(TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
-        return rot;
+        LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
+        if (location == null) {
+            return getPosition();
+        }
+
+        return location.getWorldPosition(out);
+    }
+
+    public Quat4f getViewRotation() {
+        ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
+        if (clientComponent == null) {
+            return new Quat4f(Quat4f.IDENTITY);
+        }
+        LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
+        if (location == null) {
+            return getRotation();
+        }
+
+        return location.getWorldRotation();
     }
 
     public Vector3f getViewDirection() {
-        CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character == null) {
-            return Direction.FORWARD.getVector3f();
-        }
-        Quat4f rot = new Quat4f(TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
+        Quat4f rot = getViewRotation();
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
         Vector3f dir = Direction.FORWARD.getVector3f();
@@ -172,11 +188,9 @@ public class LocalPlayer {
      */
     private boolean activateTargetOrOwnedEntity(EntityRef usedOwnedEntity) {
         EntityRef character = getCharacterEntity();
-        LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
-        Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
+        Vector3f direction = getViewDirection();
+        Vector3f originPos = getViewPosition();
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
