@@ -3,6 +3,7 @@
 
 package org.terasology.protobuf;
 
+@SuppressWarnings("all")
 public final class EntityData {
   private EntityData() {}
   public static void registerAllExtensions(
