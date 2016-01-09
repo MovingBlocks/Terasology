@@ -15,36 +15,25 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
-import org.terasology.asset.Assets;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.asset.UIData;
-import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
 
 /**
  */
 public class SettingsMenuScreen extends CoreScreenLayer {
 
-    private static final ResourceUrn INPUT_SCREEN_URI = new ResourceUrn("engine:inputScreen");
-
     @In
     private Config config;
 
     @Override
     public void initialise() {
-        CoreScreenLayer inputScreen = new InputSettingsScreen();
-        inputScreen.setSkin(getSkin());
-        UIData inputScreenData = new UIData(inputScreen);
-        Assets.generateAsset(SettingsMenuScreen.INPUT_SCREEN_URI, inputScreenData, UIElement.class);
-
         WidgetUtil.trySubscribe(this, "player", button -> getManager().pushScreen("engine:PlayerMenuScreen"));
         WidgetUtil.trySubscribe(this, "video", button -> getManager().pushScreen("engine:VideoMenuScreen"));
         WidgetUtil.trySubscribe(this, "audio", button -> getManager().pushScreen("engine:AudioMenuScreen"));
-        WidgetUtil.trySubscribe(this, "input", button -> getManager().pushScreen(INPUT_SCREEN_URI));
+        WidgetUtil.trySubscribe(this, "input", button -> getManager().pushScreen(InputSettingsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "close", button -> {
             config.save();
             getManager().popScreen();
