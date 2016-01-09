@@ -3,6 +3,7 @@
 
 package org.terasology.protobuf;
 
+@SuppressWarnings("all")
 public final class ChunksProtobuf {
   private ChunksProtobuf() {}
   public static void registerAllExtensions(

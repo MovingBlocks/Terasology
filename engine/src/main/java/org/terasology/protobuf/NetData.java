@@ -3,6 +3,7 @@
 
 package org.terasology.protobuf;
 
+@SuppressWarnings("all")
 public final class NetData {
   private NetData() {}
   public static void registerAllExtensions(
