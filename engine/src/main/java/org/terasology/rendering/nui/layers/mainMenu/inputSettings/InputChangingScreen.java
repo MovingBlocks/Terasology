@@ -19,14 +19,15 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.input.*;
+import org.terasology.input.Input;
+import org.terasology.input.InputSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.*;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -34,7 +35,10 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.layouts.relative.HorizontalHint;
 import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
 import org.terasology.rendering.nui.layouts.relative.VerticalHint;
-import org.terasology.rendering.nui.widgets.*;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISpace;
 
 
 public class InputChangingScreen extends CoreScreenLayer {
@@ -175,8 +179,8 @@ public class InputChangingScreen extends CoreScreenLayer {
         this.input = input;
     }
 
-    public void bindInput(InputConfigBinding binding) {
-        this.binding = binding;
-        setInput(binding);
+    public void bindInput(InputConfigBinding newBinding) {
+        this.binding = newBinding;
+        setInput(newBinding);
     }
 }

@@ -23,7 +23,11 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -35,8 +39,6 @@ import java.util.List;
 /**
  */
 public class UIInputBind extends CoreWidget {
-    public static final String HOVER_MODE = "hover";
-    public static final String ACTIVE_MODE = "active";
 
     private boolean capturingInput;
 
