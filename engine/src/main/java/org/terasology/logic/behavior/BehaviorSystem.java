@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -151,19 +150,12 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     public List<Interpreter> getInterpreter() {
         List<Interpreter> interpreters = Lists.newArrayList();
         interpreters.addAll(entityInterpreters.values());
-        Collections.sort(interpreters, new Comparator<Interpreter>() {
-            @Override
-            public int compare(Interpreter o1, Interpreter o2) {
-                return o1.toString().compareTo(o2.toString());
-            }
-        });
+        Collections.sort(interpreters, (o1, o2) -> o1.toString().compareTo(o2.toString()));
         return interpreters;
     }
 
     public void treeModified(BehaviorTree tree) {
-        for (Interpreter interpreter : entityInterpreters.values()) {
-            interpreter.reset();
-        }
+        entityInterpreters.values().forEach(Interpreter::reset);
         save(tree);
     }
 

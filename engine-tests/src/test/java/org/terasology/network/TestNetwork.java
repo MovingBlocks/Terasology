@@ -25,7 +25,6 @@ import org.terasology.config.Config;
 import org.terasology.engine.EngineTime;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -53,9 +52,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
 
     @After
     public void cleanUp() {
-        for (NetworkSystem sys : netSystems) {
-            sys.shutdown();
-        }
+        netSystems.forEach(NetworkSystem::shutdown);
 
     }
 

@@ -16,18 +16,17 @@
 
 package org.terasology.network;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Performs temporary connections to one or more game servers.
@@ -48,21 +47,17 @@ public class ServerInfoService implements AutoCloseable {
     }
 
     public Future<ServerInfoMessage> requestInfo(final String address, final int port) {
-        return pool.submit(new Callable<ServerInfoMessage>() {
+        return pool.submit(() -> {
+            InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
+            ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
+            connectCheck.syncUninterruptibly();
+            Channel channel = connectCheck.getChannel();
+            channel.getCloseFuture().syncUninterruptibly();
 
-            @Override
-            public ServerInfoMessage call() throws Exception {
-                InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
-                ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
-                connectCheck.syncUninterruptibly();
-                Channel channel = connectCheck.getChannel();
-                channel.getCloseFuture().syncUninterruptibly();
+            ServerInfoRequestHandler handler = channel.getPipeline().get(ServerInfoRequestHandler.class);
+            ServerInfoMessage serverInfo = handler.getServerInfo();
+            return serverInfo;
 
-                ServerInfoRequestHandler handler = channel.getPipeline().get(ServerInfoRequestHandler.class);
-                ServerInfoMessage serverInfo = handler.getServerInfo();
-                return serverInfo;
-
-            }
         });
     }
 

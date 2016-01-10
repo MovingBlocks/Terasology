@@ -31,7 +31,6 @@ import org.terasology.world.propagation.StandardBatchPropagator;
 import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,12 +58,9 @@ public class LightMerger<T> {
     }
 
     public void beginMerge(final Chunk chunk, final T data) {
-        resultFuture = executorService.submit(new Callable<T>() {
-            @Override
-            public T call() throws Exception {
-                merge(chunk);
-                return data;
-            }
+        resultFuture = executorService.submit(() -> {
+            merge(chunk);
+            return data;
         });
     }
 

@@ -16,7 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -32,7 +31,9 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -71,10 +72,8 @@ public class RegisterMods extends SingleStepLoadProcess {
             return false;
         } else {
             ModuleManager moduleManager = context.get(ModuleManager.class);
-            List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
-            for (NameVersion moduleInfo : gameManifest.getModules()) {
-                moduleIds.add(moduleInfo.getName());
-            }
+            List<Name> moduleIds = gameManifest.getModules().stream().map(NameVersion::getName)
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(moduleIds);

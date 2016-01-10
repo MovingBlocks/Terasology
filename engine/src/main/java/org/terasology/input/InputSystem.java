@@ -15,11 +15,8 @@
  */
 package org.terasology.input;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
@@ -56,8 +53,10 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.

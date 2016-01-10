@@ -125,7 +125,7 @@ public abstract class AbstractClient implements Client {
     }
 
     private Set<String> findNamesOfOtherPlayers(EntityManager entityManager, EntityRef player) {
-        Set<String> otherNames = new HashSet<String>();
+        Set<String> otherNames = new HashSet<>();
         for (EntityRef clientInfo: entityManager.getEntitiesWith(ClientInfoComponent.class)) {
             if (!clientInfo.equals(player)) {
                 DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);

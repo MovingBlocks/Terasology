@@ -501,9 +501,7 @@ public class TerasologyEngine implements GameEngine {
         currentState = newState;
         LoggingContext.setGameState(newState);
         newState.init(this);
-        for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
-            subscriber.onStateChange();
-        }
+        stateChangeSubscribers.forEach(StateChangeSubscriber::onStateChange);
         // drain input queues
         InputSystem inputSystem = rootContext.get(InputSystem.class);
         inputSystem.getMouseDevice().getInputQueue();

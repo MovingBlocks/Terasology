@@ -128,7 +128,7 @@ public class PropertyProvider {
     }
 
     protected <T> Binding<T> createTextBinding(Object target, final FieldMetadata<Object, T> fieldMetadata) {
-        return new TextBinding<T>(target, fieldMetadata);
+        return new TextBinding<>(target, fieldMetadata);
     }
 
     protected Binding<Float> createFloatBinding(Object target, final FieldMetadata<Object, ?> fieldMetadata) {

@@ -74,11 +74,7 @@ public class CertificateGenerator {
             PublicIdentityCertificate publicCert = new PublicIdentityCertificate(uuid, pub.getModulus(), pub.getPublicExponent(), signature);
             PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(priv.getModulus(), priv.getPrivateExponent());
             return new CertificatePair(publicCert, privateCert);
-        } catch (InvalidKeySpecException e) {
-            throw new RuntimeException("Unexpected exception generating certificate", e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException("Unexpected exception generating certificate", e);
-        } catch (SignatureException e) {
+        } catch (InvalidKeySpecException | SignatureException | InvalidKeyException e) {
             throw new RuntimeException("Unexpected exception generating certificate", e);
         }
     }
@@ -113,11 +109,7 @@ public class CertificateGenerator {
             PublicIdentityCertificate publicCert = new PublicIdentityCertificate(uuid, pub.getModulus(), pub.getPublicExponent(), signature);
             PrivateIdentityCertificate privateCert = new PrivateIdentityCertificate(priv.getModulus(), priv.getPrivateExponent());
             return new CertificatePair(publicCert, privateCert);
-        } catch (InvalidKeySpecException e) {
-            throw new RuntimeException("Unexpected exception generating certificate", e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException("Unexpected exception generating certificate", e);
-        } catch (SignatureException e) {
+        } catch (InvalidKeySpecException | SignatureException | InvalidKeyException e) {
             throw new RuntimeException("Unexpected exception generating certificate", e);
         }
     }

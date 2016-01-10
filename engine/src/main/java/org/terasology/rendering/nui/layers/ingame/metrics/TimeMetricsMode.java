@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.procedure.TObjectDoubleProcedure;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -71,25 +70,22 @@ public abstract class TimeMetricsMode extends MetricsMode {
     }
 
     private void sortMetrics(TObjectDoubleMap<String> metrics, final List<String> activities, final TDoubleList values) {
-        metrics.forEachEntry(new TObjectDoubleProcedure<String>() {
-            @Override
-            public boolean execute(String s, double v) {
-                boolean inserted = false;
-                for (int i = 0; i < values.size() && i < limit; i++) {
-                    if (v > values.get(i)) {
-                        values.insert(i, v);
-                        activities.add(i, s);
-                        inserted = true;
-                        break;
-                    }
+        metrics.forEachEntry((s, v) -> {
+            boolean inserted = false;
+            for (int i = 0; i < values.size() && i < limit; i++) {
+                if (v > values.get(i)) {
+                    values.insert(i, v);
+                    activities.add(i, s);
+                    inserted = true;
+                    break;
                 }
-
-                if (!inserted && values.size() < limit) {
-                    activities.add(s);
-                    values.add(v);
-                }
-                return true;
             }
+
+            if (!inserted && values.size() < limit) {
+                activities.add(s);
+                values.add(v);
+            }
+            return true;
         });
     }
 }

@@ -257,9 +257,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             factory.releaseExternalResources();
         }
         processPendingDisconnects();
-        for (Client client : clientList) {
-            processRemovedClient(client);
-        }
+        clientList.forEach(this::processRemovedClient);
         server = null;
         nextNetId = 1;
         netIdToEntityId.clear();
@@ -327,9 +325,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (!disconnectedClients.isEmpty()) {
             List<NetClient> removedPlayers = Lists.newArrayListWithExpectedSize(disconnectedClients.size());
             disconnectedClients.drainTo(removedPlayers);
-            for (NetClient client : removedPlayers) {
-                processRemovedClient(client);
-            }
+            removedPlayers.forEach(this::processRemovedClient);
         }
     }
 
@@ -337,9 +333,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (!newClients.isEmpty()) {
             List<NetClient> newPlayers = Lists.newArrayListWithExpectedSize(newClients.size());
             newClients.drainTo(newPlayers);
-            for (NetClient client : newPlayers) {
-                processNewClient(client);
-            }
+            newPlayers.forEach(this::processNewClient);
         }
     }
 
@@ -590,9 +584,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
         }
         if (mode.isAuthority() && metadata.isReferenceOwner()) {
-            for (EntityRef ownedEntity : ownershipHelper.listOwnedEntities(entity.getComponent(component))) {
-                ownedEntity.destroy();
-            }
+            ownershipHelper.listOwnedEntities(entity.getComponent(component)).forEach(EntityRef::destroy);
         }
     }
 

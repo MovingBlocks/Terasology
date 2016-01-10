@@ -27,6 +27,10 @@ import org.eaxy.NonMatchingPathException;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -37,17 +41,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Importer for Collada data exchange model files.
@@ -142,8 +140,8 @@ public class ColladaLoader {
 
     protected void parseSkeletalMeshData(Element rootElement) throws ColladaParseException {
 
-        List<MD5Joint> md5JointList = new ArrayList<MD5Joint>();
-        List<MD5Mesh> md5MeshList = new ArrayList<MD5Mesh>();
+        List<MD5Joint> md5JointList = new ArrayList<>();
+        List<MD5Mesh> md5MeshList = new ArrayList<>();
 
         skeletonBuilder = new SkeletalMeshDataBuilder();
 
@@ -151,7 +149,7 @@ public class ColladaLoader {
         // MAYBE we can construct all of the nodes up-front, and then fill in the missing data for the ones of type JOINT later
         // And only keep the MD5 nodes in the final list if they are used?
 
-        Map<String, MD5Joint> md5JointBySidMap = new HashMap<String, MD5Joint>();
+        Map<String, MD5Joint> md5JointBySidMap = new HashMap<>();
 
         MD5Joint parentMD5Joint = null;
         ElementSet nodeParentSet = rootElement.find("library_visual_scenes", "visual_scene", "node");
@@ -210,12 +208,7 @@ public class ColladaLoader {
             List<Input> vertexWeightsInputList = parseInputs(vertexWeightsInputSet);
 
             // TODO: for now, assume the offsets will always perfectly match the sorted-by-offset list indexes
-            Collections.sort(vertexWeightsInputList, new Comparator<Input>() {
-                @Override
-                public int compare(Input i1, Input i2) {
-                    return i1.offset - i2.offset;
-                }
-            });
+            Collections.sort(vertexWeightsInputList, (i1, i2) -> i1.offset - i2.offset);
             for (int i = 0; i < vertexWeightsInputList.size(); i++) {
                 Input input = vertexWeightsInputList.get(i);
                 if (input.offset != i) {
@@ -282,9 +275,7 @@ public class ColladaLoader {
                 String vCountString = vertexWeightsVCountStrings[vertexWeightsIndex];
                 int vCount = Integer.parseInt(vCountString);
                 for (int vCountIndex = 0; vCountIndex < vCount; vCountIndex++) {
-                    for (int vertexWeightsInputOffset = 0; vertexWeightsInputOffset < vertexWeightsInputList.size(); vertexWeightsInputOffset++) {
-                        Input vertexWeightsInput = vertexWeightsInputList.get(vertexWeightsInputOffset);
-
+                    for (Input vertexWeightsInput : vertexWeightsInputList) {
                         // vCount varies each time
                         ++vertexWeightsVDataIndex;
 
@@ -326,7 +317,7 @@ public class ColladaLoader {
             }
         }
 
-        Deque<MD5Joint> jointsToProcess = new LinkedList<MD5Joint>(md5JointList);
+        Deque<MD5Joint> jointsToProcess = new LinkedList<>(md5JointList);
         while (!jointsToProcess.isEmpty()) {
             MD5Joint joint = jointsToProcess.pop();
             MD5Joint parentJoint = joint.parent;
@@ -350,12 +341,9 @@ public class ColladaLoader {
         }
 
         for (MD5Joint joint : md5JointList) {
-            for (MD5Joint childJoint : joint.childList) {
-                // We can probably skip unused end nodes
-                if (null != childJoint.bone) {
-                    joint.bone.addChild(childJoint.bone);
-                }
-            }
+            // We can probably skip unused end nodes
+            joint.childList.stream().filter(childJoint -> childJoint.bone != null).forEach(childJoint ->
+                    joint.bone.addChild(childJoint.bone));
         }
 
         for (MD5Joint joint : md5JointList) {
@@ -496,7 +484,7 @@ public class ColladaLoader {
         md5Joint.element = jointNodeElement;
         md5Joint.name = jointNodeElement.id();
 
-        md5Joint.childList = new ArrayList<MD5Joint>();
+        md5Joint.childList = new ArrayList<>();
 
         return md5Joint;
     }
@@ -746,12 +734,7 @@ public class ColladaLoader {
         String[] facesStrings = getItemsInString(faceDataString);
 
         // TODO: for now, assume the offsets will always perfectly match the sorted-by-offset list indexes
-        Collections.sort(faceInputs, new Comparator<Input>() {
-            @Override
-            public int compare(Input i1, Input i2) {
-                return i1.offset - i2.offset;
-            }
-        });
+        Collections.sort(faceInputs, (i1, i2) -> i1.offset - i2.offset);
         for (int i = 0; i < faceInputs.size(); i++) {
             Input input = faceInputs.get(i);
             if (input.offset != i) {
@@ -767,9 +750,7 @@ public class ColladaLoader {
                 vCount = vcountList.get(faceIndex);
             }
             for (int vertexIndex = 0; vertexIndex < vCount; vertexIndex++) {
-                for (int faceInputOffset = 0; faceInputOffset < faceInputs.size(); faceInputOffset++) {
-                    Input faceInput = faceInputs.get(faceInputOffset);
-
+                for (Input faceInput : faceInputs) {
                     ++facesDataIndex;
                     String indexString = facesStrings[facesDataIndex];
                     int index = Integer.parseInt(indexString);
@@ -803,8 +784,8 @@ public class ColladaLoader {
                         }
 
                         if (null != vertexColors) {
-                            for (int i = 0; i < vertexColors.length; i++) {
-                                colorsParam.add(vertexColors[i]);
+                            for (float vertexColor : vertexColors) {
+                                colorsParam.add(vertexColor);
                             }
                         }
 
@@ -891,7 +872,7 @@ public class ColladaLoader {
     }
 
     private List<Input> parseInputs(ElementSet inputElementSet) {
-        List<Input> inputList = new ArrayList<Input>();
+        List<Input> inputList = new ArrayList<>();
         for (Element inputElement : inputElementSet) {
             Input input = new Input();
             inputList.add(input);
@@ -1014,7 +995,7 @@ public class ColladaLoader {
 
         private Element element;
         private MD5Joint parent;
-        private List<MD5Joint> childList = new ArrayList<MD5Joint>();
+        private List<MD5Joint> childList = new ArrayList<>();
         private Bone bone;
 
         public void addChild(MD5Joint joint) {

@@ -36,39 +36,33 @@ public class ClipboardClientSystem extends BaseComponentSystem implements Clipbo
     @Override
     public String getClipboardContentsAsString() {
         return AccessController.doPrivileged(
-                new PrivilegedAction<String>() {
-                    @Override
-                    public String run() {
-                        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+                (PrivilegedAction<String>) () -> {
+                    Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
 
-                        try {
-                            if (t != null) {
-                                return (String) t.getTransferData(DataFlavor.stringFlavor);
-                            }
-                        } catch (UnsupportedFlavorException | IOException e) {
-                            return null;
+                    try {
+                        if (t != null) {
+                            return (String) t.getTransferData(DataFlavor.stringFlavor);
                         }
+                    } catch (UnsupportedFlavorException | IOException e) {
                         return null;
                     }
+                    return null;
                 });
     }
 
     @Override
     public boolean setClipboardContents(String value) {
         return AccessController.doPrivileged(
-                new PrivilegedAction<Boolean>() {
-                    @Override
-                    public Boolean run() {
-                        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                        try {
-                            clipboard.setContents(new StringSelection(value), null);
-                        } catch (IllegalStateException exp) {
-                            // Some OSs might lock out access to clipboard, if another application uses it.
-                            // In this case, this exception is thrown
-                            return false;
-                        }
-                        return true;
+                (PrivilegedAction<Boolean>) () -> {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    try {
+                        clipboard.setContents(new StringSelection(value), null);
+                    } catch (IllegalStateException exp) {
+                        // Some OSs might lock out access to clipboard, if another application uses it.
+                        // In this case, this exception is thrown
+                        return false;
                     }
+                    return true;
                 });
     }
 }

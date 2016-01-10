@@ -67,37 +67,37 @@ public abstract class ObjectFacetTest {
 
     @Test
     public void testPrimitiveGetSet() {
-        facet.set(0, 1, 2, Integer.valueOf(2));
+        facet.set(0, 1, 2, 2);
         Assert.assertEquals(Integer.valueOf(2), facet.get(0, 1, 2));
     }
 
     @Test
     public void testBoxedGetSet() {
-        facet.set(0, 1, 3, Integer.valueOf(4));
+        facet.set(0, 1, 3, 4);
         Assert.assertEquals(Integer.valueOf(4), facet.get(0, 1, 3));
     }
 
     @Test
     public void testBoxedWorldGetSet() {
-        facet.set(0, 1, 4, Integer.valueOf(8));
+        facet.set(0, 1, 4, 8);
         Assert.assertEquals(Integer.valueOf(8), facet.get(0, 1, 4));
     }
 
     @Test
     public void testMixedGetSet1() {
-        facet.set(0, 1, 5, Integer.valueOf(16));
+        facet.set(0, 1, 5, 16);
         Assert.assertEquals(Integer.valueOf(16), facet.getWorld(10, 21, 35));
     }
 
     @Test
     public void testMixedGetSet2() {
-        facet.setWorld(24, 35, 46, Integer.valueOf(32));
+        facet.setWorld(24, 35, 46, 32);
         Assert.assertEquals(Integer.valueOf(32), facet.get(14, 15, 16));
     }
 
     @Test
     public void testMixedOnBorder() {
-        facet.set(-5, -6, -7, Integer.valueOf(64));
+        facet.set(-5, -6, -7, 64);
         Assert.assertEquals(Integer.valueOf(64), facet.getWorld(5, 14, 23));
     }
 

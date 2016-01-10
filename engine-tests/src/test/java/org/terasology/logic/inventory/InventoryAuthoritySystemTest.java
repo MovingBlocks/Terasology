@@ -21,9 +21,6 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.AtLeast;
 import org.mockito.internal.verification.Times;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.action.GiveItemAction;
@@ -263,13 +260,10 @@ public class InventoryAuthoritySystemTest {
         inventoryComp.itemSlots.set(0, item);
 
         Mockito.when(inventory.send(Matchers.any(BeforeItemRemovedFromInventory.class))).then(
-                new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Exception {
-                        BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) invocation.getArguments()[0];
-                        event.consume();
-                        return null;
-                    }
+                invocation -> {
+                    BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) invocation.getArguments()[0];
+                    event.consume();
+                    return null;
                 }
         );
 
@@ -388,13 +382,10 @@ public class InventoryAuthoritySystemTest {
         setupItemRef(item, itemComp, 2, 10);
 
         Mockito.when(inventory.send(Matchers.any(BeforeItemPutInInventory.class))).then(
-                new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Exception {
-                        BeforeItemPutInInventory event = (BeforeItemPutInInventory) invocation.getArguments()[0];
-                        event.consume();
-                        return null;
-                    }
+                invocation -> {
+                    BeforeItemPutInInventory event = (BeforeItemPutInInventory) invocation.getArguments()[0];
+                    event.consume();
+                    return null;
                 }
         );
 
@@ -418,7 +409,7 @@ public class InventoryAuthoritySystemTest {
         itemComp.stackId = "stackId";
         Mockito.when(item.exists()).thenReturn(true);
         Mockito.when(item.getComponent(ItemComponent.class)).thenReturn(itemComp);
-        Mockito.when(item.iterateComponents()).thenReturn(new LinkedList<Component>());
+        Mockito.when(item.iterateComponents()).thenReturn(new LinkedList<>());
     }
 
 
@@ -430,7 +421,7 @@ public class InventoryAuthoritySystemTest {
         EntityRef item = Mockito.mock(EntityRef.class);
         Mockito.when(item.exists()).thenReturn(true);
         Mockito.when(item.getComponent(ItemComponent.class)).thenReturn(itemComp);
-        Mockito.when(item.iterateComponents()).thenReturn(new LinkedList<Component>());
+        Mockito.when(item.iterateComponents()).thenReturn(new LinkedList<>());
         return item;
     }
 
@@ -544,18 +535,15 @@ public class InventoryAuthoritySystemTest {
 
         // Placement to slots 1 gets blocked by veto
         Mockito.when(inventory.send(Matchers.any(BeforeItemPutInInventory.class))).then(
-                new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Exception {
-                        Object arg = invocation.getArguments()[0];
-                        if (arg instanceof BeforeItemPutInInventory) {
-                            BeforeItemPutInInventory event = (BeforeItemPutInInventory) arg;
-                            if (event.getSlot() == 1) {
-                                event.consume();
-                            }
+                invocation -> {
+                    Object arg = invocation.getArguments()[0];
+                    if (arg instanceof BeforeItemPutInInventory) {
+                        BeforeItemPutInInventory event = (BeforeItemPutInInventory) arg;
+                        if (event.getSlot() == 1) {
+                            event.consume();
                         }
-                        return null;
                     }
+                    return null;
                 }
         );
 
@@ -598,18 +586,15 @@ public class InventoryAuthoritySystemTest {
 
         // Placement to slots 1 gets blocked by veto
         Mockito.when(fromInventory.send(Matchers.any(BeforeItemRemovedFromInventory.class))).then(
-                new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Exception {
-                        Object arg = invocation.getArguments()[0];
-                        if (arg instanceof BeforeItemRemovedFromInventory) {
-                            BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) arg;
-                            if (event.getSlot() == 1) {
-                                event.consume();
-                            }
+                invocation -> {
+                    Object arg = invocation.getArguments()[0];
+                    if (arg instanceof BeforeItemRemovedFromInventory) {
+                        BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) arg;
+                        if (event.getSlot() == 1) {
+                            event.consume();
                         }
-                        return null;
                     }
+                    return null;
                 }
         );
 

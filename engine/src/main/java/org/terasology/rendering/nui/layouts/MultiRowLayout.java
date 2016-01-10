@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -120,9 +121,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
 
             List<List<UIWidget>> columns = Lists.newArrayList(getColumnIterator());
             List<ColumnInfo> columnInfos = Lists.newArrayList();
-            for (List<UIWidget> column : columns) {
-                columnInfos.add(calculateColumnSize(column, canvas, availableSize));
-            }
+            columnInfos.addAll(columns.stream().map(column -> calculateColumnSize(column, canvas, availableSize)).collect(Collectors.toList()));
 
             int[] minHeights = new int[rows];
             int minColumnHeight = 0;

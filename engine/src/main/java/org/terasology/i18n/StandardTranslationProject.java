@@ -16,15 +16,15 @@
 
 package org.terasology.i18n;
 
+import org.terasology.i18n.assets.Translation;
+import org.terasology.naming.Name;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.terasology.i18n.assets.Translation;
-import org.terasology.naming.Name;
 
 /**
  * Performs textual translations based on a set of {@link Translation} instances.
@@ -65,7 +65,7 @@ public class StandardTranslationProject implements TranslationProject {
 
     @Override
     public Set<Locale> getAvailableLocales() {
-        Set<Locale> result = new HashSet<Locale>(translations.keySet());
+        Set<Locale> result = new HashSet<>(translations.keySet());
         result.remove(Locale.ROOT);
         return result;
     }

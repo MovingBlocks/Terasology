@@ -58,7 +58,7 @@ public final class IntToStringBinding implements Binding<String> {
         Integer val = Ints.tryParse(text);
         if (val != null && validRange.contains(val)) {
             // An alternative would be to clamp the value to min/max
-            intBinding.set(val.intValue());
+            intBinding.set(val);
         }
     }
 }

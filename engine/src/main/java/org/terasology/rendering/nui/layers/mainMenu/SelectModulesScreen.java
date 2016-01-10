@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -40,13 +39,10 @@ import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -159,14 +155,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
             });
 
             //ItemActivateEventListener is triggered by double clicking
-            moduleList.subscribe(new ItemActivateEventListener<ModuleSelectionInfo>() {
-                @Override
-                public void onItemActivated(UIWidget widget, ModuleSelectionInfo item) {
-                    if (item.isSelected() && moduleList.getSelection().isExplicitSelection()) {
-                        deselect(item);
-                    } else if (item.isValidToSelect()) {
-                        select(item);
-                    }
+            moduleList.subscribe((widget, item) -> {
+                if (item.isSelected() && moduleList.getSelection().isExplicitSelection()) {
+                    deselect(item);
+                } else if (item.isValidToSelect()) {
+                    select(item);
                 }
             });
 
@@ -229,7 +222,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleMetadata moduleMetadata = moduleInfoBinding.get();
                         if (moduleMetadata != null) {
-                            String dependenciesNames = "";
+                            String dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && dependencies.size() > 0) {
                                 dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
@@ -274,17 +267,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
             UIButton toggleActivate = find("toggleActivation", UIButton.class);
             if (toggleActivate != null) {
-                toggleActivate.subscribe(new ActivateEventListener() {
-                    @Override
-                    public void onActivated(UIWidget button) {
-                        ModuleSelectionInfo info = moduleList.getSelection();
-                        if (info != null) {
-                            // Toggle
-                            if (info.isSelected() && info.isExplicitSelection()) {
-                                deselect(info);
-                            } else if (info.isValidToSelect()) {
-                                select(info);
-                            }
+                toggleActivate.subscribe(button -> {
+                    ModuleSelectionInfo info = moduleList.getSelection();
+                    if (info != null) {
+                        // Toggle
+                        if (info.isSelected() && info.isExplicitSelection()) {
+                            deselect(info);
+                        } else if (info.isValidToSelect()) {
+                            select(info);
                         }
                     }
                 });
@@ -313,14 +303,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
             UIButton downloadButton = find("download", UIButton.class);
             if (downloadButton != null) {
-                downloadButton.subscribe(new ActivateEventListener() {
-                    @Override
-                    public void onActivated(UIWidget button) {
-                        if (moduleList.getSelection() != null) {
+                downloadButton.subscribe(button -> {
+                    if (moduleList.getSelection() != null) {
 
-                            ModuleSelectionInfo info = moduleList.getSelection();
-                            startDownloadingNewestModulesRequiredFor(info);
-                        }
+                        ModuleSelectionInfo info = moduleList.getSelection();
+                        startDownloadingNewestModulesRequiredFor(info);
                     }
                 });
 
@@ -339,26 +326,13 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
             UIButton disableAll = find("disableAll", UIButton.class);
             if (disableAll != null) {
-                disableAll.subscribe(new ActivateEventListener() {
-                    @Override
-                    public void onActivated(UIWidget button) {
-                        for (ModuleSelectionInfo info : sortedModules) {
-                            if (info.isSelected() && info.isExplicitSelection()) {
-                                deselect(info);
-                            }
-                        }
-                    }
-                });
+                disableAll.subscribe(button -> sortedModules.stream()
+                        .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
         }
 
 
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().popScreen();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
@@ -479,7 +453,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             throws DependencyResolutionFailed {
         List<ModuleSelectionInfo> requiredModules = getModulesRequiredFor(mainModuleInfo);
 
-        List<ModuleSelectionInfo> modulesToDownload = requiredModules.stream().filter(m -> m.isOnlineVersionNewer())
+        List<ModuleSelectionInfo> modulesToDownload = requiredModules.stream().filter(ModuleSelectionInfo::isOnlineVersionNewer)
                 .collect(Collectors.toList());
         return modulesToDownload;
     }
@@ -487,17 +461,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private void updateValidToSelect() {
         List<Name> selectedModules = Lists.newArrayList();
-        for (ModuleSelectionInfo info : sortedModules) {
-            if (info.isSelected()) {
-                selectedModules.add(info.getMetadata().getId());
-            }
-        }
+        selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
+                .map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
         Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-        for (ModuleSelectionInfo info : sortedModules) {
-            if (!info.isSelected()) {
-                info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess());
-            }
-        }
+        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info ->
+                info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
     }
 
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
@@ -548,11 +516,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void onClosed() {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
-        for (ModuleSelectionInfo info : sortedModules) {
-            if (info.isSelected() && info.isExplicitSelection()) {
-                moduleConfig.addModule(info.getMetadata().getId());
-            }
-        }
+        sortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
+                moduleConfig.addModule(info.getMetadata().getId()));
         SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
         ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
         if (info != null && !info.isSelected()) {
@@ -580,13 +545,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private List<Name> getExplicitlySelectedModules() {
-        List<Name> selectedModules = Lists.newArrayList();
-        for (ModuleSelectionInfo info : sortedModules) {
-            if (info.isExplicitSelection()) {
-                selectedModules.add(info.getMetadata().getId());
-            }
-        }
-        return selectedModules;
+        return sortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection).map(info ->
+                info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void deselect(ModuleSelectionInfo target) {
@@ -636,12 +596,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
             int index = 0;
             for (Map.Entry<URL, Path> entry: urlToTargetMap.entrySet()) {
                 float progressWithFiles = fractionPerFile * index;
-                ProgressListener singleDownloadListener = new ProgressListener() {
-                    @Override
-                    public void onProgress(float fraction) {
-                        float totalPrecentDone = progressWithFiles + (fraction / urlToTargetMap.size());
-                        progressListener.onProgress(totalPrecentDone);
-                    }
+                ProgressListener singleDownloadListener = fraction -> {
+                    float totalPrecentDone = progressWithFiles + (fraction / urlToTargetMap.size());
+                    progressListener.onProgress(totalPrecentDone);
                 };
                 FileDownloader fileDownloader = new FileDownloader(entry.getKey(), entry.getValue(),
                         singleDownloadListener);

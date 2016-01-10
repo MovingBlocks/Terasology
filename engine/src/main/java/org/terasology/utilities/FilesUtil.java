@@ -31,12 +31,7 @@ public final class FilesUtil {
      * A filter for DirectoryStream that only accepts directories
      */
     public static final DirectoryStream.Filter<Path> DIRECTORY_FILTER =
-            new DirectoryStream.Filter<Path>() {
-                @Override
-                public boolean accept(Path file) throws IOException {
-                    return Files.isDirectory(file);
-                }
-            };
+            file -> Files.isDirectory(file);
 
     private FilesUtil() {
     }

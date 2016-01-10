@@ -85,9 +85,7 @@ public final class GameThread {
         if (Thread.currentThread() == gameThread) {
             List<Runnable> processes = Lists.newArrayList();
             pendingRunnables.drainTo(processes);
-            for (Runnable process : processes) {
-                process.run();
-            }
+            processes.forEach(Runnable::run);
         }
     }
 

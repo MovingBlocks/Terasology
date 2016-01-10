@@ -93,7 +93,7 @@ public class ChunkMonitorDisplay extends JPanel {
 
     private Vector3i selectedChunk;
 
-    private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
+    private final BlockingQueue<Request> queue = new LinkedBlockingQueue<>();
     private final transient ExecutorService executor;
     private final transient Runnable renderTask;
 
@@ -704,11 +704,8 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private void renderChunks(Graphics2D g, int offsetx, int offsety, List<ChunkMonitorEntry> chunkEntries) {
-            for (ChunkMonitorEntry entry : chunkEntries) {
-                if (entry.getPosition().y == renderY) {
-                    renderChunk(g, offsetx, offsety, entry.getPosition(), entry);
-                }
-            }
+            chunkEntries.stream().filter(entry -> entry.getPosition().y == renderY).forEach(entry ->
+                    renderChunk(g, offsetx, offsety, entry.getPosition(), entry));
         }
 
         private void renderChunk(Graphics2D g, int offsetx, int offsety, Vector3i pos, ChunkMonitorEntry entry) {
@@ -736,12 +733,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private void repaint() {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    ChunkMonitorDisplay.this.repaint();
-                }
-            });
+            SwingUtilities.invokeLater(ChunkMonitorDisplay.this::repaint);
         }
 
         private long poll(List<Request> output) throws InterruptedException {

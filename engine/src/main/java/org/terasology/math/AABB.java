@@ -16,21 +16,18 @@
 
 package org.terasology.math;
 
+import com.bulletphysics.linearmath.AabbUtil2;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.base.Objects;
 import gnu.trove.list.TFloatList;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.vecmath.Matrix4f;
-
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 
-import com.bulletphysics.linearmath.AabbUtil2;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.base.Objects;
+import javax.vecmath.Matrix4f;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion
@@ -296,9 +293,7 @@ public final class AABB {
         float minDistance = Float.MAX_VALUE;
         Vector3f closestNormal = new Vector3f();
 
-        for (int i = 0; i < normals.size(); i++) {
-            Vector3f n = normals.get(i);
-
+        for (Vector3f n : normals) {
             Vector3f diff = new Vector3f(centerPointForNormal(n));
             diff.sub(origin);
 

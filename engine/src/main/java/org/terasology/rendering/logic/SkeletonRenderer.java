@@ -355,9 +355,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         glVertex3f(offset.x, offset.y, offset.z);
         glEnd();
 
-        for (EntityRef child : loc.getChildren()) {
-            renderBoneOrientation(child);
-        }
+        loc.getChildren().forEach(this::renderBoneOrientation);
         glPopMatrix();
     }
 

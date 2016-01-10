@@ -25,11 +25,9 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -67,20 +65,17 @@ public class ChatScreen extends CoreScreenLayer {
         commandLine = find("commandLine", UIText.class);
         getManager().setFocus(commandLine);
 
-        commandLine.subscribe(new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget widget) {
-                String text = commandLine.getText();
+        commandLine.subscribe(widget -> {
+            String text = commandLine.getText();
 
-                if (!text.isEmpty()) {
-                    String command = "say";
-                    List<String> params = Collections.singletonList(text);
-    
-                    // TODO: move command execution to separate class
-                    console.execute(new Name(command), params, localPlayer.getClientEntity());
-                    commandLine.setText("");
-                    scrollArea.moveToBottom();
-                }
+            if (!text.isEmpty()) {
+                String command = "say";
+                List<String> params = Collections.singletonList(text);
+
+                // TODO: move command execution to separate class
+                console.execute(new Name(command), params, localPlayer.getClientEntity());
+                commandLine.setText("");
+                scrollArea.moveToBottom();
             }
         });
 

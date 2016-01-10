@@ -15,15 +15,9 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
@@ -39,7 +33,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
@@ -47,17 +40,20 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.CardLayout;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
-import org.terasology.rendering.nui.widgets.ItemSelectEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  */
@@ -85,7 +81,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private List<ServerInfo> listedServers = new ArrayList<>();
 
-    private Predicate<ServerInfo> activeServersOnly = server -> server.isActive();
+    private Predicate<ServerInfo> activeServersOnly = ServerInfo::isActive;
 
     private boolean updateComplete;
 
@@ -128,12 +124,9 @@ public class JoinGameScreen extends CoreScreenLayer {
         bindCustomButtons();
         bindInfoLabels();
 
-        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                config.save();
-                getManager().popScreen();
-            }
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            config.save();
+            getManager().popScreen();
         });
 
         activateOnline.onActivated(null);
@@ -173,13 +166,9 @@ public class JoinGameScreen extends CoreScreenLayer {
     }
 
     private void join(final String address, final int port) {
-        Callable<JoinStatus> operation = new Callable<JoinStatus>() {
-
-            @Override
-            public JoinStatus call() throws InterruptedException {
-                JoinStatus joinStatus = networkSystem.join(address, port);
-                return joinStatus;
-            }
+        Callable<JoinStatus> operation = () -> {
+            JoinStatus joinStatus = networkSystem.join(address, port);
+            return joinStatus;
         };
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
@@ -198,19 +187,11 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private void configureServerList(final UIList<ServerInfo> serverList) {
 
-        serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
-            @Override
-            public void onItemActivated(UIWidget widget, ServerInfo item) {
-                join(item.getAddress(), item.getPort());
-            }
-        });
+        serverList.subscribe((widget, item) -> join(item.getAddress(), item.getPort()));
 
-        serverList.subscribeSelection(new ItemSelectEventListener<ServerInfo>() {
-            @Override
-            public void onItemSelected(UIWidget widget, ServerInfo item) {
-                if (item != null && !extInfo.containsKey(item)) {
-                    extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
-                }
+        serverList.subscribeSelection((widget, item) -> {
+            if (item != null && !extInfo.containsKey(item)) {
+                extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
             }
         });
 
@@ -293,14 +274,11 @@ public class JoinGameScreen extends CoreScreenLayer {
                     return infoBinding.get() != null;
                 }
             });
-            joinButton.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget button) {
-                    config.save();
-                    ServerInfo item = infoBinding.get();
-                    if (item != null) {
-                        join(item.getAddress(), item.getPort());
-                    }
+            joinButton.subscribe(button -> {
+                config.save();
+                ServerInfo item = infoBinding.get();
+                if (item != null) {
+                    join(item.getAddress(), item.getPort());
                 }
             });
         }

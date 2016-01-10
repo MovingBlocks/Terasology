@@ -46,16 +46,16 @@ public class SparseObjectFacetTest extends ObjectFacetTest {
 
     @Test
     public void testBoxedGetSetSparse() {
-        facet.set(0, 1, 3, new Integer(64));
+        facet.set(0, 1, 3, 64);
         Assert.assertEquals(64.0f, facet.get(0, 1, 3), 0.0);
     }
 
     @Test
     public void testGetRelativeMap() {
 
-        facet.set(0, 1, 2, Integer.valueOf(1));
-        facet.set(0, 1, 3, Integer.valueOf(2));
-        facet.set(9, 3, 1, Integer.valueOf(3));
+        facet.set(0, 1, 2, 1);
+        facet.set(0, 1, 3, 2);
+        facet.set(9, 3, 1, 3);
 
         facet.setWorld(13, 28, 34, 2);
         facet.setWorld(10, 21, 35, 1);

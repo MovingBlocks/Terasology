@@ -46,7 +46,7 @@ import java.util.List;
 public class InventoryCell extends ItemCell {
     private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);
     @LayoutConfig
-    private Binding<Integer> targetSlot = new DefaultBinding<Integer>(0);
+    private Binding<Integer> targetSlot = new DefaultBinding<>(0);
 
     private Binding<EntityRef> targetInventory = new DefaultBinding<>(EntityRef.NULL);
 

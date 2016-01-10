@@ -49,11 +49,7 @@ public class CompressedChunkBuilder {
                                   Collection<EntityRef> entitiesToSave,
                                   boolean chunkUnloaded) {
         EntityStorer storer = new EntityStorer(entityManager);
-        for (EntityRef entityRef : entitiesToSave) {
-            if (entityRef.isPersistent()) {
-                storer.store(entityRef);
-            }
-        }
+        entitiesToSave.stream().filter(EntityRef::isPersistent).forEach(storer::store);
         storedEntities = storer.getStoredEntities();
         this.entityStore = storer.finaliseStore();
 

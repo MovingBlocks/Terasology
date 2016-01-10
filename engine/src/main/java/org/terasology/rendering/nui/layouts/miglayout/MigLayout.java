@@ -24,7 +24,6 @@ import net.miginfocom.layout.ConstraintParser;
 import net.miginfocom.layout.ContainerWrapper;
 import net.miginfocom.layout.Grid;
 import net.miginfocom.layout.LC;
-import net.miginfocom.layout.LayoutCallback;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
@@ -46,7 +45,6 @@ import java.util.Map;
  * <br><br>
  * see: http://www.miglayout.com/
  * <br><br>
- * Created by synopia on 06.01.14.
  */
 public class MigLayout extends CoreLayout<MigLayout.CCHint> implements ContainerWrapper {
     private Map<ComponentWrapper, CC> ccMap = Maps.newHashMap();
@@ -146,12 +144,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         final ComponentWrapper cw = getWrapper(element);
 
         final String cStr = ConstraintParser.prepare(hint != null ? hint.cc : "");
-        CC constraint = AccessController.doPrivileged(new PrivilegedAction<CC>() {
-            @Override
-            public CC run() {
-                return ConstraintParser.parseComponentConstraint(cStr);
-            }
-        });
+        CC constraint = AccessController.doPrivileged((PrivilegedAction<CC>) () -> ConstraintParser.parseComponentConstraint(cStr));
 
         ccMap.put(cw, constraint);
         wrappers.put(element, cw);
@@ -208,7 +201,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         }
 
         if (grid == null) {
-            grid = new Grid(this, lc, rc, cc, ccMap, new ArrayList<LayoutCallback>());
+            grid = new Grid(this, lc, rc, cc, ccMap, new ArrayList<>());
         }
         debugRects.clear();
 

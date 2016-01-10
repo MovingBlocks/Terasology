@@ -185,12 +185,7 @@ public class ChunkRelevanceRegion {
     }
 
     public Iterable<Vector3i> getNeededChunks() {
-        return new Iterable<Vector3i>() {
-            @Override
-            public Iterator<Vector3i> iterator() {
-                return new NeededChunksIterator();
-            }
-        };
+        return NeededChunksIterator::new;
     }
 
     public void chunkUnloaded(Vector3i pos) {

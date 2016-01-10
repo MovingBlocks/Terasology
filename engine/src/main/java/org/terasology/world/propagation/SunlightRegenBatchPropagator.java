@@ -109,9 +109,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         for (byte depth = 0; depth <= regenRules.getMaxValue(); depth++) {
             Set<Vector3i> toProcess = reduceQueues[depth];
 
-            for (Vector3i pos : toProcess) {
-                purge(pos);
-            }
+            toProcess.forEach(this::purge);
             toProcess.clear();
         }
     }

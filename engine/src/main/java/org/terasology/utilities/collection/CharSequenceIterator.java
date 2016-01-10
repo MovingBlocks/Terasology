@@ -39,7 +39,7 @@ public class CharSequenceIterator implements Iterator<Character> {
     // The method nextChar is preferred over this one, as it does not create a wrapper for the primitive
     @Override
     public Character next() {
-        return Character.valueOf(nextChar());
+        return nextChar();
     }
 
     public char nextChar() {

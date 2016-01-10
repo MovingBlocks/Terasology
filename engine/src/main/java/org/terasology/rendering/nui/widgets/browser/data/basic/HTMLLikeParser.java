@@ -180,9 +180,7 @@ public final class HTMLLikeParser {
             return null;
         }
         FlowParagraphData paragraphData = new FlowParagraphData(paragraphRenderStyle);
-        for (FlowRenderable flowRenderable : flowRenderables) {
-            paragraphData.append(flowRenderable);
-        }
+        flowRenderables.forEach(paragraphData::append);
 
         return paragraphData;
     }

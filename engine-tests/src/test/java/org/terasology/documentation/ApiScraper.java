@@ -15,7 +15,6 @@
  */
 package org.terasology.documentation;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
 import org.terasology.engine.module.ModuleManager;
@@ -24,7 +23,6 @@ import org.terasology.module.sandbox.API;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -45,14 +43,7 @@ public final class ApiScraper {
         ModuleEnvironment environment = moduleManager.getEnvironment();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        SortedSetMultimap<String, String> sortedApi = Multimaps.newSortedSetMultimap(
-                new HashMap<String, Collection<String>>(),
-                new Supplier<TreeSet<String>>() {
-                    @Override
-                    public TreeSet<String> get() {
-                        return new TreeSet<>();
-                    }
-                });
+        SortedSetMultimap<String, String> sortedApi = Multimaps.newSortedSetMultimap(new HashMap<>(), TreeSet::new);
 
         for (Class<?> apiClass : environment.getTypesAnnotatedWith(API.class)) {
             //System.out.println("Processing: " + apiClass);

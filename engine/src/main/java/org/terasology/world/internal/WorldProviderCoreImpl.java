@@ -37,6 +37,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
+import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.liquid.LiquidData;
@@ -360,21 +361,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public Collection<Region3i> getRelevantRegions() {
         Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Function<Chunk, Region3i> mapping = new Function<Chunk, Region3i>() {
+        Function<Chunk, Region3i> mapping = CoreChunk::getRegion;
 
-            @Override
-            public Region3i apply(Chunk input) {
-                return input.getRegion();
-            }
-        };
-
-        Predicate<Chunk> isReady = new Predicate<Chunk>() {
-
-            @Override
-            public boolean apply(Chunk input) {
-                return input.isReady();
-            }
-        };
+        Predicate<Chunk> isReady = ManagedChunk::isReady;
 
         return FluentIterable.from(chunks).filter(isReady).transform(mapping).toList();
     }

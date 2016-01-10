@@ -141,9 +141,7 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void postRender() {
-        for (DrawOperation operation : drawOnTopOperations) {
-            operation.draw();
-        }
+        drawOnTopOperations.forEach(DrawOperation::draw);
         drawOnTopOperations.clear();
 
         if (topMouseOverRegion != null && time.getGameTime() >= tooltipTime && getSkin() != null) {
@@ -180,11 +178,8 @@ public class CanvasImpl implements CanvasControl {
             }
         }
 
-        for (InteractionRegion region : mouseOverRegions) {
-            if (!newMouseOverRegions.contains(region)) {
-                region.listener.onMouseLeave();
-            }
-        }
+        mouseOverRegions.stream().filter(region -> !newMouseOverRegions.contains(region)).forEach(region ->
+                region.listener.onMouseLeave());
 
         if (clickedRegion != null && !interactionRegions.contains(clickedRegion)) {
             clickedRegion = null;

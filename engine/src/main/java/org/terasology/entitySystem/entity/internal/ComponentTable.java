@@ -46,7 +46,7 @@ class ComponentTable {
     public Component put(long entityId, Component component) {
         TLongObjectMap<Component> entityMap = store.get(component.getClass());
         if (entityMap == null) {
-            entityMap = new TLongObjectHashMap<Component>();
+            entityMap = new TLongObjectHashMap<>();
             store.put(component.getClass(), entityMap);
         }
         return entityMap.put(entityId, component);

@@ -27,7 +27,6 @@ import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -36,7 +35,6 @@ import org.terasology.rendering.nui.layers.mainMenu.EnterTextPopup;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIList;
 
@@ -200,114 +198,87 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "copy", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                String data = behaviorEditor.save();
-                StringSelection contents = new StringSelection(data);
-                systemClipboard.setContents(contents, contents);
+        WidgetUtil.trySubscribe(this, "copy", button -> {
+            Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            String data = behaviorEditor.save();
+            StringSelection contents1 = new StringSelection(data);
+            systemClipboard.setContents(contents1, contents1);
+        });
+
+        WidgetUtil.trySubscribe(this, "layout", button -> {
+            BehaviorTree selection = selectTree.getSelection();
+            if (selection != null) {
+                selection.layout(selectedNode);
             }
         });
 
-        WidgetUtil.trySubscribe(this, "layout", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                BehaviorTree selection = selectTree.getSelection();
-                if (selection != null) {
-                    selection.layout(selectedNode);
+        WidgetUtil.trySubscribe(this, "new", button -> {
+            if (selectedNode != null) {
+                nuiManager.pushScreen("engine:enterTextPopup", EnterTextPopup.class).bindInput(new Binding<String>() {
+                    @Override
+                    public String get() {
+                        return null;
+                    }
+
+                    @Override
+                    public void set(String value) {
+                        behaviorSystem.createTree(value, selectedNode.getNode());
+                    }
+                });
+            }
+        });
+        WidgetUtil.trySubscribe(this, "assign", button -> {
+            if (selectedTree != null && selectedInterpreter != null) {
+                EntityRef minion = selectedInterpreter.actor().minion();
+                minion.removeComponent(BehaviorComponent.class);
+                BehaviorComponent component = new BehaviorComponent();
+                component.tree = selectedTree;
+                minion.addComponent(component);
+                List<Interpreter> interpreter = behaviorSystem.getInterpreter();
+                selectEntity.setSelection(null);
+                for (Interpreter i : interpreter) {
+                    if (i.actor().minion() == minion) {
+                        selectEntity.setSelection(i);
+                        break;
+                    }
                 }
             }
         });
-
-        WidgetUtil.trySubscribe(this, "new", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (selectedNode != null) {
-                    nuiManager.pushScreen("engine:enterTextPopup", EnterTextPopup.class).bindInput(new Binding<String>() {
-                        @Override
-                        public String get() {
-                            return null;
-                        }
-
-                        @Override
-                        public void set(String value) {
-                            behaviorSystem.createTree(value, selectedNode.getNode());
-                        }
-                    });
-                }
-            }
-        });
-        WidgetUtil.trySubscribe(this, "assign", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (selectedTree != null && selectedInterpreter != null) {
-                    EntityRef minion = selectedInterpreter.actor().minion();
-                    minion.removeComponent(BehaviorComponent.class);
-                    BehaviorComponent component = new BehaviorComponent();
-                    component.tree = selectedTree;
-                    minion.addComponent(component);
-                    List<Interpreter> interpreter = behaviorSystem.getInterpreter();
-                    selectEntity.setSelection(null);
-                    for (Interpreter i : interpreter) {
-                        if (i.actor().minion() == minion) {
-                            selectEntity.setSelection(i);
+        WidgetUtil.trySubscribe(this, "remove", button -> {
+            if (selectedNode != null && selectedTree != null) {
+                RenderableNode targetNode = selectedNode.getInputPort().getTargetNode();
+                if (targetNode != null) {
+                    for (int i = 0; i < targetNode.getChildrenCount(); i++) {
+                        if (targetNode.getChild(i) == selectedNode) {
+                            targetNode.withModel().removeChild(i);
                             break;
                         }
                     }
                 }
-            }
-        });
-        WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (selectedNode != null && selectedTree != null) {
-                    RenderableNode targetNode = selectedNode.getInputPort().getTargetNode();
-                    if (targetNode != null) {
-                        for (int i = 0; i < targetNode.getChildrenCount(); i++) {
-                            if (targetNode.getChild(i) == selectedNode) {
-                                targetNode.withModel().removeChild(i);
-                                break;
-                            }
-                        }
-                    }
-                    removeWidget(selectedNode);
-                    behaviorEditor.nodeClicked(null);
-                    behaviorSystem.treeModified(selectedTree);
-                }
+                removeWidget(selectedNode);
+                behaviorEditor.nodeClicked(null);
+                behaviorSystem.treeModified(selectedTree);
             }
         });
 
-        WidgetUtil.trySubscribe(this, "debug_run", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (debugger != null) {
-                    debugger.run();
-                }
+        WidgetUtil.trySubscribe(this, "debug_run", button -> {
+            if (debugger != null) {
+                debugger.run();
             }
         });
-        WidgetUtil.trySubscribe(this, "debug_pause", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (debugger != null) {
-                    debugger.pause();
-                }
+        WidgetUtil.trySubscribe(this, "debug_pause", button -> {
+            if (debugger != null) {
+                debugger.pause();
             }
         });
-        WidgetUtil.trySubscribe(this, "debug_reset", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (selectedInterpreter != null) {
-                    selectedInterpreter.reset();
-                }
+        WidgetUtil.trySubscribe(this, "debug_reset", button -> {
+            if (selectedInterpreter != null) {
+                selectedInterpreter.reset();
             }
         });
-        WidgetUtil.trySubscribe(this, "debug_step", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                if (debugger != null) {
-                    debugger.step();
-                }
+        WidgetUtil.trySubscribe(this, "debug_step", button -> {
+            if (debugger != null) {
+                debugger.step();
             }
         });
 
@@ -321,9 +292,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
 
     private void removeWidget(RenderableNode node) {
         behaviorEditor.removeWidget(node);
-        for (RenderableNode renderableNode : node.children()) {
-            removeWidget(renderableNode);
-        }
+        node.children().forEach(this::removeWidget);
     }
 
     private void updateDebugger() {

@@ -177,9 +177,9 @@ public class ThreadMonitorPanel extends JPanel {
 
     private static final class ThreadListModel extends AbstractListModel {
 
-        private final java.util.List<SingleThreadMonitor> monitors = new ArrayList<SingleThreadMonitor>();
+        private final java.util.List<SingleThreadMonitor> monitors = new ArrayList<>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
-        private final BlockingQueue<Task> queue = new LinkedBlockingQueue<Task>();
+        private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
 
         private ThreadListModel() {
             ThreadMonitor.registerForEvents(this);
@@ -222,32 +222,17 @@ public class ThreadMonitorPanel extends JPanel {
 
         private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalAdded(source, a, b);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireIntervalAdded(source, a, b));
         }
 
         private void invokeIntervalRemoved(final int a, final int b) {
             final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireIntervalRemoved(source, a, b);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireIntervalRemoved(source, a, b));
         }
 
         private void invokeContentsChanged(final int a, final int b) {
             final Object source = this;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireContentsChanged(source, a, b);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireContentsChanged(source, a, b));
         }
 
         @Subscribe

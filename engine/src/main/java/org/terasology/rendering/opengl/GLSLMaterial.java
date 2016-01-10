@@ -249,9 +249,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public void deactivateFeatures(ShaderProgramFeature... features) {
-        for (ShaderProgramFeature feature : Arrays.asList(features)) {
-            deactivateFeature(feature);
-        }
+        Arrays.asList(features).forEach(this::deactivateFeature);
     }
 
     @Override

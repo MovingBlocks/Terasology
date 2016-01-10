@@ -71,17 +71,14 @@ public class FloraRasterizer implements WorldRasterizer {
         WhiteNoise noise = new WhiteNoise(chunk.getPosition().hashCode());
 
         Map<BaseVector3i, FloraType> entries = facet.getRelativeEntries();
-        for (BaseVector3i pos : entries.keySet()) {
+        // check if some other rasterizer has already placed something here
+        entries.keySet().stream().filter(pos -> chunk.getBlock(pos).equals(air)).forEach(pos -> {
 
-            // check if some other rasterizer has already placed something here
-            if (chunk.getBlock(pos).equals(air)) {
-
-                FloraType type = entries.get(pos);
-                List<Block> list = flora.get(type);
-                int blockIdx = Math.abs(noise.intNoise(pos.x(), pos.y(), pos.z())) % list.size();
-                Block block = list.get(blockIdx);
-                chunk.setBlock(pos, block);
-            }
-        }
+            FloraType type = entries.get(pos);
+            List<Block> list = flora.get(type);
+            int blockIdx = Math.abs(noise.intNoise(pos.x(), pos.y(), pos.z())) % list.size();
+            Block block = list.get(blockIdx);
+            chunk.setBlock(pos, block);
+        });
     }
 }

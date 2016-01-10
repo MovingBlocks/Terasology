@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
-    private Binding<List<T>> options = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
+    private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override

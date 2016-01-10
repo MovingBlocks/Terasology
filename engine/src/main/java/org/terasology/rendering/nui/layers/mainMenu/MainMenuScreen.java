@@ -20,9 +20,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
@@ -36,39 +34,16 @@ public class MainMenuScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
-        WidgetUtil.trySubscribe(this, "singleplayer", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:selectGameScreen");
+        WidgetUtil.trySubscribe(this, "singleplayer", button -> getManager().pushScreen("engine:selectGameScreen"));
+        WidgetUtil.trySubscribe(this, "multiplayer", button -> {
+            UIScreenLayer screen = getManager().pushScreen("engine:selectGameScreen");
+            if (screen instanceof SelectGameScreen) {
+                ((SelectGameScreen) screen).setLoadingAsServer(true);
             }
         });
-        WidgetUtil.trySubscribe(this, "multiplayer", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                UIScreenLayer screen = getManager().pushScreen("engine:selectGameScreen");
-                if (screen instanceof SelectGameScreen) {
-                    ((SelectGameScreen) screen).setLoadingAsServer(true);
-                }
-            }
-        });
-        WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:joinGameScreen");
-            }
-        });
-        WidgetUtil.trySubscribe(this, "settings", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:settingsMenuScreen");
-            }
-        });
-        WidgetUtil.trySubscribe(this, "exit", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                engine.shutdown();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "join", button -> getManager().pushScreen("engine:joinGameScreen"));
+        WidgetUtil.trySubscribe(this, "settings", button -> getManager().pushScreen("engine:settingsMenuScreen"));
+        WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
     }
 
     @Override
