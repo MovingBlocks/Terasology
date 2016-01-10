@@ -85,7 +85,7 @@ public final class BindsConfig {
         data.putAll(other.data);
     }
 
-    public Collection<Input> getBinds(SimpleUri uri) {
+    public List<Input> getBinds(SimpleUri uri) {
         return data.get(uri);
     }
 

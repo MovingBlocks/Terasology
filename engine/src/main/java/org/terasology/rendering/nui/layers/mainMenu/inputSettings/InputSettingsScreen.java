@@ -18,13 +18,16 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
@@ -39,9 +42,11 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
@@ -59,7 +64,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:inputSettingsScreen");
 
-    private int horizontalSpacing = 4;
+    private int horizontalSpacing = 12;
 
     @In
     private Config config;
@@ -228,15 +233,33 @@ public class InputSettingsScreen extends CoreScreenLayer {
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
-        UIInputBindButton inputBind = new UIInputBindButton();
-        inputBind.setManager(getManager());
-        inputBind.setDescription(bind.description());
-        inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
-        UIInputBindButton secondaryInputBind = new UIInputBindButton();
-        secondaryInputBind.setManager(getManager());
-        secondaryInputBind.setDescription(bind.description());
-        secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
-        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
+        BindsConfig bindConfig = config.getInput().getBinds();
+        List<Input> binds = bindConfig.getBinds(uri);
+        UIButton primaryInputBind = new UIButton();
+        primaryInputBind.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                if (binds.size() > 0) {
+                    Input input = binds.get(0);
+                    if (input != null) {
+                        return input.getDisplayName();
+                    }
+                }
+                return "<not bound>";
+            }
+        });
+        primaryInputBind.subscribe(event -> {
+//            inputBind.setDescription(bind.description());
+//            inputBind.bindInput(new InputConfigBinding(binds, uri, 0));
+            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
+            popup.setBindingData(uri, bind, 0);
+        });
+
+        UIButton secondaryInputBind = new UIButton();
+//      Input secondary = binds.get(1);
+        layout.addWidget(new RowLayout(new UILabel(bind.description()), primaryInputBind, secondaryInputBind)
+                .setColumnRatios(0.4f)
+                .setHorizontalSpacing(horizontalSpacing));
     }
 
     @Override
