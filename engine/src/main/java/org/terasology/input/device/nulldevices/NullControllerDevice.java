@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.input.device.nulldevices;
 
-import com.google.common.collect.Queues;
-
-import org.terasology.input.device.KeyboardAction;
-import org.terasology.input.device.KeyboardDevice;
-
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 
+import org.terasology.input.ControllerDevice;
+import org.terasology.input.device.ControllerAction;
+
 /**
+ * A dummy implementation of {@link ControllerDevice}.
  */
-public class NullKeyboardDevice implements KeyboardDevice {
+public class NullControllerDevice implements ControllerDevice {
 
     @Override
-    public boolean isKeyDown(int button) {
-        return false;
+    public Queue<ControllerAction> getInputQueue() {
+        return new ArrayDeque<>();
     }
 
     @Override
-    public Queue<KeyboardAction> getInputQueue() {
-        return Queues.newArrayDeque();
+    public List<String> getControllers() {
+        return Collections.emptyList();
     }
 }

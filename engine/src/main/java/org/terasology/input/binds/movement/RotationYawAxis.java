@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds.interaction;
+package org.terasology.input.binds.movement;
 
-import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindAxisEvent;
 import org.terasology.input.ControllerId;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.input.RegisterRealBindAxis;
+import org.terasology.input.SendEventMode;
 
 /**
+ * Relates to the horizontal screen axis, i.e. look left/right.
  */
-@RegisterBindButton(id = "attack", description = "Attack", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
-@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ZERO)
-public class AttackButton extends BindButtonEvent {
+@RegisterRealBindAxis(id = "rotationYaw", eventMode = SendEventMode.WHEN_NON_ZERO)
+@DefaultBinding(type = InputType.CONTROLLER_AXIS, id = ControllerId.RX_AXIS)
+public class RotationYawAxis extends BindAxisEvent {
 }

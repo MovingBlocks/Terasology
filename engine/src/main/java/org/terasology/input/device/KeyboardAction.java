@@ -17,54 +17,24 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector2i;
 
 /**
  */
-public final class InputAction {
+public final class KeyboardAction {
     private final Input input;
     private final ButtonState state;
-    private final int delta;
     private final char inputChar;
-    private final Vector2i mousePosition;
 
-    public InputAction(Input input, ButtonState state, Vector2i mousePosition) {
-        this.mousePosition = mousePosition;
+    public KeyboardAction(Input input, ButtonState state, char inputChar) {
         this.input = input;
         this.state = state;
-        this.delta = 0;
-        this.inputChar = '\0';
-    }
-
-    public InputAction(Input input, int delta, Vector2i mousePosition) {
-        this.mousePosition = mousePosition;
-        this.input = input;
-        this.state = ButtonState.DOWN;
-        this.delta = delta;
-        this.inputChar = '\0';
-    }
-
-    public InputAction(Input input, ButtonState state, char inputChar) {
-        this.mousePosition = null;
-        this.input = input;
-        this.state = state;
-        this.delta = 0;
         this.inputChar = inputChar;
     }
 
-    public InputAction(Input input, int delta, char inputChar) {
-        this.mousePosition = null;
+    public KeyboardAction(Input input, int delta, char inputChar) {
         this.input = input;
         this.state = ButtonState.DOWN;
-        this.delta = delta;
         this.inputChar = inputChar;
-    }
-
-    /**
-     * @return Whether this is an axis action (e.g. a mouse wheel or volume knob)
-     */
-    public boolean isAxisAction() {
-        return delta != 0;
     }
 
     /**
@@ -81,23 +51,12 @@ public final class InputAction {
         return state;
     }
 
-    /**
-     * @return For axis actions, the change in value
-     */
-    public int getTurns() {
-        return delta;
-    }
-
     public char getInputChar() {
         return inputChar;
     }
 
-    public Vector2i getMousePosition() {
-        return mousePosition;
-    }
-
     @Override
     public String toString() {
-        return "InputAction [" + this.input + " \'" + inputChar + "' (" + state + "), mouse: " + mousePosition + "]";
+        return "KeyboardAction [" + this.input + " '" + inputChar + "' (" + state + ")]";
     }
 }

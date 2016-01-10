@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.input;
 
-import org.terasology.math.geom.Vector2i;
-import org.terasology.registry.CoreRegistry;
+public interface ControllerId {
 
-/**
- */
-public final class Mouse {
+    int NONE = -1;
 
-    private Mouse() {
-    }
+    int ZERO = 0;
+    int ONE = 1;
+    int TWO = 2;
+    int THREE = 3;
+    int FOUR = 4;
+    int FIVE = 5;
+    int SIX = 6;
+    int SEVEN = 7;
+    int EIGHT = 8;
+    int NINE = 9;
+    int TEN = 10;
+    int ELEVEN = 11;
 
-    public static Vector2i getPosition() {
-        return CoreRegistry.get(InputSystem.class).getMouseDevice().getPosition();
-    }
+    int X_AXIS = 100;
+    int Y_AXIS = 200;
+    int Z_AXIS = 300;
 
-    public static boolean getButtonState(int button) {
-        return CoreRegistry.get(InputSystem.class).getMouseDevice().isButtonDown(button);
-    }
+    int RX_AXIS = 500;
+    int RY_AXIS = 600;
 
-    public static boolean isVisible() {
-        return CoreRegistry.get(InputSystem.class).getMouseDevice().isVisible();
-    }
+    int POVX_AXIS = 800;
+    int POVY_AXIS = 900;
 }

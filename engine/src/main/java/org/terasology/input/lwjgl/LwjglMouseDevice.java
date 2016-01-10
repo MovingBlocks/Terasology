@@ -20,7 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
-import org.terasology.input.device.InputAction;
+import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.math.geom.Vector2i;
 
@@ -60,17 +60,17 @@ public class LwjglMouseDevice implements MouseDevice {
     }
 
     @Override
-    public Queue<InputAction> getInputQueue() {
-        Queue<InputAction> result = Queues.newArrayDeque();
+    public Queue<MouseAction> getInputQueue() {
+        Queue<MouseAction> result = Queues.newArrayDeque();
 
         while (Mouse.next()) {
             if (Mouse.getEventButton() != -1) {
                 ButtonState state = (Mouse.getEventButtonState()) ? ButtonState.DOWN : ButtonState.UP;
-                result.add(new InputAction(InputType.MOUSE_BUTTON.getInput(Mouse.getEventButton()), state, getPosition()));
+                result.add(new MouseAction(InputType.MOUSE_BUTTON.getInput(Mouse.getEventButton()), state, getPosition()));
             }
             if (Mouse.getEventDWheel() != 0) {
                 int id = (Mouse.getEventDWheel() > 0) ? 1 : -1;
-                result.add(new InputAction(InputType.MOUSE_WHEEL.getInput(id), id * Mouse.getEventDWheel() / 120, getPosition()));
+                result.add(new MouseAction(InputType.MOUSE_WHEEL.getInput(id), id * Mouse.getEventDWheel() / 120, getPosition()));
             }
         }
 

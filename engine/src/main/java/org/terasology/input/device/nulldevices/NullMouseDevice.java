@@ -17,7 +17,7 @@ package org.terasology.input.device.nulldevices;
 
 import com.google.common.collect.Queues;
 
-import org.terasology.input.device.InputAction;
+import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.math.geom.Vector2i;
 
@@ -47,7 +47,7 @@ public class NullMouseDevice implements MouseDevice {
     }
 
     @Override
-    public Queue<InputAction> getInputQueue() {
+    public Queue<MouseAction> getInputQueue() {
         return Queues.newArrayDeque();
     }
 

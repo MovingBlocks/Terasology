@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -40,6 +41,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -125,6 +127,12 @@ public class InputSettingsScreen extends CoreScreenLayer {
         }
         mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
 
+        List<String> controllers = inputSystem.getControllerDevice().getControllers();
+        for (String name : controllers) {
+            ControllerInfo cfg = config.getInput().getControllers().getController(name);
+            addInputSection(mainLayout, name, cfg);
+        }
+
         ScrollableArea area = new ScrollableArea();
         area.setContent(mainLayout);
 
@@ -185,6 +193,55 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 addInputBindRow(extension.uri, extension.bind, layout);
             }
         }
+    }
+
+    private void addInputSection(ColumnLayout layout, String name, ControllerInfo info) {
+        UILabel categoryHeader = new UILabel(name);
+        categoryHeader.setFamily("subheading");
+        layout.addWidget(categoryHeader);
+
+        float columnRatio = 0.4f;
+
+        UICheckbox invertX = new UICheckbox();
+        invertX.bindChecked(BindHelper.bindBeanProperty("invertX", info, Boolean.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Invert X Axis"), invertX)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        UICheckbox invertY = new UICheckbox();
+        invertY.bindChecked(BindHelper.bindBeanProperty("invertY", info, Boolean.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Invert Y Axis"), invertY)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        UICheckbox invertZ = new UICheckbox();
+        invertZ.bindChecked(BindHelper.bindBeanProperty("invertZ", info, Boolean.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Invert Z Axis"), invertZ)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        UISlider mvmtDeadZone = new UISlider();
+        mvmtDeadZone.setIncrement(0.01f);
+        mvmtDeadZone.setMinimum(0);
+        mvmtDeadZone.setRange(1);
+        mvmtDeadZone.setPrecision(2);
+        mvmtDeadZone.bindValue(BindHelper.bindBeanProperty("movementDeadZone", info, Float.TYPE));
+        layout.addWidget(new RowLayout(new UILabel("Movement Axis Dead Zone"), mvmtDeadZone)
+            .setColumnRatios(columnRatio)
+            .setHorizontalSpacing(horizontalSpacing));
+
+        UISlider rotDeadZone = new UISlider();
+        rotDeadZone.setIncrement(0.01f);
+        rotDeadZone.setMinimum(0);
+        rotDeadZone.setRange(1);
+        rotDeadZone.setPrecision(2);
+        rotDeadZone.bindValue(BindHelper.bindBeanProperty("rotationDeadZone", info, Float.TYPE));
+
+        layout.addWidget(new RowLayout(new UILabel("Rotation Axis Dead Zone"), rotDeadZone)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        layout.addWidget(new UISpace(new Vector2i(0, 16)));
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {

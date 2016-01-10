@@ -16,73 +16,26 @@
 
 package org.terasology.input.internal;
 
-import com.google.common.collect.Lists;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindAxisSubscriber;
-import org.terasology.input.BindableAxis;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
-import org.terasology.input.SendEventMode;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-
-import java.util.List;
 
 /**
- * A Bind Axis is an simulated analog input axis, maintaining a value between -1 and 1.  It is linked to
- * a positive BindableButton (that pushes the axis towards 1) and a negative BindableButton (that pushes it towards -1)
- *
+ * This implementation is linked to a positive BindableButton (that pushes the axis towards 1)
+ * and a negative BindableButton (that pushes it towards -1).
  */
-public class BindableAxisImpl implements BindableAxis {
-    private String id;
-    private BindAxisEvent event;
+public class BindableAxisImpl extends AbstractBindableAxis {
     private BindableButton positiveInput;
     private BindableButton negativeInput;
-    private float value;
-
-    private List<BindAxisSubscriber> subscribers = Lists.newArrayList();
-
-    private SendEventMode sendEventMode = SendEventMode.WHEN_NON_ZERO;
 
     public BindableAxisImpl(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
-        this.id = id;
-        this.event = event;
+        super(id, event);
         this.positiveInput = positiveButton;
         this.negativeInput = negativeButton;
     }
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public void setSendEventMode(SendEventMode mode) {
-        sendEventMode = mode;
-    }
-
-    @Override
-    public SendEventMode getSendEventMode() {
-        return sendEventMode;
-    }
-
-    @Override
-    public void subscribe(BindAxisSubscriber subscriber) {
-        this.subscribers.add(subscriber);
-    }
-
-    @Override
-    public void unsubscribe(BindAxisSubscriber subscriber) {
-        this.subscribers.remove(subscriber);
-    }
-
-    @Override
-    public float getValue() {
-        return value;
-    }
-
-    public void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
+    protected float getTargetValue() {
         boolean posInput = positiveInput.getState() == ButtonState.DOWN;
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
@@ -94,28 +47,6 @@ public class BindableAxisImpl implements BindableAxis {
             targetValue -= 1.0f;
         }
 
-        // TODO: Interpolate, based on some settings (immediate, linear, lerp?)
-
-        float newValue = targetValue;
-
-        if (sendEventMode.shouldSendEvent(value, newValue)) {
-            event.prepare(id, newValue, delta);
-            event.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
-            for (EntityRef entity : inputEntities) {
-                entity.send(event);
-                if (event.isConsumed()) {
-                    break;
-                }
-            }
-            sendEventToSubscribers(delta, target);
-        }
-        value = newValue;
+        return targetValue;
     }
-
-    private void sendEventToSubscribers(float delta, EntityRef target) {
-        for (BindAxisSubscriber subscriber : subscribers) {
-            subscriber.update(value, delta, target);
-        }
-    }
-
 }

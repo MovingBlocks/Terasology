@@ -67,48 +67,26 @@ public enum InputType {
             return MouseInput.find(name);
         }
     },
-    CONTROLLER_1 {
+    CONTROLLER_BUTTON {
         @Override
         public Input getInput(int id) {
-            return null;
+            return ControllerInput.find(this, id);
         }
 
         @Override
         public Input getInput(String name) {
-            return null;
+            return ControllerInput.find(name);
         }
     },
-    CONTROLLER_2 {
+    CONTROLLER_AXIS {
         @Override
         public Input getInput(int id) {
-            return null;
+            return ControllerInput.find(this, id);
         }
 
         @Override
         public Input getInput(String name) {
-            return null;
-        }
-    },
-    CONTROLLER_3 {
-        @Override
-        public Input getInput(int id) {
-            return null;
-        }
-
-        @Override
-        public Input getInput(String name) {
-            return null;
-        }
-    },
-    CONTROLLER_4 {
-        @Override
-        public Input getInput(int id) {
-            return null;
-        }
-
-        @Override
-        public Input getInput(String name) {
-            return null;
+            return ControllerInput.find(name);
         }
     };
 

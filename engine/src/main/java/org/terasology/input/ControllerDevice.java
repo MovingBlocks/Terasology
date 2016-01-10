@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.input.device;
 
+package org.terasology.input;
+
+import java.util.List;
 import java.util.Queue;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.input.device.ControllerAction;
+import org.terasology.input.device.InputDevice;
 
 /**
+ * Represents <b>all</b> connected controllers (e.g. gamepads, but also some keyboards).
+ * Unfortunately, it is impossible to separate events in LWJGL2 based on controllers, so they have
+ * to be processes all at once.
  */
-@API
-public interface KeyboardDevice extends InputDevice {
+public interface ControllerDevice extends InputDevice {
 
     @Override
-    Queue<KeyboardAction> getInputQueue();
+    Queue<ControllerAction> getInputQueue();
 
     /**
-     * @param key
-     * @return The current state of the given key
+     * @return a list of currently connected controller IDs.
      */
-    boolean isKeyDown(int key);
+    List<String> getControllers();
 }

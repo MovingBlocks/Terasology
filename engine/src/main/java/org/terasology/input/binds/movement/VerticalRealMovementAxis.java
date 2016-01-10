@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds.interaction;
+package org.terasology.input.binds.movement;
 
-import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindAxisEvent;
 import org.terasology.input.ControllerId;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.input.RegisterRealBindAxis;
+import org.terasology.input.SendEventMode;
 
 /**
  */
-@RegisterBindButton(id = "attack", description = "Attack", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
-@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ZERO)
-public class AttackButton extends BindButtonEvent {
+@RegisterRealBindAxis(id = "verticalRealMovement", eventMode = SendEventMode.WHEN_CHANGED)
+@DefaultBinding(type = InputType.CONTROLLER_AXIS, id = ControllerId.Z_AXIS)
+public class VerticalRealMovementAxis extends BindAxisEvent {
 }

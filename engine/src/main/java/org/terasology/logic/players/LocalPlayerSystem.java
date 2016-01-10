@@ -27,12 +27,17 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
+import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
+import org.terasology.input.binds.movement.RotationPitchAxis;
+import org.terasology.input.binds.movement.RotationYawAxis;
 import org.terasology.input.binds.movement.StrafeMovementAxis;
+import org.terasology.input.binds.movement.StrafeRealMovementAxis;
 import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
+import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
@@ -174,6 +179,20 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
+    @ReceiveEvent(components = {CharacterComponent.class})
+    public void updateRotationYaw(RotationYawAxis event, EntityRef entity) {
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        lookYaw = (characterComponent.yaw - event.getValue()) % 360;
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {CharacterComponent.class})
+    public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        lookPitch = TeraMath.clamp(character.pitch + event.getValue(), -89, 89);
+        event.consume();
+    }
+
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class})
     public void onJump(JumpButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
@@ -198,6 +217,24 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
+        relativeMovement.y = event.getValue();
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
+        relativeMovement.z = event.getValue();
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
+        relativeMovement.x = event.getValue();
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
         relativeMovement.y = event.getValue();
         event.consume();
     }

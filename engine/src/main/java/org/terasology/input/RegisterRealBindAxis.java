@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds.interaction;
+package org.terasology.input;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.ControllerId;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  */
-@RegisterBindButton(id = "attack", description = "Attack", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
-@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ZERO)
-public class AttackButton extends BindButtonEvent {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RegisterRealBindAxis {
+    String id();
+
+    SendEventMode eventMode() default SendEventMode.WHEN_CHANGED;
 }

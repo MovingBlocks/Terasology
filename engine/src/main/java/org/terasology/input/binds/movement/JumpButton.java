@@ -17,6 +17,7 @@
 package org.terasology.input.binds.movement;
 
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ControllerId;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
@@ -26,5 +27,6 @@ import org.terasology.input.RegisterBindButton;
  */
 @RegisterBindButton(id = "jump", description = "Jump / Ascend", repeating = false)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.SPACE)
+@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.TWO)
 public class JumpButton extends BindButtonEvent {
 }

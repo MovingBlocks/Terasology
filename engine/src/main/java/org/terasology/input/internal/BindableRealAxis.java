@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds.interaction;
+package org.terasology.input.internal;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.ControllerId;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.input.BindAxisEvent;
 
 /**
+ * This implementation is linked to a real axis.
  */
-@RegisterBindButton(id = "attack", description = "Attack", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
-@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ZERO)
-public class AttackButton extends BindButtonEvent {
+public class BindableRealAxis extends AbstractBindableAxis {
+
+    private float targetValue;
+
+    public BindableRealAxis(String id, BindAxisEvent event) {
+        super(id, event);
+    }
+
+    @Override
+    protected float getTargetValue() {
+        return targetValue;
+    }
+
+    /**
+     * @param targetValue
+     */
+    public void setTargetValue(float targetValue) {
+        this.targetValue = targetValue;
+    }
 }
