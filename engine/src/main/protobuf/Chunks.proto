@@ -1,7 +1,5 @@
 /**
  * Protobuf messages for TeraArrays.
- *
- * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 
 option java_package = "org.terasology.protobuf";
