@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
+@FunctionalInterface
 public interface ContainerInteger {
     int getValue(int containerWidth);
 }

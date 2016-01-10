@@ -19,6 +19,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 /**
  * Gets notified whenever a long-running background task has performed some work.
  */
+@FunctionalInterface
 public interface ProgressListener {
 
     /**

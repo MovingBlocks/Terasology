@@ -19,6 +19,7 @@ import org.terasology.rendering.nui.widgets.browser.data.html.HTMLBlockBuilder;
 import org.terasology.rendering.nui.widgets.browser.data.html.HTMLFontResolver;
 import org.xml.sax.Attributes;
 
+@FunctionalInterface
 public interface HTMLBlockBuilderFactory {
     HTMLBlockBuilder create(HTMLFontResolver htmlFontResolver, Attributes attributes);
 }

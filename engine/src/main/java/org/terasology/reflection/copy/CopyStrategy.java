@@ -19,8 +19,8 @@ package org.terasology.reflection.copy;
  * A strategy for copying an object/type.
  * This may be returning the object unchanged for immutable or otherwise safe to share types.
  * Copy strategies are deep-copies - contents should also be copied where appropriate.
- *
  */
+@FunctionalInterface
 public interface CopyStrategy<T> {
 
     /**

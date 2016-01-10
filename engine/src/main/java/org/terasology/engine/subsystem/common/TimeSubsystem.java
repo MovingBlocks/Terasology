@@ -18,9 +18,6 @@ package org.terasology.engine.subsystem.common;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.subsystem.EngineSubsystem;
 
-/**
- *
- */
 public interface TimeSubsystem extends EngineSubsystem {
 
     EngineTime getEngineTime();

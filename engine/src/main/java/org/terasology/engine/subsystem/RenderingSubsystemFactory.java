@@ -18,6 +18,7 @@ package org.terasology.engine.subsystem;
 import org.terasology.context.Context;
 import org.terasology.rendering.world.WorldRenderer;
 
+@FunctionalInterface
 public interface RenderingSubsystemFactory {
 
     WorldRenderer createWorldRenderer(Context context);

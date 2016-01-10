@@ -17,8 +17,8 @@ package org.terasology.logic.console;
 
 /**
  * Interface for subscribers to messages being added to the console
- *
  */
+@FunctionalInterface
 public interface ConsoleSubscriber {
 
     /**

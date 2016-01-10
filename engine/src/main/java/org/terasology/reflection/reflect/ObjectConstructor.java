@@ -22,6 +22,7 @@ package org.terasology.reflection.reflect;
  *
  * @param <T> The type of the class to construct instances of
  */
+@FunctionalInterface
 public interface ObjectConstructor<T> {
 
     /**

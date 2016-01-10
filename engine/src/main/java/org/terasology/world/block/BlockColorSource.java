@@ -21,6 +21,7 @@ import org.terasology.world.biomes.Biome;
 /**
  * Used to determine a multiplicative color for certain blocks based on the biome the block is in.
  */
+@FunctionalInterface
 public interface BlockColorSource {
 
     Vector4f calcColor(Biome biome);

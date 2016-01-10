@@ -33,6 +33,7 @@ import org.terasology.entitySystem.entity.EntityRef;
  * </ul>
  *
  */
+@FunctionalInterface
 public interface CharacterMover {
 
     /**

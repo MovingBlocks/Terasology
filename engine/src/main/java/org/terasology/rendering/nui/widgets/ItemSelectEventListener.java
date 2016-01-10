@@ -17,8 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.rendering.nui.UIWidget;
 
-/**
- */
+@FunctionalInterface
 public interface ItemSelectEventListener<U> {
 
     void onItemSelected(UIWidget widget, U item);

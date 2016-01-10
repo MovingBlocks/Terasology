@@ -19,7 +19,9 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 
 /**
+ * Interface for checks as whether a component should be deserialized
  */
+@FunctionalInterface
 public interface DeserializeFieldCheck {
 
     boolean shouldDeserialize(ClassMetadata<?, ?> classMetadata, FieldMetadata<?, ?> fieldMetadata);
