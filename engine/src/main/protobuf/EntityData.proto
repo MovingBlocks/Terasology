@@ -1,7 +1,3 @@
-/**
- * @author Immortius <immortius@gmail.com>
- */
-
 option java_package = "org.terasology.protobuf";
 option java_outer_classname = "EntityData";
 option optimize_for = SPEED;
