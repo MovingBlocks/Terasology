@@ -15,8 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
-/**
- */
+@FunctionalInterface
 public interface SubRegion extends AutoCloseable {
 
     @Override

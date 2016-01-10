@@ -23,6 +23,7 @@ import org.terasology.world.generation.World;
 /**
  * Defines spawning points.
  */
+@FunctionalInterface
 public interface Spawner {
 
     Vector3f getSpawnPosition(World world, EntityRef entity);

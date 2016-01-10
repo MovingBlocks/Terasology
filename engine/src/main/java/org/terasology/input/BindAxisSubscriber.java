@@ -18,8 +18,7 @@ package org.terasology.input;
 
 import org.terasology.entitySystem.entity.EntityRef;
 
-/**
- */
+@FunctionalInterface
 public interface BindAxisSubscriber {
     void update(float value, float delta, EntityRef target);
 }

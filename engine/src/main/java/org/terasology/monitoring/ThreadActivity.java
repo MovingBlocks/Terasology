@@ -17,8 +17,8 @@ package org.terasology.monitoring;
 
 /**
  * A token that is used to express a thread working on a task.
- *
  */
+@FunctionalInterface
 public interface ThreadActivity extends AutoCloseable {
     @Override
     void close();

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
+@FunctionalInterface
 public interface BrowserHyperlinkListener {
     void hyperlinkClicked(String hyperlink);
 }

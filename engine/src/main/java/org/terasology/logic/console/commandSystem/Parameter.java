@@ -19,8 +19,8 @@ import java.util.Optional;
 
 /**
  * Classes extending this interface occur in command method parameter definition
- *
  */
+@FunctionalInterface
 interface Parameter {
     Optional<? extends Class<?>> getProvidedType();
 }

@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets.browser.data.html.basic.list;
 
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 
+@FunctionalInterface
 public interface ListDecorator {
     ParagraphData wrapParagraph(ParagraphData paragraphData);
 }

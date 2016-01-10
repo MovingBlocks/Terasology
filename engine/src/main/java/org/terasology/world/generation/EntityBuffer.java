@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityStore;
 /**
  * A buffer for {@link EntityStore} instances.
  */
+@FunctionalInterface
 public interface EntityBuffer {
 
     void enqueue(EntityStore entity);

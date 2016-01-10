@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.structure;
 
+@FunctionalInterface
 public interface BlockStructuralSupportRegistry {
     void registerBlockStructuralSupport(BlockStructuralSupport blockStructuralSupport);
 }

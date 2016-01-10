@@ -17,9 +17,8 @@ package org.terasology.engine.subsystem.common;
 
 import org.terasology.module.sandbox.API;
 
-/**
- */
 @API
+@FunctionalInterface
 public interface ThreadManager {
 
     void submitTask(String name, Runnable task);

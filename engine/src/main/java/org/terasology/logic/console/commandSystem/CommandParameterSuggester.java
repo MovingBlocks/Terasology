@@ -26,6 +26,7 @@ import java.util.Set;
  * Constructor arguments will be filled from the {@link org.terasology.context.Context} via dependency injection.
  */
 @API
+@FunctionalInterface
 public interface CommandParameterSuggester<T> {
     /**
      * @param resolvedParameters Currently entered values of the types declared in the command method

@@ -18,8 +18,7 @@ package org.terasology.logic.console;
 
 import org.terasology.entitySystem.event.Event;
 
-/**
- */
+@FunctionalInterface
 public interface MessageEvent extends Event {
 
     /**

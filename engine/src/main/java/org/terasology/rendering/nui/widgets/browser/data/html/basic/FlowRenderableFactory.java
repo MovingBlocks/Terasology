@@ -22,6 +22,7 @@ import org.xml.sax.Attributes;
 
 import java.util.Collection;
 
+@FunctionalInterface
 public interface FlowRenderableFactory {
     Collection<FlowRenderable> create(Attributes attributes, Font font, Color color, String hyperlink);
 }

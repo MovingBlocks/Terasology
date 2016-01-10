@@ -21,6 +21,7 @@ import org.terasology.module.sandbox.API;
  * Implement this interface in your module to register your biomes with the engine.
  */
 @API
+@FunctionalInterface
 public interface BiomeRegistrator {
 
     void registerBiomes(BiomeRegistry registry);

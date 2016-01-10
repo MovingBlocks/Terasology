@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+@FunctionalInterface
 public interface BlockFamilyFactoryRegistry {
     BlockFamilyFactory getBlockFamilyFactory(String blockFamilyFactoryId);
 }

@@ -22,6 +22,7 @@ import org.terasology.module.sandbox.API;
  * Transforms the input text that contains markers (e.g. <code>${text}</code> expressions).
  */
 @API
+@FunctionalInterface
 public interface TemplateEngine {
 
     /**

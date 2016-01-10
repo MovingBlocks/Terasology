@@ -18,6 +18,7 @@ package org.terasology.persistence.internal;
 /**
  * Creates {@link DelayedEntityRef} objects and may save them to actually bind them later.
  */
+@FunctionalInterface
 public interface DelayedEntityRefFactory {
     DelayedEntityRef createDelayedEntityRef(long id);
 

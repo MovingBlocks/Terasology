@@ -21,8 +21,8 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * Interface for a single event receiver
- *
  */
+@FunctionalInterface
 public interface EventReceiver<T extends Event> {
     void onEvent(T event, EntityRef entity);
 }
