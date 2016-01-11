@@ -24,8 +24,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.GazeAuthoritySystem;
+import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.Location;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.permission.PermissionManager;
+import org.terasology.logic.players.event.ResetCameraEvent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -34,19 +36,31 @@ import org.terasology.registry.In;
 @RegisterSystem(RegisterMode.CLIENT)
 public class CameraClientSystem extends BaseComponentSystem {
     @In
+    LocalPlayer localPlayer;
+    @In
     EntityManager entityManager;
 
     @ReceiveEvent
     public void onAutoMountCamera(OnChangedComponent event, EntityRef client, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
-        EntityRef targetEntityForCamera = GazeAuthoritySystem.getGazeEntityForCharacter(clientComponent.character);
-        Location.attachChild(targetEntityForCamera, clientComponent.camera, Vector3f.zero(), new Quat4f(Quat4f.IDENTITY));
+        client.send(new ResetCameraEvent());
     }
 
     @ReceiveEvent
     public void ensureCameraEntityCreated(OnActivatedComponent event, EntityRef entityRef, ClientComponent clientComponent) {
         if (!clientComponent.camera.exists()) {
-            clientComponent.camera = entityManager.create(new LocationComponent());
+            clientComponent.camera = entityManager.create("engine:camera");
             entityRef.saveComponent(clientComponent);
         }
+    }
+
+    @Command(shortDescription = "Reset the camera position", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void resetCamera() {
+        localPlayer.getClientEntity().send(new ResetCameraEvent());
+    }
+
+    @ReceiveEvent
+    public void resetCamera(ResetCameraEvent resetCameraEvent, EntityRef client, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+        EntityRef targetEntityForCamera = GazeAuthoritySystem.getGazeEntityForCharacter(clientComponent.character);
+        Location.attachChild(targetEntityForCamera, clientComponent.camera, Vector3f.zero(), new Quat4f(Quat4f.IDENTITY));
     }
 }

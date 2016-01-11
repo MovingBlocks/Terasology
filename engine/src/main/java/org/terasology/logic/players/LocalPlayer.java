@@ -72,6 +72,14 @@ public class LocalPlayer {
         return EntityRef.NULL;
     }
 
+    public EntityRef getCameraEntity() {
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+        if (client != null) {
+            return client.camera;
+        }
+        return EntityRef.NULL;
+    }
+
     public EntityRef getClientInfoEntity() {
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         if (client != null) {

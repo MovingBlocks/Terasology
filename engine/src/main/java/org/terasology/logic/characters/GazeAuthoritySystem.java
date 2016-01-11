@@ -27,7 +27,6 @@ import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.network.NetworkComponent;
 import org.terasology.registry.In;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -47,9 +46,8 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
     private EntityRef createGazeContainer() {
         EntityRef gaze = createGaze();
         EntityBuilder gazeContainerBuilder = entityManager.newBuilder("engine:gazeContainer");
-        gazeContainerBuilder.addComponent(new LocationComponent());
-        gazeContainerBuilder.addComponent(new GazeComponent(gaze));
-        gazeContainerBuilder.addComponent(new NetworkComponent());
+        GazeComponent gazeComponent = gazeContainerBuilder.getComponent(GazeComponent.class);
+        gazeComponent.gazeEntity = gaze;
         EntityRef gazeContainer = gazeContainerBuilder.build();
         Location.attachChild(gazeContainer, gaze, Vector3f.zero(), new Quat4f(Quat4f.IDENTITY));
         return gazeContainer;
@@ -57,8 +55,6 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
 
     private EntityRef createGaze() {
         EntityBuilder gaze = entityManager.newBuilder("engine:gaze");
-        gaze.addComponent(new LocationComponent());
-        gaze.addComponent(new NetworkComponent());
         return gaze.build();
     }
 
@@ -71,7 +67,7 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
     public static EntityRef getGazeEntityForCharacter(EntityRef character) {
         GazeMountPointComponent gazeMountPointComponent = character.getComponent(GazeMountPointComponent.class);
         if (gazeMountPointComponent != null && gazeMountPointComponent.gazeContainer.exists()) {
-            return gazeMountPointComponent.gazeContainer.getComponent(GazeComponent.class).camera;
+            return gazeMountPointComponent.gazeContainer.getComponent(GazeComponent.class).gazeEntity;
         }
         return character;
     }

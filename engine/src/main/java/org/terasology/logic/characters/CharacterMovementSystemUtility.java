@@ -67,13 +67,13 @@ public final class CharacterMovementSystemUtility {
 
         // set the pitch to the character's camera entity
         Quat4f rotation = new Quat4f(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
-        EntityRef cameraEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
-        LocationComponent cameraLocation = cameraEntity.getComponent(LocationComponent.class);
-        if (!cameraEntity.equals(entity)) {
-            cameraLocation.setWorldRotation(state.getRotation());
-            cameraLocation.setLocalRotation(rotation);
+        EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
+        LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
+        if (!gazeEntity.equals(entity)) {
+            gazeLocation.setWorldRotation(state.getRotation());
+            gazeLocation.setLocalRotation(rotation);
         }
-        cameraEntity.saveComponent(cameraLocation);
+        gazeEntity.saveComponent(gazeLocation);
     }
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {

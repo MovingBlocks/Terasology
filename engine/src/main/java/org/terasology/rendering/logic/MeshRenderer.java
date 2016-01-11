@@ -19,7 +19,6 @@ import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
-
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,13 +128,13 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, MeshComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, MeshComponent.class, LocationComponent.class})
     public void onLocalMesh(OnChangedComponent event, EntityRef entity) {
         removeMesh(entity);
         addMesh(entity);
     }
 
-    @ReceiveEvent(components = {MeshComponent.class})
+    @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
     public void onChangeMesh(OnChangedComponent event, EntityRef entity) {
         removeMesh(entity);
         addMesh(entity);
