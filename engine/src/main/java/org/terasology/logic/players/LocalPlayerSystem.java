@@ -27,8 +27,8 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
+import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.binds.movement.RotationPitchAxis;
 import org.terasology.input.binds.movement.RotationYawAxis;
@@ -177,15 +177,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void updateRotationYaw(RotationYawAxis event, EntityRef entity) {
-        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
-        lookYaw = (characterComponent.yaw - event.getValue()) % 360;
+        lookYawDelta = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        lookPitch = TeraMath.clamp(character.pitch + event.getValue(), -89, 89);
+        lookPitchDelta = event.getValue();
         event.consume();
     }
 
