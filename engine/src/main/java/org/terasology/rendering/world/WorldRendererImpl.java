@@ -267,6 +267,8 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.update();
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
+
+            buffersManager.preRenderUpdate();
         }
 
         if (currentRenderingStage != WorldRenderingStage.MONO) {
@@ -309,8 +311,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
-        buffersManager.createOrUpdateFullscreenFbos();
-
 
         postProcessor.generateOutline();                      // into outline buffer
         postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
@@ -323,7 +323,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.generateLightShafts();                // into lightShafts buffer
 
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        postProcessor.initialPostProcessing();              // into initialPost buffer
+        postProcessor.initialPostProcessing();              // into scenePrePost buffer
 
         // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
         postProcessor.downsampleSceneAndUpdateExposure();   // downSampledScene buffer used only to update exposure value

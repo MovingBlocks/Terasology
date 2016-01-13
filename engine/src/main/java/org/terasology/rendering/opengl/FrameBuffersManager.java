@@ -51,9 +51,12 @@ public class FrameBuffersManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FrameBuffersManager.class);
 
-    private PBO readBackPBOFront;
-    private PBO readBackPBOBack;
-    private PBO readBackPBOCurrent;
+    private PBO frontReadbackPBO;
+    private PBO backReadbackPBO;
+    private PBO currentReadbackPBO;
+
+    private FBO sceneShadowMap;
+    private FBO sceneOpaque;
 
     // I could have named them fullResolution, halfResolution and so on. But halfScale is actually
     // -both- fullScale's dimensions halved, leading to -a quarter- of its resolution. Following
@@ -65,9 +68,6 @@ public class FrameBuffersManager {
     private Dimensions one8thScale;
     private Dimensions one16thScale;
     private Dimensions one32thScale;
-
-    private int overwriteRtWidth;
-    private int overwriteRtHeight;
 
     private String currentlyBoundFboName = "";
     private FBO currentlyBoundFbo;
@@ -91,88 +91,138 @@ public class FrameBuffersManager {
     }
 
     public void initialize() {
-        createOrUpdateFullscreenFbos();
+        createStaticFBOs();
+        postProcessor.obtainStaticFBOs();
 
-        // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
+        setDynamicFBOsDimensions();
+        createDynamicFBOs();
+        graphicState.refreshDynamicFBOs();
+        postProcessor.refreshDynamicFBOs();
+
+        createShadowMapFBO();
+        graphicState.setSceneShadowMap(sceneShadowMap);
+    }
+
+    private void createStaticFBOs() {
+        // The FBObuilder takes care of registering the new FBOs on fboLookup.
         new FBObuilder("scene16", 16, 16, FBO.Type.DEFAULT).build();
         new FBObuilder("scene8",   8,  8, FBO.Type.DEFAULT).build();
         new FBObuilder("scene4",   4,  4, FBO.Type.DEFAULT).build();
         new FBObuilder("scene2",   2,  2, FBO.Type.DEFAULT).build();
         new FBObuilder("scene1",   1,  1, FBO.Type.DEFAULT).build();
 
-        postProcessor.obtainStaticFBOs();
-
-        readBackPBOFront = new PBO(1, 1);
-        readBackPBOBack = new PBO(1, 1);
-        readBackPBOCurrent = readBackPBOFront;
+        frontReadbackPBO = new PBO(1, 1);
+        backReadbackPBO = new PBO(1, 1);
+        currentReadbackPBO = frontReadbackPBO;
     }
 
-    public void setGraphicState(GraphicState graphicState) {
-        this.graphicState = graphicState;
+    private void setDynamicFBOsDimensions() {
+        refreshDynamicFBOsDimensions();
     }
 
-    public void setPostProcessor(PostProcessor postProcessor) {
-        this.postProcessor = postProcessor;
+    private void createDynamicFBOs() {
+        recreateDynamicFBOs();
     }
 
-    /**
-     * Creates the scene FBOs and updates them according to the size of the viewport. The current size
-     * provided by the display class is only used if the parameters overwriteRTWidth and overwriteRTHeight are set
-     * to zero.
-     */
-    public void createOrUpdateFullscreenFbos() {
+    private void createShadowMapFBO() {
+        recreateShadowMapFBO();
+    }
 
-        if (overwriteRtWidth == 0) {
+    public void preRenderUpdate() {
+        refreshDynamicFBOsDimensions();
+        if (sceneOpaque.dimensions().areDifferentFrom(fullScale)) {
+            disposeOfAllDynamicFBOs();
+            recreateDynamicFBOs();
+            graphicState.refreshDynamicFBOs();
+            postProcessor.refreshDynamicFBOs();
+        }
+
+        if (sceneShadowMap != null && sceneShadowMap.width() != renderingConfig.getShadowMapResolution()) {
+            recreateShadowMapFBO();
+            graphicState.setSceneShadowMap(sceneShadowMap);
+        }
+    }
+
+    private boolean refreshDynamicFBOsDimensions() {
+        boolean refreshed = false;
+        Dimensions oldFullScale = fullScale;
+
+        if (isNotTakingScreenshot()) {
             fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
-        } else {
-            fullScale = new Dimensions(overwriteRtWidth, overwriteRtHeight);
             if (renderingConfig.isOculusVrSupport()) {
                 fullScale.multiplySelfBy(OculusVrHelper.getScaleFactor());
             }
+        } else {
+            fullScale = new Dimensions(
+                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
+                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
+            );
         }
 
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
 
-        halfScale    = fullScale.dividedBy(2);   // quarter resolution
-        quarterScale = fullScale.dividedBy(4);   // one 16th resolution
-        one8thScale  = fullScale.dividedBy(8);   // one 64th resolution
-        one16thScale = fullScale.dividedBy(16);  // one 256th resolution
-        one32thScale = fullScale.dividedBy(32);  // one 1024th resolution
-
-        FBO scene = fboLookup.get("sceneOpaque");
-        final boolean recreate = scene == null || (scene.dimensions().areDifferentFrom(fullScale));
-
-        if (!recreate) {
-            return;
+        if (fullScale.isDifferentFrom(oldFullScale)) {
+            halfScale    = fullScale.dividedBy(2);
+            quarterScale = fullScale.dividedBy(4);
+            one8thScale  = fullScale.dividedBy(8);
+            one16thScale = fullScale.dividedBy(16);
+            one32thScale = fullScale.dividedBy(32);
+            refreshed = true;
         }
 
-        // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
-        int shadowMapResolution = renderingConfig.getShadowMapResolution();
-        FBO sceneShadowMap =
-                new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
-        graphicState.setSceneShadowMap(sceneShadowMap);
+        return refreshed;
+    }
 
-        // buffers for the initial renderings
-        FBO sceneOpaque =
-                new FBObuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+    private void disposeOfAllDynamicFBOs() {
+        deleteFBO("sceneOpaque");
+        deleteFBO("sceneOpaquePingPong");
+
+        deleteFBO("sceneSkyBand0");
+        deleteFBO("sceneSkyBand1");
+
+        deleteFBO("sceneReflectiveRefractive");
+
+        deleteFBO("sceneReflected");
+
+        deleteFBO("outline");
+        deleteFBO("ssao");
+        deleteFBO("ssaoBlurred");
+        deleteFBO("scenePrePost");
+
+        deleteFBO("lightShafts");
+        deleteFBO("sceneToneMapped");
+
+        deleteFBO("sceneHighPass");
+        deleteFBO("sceneBloom0");
+        deleteFBO("sceneBloom1");
+        deleteFBO("sceneBloom2");
+
+        deleteFBO("sceneBlur0");
+        deleteFBO("sceneBlur1");
+
+        deleteFBO("ocUndistorted");
+        deleteFBO("sceneFinal");
+    }
+
+    private void recreateDynamicFBOs() {
+        // The FBObuilder takes care of registering thew new FBOs on the fboLookup hashmap.
+        sceneOpaque = new FBObuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
         new FBObuilder("sceneOpaquePingPong", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
 
-        new FBObuilder("sceneSkyBand0", one16thScale, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneSkyBand1", one32thScale, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand0",   one16thScale, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand1",   one32thScale, FBO.Type.DEFAULT).build();
 
         FBO sceneReflectiveRefractive = new FBObuilder("sceneReflectiveRefractive", fullScale, FBO.Type.HDR).useNormalBuffer().build();
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
 
         new FBObuilder("sceneReflected",  halfScale,    FBO.Type.DEFAULT).useDepthBuffer().build();
 
-        // buffers for the prePost-Processing composite
         new FBObuilder("outline",         fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("ssao",            fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("ssaoBlurred",     fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("scenePrePost",    fullScale,    FBO.Type.HDR).build();
 
-        // buffers for the Initial Post-Processing
         new FBObuilder("lightShafts",     halfScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("initialPost",     fullScale,    FBO.Type.HDR).build();
         new FBObuilder("sceneToneMapped", fullScale,    FBO.Type.HDR).build();
 
         new FBObuilder("sceneHighPass",   fullScale,    FBO.Type.DEFAULT).build();
@@ -183,42 +233,30 @@ public class FrameBuffersManager {
         new FBObuilder("sceneBlur0",      halfScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneBlur1",      halfScale,    FBO.Type.DEFAULT).build();
 
-        // buffers for the Final Post-Processing
         new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
-
-        graphicState.refreshDynamicFBOs();
-        postProcessor.refreshDynamicFBOs();
     }
 
-    public void deleteFBO(String title) {
-        if (fboLookup.containsKey(title)) {
-            FBO fbo = fboLookup.get(title);
+    private void recreateShadowMapFBO() {
+        int shadowMapResFromSettings = renderingConfig.getShadowMapResolution();
+        Dimensions shadowMapResolution =  new Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
+        sceneShadowMap = new FBObuilder("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        handleDisposedShadowMap(sceneShadowMap);
+    }
 
-            glDeleteFramebuffersEXT(fbo.fboId);
-            glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
-            GL11.glDeleteTextures(fbo.normalsBufferTextureId);
-            GL11.glDeleteTextures(fbo.depthStencilTextureId);
-            GL11.glDeleteTextures(fbo.colorBufferTextureId);
+    private void handleDisposedShadowMap(FBO fbo) {
+        if (fbo.getStatus() == FBO.Status.DISPOSED) {
+            logger.warn("Failed to generate ShadowMap FBO. Turning off shadows.");
+            renderingConfig.setDynamicShadows(false);
         }
     }
 
     public void takeScreenshot() {
         isTakingScreenshot = true;
-
-        overwriteRtWidth = renderingConfig.getScreenshotSize().getWidth(Display.getWidth());
-        overwriteRtHeight = renderingConfig.getScreenshotSize().getHeight(Display.getHeight());
-
-        createOrUpdateFullscreenFbos();
     }
 
     public void saveScreenshot() {
-        if (!isTakingScreenshot) {
-            return;
-        }
-
         final FBO fboSceneFinal = getFBO("sceneFinal");
-
         if (fboSceneFinal == null) {
             return;
         }
@@ -258,10 +296,6 @@ public class FrameBuffersManager {
         CoreRegistry.get(ThreadManager.class).submitTask("Write screenshot", task);
 
         isTakingScreenshot = false;
-        overwriteRtWidth = 0;
-        overwriteRtHeight = 0;
-
-        createOrUpdateFullscreenFbos();
     }
 
     public FBO getFBO(String title) {
@@ -274,28 +308,16 @@ public class FrameBuffersManager {
         return fbo;
     }
 
-    public boolean bindFbo(String title) {
+    public void deleteFBO(String title) {
         FBO fbo = fboLookup.get(title);
 
         if (fbo != null) {
-            fbo.bind();
-            return true;
+            fbo.dispose();
+            fboLookup.remove(title);
+
+        } else {
+            logger.error("Failed to delete FBO '" + title + "': it doesn't exist!");
         }
-
-        logger.error("Failed to bind FBO since the requested FBO could not be found!");
-        return false;
-    }
-
-    public boolean unbindFbo(String title) {
-        FBO fbo = fboLookup.get(title);
-
-        if (fbo != null) {
-            fbo.unbind();
-            return true;
-        }
-
-        logger.error("Failed to unbind FBO since the requested FBO could not be found!");
-        return false;
     }
 
     public boolean bindFboColorTexture(String title) {
@@ -346,18 +368,6 @@ public class FrameBuffersManager {
         return false;
     }
 
-    public void flipPingPongFbo(String title) {
-        FBO fbo1 = getFBO(title);
-        FBO fbo2 = getFBO(title + "PingPong");
-
-        if (fbo1 == null || fbo2 == null) {
-            return;
-        }
-
-        fboLookup.put(title, fbo2);
-        fboLookup.put(title + "PingPong", fbo1);
-    }
-
     public void swapSceneOpaqueFBOs() {
         FBO currentSceneOpaquePingPong = fboLookup.get("sceneOpaquePingPong");
         fboLookup.put("sceneOpaquePingPong", fboLookup.get("sceneOpaque"));
@@ -368,15 +378,15 @@ public class FrameBuffersManager {
     }
 
     public void swapReadbackPBOs() {
-        if (readBackPBOCurrent == readBackPBOFront) {
-            readBackPBOCurrent = readBackPBOBack;
+        if (currentReadbackPBO == frontReadbackPBO) {
+            currentReadbackPBO = backReadbackPBO;
         } else {
-            readBackPBOCurrent = readBackPBOFront;
+            currentReadbackPBO = frontReadbackPBO;
         }
     }
 
     public PBO getCurrentReadbackPBO() {
-        return readBackPBOCurrent;
+        return currentReadbackPBO;
     }
 
     public boolean isTakingScreenshot() {
@@ -385,6 +395,14 @@ public class FrameBuffersManager {
 
     public boolean isNotTakingScreenshot() {
         return !isTakingScreenshot;
+    }
+
+    public void setGraphicState(GraphicState graphicState) {
+        this.graphicState = graphicState;
+    }
+
+    public void setPostProcessor(PostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
     }
 
     /**

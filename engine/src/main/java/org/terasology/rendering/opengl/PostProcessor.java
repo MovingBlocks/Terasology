@@ -149,7 +149,7 @@ public class PostProcessor {
 
         // initial post-processing
         materials.lightShafts = getMaterial("engine:prog.lightshaft");   // TODO: rename shader to lightShafts
-        materials.initialPost = getMaterial("engine:prog.prePost");      // TODO: rename shader to initialPost
+        materials.initialPost = getMaterial("engine:prog.prePost");      // TODO: rename shader to scenePrePost
         materials.downSampler = getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
         materials.highPass = getMaterial("engine:prog.highp");           // TODO: rename shader to highPass
         materials.blur = getMaterial("engine:prog.blur");
@@ -212,10 +212,10 @@ public class PostProcessor {
         buffers.outline         = buffersManager.getFBO("outline");
         buffers.ssao            = buffersManager.getFBO("ssao");
         buffers.ssaoBlurred     = buffersManager.getFBO("ssaoBlurred");
+        buffers.scenePrePost    = buffersManager.getFBO("scenePrePost");
 
         // initial post-processing
         buffers.lightShafts     = buffersManager.getFBO("lightShafts");
-        buffers.initialPost     = buffersManager.getFBO("initialPost");
         buffers.sceneToneMapped = buffersManager.getFBO("sceneToneMapped");
 
         buffers.sceneHighPass   = buffersManager.getFBO("sceneHighPass");
@@ -464,9 +464,9 @@ public class PostProcessor {
         materials.initialPost.enable();
 
         // TODO: verify what the inputs are
-        buffers.initialPost.bind(); // TODO: see if we could write this straight into sceneOpaque
+        buffers.scenePrePost.bind(); // TODO: see if we could write this straight into sceneOpaque
 
-        setViewportTo(buffers.initialPost.dimensions());
+        setViewportTo(buffers.scenePrePost.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -495,7 +495,7 @@ public class PostProcessor {
 
             // TODO: move this block above, for consistency
             if (i == 4) {
-                buffers.initialPost.bindTexture();
+                buffers.scenePrePost.bindTexture();
             } else {
                 buffers.downSampledScene[i + 1].bindTexture();
             }
@@ -959,7 +959,7 @@ public class PostProcessor {
         public FBO outline;
         public FBO ssao;
         public FBO ssaoBlurred;
-        public FBO initialPost;
+        public FBO scenePrePost;
 
         // initial post-processing
         public FBO lightShafts;
