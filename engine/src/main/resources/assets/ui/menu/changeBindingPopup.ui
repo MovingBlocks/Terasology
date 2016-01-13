@@ -35,7 +35,6 @@
                                     {
                                         "type" : "UILabel",
                                         "text" : "${engine:menu#new-binding}: ",
-                                        "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.4
                                         }
@@ -85,9 +84,30 @@
                                 "size" : [1, 16]
                             },
                             {
-                                "type" : "UIButton",
-                                "text" : "${engine:menu#back}",
-                                "id" : "close"
+                                "type" : "RowLayout",
+                                "id" : "actionsRow",
+                                "horizontalSpacing" : 8,
+                                "contents" : [
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "${engine:menu#dialog-cancel}",
+                                        "id" : "cancel"
+                                    },
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "${engine:menu#dialog-ok}",
+                                        "id" : "ok"
+                                    }
+                                ],
+                                "layoutInfo" : {
+                                    "width" : 400,
+                                    "height" : 32,
+                                    "position-horizontal-center" : {},
+                                    "position-bottom" : {
+                                        "target" : "BOTTOM",
+                                        "offset" : 48
+                                    }
+                                }
                             }
                         ]
                     }

@@ -59,7 +59,11 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
         bindButton = find("new-binding", UIInputBind.class);
         WidgetUtil.trySubscribe(this, "remove", button -> bindButton.setNewInput(null));
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "ok", button -> {
+            bindButton.saveInput();
+            getManager().popScreen();
+        });
+        WidgetUtil.trySubscribe(this, "cancel", button -> getManager().popScreen());
     }
 
     public void setBindingData(SimpleUri uri, RegisterBindButton bind, int i) {
