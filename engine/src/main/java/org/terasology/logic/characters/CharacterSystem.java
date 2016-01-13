@@ -71,8 +71,12 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     private PickupBuilder pickupBuilder;
 
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD,
-            StandardCollisionGroup.CHARACTER};
+    /**
+     * TODO: Include the Character collision group
+     * Including the character collision group was removed because tracing from the character's gaze position would hit
+     * the initiating character instead of the ground when looking downwards.
+     */
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
 
     @Override
@@ -98,11 +102,11 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             }
         }
 
-        LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
-        Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
+        EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
+        LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
+        Vector3f direction = gazeLocation.getWorldDirection();
+        Vector3f originPos = gazeLocation.getWorldPosition();
 
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
 
@@ -163,9 +167,10 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private boolean isPredictionOfEventCorrect(EntityRef character, ActivationRequest event) {
-        LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
+        EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
+        LocationComponent location = camera.getComponent(LocationComponent.class);
+        Vector3f direction = location.getWorldDirection();
         if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
@@ -173,7 +178,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         direction = event.getDirection();
 
         Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
         if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
@@ -261,7 +265,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @Override
     public void update(float delta) {
         Iterable<EntityRef> characterEntities = entityManager.getEntitiesWith(CharacterComponent.class, LocationComponent.class);
-        for (EntityRef characterEntity: characterEntities) {
+        for (EntityRef characterEntity : characterEntities) {
             CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
             if (characterComponent == null) {
                 continue; // could have changed during events below

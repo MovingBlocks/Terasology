@@ -16,10 +16,10 @@
 package org.terasology.rendering.cameras;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;
 
@@ -143,7 +143,7 @@ public class ViewFrustum {
 
         Vector3f[] aabbVertices = aabb.getVertices();
 
-        Vector3f cp = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
 
         for (int i = 0; i < 6; i++) {
             if (planes[i].getA() * (aabbVertices[0].x - cp.x) + planes[i].getB() * (aabbVertices[0].y - cp.y)

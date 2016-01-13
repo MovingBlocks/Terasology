@@ -21,7 +21,6 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3f;
@@ -114,10 +113,13 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     Vector3f pos = localPlayer.getPosition();
-                    CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
-                    float yaw = (character != null) ? character.yaw : 0;
                     Vector3i chunkPos = ChunkMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
-                    return String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Yaw %.2f", pos.x, pos.y, pos.z, chunkPos.x, chunkPos.y, chunkPos.z, yaw);
+                    Vector3f rotation = localPlayer.getViewDirection();
+                    Vector3f cameraPos = localPlayer.getViewPosition();
+                    return String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z,
+                            chunkPos.x, chunkPos.y, chunkPos.z,
+                            cameraPos.x, cameraPos.y, cameraPos.z,
+                            rotation.x, rotation.y, rotation.z);
                 }
             });
         }
