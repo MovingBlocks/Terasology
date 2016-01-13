@@ -40,6 +40,7 @@ import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
@@ -49,6 +50,7 @@ import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -56,7 +58,6 @@ import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
@@ -306,15 +307,17 @@ public class CoreCommands extends BaseComponentSystem {
         worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
     }
 
-    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
-    @Command(shortDescription = "Spawns an instance of a prefab in the world")
-    public String spawnPrefab(@CommandParam("prefabId") String prefabName) {
-        Camera camera = worldRenderer.getActiveCamera();
-        Vector3f spawnPos = camera.getPosition();
-        Vector3f offset = new Vector3f(camera.getViewingDirection());
+    @Command(shortDescription = "Spawns an instance of a prefab in the world", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String spawnPrefab(@Sender EntityRef sender, @CommandParam("prefabId") String prefabName) {
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+
+        Vector3f spawnPos = characterLocation.getWorldPosition();
+        Vector3f offset = new Vector3f(characterLocation.getWorldDirection());
         offset.scale(2);
         spawnPos.add(offset);
-        Vector3f dir = new Vector3f(camera.getViewingDirection());
+        Vector3f dir = new Vector3f(characterLocation.getWorldDirection());
         dir.y = 0;
         if (dir.lengthSquared() > 0.001f) {
             dir.normalize();
@@ -334,14 +337,14 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera), also applied required
-    // TODO: permission
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-            "item in front of the player. You can simply pick it up.")
-    public String spawnBlock(@CommandParam("blockName") String blockName) {
-        Camera camera = worldRenderer.getActiveCamera();
-        Vector3f spawnPos = camera.getPosition();
-        Vector3f offset = camera.getViewingDirection();
+            "item in front of the player. You can simply pick it up.", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+        Vector3f spawnPos = characterLocation.getWorldPosition();
+        Vector3f offset = characterLocation.getWorldDirection();
         offset.scale(3);
         spawnPos.add(offset);
 

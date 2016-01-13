@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.network;
+package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.network.Replicate;
 
-/**
- * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
- * client info entity (for replicated information) and character entity (their body).
- *
- */
-public class ClientComponent implements Component {
-    public boolean local;
-
+public class GazeComponent implements Component {
+    /**
+     * Used to store an entity that can move/rotate independently from the character and and the gaze mount point
+     */
+    @Owns
     @Replicate
-    public EntityRef clientInfo = EntityRef.NULL;
+    EntityRef gazeEntity = EntityRef.NULL;
 
-    @Replicate
-    public EntityRef character = EntityRef.NULL;
+    public GazeComponent() {
+    }
 
-    public EntityRef camera = EntityRef.NULL;
+    public GazeComponent(EntityRef gazeEntity) {
+        this.gazeEntity = gazeEntity;
+    }
 }

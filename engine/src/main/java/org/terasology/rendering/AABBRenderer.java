@@ -17,11 +17,11 @@
 package org.terasology.rendering;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.registry.CoreRegistry;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
@@ -92,7 +92,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         CoreRegistry.get(ShaderManager.class).enableDefault();
 
         glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition();
         glTranslated(aabb.getCenter().x - cameraPosition.x, -cameraPosition.y, aabb.getCenter().z - cameraPosition.z);
 
         renderLocally(lineThickness);
@@ -104,7 +104,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         CoreRegistry.get(ShaderManager.class).enableDefault();
 
         glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition();
         glTranslated(aabb.getCenter().x - cameraPosition.x, -cameraPosition.y, aabb.getCenter().z - cameraPosition.z);
 
         renderSolidLocally();

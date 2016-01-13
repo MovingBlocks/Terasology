@@ -16,14 +16,14 @@
 package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
-
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.rendering.nui.properties.TextField;
 
 import java.util.Collection;
@@ -32,7 +32,6 @@ import java.util.Objects;
 
 /**
  * Component represent the location and facing of an entity in the world
- *
  */
 public final class LocationComponent implements Component, ReplicationCheck {
 
@@ -72,6 +71,12 @@ public final class LocationComponent implements Component, ReplicationCheck {
         position.set(newPos);
     }
 
+    public Vector3f getLocalDirection() {
+        Vector3f result = Direction.FORWARD.getVector3f();
+        getLocalRotation().rotate(result, result);
+        return result;
+    }
+
     public Quat4f getLocalRotation() {
         return rotation;
     }
@@ -105,6 +110,12 @@ public final class LocationComponent implements Component, ReplicationCheck {
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
+    }
+
+    public Vector3f getWorldDirection() {
+        Vector3f result = Direction.FORWARD.getVector3f();
+        getWorldRotation().rotate(result, result);
+        return result;
     }
 
     public Quat4f getWorldRotation() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.network;
+package org.terasology.logic.players;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.geom.Vector3f;
 
 /**
- * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
- * client info entity (for replicated information) and character entity (their body).
- *
+ * Only used by the client side so that held items can be positioned in line with the camera
  */
-public class ClientComponent implements Component {
-    public boolean local;
-
-    @Replicate
-    public EntityRef clientInfo = EntityRef.NULL;
-
-    @Replicate
-    public EntityRef character = EntityRef.NULL;
-
-    public EntityRef camera = EntityRef.NULL;
+public class FirstPersonHeldItemMountPointComponent implements Component {
+    @Owns
+    public EntityRef mountPointEntity = EntityRef.NULL;
+    public Vector3f rotateDegrees = Vector3f.zero();
+    public Vector3f translate = Vector3f.zero();
+    public float scale = 1f;
 }

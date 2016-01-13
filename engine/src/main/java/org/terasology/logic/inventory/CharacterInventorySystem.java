@@ -35,12 +35,9 @@ import org.terasology.logic.inventory.events.ChangeSelectedInventorySlotRequest;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.hud.HudToolbar;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  */
@@ -143,16 +140,16 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             // Compute new position
             dropPower *= 150f;
 
-            // TODO: This will change when camera are handled better (via a component)
-            Camera playerCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            Vector3f position = localPlayer.getViewPosition();
+            Vector3f direction = localPlayer.getViewDirection();
 
-            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x * 1.5f,
-                    playerCamera.getPosition().y + playerCamera.getViewingDirection().y * 1.5f,
-                    playerCamera.getPosition().z + playerCamera.getViewingDirection().z * 1.5f
+            Vector3f newPosition = new Vector3f(position.x + direction.x * 1.5f,
+                    position.y + direction.y * 1.5f,
+                    position.z + direction.z * 1.5f
             );
 
             //send DropItemRequest
-            Vector3f impulseVector = new Vector3f(playerCamera.getViewingDirection());
+            Vector3f impulseVector = new Vector3f(direction);
             impulseVector.scale(dropPower);
             entity.send(new DropItemRequest(selectedItemEntity, entity,
                     impulseVector,

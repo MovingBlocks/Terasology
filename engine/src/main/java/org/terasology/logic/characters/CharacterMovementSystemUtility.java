@@ -17,6 +17,7 @@ package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.Quat4f;
@@ -48,22 +49,31 @@ public final class CharacterMovementSystemUtility {
     public void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
-        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
-        if (location == null || movementComp == null || characterComponent == null) {
+
+        if (location == null || movementComp == null) {
             return;
         }
         location.setWorldPosition(state.getPosition());
         location.setWorldRotation(state.getRotation());
         entity.saveComponent(location);
+
         movementComp.mode = state.getMode();
         movementComp.setVelocity(state.getVelocity());
         movementComp.grounded = state.isGrounded();
         movementComp.footstepDelta = state.getFootstepDelta();
         entity.saveComponent(movementComp);
-        characterComponent.pitch = state.getPitch();
-        characterComponent.yaw = state.getYaw();
-        entity.saveComponent(characterComponent);
+
         setPhysicsLocation(entity, state.getPosition());
+
+        // set the pitch to the character's camera entity
+        Quat4f rotation = new Quat4f(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
+        EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
+        LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
+        if (!gazeEntity.equals(entity)) {
+            gazeLocation.setWorldRotation(state.getRotation());
+            gazeLocation.setLocalRotation(rotation);
+        }
+        gazeEntity.saveComponent(gazeLocation);
     }
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
@@ -89,7 +99,6 @@ public final class CharacterMovementSystemUtility {
         }
         entity.saveComponent(movementComponent);
 
-        extrapolateCharacterComponent(entity, b);
         setPhysicsLocation(entity, newPos);
     }
 
@@ -102,7 +111,6 @@ public final class CharacterMovementSystemUtility {
 
         extrapolateCharacterMovementComponent(entity, state);
 
-        extrapolateCharacterComponent(entity, state);
         setPhysicsLocation(entity, newPos);
     }
 
@@ -119,13 +127,6 @@ public final class CharacterMovementSystemUtility {
         movementComponent.setVelocity(state.getVelocity());
         movementComponent.grounded = state.isGrounded();
         entity.saveComponent(movementComponent);
-    }
-    
-    private void extrapolateCharacterComponent(EntityRef entity, CharacterStateEvent state) {
-        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
-        characterComponent.pitch = state.getPitch();
-        characterComponent.yaw = state.getYaw();
-        entity.saveComponent(characterComponent);
     }
 
     /**

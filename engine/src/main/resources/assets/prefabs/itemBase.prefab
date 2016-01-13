@@ -8,5 +8,18 @@
     },
     "Network" : {
         "replicateMode" : "RELEVANT"
+    },
+    "FirstPersonHeldItemTransform": {
+        "rotateDegrees": [
+            0,
+            -80,
+            0
+        ],
+        "translate": [
+            0,
+            -0.5,
+            0
+        ],
+        "scale": 0.75
     }
 }

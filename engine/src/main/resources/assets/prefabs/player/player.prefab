@@ -26,7 +26,7 @@
         "jumpSpeed" : 12
     },
     "Mesh" : {
-        "mesh" : "engine:testmonkey",
+        "mesh": "engine:pony",
         "material" : "engine:monkeyHead9",
         "hideFromOwner" : true
     },
@@ -64,5 +64,12 @@
     },
     "CharacterHeldItem": {
     },
-    "Breather" : {}
+    "Breather": {},
+    "GazeMountPoint": {
+        "translate": [
+            0,
+            0.9,
+            0
+        ]
+    }
 }

@@ -132,5 +132,6 @@ public class CharacterHeldItemSystem extends BaseComponentSystem implements Upda
         // Hand animation update
         CharacterHeldItemComponent characterHeldItemComponent = characterEntity.getComponent(CharacterHeldItemComponent.class);
         characterHeldItemComponent.handAnimation = Math.max(0, characterHeldItemComponent.handAnimation - 2.5f * delta);
+        characterEntity.saveComponent(characterHeldItemComponent);
     }
 }

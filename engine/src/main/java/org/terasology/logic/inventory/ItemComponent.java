@@ -84,5 +84,4 @@ public final class ItemComponent implements Component {
     public Prefab damageType;
 
     public Prefab pickupPrefab;
-
 }

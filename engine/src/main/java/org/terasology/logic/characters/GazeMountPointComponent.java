@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.network;
+package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.network.Replicate;
 
-/**
- * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
- * client info entity (for replicated information) and character entity (their body).
- *
- */
-public class ClientComponent implements Component {
-    public boolean local;
-
+public class GazeMountPointComponent implements Component {
+    /**
+     * holds an entity that has its location linked to the character entity.  Created and configured at runtime when this component is added
+     */
+    @Owns
     @Replicate
-    public EntityRef clientInfo = EntityRef.NULL;
-
-    @Replicate
-    public EntityRef character = EntityRef.NULL;
-
-    public EntityRef camera = EntityRef.NULL;
+    public EntityRef gazeContainer = EntityRef.NULL;
+    public Vector3f translate = new Vector3f(0, 0, 0);
 }

@@ -17,9 +17,9 @@
 package org.terasology.logic.inventory;
 
 import com.bulletphysics.collision.shapes.BoxShape;
-
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
+import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -48,7 +48,7 @@ public class ItemPickupSystem extends BaseComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
-    private Random rand = new FastRandom();
+    private static Random rand = new FastRandom();
 
     @ReceiveEvent(components = PickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
@@ -64,12 +64,11 @@ public class ItemPickupSystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onBlockItemDropped(ItemDroppedEvent event, EntityRef itemEntity, BlockItemComponent blockItemComponent) {
         EntityBuilder builder = event.getPickup();
-        BlockFamily blockFamily = blockItemComponent.blockFamily;
-        if (builder.hasComponent(MeshComponent.class)) {
-            MeshComponent mesh = builder.getComponent(MeshComponent.class);
-            mesh.mesh = blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
-            mesh.material = Assets.getMaterial("engine:terrain").get();
+        if( builder.hasComponent(MeshComponent.class)) {
+            addOrUpdateBlockRendering(blockItemComponent, builder);
         }
+
+        BlockFamily blockFamily = blockItemComponent.blockFamily;
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
             javax.vecmath.Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new javax.vecmath.Vector3f());
             extents.scale(2.0f);
@@ -78,14 +77,6 @@ public class ItemPickupSystem extends BaseComponentSystem {
             extents.z = Math.max(extents.z, 0.5f);
             builder.getComponent(BoxShapeComponent.class).extents.set(VecMath.from(extents));
         }
-        if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
-            LightComponent lightComponent = builder.addComponent(new LightComponent());
-
-            Vector3f randColor = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
-            lightComponent.lightColorDiffuse.set(randColor);
-            lightComponent.lightColorAmbient.set(randColor);
-        }
-
         if (builder.hasComponent(RigidBodyComponent.class)) {
             builder.getComponent(RigidBodyComponent.class).mass = blockItemComponent.blockFamily.getArchetypeBlock().getMass();
         }
@@ -94,11 +85,52 @@ public class ItemPickupSystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onItemDropped(ItemDroppedEvent event, EntityRef itemEntity, ItemComponent itemComponent) {
         EntityBuilder builder = event.getPickup();
-        if (builder.hasComponent(MeshComponent.class)) {
-            MeshComponent mesh = builder.getComponent(MeshComponent.class);
-            if (mesh.mesh == null && itemComponent.icon != null) {
-                builder.getComponent(MeshComponent.class).mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
+        addOrUpdateItemRendering(itemComponent, builder);
+    }
+
+    public static void addOrUpdateItemRendering(ItemComponent itemComponent, MutableComponentContainer entity) {
+        if (itemComponent != null) {
+            MeshComponent meshComponent = null;
+            if( entity.hasComponent(MeshComponent.class)) {
+                meshComponent = entity.getComponent(MeshComponent.class);
+            } else {
+                meshComponent = new MeshComponent();
             }
+            meshComponent.material = Assets.getMaterial("engine:droppedItem").get();
+            if (itemComponent.icon != null) {
+                meshComponent.mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
+            }
+            entity.addOrSaveComponent(meshComponent);
         }
     }
+
+    public static void addOrUpdateBlockRendering(BlockItemComponent blockItemComponent, MutableComponentContainer entity) {
+        if( blockItemComponent != null) {
+            MeshComponent meshComponent = null;
+            if( entity.hasComponent(MeshComponent.class)) {
+                meshComponent = entity.getComponent(MeshComponent.class);
+            } else {
+                meshComponent = new MeshComponent();
+            }
+            BlockFamily blockFamily = blockItemComponent.blockFamily;
+
+            if (blockFamily == null) {
+                return;
+            }
+
+            meshComponent.mesh = blockFamily.getArchetypeBlock().getMesh();
+            meshComponent.material = Assets.getMaterial("engine:terrain").get();
+
+            if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !entity.hasComponent(LightComponent.class)) {
+                LightComponent lightComponent = entity.addComponent(new LightComponent());
+
+                Vector3f randColor = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+                lightComponent.lightColorDiffuse.set(randColor);
+                lightComponent.lightColorAmbient.set(randColor);
+            }
+
+            entity.addOrSaveComponent(meshComponent);
+        }
+    }
+
 }
