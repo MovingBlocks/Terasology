@@ -60,18 +60,17 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
     public void update(float delta) {
         EntityRef charEntity = player.getCharacterEntity();
         if (charEntity.exists()) {
-            // The camera position is the player's position plus the eye offset
-            Vector3f playerPos = player.getPosition();
-            Vector3f cameraPos = new Vector3f(playerPos);
+            Vector3f cameraPos = player.getViewPosition();
             CharacterComponent charComp = charEntity.getComponent(CharacterComponent.class);
-            cameraPos.add(0, charComp.eyeOffset, 0);
 
-            Vector3f dir = player.getViewDirection();
-            float maxDist = charComp.interactionRange;
-            if (targetSystem.updateTarget(cameraPos, dir, maxDist)) {
-                EntityRef oldTarget = targetSystem.getPreviousTarget();
-                EntityRef newTarget = targetSystem.getTarget();
-                charEntity.send(new PlayerTargetChangedEvent(oldTarget, newTarget));
+            if (charComp != null) {
+                Vector3f dir = player.getViewDirection();
+                float maxDist = charComp.interactionRange;
+                if (targetSystem.updateTarget(cameraPos, dir, maxDist)) {
+                    EntityRef oldTarget = targetSystem.getPreviousTarget();
+                    EntityRef newTarget = targetSystem.getTarget();
+                    charEntity.send(new PlayerTargetChangedEvent(oldTarget, newTarget));
+                }
             }
         }
     }
