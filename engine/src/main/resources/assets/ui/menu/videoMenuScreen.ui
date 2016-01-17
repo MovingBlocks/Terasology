@@ -42,7 +42,7 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
-                            "text": " ${engine:menu#video-graphic-settings}: "
+                            "text": "${engine:menu#video-graphic-settings}"
                         },
                         {
                             "type": "ColumnLayout",
@@ -100,7 +100,7 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
-                            "text": " ${engine:menu#camera-details-settings}: "
+                            "text": "${engine:menu#camera-details-settings}"
                         },
                         {
                             "type": "ColumnLayout",
@@ -215,7 +215,7 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
-                            "text": " ${engine:menu#video-high-end-settings}: "
+                            "text": "${engine:menu#video-high-end-settings}"
                         },
                         {
                             "type": "ColumnLayout",
