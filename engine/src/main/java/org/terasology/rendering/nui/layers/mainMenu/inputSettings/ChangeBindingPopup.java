@@ -66,15 +66,15 @@ public class ChangeBindingPopup extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "cancel", button -> getManager().popScreen());
     }
 
-    public void setBindingData(SimpleUri uri, RegisterBindButton bind, int i) {
+    public void setBindingData(SimpleUri uri, RegisterBindButton bind, int index) {
         find("title", UILabel.class).setText(bind.description());
         BindsConfig bindConfig = config.getInput().getBinds();
-        bindButton.bindInput(new InputConfigBinding(bindConfig, uri));
+        bindButton.bindInput(new InputConfigBinding(bindConfig, uri, index));
         List<Input> defaults = defaultBinds.getBinds(uri);
         find("default-binding", UILabel.class).setText(
-                defaults.size() > i ? defaults.get(i).getDisplayName() : "");
+                defaults.size() > index ? defaults.get(index).getDisplayName() : "<none>");
         find("default", UIButton.class).subscribe(e -> bindButton.setNewInput(
-                defaults.size() > i ? defaults.get(i) : null));
+                defaults.size() > index ? defaults.get(index) : null));
     }
 
     @Override
