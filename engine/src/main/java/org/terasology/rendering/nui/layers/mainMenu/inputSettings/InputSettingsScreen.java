@@ -236,27 +236,18 @@ public class InputSettingsScreen extends CoreScreenLayer {
         BindsConfig bindConfig = config.getInput().getBinds();
         List<Input> binds = bindConfig.getBinds(uri);
         UIButton primaryInputBind = new UIButton();
-        primaryInputBind.bindText(new ReadOnlyBinding<String>() {
-            @Override
-            public String get() {
-                if (binds.size() > 0) {
-                    Input input = binds.get(0);
-                    if (input != null) {
-                        return input.getDisplayName();
-                    }
-                }
-                return "<not bound>";
-            }
-        });
+        primaryInputBind.bindText(new BindingText(binds, 0));
         primaryInputBind.subscribe(event -> {
-//            inputBind.setDescription(bind.description());
-//            inputBind.bindInput(new InputConfigBinding(binds, uri, 0));
             ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
             popup.setBindingData(uri, bind, 0);
         });
 
         UIButton secondaryInputBind = new UIButton();
-//      Input secondary = binds.get(1);
+        secondaryInputBind.bindText(new BindingText(binds, 1));
+        secondaryInputBind.subscribe(event -> {
+            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
+            popup.setBindingData(uri, bind, 1);
+        });
         layout.addWidget(new RowLayout(new UILabel(bind.description()), primaryInputBind, secondaryInputBind)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
@@ -270,6 +261,28 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    private final class BindingText extends ReadOnlyBinding<String> {
+
+        private List<Input> binds;
+        private int index;
+
+        public BindingText(List<Input> binds, int index) {
+            this.binds = binds;
+            this.index = index;
+        }
+
+        @Override
+        public String get() {
+            if (binds.size() > index) {
+                Input input = binds.get(index);
+                if (input != null) {
+                    return input.getDisplayName();
+                }
+            }
+            return "<not bound>";
+        }
     }
 
     private static final class ExtensionBind implements Comparable<ExtensionBind> {
