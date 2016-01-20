@@ -18,10 +18,6 @@ package org.terasology.logic.characters;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Direction;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 
@@ -34,7 +30,6 @@ public final class CharacterComponent implements Component {
      * Recommended height from center at which name tags should be placed if there is one.
      */
     public float nameTagOffset = 0.8f;
-    public float eyeOffset = 0.6f;
     /**
      * Specifies the maximium range at which this character is able to interact with other objects.
      * When the player leaves the range the interaction gets canceled.
@@ -75,25 +70,10 @@ public final class CharacterComponent implements Component {
      */
     public int predictedInteractionId;
 
-
-    public float pitch;
-    public float yaw;
-
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     @Owns
     public EntityRef movingItem = EntityRef.NULL;
 
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public EntityRef controller = EntityRef.NULL;
-
-    public Quat4f getLookRotation() {
-        Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
-        return lookRotation;
-    }
-
-    public Vector3f getLookDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getLookRotation().rotate(result, result);
-        return result;
-    }
 }

@@ -27,8 +27,8 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
+import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.binds.movement.RotationPitchAxis;
 import org.terasology.input.binds.movement.RotationYawAxis;
@@ -89,7 +89,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private boolean run = runPerDefault;
     private boolean jump;
     private float lookPitch;
+    private float lookPitchDelta;
     private float lookYaw;
+    private float lookYawDelta;
 
     @In
     private Time time;
@@ -114,43 +116,37 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         EntityRef entity = localPlayer.getCharacterEntity();
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
-        CharacterComponent characterComp = entity.getComponent(CharacterComponent.class);
-        LocationComponent location = entity.getComponent(LocationComponent.class);
 
-        processInput(entity, characterComp, characterMovementComponent);
-        updateCamera(characterComp, characterMovementComponent, characterComp, location);
-
-        entity.saveComponent(characterComp);
+        processInput(entity, characterMovementComponent);
+        updateCamera(characterMovementComponent, localPlayer.getViewPosition(), localPlayer.getViewRotation());
     }
 
-    private void processInput(EntityRef entity, CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent) {
+    private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
+        lookYaw = (lookYaw - lookYawDelta) % 360;
+        lookYawDelta = 0f;
+        lookPitch = TeraMath.clamp(lookPitch + lookPitchDelta, -89, 89);
+        lookPitchDelta = 0f;
+
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
         Quat4f viewRot;
         switch (characterMovementComponent.mode) {
             case WALKING:
-                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
+                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
                 viewRot.rotate(relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
                 break;
             default:
-                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
+                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
                 viewRot.rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }
         entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump, time.getGameDeltaInMs()));
         jump = false;
-    }
-
-    private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent,
-                              CharacterComponent characterComp, LocationComponent location) {
-        // TODO: Remove, use component camera, breaks spawn camera anyway
-        Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
-        updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
     }
 
     @ReceiveEvent
@@ -161,35 +157,33 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             // This is not done while the game is still loading, since systems are not updated.
             // RenderableWorldImpl pre-generates chunks around the player camera and therefore needs
             // the correct location.
+            lookYaw = 0f;
+            lookPitch = 0f;
             update(0);
         }
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
-        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
-        lookYaw = (characterComponent.yaw - event.getValue()) % 360;
+        lookYawDelta = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        lookPitch = TeraMath.clamp(character.pitch + event.getValue(), -89, 89);
+        lookPitchDelta = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void updateRotationYaw(RotationYawAxis event, EntityRef entity) {
-        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
-        lookYaw = (characterComponent.yaw - event.getValue()) % 360;
+        lookYawDelta = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        lookPitch = TeraMath.clamp(character.pitch + event.getValue(), -89, 89);
+        lookPitchDelta = event.getValue();
         event.consume();
     }
 
@@ -299,12 +293,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
 
-    private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
-        // The camera position is the player's position plus the eye offset
-        Vector3f cameraPosition = new Vector3f(position);
-        cameraPosition.add(0, characterComponent.eyeOffset, 0);
-
-        playerCamera.getPosition().set(cameraPosition);
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
+        playerCamera.getPosition().set(position);
         Vector3f viewDir = Direction.FORWARD.getVector3f();
         rotation.rotate(viewDir, playerCamera.getViewingDirection());
 
