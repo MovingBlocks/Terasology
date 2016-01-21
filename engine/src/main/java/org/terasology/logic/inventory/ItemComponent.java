@@ -28,12 +28,6 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
  */
 public final class ItemComponent implements Component {
     /**
-     * Should this item be rendered? Some items have an inventory icon but no "held" representation
-     */
-    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public boolean renderWithIcon;
-
-    /**
      * Name of the icon this item should be rendered with
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
@@ -85,4 +79,5 @@ public final class ItemComponent implements Component {
 
     public Prefab pickupPrefab;
 
+    public int cooldownTime;
 }

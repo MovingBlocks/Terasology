@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateCompon
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.ChangeHeldItemRequest;
 import org.terasology.logic.characters.events.HeldItemChangedEvent;
 import org.terasology.logic.players.LocalPlayer;
@@ -30,7 +29,7 @@ import org.terasology.rendering.logic.LightFadeComponent;
 import org.terasology.world.block.items.BlockItemComponent;
 
 @RegisterSystem
-public class CharacterHeldItemSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+public class CharacterHeldItemSystem extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
@@ -118,19 +117,5 @@ public class CharacterHeldItemSystem extends BaseComponentSystem implements Upda
             return blockItem.blockFamily.getArchetypeBlock().getLuminance();
         }
         return 0;
-    }
-
-
-    @Override
-    public void update(float delta) {
-        if (!localPlayer.isValid()) {
-            return;
-        }
-
-        EntityRef characterEntity = localPlayer.getCharacterEntity();
-
-        // Hand animation update
-        CharacterHeldItemComponent characterHeldItemComponent = characterEntity.getComponent(CharacterHeldItemComponent.class);
-        characterHeldItemComponent.handAnimation = Math.max(0, characterHeldItemComponent.handAnimation - 2.5f * delta);
     }
 }

@@ -40,7 +40,7 @@ public class Location extends BaseComponentSystem {
      * @param offset
      * @param relativeRotation
      */
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation, float relativeScale) {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && !childLoc.getParent().equals(parent)) {
@@ -52,10 +52,15 @@ public class Location extends BaseComponentSystem {
             childLoc.parent = parent;
             childLoc.setLocalPosition(offset);
             childLoc.setLocalRotation(relativeRotation);
+            childLoc.setLocalScale(relativeScale);
             parentLoc.children.add(child);
             child.saveComponent(childLoc);
             parent.saveComponent(parentLoc);
         }
+    }
+
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
+        attachChild(parent, child, offset, relativeRotation, 1f);
     }
 
     /**
