@@ -17,7 +17,6 @@
 package org.terasology.logic.inventory;
 
 import com.bulletphysics.collision.shapes.BoxShape;
-
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -28,16 +27,11 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.iconmesh.IconMeshFactory;
-import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
@@ -47,8 +41,6 @@ public class ItemPickupSystem extends BaseComponentSystem {
 
     @In
     private InventoryManager inventoryManager;
-
-    private Random rand = new FastRandom();
 
     @ReceiveEvent(components = PickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
@@ -65,11 +57,6 @@ public class ItemPickupSystem extends BaseComponentSystem {
     public void onBlockItemDropped(ItemDroppedEvent event, EntityRef itemEntity, BlockItemComponent blockItemComponent) {
         EntityBuilder builder = event.getPickup();
         BlockFamily blockFamily = blockItemComponent.blockFamily;
-        if (builder.hasComponent(MeshComponent.class)) {
-            MeshComponent mesh = builder.getComponent(MeshComponent.class);
-            mesh.mesh = blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
-            mesh.material = Assets.getMaterial("engine:terrain").get();
-        }
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
             javax.vecmath.Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new javax.vecmath.Vector3f());
             extents.scale(2.0f);
@@ -78,27 +65,16 @@ public class ItemPickupSystem extends BaseComponentSystem {
             extents.z = Math.max(extents.z, 0.5f);
             builder.getComponent(BoxShapeComponent.class).extents.set(VecMath.from(extents));
         }
-        if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
-            LightComponent lightComponent = builder.addComponent(new LightComponent());
-
-            Vector3f randColor = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
-            lightComponent.lightColorDiffuse.set(randColor);
-            lightComponent.lightColorAmbient.set(randColor);
-        }
-
         if (builder.hasComponent(RigidBodyComponent.class)) {
             builder.getComponent(RigidBodyComponent.class).mass = blockItemComponent.blockFamily.getArchetypeBlock().getMass();
         }
     }
 
     @ReceiveEvent
-    public void onItemDropped(ItemDroppedEvent event, EntityRef itemEntity, ItemComponent itemComponent) {
+    public void onItemDropped(ItemDroppedEvent event, EntityRef itemEntity, MeshComponent meshComponent) {
         EntityBuilder builder = event.getPickup();
-        if (builder.hasComponent(MeshComponent.class)) {
-            MeshComponent mesh = builder.getComponent(MeshComponent.class);
-            if (mesh.mesh == null && itemComponent.icon != null) {
-                builder.getComponent(MeshComponent.class).mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
-            }
+        if (itemEntity.hasComponent(MeshComponent.class)) {
+            builder.addOrSaveComponent(meshComponent);
         }
     }
 }

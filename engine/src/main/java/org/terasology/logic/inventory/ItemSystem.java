@@ -16,14 +16,26 @@
 
 package org.terasology.logic.inventory;
 
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
+import org.terasology.rendering.iconmesh.IconMeshFactory;
+import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemComponent;
 
 /**
  */
@@ -32,12 +44,85 @@ public class ItemSystem extends BaseComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
+    private static Random rand = new FastRandom();
+
     @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp.consumedOnUse) {
             int slot = InventoryUtils.getSlotWithItem(event.getInstigator(), item);
             inventoryManager.removeItem(event.getInstigator(), event.getInstigator(), slot, true, 1);
+        }
+    }
+
+    @ReceiveEvent
+    public void onRenderItemIconMeshAdded(OnAddedComponent event, EntityRef item, RenderItemIconMeshComponent renderItemIconMeshComponent, ItemComponent itemComponent) {
+        addOrUpdateItemMeshComponent(itemComponent, item);
+    }
+
+    @ReceiveEvent
+    public void onRenderItemIconMeshChanged(OnChangedComponent event, EntityRef item, RenderItemIconMeshComponent renderItemIconMeshComponent, ItemComponent itemComponent) {
+        addOrUpdateItemMeshComponent(itemComponent, item);
+    }
+
+    @ReceiveEvent
+    public void onRenderItemBlockMeshAdded(OnAddedComponent event, EntityRef item,
+                                           RenderItemBlockMeshComponent renderItemBlockMeshComponent,
+                                           BlockItemComponent blockItemComponent,
+                                           ItemComponent itemComponent) {
+        addOrUpdateBlockMeshComponent(blockItemComponent, item);
+    }
+
+    @ReceiveEvent
+    public void onRenderItemBlockMeshChanged(OnChangedComponent event, EntityRef item,
+                                             RenderItemBlockMeshComponent renderItemBlockMeshComponent,
+                                             BlockItemComponent blockItemComponent,
+                                             ItemComponent itemComponent) {
+        addOrUpdateBlockMeshComponent(blockItemComponent, item);
+    }
+
+    public static void addOrUpdateItemMeshComponent(ItemComponent itemComponent, MutableComponentContainer entity) {
+        if (itemComponent != null) {
+            MeshComponent meshComponent = null;
+            if (entity.hasComponent(MeshComponent.class)) {
+                meshComponent = entity.getComponent(MeshComponent.class);
+            } else {
+                meshComponent = new MeshComponent();
+            }
+            meshComponent.material = Assets.getMaterial("engine:droppedItem").get();
+            if (itemComponent.icon != null) {
+                meshComponent.mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
+            }
+            entity.addOrSaveComponent(meshComponent);
+        }
+    }
+
+    public static void addOrUpdateBlockMeshComponent(BlockItemComponent blockItemComponent, MutableComponentContainer entity) {
+        if (blockItemComponent != null) {
+            MeshComponent meshComponent = null;
+            if (entity.hasComponent(MeshComponent.class)) {
+                meshComponent = entity.getComponent(MeshComponent.class);
+            } else {
+                meshComponent = new MeshComponent();
+            }
+            BlockFamily blockFamily = blockItemComponent.blockFamily;
+
+            if (blockFamily == null) {
+                return;
+            }
+
+            meshComponent.mesh = blockFamily.getArchetypeBlock().getMesh();
+            meshComponent.material = Assets.getMaterial("engine:terrain").get();
+
+            if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !entity.hasComponent(LightComponent.class)) {
+                LightComponent lightComponent = entity.addComponent(new LightComponent());
+
+                Vector3f randColor = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+                lightComponent.lightColorDiffuse.set(randColor);
+                lightComponent.lightColorAmbient.set(randColor);
+            }
+
+            entity.addOrSaveComponent(meshComponent);
         }
     }
 }

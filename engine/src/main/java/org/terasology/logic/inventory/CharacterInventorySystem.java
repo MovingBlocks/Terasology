@@ -96,18 +96,24 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
-    public void onAttackRequest(AttackButton event, EntityRef entity) {
-        if (!event.isDown() || time.getGameTimeInMs() - lastInteraction < 200) {
+    public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+        if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
             return;
         }
 
-        CharacterHeldItemComponent characterHeldItemComponent = entity.getComponent(CharacterHeldItemComponent.class);
         EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
 
         entity.send(new AttackRequest(selectedItemEntity));
 
-        lastInteraction = time.getGameTimeInMs();
-        characterHeldItemComponent.handAnimation = 0.5f;
+        long currentTime = time.getGameTimeInMs();
+        characterHeldItemComponent.lastItemUsedTime = currentTime;
+        characterHeldItemComponent.nextItemUseTime = currentTime;
+        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
+        if (itemComponent != null) {
+            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
+        } else {
+            characterHeldItemComponent.nextItemUseTime += 200;
+        }
         entity.saveComponent(characterHeldItemComponent);
         event.consume();
     }
@@ -155,15 +161,13 @@ public class CharacterInventorySystem extends BaseComponentSystem {
                     impulseVector,
                     newPosition));
 
-            characterHeldItemComponent.handAnimation = 0.5f;
+            characterHeldItemComponent.lastItemUsedTime = time.getGameTimeInMs();
+            entity.saveComponent(characterHeldItemComponent);
 
             resetDropMark();
         }
 
-        entity.saveComponent(characterHeldItemComponent);
         event.consume();
-
-
     }
 
     public void resetDropMark() {
