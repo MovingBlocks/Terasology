@@ -23,22 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO.Dimensions;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -59,7 +48,6 @@ import java.util.Map;
  * redirect its output to a file. This is the only public method that is intended to be used from outside the
  * rendering engine.
  */
-// TODO: should most of the public methods really be as much as possible package-private?
 public class FrameBuffersManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FrameBuffersManager.class);
@@ -82,14 +70,10 @@ public class FrameBuffersManager {
     private Dimensions one16thScale;
     private Dimensions one32thScale;
 
-    private boolean isTakingScreenshot;
-
     // Note: this assumes that the settings in the configs might change at runtime,
     // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
-
-    ThreadManager threadManager = CoreRegistry.get(ThreadManager.class);
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
@@ -172,7 +156,7 @@ public class FrameBuffersManager {
         boolean refreshed = false;
         Dimensions oldFullScale = fullScale;
 
-        if (isNotTakingScreenshot()) {
+        if (postProcessor.isNotTakingScreenshot()) {
             fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
             if (renderingConfig.isOculusVrSupport()) {
                 fullScale.multiplySelfBy(OculusVrHelper.getScaleFactor());
@@ -282,70 +266,26 @@ public class FrameBuffersManager {
         }
     }
 
-    // TODO: (?) move to the post-processor?
     /**
-     * Triggers a screenshot.
+     * Returns the content of the color buffer of the FBO "sceneFinal", from GPU memory as a ByteBuffer.
+     * If the FBO "sceneFinal" is unavailable, returns null.
      *
-     * Notice that this method just starts the process: screenshot data is captured and written to file
-     * as soon as possible but not necessarily immediately after the trigger.
+     * @return a ByteBuffer or null
      */
-    public void takeScreenshot() {
-        isTakingScreenshot = true;
-    }
-
-    /**
-     * Schedules the saving of screenshot data to file.
-     *
-     * Screenshot data from the GPU is obtained as soon as this method executes. However, the data is only scheduled
-     * to be written to file, by submitting a task to the ThreadManager. The task is then executed as soon as possible
-     * but not necessarily immediately.
-     *
-     * The file is then saved in the designated screenshot folder with a filename in the form:
-     *
-     *     Terasology-[yyMMddHHmmss]-[width]x[height].[format]
-     */
-    public void saveScreenshot() {
-        final FBO fboSceneFinal = getFBO("sceneFinal");
+    public ByteBuffer getSceneFinalRawData() {
+        FBO fboSceneFinal = getFBO("sceneFinal");
         if (fboSceneFinal == null) {
-            logger.error("FBO sceneFinal is unavailable: cannot save screenshot.");
-            return;
+            logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
+            return null;
         }
 
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width() * fboSceneFinal.height() * 4);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width() * fboSceneFinal.height() * 4);
 
         fboSceneFinal.bindTexture();
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         FBO.unbindTexture();
 
-        // TODO: (?) should this class (or even individual FBOs) just make available the data (in buffer, above) while the writing to file is handled elsewhere?
-        Runnable task = () -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
-
-            final String format = renderingConfig.getScreenshotFormat();
-            final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width() + "x" + fboSceneFinal.height() + "." + format;
-            Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
-            BufferedImage image = new BufferedImage(fboSceneFinal.width(), fboSceneFinal.height(), BufferedImage.TYPE_INT_RGB);
-
-            for (int x = 0; x < fboSceneFinal.width(); x++) {
-                for (int y = 0; y < fboSceneFinal.height(); y++) {
-                    int i = (x + fboSceneFinal.width() * y) * 4;
-                    int r = buffer.get(i) & 0xFF;
-                    int g = buffer.get(i + 1) & 0xFF;
-                    int b = buffer.get(i + 2) & 0xFF;
-                    image.setRGB(x, fboSceneFinal.height() - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-                }
-            }
-
-            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
-                ImageIO.write(image, format, out);
-                logger.info("Screenshot '" + fileName + "' saved! ");
-            } catch (IOException e) {
-                logger.warn("Failed to save screenshot!", e);
-            }
-        };
-
-        threadManager.submitTask("Write screenshot", task);
-        isTakingScreenshot = false;
+        return buffer;
     }
 
     /**
@@ -487,17 +427,6 @@ public class FrameBuffersManager {
      */
     public PBO getCurrentReadbackPBO() {
         return currentReadbackPBO;
-    }
-
-    /**
-     * Returns true if the rendering engine is not in the process of taking a screenshot.
-     * Returns false if a screenshot is being taken.
-     *
-     * @return true if no screenshot is being taken, false otherwise
-     */
-    // for code readability it make sense to have this method rather than its opposite.
-    public boolean isNotTakingScreenshot() {
-        return !isTakingScreenshot;
     }
 
     /**
