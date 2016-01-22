@@ -25,6 +25,8 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -34,7 +36,16 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -109,6 +120,10 @@ public class PostProcessor {
     private GraphicState graphicState;
     private Materials materials = new Materials();
     private Buffers buffers = new Buffers();
+
+    ThreadManager threadManager = CoreRegistry.get(ThreadManager.class);
+
+    private boolean isTakingScreenshot;
 
     private RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
@@ -735,7 +750,7 @@ public class PostProcessor {
 
     private void renderFinalMonoImage() {
 
-        if (buffersManager.isNotTakingScreenshot()) {
+        if (isNotTakingScreenshot()) {
             graphicState.bindDisplay();
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
@@ -745,7 +760,7 @@ public class PostProcessor {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
 
-            buffersManager.saveScreenshot();
+            saveScreenshot();
             // when saving a screenshot we do not send the image to screen,
             // to avoid the brief one-frame flicker of the screenshot
 
@@ -758,7 +773,7 @@ public class PostProcessor {
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(WorldRenderer.WorldRenderingStage renderingStage) {
-        if (buffersManager.isNotTakingScreenshot()) {
+        if (isNotTakingScreenshot()) {
             buffers.sceneFinal.bind();
         } else {
             buffers.ocUndistorted.bind();
@@ -775,14 +790,14 @@ public class PostProcessor {
                 // no glClear() here: the rendering for the second eye is being added besides the first eye's rendering
                 renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
 
-                if (buffersManager.isNotTakingScreenshot()) {
+                if (isNotTakingScreenshot()) {
                     graphicState.bindDisplay();
                     applyOculusDistortion(buffers.sceneFinal);
 
                 } else {
                     buffers.sceneFinal.bind();
                     applyOculusDistortion(buffers.ocUndistorted);
-                    buffersManager.saveScreenshot();
+                    saveScreenshot();
                     // when saving a screenshot we do NOT send the image to screen,
                     // to avoid the brief flicker of the screenshot for one frame
                 }
@@ -801,7 +816,7 @@ public class PostProcessor {
         inputBuffer.bindTexture();
         materials.ocDistortion.setInt("texInputBuffer", texId, true);
 
-        if (buffersManager.isNotTakingScreenshot()) {
+        if (isNotTakingScreenshot()) {
             updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
             updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
@@ -918,6 +933,80 @@ public class PostProcessor {
      */
     public float getExposure() {
         return currentExposure;
+    }
+
+    /**
+     * Triggers a screenshot.
+     *
+     * Notice that this method just starts the process: screenshot data is captured and written to file
+     * as soon as possible but not necessarily immediately after the trigger.
+     */
+    public void takeScreenshot() {
+        isTakingScreenshot = true;
+    }
+
+    /**
+     * Schedules the saving of screenshot data to file.
+     *
+     * Screenshot data from the GPU is obtained as soon as this method executes. However, the data is only scheduled
+     * to be written to file, by submitting a task to the ThreadManager. The task is then executed as soon as possible
+     * but not necessarily immediately.
+     *
+     * The file is then saved in the designated screenshot folder with a filename in the form:
+     *
+     *     Terasology-[yyMMddHHmmss]-[width]x[height].[format]
+     *
+     * If no screenshot data is available an error is logged and the method returns doing nothing.
+     */
+    public void saveScreenshot() {
+        final ByteBuffer buffer = buffersManager.getSceneFinalRawData();
+        if(buffer == null) {
+            logger.error("No screenshot data available. No screenshot will be saved.");
+            return;
+        }
+
+        int width = buffers.sceneFinal.width();
+        int height = buffers.sceneFinal.height();
+
+        Runnable task = () -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
+
+            final String format = renderingConfig.getScreenshotFormat();
+            final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + width + "x" + height + "." + format;
+            Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int i = (x + width * y) * 4;
+                    int r = buffer.get(i) & 0xFF;
+                    int g = buffer.get(i + 1) & 0xFF;
+                    int b = buffer.get(i + 2) & 0xFF;
+                    image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+                }
+            }
+
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
+                ImageIO.write(image, format, out);
+                logger.info("Screenshot '" + fileName + "' saved! ");
+            } catch (IOException e) {
+                logger.warn("Failed to save screenshot!", e);
+            }
+        };
+
+        threadManager.submitTask("Write screenshot", task);
+        isTakingScreenshot = false;
+    }
+
+    /**
+     * Returns true if the rendering engine is not in the process of taking a screenshot.
+     * Returns false if a screenshot is being taken.
+     *
+     * @return true if no screenshot is being taken, false otherwise
+     */
+    // for code readability it make sense to have this method rather than its opposite.
+    public boolean isNotTakingScreenshot() {
+        return !isTakingScreenshot;
     }
 
     private class Materials {
