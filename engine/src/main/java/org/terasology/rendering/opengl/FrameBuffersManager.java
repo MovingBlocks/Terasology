@@ -23,38 +23,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO.Dimensions;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
-
 /**
- * The Default Rendering Process class.
+ * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
+ * rendering engine.
  *
+ * In most instances Frame Buffers can be thought of as 2D arrays of pixels in GPU memory: shaders write to them or
+ * read from them. Some buffers are static and never change for the lifetime of the manager. Some buffers are dynamic:
+ * they get disposed and regenerated, i.e. in case the display resolution changes. Some buffers hold intermediate
+ * steps of the rendering process and the content of one buffer, "sceneFinal", is eventually sent to the display.
+ * <br/>
+ * At this stage no buffer can be added or deleted: the list of buffers and their characteristics is hardcoded.
+ * <br/>
+ * The existing set of public methods is primarily intended to allow communication between this manager and other parts
+ * of the rendering engine, most notably the PostProcessor and the GraphicState instances and the shaders system.
+ * <br/>
+ * An important exception is the takeScreenshot() method which prompts the renderer to eventually (not immediately)
+ * redirect its output to a file. This is the only public method that is intended to be used from outside the
+ * rendering engine.
  */
-public class LwjglRenderingProcess {
+public class FrameBuffersManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(LwjglRenderingProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrameBuffersManager.class);
 
-    private PBO readBackPBOFront;
-    private PBO readBackPBOBack;
-    private PBO readBackPBOCurrent;
+    private PBO frontReadbackPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back
+    private PBO backReadbackPBO;    // into the CPU. This data is then used in the context of
+    private PBO currentReadbackPBO; // eye adaptation.
+
+    private FBO sceneOpaque;
+    private FBO sceneShadowMap;
 
     // I could have named them fullResolution, halfResolution and so on. But halfScale is actually
     // -both- fullScale's dimensions halved, leading to -a quarter- of its resolution. Following
@@ -67,12 +70,6 @@ public class LwjglRenderingProcess {
     private Dimensions one16thScale;
     private Dimensions one32thScale;
 
-    private int overwriteRtWidth;
-    private int overwriteRtHeight;
-
-    /* VARIOUS */
-    private boolean isTakingScreenshot;
-
     // Note: this assumes that the settings in the configs might change at runtime,
     // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
@@ -83,93 +80,164 @@ public class LwjglRenderingProcess {
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
-    public LwjglRenderingProcess() {
-
+    public FrameBuffersManager() {
+        // nothing to do here, everything happens at initialization time,
+        // after GraphicState and PostProcessors have been set.
     }
 
+    /**
+    Initializes the FrameBuffersManager instance by creating static FBOs, dynamic FBOs and shadowMap FBO.
+    Also instructs the PostProcessor and the GraphicState instances to fetch the FBOs they require.
+     */
     public void initialize() {
-        createOrUpdateFullscreenFbos();
+        createStaticFBOs();
+        postProcessor.obtainStaticFBOs();
 
-        // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
+        setDynamicFBOsDimensions();
+        createDynamicFBOs();
+        graphicState.refreshDynamicFBOs();
+        postProcessor.refreshDynamicFBOs();
+
+        createShadowMapFBO();
+        graphicState.setSceneShadowMap(sceneShadowMap);
+    }
+
+    // Static FBOs do not change during the lifetime of a FrameBuffersManager instance.
+    // They are used to progressively downsample the image all the way into a 1x1 buffer
+    // holding average image brightness data. This is then used in the context of eye adaptation.
+    private void createStaticFBOs() {
+        // The FBObuilder takes care of registering the new FBOs on the fboLookup map.
         new FBObuilder("scene16", 16, 16, FBO.Type.DEFAULT).build();
         new FBObuilder("scene8",   8,  8, FBO.Type.DEFAULT).build();
         new FBObuilder("scene4",   4,  4, FBO.Type.DEFAULT).build();
         new FBObuilder("scene2",   2,  2, FBO.Type.DEFAULT).build();
         new FBObuilder("scene1",   1,  1, FBO.Type.DEFAULT).build();
 
-        postProcessor.obtainStaticFBOs();
-
-        readBackPBOFront = new PBO(1, 1);
-        readBackPBOBack = new PBO(1, 1);
-        readBackPBOCurrent = readBackPBOFront;
+        // Technically these are not Frame Buffer Objects but Pixel Buffer Objects.
+        // Their instantiation and assignments are done here because they are static buffers.
+        frontReadbackPBO = new PBO(1, 1);
+        backReadbackPBO = new PBO(1, 1);
+        currentReadbackPBO = frontReadbackPBO;
     }
 
-    public void setGraphicState(GraphicState graphicState) {
-        this.graphicState = graphicState;
+    private void setDynamicFBOsDimensions() {
+        refreshDynamicFBOsDimensions();
     }
 
-    public void setPostProcessor(PostProcessor postProcessor) {
-        this.postProcessor = postProcessor;
+    private void createDynamicFBOs() {
+        recreateDynamicFBOs();
+    }
+
+    private void createShadowMapFBO() {
+        recreateShadowMapFBO();
     }
 
     /**
-     * Creates the scene FBOs and updates them according to the size of the viewport. The current size
-     * provided by the display class is only used if the parameters overwriteRTWidth and overwriteRTHeight are set
-     * to zero.
+     * Executed before any rendering begins, this method disposes and regenerates a number of FBOs if size changes
+     * have been triggered. Also prompts the GraphicState and PostProcessor instances to refresh their internal
+     * references to use the new FBOs.
      */
-    public void createOrUpdateFullscreenFbos() {
+    public void preRenderUpdate() {
+        refreshDynamicFBOsDimensions();
+        if (sceneOpaque.dimensions().areDifferentFrom(fullScale)) {
+            disposeOfAllDynamicFBOs();
+            recreateDynamicFBOs();
+            graphicState.refreshDynamicFBOs();
+            postProcessor.refreshDynamicFBOs();
+        }
 
-        if (overwriteRtWidth == 0) {
+        if (sceneShadowMap != null && sceneShadowMap.width() != renderingConfig.getShadowMapResolution()) {
+            recreateShadowMapFBO();
+            graphicState.setSceneShadowMap(sceneShadowMap);
+        }
+    }
+
+    private boolean refreshDynamicFBOsDimensions() {
+        boolean refreshed = false;
+        Dimensions oldFullScale = fullScale;
+
+        if (postProcessor.isNotTakingScreenshot()) {
             fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
-        } else {
-            fullScale = new Dimensions(overwriteRtWidth, overwriteRtHeight);
             if (renderingConfig.isOculusVrSupport()) {
                 fullScale.multiplySelfBy(OculusVrHelper.getScaleFactor());
             }
+        } else {
+            fullScale = new Dimensions(
+                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
+                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
+            );
         }
 
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
 
-        halfScale    = fullScale.dividedBy(2);   // quarter resolution
-        quarterScale = fullScale.dividedBy(4);   // one 16th resolution
-        one8thScale  = fullScale.dividedBy(8);   // one 64th resolution
-        one16thScale = fullScale.dividedBy(16);  // one 256th resolution
-        one32thScale = fullScale.dividedBy(32);  // one 1024th resolution
-
-        FBO scene = fboLookup.get("sceneOpaque");
-        final boolean recreate = scene == null || (scene.dimensions().areDifferentFrom(fullScale));
-
-        if (!recreate) {
-            return;
+        if (fullScale.isDifferentFrom(oldFullScale)) {
+            halfScale    = fullScale.dividedBy(2);
+            quarterScale = fullScale.dividedBy(4);
+            one8thScale  = fullScale.dividedBy(8);
+            one16thScale = fullScale.dividedBy(16);
+            one32thScale = fullScale.dividedBy(32);
+            refreshed = true;
         }
 
-        // Note: the FBObuilder takes care of registering thew new FBOs on fboLookup.
-        int shadowMapResolution = renderingConfig.getShadowMapResolution();
-        FBO sceneShadowMap =
-                new FBObuilder("sceneShadowMap", shadowMapResolution, shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
-        graphicState.setSceneShadowMap(sceneShadowMap);
+        return refreshed;
+    }
 
-        // buffers for the initial renderings
-        FBO sceneOpaque =
-                new FBObuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+    // providing a rough guide of each FBO here, as the method that creates them (recreateDynamicFBOs) is quite dense already
+    private void disposeOfAllDynamicFBOs() {
+
+        deleteFBO("sceneOpaque");           // Primary FBO: most visual information eventually ends up here
+        deleteFBO("sceneOpaquePingPong");   // The sceneOpaque FBOs are swapped every frame, to use one for reading and the other for writing
+                                            // Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
+
+        deleteFBO("sceneSkyBand0"); // two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
+        deleteFBO("sceneSkyBand1");
+
+        deleteFBO("sceneReflectiveRefractive"); // used to render reflective and refractive surfaces, most obvious case being the water surface
+
+        deleteFBO("sceneReflected"); // the water surface displays a reflected version of the scene. This version is stored here.
+
+        deleteFBO("outline");       // greyscale depth-based rendering of object outlines
+        deleteFBO("ssao");          // greyscale screen-space ambient occlusion rendering
+        deleteFBO("ssaoBlurred");   // greyscale screen-space ambient occlusion rendering - blurred version
+        deleteFBO("scenePrePost");  // intermediate step, combining a number of renderings made available so far
+                                    // into one buffer to be post-processed.
+
+        deleteFBO("lightShafts");       // light shafts rendering
+        deleteFBO("sceneToneMapped");   // HDR tone mapping
+
+        deleteFBO("sceneHighPass"); // a number of buffers to create the bloom effect
+        deleteFBO("sceneBloom0");
+        deleteFBO("sceneBloom1");
+        deleteFBO("sceneBloom2");
+
+        deleteFBO("sceneBlur0");    // a pair of buffers holding blurred versions of the rendered scene,
+        deleteFBO("sceneBlur1");    // also used for the bloom effect, but not only.
+
+        deleteFBO("ocUndistorted"); // if OculusRift support is enabled this buffer holds the side-by-side views
+                                    // for each eye, with no lens distortion applied.
+
+        deleteFBO("sceneFinal");    // the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
+    }
+
+    private void recreateDynamicFBOs() {
+        // The FBObuilder takes care of registering thew new FBOs on the fboLookup hashmap.
+        sceneOpaque = new FBObuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
         new FBObuilder("sceneOpaquePingPong", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
 
-        new FBObuilder("sceneSkyBand0", one16thScale, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneSkyBand1", one32thScale, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand0",   one16thScale, FBO.Type.DEFAULT).build();
+        new FBObuilder("sceneSkyBand1",   one32thScale, FBO.Type.DEFAULT).build();
 
         FBO sceneReflectiveRefractive = new FBObuilder("sceneReflectiveRefractive", fullScale, FBO.Type.HDR).useNormalBuffer().build();
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
 
         new FBObuilder("sceneReflected",  halfScale,    FBO.Type.DEFAULT).useDepthBuffer().build();
 
-        // buffers for the prePost-Processing composite
         new FBObuilder("outline",         fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("ssao",            fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("ssaoBlurred",     fullScale,    FBO.Type.DEFAULT).build();
+        new FBObuilder("scenePrePost",    fullScale,    FBO.Type.HDR).build();
 
-        // buffers for the Initial Post-Processing
         new FBObuilder("lightShafts",     halfScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("initialPost",     fullScale,    FBO.Type.HDR).build();
         new FBObuilder("sceneToneMapped", fullScale,    FBO.Type.HDR).build();
 
         new FBObuilder("sceneHighPass",   fullScale,    FBO.Type.DEFAULT).build();
@@ -180,181 +248,159 @@ public class LwjglRenderingProcess {
         new FBObuilder("sceneBlur0",      halfScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneBlur1",      halfScale,    FBO.Type.DEFAULT).build();
 
-        // buffers for the Final Post-Processing
         new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
-
-        graphicState.refreshDynamicFBOs();
-        postProcessor.refreshDynamicFBOs();
     }
 
-    public void deleteFBO(String title) {
-        if (fboLookup.containsKey(title)) {
-            FBO fbo = fboLookup.get(title);
+    private void recreateShadowMapFBO() {
+        int shadowMapResFromSettings = renderingConfig.getShadowMapResolution();
+        Dimensions shadowMapResolution =  new Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
+        sceneShadowMap = new FBObuilder("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        handleDisposedShadowMap(sceneShadowMap);
+    }
 
-            glDeleteFramebuffersEXT(fbo.fboId);
-            glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
-            GL11.glDeleteTextures(fbo.normalsBufferTextureId);
-            GL11.glDeleteTextures(fbo.depthStencilTextureId);
-            GL11.glDeleteTextures(fbo.colorBufferTextureId);
+    private void handleDisposedShadowMap(FBO fbo) {
+        if (fbo.getStatus() == FBO.Status.DISPOSED) {
+            logger.warn("Failed to generate ShadowMap FBO. Turning off shadows.");
+            renderingConfig.setDynamicShadows(false);
         }
     }
 
-    public void takeScreenshot() {
-        isTakingScreenshot = true;
-
-        overwriteRtWidth = renderingConfig.getScreenshotSize().getWidth(Display.getWidth());
-        overwriteRtHeight = renderingConfig.getScreenshotSize().getHeight(Display.getHeight());
-
-        createOrUpdateFullscreenFbos();
-    }
-
-    public void saveScreenshot() {
-        if (!isTakingScreenshot) {
-            return;
-        }
-
-        final FBO fboSceneFinal = getFBO("sceneFinal");
-
+    /**
+     * Returns the content of the color buffer of the FBO "sceneFinal", from GPU memory as a ByteBuffer.
+     * If the FBO "sceneFinal" is unavailable, returns null.
+     *
+     * @return a ByteBuffer or null
+     */
+    public ByteBuffer getSceneFinalRawData() {
+        FBO fboSceneFinal = getFBO("sceneFinal");
         if (fboSceneFinal == null) {
-            return;
+            logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
+            return null;
         }
 
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width() * fboSceneFinal.height() * 4);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width() * fboSceneFinal.height() * 4);
 
         fboSceneFinal.bindTexture();
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         FBO.unbindTexture();
 
-        Runnable task = () -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
-
-            final String format = renderingConfig.getScreenshotFormat().toString();
-            final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width() + "x" + fboSceneFinal.height() + "." + format;
-            Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
-            BufferedImage image = new BufferedImage(fboSceneFinal.width(), fboSceneFinal.height(), BufferedImage.TYPE_INT_RGB);
-
-            for (int x = 0; x < fboSceneFinal.width(); x++) {
-                for (int y = 0; y < fboSceneFinal.height(); y++) {
-                    int i = (x + fboSceneFinal.width() * y) * 4;
-                    int r = buffer.get(i) & 0xFF;
-                    int g = buffer.get(i + 1) & 0xFF;
-                    int b = buffer.get(i + 2) & 0xFF;
-                    image.setRGB(x, fboSceneFinal.height() - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-                }
-            }
-
-            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
-                ImageIO.write(image, format, out);
-                logger.info("Screenshot '" + fileName + "' saved! ");
-            } catch (IOException e) {
-                logger.warn("Failed to save screenshot!", e);
-            }
-        };
-
-        CoreRegistry.get(ThreadManager.class).submitTask("Write screenshot", task);
-
-        isTakingScreenshot = false;
-        overwriteRtWidth = 0;
-        overwriteRtHeight = 0;
-
-        createOrUpdateFullscreenFbos();
+        return buffer;
     }
 
-    public FBO getFBO(String title) {
-        FBO fbo = fboLookup.get(title);
+    /**
+     * Returns an FBO given its name.
+     *
+     * If no FBO maps to the given name, null is returned and an error is logged.
+     *
+     * @param fboName The name of the FBO
+     * @return an FBO or null
+     */
+    public FBO getFBO(String fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
-            logger.error("Failed to retrieve FBO '" + title + "'!");
+            logger.error("Failed to retrieve FBO '" + fboName + "'!");
         }
 
         return fbo;
     }
 
-    public boolean bindFbo(String title) {
-        FBO fbo = fboLookup.get(title);
+    private void deleteFBO(String fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
-            fbo.bind();
-            return true;
-        }
+            fbo.dispose();
+            fboLookup.remove(fboName);
 
-        logger.error("Failed to bind FBO since the requested FBO could not be found!");
-        return false;
+        } else {
+            logger.error("Failed to delete FBO '" + fboName + "': it doesn't exist!");
+        }
     }
 
-    public boolean unbindFbo(String title) {
-        FBO fbo = fboLookup.get(title);
-
-        if (fbo != null) {
-            fbo.unbind();
-            return true;
-        }
-
-        logger.error("Failed to unbind FBO since the requested FBO could not be found!");
-        return false;
-    }
-
-    public boolean bindFboColorTexture(String title) {
-        FBO fbo = fboLookup.get(title);
+    /**
+     * Binds the color texture of the FBO with the given name and returns true.
+     *
+     * If no FBO is associated with the given name, false is returned and an error is logged.
+     *
+     * @param fboName the name of an FBO
+     * @return True if an FBO associated with the given name exists. False otherwise.
+     */
+    public boolean bindFboColorTexture(String fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO color texture since the requested " + title + " FBO could not be found!");
+        logger.error("Failed to bind FBO color texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
-    public boolean bindFboDepthTexture(String title) {
-        FBO fbo = fboLookup.get(title);
+    /**
+     * Binds the depth texture of the FBO with the given name and returns true.
+     *
+     * If no FBO is associated with the given name, false is returned and an error is logged.
+     *
+     * @param fboName the name of an FBO
+     * @return True if an FBO associated with the given name exists. False otherwise.
+     */
+    public boolean bindFboDepthTexture(String fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindDepthTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO depth texture since the requested " + title + " FBO could not be found!");
+        logger.error("Failed to bind FBO depth texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
-    public boolean bindFboNormalsTexture(String title) {
-        FBO fbo = fboLookup.get(title);
+    /**
+     * Binds the normals texture of the FBO with the given name and returns true.
+     *
+     * If no FBO is associated with the given name, false is returned and an error is logged.
+     *
+     * @param fboName the name of an FBO
+     * @return True if an FBO associated with the given name exists. False otherwise.
+     */
+    public boolean bindFboNormalsTexture(String fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindNormalsTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO normals texture since the requested " + title + " FBO could not be found!");
+        logger.error("Failed to bind FBO normals texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
-    public boolean bindFboLightBufferTexture(String title) {
-        FBO fbo = fboLookup.get(title);
+    /**
+     * Binds the light buffer texture of the FBO with the given name and returns true.
+     *
+     * If no FBO is associated with the given name, false is returned and an error is logged.
+     *
+     * @param fboName the name of an FBO
+     * @return True if an FBO associated with the given name exists. False otherwise.
+     */
+    public boolean bindFboLightBufferTexture(String fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindLightBufferTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO light buffer texture since the requested " + title + " FBO could not be found!");
+        logger.error("Failed to bind FBO light buffer texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
-    public void flipPingPongFbo(String title) {
-        FBO fbo1 = getFBO(title);
-        FBO fbo2 = getFBO(title + "PingPong");
-
-        if (fbo1 == null || fbo2 == null) {
-            return;
-        }
-
-        fboLookup.put(title, fbo2);
-        fboLookup.put(title + "PingPong", fbo1);
-    }
-
+    /**
+     * Swaps the sceneOpaque FBOs, so that the one previously used for writing is now used for reading and viceversa.
+     */
     public void swapSceneOpaqueFBOs() {
         FBO currentSceneOpaquePingPong = fboLookup.get("sceneOpaquePingPong");
         fboLookup.put("sceneOpaquePingPong", fboLookup.get("sceneOpaque"));
@@ -364,24 +410,43 @@ public class LwjglRenderingProcess {
         postProcessor.refreshSceneOpaqueFBOs();
     }
 
+    /**
+     * Swaps the readback PBOs, so that the one previously used for writing is now used for reading and viceversa.
+     */
     public void swapReadbackPBOs() {
-        if (readBackPBOCurrent == readBackPBOFront) {
-            readBackPBOCurrent = readBackPBOBack;
+        if (currentReadbackPBO == frontReadbackPBO) {
+            currentReadbackPBO = backReadbackPBO;
         } else {
-            readBackPBOCurrent = readBackPBOFront;
+            currentReadbackPBO = frontReadbackPBO;
         }
     }
 
+    /**
+     * Returns the current readback PBO, the one that will be used for reading from.
+     * @return the current readback PBO
+     */
     public PBO getCurrentReadbackPBO() {
-        return readBackPBOCurrent;
+        return currentReadbackPBO;
     }
 
-    public boolean isTakingScreenshot() {
-        return isTakingScreenshot;
+    /**
+     * Sets an internal reference to the GraphicState instance. This reference is used to inform the GraphicState
+     * instance that changes have occurred and that it should refresh its references to the FBOs it uses.
+     *
+     * @param graphicState a GraphicState instance
+     */
+    public void setGraphicState(GraphicState graphicState) {
+        this.graphicState = graphicState;
     }
 
-    public boolean isNotTakingScreenshot() {
-        return !isTakingScreenshot;
+    /**
+     * Sets an internal reference to the PostProcessor instance. This reference is used to inform the PostProcessor
+     * instance that changes have occurred and that it should refresh its references to the FBOs it uses.
+     *
+     * @param postProcessor a PostProcessor instance
+     */
+    public void setPostProcessor(PostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
     }
 
     /**

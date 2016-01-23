@@ -24,7 +24,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 import java.util.Optional;
 
@@ -90,7 +90,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             return;
         }
 
-        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
+        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -112,10 +112,10 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.get().getId());
         program.setInt("textureEffects", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboColorTexture("sceneReflected");
+        buffersManager.bindFboColorTexture("sceneReflected");
         program.setInt("textureWaterReflection", texId++, true);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        renderingProcess.bindFboColorTexture("sceneOpaque");
+        buffersManager.bindFboColorTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
