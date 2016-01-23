@@ -79,5 +79,5 @@ public final class ItemComponent implements Component {
 
     public Prefab pickupPrefab;
 
-    public int cooldownTime;
+    public int cooldownTime = 200;
 }

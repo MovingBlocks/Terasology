@@ -19,7 +19,7 @@ package org.terasology.logic.inventory;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -56,7 +56,7 @@ public class ItemSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onRenderItemIconMeshAdded(OnAddedComponent event, EntityRef item, RenderItemIconMeshComponent renderItemIconMeshComponent, ItemComponent itemComponent) {
+    public void onRenderItemIconMeshActivated(OnActivatedComponent event, EntityRef item, RenderItemIconMeshComponent renderItemIconMeshComponent, ItemComponent itemComponent) {
         addOrUpdateItemMeshComponent(itemComponent, item);
     }
 
@@ -66,10 +66,10 @@ public class ItemSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onRenderItemBlockMeshAdded(OnAddedComponent event, EntityRef item,
-                                           RenderItemBlockMeshComponent renderItemBlockMeshComponent,
-                                           BlockItemComponent blockItemComponent,
-                                           ItemComponent itemComponent) {
+    public void onRenderItemBlockMeshActivated(OnActivatedComponent event, EntityRef item,
+                                               RenderItemBlockMeshComponent renderItemBlockMeshComponent,
+                                               BlockItemComponent blockItemComponent,
+                                               ItemComponent itemComponent) {
         addOrUpdateBlockMeshComponent(blockItemComponent, item);
     }
 

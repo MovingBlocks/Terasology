@@ -73,8 +73,14 @@ public class ItemPickupSystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onItemDropped(ItemDroppedEvent event, EntityRef itemEntity, MeshComponent meshComponent) {
         EntityBuilder builder = event.getPickup();
-        if (itemEntity.hasComponent(MeshComponent.class)) {
-            builder.addOrSaveComponent(meshComponent);
+        MeshComponent builderMeshComponent = builder.getComponent(MeshComponent.class);
+        if (builderMeshComponent != null) {
+            builderMeshComponent.mesh = meshComponent.mesh;
+            builderMeshComponent.material = meshComponent.material;
+            builderMeshComponent.color = meshComponent.color;
+            builderMeshComponent.hideFromOwner = meshComponent.hideFromOwner;
+            builderMeshComponent.translucent = meshComponent.translucent;
+            builder.saveComponent(builderMeshComponent);
         }
     }
 }
