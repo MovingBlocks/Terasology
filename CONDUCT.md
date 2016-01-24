@@ -1,7 +1,4 @@
----
-layout: code-of-conduct
-version: v1.0
----
+# Open Code of Conduct
 
 This code of conduct outlines our expectations for participants within the Terasology community, as well as steps to reporting unacceptable behavior. We are committed to providing a welcoming and inspiring community for all and expect our code of conduct to be honored. Anyone who violates this code of conduct may be banned from the community.
 
@@ -52,7 +49,7 @@ characteristics above, including participants with disabilities.
 
 ### Reporting Issues
 
-If you experience or witness unacceptable behavior—or have any other concerns—please report it by contacting us via cervator@gmail.com. All reports will be handled with discretion. In your report please include:
+If you experience or witness unacceptable behavior—or have any other concerns—please report it by contacting us via abuse@terasology.org. All reports will be handled with discretion. In your report please include:
 
 - Your contact information.
 - Names (real, nicknames, or pseudonyms) of any individuals involved. If there are additional witnesses, please
@@ -63,11 +60,4 @@ After filing a report, a representative will contact you personally, review the 
 
 ### Attribution & Acknowledgements
 
-We all stand on the shoulders of giants across many open source communities.  We'd like to thank the communities and projects that established code of conducts and diversity statements as our inspiration:
-
-* [Django](https://www.djangoproject.com/conduct/reporting/)
-* [Python](https://www.python.org/community/diversity/)
-* [Ubuntu](http://www.ubuntu.com/about/about-ubuntu/conduct)
-* [Contributor Covenant](http://contributor-covenant.org/)
-* [Geek Feminism](http://geekfeminism.org/about/code-of-conduct/)
-* [Citizen Code of Conduct](http://citizencodeofconduct.org/)
+This code of conduct has been adopted from the [TODOGroup's template](https://github.com/todogroup/opencodeofconduct). See their [nicely formatted version](http://todogroup.org/opencodeofconduct/#Open+Code+of+Conduct) and consider adopting it for your own project(s) as well!

@@ -5,11 +5,13 @@ Terasology
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by aiming for the NPC-helper and caretaker focus from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
-Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft. You can check out his blog at [Moving Blocks!](http://blog.movingblocks.net)
+Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft.
 
 The creators of Terasology are a diverse mix of software developers, game testers, graphic artists, and musicians. Get involved by checking out our [Community Portal](http://forum.terasology.org/index.php), [Facebook Page](http://www.facebook.com/pages/Terasology/248329655219905), [Twitter](https://twitter.com/Terasology), [G+](https://plus.google.com/b/103835217961917018533), or [Reddit](http://www.reddit.com/r/Terasology)
 
 Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology).
+
+We encourage contributions from anybody and try to keep a warm and friendly community. See [our published code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/CONDUCT.md) adopted from the [template by the TODOGroup](https://github.com/todogroup/opencodeofconduct).
 
 [![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
 [![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
@@ -90,7 +92,7 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [Home] - Increase viewing distance
 * [End] - Decrease viewing distance
 * [Escape] - Show/hide the game menu screen
-* [`] OR [F1] - Toggle full developer console (the "grave" key, usually above tab)
+* [F1] OR [`] - Toggle full developer console (the "grave" key, usually above tab)
 * [F2] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled)
 * [F3] - Toggle debug mode and information
 * [F5] - Show behavior tree editor
@@ -125,7 +127,7 @@ More or completely alternative line-ups with certain modules / world types selec
 Console Commands
 --------
 
-Press the `grave` key (usually the \` key immediately above `tab`) to show the in-game console. Mostly everything is case insensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
+Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to show the in-game console. Mostly everything is case insensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
 
 * help - Show in-game help (more thorough)
 * search [something] - searches for any command, prefab, or asset with "something" in its name, help text, etc
@@ -301,6 +303,6 @@ Soundtrack and Sound Effects
 Additional Notes
 --------
 
-Terasology's base graphics use the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
+A few of Terasology's base textures use the awesome [Good Morning Craft](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1227051-16x-good-morning-craft) texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
 
-Our default font is ["Noto" by Google](http://www.google.com/get/noto), which is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) just like Terasology.
+Our default font is ["Noto" by Google](http://www.google.com/get/noto), which is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) just like Terasology. More on the [font in the wiki](https://github.com/MovingBlocks/Terasology/wiki/Text-and-Font).
