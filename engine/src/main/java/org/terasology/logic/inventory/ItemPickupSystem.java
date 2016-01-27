@@ -22,6 +22,7 @@ import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -31,6 +32,7 @@ import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
@@ -41,9 +43,12 @@ public class ItemPickupSystem extends BaseComponentSystem {
 
     @In
     private InventoryManager inventoryManager;
+    @In
+    EntitySystemLibrary library;
+
 
     @ReceiveEvent(components = PickupComponent.class)
-    public void onBump(CollideEvent event, EntityRef entity) {
+    public void onBumpGiveItemToEntity(CollideEvent event, EntityRef entity) {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
 
         if (inventoryManager.giveItem(event.getOtherEntity(), entity, pickupComponent.itemEntity)) {
@@ -54,7 +59,7 @@ public class ItemPickupSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onBlockItemDropped(ItemDroppedEvent event, EntityRef itemEntity, BlockItemComponent blockItemComponent) {
+    public void onBlockItemDroppedOnAuthorityAddPhysics(ItemDroppedEvent event, EntityRef itemEntity, BlockItemComponent blockItemComponent) {
         EntityBuilder builder = event.getPickup();
         BlockFamily blockFamily = blockItemComponent.blockFamily;
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
@@ -71,16 +76,12 @@ public class ItemPickupSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onItemDropped(ItemDroppedEvent event, EntityRef itemEntity, MeshComponent meshComponent) {
-        EntityBuilder builder = event.getPickup();
-        MeshComponent builderMeshComponent = builder.getComponent(MeshComponent.class);
-        if (builderMeshComponent != null) {
-            builderMeshComponent.mesh = meshComponent.mesh;
-            builderMeshComponent.material = meshComponent.material;
-            builderMeshComponent.color = meshComponent.color;
-            builderMeshComponent.hideFromOwner = meshComponent.hideFromOwner;
-            builderMeshComponent.translucent = meshComponent.translucent;
-            builder.saveComponent(builderMeshComponent);
-        }
+    public void copyDroppedItemMesh(ItemDroppedEvent event, EntityRef item, MeshComponent meshComponent) {
+        event.getPickup().addComponent(library.getComponentLibrary().copy(meshComponent));
+    }
+
+    @ReceiveEvent
+    public void copyDroppedItemLight(ItemDroppedEvent event, EntityRef item, LightComponent lightComponent) {
+        event.getPickup().addComponent(library.getComponentLibrary().copy(lightComponent));
     }
 }

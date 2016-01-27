@@ -19,7 +19,6 @@ import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
-
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
@@ -129,16 +127,12 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, MeshComponent.class})
-    public void onLocalMesh(OnChangedComponent event, EntityRef entity) {
-        removeMesh(entity);
-        addMesh(entity);
-    }
-
     @ReceiveEvent(components = {MeshComponent.class})
     public void onChangeMesh(OnChangedComponent event, EntityRef entity) {
         removeMesh(entity);
-        addMesh(entity);
+        if (entity.hasComponent(LocationComponent.class)) {
+            addMesh(entity);
+        }
     }
 
     private void removeMesh(EntityRef entity) {

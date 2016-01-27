@@ -37,10 +37,8 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class ItemSystem extends BaseComponentSystem {
+public class ItemAuthoritySystem extends BaseComponentSystem {
     @In
     private InventoryManager inventoryManager;
 
@@ -111,7 +109,7 @@ public class ItemSystem extends BaseComponentSystem {
                 return;
             }
 
-            meshComponent.mesh = blockFamily.getArchetypeBlock().getMesh();
+            meshComponent.mesh = blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
             meshComponent.material = Assets.getMaterial("engine:terrain").get();
 
             if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !entity.hasComponent(LightComponent.class)) {
