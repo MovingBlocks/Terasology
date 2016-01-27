@@ -356,6 +356,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
 
         long currentTime = time.getGameTimeInMs();
+        // TODO: send this data back to the server so that other players can visualize this item use
+        // TODO: extract this into an event someplace so that this code does not have to exist both here and in CharacterInventorySystem
         characterHeldItemComponent.lastItemUsedTime = currentTime;
         characterHeldItemComponent.nextItemUseTime = currentTime;
         ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);

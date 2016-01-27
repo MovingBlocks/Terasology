@@ -28,9 +28,10 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
-import org.terasology.logic.characters.events.HeldItemChangedEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.inventory.PickupComponent;
+import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
@@ -56,6 +57,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     private Time time;
 
     private EntityRef handEntity;
+    private EntityRef currentHeldItem;
 
     private EntityRef getHandEntity() {
         if (handEntity == null) {
@@ -118,8 +120,26 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     @ReceiveEvent
-    public void onHeldItemChanged(HeldItemChangedEvent event, EntityRef character, CharacterComponent characterComponents) {
-        linkHeldItemLocationForLocalPlayer(character, event.getNewItem(), event.getOldItem());
+    public void onHeldItemActivated(OnActivatedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
+        linkHeldItemLocationForLocalPlayer(character, heldItemComponent.selectedItem, currentHeldItem);
+        currentHeldItem = heldItemComponent.selectedItem;
+    }
+
+    @ReceiveEvent
+    public void onDroppedItemRemoveClientSideLocationComponent(ItemDroppedEvent event, EntityRef item, LocationComponent locationComponent) {
+        // This is only needed on local single player because when a dropped item is split from the original held item (only partially dropped), the item nested
+        // inside the pickupComponent will have a copy of the LocationComponent added on the client side and will continue rendering in front of the camera.
+        // This does not happen on a remote client because the pickupComponent.itemEntity is not replicated across the network.
+        PickupComponent pickupComponent = event.getPickup().getComponent(PickupComponent.class);
+        if (pickupComponent != null) {
+            pickupComponent.itemEntity.removeComponent(LocationComponent.class);
+        }
+    }
+
+    @ReceiveEvent
+    public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
+        linkHeldItemLocationForLocalPlayer(character, heldItemComponent.selectedItem, currentHeldItem);
+        currentHeldItem = heldItemComponent.selectedItem;
     }
 
     void linkHeldItemLocationForLocalPlayer(EntityRef character, EntityRef newItem, EntityRef oldItem) {
