@@ -5,7 +5,6 @@
     },
     "Item": {
         "icon": "engine:items#pick",
-        "renderWithIcon": true,
         "damageType": "pickaxeDamage",
         "baseDamage" : 2
     }
