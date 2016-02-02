@@ -16,9 +16,6 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
@@ -38,12 +35,9 @@ import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
 import java.security.Policy;
@@ -51,8 +45,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- */
 public class ModuleManagerImpl implements ModuleManager {
 
     private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
@@ -94,71 +86,16 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     private void setupSandbox() {
-        // TODO: This one org.terasology entry is a hack and needs a proper fix
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("org.terasology.world.biomes");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("org.terasology.math.geom");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.lang");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.lang.invoke");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.lang.ref");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.math");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent.atomic");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.concurrent.locks");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.function");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.regex");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.util.stream");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt.geom");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.awt.image");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.annotations");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.cache");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.collect");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.base");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.math");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.primitives");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.google.common.util.concurrent");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.decorator");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.function");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.iterator");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.iterator.hash");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.list");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.list.array");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.list.linked");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.map");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.map.hash");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.map.custom_hash");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.procedure");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.procedure.array");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.queue");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.set");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.set.hash");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.stack");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.stack.array");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("gnu.trove.strategy");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("javax.vecmath");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.yourkit.runtime");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("com.bulletphysics.linearmath");
-        permissionProviderFactory.getBasePermissionSet().addAPIPackage("sun.reflect");
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(IOException.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(InvocationTargetException.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(LoggerFactory.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(Logger.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(Reader.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(StringReader.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(BufferedReader.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(java.awt.datatransfer.UnsupportedFlavorException.class);
+        ExternalApiWhitelist.CLASSES.stream().forEach(clazz ->
+                permissionProviderFactory.getBasePermissionSet().addAPIClass(clazz));
+        ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
+                permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
 
         APIScanner apiScanner = new APIScanner(permissionProviderFactory);
         registry.stream().filter(Module::isOnClasspath).forEach(apiScanner::scan);
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
-
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(java.nio.ByteBuffer.class);
-        permissionProviderFactory.getBasePermissionSet().addAPIClass(java.nio.IntBuffer.class);
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());
