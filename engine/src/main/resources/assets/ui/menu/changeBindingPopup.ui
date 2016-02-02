@@ -90,13 +90,13 @@
                                 "contents" : [
                                     {
                                         "type" : "UIButton",
-                                        "text" : "${engine:menu#dialog-cancel}",
-                                        "id" : "cancel"
+                                        "text" : "${engine:menu#dialog-ok}",
+                                        "id" : "ok"
                                     },
                                     {
                                         "type" : "UIButton",
-                                        "text" : "${engine:menu#dialog-ok}",
-                                        "id" : "ok"
+                                        "text" : "${engine:menu#dialog-cancel}",
+                                        "id" : "cancel"
                                     }
                                 ],
                                 "layoutInfo" : {
