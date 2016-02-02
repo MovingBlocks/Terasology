@@ -37,9 +37,10 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -69,20 +70,12 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private InventoryManager inventoryManager;
 
-    private PickupBuilder pickupBuilder;
-
     /**
      * TODO: Include the Character collision group
      * Including the character collision group was removed because tracing from the character's gaze position would hit
      * the initiating character instead of the ground when looking downwards.
      */
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
-
-
-    @Override
-    public void initialise() {
-        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
-    }
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DestroyEvent event, EntityRef entity) {
@@ -258,8 +251,18 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             return;
         }
 
-        EntityRef pickup = pickupBuilder.createPickupFor(event.getItem(), event.getNewPosition(), 200);
-        pickup.send(new ImpulseEvent(event.getImpulse()));
+        // remove a single item from the stack
+        EntityRef pickupItem = event.getItem();
+        EntityRef owner = pickupItem.getOwner();
+        if (owner.hasComponent(InventoryComponent.class)) {
+            final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
+            if (removedItem != null) {
+                pickupItem = removedItem;
+            }
+        }
+
+        pickupItem.send(new DropItemEvent(event.getNewPosition()));
+        pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }
 
     @Override

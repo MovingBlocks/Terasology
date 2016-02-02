@@ -15,8 +15,6 @@
  */
 package org.terasology.world.block.entity;
 
-import java.math.RoundingMode;
-
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -33,7 +31,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.FullHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.geom.Vector3f;
@@ -54,6 +52,8 @@ import org.terasology.world.block.items.OnBlockToItem;
 import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 import org.terasology.world.block.sounds.BlockSounds;
+
+import java.math.RoundingMode;
 
 /**
  * Event handler for events affecting block entities
@@ -78,13 +78,11 @@ public class BlockEntitySystem extends BaseComponentSystem {
     private BlockManager blockManager;
 
     private BlockItemFactory blockItemFactory;
-    private PickupBuilder pickupBuilder;
     private Random random;
 
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
         random = new FastRandom();
     }
 
@@ -176,8 +174,8 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     private void processDropping(EntityRef item, Vector3i location) {
-        EntityRef pickup = pickupBuilder.createPickupFor(item, location.toVector3f(), 60);
-        pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+        item.send(new DropItemEvent(location.toVector3f()));
+        item.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     @ReceiveEvent

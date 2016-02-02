@@ -25,7 +25,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -100,11 +100,10 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
                 }
 
                 if (initialEvent) {
-                    PickupBuilder pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
                     for (int i = 0; i < GATHERING_INVENTORY_SLOT_COUNT; i++) {
                         EntityRef item = inventoryManager.getItemInSlot(gatheringEntity, i);
                         if (item.exists()) {
-                            pickupBuilder.createPickupFor(item, event.getBlockPosition().toVector3f(), 60, true);
+                            item.send(new DropItemEvent(event.getBlockPosition().toVector3f()));
                         }
                     }
                 }

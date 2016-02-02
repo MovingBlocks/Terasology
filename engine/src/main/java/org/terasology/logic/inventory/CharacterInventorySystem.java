@@ -16,7 +16,10 @@
 
 package org.terasology.logic.inventory;
 
+import org.terasology.asset.Assets;
+import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -36,6 +39,7 @@ import org.terasology.logic.inventory.events.ChangeSelectedInventorySlotRequest;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.physics.events.CollideEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.hud.HudToolbar;
@@ -54,6 +58,9 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
+    @In
+    private InventoryManager inventoryManager;
+
     private long lastInteraction;
     private long lastTimeThrowInteraction;
 
@@ -66,7 +73,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void onChangeSelectedInventorySlotRequested(ChangeSelectedInventorySlotRequest request, EntityRef character, SelectedInventorySlotComponent selectedInventorySlotComponent) {
+    public void onChangeSelectedInventorySlotRequested(ChangeSelectedInventorySlotRequest request, EntityRef character,
+                                                       SelectedInventorySlotComponent selectedInventorySlotComponent) {
         if (request.getSlot() >= 0 && request.getSlot() < 10 && request.getSlot() != selectedInventorySlotComponent.slot) {
             EntityRef newItem = InventoryUtils.getItemAt(character, request.getSlot());
             selectedInventorySlotComponent.slot = request.getSlot();
@@ -189,5 +197,23 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         return Math.min(1.0f, dropPower);
     }
 
+
+    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    public void onBumpGiveItemToEntity(CollideEvent event, EntityRef entity, PickupComponent pickupComponent) {
+        if (event.getOtherEntity().hasComponent(InventoryComponent.class) && event.getOtherEntity().hasComponent(CharacterComponent.class)) {
+            // remove all the components added from the pickup prefab
+            ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
+            if (itemComponent != null) {
+                for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
+                    entity.removeComponent(component.getClass());
+                }
+            }
+
+            if (inventoryManager.giveItem(event.getOtherEntity(), entity, entity)) {
+
+                event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot").get(), 1.0f));
+            }
+        }
+    }
 
 }

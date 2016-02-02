@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,25 @@
  */
 package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.network.ServerEvent;
 
 /**
+ * Fire this event on an item in order for the authority to add the necessary components to put it in the world.
  */
-public class ItemDroppedEvent implements Event {
+@ServerEvent
+public class DropItemEvent implements Event {
+    private Vector3f position;
 
-    private EntityBuilder pickup;
-
-    public ItemDroppedEvent(EntityBuilder pickupEntity) {
-        this.pickup = pickupEntity;
+    public DropItemEvent() {
     }
 
-    public EntityBuilder getPickup() {
-        return pickup;
+    public DropItemEvent(Vector3f position) {
+        this.position = position;
+    }
+
+    public Vector3f getPosition() {
+        return position;
     }
 }

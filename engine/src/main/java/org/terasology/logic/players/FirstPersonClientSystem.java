@@ -19,6 +19,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -30,8 +31,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.inventory.PickupComponent;
-import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
@@ -58,6 +57,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     private EntityRef handEntity;
     private EntityRef currentHeldItem;
+    private boolean relinkHeldItem;
 
     private EntityRef getHandEntity() {
         if (handEntity == null) {
@@ -70,7 +70,8 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     @ReceiveEvent
-    public void ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent event, EntityRef camera, FirstPersonHeldItemMountPointComponent firstPersonHeldItemMountPointComponent) {
+    public void ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent event, EntityRef camera,
+                                                           FirstPersonHeldItemMountPointComponent firstPersonHeldItemMountPointComponent) {
         if (!firstPersonHeldItemMountPointComponent.mountPointEntity.exists()) {
             EntityBuilder builder = entityManager.newBuilder("engine:FirstPersonHeldItemMountPoint");
             builder.setPersistent(false);
@@ -121,25 +122,25 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @ReceiveEvent
     public void onHeldItemActivated(OnActivatedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        linkHeldItemLocationForLocalPlayer(character, heldItemComponent.selectedItem, currentHeldItem);
+        EntityRef oldHeldItem = currentHeldItem;
         currentHeldItem = heldItemComponent.selectedItem;
-    }
-
-    @ReceiveEvent
-    public void onDroppedItemRemoveClientSideLocationComponent(ItemDroppedEvent event, EntityRef item, LocationComponent locationComponent) {
-        // This is only needed on local single player because when a dropped item is split from the original held item (only partially dropped), the item nested
-        // inside the pickupComponent will have a copy of the LocationComponent added on the client side and will continue rendering in front of the camera.
-        // This does not happen on a remote client because the pickupComponent.itemEntity is not replicated across the network.
-        PickupComponent pickupComponent = event.getPickup().getComponent(PickupComponent.class);
-        if (pickupComponent != null) {
-            pickupComponent.itemEntity.removeComponent(LocationComponent.class);
-        }
+        linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
     }
 
     @ReceiveEvent
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        linkHeldItemLocationForLocalPlayer(character, heldItemComponent.selectedItem, currentHeldItem);
+        EntityRef oldHeldItem = currentHeldItem;
         currentHeldItem = heldItemComponent.selectedItem;
+        linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
+    }
+
+    @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    public void onLocationRemovedAddClientSideLocation(BeforeDeactivateComponent event, EntityRef entityRef, LocationComponent locationComponent) {
+        // when in a remote client situation,  the remove LocationComponent happens after the CharacterHeldItemComponent is changed.
+        // So this allows re-adding the client side LocationComponent after this
+        if (entityRef.equals(currentHeldItem)) {
+            relinkHeldItem = true;
+        }
     }
 
     void linkHeldItemLocationForLocalPlayer(EntityRef character, EntityRef newItem, EntityRef oldItem) {
@@ -185,14 +186,22 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
      */
     @Override
     public void update(float delta) {
+        // relink the held item if its location got removed from an item transition that removed its location
+        if (relinkHeldItem) {
+            linkHeldItemLocationForLocalPlayer(localPlayer.getCharacterEntity(), currentHeldItem, null);
+            relinkHeldItem = false;
+        }
+
         // get the first person mount point and rotate it away from the camera
         CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
         FirstPersonHeldItemMountPointComponent mountPointComponent = localPlayer.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
-        LocationComponent locationComponent = mountPointComponent.mountPointEntity.getComponent(LocationComponent.class);
+        if (characterHeldItemComponent == null
+                || mountPointComponent == null) {
+            return;
+        }
 
-        if (characterHeldItemComponent == null ||
-                mountPointComponent == null ||
-                locationComponent == null) {
+        LocationComponent locationComponent = mountPointComponent.mountPointEntity.getComponent(LocationComponent.class);
+        if (locationComponent == null) {
             return;
         }
 
