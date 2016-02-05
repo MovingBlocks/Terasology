@@ -16,7 +16,7 @@
 package org.terasology.engine.module;
 
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,79 +25,73 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.Set;
 
 public final class ExternalApiWhitelist {
-    public static final Set<Class<?>> CLASSES;
-    public static final Set<String> PACKAGES;
+    public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
+            // TODO: This one org.terasology entry is a hack and needs a proper fix
+            .add("org.terasology.world.biomes")
+            .add("org.terasology.math.geom")
+            .add("java.lang")
+            .add("java.lang.invoke")
+            .add("java.lang.ref")
+            .add("java.math")
+            .add("java.util")
+            .add("java.util.concurrent")
+            .add("java.util.concurrent.atomic")
+            .add("java.util.concurrent.locks")
+            .add("java.util.function")
+            .add("java.util.regex")
+            .add("java.util.stream")
+            .add("java.awt")
+            .add("java.awt.geom")
+            .add("java.awt.image")
+            .add("com.google.common.annotations")
+            .add("com.google.common.cache")
+            .add("com.google.common.collect")
+            .add("com.google.common.base")
+            .add("com.google.common.math")
+            .add("com.google.common.primitives")
+            .add("com.google.common.util.concurrent")
+            .add("gnu.trove")
+            .add("gnu.trove.decorator")
+            .add("gnu.trove.function")
+            .add("gnu.trove.iterator")
+            .add("gnu.trove.iterator.hash")
+            .add("gnu.trove.list")
+            .add("gnu.trove.list.array")
+            .add("gnu.trove.list.linked")
+            .add("gnu.trove.map")
+            .add("gnu.trove.map.hash")
+            .add("gnu.trove.map.custom_hash")
+            .add("gnu.trove.procedure")
+            .add("gnu.trove.procedure.array")
+            .add("gnu.trove.queue")
+            .add("gnu.trove.set")
+            .add("gnu.trove.set.hash")
+            .add("gnu.trove.stack")
+            .add("gnu.trove.stack.array")
+            .add("gnu.trove.strategy")
+            .add("javax.vecmath")
+            .add("com.yourkit.runtime")
+            .add("com.bulletphysics.linearmath")
+            .add("sun.reflect")
+            .build();
+
+    public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
+            .add(com.esotericsoftware.reflectasm.MethodAccess.class)
+            .add(IOException.class)
+            .add(InvocationTargetException.class)
+            .add(LoggerFactory.class)
+            .add(Logger.class)
+            .add(Reader.class)
+            .add(StringReader.class)
+            .add(BufferedReader.class)
+            .add(java.awt.datatransfer.UnsupportedFlavorException.class)
+            .add(java.nio.ByteBuffer.class)
+            .add(java.nio.IntBuffer.class)
+            .build();
 
     private ExternalApiWhitelist() {
-    }
-
-    static {
-        Set<String> tmpPackages = Sets.newHashSet();
-        // TODO: This one org.terasology entry is a hack and needs a proper fix
-        tmpPackages.add("org.terasology.world.biomes");
-        tmpPackages.add("org.terasology.math.geom");
-        tmpPackages.add("java.lang");
-        tmpPackages.add("java.lang.invoke");
-        tmpPackages.add("java.lang.ref");
-        tmpPackages.add("java.math");
-        tmpPackages.add("java.util");
-        tmpPackages.add("java.util.concurrent");
-        tmpPackages.add("java.util.concurrent.atomic");
-        tmpPackages.add("java.util.concurrent.locks");
-        tmpPackages.add("java.util.function");
-        tmpPackages.add("java.util.regex");
-        tmpPackages.add("java.util.stream");
-        tmpPackages.add("java.awt");
-        tmpPackages.add("java.awt.geom");
-        tmpPackages.add("java.awt.image");
-        tmpPackages.add("com.google.common.annotations");
-        tmpPackages.add("com.google.common.cache");
-        tmpPackages.add("com.google.common.collect");
-        tmpPackages.add("com.google.common.base");
-        tmpPackages.add("com.google.common.math");
-        tmpPackages.add("com.google.common.primitives");
-        tmpPackages.add("com.google.common.util.concurrent");
-        tmpPackages.add("gnu.trove");
-        tmpPackages.add("gnu.trove.decorator");
-        tmpPackages.add("gnu.trove.function");
-        tmpPackages.add("gnu.trove.iterator");
-        tmpPackages.add("gnu.trove.iterator.hash");
-        tmpPackages.add("gnu.trove.list");
-        tmpPackages.add("gnu.trove.list.array");
-        tmpPackages.add("gnu.trove.list.linked");
-        tmpPackages.add("gnu.trove.map");
-        tmpPackages.add("gnu.trove.map.hash");
-        tmpPackages.add("gnu.trove.map.custom_hash");
-        tmpPackages.add("gnu.trove.procedure");
-        tmpPackages.add("gnu.trove.procedure.array");
-        tmpPackages.add("gnu.trove.queue");
-        tmpPackages.add("gnu.trove.set");
-        tmpPackages.add("gnu.trove.set.hash");
-        tmpPackages.add("gnu.trove.stack");
-        tmpPackages.add("gnu.trove.stack.array");
-        tmpPackages.add("gnu.trove.strategy");
-        tmpPackages.add("javax.vecmath");
-        tmpPackages.add("com.yourkit.runtime");
-        tmpPackages.add("com.bulletphysics.linearmath");
-        tmpPackages.add("sun.reflect");
-        PACKAGES = Collections.unmodifiableSet(tmpPackages);
-
-        Set<Class<?>> tmpClasses = Sets.newHashSet();
-        tmpClasses.add(com.esotericsoftware.reflectasm.MethodAccess.class);
-        tmpClasses.add(IOException.class);
-        tmpClasses.add(InvocationTargetException.class);
-        tmpClasses.add(LoggerFactory.class);
-        tmpClasses.add(Logger.class);
-        tmpClasses.add(Reader.class);
-        tmpClasses.add(StringReader.class);
-        tmpClasses.add(BufferedReader.class);
-        tmpClasses.add(java.awt.datatransfer.UnsupportedFlavorException.class);
-        tmpClasses.add(java.nio.ByteBuffer.class);
-        tmpClasses.add(java.nio.IntBuffer.class);
-        CLASSES = Collections.unmodifiableSet(tmpClasses);
     }
 }
