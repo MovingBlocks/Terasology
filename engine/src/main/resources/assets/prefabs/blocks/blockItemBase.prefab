@@ -3,11 +3,24 @@
     "Item" : {
         "consumedOnUse" : true,
         "usage" : "ON_BLOCK",
-        "pickupPrefab" : "engine:blockItemPickup"
+        "pickupPrefab": "engine:blockItemPickup",
+        "cooldownTime": 200
     },
     "BlockItem" : {
     },
-    "Network" : {
-        "replicateMode" : "RELEVANT"
+    "RenderItemBlockMesh": {
+    },
+    "FirstPersonHeldItemTransform": {
+        "rotateDegrees": [
+            0,
+            0,
+            0
+        ],
+        "translate": [
+            -0.1,
+            -0.5,
+            0
+        ],
+        "scale": 0.75
     }
 }

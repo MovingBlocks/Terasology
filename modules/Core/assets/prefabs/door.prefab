@@ -5,7 +5,6 @@
     },
     "Item": {
         "icon": "engine:items#door",
-        "renderWithIcon": true,
         "stackId": "door",
         "consumedOnUse": true,
         "usage": "ON_BLOCK"

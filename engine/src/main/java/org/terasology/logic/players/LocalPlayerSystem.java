@@ -47,6 +47,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
@@ -343,7 +344,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
-        if (!event.isDown() || time.getGameTimeInMs() - lastItemUse < 200) {
+        if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
             return;
         }
 
@@ -354,8 +355,17 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
 
-        lastItemUse = time.getGameTimeInMs();
-        characterHeldItemComponent.handAnimation = 0.5f;
+        long currentTime = time.getGameTimeInMs();
+        // TODO: send this data back to the server so that other players can visualize this item use
+        // TODO: extract this into an event someplace so that this code does not have to exist both here and in CharacterInventorySystem
+        characterHeldItemComponent.lastItemUsedTime = currentTime;
+        characterHeldItemComponent.nextItemUseTime = currentTime;
+        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
+        if (itemComponent != null) {
+            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
+        } else {
+            characterHeldItemComponent.nextItemUseTime += 200;
+        }
         entity.saveComponent(characterHeldItemComponent);
         event.consume();
     }

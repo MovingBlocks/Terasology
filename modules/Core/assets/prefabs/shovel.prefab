@@ -5,7 +5,6 @@
     },
     "Item": {
         "icon": "engine:items#shovel",
-        "renderWithIcon": true,
         "damageType": "shovelDamage"
     }
 }

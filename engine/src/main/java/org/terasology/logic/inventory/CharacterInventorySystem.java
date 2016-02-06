@@ -20,6 +20,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.inventory.DropItemButton;
@@ -56,7 +57,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     private long lastInteraction;
     private long lastTimeThrowInteraction;
 
-    @ReceiveEvent
+    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void syncSelectedSlotWithHeldItem(InventorySlotChangedEvent event, EntityRef entityRef,
                                              SelectedInventorySlotComponent selectedInventorySlotComponent) {
         if (selectedInventorySlotComponent.slot == event.getSlot()) {
@@ -64,7 +65,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent
+    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onChangeSelectedInventorySlotRequested(ChangeSelectedInventorySlotRequest request, EntityRef character, SelectedInventorySlotComponent selectedInventorySlotComponent) {
         if (request.getSlot() >= 0 && request.getSlot() < 10 && request.getSlot() != selectedInventorySlotComponent.slot) {
             EntityRef newItem = InventoryUtils.getItemAt(character, request.getSlot());
@@ -74,45 +75,53 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
     public void onNextItem(ToolbarNextButton event, EntityRef entity, SelectedInventorySlotComponent selectedInventorySlotComponent) {
         int nextSlot = (selectedInventorySlotComponent.slot + 1) % 10;
         localPlayer.getCharacterEntity().send(new ChangeSelectedInventorySlotRequest(nextSlot));
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity, SelectedInventorySlotComponent selectedInventorySlotComponent) {
         int prevSlot = (selectedInventorySlotComponent.slot + 9) % 10;
         localPlayer.getCharacterEntity().send(new ChangeSelectedInventorySlotRequest(prevSlot));
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
     public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
         localPlayer.getCharacterEntity().send(new ChangeSelectedInventorySlotRequest(event.getSlot()));
         event.consume();
     }
 
 
-    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
-    public void onAttackRequest(AttackButton event, EntityRef entity) {
-        if (!event.isDown() || time.getGameTimeInMs() - lastInteraction < 200) {
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class}, netFilter = RegisterMode.CLIENT)
+    public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+        if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
             return;
         }
 
-        CharacterHeldItemComponent characterHeldItemComponent = entity.getComponent(CharacterHeldItemComponent.class);
         EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
 
         entity.send(new AttackRequest(selectedItemEntity));
 
-        lastInteraction = time.getGameTimeInMs();
-        characterHeldItemComponent.handAnimation = 0.5f;
+        long currentTime = time.getGameTimeInMs();
+        // TODO: send this data back to the server so that other players can visualize this attack
+        // TODO: extract this into an event someplace so that this code does not have to exist both here and in LocalPlayerSystem
+        characterHeldItemComponent.lastItemUsedTime = currentTime;
+        characterHeldItemComponent.nextItemUseTime = currentTime;
+        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
+        if (itemComponent != null) {
+            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
+        } else {
+            characterHeldItemComponent.nextItemUseTime += 200;
+        }
         entity.saveComponent(characterHeldItemComponent);
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class}, netFilter = RegisterMode.CLIENT)
     public void onDropItemRequest(DropItemButton event, EntityRef entity) {
         CharacterHeldItemComponent characterHeldItemComponent = entity.getComponent(CharacterHeldItemComponent.class);
         EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
@@ -155,15 +164,13 @@ public class CharacterInventorySystem extends BaseComponentSystem {
                     impulseVector,
                     newPosition));
 
-            characterHeldItemComponent.handAnimation = 0.5f;
+            characterHeldItemComponent.lastItemUsedTime = time.getGameTimeInMs();
+            entity.saveComponent(characterHeldItemComponent);
 
             resetDropMark();
         }
 
-        entity.saveComponent(characterHeldItemComponent);
         event.consume();
-
-
     }
 
     public void resetDropMark() {

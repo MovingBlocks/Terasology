@@ -19,20 +19,15 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.ChangeHeldItemRequest;
-import org.terasology.logic.characters.events.HeldItemChangedEvent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.registry.In;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.LightFadeComponent;
 import org.terasology.world.block.items.BlockItemComponent;
 
-@RegisterSystem
-public class CharacterHeldItemSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-    @In
-    private LocalPlayer localPlayer;
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class CharacterHeldItemAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onChangeHeldItemRequest(ChangeHeldItemRequest event, EntityRef character,
@@ -40,14 +35,8 @@ public class CharacterHeldItemSystem extends BaseComponentSystem implements Upda
         EntityRef oldItem = characterHeldItemComponent.selectedItem;
         characterHeldItemComponent.selectedItem = event.getItem();
         character.saveComponent(characterHeldItemComponent);
-        character.send(new HeldItemChangedEvent(oldItem, event.getItem()));
+        updateLightFromItem(character, oldItem, event.getItem());
     }
-
-    @ReceiveEvent(components = CharacterComponent.class)
-    public void onHeldItemChanged(HeldItemChangedEvent event, EntityRef entity) {
-        updateLightFromItem(entity, event.getOldItem(), event.getNewItem());
-    }
-
     @ReceiveEvent
     public void onBlockItemDestroyedRemoveLight(BeforeDeactivateComponent event, EntityRef item, BlockItemComponent blockItemComponent) {
         if (blockItemComponent.blockFamily == null || blockItemComponent.blockFamily.getArchetypeBlock().getLuminance() == 0) {
@@ -118,19 +107,5 @@ public class CharacterHeldItemSystem extends BaseComponentSystem implements Upda
             return blockItem.blockFamily.getArchetypeBlock().getLuminance();
         }
         return 0;
-    }
-
-
-    @Override
-    public void update(float delta) {
-        if (!localPlayer.isValid()) {
-            return;
-        }
-
-        EntityRef characterEntity = localPlayer.getCharacterEntity();
-
-        // Hand animation update
-        CharacterHeldItemComponent characterHeldItemComponent = characterEntity.getComponent(CharacterHeldItemComponent.class);
-        characterHeldItemComponent.handAnimation = Math.max(0, characterHeldItemComponent.handAnimation - 2.5f * delta);
     }
 }

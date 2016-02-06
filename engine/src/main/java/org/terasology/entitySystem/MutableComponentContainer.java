@@ -37,4 +37,12 @@ public interface MutableComponentContainer extends ComponentContainer {
      * @param component
      */
     void saveComponent(Component component);
+
+    default void addOrSaveComponent(Component component) {
+        if (hasComponent(component.getClass())) {
+            saveComponent(component);
+        } else {
+            addComponent(component);
+        }
+    }
 }

@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters.events;
+package org.terasology.logic.players;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.math.geom.Vector3f;
 
 /**
+ * Only used by the client side so that held items can be positioned in line with the camera
  */
-public class HeldItemChangedEvent implements Event {
-    private EntityRef oldItem;
-    private EntityRef newItem;
-
-    public HeldItemChangedEvent(EntityRef oldItem, EntityRef newItem) {
-        this.oldItem = oldItem;
-        this.newItem = newItem;
-    }
-
-    public EntityRef getOldItem() {
-        return oldItem;
-    }
-
-    public EntityRef getNewItem() {
-        return newItem;
-    }
+public class FirstPersonHeldItemMountPointComponent implements Component {
+    @Owns
+    public EntityRef mountPointEntity = EntityRef.NULL;
+    public Vector3f rotateDegrees = Vector3f.zero();
+    public Vector3f translate = Vector3f.zero();
+    public float scale = 1f;
 }

@@ -5,7 +5,6 @@
     },
     "Item" : {
         "icon" : "engine:items#Axe",
-        "renderWithIcon" : true,
         "baseDamage" : 50
     }
 }
