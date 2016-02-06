@@ -17,6 +17,7 @@ package org.terasology.documentation;
 
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
+import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
@@ -25,6 +26,7 @@ import org.terasology.testUtil.ModuleManagerFactory;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Enumerates all classes and packages that are annotated with {@link API}.
@@ -105,6 +107,10 @@ public final class ApiScraper {
                     System.out.println("Unknown protocol for: " + apiClass + ", came from " + location);
             }
         }
+        sortedApi.putAll("external", ExternalApiWhitelist.CLASSES.stream()
+                .map(clazz->clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
+        sortedApi.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
+                .map(packagee->packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
         System.out.println("# Modding API:\n");
         for (String key : sortedApi.keySet()) {
