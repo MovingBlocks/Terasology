@@ -5,7 +5,7 @@ If you would like to contribute code, documentation, or other assets you can do 
 
 *When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable as possible.*
 
-Read on to learn more. For questions please join us in our [forum](http://forum.terasology.org/forum) or on `#terasology` (irc.freenode.net).
+Read on for an overview and [check the wiki for more details](https://github.com/MovingBlocks/Terasology/wiki). For questions please join us in our [forum](http://forum.terasology.org/forum) or on `#terasology` (irc.freenode.net).
 
 File an Issue
 -------------
