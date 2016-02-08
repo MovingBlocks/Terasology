@@ -98,4 +98,4 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 
 Some of the modules in action:
 
-![Terasology](/images/PopulatedVillage.jpg "Terasology")
+![Terasology](docs/images/PopulatedVillage.jpg "Terasology")
