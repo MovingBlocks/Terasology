@@ -19,13 +19,13 @@ import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
+import org.terasology.module.sandbox.API;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
+@API
 public class BlockSounds extends Asset<BlockSoundsData> {
     private final List<StaticSound> stepSounds = new ArrayList<>();
     private final List<StaticSound> destroySounds = new ArrayList<>();

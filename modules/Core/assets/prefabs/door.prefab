@@ -21,7 +21,6 @@
         "regenRate": 1,
         "waitBeforeRegen": 2,
         "destroyEntityOnNoHealth" : true
-
     },
     "BlockDropGrammar": {
         "itemDrops": ["Core:door"]

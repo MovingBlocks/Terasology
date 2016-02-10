@@ -137,7 +137,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         }
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
     public void onLocationRemovedAddClientSideLocation(BeforeDeactivateComponent event, EntityRef entityRef, LocationComponent locationComponent) {
         // when in a remote client situation,  the remove LocationComponent happens after the CharacterHeldItemComponent is changed.
         // So this allows re-adding the client side LocationComponent after this

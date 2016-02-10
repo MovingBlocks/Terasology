@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -42,7 +41,6 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
@@ -67,10 +65,9 @@ import java.util.Set;
 /**
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
-
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
-            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class);
+            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
     private static final float BLOCK_REGEN_SECONDS = 4.0f;
 
     private EngineEntityManager entityManager;
@@ -263,22 +260,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         blockComponent.setBlock(type);
         blockEntity.saveComponent(blockComponent);
 
-        HealthComponent health = blockEntity.getComponent(HealthComponent.class);
-        if (health == null && type.isDestructible()) {
-            blockEntity.addComponent(new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f));
-        } else if (health != null && !type.isDestructible()) {
-            blockEntity.removeComponent(HealthComponent.class);
-        } else if (health != null && type.isDestructible()) {
-            health.maxHealth = type.getHardness();
-            health.currentHealth = Math.min(health.currentHealth, health.maxHealth);
-            blockEntity.saveComponent(health);
-        }
-
         for (Component comp : newEntityBuilder.iterateComponents()) {
             copyIntoPrefab(blockEntity, comp, retainComponents);
         }
-
-
     }
 
     @SuppressWarnings("unchecked")
@@ -312,10 +296,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
         builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
         builder.addComponent(new BlockComponent(block, blockPosition));
-        if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
-            // Block regen should always take the same amount of time,  regardless of its hardness
-            builder.addComponent(new HealthComponent(block.getHardness(), block.getHardness() / BLOCK_REGEN_SECONDS, 1.0f));
-        }
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {
             builder.addComponent(new NetworkComponent());

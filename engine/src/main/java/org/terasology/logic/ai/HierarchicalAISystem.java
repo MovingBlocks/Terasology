@@ -26,8 +26,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
-import org.terasology.logic.health.DoDamageEvent;
-import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
@@ -129,13 +127,14 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
             // if wild
             if (ai.aggressive) {
                 // TODO fix this to proper attacking
-                if (distanceToPlayer <= ai.attackDistance) {
+                // TODO since health is no longer an engine system, the worst an AI can do is give you a hug.
+                /*if (distanceToPlayer <= ai.attackDistance) {
                     if (tempTime - lastAttack > ai.damageFrequency) {
                         localPlayer.getCharacterEntity().send(
                                 new DoDamageEvent(ai.damage, EngineDamageTypes.PHYSICAL.get(), entity));
                         lastAttack = time.getGameTimeInMs();
                     }
-                }
+                }*/
             }
 
             //update

@@ -17,7 +17,7 @@ package org.terasology.rendering.world.selection;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
-import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
@@ -27,6 +27,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -55,22 +56,28 @@ public class BlockSelectionRenderer {
     private Mesh overlayMesh2;
     private Texture effectsTexture;
     private Material defaultTextured;
+    private Rect2f textureRegion = Rect2f.createFromMinAndSize(0f, 0f, 1f, 1f);
 
     public BlockSelectionRenderer(Texture effectsTexture) {
         this.effectsTexture = effectsTexture;
-        Vector2f texWidth = new Vector2f(1.f / effectsTexture.getWidth(), 1.f / effectsTexture.getHeight());
-        initialize(texWidth);
+        initialize();
     }
 
-    private void initialize(Vector2f effectsTextureWidth) {
-        Vector2f texPos = new Vector2f(0.0f, 0.0f);
+    private void initialize() {
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
         tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
         defaultTextured = Assets.getMaterial("engine:prog.defaultTextured").get();
+    }
+
+    public void setEffectsTexture(TextureRegionAsset textureRegionAsset) {
+        setEffectsTexture(textureRegionAsset.getTexture());
+        textureRegion = textureRegionAsset.getRegion();
+        // reinitialize to recreate the mesh's UV coordinates for this textureRegion
+        initialize();
     }
 
     public void setEffectsTexture(Texture newEffectsTexture) {

@@ -15,53 +15,10 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
-import org.terasology.engine.Time;
-import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIIconBar;
-
 /**
  */
 public class HudToolbar extends CoreHudWidget {
-
-    @In
-    private LocalPlayer localPlayer;
-
-    @In
-    private Time time;
-
-    private UICrosshair crosshair;
-
     @Override
-    public void initialise() {
-        UIIconBar healthBar = find("healthBar", UIIconBar.class);
-        healthBar.bindValue(new ReadOnlyBinding<Float>() {
-            @Override
-            public Float get() {
-                HealthComponent healthComponent = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
-                if (healthComponent != null) {
-                    return (float) healthComponent.currentHealth;
-                }
-                return 0f;
-            }
-        });
-        healthBar.bindMaxValue(new ReadOnlyBinding<Float>() {
-            @Override
-            public Float get() {
-                HealthComponent healthComponent = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
-                if (healthComponent != null) {
-                    return (float) healthComponent.maxHealth;
-                }
-                return 0f;
-            }
-        });
-
-        crosshair = find("crosshair", UICrosshair.class);
-    }
-
-    public void setChargeAmount(float amount) {
-        crosshair.setChargeAmount(amount);
+    protected void initialise() {
     }
 }

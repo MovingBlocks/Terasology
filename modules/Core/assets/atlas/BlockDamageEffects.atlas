@@ -1,0 +1,11 @@
+{
+    "texture" : "core:BlockDamageEffects",
+    "textureSize" : [160, 16],
+    "grid" : {
+        "tileSize" : [16, 16],
+        "gridDimensions" : [10, 1],
+        "tileNames" : [
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+        ]
+    }
+}

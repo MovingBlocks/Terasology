@@ -33,6 +33,9 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
+/**
+ * This system adds meshes to items that have RenderItemBlockMeshComponent or RenderItemIconMeshComponent
+ */
 @RegisterSystem
 public class ItemCommonSystem extends BaseComponentSystem {
     private static Random rand = new FastRandom();
