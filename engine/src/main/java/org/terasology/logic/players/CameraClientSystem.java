@@ -29,6 +29,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.ResetCameraEvent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -43,19 +44,27 @@ public class CameraClientSystem extends BaseComponentSystem {
     EntityManager entityManager;
 
     @ReceiveEvent
-    public void onAutoMountCamera(OnChangedComponent event, EntityRef client, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
-        if (clientComponent.camera.exists()) {
-            client.send(new ResetCameraEvent());
+    public void ensureCameraEntityCreatedOnChangedClientComponent(OnChangedComponent event, EntityRef client, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+        if (localPlayer.getClientEntity().equals(client)) {
+            ensureCameraEntityCreated();
         }
     }
 
     @ReceiveEvent
-    public void ensureCameraEntityCreated(OnActivatedComponent event, EntityRef entityRef, ClientComponent clientComponent) {
-        if (!clientComponent.camera.exists()) {
+    public void ensureCameraEntityCreatedOnActivateClientComponent(OnActivatedComponent event, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+        if (localPlayer.getClientEntity().equals(entityRef)) {
+            ensureCameraEntityCreated();
+        }
+    }
+
+    void ensureCameraEntityCreated() {
+        if (!localPlayer.getCameraEntity().exists()) {
+            ClientComponent clientComponent = localPlayer.getClientEntity().getComponent(ClientComponent.class);
             EntityBuilder builder = entityManager.newBuilder("engine:camera");
             builder.setPersistent(false);
             clientComponent.camera = builder.build();
-            entityRef.saveComponent(clientComponent);
+            localPlayer.getClientEntity().saveComponent(clientComponent);
+            mountCamera();
         }
     }
 
@@ -65,7 +74,18 @@ public class CameraClientSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void resetCamera(ResetCameraEvent resetCameraEvent, EntityRef client, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+    public void resetCamera(ResetCameraEvent resetCameraEvent, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+        if (localPlayer.getClientEntity().equals(entityRef)) {
+            clientComponent.camera.destroy();
+            clientComponent.camera = EntityRef.NULL;
+            // this will trigger a ClientComponent change which will in turn trigger a remount
+            localPlayer.getClientEntity().saveComponent(clientComponent);
+        }
+    }
+
+    @Command(shortDescription = "Mounts the camera to the character", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void mountCamera() {
+        ClientComponent clientComponent = localPlayer.getClientEntity().getComponent(ClientComponent.class);
         EntityRef targetEntityForCamera = GazeAuthoritySystem.getGazeEntityForCharacter(clientComponent.character);
         LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
         Vector3f cameraPosition;
@@ -75,5 +95,12 @@ public class CameraClientSystem extends BaseComponentSystem {
             cameraPosition = cameraLocation.getLocalPosition();
         }
         Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraPosition, new Quat4f(Quat4f.IDENTITY));
+    }
+
+    @ReceiveEvent
+    public void resetCameraOnCharacterSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
+        if (localPlayer.getCharacterEntity().equals(character)) {
+            resetCamera();
+        }
     }
 }
