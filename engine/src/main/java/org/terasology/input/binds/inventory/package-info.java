@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
 
-/**
- * Add this to a component so that it will evaluate equals(...) before merging with an item stack
- */
-public interface ItemDifferentiating {
-}
+@API
+package org.terasology.input.binds.inventory;
+
+import org.terasology.module.sandbox.API;

@@ -17,13 +17,10 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,20 +103,16 @@ public final class InventoryUtils {
     }
 
     private static boolean hasSameAttributes(EntityRef from, EntityRef to) {
-        EntitySystemLibrary entitySystemLibrary = CoreRegistry.get(EntitySystemLibrary.class);
-
         Set<Component> differentiatingComponentsFrom = new HashSet<>();
         for (Component component : from.iterateComponents()) {
-            ComponentMetadata metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
-            if (metadata.getAnnotation(ItemDifferentiating.class) != null) {
+            if (component instanceof ItemDifferentiating) {
                 differentiatingComponentsFrom.add(component);
             }
         }
 
         Map<Class<?>, Component> differentiatingComponentsTo = new HashMap<>();
         for (Component component : to.iterateComponents()) {
-            ComponentMetadata metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
-            if (metadata.getAnnotation(ItemDifferentiating.class) != null) {
+            if (component instanceof ItemDifferentiating) {
                 differentiatingComponentsTo.put(component.getClass(), component);
             }
         }
