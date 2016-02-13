@@ -36,6 +36,23 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
+/**
+ * This is a system that creates and maintains a client side entity for the camera.
+ * <p>
+ * Entity Creation Flow:
+ * - ClientComponent for the local player added or changed
+ * - If Camera does not exist, create "engine:camera" entity
+ * - Save the ClientComponent with the new camera attached
+ * <p>
+ * Reset Camera Event Flow:
+ * - ResetCameraEvent
+ * - Camera entity on the ClientComponent is destroyed and set to EntityRef.NULL
+ * - ClientComponent is saved
+ * <p>
+ * Auto Mount Camera Flow:
+ * - ClientComponent or AutoMountCameraComponent for the local player added or changed
+ * - The local player's camera entity (created from above steps) is location linked to the Gaze Entity
+ */
 @RegisterSystem(RegisterMode.CLIENT)
 public class CameraClientSystem extends BaseComponentSystem {
     @In
@@ -44,27 +61,34 @@ public class CameraClientSystem extends BaseComponentSystem {
     EntityManager entityManager;
 
     @ReceiveEvent
-    public void ensureCameraEntityCreatedOnChangedClientComponent(OnChangedComponent event, EntityRef client, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+    public void ensureCameraEntityCreatedOnChangedClientComponent(OnChangedComponent event, EntityRef client, ClientComponent clientComponent) {
         if (localPlayer.getClientEntity().equals(client)) {
             ensureCameraEntityCreated();
         }
     }
 
     @ReceiveEvent
-    public void ensureCameraEntityCreatedOnActivateClientComponent(OnActivatedComponent event, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
-        if (localPlayer.getClientEntity().equals(entityRef)) {
+    public void ensureCameraEntityCreatedOnActivateClientComponent(OnActivatedComponent event, EntityRef client, ClientComponent clientComponent) {
+        if (localPlayer.getClientEntity().equals(client)) {
             ensureCameraEntityCreated();
         }
     }
 
-    void ensureCameraEntityCreated() {
+    private void ensureCameraEntityCreated() {
         if (!localPlayer.getCameraEntity().exists()) {
             ClientComponent clientComponent = localPlayer.getClientEntity().getComponent(ClientComponent.class);
+            // create the camera from the prefab
             EntityBuilder builder = entityManager.newBuilder("engine:camera");
             builder.setPersistent(false);
             clientComponent.camera = builder.build();
             localPlayer.getClientEntity().saveComponent(clientComponent);
-            mountCamera();
+        }
+    }
+
+    @ReceiveEvent
+    public void resetCameraOnCharacterSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
+        if (localPlayer.getCharacterEntity().equals(character)) {
+            resetCamera();
         }
     }
 
@@ -74,33 +98,38 @@ public class CameraClientSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void resetCamera(ResetCameraEvent resetCameraEvent, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+    public void resetCameraForClient(ResetCameraEvent resetCameraEvent, EntityRef entityRef, ClientComponent clientComponent) {
         if (localPlayer.getClientEntity().equals(entityRef)) {
             clientComponent.camera.destroy();
             clientComponent.camera = EntityRef.NULL;
-            // this will trigger a ClientComponent change which will in turn trigger a remount
+            // this will trigger a ClientComponent change which will in turn trigger recreation of the camera entity
             localPlayer.getClientEntity().saveComponent(clientComponent);
         }
     }
 
-    @Command(shortDescription = "Mounts the camera to the character", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void mountCamera() {
-        ClientComponent clientComponent = localPlayer.getClientEntity().getComponent(ClientComponent.class);
-        EntityRef targetEntityForCamera = GazeAuthoritySystem.getGazeEntityForCharacter(clientComponent.character);
-        LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
-        Vector3f cameraPosition;
-        if (cameraLocation == null) {
-            cameraPosition = Vector3f.zero();
-        } else {
-            cameraPosition = cameraLocation.getLocalPosition();
+    @ReceiveEvent
+    public void mountCameraOnActivate(OnActivatedComponent event, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+        if (localPlayer.getClientEntity().equals(entityRef) && clientComponent.camera.exists()) {
+            mountCamera();
         }
-        Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraPosition, new Quat4f(Quat4f.IDENTITY));
     }
 
     @ReceiveEvent
-    public void resetCameraOnCharacterSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
-        if (localPlayer.getCharacterEntity().equals(character)) {
-            resetCamera();
+    public void mountCameraOnChange(OnChangedComponent event, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+        if (localPlayer.getClientEntity().equals(entityRef) && clientComponent.camera.exists()) {
+            mountCamera();
+        }
+    }
+
+    private void mountCamera() {
+        ClientComponent clientComponent = localPlayer.getClientEntity().getComponent(ClientComponent.class);
+        EntityRef targetEntityForCamera = GazeAuthoritySystem.getGazeEntityForCharacter(clientComponent.character);
+        LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
+        // if the camera already has a location,  use that as the relative position of the camera
+        if (cameraLocation != null) {
+            Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraLocation.getLocalPosition(), new Quat4f(Quat4f.IDENTITY));
+        } else {
+            Location.attachChild(targetEntityForCamera, clientComponent.camera, Vector3f.zero(), new Quat4f(Quat4f.IDENTITY));
         }
     }
 }
