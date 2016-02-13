@@ -286,7 +286,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 });
                 PerformanceMonitor.endActivity();
 
-                if (!readyChunkInfo.isNewChunk()) {
+                if (readyChunkInfo.isNewChunk()) {
                     worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));
                 }
                 worldEntity.send(new OnChunkLoaded(readyChunkInfo.getPos()));
