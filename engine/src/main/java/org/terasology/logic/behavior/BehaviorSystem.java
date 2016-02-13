@@ -23,9 +23,8 @@ import org.terasology.audio.StaticSound;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -90,17 +89,12 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     }
 
     @ReceiveEvent
-    public void onBehaviorAdded(OnAddedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        addEntity(entityRef, behaviorComponent);
-    }
-
-    @ReceiveEvent
     public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         addEntity(entityRef, behaviorComponent);
     }
 
     @ReceiveEvent
-    public void onBehaviorRemoved(BeforeRemoveComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
+    public void onBehaviorDeactivated(BeforeDeactivateComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         if (behaviorComponent.tree != null) {
             entityInterpreters.remove(entityRef);
         }
