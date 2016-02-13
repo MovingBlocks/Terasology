@@ -78,22 +78,21 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
             firstPersonHeldItemMountPointComponent.mountPointEntity = builder.build();
             camera.saveComponent(firstPersonHeldItemMountPointComponent);
         }
-        if (camera.exists()) {
-            // link the mount point entity to the camera
-            Location.removeChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity);
-            Location.attachChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity,
-                    firstPersonHeldItemMountPointComponent.translate,
-                    new Quat4f(
-                            TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.y,
-                            TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.x,
-                            TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.z),
-                    firstPersonHeldItemMountPointComponent.scale);
-        }
+
+        // link the mount point entity to the camera
+        Location.removeChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity);
+        Location.attachChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity,
+                firstPersonHeldItemMountPointComponent.translate,
+                new Quat4f(
+                        TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.y,
+                        TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.x,
+                        TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.z),
+                firstPersonHeldItemMountPointComponent.scale);
     }
 
     @ReceiveEvent
     public void ensureHeldItemIsMountedOnLoad(OnChangedComponent event, EntityRef entityRef, ClientComponent clientComponent) {
-        if (localPlayer.getCharacterEntity().exists() && localPlayer.getCameraEntity().exists()) {
+        if (localPlayer.getClientEntity().equals(entityRef) && localPlayer.getCharacterEntity().exists() && localPlayer.getCameraEntity().exists()) {
             CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
             if (characterHeldItemComponent != null) {
                 // special case of sending in null so that the initial load works
@@ -122,16 +121,20 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @ReceiveEvent
     public void onHeldItemActivated(OnActivatedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        EntityRef oldHeldItem = currentHeldItem;
-        currentHeldItem = heldItemComponent.selectedItem;
-        linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
+        if (localPlayer.getCharacterEntity().equals(character)) {
+            EntityRef oldHeldItem = currentHeldItem;
+            currentHeldItem = heldItemComponent.selectedItem;
+            linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
+        }
     }
 
     @ReceiveEvent
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        EntityRef oldHeldItem = currentHeldItem;
-        currentHeldItem = heldItemComponent.selectedItem;
-        linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
+        if (localPlayer.getCharacterEntity().equals(character)) {
+            EntityRef oldHeldItem = currentHeldItem;
+            currentHeldItem = heldItemComponent.selectedItem;
+            linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
+        }
     }
 
     @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
@@ -144,7 +147,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     void linkHeldItemLocationForLocalPlayer(EntityRef character, EntityRef newItem, EntityRef oldItem) {
-        if (character.equals(localPlayer.getCharacterEntity()) && !newItem.equals(oldItem)) {
+        if (!newItem.equals(oldItem)) {
             EntityRef camera = localPlayer.getCameraEntity();
             FirstPersonHeldItemMountPointComponent mountPointComponent = camera.getComponent(FirstPersonHeldItemMountPointComponent.class);
             if (mountPointComponent != null) {
