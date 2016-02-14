@@ -16,6 +16,7 @@
 
 package org.terasology.logic.characters;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -55,6 +56,7 @@ import org.terasology.registry.In;
  */
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+    public static final CollisionGroup[] DEFAULTPHYSICSFILTER = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
     private static final Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
 
     @In
@@ -70,14 +72,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private InventoryManager inventoryManager;
 
     private PickupBuilder pickupBuilder;
-
-    /**
-     * TODO: Include the Character collision group
-     * Including the character collision group was removed because tracing from the character's gaze position would hit
-     * the initiating character instead of the ground when looking downwards.
-     */
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
-
 
     @Override
     public void initialise() {
@@ -108,7 +102,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         Vector3f direction = gazeLocation.getWorldDirection();
         Vector3f originPos = gazeLocation.getWorldPosition();
 
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
 
         if (result.isHit()) {
             int damage = 1;
@@ -211,7 +205,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false; // can happen if target existed on client
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
                 String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
                 logger.info(msg, getPlayerNameFromCharacter(character));
