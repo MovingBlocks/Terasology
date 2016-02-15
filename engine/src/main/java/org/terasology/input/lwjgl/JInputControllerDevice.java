@@ -16,26 +16,18 @@
 
 package org.terasology.input.lwjgl;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import net.java.games.input.Component;
+import net.java.games.input.Component.Identifier;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
+import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.ControllerEvent;
 import net.java.games.input.ControllerListener;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
-import net.java.games.input.Component.Identifier;
-import net.java.games.input.Controller.Type;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ControllerConfig;
@@ -47,8 +39,13 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.device.ControllerAction;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Retrieves information on connected controllers through JInput.
@@ -149,7 +146,11 @@ public class JInputControllerDevice implements ControllerDevice {
 
         if (id instanceof Identifier.Button) {
             state = event.getValue() != 0 ? ButtonState.DOWN : ButtonState.UP;
-            input = InputType.CONTROLLER_BUTTON.getInput(buttonMap.get(id));
+            Integer buttonId = buttonMap.get(id);
+            if (buttonId == null) {
+                return null; //button not registered
+            }
+            input = InputType.CONTROLLER_BUTTON.getInput(buttonId);
         } else if (id instanceof Identifier.Axis) {
             ControllerInfo info = config.getController(c.getName());
             if (id.equals(Identifier.Axis.X)) {

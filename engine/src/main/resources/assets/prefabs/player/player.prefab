@@ -21,7 +21,7 @@
         "maxGroundSpeed" : 3,
         "distanceBetweenFootsteps" : 1.5,
         "distanceBetweenSwimStrokes" : 2.5,
-        "height" : 1.6,
+        "height": 1.8,
         "radius" : 0.3,
         "jumpSpeed" : 12
     },
@@ -31,7 +31,11 @@
         "hideFromOwner" : true
     },
     "BoxShape" : {
-        "extents" : [1.5, 1.6, 1.5]
+        "extents": [
+            1.5,
+            1.8,
+            1.5
+        ]
     },
     "Trigger" : {
         "detectGroups" : ["engine:debris", "engine:sensor"]
@@ -68,7 +72,7 @@
     "GazeMountPoint": {
         "translate": [
             0,
-            0.9,
+            0.7,
             0
         ]
     }

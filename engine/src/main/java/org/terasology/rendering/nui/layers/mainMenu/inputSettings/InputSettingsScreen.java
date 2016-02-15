@@ -18,13 +18,16 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.asset.Assets;
+
+import org.terasology.assets.ResourceUrn;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
@@ -37,20 +40,14 @@ import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.layouts.relative.HorizontalHint;
-import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
-import org.terasology.rendering.nui.layouts.relative.VerticalHint;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UISpace;
@@ -65,7 +62,9 @@ import java.util.Set;
  */
 public class InputSettingsScreen extends CoreScreenLayer {
 
-    private int horizontalSpacing = 4;
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:inputSettingsScreen");
+
+    private int horizontalSpacing = 12;
 
     @In
     private Config config;
@@ -85,13 +84,22 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mainLayout.setHorizontalSpacing(8);
         mainLayout.setVerticalSpacing(8);
         mainLayout.setFamily("option-grid");
+
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
+        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
+        UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
+        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
+
         mainLayout.addWidget(new UILabel("mouseLabel", "subheading", "Mouse"));
-        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
+        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity)
+                .setColumnRatios(0.4f)
+                .setHorizontalSpacing(horizontalSpacing));
+        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), mouseInverted)
+                .setColumnRatios(0.4f)
+                .setHorizontalSpacing(horizontalSpacing));
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
@@ -133,31 +141,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
             addInputSection(mainLayout, name, cfg);
         }
 
-        ScrollableArea area = new ScrollableArea();
+        ScrollableArea area = find("area", ScrollableArea.class);
         area.setContent(mainLayout);
 
-        ColumnLayout footerGrid = new ColumnLayout("footer");
-        footerGrid.setFamily("menu-options");
-        footerGrid.setColumns(2);
-        footerGrid.addWidget(new UIButton("reset", "Restore Defaults"));
-        footerGrid.addWidget(new UIButton("close", "Back"));
-        footerGrid.setHorizontalSpacing(8);
-
-        RelativeLayout layout = new RelativeLayout();
-        layout.addWidget(new UIImage("title", Assets.getTexture("engine:terasology").get()),
-                HorizontalHint.create().fixedWidth(512).center(),
-                VerticalHint.create().fixedHeight(128).alignTop(48));
-        layout.addWidget(new UILabel("subtitle", "title", "Input Settings"),
-                HorizontalHint.create().center(),
-                VerticalHint.create().fixedHeight(48).alignTopRelativeTo("title", VerticalAlign.BOTTOM));
-        layout.addWidget(area,
-                HorizontalHint.create().fixedWidth(640).center(),
-                VerticalHint.create().alignTopRelativeTo("subtitle", VerticalAlign.BOTTOM, 16).alignBottomRelativeTo("footer", VerticalAlign.TOP, 48));
-        layout.addWidget(footerGrid,
-                HorizontalHint.create().center().fixedWidth(400),
-                VerticalHint.create().fixedHeight(48).alignBottom(48));
-
-        setContents(layout);
+        WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
+        WidgetUtil.trySubscribe(this, "back", button -> getManager().popScreen());
     }
 
     private void addInputSection(InputCategory category, ColumnLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {
@@ -245,24 +233,24 @@ public class InputSettingsScreen extends CoreScreenLayer {
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
-        UIInputBindButton inputBind = new UIInputBindButton();
-        inputBind.setManager(getManager());
-        inputBind.setDescription(bind.description());
-        inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
-        UIInputBindButton secondaryInputBind = new UIInputBindButton();
-        secondaryInputBind.setManager(getManager());
-        secondaryInputBind.setDescription(bind.description());
-        secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
-        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
-    }
+        BindsConfig bindConfig = config.getInput().getBinds();
+        List<Input> binds = bindConfig.getBinds(uri);
+        UIButton primaryInputBind = new UIButton();
+        primaryInputBind.bindText(new BindingText(binds, 0));
+        primaryInputBind.subscribe(event -> {
+            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
+            popup.setBindingData(uri, bind, 0);
+        });
 
-    @Override
-    public void setContents(UIWidget contents) {
-        super.setContents(contents);
-        find("mouseSensitivity", UISlider.class).bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
-        find("mouseYAxisInverted", UICheckbox.class).bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
-        WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        UIButton secondaryInputBind = new UIButton();
+        secondaryInputBind.bindText(new BindingText(binds, 1));
+        secondaryInputBind.subscribe(event -> {
+            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
+            popup.setBindingData(uri, bind, 1);
+        });
+        layout.addWidget(new RowLayout(new UILabel(bind.description()), primaryInputBind, secondaryInputBind)
+                .setColumnRatios(0.4f)
+                .setHorizontalSpacing(horizontalSpacing));
     }
 
     @Override
@@ -273,6 +261,28 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    private final class BindingText extends ReadOnlyBinding<String> {
+
+        private List<Input> binds;
+        private int index;
+
+        public BindingText(List<Input> binds, int index) {
+            this.binds = binds;
+            this.index = index;
+        }
+
+        @Override
+        public String get() {
+            if (binds.size() > index) {
+                Input input = binds.get(index);
+                if (input != null) {
+                    return input.getDisplayName();
+                }
+            }
+            return "<not bound>";
+        }
     }
 
     private static final class ExtensionBind implements Comparable<ExtensionBind> {

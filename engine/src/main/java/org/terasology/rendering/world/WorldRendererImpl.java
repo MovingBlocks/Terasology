@@ -48,7 +48,7 @@ import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.GraphicState;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
@@ -109,7 +109,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
 
-    private LwjglRenderingProcess renderingProcess;
+    private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
@@ -155,16 +155,16 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        renderingProcess = new LwjglRenderingProcess();
-        context.put(LwjglRenderingProcess.class, renderingProcess);
+        buffersManager = new FrameBuffersManager();
+        context.put(FrameBuffersManager.class, buffersManager);
 
-        graphicState = new GraphicState(renderingProcess);
-        postProcessor = new PostProcessor(renderingProcess, graphicState);
+        graphicState = new GraphicState(buffersManager);
+        postProcessor = new PostProcessor(buffersManager, graphicState);
         context.put(PostProcessor.class, postProcessor);
 
-        renderingProcess.setGraphicState(graphicState);
-        renderingProcess.setPostProcessor(postProcessor);
-        renderingProcess.initialize();
+        buffersManager.setGraphicState(graphicState);
+        buffersManager.setPostProcessor(postProcessor);
+        buffersManager.initialize();
 
         context.get(ShaderManager.class).initShaders();
         postProcessor.initializeMaterials();
@@ -267,6 +267,8 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.update();
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
+
+            buffersManager.preRenderUpdate();
         }
 
         if (currentRenderingStage != WorldRenderingStage.MONO) {
@@ -309,8 +311,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
-        renderingProcess.createOrUpdateFullscreenFbos();
-
 
         postProcessor.generateOutline();                      // into outline buffer
         postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
@@ -323,7 +323,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.generateLightShafts();                // into lightShafts buffer
 
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        postProcessor.initialPostProcessing();              // into initialPost buffer
+        postProcessor.initialPostProcessing();              // into scenePrePost buffer
 
         // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
         postProcessor.downsampleSceneAndUpdateExposure();   // downSampledScene buffer used only to update exposure value

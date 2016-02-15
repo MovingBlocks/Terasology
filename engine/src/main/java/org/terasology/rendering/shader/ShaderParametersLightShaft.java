@@ -24,7 +24,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -46,8 +46,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        LwjglRenderingProcess renderingProcess = CoreRegistry.get(LwjglRenderingProcess.class);
-        FBO scene = renderingProcess.getFBO("sceneOpaque");
+        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
+        FBO scene = buffersManager.getFBO("sceneOpaque");
 
         int texId = 0;
 

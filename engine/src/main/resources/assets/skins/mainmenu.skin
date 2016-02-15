@@ -44,7 +44,11 @@
         },
         "subheading": {
             "font": "NotoSans-Regular-Medium",
-            "text-align-horizontal": "left"
+            "text-align-horizontal": "left",
+            "margin" : {
+                "bottom" : 4,
+                "left" : 4
+            }
         },
         "left-label": {
             "elements": {

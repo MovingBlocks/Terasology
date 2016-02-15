@@ -1,0 +1,117 @@
+{
+    "type" : "changeBindingPopup",
+    "skin" : "popup",
+    "contents" : {
+        "type" : "relativeLayout",
+            "contents" : [
+                {
+                    "type" : "UIBox",
+                    "skin" : "solid",
+                    "layoutInfo" : {
+                        "width" : 500,
+                        "use-content-height" : true,
+                        "position-horizontal-center" : {},
+                        "position-vertical-center" : {}
+                    },
+                    "content" : {
+                        "type" : "ColumnLayout",
+                        "columns" : 1,
+                        "verticalSpacing" : 8,
+                        "contents" : [
+                            {
+                                "type" : "UILabel",
+                                "id" : "title",
+                                "text" : "<Binding name>",
+                                "family" : "title"
+                            },
+                            {
+                                "type" : "UISpace",
+                                "size" : [1, 8]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "horizontalSpacing" : 12,
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "${engine:menu#new-binding}: ",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.4
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIInputBind",
+                                        "id" : "new-binding",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.3
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "${engine:menu#remove-binding}",
+                                        "id" : "remove"
+                                    }
+                                ]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "horizontalSpacing" : 12,
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "${engine:menu#default-binding}: ",
+                                        "family" : "option-grid",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.4
+                                        }
+                                    },
+                                    {
+                                        "type" : "UILabel",
+                                        "id" : "default-binding",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.3
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "${engine:menu#reset-default}",
+                                        "id" : "default"
+                                    }
+                                ]
+                            },
+                            {
+                                "type" : "UISpace",
+                                "size" : [1, 16]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "id" : "actionsRow",
+                                "horizontalSpacing" : 8,
+                                "contents" : [
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "${engine:menu#dialog-ok}",
+                                        "id" : "ok"
+                                    },
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "${engine:menu#dialog-cancel}",
+                                        "id" : "cancel"
+                                    }
+                                ],
+                                "layoutInfo" : {
+                                    "width" : 400,
+                                    "height" : 32,
+                                    "position-horizontal-center" : {},
+                                    "position-bottom" : {
+                                        "target" : "BOTTOM",
+                                        "offset" : 48
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+    }
+}

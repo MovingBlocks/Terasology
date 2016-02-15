@@ -30,7 +30,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -91,7 +91,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO scene = CoreRegistry.get(LwjglRenderingProcess.class).getFBO("sceneOpaque");
+        FBO scene = CoreRegistry.get(FrameBuffersManager.class).getFBO("sceneOpaque");
 
         int texId = 0;
 

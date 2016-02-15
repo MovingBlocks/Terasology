@@ -40,7 +40,7 @@ import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.nui.layers.ingame.inventory.TransferItemCursor;
-import org.terasology.rendering.opengl.LwjglRenderingProcess;
+import org.terasology.rendering.opengl.PostProcessor;
 
 /**
  */
@@ -78,7 +78,7 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F12:
-                CoreRegistry.get(LwjglRenderingProcess.class).takeScreenshot();
+                CoreRegistry.get(PostProcessor.class).takeScreenshot();
                 CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
                 break;
             default:

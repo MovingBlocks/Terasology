@@ -54,14 +54,13 @@ public class InputConfigBinding implements Binding<Input> {
         List<Input> binds = Lists.newArrayList(config.getBinds(bindUri));
         if (value == null) {
             if (position < binds.size()) {
-                binds.remove(position);
+                binds.set(position, null);
             }
         } else {
-            if (position < binds.size()) {
-                binds.set(position, value);
-            } else {
-                binds.add(value);
+            while (binds.size() <= position) {
+                binds.add(null);
             }
+            binds.set(position, value);
         }
         config.setBinds(bindUri, binds);
     }
