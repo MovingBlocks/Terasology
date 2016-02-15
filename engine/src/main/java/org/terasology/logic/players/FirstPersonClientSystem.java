@@ -188,11 +188,13 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         // get the first person mount point and rotate it away from the camera
         CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
         FirstPersonHeldItemMountPointComponent mountPointComponent = localPlayer.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
-        LocationComponent locationComponent = mountPointComponent.mountPointEntity.getComponent(LocationComponent.class);
+        if (characterHeldItemComponent == null
+                || mountPointComponent == null) {
+            return;
+        }
 
-        if (characterHeldItemComponent == null ||
-                mountPointComponent == null ||
-                locationComponent == null) {
+        LocationComponent locationComponent = mountPointComponent.mountPointEntity.getComponent(LocationComponent.class);
+        if (locationComponent == null) {
             return;
         }
 
