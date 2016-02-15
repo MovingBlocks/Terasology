@@ -19,6 +19,7 @@ package org.terasology.logic.characters;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -27,21 +28,18 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.characters.events.ActivationRequestDenied;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -50,7 +48,6 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 
 /**
@@ -70,7 +67,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private EntityManager entityManager;
 
     @In
-    private InventoryManager inventoryManager;
+    private Time time;
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DestroyEvent event, EntityRef entity) {
@@ -80,6 +77,32 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
         entity.destroy();
+    }
+
+
+    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+        if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
+            return;
+        }
+
+        EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
+
+        entity.send(new AttackRequest(selectedItemEntity));
+
+        long currentTime = time.getGameTimeInMs();
+        // TODO: send this data back to the server so that other players can visualize this attack
+        // TODO: extract this into an event someplace so that this code does not have to exist both here and in LocalPlayerSystem
+        characterHeldItemComponent.lastItemUsedTime = currentTime;
+        characterHeldItemComponent.nextItemUseTime = currentTime;
+        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
+        if (itemComponent != null) {
+            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
+        } else {
+            characterHeldItemComponent.nextItemUseTime += 200;
+        }
+        entity.saveComponent(characterHeldItemComponent);
+        event.consume();
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
@@ -236,28 +259,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             }
         }
         return true;
-    }
-
-
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
-    public void onDropItemRequest(DropItemRequest event, EntityRef character) {
-        //make sure we own the item and it exists
-        if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
-            return;
-        }
-
-        // remove a single item from the stack
-        EntityRef pickupItem = event.getItem();
-        EntityRef owner = pickupItem.getOwner();
-        if (owner.hasComponent(InventoryComponent.class)) {
-            final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
-            if (removedItem != null) {
-                pickupItem = removedItem;
-            }
-        }
-
-        pickupItem.send(new DropItemEvent(event.getNewPosition()));
-        pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }
 
     @Override

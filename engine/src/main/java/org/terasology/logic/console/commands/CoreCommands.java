@@ -42,7 +42,6 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
@@ -115,9 +114,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     @In
     private AssetManager assetManager;
-
-    @In
-    private InventoryManager inventoryManager;
 
     @In
     private TranslationSystem translationSystem;

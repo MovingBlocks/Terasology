@@ -19,13 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.ButtonState;
-import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequestDenied;
@@ -135,26 +132,4 @@ public class InteractionSystem extends BaseComponentSystem {
             InteractionUtil.cancelInteractionAsClient(clientComponent.character);
         }
     }
-
-
-    /*
-     * At the activation of the inventory the current dialog needs to be closed instantly.
-     *
-     * The close of the dialog triggers {@link #onScreenLayerClosed} which resets the
-     * interactionTarget.
-     */
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void onToggleInventory(InventoryButton event, EntityRef entity, ClientComponent clientComponent) {
-        if (event.getState() != ButtonState.DOWN) {
-            return;
-        }
-
-        EntityRef character = clientComponent.character;
-        ResourceUrn activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
-        if (activeInteractionScreenUri != null) {
-            InteractionUtil.cancelInteractionAsClient(character);
-            // do not consume the event, so that the inventory will still open
-        }
-    }
-
 }

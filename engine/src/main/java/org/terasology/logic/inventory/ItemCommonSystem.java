@@ -97,8 +97,9 @@ public class ItemCommonSystem extends BaseComponentSystem {
                 return;
             }
 
-            meshComponent.mesh = blockFamily.getArchetypeBlock().getMesh();
+            meshComponent.mesh = blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
             meshComponent.material = Assets.getMaterial("engine:terrain").get();
+            meshComponent.translucent = blockFamily.getArchetypeBlock().isTranslucent();
 
             if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !entity.hasComponent(LightComponent.class)) {
                 LightComponent lightComponent = entity.addComponent(new LightComponent());

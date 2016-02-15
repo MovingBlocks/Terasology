@@ -21,7 +21,6 @@ import org.terasology.benchmark.AbstractBenchmark;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.random.FastRandom;
@@ -52,9 +51,6 @@ public class IterateMultipleComponentBenchmark extends AbstractBenchmark {
             }
             if (rand.nextFloat() < 0.5f) {
                 entityData.add(new MeshComponent());
-            }
-            if (rand.nextFloat() < 0.5f) {
-                entityData.add(new InventoryComponent());
             }
             if (rand.nextFloat() < 0.25f) {
                 entityData.add(new BlockComponent());

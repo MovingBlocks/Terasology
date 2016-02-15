@@ -56,16 +56,6 @@
         "diveVolume" : 0.5,
         "landingVolume" : 0.25
     },
-    "Inventory" : {
-        "itemSlots": [
-              0,0,0,0,0,0,0,0,0,0,
-              0,0,0,0,0,0,0,0,0,0,
-              0,0,0,0,0,0,0,0,0,0,
-              0,0,0,0,0,0,0,0,0,0
-            ]
-    },
-    "SelectedInventorySlot": {
-    },
     "CharacterHeldItem": {
     },
     "Breather": {},

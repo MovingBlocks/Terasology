@@ -89,8 +89,6 @@ public class PlayerFactory {
         }
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
-        EntityRef transferSlot = entityManager.create("engine:transferSlot");
-        playerComponent.movingItem = transferSlot;
         playerComponent.controller = controller;
 
         EntityRef player = builder.build();

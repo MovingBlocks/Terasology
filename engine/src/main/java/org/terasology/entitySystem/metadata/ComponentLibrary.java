@@ -16,7 +16,6 @@
 package org.terasology.entitySystem.metadata;
 
 import com.google.common.collect.Iterables;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -32,7 +31,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * The library for metadata about components (and their fields).
- *
  */
 public class ComponentLibrary extends AbstractClassLibrary<Component> {
 
@@ -62,6 +60,10 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", type.getSimpleName(), e);
             return null;
+        } catch (NoClassDefFoundError e) {
+            // log what class was not found so that diagnosis is easier
+            logger.error("Class not found, {}", type.getSimpleName(), e);
+            throw e;
         }
         return info;
     }

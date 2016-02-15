@@ -30,8 +30,8 @@ import org.terasology.logic.health.BeforeDamagedEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.FullHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.geom.Vector3f;
@@ -70,9 +70,6 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     @In
     private AudioManager audioManager;
-
-    @In
-    private InventoryManager inventoryManager;
 
     @In
     private BlockManager blockManager;
@@ -152,7 +149,9 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     private boolean giveItem(CreateBlockDropsEvent event, EntityRef item) {
-        return inventoryManager.giveItem(event.getInstigator(), item, item);
+        GiveItemEvent giveItemEvent = new GiveItemEvent(event.getInstigator());
+        item.send(giveItemEvent);
+        return giveItemEvent.isHandled();
     }
 
     private boolean isDirectPickup(Block block, BlockDamageModifierComponent blockDamageModifierComponent) {

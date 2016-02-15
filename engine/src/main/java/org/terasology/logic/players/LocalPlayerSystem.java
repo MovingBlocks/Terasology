@@ -46,7 +46,6 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.interactions.InteractionUtil;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -342,7 +341,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
 
-    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
             return;

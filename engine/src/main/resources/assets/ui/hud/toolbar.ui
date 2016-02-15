@@ -5,60 +5,6 @@
         "type" : "relativeLayout",
         "contents" : [
             {
-                "type" : "flowLayout",
-                "id" : "toolbar",
-                "contents" : [
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 0
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 1
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 2
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 3
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 4
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 5
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 6
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 7
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 8
-                    },
-                    {
-                        "type" : "InventoryCell",
-                        "targetSlot" : 9
-                    }
-                ],
-                "layoutInfo" : {
-                    "use-content-width" : true,
-                    "use-content-height" : true,
-                    "position-horizontal-center" : {},
-                    "position-bottom" : {
-                        "target" : "BOTTOM"
-                    }
-                }
-            },
-            {
                 "type" : "UIIconBar",
                 "id" : "healthBar",
                 "family" : "healthBar",
@@ -69,17 +15,10 @@
                 "layoutInfo" : {
                     "use-content-width" : true,
                     "use-content-height" : true,
-                    "position-right" : {
-                        "target" : "CENTER"
-                    },
-                    "position-left" : {
-                        "target" : "LEFT",
-                        "widget" : "toolbar"
-                    },
+                    "position-horizontal-center": {},
                     "position-bottom" : {
-                        "target" : "TOP",
-                        "widget" : "toolbar",
-                        "offset" : 1
+                        "target": "BOTTOM",
+                        "offset": 60
                     }
                 }
             },
@@ -100,11 +39,11 @@
                     },
                     "position-right" : {
                         "target" : "RIGHT",
-                        "widget" : "toolbar"
+                        "widget": "healthBar"
                     },
                     "position-bottom" : {
                         "target" : "TOP",
-                        "widget" : "toolbar",
+                        "widget": "healthBar",
                         "offset" : 1
                     }
                 }
