@@ -37,6 +37,8 @@ import java.util.List;
 /**
  */
 public class UIDropdownScroll<T> extends UIDropdown {
+    private final int MAX_ITEM_NOSCROLL_COUNT = 5;
+
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
