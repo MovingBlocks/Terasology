@@ -40,6 +40,8 @@ public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
+    private UIScrollbar verticalBar = new UIScrollbar(true);
+
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
     private InteractionListener mainListener = new BaseInteractionListener() {
