@@ -88,13 +88,27 @@ public class UIDropdown<T> extends CoreWidget {
             canvas.setDrawOnTop(true);
             Font font = canvas.getCurrentStyle().getFont();
             Border itemMargin = canvas.getCurrentStyle().getMargin();
-            int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * options.get().size() + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+
+            // Limit number of options showed
+            int optionsMaxNum = 5;
+            int optionsSize = options.get().size()<=5 ? options.get().size() : optionsMaxNum;
+
+            int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
             Rect2i location = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height);
             canvas.drawBackground(location);
 
+            // Scrollbar Measurement
+            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
+            int scrollbarHeight = location.size().y-itemMargin.getTop();
+            int availableWidth = location.size().x - scrollbarWidth;
+            int availableHeight = scrollbarHeight;
+
+            // Item
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            int itemWidth = availableWidth;
+
             canvas.setPart(LIST_ITEM);
             for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
@@ -102,11 +116,29 @@ public class UIDropdown<T> extends CoreWidget {
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
-                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
-                canvas.drawBackground(itemRegion);
-                optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
-                canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+
+                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i-verticalBar.getValue(), itemWidth, itemHeight);
+
+
+                // If outside location, then hide
+                try (SubRegion ignored = canvas.subRegion(location, true)) {
+                    canvas.drawBackground(itemRegion);
+                    optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
+                    canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+                }
+
             }
+
+
+
+            //Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, availableWidth, availableHeight);
+            //verticalBar.setRange(location.size().y - contentRegion.height());
+            //verticalBar.setValue(0);
+
+            // Draw Scrollbar
+            canvas.drawWidget(verticalBar, Rect2i.createFromMinAndSize(availableWidth-itemMargin.getRight(), itemMargin.getTotalHeight()*2 + font.getLineHeight(), scrollbarWidth, scrollbarHeight));
+
+
         } else {
             canvas.addInteractionRegion(mainListener);
         }
@@ -131,7 +163,7 @@ public class UIDropdown<T> extends CoreWidget {
     @Override
     public void onLoseFocus() {
         super.onLoseFocus();
-        opened = false;
+        //opened = false;
     }
 
     public void bindOptions(Binding<List<T>> binding) {
