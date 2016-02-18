@@ -16,31 +16,41 @@
 
 package org.terasology.logic.common.lifespan;
 
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
 
 /**
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class LifespanSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In
     private EntityManager entityManager;
+    @In
+    private Time time;
 
     @Override
     public void update(float delta) {
+        long currentTime = time.getGameTimeInMs();
         for (EntityRef entity : entityManager.getEntitiesWith(LifespanComponent.class)) {
             LifespanComponent lifespan = entity.getComponent(LifespanComponent.class);
-            lifespan.lifespan -= delta;
-            if (lifespan.lifespan < 0) {
+            if (lifespan.deathTime < currentTime) {
                 entity.destroy();
-            } else {
-                entity.saveComponent(lifespan);
             }
         }
+    }
+
+    @ReceiveEvent
+    public void addedLifeSpanComponent(OnAddedComponent event, EntityRef entityRef, LifespanComponent lifespanComponent) {
+        lifespanComponent.deathTime = time.getGameTimeInMs() + (long) (lifespanComponent.lifespan * 1000);
+        entityRef.saveComponent(lifespanComponent);
     }
 }

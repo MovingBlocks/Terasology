@@ -147,9 +147,12 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             EntityRef entity = iter.next();
             RigidBodyComponent comp = entity.getComponent(RigidBodyComponent.class);
             RigidBody body = physics.getRigidBody(entity);
-            body.getLinearVelocity(comp.velocity);
-            body.getAngularVelocity(comp.angularVelocity);
-            entity.saveComponent(comp);
+
+            if (body.isActive()) {
+                body.getLinearVelocity(comp.velocity);
+                body.getAngularVelocity(comp.angularVelocity);
+                entity.saveComponent(comp);
+            }
         }
 
         if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
