@@ -137,6 +137,34 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    public void bindOptions(Binding<List<T>> binding) {
+        options = binding;
+    }
+
+    public List<T> getOptions() {
+        return options.get();
+    }
+
+    public void setOptions(List<T> values) {
+        this.options.set(values);
+    }
+
+    public void bindSelection(Binding<T> binding) {
+        this.selection = binding;
+    }
+
+    public T getSelection() {
+        return selection.get();
+    }
+
+    public void setSelection(T value) {
+        selection.set(value);
+    }
+
+    public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
+        optionRenderer = itemRenderer;
+    }
+
     private class ItemListener extends BaseInteractionListener {
         private int index;
 
