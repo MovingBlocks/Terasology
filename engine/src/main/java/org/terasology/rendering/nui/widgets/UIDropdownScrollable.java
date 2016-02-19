@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  */
-public class UIDropdownScroll<T> extends UIDropdown<T> {
+public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
@@ -61,10 +61,10 @@ public class UIDropdownScroll<T> extends UIDropdown<T> {
 
     private boolean opened;
 
-    public UIDropdownScroll() {
+    public UIDropdownScrollable() {
     }
 
-    public UIDropdownScroll(String id) {
+    public UIDropdownScrollable(String id) {
         super(id);
     }
 

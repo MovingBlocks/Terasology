@@ -36,6 +36,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -59,7 +60,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UIText nametext;
     private UISlider slider;
     private UIImage img;
-    private UIDropdown<Locale> language;
+    private UIDropdownScrollable<Locale> language;
 
     @Override
     public void onOpened() {
@@ -97,7 +98,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             slider.setLabelFunction(constant);
         }
 
-        language = find("language", UIDropdown.class);
+        language = find("language", UIDropdownScrollable.class);
         if (language != null) {
             SimpleUri menuUri = new SimpleUri("engine:menu");
             TranslationProject menuProject = translationSystem.getProject(menuUri);
