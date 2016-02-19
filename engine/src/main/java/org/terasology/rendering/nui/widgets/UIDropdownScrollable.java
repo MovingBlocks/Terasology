@@ -146,6 +146,17 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    @Override
+    public void onLoseFocus() {
+        super.onLoseFocus();
+
+        String mode = verticalBar.getMode();
+        if (!mode.equals("active")) {
+            opened = false;
+            super.onGainFocus();
+        }
+    }
+
     public void bindOptions(Binding<List<T>> binding) {
         options = binding;
     }
