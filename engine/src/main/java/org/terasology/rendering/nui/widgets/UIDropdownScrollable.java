@@ -27,6 +27,7 @@ import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
@@ -36,6 +37,8 @@ import java.util.List;
 /**
  */
 public class UIDropdownScrollable<T> extends UIDropdown<T> {
+    private static final int SCROLL_MULTIPLIER = -42;
+
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
@@ -53,6 +56,12 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                     optionListeners.add(new ItemListener(i));
                 }
             }
+            return true;
+        }
+
+        @Override
+        public boolean onMouseWheel(NUIMouseWheelEvent event) {
+            verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * SCROLL_MULTIPLIER);
             return true;
         }
     };
