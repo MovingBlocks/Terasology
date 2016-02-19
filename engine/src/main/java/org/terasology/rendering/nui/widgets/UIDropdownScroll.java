@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -36,9 +35,11 @@ import java.util.List;
 
 /**
  */
-public class UIDropdownScroll<T> extends UIDropdown {
+public class UIDropdownScroll<T> extends UIDropdown<T> {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
+
+    private UIScrollbar verticalBar = new UIScrollbar(true);
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
@@ -60,6 +61,18 @@ public class UIDropdownScroll<T> extends UIDropdown {
 
     private boolean opened;
 
+    public UIDropdownScroll() {
+    }
+
+    public UIDropdownScroll(String id) {
+        super(id);
+    }
+
+    @Override
+    public boolean isSkinAppliedByCanvas() {
+        return false;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         canvas.drawBackground();
@@ -74,13 +87,27 @@ public class UIDropdownScroll<T> extends UIDropdown {
             canvas.setDrawOnTop(true);
             Font font = canvas.getCurrentStyle().getFont();
             Border itemMargin = canvas.getCurrentStyle().getMargin();
-            int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * options.get().size() + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+
+            // Limit number of options showed
+            int optionsMaxNum = 5;
+            int optionsSize = options.get().size()<=5 ? options.get().size() : optionsMaxNum;
+
+            int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
             Rect2i location = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height);
             canvas.drawBackground(location);
 
+            // Scrollbar Measurement
+            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
+            int scrollbarHeight = location.size().y-itemMargin.getTop();
+            int availableWidth = location.size().x - scrollbarWidth;
+            int availableHeight = scrollbarHeight;
+
+            // Item
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            int itemWidth = availableWidth;
+
             canvas.setPart(LIST_ITEM);
             for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
@@ -88,11 +115,23 @@ public class UIDropdownScroll<T> extends UIDropdown {
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
-                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
-                canvas.drawBackground(itemRegion);
-                optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
-                canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+
+                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i-verticalBar.getValue(), itemWidth, itemHeight);
+
+
+                // If outside location, then hide
+                try (SubRegion ignored = canvas.subRegion(location, true)) {
+                    canvas.drawBackground(itemRegion);
+                    optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
+                    canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+                }
+
             }
+
+            // Draw Scrollbar
+            canvas.drawWidget(verticalBar, Rect2i.createFromMinAndSize(availableWidth-itemMargin.getRight(), itemMargin.getTotalHeight()*2 + font.getLineHeight(), scrollbarWidth, scrollbarHeight));
+
+
         } else {
             canvas.addInteractionRegion(mainListener);
         }
