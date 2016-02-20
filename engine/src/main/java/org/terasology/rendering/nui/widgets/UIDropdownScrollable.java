@@ -41,6 +41,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private static final String LIST_ITEM = "list-item";
 
     private UIScrollbar verticalBar = new UIScrollbar(true);
+    private int visibleOptionsNum = 5;
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
@@ -96,10 +97,10 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             Font font = canvas.getCurrentStyle().getFont();
             Border itemMargin = canvas.getCurrentStyle().getMargin();
 
-            // Limit number of options showed
-            int optionsMaxNum = 5;
-            int optionsSize = options.get().size()<=5 ? options.get().size() : optionsMaxNum;
+            // Limit number of visible options
+            int optionsSize = options.get().size()<=visibleOptionsNum ? options.get().size() : visibleOptionsNum;
 
+            // Calculate total options height
             int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
@@ -185,6 +186,10 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
         optionRenderer = itemRenderer;
     }
+
+    public void setVisibleOptions(int num) { visibleOptionsNum = num; }
+
+    public int getVisibleOptions() { return visibleOptionsNum; }
 
     private class ItemListener extends BaseInteractionListener {
         private int index;
