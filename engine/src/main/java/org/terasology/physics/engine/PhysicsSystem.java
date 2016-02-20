@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.location.LocationResynchEvent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -60,7 +61,7 @@ import java.util.List;
 public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
-    private static final long TIME_BETWEEN_NETSYNCS = 200;
+    private static final long TIME_BETWEEN_NETSYNCS = 500;
     @In
     private Time time;
     @In
@@ -138,7 +139,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     public void update(float delta) {
 
         PerformanceMonitor.startActivity("Physics Renderer");
-        physics.update(delta);
+        physics.update(time.getGameDelta());
         PerformanceMonitor.endActivity();
 
         //Update the velocity from physics engine bodies to Components:
@@ -151,7 +152,6 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             if (body.isActive()) {
                 body.getLinearVelocity(comp.velocity);
                 body.getAngularVelocity(comp.angularVelocity);
-                entity.saveComponent(comp);
             }
         }
 
@@ -180,22 +180,24 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 //TODO after implementing rigidbody interface
                 RigidBody body = physics.getRigidBody(entity);
                 if (body.isActive()) {
-                    PhysicsResynchEvent event = new PhysicsResynchEvent(body.getLocation(new Vector3f()), body.getOrientation(new Quat4f()),
-                            body.getLinearVelocity(new Vector3f()), body.getAngularVelocity(new Vector3f()));
-                    entity.send(event);
+                    entity.send(new LocationResynchEvent(body.getLocation(new Vector3f()), body.getOrientation(new Quat4f())));
+                    entity.send(new PhysicsResynchEvent(body.getLinearVelocity(new Vector3f()), body.getAngularVelocity(new Vector3f())));
                 }
             }
         }
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
-    public void resynch(PhysicsResynchEvent event, EntityRef entity) {
+    public void resynchPhysics(PhysicsResynchEvent event, EntityRef entity) {
         logger.debug("Received resynch event");
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-        Vector3f delta = new Vector3f(event.getPosition());
-        delta.sub(loc.getWorldPosition());
         RigidBody body = physics.getRigidBody(entity);
         body.setVelocity(event.getVelocity(), event.getAngularVelocity());
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
+    public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
+        logger.debug("Received location resynch event");
+        RigidBody body = physics.getRigidBody(entity);
         body.setTransform(event.getPosition(), event.getRotation());
     }
 
