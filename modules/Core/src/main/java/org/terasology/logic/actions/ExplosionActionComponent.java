@@ -16,9 +16,13 @@
 package org.terasology.logic.actions;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.health.EngineDamageTypes;
 
 /**
  */
 public class ExplosionActionComponent implements Component {
     public ActionTarget relativeTo = ActionTarget.Instigator;
+    public int damageAmount = 1000;
+    public Prefab damageType = EngineDamageTypes.EXPLOSIVE.get();
 }

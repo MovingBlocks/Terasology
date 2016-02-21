@@ -1,0 +1,6 @@
+{
+  "parent": "engine:explosiveDamage",
+  "blockDamageModifier": {
+    "blockAnnihilationChance": 0
+  }
+}

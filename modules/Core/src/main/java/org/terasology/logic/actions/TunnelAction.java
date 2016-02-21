@@ -24,7 +24,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DoDamageEvent;
-import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -38,19 +37,6 @@ import org.terasology.world.block.Block;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TunnelAction extends BaseComponentSystem {
-
-    /** The most blocks that can be destroyed before the action ends (counts duplicates, so actually way lower) */
-    private static final int MAX_DESTROYED_BLOCKS = 5000;
-
-    /** How many effects to display at the most */
-    private static final int MAX_PARTICLE_EFFECTS = 4;
-
-    /** The max number of "steps" we'll take along the direction of the tunnel to pick explosive points */
-    private static final int MAX_TUNNEL_DEPTH = 64;
-
-    /** The max number of rays to cast at each chosen spot in the path of the tunnel to hit target blocks */
-    private static final int MAX_RAYS_CAST = 512;
-
     @In
     private WorldProvider worldProvider;
 
@@ -73,8 +59,8 @@ public class TunnelAction extends BaseComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = TunnelActionComponent.class)
-    public void onActivate(ActivateEvent event, EntityRef entity) {
+    @ReceiveEvent
+    public void onActivate(ActivateEvent event, EntityRef entity, TunnelActionComponent tunnelActionComponent) {
 
         Vector3f dir = new Vector3f(event.getDirection());
         dir.scale(4.0f);
@@ -83,17 +69,17 @@ public class TunnelAction extends BaseComponentSystem {
         Vector3i blockPos = new Vector3i();
 
         int particleEffects = 0;
-        int blockCounter = MAX_DESTROYED_BLOCKS;
-        for (int s = 0; s <= MAX_TUNNEL_DEPTH; s++) {
+        int blockCounter = tunnelActionComponent.maxDestroyedBlocks;
+        for (int s = 0; s <= tunnelActionComponent.maxTunnelDepth; s++) {
             origin.add(dir);
             if (!worldProvider.isBlockRelevant(origin)) {
                 break;
             }
 
-            for (int i = 0; i < MAX_RAYS_CAST; i++) {
-                Vector3f direction = random.nextVector3f(1.0f);
+            for (int i = 0; i < tunnelActionComponent.maxRaysCast; i++) {
+                Vector3f direction = random.nextVector3f();
                 Vector3f impulse = new Vector3f(direction);
-                impulse.scale(200);
+                impulse.scale(tunnelActionComponent.explosiveForce);
 
                 for (int j = 0; j < 3; j++) {
                     Vector3f target = new Vector3f(origin);
@@ -107,15 +93,15 @@ public class TunnelAction extends BaseComponentSystem {
                     Block currentBlock = worldProvider.getBlock(blockPos);
 
                     if (currentBlock.isDestructible()) {
-                        if (particleEffects < MAX_PARTICLE_EFFECTS) {
+                        if (particleEffects < tunnelActionComponent.maxParticalEffects) {
                             EntityBuilder builder = entityManager.newBuilder("engine:smokeExplosion");
                             builder.getComponent(LocationComponent.class).setWorldPosition(target);
                             builder.build();
                             particleEffects++;
                         }
-                        if (random.nextInt(4) == 0) {
+                        if (random.nextFloat() < tunnelActionComponent.thoroughness) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
-                            blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get()));
+                            blockEntity.send(new DoDamageEvent(tunnelActionComponent.damageAmount, tunnelActionComponent.damageType));
                         }
 
                         blockCounter--;
@@ -128,7 +114,7 @@ public class TunnelAction extends BaseComponentSystem {
             }
         }
         // No blocks were destroyed, so cancel the event
-        if (blockCounter == MAX_DESTROYED_BLOCKS) {
+        if (blockCounter == tunnelActionComponent.maxDestroyedBlocks) {
             event.consume();
         }
     }
