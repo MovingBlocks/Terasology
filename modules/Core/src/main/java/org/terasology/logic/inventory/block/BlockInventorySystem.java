@@ -78,6 +78,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
         for (int i = 0; i < slotCount; i++) {
             EntityRef itemInSlot = InventoryUtils.getItemAt(entity, i);
             if (itemInSlot.exists()) {
+                inventoryManager.removeItem(entity, entity, itemInSlot, false);
                 itemInSlot.send(new DropItemEvent(position));
                 itemInSlot.send(new ImpulseEvent(random.nextVector3f(30.0f)));
             }

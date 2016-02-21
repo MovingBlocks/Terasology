@@ -33,11 +33,13 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterSoundComponent;
 import org.terasology.logic.characters.CharacterSoundSystem;
+import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
@@ -94,6 +96,32 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
 
             checkHealed(entity, health, healAmount);
         }
+    }
+
+
+    /**
+     * Override the default behavior for an attack, causing it damage as opposed to just destroying it or doing nothing.
+     */
+    @ReceiveEvent(components = HealthComponent.class, netFilter = RegisterMode.AUTHORITY)
+    public void onAttackEntity(AttackEvent event, EntityRef targetEntity) {
+        damageEntity(event, targetEntity);
+    }
+
+    static void damageEntity(AttackEvent event, EntityRef targetEntity) {
+        int damage = 1;
+        Prefab damageType = EngineDamageTypes.PHYSICAL.get();
+        // Calculate damage from item
+        ItemComponent item = event.getDirectCause().getComponent(ItemComponent.class);
+        if (item != null) {
+            damage = item.baseDamage;
+            if (item.damageType != null) {
+                damageType = item.damageType;
+            }
+        }
+
+        targetEntity.send(new DoDamageEvent(damage, damageType, event.getInstigator(), event.getDirectCause()));
+        // consume the event so that the health system can take priority over default engine behavior
+        event.consume();
     }
 
     private int regenerateHealth(HealthComponent health, int healAmount) {

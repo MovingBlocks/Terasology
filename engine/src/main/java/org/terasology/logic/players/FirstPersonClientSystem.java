@@ -155,9 +155,11 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                 if (oldItem != null && oldItem.exists()) {
                     Location.removeChild(mountPointComponent.mountPointEntity, oldItem);
                     oldItem.removeComponent(LocationComponent.class);
+                    oldItem.removeComponent(ItemIsHeldComponent.class);
                 } else {
                     Location.removeChild(mountPointComponent.mountPointEntity, getHandEntity());
                     getHandEntity().removeComponent(LocationComponent.class);
+                    getHandEntity().removeComponent(ItemIsHeldComponent.class);
                 }
 
                 // use the hand if there is no new item
@@ -198,7 +200,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
         // ensure that there are no lingering items that are marked as still held. This situation happens with client side predicted items
         for (EntityRef entityRef : entityManager.getEntitiesWith(ItemIsHeldComponent.class)) {
-            if (!entityRef.equals(currentHeldItem)) {
+            if (!entityRef.equals(currentHeldItem) && !entityRef.equals(handEntity)) {
                 entityRef.removeComponent(ItemIsHeldComponent.class);
 
                 // also remove the location if it is currently location linked to the mount point

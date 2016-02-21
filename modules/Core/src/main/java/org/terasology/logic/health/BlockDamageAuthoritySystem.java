@@ -21,12 +21,10 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackEvent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.geom.Vector3f;
@@ -147,44 +145,18 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
         }
     }
 
-    /**
-     * Override the default behavior for an attack on a block, causing it damage as opposed to just destroying it.
-     *
-     * @param event
-     * @param character
-     * @param blockComponent
-     */
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void onAttackBlock(AttackEvent event, EntityRef character, BlockComponent blockComponent) {
-        damageBlock(event, character);
-    }
-
-    /**
-     * Override the default behavior for an attack on a block, causing it damage as opposed to just destroying it.
-     *
-     * @param event
-     * @param character
-     * @param actAsBlockComponent
-     */
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void onAttackBlock(AttackEvent event, EntityRef character, ActAsBlockComponent actAsBlockComponent) {
-        damageBlock(event, character);
-    }
-
-    void damageBlock(AttackEvent event, EntityRef character) {
-        int damage = 1;
-        Prefab damageType = EngineDamageTypes.PHYSICAL.get();
-        // Calculate damage from item
-        ItemComponent item = event.getDirectCause().getComponent(ItemComponent.class);
-        if (item != null) {
-            damage = item.baseDamage;
-            if (item.damageType != null) {
-                damageType = item.damageType;
-            }
+    public void onAttackHealthlessBlock(AttackEvent event, EntityRef targetEntity, BlockComponent blockComponent) {
+        if (!targetEntity.hasComponent(HealthComponent.class)) {
+            HealthAuthoritySystem.damageEntity(event, targetEntity);
         }
+    }
 
-        character.send(new DoDamageEvent(damage, damageType, character, event.getDirectCause()));
-        event.consume();
+    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    public void onAttackHealthlessActAsBlock(AttackEvent event, EntityRef targetEntity, ActAsBlockComponent actAsBlockComponent) {
+        if (!targetEntity.hasComponent(HealthComponent.class)) {
+            HealthAuthoritySystem.damageEntity(event, targetEntity);
+        }
     }
 
     @ReceiveEvent

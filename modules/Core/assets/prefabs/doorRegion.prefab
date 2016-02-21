@@ -22,5 +22,6 @@
   },
   "ActAsBlock": {
     "block": "core:DoorTop"
-  }
+  },
+  "Network": {}
 }
