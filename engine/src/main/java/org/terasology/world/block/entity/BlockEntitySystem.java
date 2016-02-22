@@ -130,7 +130,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
             entity.send(new OnBlockToItem(item));
 
             if (shouldDropToWorld(event, block, blockDamageModifierComponent, item)) {
-                processDropping(item, location);
+                processDropping(item, location, blockDamageModifierComponent.impulsePower);
             }
         }
     }
@@ -163,9 +163,9 @@ public class BlockEntitySystem extends BaseComponentSystem {
         }
     }
 
-    private void processDropping(EntityRef item, Vector3i location) {
+    private void processDropping(EntityRef item, Vector3i location, float impulsePower) {
         item.send(new DropItemEvent(location.toVector3f()));
-        item.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+        item.send(new ImpulseEvent(random.nextVector3f(impulsePower)));
     }
 
 }
