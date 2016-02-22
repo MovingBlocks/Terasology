@@ -60,8 +60,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
-            int scroll_multiplier = 0 - verticalBar.getRange() / getOptions().size();
-            verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scroll_multiplier);
+            int scrollMultiplier = 0 - verticalBar.getRange() / getOptions().size();
+            verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
             return true;
         }
     };
@@ -98,7 +98,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             Border itemMargin = canvas.getCurrentStyle().getMargin();
 
             // Limit number of visible options
-            int optionsSize = options.get().size()<=visibleOptionsNum ? options.get().size() : visibleOptionsNum;
+            int optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : visibleOptionsNum;
 
             // Calculate total options height
             int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
@@ -109,13 +109,15 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             canvas.drawBackground(frame);
 
             // Scrollable Area
-            Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height-itemMargin.getBottom());
+            Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
 
             // Scrollbar Measurement
             int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
-            int scrollbarHeight = frame.size().y-itemMargin.getTop();
+            int scrollbarHeight = frame.size().y - itemMargin.getTop();
             int availableWidth = frame.size().x - scrollbarWidth;
             int availableHeight = scrollbarHeight;
+            int scrollbarXPos = availableWidth - itemMargin.getRight();
+            int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
 
             // Item
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
@@ -129,7 +131,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                     canvas.setMode(DEFAULT_MODE);
                 }
 
-                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i-verticalBar.getValue(), itemWidth, itemHeight);
+                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), itemWidth, itemHeight);
 
                 // If outside location, then hide
                 try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
@@ -140,7 +142,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             }
 
             // Draw Scrollbar
-            canvas.drawWidget(verticalBar, Rect2i.createFromMinAndSize(availableWidth-itemMargin.getRight(), itemMargin.getTotalHeight()*2 + font.getLineHeight(), scrollbarWidth, scrollbarHeight));
+            Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
+            canvas.drawWidget(verticalBar, scrollbarRegion);
 
 
         } else {
