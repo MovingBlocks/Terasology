@@ -1,7 +1,7 @@
 {
   "parent": "engine:iconItem",
   "DisplayName": {
-    "name": "Thorough Railgun"
+    "name": "Shallow Railgun"
   },
   "Item": {
     "icon": "engine:items#dynamite",
