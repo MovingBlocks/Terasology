@@ -33,7 +33,6 @@ import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.debug.DebugProperties;
-import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -133,10 +132,6 @@ public class DebugControlSystem extends BaseComponentSystem {
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey().getId()) {
-                case Keyboard.KeyId.K:
-                    entity.send(new DoDamageEvent(9999, null));
-                    //TODO: Seems to be broken, which is probably not a terrible thing ... remove?
-                    break;
                 case Keyboard.KeyId.F6:
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
                     event.consume();

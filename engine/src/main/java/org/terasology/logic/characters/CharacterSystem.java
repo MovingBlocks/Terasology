@@ -19,29 +19,28 @@ package org.terasology.logic.characters;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.characters.events.ActivationRequestDenied;
+import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -50,8 +49,9 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.regions.ActAsBlockComponent;
 
 /**
  */
@@ -70,20 +70,47 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private EntityManager entityManager;
 
     @In
-    private InventoryManager inventoryManager;
+    private Time time;
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onDeath(DestroyEvent event, EntityRef entity) {
+    public void onDeath(DoDestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         character.controller.send(new DeathEvent());
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
-        entity.destroy();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
+
+    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+        if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
+            return;
+        }
+
+        EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
+
+        entity.send(new AttackRequest(selectedItemEntity));
+
+        long currentTime = time.getGameTimeInMs();
+        // TODO: send this data back to the server so that other players can visualize this attack
+        // TODO: extract this into an event someplace so that this code does not have to exist both here and in LocalPlayerSystem
+        characterHeldItemComponent.lastItemUsedTime = currentTime;
+        characterHeldItemComponent.nextItemUseTime = currentTime;
+        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
+        if (itemComponent != null) {
+            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
+        } else {
+            characterHeldItemComponent.nextItemUseTime += 200;
+        }
+        entity.saveComponent(characterHeldItemComponent);
+        event.consume();
+    }
+
+
+    @ReceiveEvent(components = LocationComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onAttackRequest(AttackRequest event, EntityRef character) {
+        // if an item is used,  make sure this entity is allowed to attack with it
         if (event.getItem().exists()) {
             if (!character.equals(event.getItem().getOwner())) {
                 return;
@@ -99,20 +126,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
 
         if (result.isHit()) {
-            int damage = 1;
-            Prefab damageType = EngineDamageTypes.PHYSICAL.get();
-            // Calculate damage from item
-            ItemComponent item = event.getItem().getComponent(ItemComponent.class);
-            if (item != null) {
-                damage = item.baseDamage;
-                if (item.damageType != null) {
-                    damageType = item.damageType;
-                }
-            }
-
-            result.getEntity().send(new DoDamageEvent(damage, damageType, character, event.getItem()));
+            result.getEntity().send(new AttackEvent(character, event.getItem()));
         }
     }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, netFilter = RegisterMode.AUTHORITY)
+    public void onAttackBlock(AttackEvent event, EntityRef entityRef, BlockComponent blockComponent) {
+        entityRef.send(new DestroyEvent(event.getInstigator(), event.getDirectCause(), EngineDamageTypes.PHYSICAL.get()));
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, netFilter = RegisterMode.AUTHORITY)
+    public void onAttackBlock(AttackEvent event, EntityRef entityRef, ActAsBlockComponent actAsBlockComponent) {
+        entityRef.send(new DestroyEvent(event.getInstigator(), event.getDirectCause(), EngineDamageTypes.PHYSICAL.get()));
+    }
+
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivationRequest(ActivationRequest event, EntityRef character) {
@@ -236,28 +263,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             }
         }
         return true;
-    }
-
-
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
-    public void onDropItemRequest(DropItemRequest event, EntityRef character) {
-        //make sure we own the item and it exists
-        if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
-            return;
-        }
-
-        // remove a single item from the stack
-        EntityRef pickupItem = event.getItem();
-        EntityRef owner = pickupItem.getOwner();
-        if (owner.hasComponent(InventoryComponent.class)) {
-            final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
-            if (removedItem != null) {
-                pickupItem = removedItem;
-            }
-        }
-
-        pickupItem.send(new DropItemEvent(event.getNewPosition()));
-        pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }
 
     @Override

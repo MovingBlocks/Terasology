@@ -137,7 +137,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         }
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
     public void onLocationRemovedAddClientSideLocation(BeforeDeactivateComponent event, EntityRef entityRef, LocationComponent locationComponent) {
         // when in a remote client situation,  the remove LocationComponent happens after the CharacterHeldItemComponent is changed.
         // So this allows re-adding the client side LocationComponent after this
@@ -155,9 +155,11 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                 if (oldItem != null && oldItem.exists()) {
                     Location.removeChild(mountPointComponent.mountPointEntity, oldItem);
                     oldItem.removeComponent(LocationComponent.class);
+                    oldItem.removeComponent(ItemIsHeldComponent.class);
                 } else {
                     Location.removeChild(mountPointComponent.mountPointEntity, getHandEntity());
                     getHandEntity().removeComponent(LocationComponent.class);
+                    getHandEntity().removeComponent(ItemIsHeldComponent.class);
                 }
 
                 // use the hand if there is no new item
@@ -168,6 +170,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
                 //ensure the item has a location
                 heldItem.addOrSaveComponent(new LocationComponent());
+                heldItem.addOrSaveComponent(new ItemIsHeldComponent());
 
                 FirstPersonHeldItemTransformComponent heldItemTransformComponent = heldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
                 if (heldItemTransformComponent == null) {
@@ -193,6 +196,21 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         if (relinkHeldItem) {
             linkHeldItemLocationForLocalPlayer(localPlayer.getCharacterEntity(), currentHeldItem, null);
             relinkHeldItem = false;
+        }
+
+        // ensure that there are no lingering items that are marked as still held. This situation happens with client side predicted items
+        for (EntityRef entityRef : entityManager.getEntitiesWith(ItemIsHeldComponent.class)) {
+            if (!entityRef.equals(currentHeldItem) && !entityRef.equals(handEntity)) {
+                entityRef.removeComponent(ItemIsHeldComponent.class);
+
+                // also remove the location if it is currently location linked to the mount point
+                EntityRef camera = localPlayer.getCameraEntity();
+                FirstPersonHeldItemMountPointComponent mountPointComponent = camera.getComponent(FirstPersonHeldItemMountPointComponent.class);
+                LocationComponent locationComponent = entityRef.getComponent(LocationComponent.class);
+                if (mountPointComponent != null && locationComponent != null && locationComponent.getParent().equals(mountPointComponent.mountPointEntity)) {
+                    entityRef.removeComponent(LocationComponent.class);
+                }
+            }
         }
 
         // get the first person mount point and rotate it away from the camera

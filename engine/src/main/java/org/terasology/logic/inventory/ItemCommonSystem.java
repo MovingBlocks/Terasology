@@ -33,6 +33,9 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
+/**
+ * This system adds meshes to items that have RenderItemBlockMeshComponent or RenderItemIconMeshComponent
+ */
 @RegisterSystem
 public class ItemCommonSystem extends BaseComponentSystem {
     private static Random rand = new FastRandom();
@@ -97,8 +100,9 @@ public class ItemCommonSystem extends BaseComponentSystem {
                 return;
             }
 
-            meshComponent.mesh = blockFamily.getArchetypeBlock().getMesh();
+            meshComponent.mesh = blockFamily.getArchetypeBlock().getMeshGenerator().getStandaloneMesh();
             meshComponent.material = Assets.getMaterial("engine:terrain").get();
+            meshComponent.translucent = blockFamily.getArchetypeBlock().isTranslucent();
 
             if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !entity.hasComponent(LightComponent.class)) {
                 LightComponent lightComponent = entity.addComponent(new LightComponent());

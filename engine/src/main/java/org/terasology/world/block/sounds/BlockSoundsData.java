@@ -17,12 +17,12 @@ package org.terasology.world.block.sounds;
 
 import org.terasology.assets.AssetData;
 import org.terasology.audio.StaticSound;
+import org.terasology.module.sandbox.API;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
+@API
 public class BlockSoundsData implements AssetData {
     private List<StaticSound> stepSounds = new ArrayList<>();
     private List<StaticSound> destroySounds = new ArrayList<>();

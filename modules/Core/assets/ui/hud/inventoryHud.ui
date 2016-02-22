@@ -1,0 +1,84 @@
+{
+  "type": "InventoryHud",
+  "skin": "inventoryDefault",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "flowLayout",
+        "id": "toolbar",
+        "contents": [
+          {
+            "type": "InventoryCell",
+            "targetSlot": 0
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 1
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 2
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 3
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 4
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 5
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 6
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 7
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 8
+          },
+          {
+            "type": "InventoryCell",
+            "targetSlot": 9
+          }
+        ],
+        "layoutInfo": {
+          "use-content-width": true,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "BOTTOM"
+          }
+        }
+      },
+      {
+        "type": "UICrosshair",
+        "id": "crosshair",
+        "crosshairIcon": "engine:gui#crosshair",
+        "chargeStages": [
+          "engine:gui#crosshairCharge1",
+          "engine:gui#crosshairCharge2",
+          "engine:gui#crosshairCharge3",
+          "engine:gui#crosshairCharge4",
+          "engine:gui#crosshairCharge5",
+          "engine:gui#crosshairCharge6",
+          "engine:gui#crosshairCharge7",
+          "engine:gui#crosshairCharge8"
+        ],
+        "layoutInfo": {
+          "use-content-width": true,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-vertical-center": {}
+        }
+      }
+    ]
+  }
+}

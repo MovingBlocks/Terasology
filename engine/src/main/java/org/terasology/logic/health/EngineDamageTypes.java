@@ -20,7 +20,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 
 /**
  * Helper enum for getting engine damage type prefabs.
- *
+ * TODO: Should this really be an engine mechanism?
  */
 public enum EngineDamageTypes {
     /**

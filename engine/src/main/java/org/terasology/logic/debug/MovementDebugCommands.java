@@ -27,7 +27,6 @@ import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 
@@ -123,12 +122,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
     public String hjump(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        if (health != null && move != null) {
+        if (move != null) {
             move.jumpSpeed = 75f;
-            health.fallingDamageSpeedThreshold = 85f;
-            health.excessSpeedDamageMultiplier = 2f;
-            clientComp.character.saveComponent(health);
             clientComp.character.saveComponent(move);
 
             return "High-jump mode activated";
@@ -153,15 +148,6 @@ public class MovementDebugCommands extends BaseComponentSystem {
             move.slopeFactor = moveDefault.slopeFactor;
             move.distanceBetweenFootsteps = moveDefault.distanceBetweenFootsteps;
             clientComp.character.saveComponent(move);
-        }
-
-        HealthComponent healthDefault = prefab.get().getComponent(HealthComponent.class);
-        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        if (health != null && healthDefault != null) {
-            health.fallingDamageSpeedThreshold = healthDefault.fallingDamageSpeedThreshold;
-            health.horizontalDamageSpeedThreshold = healthDefault.horizontalDamageSpeedThreshold;
-            health.excessSpeedDamageMultiplier = healthDefault.excessSpeedDamageMultiplier;
-            clientComp.character.saveComponent(health);
         }
 
         return "Normal speed values restored";

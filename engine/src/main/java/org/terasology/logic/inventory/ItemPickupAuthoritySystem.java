@@ -26,9 +26,11 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.VecMath;
 import org.terasology.physics.components.RigidBodyComponent;
+import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.family.BlockFamily;
@@ -56,6 +58,23 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
 
         if (!itemEntity.hasComponent(LocationComponent.class)) {
             itemEntity.addComponent(new LocationComponent(event.getPosition()));
+        }
+    }
+
+
+    @ReceiveEvent
+    public void onBumpGiveItemToEntity(CollideEvent event, EntityRef entity, PickupComponent pickupComponent) {
+        GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
+        entity.send(giveItemEvent);
+
+        if (giveItemEvent.isHandled()) {
+            // remove all the components added from the pickup prefab
+            ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
+            if (itemComponent != null) {
+                for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
+                    entity.removeComponent(component.getClass());
+                }
+            }
         }
     }
 
