@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,9 +188,13 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         optionRenderer = itemRenderer;
     }
 
-    public void setVisibleOptions(int num) { visibleOptionsNum = num; }
+    public void setVisibleOptions(int num) {
+        visibleOptionsNum = num;
+    }
 
-    public int getVisibleOptions() { return visibleOptionsNum; }
+    public int getVisibleOptions() {
+        return visibleOptionsNum;
+    }
 
     private class ItemListener extends BaseInteractionListener {
         private int index;
