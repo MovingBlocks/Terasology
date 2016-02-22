@@ -1,0 +1,12 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "Long Fuse"
+  },
+  "Item": {
+    "icon": "engine:items#pole"
+  },
+  "TimedExplosion": {
+    "fuseTimeMs": 10000
+  }
+}

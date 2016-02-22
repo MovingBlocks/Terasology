@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,10 @@
 package org.terasology.logic.actions;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.logic.health.EngineDamageTypes;
+import org.terasology.world.block.ForceBlockActive;
 
-/**
- */
-public class ExplosionActionComponent implements Component {
-    public ActionTarget relativeTo = ActionTarget.Instigator;
-    public int damageAmount = 1000;
-    public Prefab damageType = EngineDamageTypes.EXPLOSIVE.get();
-    public int maxRange = 64;
+// force block active so that we can put this on a block while waiting for the explosion
+@ForceBlockActive
+public class TimedExplosionComponent implements Component {
+    public long fuseTimeMs;
 }
