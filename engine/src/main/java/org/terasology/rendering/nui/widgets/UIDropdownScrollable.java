@@ -115,13 +115,11 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
             int scrollbarHeight = frame.size().y - itemMargin.getTop();
             int availableWidth = frame.size().x - scrollbarWidth;
-            int availableHeight = scrollbarHeight;
             int scrollbarXPos = availableWidth - itemMargin.getRight();
             int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
 
             // Item
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
-            int itemWidth = availableWidth;
 
             canvas.setPart(LIST_ITEM);
             for (int i = 0; i < optionListeners.size(); ++i) {
@@ -131,7 +129,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                     canvas.setMode(DEFAULT_MODE);
                 }
 
-                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), itemWidth, itemHeight);
+                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
 
                 // If outside location, then hide
                 try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
