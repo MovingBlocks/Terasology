@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.time;
 
-package org.terasology.logic.common.lifespan;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.network.BroadcastEvent;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
+@BroadcastEvent
+public class TimeResynchEvent implements Event {
+    private float gameTimeDilation;
 
-/**
- * Component describes the lifespan of an entity. When the lifespan ends the entity is destroyed.
- *
- */
-public class LifespanComponent implements Component {
-    // Lifespan in seconds
-    @Replicate
-    public float lifespan = 5;
-    @Replicate
-    public long deathTime;
-
-    public LifespanComponent() {
+    public TimeResynchEvent() {
     }
 
-    public LifespanComponent(float span) {
-        this.lifespan = span;
+    public TimeResynchEvent(float gameTimeDilation) {
+        this.gameTimeDilation = gameTimeDilation;
+    }
+
+    public float getGameTimeDilation() {
+        return gameTimeDilation;
     }
 }

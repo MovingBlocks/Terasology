@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -118,5 +119,12 @@ public class Location extends BaseComponentSystem {
             }
             childIterator.remove();
         }
+    }
+
+    @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
+    public void onResyncLocation(LocationResynchEvent event, EntityRef entityRef, LocationComponent locationComponent) {
+        locationComponent.setWorldPosition(event.getPosition());
+        locationComponent.setWorldRotation(event.getRotation());
+        entityRef.saveComponent(locationComponent);
     }
 }

@@ -18,7 +18,6 @@ package org.terasology.physics.bullet;
 
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
-
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.VecMath;
@@ -56,13 +55,8 @@ public class EntityMotionState extends MotionState {
     public void setWorldTransform(Transform transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            javax.vecmath.Quat4f rot = new javax.vecmath.Quat4f();
-            transform.getRotation(rot);
-            if (!transform.origin.equals(VecMath.to(loc.getWorldPosition())) || !rot.equals(VecMath.to(loc.getWorldRotation()))) {
-                loc.setWorldPosition(VecMath.from(transform.origin));
-                loc.setWorldRotation(VecMath.from(transform.getRotation(new javax.vecmath.Quat4f())));
-                entity.saveComponent(loc);
-            }
+            loc.setWorldPosition(VecMath.from(transform.origin));
+            loc.setWorldRotation(VecMath.from(transform.getRotation(new javax.vecmath.Quat4f())));
         }
     }
 

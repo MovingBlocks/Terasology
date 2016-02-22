@@ -17,7 +17,6 @@
 package org.terasology.physics.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
 
@@ -25,33 +24,15 @@ import org.terasology.network.BroadcastEvent;
  */
 @BroadcastEvent
 public class PhysicsResynchEvent implements Event {
-    private Vector3f position = new Vector3f();
-    private Quat4f rotation = new Quat4f();
     private Vector3f velocity = new Vector3f();
     private Vector3f angularVelocity = new Vector3f();
 
     protected PhysicsResynchEvent() {
     }
 
-    public PhysicsResynchEvent(Vector3f position, Quat4f rotation, Vector3f velocity, Vector3f angularVelocity) {
-        this.position.set(position);
-        this.rotation.set(rotation);
+    public PhysicsResynchEvent(Vector3f velocity, Vector3f angularVelocity) {
         this.velocity.set(velocity);
         this.angularVelocity.set(angularVelocity);
-    }
-
-    /**
-     * @return The position of the physics entity when this event is sent. Copy to use.
-     */
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    /**
-     * @return The rotation of the physics entity when this event is sent. Copy to use.
-     */
-    public Quat4f getRotation() {
-        return rotation;
     }
 
     /**

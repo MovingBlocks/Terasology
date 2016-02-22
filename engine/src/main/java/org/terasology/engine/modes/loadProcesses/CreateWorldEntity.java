@@ -22,6 +22,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.network.NetworkComponent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.generator.WorldConfigurator;
@@ -71,6 +72,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         } else {
             EntityRef worldEntity = entityManager.create();
             worldEntity.addComponent(new WorldComponent());
+            NetworkComponent networkComponent = new NetworkComponent();
+            networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
+            worldEntity.addComponent(networkComponent);
             worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
 
             // transfer all world generation parameters from Config to WorldEntity

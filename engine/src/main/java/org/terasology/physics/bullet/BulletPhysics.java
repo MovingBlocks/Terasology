@@ -95,7 +95,6 @@ import java.util.Set;
 
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet)
- *
  */
 public class BulletPhysics implements PhysicsEngine {
 
@@ -279,6 +278,10 @@ public class BulletPhysics implements PhysicsEngine {
         BulletRigidBody rigidBody = entityRigidBodies.remove(entity);
         if (rigidBody != null) {
             removeRigidBody(rigidBody);
+            // wake up this entities neighbors
+            float[] radius = new float[1];
+            rigidBody.rb.getCollisionShape().getBoundingSphere(new Vector3f(), radius);
+            awakenArea(rigidBody.getLocation(new org.terasology.math.geom.Vector3f()), radius[0]);
             return true;
         } else {
             logger.warn("Deleting non existing rigidBody from physics engine?! Entity: {}", entity);
@@ -304,16 +307,11 @@ public class BulletPhysics implements PhysicsEngine {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
             } else {
-                if (!rigidBody.rb.getAngularFactor().equals(rb.angularFactor)) {
-                    rigidBody.rb.setAngularFactor(VecMath.to(rb.angularFactor));
-                }
-                if (!rigidBody.rb.getLinearFactor().equals(rb.linearFactor)) {
-                    rigidBody.rb.setLinearFactor(VecMath.to(rb.linearFactor));
-                }
+                rigidBody.rb.setAngularFactor(VecMath.to(rb.angularFactor));
+                rigidBody.rb.setLinearFactor(VecMath.to(rb.linearFactor));
                 rigidBody.rb.setFriction(rb.friction);
             }
 
-            updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
             return true;
         } else {
             /*
