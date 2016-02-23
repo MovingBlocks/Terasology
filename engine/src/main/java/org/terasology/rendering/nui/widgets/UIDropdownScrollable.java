@@ -121,6 +121,12 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    /**
+     * Located in the onDraw method, this draws the menu items when the scrollbar is unnecessary.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param itemMargin Margin around every menu item.
+     * @param itemHeight Height per menu item.
+     */
     private void createNoScrollItems(Canvas canvas, Border itemMargin, int itemHeight) {
         for (int i = 0; i < optionListeners.size(); ++i) {
             readItemMouseOver(canvas, i);
@@ -129,6 +135,15 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    /**
+     * Located in the onDraw method, this draws the menu items with a scrollbar.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param frame Menu frame.
+     * @param font {@link Font} used in the menu.
+     * @param itemMargin Margin around every menu item.
+     * @param height Total menu height.
+     * @param itemHeight Height per menu item.
+     */
     private void createScrollbarItems(Canvas canvas, Rect2i frame, Font font, Border itemMargin, int height, int itemHeight) {
         // Scrollable Area
         Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
@@ -155,6 +170,11 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    /**
+     * Looks for MouseOver event for every item in the menu.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param i Item index.
+     */
     private void readItemMouseOver(Canvas canvas, int i) {
         if (optionListeners.get(i).isMouseOver()) {
             canvas.setMode(HOVER_MODE);
@@ -163,6 +183,13 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    /**
+     * Draws the item on the {@link Canvas}.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param itemMargin Margin around every menu item.
+     * @param i Item index.
+     * @param itemRegion Region of the item in the menu.
+     */
     private void drawItem(Canvas canvas, Border itemMargin, int i, Rect2i itemRegion) {
         canvas.drawBackground(itemRegion);
         optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
