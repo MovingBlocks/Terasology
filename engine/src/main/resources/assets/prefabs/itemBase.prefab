@@ -7,6 +7,13 @@
         "pickupPrefab": "engine:itemPickup",
         "cooldownTime": 200
     },
+    "BoxShape": {
+        "extents": [
+            1,
+            1,
+            1
+        ]
+    },
     "Network" : {
         "replicateMode" : "RELEVANT"
     },

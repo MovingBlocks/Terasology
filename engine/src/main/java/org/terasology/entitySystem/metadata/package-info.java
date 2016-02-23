@@ -18,4 +18,7 @@
  * This package contains metadata classes for the types important to the entity system - components and events.
  * These classes provide information above and beyond the basic class metadata, often driven from annotations.
  */
+@API
 package org.terasology.entitySystem.metadata;
+
+import org.terasology.module.sandbox.API;

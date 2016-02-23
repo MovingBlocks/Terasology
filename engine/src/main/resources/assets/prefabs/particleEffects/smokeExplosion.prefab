@@ -15,5 +15,6 @@
         "texture" : "engine:fx_smoke",
         "blendMode" : "ADD",
         "color" : [0.847, 0.78, 0.62, 0.5]
-    }
+    },
+    "network": {}
 }

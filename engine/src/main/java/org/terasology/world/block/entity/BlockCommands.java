@@ -31,7 +31,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
@@ -74,9 +74,6 @@ public class BlockCommands extends BaseComponentSystem {
 
     @In
     private PrefabManager prefabManager;
-
-    @In
-    private InventoryManager inventoryManager;
 
     @In
     private LocalPlayer localPlayer;
@@ -247,7 +244,9 @@ public class BlockCommands extends BaseComponentSystem {
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
 
-        if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
+        GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
+        item.send(giveItemEvent);
+        if (!giveItemEvent.isHandled()) {
             item.destroy();
         }
 

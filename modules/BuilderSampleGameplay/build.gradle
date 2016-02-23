@@ -1,0 +1,301 @@
+// Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
+
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
+apply from: "$rootDir/config/gradle/artifactory.gradle"
+
+import groovy.json.JsonSlurper
+import java.text.SimpleDateFormat;
+
+// Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
+
+// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
+buildscript {
+    repositories {
+        // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        // Artifactory plugin
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.0.0')
+
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+
+        // Needed for caching reflected data during builds
+        classpath 'org.reflections:reflections:0.9.10'
+        classpath 'dom4j:dom4j:1.6.1'
+    }
+}
+
+ext {
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
+}
+
+def moduleDepends = [];
+def moduleFile = file('module.txt')
+
+// The module file should always exist if the module was correctly created or cloned using Gradle
+if (!moduleFile.exists()) {
+    println "Y U NO EXIST MODULE.TXT!"
+    throw new GradleException("Failed to find module.txt for " + project.name)
+}
+
+//println "Scanning for dependencies in module.txt for " + project.name
+def slurper = new JsonSlurper()
+def moduleConfig = slurper.parseText(moduleFile.text)
+for (dependency in moduleConfig.dependencies) {
+    if (dependency.id != 'engine') {
+        moduleDepends += dependency.id
+    }
+}
+
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+version = moduleConfig.version
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.modules'
+
+println "Version for $project.name loaded as $version for group $group"
+
+// TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+// Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
+dependencies {
+    // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
+    if (project.name != project(':').name) {
+        println "\nProcessing module '$project.name' in a multi-project workspace"
+
+        // Dependency on the engine itself (actually its built jar file)
+        compile project(':engine')
+
+        // Engine unit tests contain classes that module unit tests can extend, so need to be compile, not testCompile
+        compile project(':engine-tests')
+
+        if (moduleDepends.size() > 0) {
+            println "* $project.name has extra dependencies:"
+            moduleDepends.each {
+                println "** $it"
+            }
+        } else {
+            println "* No extra dependencies"
+        }
+
+        // If the module has dependencies on other modules we look for either a source version or a remote binary
+        for (dependency in moduleDepends) {
+            File wouldBeSrcPath = new File(rootDir, 'modules/' + dependency)
+            //println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
+
+            // First see if we have an actual source module project in the Gradle project tree (user fetchModule'ed it)
+            if (wouldBeSrcPath.exists()) {
+                //TODO: This could hit problems with corrupt module directories?
+
+                println "*** Identified source: " + dependency
+                // Note: if artifactoryPublish is used in a multi-project workspace including modules the .pom gets hard version refs
+                // Normally they're expected to run in Jenkins standalone where they'll instead match the else and get version '+'
+                compile project(':modules:' + dependency)
+            } else {
+                println "*** Seeking as binary: " + dependency
+                // The '+' is satisfied by any version. "changing" triggers better checking for updated snapshots
+                // TODO: When version handling and promotion is in then we can probably ignore snapshots in normal cases
+                compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
+            }
+        }
+
+        // This step resolves artifacts early, after which project config CANNOT be altered again!
+        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+            def id = artifact.moduleVersion.id
+
+            // Check for any needed module dependencies on other modules that we need at runtime
+            if (id.group == 'org.terasology.modules' && id.name != "Core") {
+                File moduleSrcPath = new File(rootDir, 'modules/' + id.name)
+                File moduleJarPath = new File(rootDir, 'modules/' + id.name + '-' + id.version + '.jar')
+
+                if (moduleSrcPath.exists()) {
+                    println "*** Found module dependency $id.name in source form, not copying a runtime jar from Gradle"
+                } else {
+                    println "$project.name resolved binary $id.group - $id.name at version $id.version"
+
+                    // This copies the jar from the Gradle cache to the game's module dir for runtime usage, if needed
+                    if (!moduleJarPath.exists()) {
+                        println "* Writing a runtime jar to /modules: " + moduleJarPath.name
+                        moduleJarPath.createNewFile()
+                        moduleJarPath << artifact.file.bytes
+                    }
+                }
+            }
+        }
+    } else {
+        println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
+
+        // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
+        // TODO: Look for a provided engine jar in the workspace and use that if present
+        // TODO: Only use engine, engine-tests, and maybe core for compilation, but remove when publishing?
+        compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
+        compile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
+
+        // To get Terasology module dependencies we simply declare them against Artifactory
+        moduleDepends.each {
+            println "*** Attempting to fetch dependency module from Artifactory for " + project.name + ": " + it
+            // The '+' is satisfied by any version
+            compile(group: 'org.terasology.modules', name: it, version: '+', changing: true)
+
+        }
+
+        // TODO: parse and apply external lib dependencies if any are present
+        // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any trouble (is only for logging)
+        // This step resolves artifacts (both compile & testCompile) and prints out some interesting versions
+        configurations.testCompile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+            def id = artifact.moduleVersion.id
+            // Print out module (and engine stuff) dependencies and the exact versions they resolved at
+            if (id.group.startsWith('org.terasology')) {
+                println "*** $project.name remotely resolved $id.group - $id.name - version $id.version"
+            }
+        }
+    }
+}
+
+// Change the output dir of each module
+sourceSets {
+    main {
+        java {
+            output.classesDir 'build/classes'
+        }
+    }
+}
+
+// Generate the module directory structure if missing
+task createSkeleton() {
+    mkdir('assets')
+    mkdir('assets/animations')
+    mkdir('assets/atlas')
+    mkdir('assets/behaviors')
+    mkdir('assets/blocks')
+    mkdir('assets/blockSounds')
+    mkdir('assets/blockTiles')
+    mkdir('assets/fonts')
+    mkdir('assets/materials')
+    mkdir('assets/mesh')
+    mkdir('assets/music')
+    mkdir('assets/prefabs')
+    mkdir('assets/shaders')
+    mkdir('assets/shapes')
+    mkdir('assets/skeletalMesh')
+    mkdir('assets/skins')
+    mkdir('assets/sounds')
+    mkdir('assets/textures')
+    mkdir('assets/ui')
+    mkdir('overrides')
+    mkdir('deltas')
+    mkdir('src/main/java')
+    mkdir('src/test/java')
+}
+
+task cacheReflections {
+    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
+    // TODO: The extra "org" qualifier excludes test classes otherwise sucked up in Jenkins, causing issues. Redo later
+    File dirToReflect = new File(sourceSets.main.output.classesDir, "org")
+    inputs.files dirToReflect
+    outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    dependsOn classes
+    doFirst {
+        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+        dirToReflect.mkdirs()
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .addUrls(dirToReflect.toURI().toURL())
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    }
+}
+
+task cleanReflections(type: Delete) {
+    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache"
+}
+
+// This task syncs everything in the assets dir into the output dir, used when jarring the module
+task syncAssets(type: Sync) {
+    from 'assets'
+    into 'build/classes/assets'
+}
+
+task syncOverrides(type: Sync) {
+    from 'overrides'
+    into 'build/classes/overrides'
+}
+
+task syncDeltas(type: Sync) {
+    from 'deltas'
+    into 'build/classes/deltas'
+}
+
+// Instructions for packaging a jar file - is a manifest even needed for modules?
+jar {
+    // Make sure the assets directory is included
+    dependsOn cacheReflections
+    dependsOn syncAssets
+    dependsOn syncOverrides
+    dependsOn syncDeltas
+
+    // Jarring needs to copy module.txt and all the assets into the output
+    doFirst {
+        copy {
+            from 'module.txt'
+            into 'build/classes'
+        }
+    }
+}
+
+jar.finalizedBy cleanReflections
+
+// Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D
+idea {
+    module {
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+        downloadSources = true
+    }
+}
+
+// For Eclipse just make sure the classpath is right
+eclipse {
+    classpath {
+        defaultOutputDir = file('build/classes')
+    }
+}
+
+// Utility task to update the module (except Core) via Git - not tested with local changes present, may cause trouble
+task (updateModule, type: GitPull)  {
+    description = 'Updates source for the module from its home (most likely GitHub)'
+
+    // Base whether the task executes on two things
+    // 1 - we actually asked for it ("gradlew updateModule") - otherwise we don't want it to run TODO: Test for abbreviations?
+    // 2 - this is not the Core module, which lives with the engine and needs no updates
+    boolean enabled = "updateModule" in project.gradle.startParameter.taskNames && !project.name.equals("Core")
+    // TODO: Used to cheat with declaring tasks using << but that defers everything (including config) to execution phase
+    // Some tasks do not work that way, this one would ALWAYS go with default (root git repo) in that case
+    // Probably should go through other stuff and use this strategy instead of <<
+
+    // Only if we asked for it (and not Core) do we actually configure the repo path and log that we're updating
+    if (enabled) {
+
+        // This is the Git repo we're actually using - projectDir is specific to the executing project, a.k.a. module whatever
+        // If not enabled the default is the root project's Git dir, which is a valid Git dir
+        // However in the case of Core we'd be setting ain invalid Git dir which causes fail - so this avoids that
+        repoPath = projectDir
+
+        println "Pulling updates via Git to " + getRepoDir() + ", if dependencies change run Gradle again (like 'gradlew idea')"
+    }
+}

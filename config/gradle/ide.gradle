@@ -66,7 +66,7 @@ ext {
         // Set Terasology "modules" to use Git (also: huh, this works and both prints and does stuff - handy!)
         //println "Each module child project (for Git auto-enable): " +
         rootProject.project(':modules').childProjects.each { child ->
-            if (child.value.path == ':modules:Core'|| child.value.path == ':modules:CoreSampleGameplay') {
+            if (child.value.path == ':modules:Core' || child.value.path == ':modules:CoreSampleGameplay' || child.value.path == ':modules:BuilderSampleGameplay') {
                 println "Skipping IntelliJ Git setup for internal module: " + child.value.path
             } else {
                 println "Preparing IntelliJ Git setup for module $child.value.name"

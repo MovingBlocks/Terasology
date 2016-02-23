@@ -15,9 +15,11 @@
  */
 package org.terasology.logic.players;
 
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterSystem;
 import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
@@ -25,10 +27,8 @@ import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
-import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.CoreRegistry;
 
 /**
@@ -37,10 +37,6 @@ public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
     private int nextActivationId;
-
-    // TODO use same as CharacterSystem?
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD,
-            StandardCollisionGroup.CHARACTER};
 
     public LocalPlayer() {
     }
@@ -202,7 +198,7 @@ public class LocalPlayer {
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
         if (eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();

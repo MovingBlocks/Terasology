@@ -1,0 +1,38 @@
+{
+    "type" : "containerScreen",
+    "skin": "inventoryDefault",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "InventoryGrid",
+                "id" : "inventory",
+                "maxHorizontalCells" : 10,
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 128
+                    },
+                    "position-horizontal-center" : {}
+                }
+            },
+            {
+                "type" : "InventoryGrid",
+                "id" : "container",
+                "maxHorizontalCells" : 10,
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "inventory",
+                        "offset" : 16
+                    },
+                    "position-horizontal-center" : {}
+                }
+            }
+        ]
+    }
+}

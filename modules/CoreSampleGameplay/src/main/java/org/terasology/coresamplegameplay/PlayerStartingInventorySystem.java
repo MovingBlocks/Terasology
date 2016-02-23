@@ -23,8 +23,6 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
@@ -32,8 +30,6 @@ import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.registry.In;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
-
-import java.util.Arrays;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerStartingInventorySystem extends BaseComponentSystem {
@@ -57,6 +53,10 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:companion"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:brick:engine:stair"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("core:Tnt"), 99));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:fuseShort"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:fuseLong"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:ShortRailgunTool"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:thoroughRailgunTool"));
 
         inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:railgunTool"));
 

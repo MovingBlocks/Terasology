@@ -1,0 +1,20 @@
+{
+    "type" : "inventoryScreen",
+    "skin": "inventoryDefault",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "InventoryGrid",
+                "id" : "inventory",
+                "maxHorizontalCells" : 10,
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-vertical-center" : {}
+                }
+            }
+        ]
+    }
+}

@@ -135,9 +135,10 @@ public class DebugOverlay extends CoreScreenLayer {
                         Biome biome = worldProvider.getBiome(blockPos);
                         biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
                     }
-                    return String.format("total vus: %s | worldTime: %.3f | biome: %s",
+                    return String.format("total vus: %s | worldTime: %.3f | tiDi: %.1f |  biome: %s",
                             ChunkTessellator.getVertexArrayUpdateCount(),
                             worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
+                            time.getGameTimeDilation(),
                             biomeId);
                 }
             });

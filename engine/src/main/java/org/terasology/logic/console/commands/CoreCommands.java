@@ -42,8 +42,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
@@ -117,20 +116,10 @@ public class CoreCommands extends BaseComponentSystem {
     private AssetManager assetManager;
 
     @In
-    private InventoryManager inventoryManager;
-
-    @In
     private TranslationSystem translationSystem;
 
     @In
     private Config config;
-
-    private PickupBuilder pickupBuilder;
-
-    @Override
-    public void initialise() {
-        pickupBuilder = new PickupBuilder(entityManager, inventoryManager);
-    }
 
     @Command(shortDescription = "Search commands/prefabs/assets",
             helpText = "Displays commands, prefabs, and assets with matching name, description, "
@@ -356,7 +345,7 @@ public class CoreCommands extends BaseComponentSystem {
         BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
         EntityRef blockItem = blockItemFactory.newInstance(block);
 
-        pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
+        blockItem.send(new DropItemEvent(spawnPos));
         return "Spawned block.";
     }
 
