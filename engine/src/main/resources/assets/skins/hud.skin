@@ -14,18 +14,5 @@
             "fixed-width" : 40,
             "fixed-height" : 40
         }
-    },
-    "families" : {
-        "healthBar" : {
-            "elements" : {
-                "UIIconBar" : {
-                    "parts" : {
-                        "icon" : {
-                            "background" : "engine:icons#darkHeartOutline"
-                        }
-                    }
-                }
-            }
-        }
     }
 }

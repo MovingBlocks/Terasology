@@ -23,37 +23,6 @@
             "align-vertical" : "bottom",
             "text-align-horizontal" : "left"
         },
-        "InventoryCell" : {
-            "background" : "engine:box",
-            "background-border" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
-            },
-            "margin" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
-            },
-            "modes" : {
-                "active" : {
-                    "background" : "engine:boxActive"
-                }
-            }
-        },
-        "TransferItemCursor" : {
-            "align-horizontal" : "center",
-            "align-vertical" : "top"
-        },
-        "ItemIcon" : {
-            "fixed-width" : 48,
-            "fixed-height" : 48,
-            "texture-scale-mode" : "scale fit",
-            "text-align-horizontal" : "right",
-            "text-align-vertical" : "bottom"
-        },
         "UIText" : {
             "text-align-horizontal" : "left",
             "text-align-vertical" : "top",
@@ -141,6 +110,61 @@
             }
         },
         "UIDropdown" : {
+            "text-align-horizontal" : "left",
+            "fixed-height" : 32,
+            "parts" : {
+                "base" : {
+                    "background" : "dropdown",
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 29
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 31
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "dropdownActive"
+                        }
+                    }
+                },
+                "list" : {
+                    "background" : "dropdownList",
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 3
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    }
+                },
+                "list-item" : {
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "hover" : {
+                            "text-color" : "FFFF00FF",
+                            "background" : "dropdownListItemActive"
+                        }
+                    }
+                }
+            }
+        },
+        "UIDropdownScrollable" : {
             "text-align-horizontal" : "left",
             "fixed-height" : 32,
             "parts" : {

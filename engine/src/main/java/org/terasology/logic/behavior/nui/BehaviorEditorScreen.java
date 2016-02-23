@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.behavior.BehaviorComponent;
@@ -38,7 +39,7 @@ import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIList;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
@@ -71,6 +72,9 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
     @In
     private OneOfProviderFactory providerFactory;
 
+    @In
+    private Context context;
+
     @Override
     public void initialise() {
         debugger = new BehaviorDebugger(nodeFactory);
@@ -81,6 +85,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
         selectEntity = find("select_entity", UIDropdown.class);
         palette = find("palette", UIList.class);
 
+        behaviorEditor.initialize(context);
         behaviorEditor.bindSelection(new Binding<RenderableNode>() {
             private PropertyProvider provider = new PropertyProvider();
 

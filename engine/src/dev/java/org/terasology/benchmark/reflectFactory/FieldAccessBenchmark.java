@@ -15,13 +15,13 @@
  */
 package org.terasology.benchmark.reflectFactory;
 
-import org.terasology.benchmark.AbstractBenchmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.benchmark.AbstractBenchmark;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.reflection.reflect.FieldAccessor;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.logic.health.HealthComponent;
 
 /**
  */
@@ -31,7 +31,7 @@ public class FieldAccessBenchmark extends AbstractBenchmark {
     private ReflectFactory reflectFactory;
     private FieldAccessor accessor;
     private int i;
-    private HealthComponent comp;
+    private DisplayNameComponent comp;
 
     public FieldAccessBenchmark(ReflectFactory reflectFactory) {
         super("Field access via " + reflectFactory.getClass().getSimpleName(), 100000000, new int[]{100000000, 100000000});
@@ -41,9 +41,9 @@ public class FieldAccessBenchmark extends AbstractBenchmark {
     @Override
     public void setup() {
         i = 0;
-        comp = new HealthComponent();
+        comp = new DisplayNameComponent();
         try {
-            accessor = reflectFactory.createFieldAccessor(HealthComponent.class, HealthComponent.class.getField("maxHealth"));
+            accessor = reflectFactory.createFieldAccessor(DisplayNameComponent.class, DisplayNameComponent.class.getField("description"));
         } catch (InaccessibleFieldException | NoSuchFieldException e) {
             logger.error("Failed to establish field accessor object", e);
         }

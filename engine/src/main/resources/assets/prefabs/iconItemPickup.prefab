@@ -1,6 +1,0 @@
-{
-    "parent" : "engine:itemPickup",
-    "BoxShape" : {
-        "extents" : [2, 2, 0.2]
-    }
-}

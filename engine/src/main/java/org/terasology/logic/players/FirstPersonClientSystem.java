@@ -19,6 +19,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -30,8 +31,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.inventory.PickupComponent;
-import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
@@ -58,6 +57,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     private EntityRef handEntity;
     private EntityRef currentHeldItem;
+    private boolean relinkHeldItem;
 
     private EntityRef getHandEntity() {
         if (handEntity == null) {
@@ -70,29 +70,29 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     @ReceiveEvent
-    public void ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent event, EntityRef camera, FirstPersonHeldItemMountPointComponent firstPersonHeldItemMountPointComponent) {
+    public void ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent event, EntityRef camera,
+                                                           FirstPersonHeldItemMountPointComponent firstPersonHeldItemMountPointComponent) {
         if (!firstPersonHeldItemMountPointComponent.mountPointEntity.exists()) {
             EntityBuilder builder = entityManager.newBuilder("engine:FirstPersonHeldItemMountPoint");
             builder.setPersistent(false);
             firstPersonHeldItemMountPointComponent.mountPointEntity = builder.build();
             camera.saveComponent(firstPersonHeldItemMountPointComponent);
         }
-        if (camera.exists()) {
-            // link the mount point entity to the camera
-            Location.removeChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity);
-            Location.attachChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity,
-                    firstPersonHeldItemMountPointComponent.translate,
-                    new Quat4f(
-                            TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.y,
-                            TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.x,
-                            TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.z),
-                    firstPersonHeldItemMountPointComponent.scale);
-        }
+
+        // link the mount point entity to the camera
+        Location.removeChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity);
+        Location.attachChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity,
+                firstPersonHeldItemMountPointComponent.translate,
+                new Quat4f(
+                        TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.y,
+                        TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.x,
+                        TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.z),
+                firstPersonHeldItemMountPointComponent.scale);
     }
 
     @ReceiveEvent
     public void ensureHeldItemIsMountedOnLoad(OnChangedComponent event, EntityRef entityRef, ClientComponent clientComponent) {
-        if (localPlayer.getCharacterEntity().exists() && localPlayer.getCameraEntity().exists()) {
+        if (localPlayer.getClientEntity().equals(entityRef) && localPlayer.getCharacterEntity().exists() && localPlayer.getCameraEntity().exists()) {
             CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
             if (characterHeldItemComponent != null) {
                 // special case of sending in null so that the initial load works
@@ -121,29 +121,33 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @ReceiveEvent
     public void onHeldItemActivated(OnActivatedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        linkHeldItemLocationForLocalPlayer(character, heldItemComponent.selectedItem, currentHeldItem);
-        currentHeldItem = heldItemComponent.selectedItem;
-    }
-
-    @ReceiveEvent
-    public void onDroppedItemRemoveClientSideLocationComponent(ItemDroppedEvent event, EntityRef item, LocationComponent locationComponent) {
-        // This is only needed on local single player because when a dropped item is split from the original held item (only partially dropped), the item nested
-        // inside the pickupComponent will have a copy of the LocationComponent added on the client side and will continue rendering in front of the camera.
-        // This does not happen on a remote client because the pickupComponent.itemEntity is not replicated across the network.
-        PickupComponent pickupComponent = event.getPickup().getComponent(PickupComponent.class);
-        if (pickupComponent != null) {
-            pickupComponent.itemEntity.removeComponent(LocationComponent.class);
+        if (localPlayer.getCharacterEntity().equals(character)) {
+            EntityRef oldHeldItem = currentHeldItem;
+            currentHeldItem = heldItemComponent.selectedItem;
+            linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
         }
     }
 
     @ReceiveEvent
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        linkHeldItemLocationForLocalPlayer(character, heldItemComponent.selectedItem, currentHeldItem);
-        currentHeldItem = heldItemComponent.selectedItem;
+        if (localPlayer.getCharacterEntity().equals(character)) {
+            EntityRef oldHeldItem = currentHeldItem;
+            currentHeldItem = heldItemComponent.selectedItem;
+            linkHeldItemLocationForLocalPlayer(character, currentHeldItem, oldHeldItem);
+        }
+    }
+
+    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
+    public void onLocationRemovedAddClientSideLocation(BeforeDeactivateComponent event, EntityRef entityRef, LocationComponent locationComponent) {
+        // when in a remote client situation,  the remove LocationComponent happens after the CharacterHeldItemComponent is changed.
+        // So this allows re-adding the client side LocationComponent after this
+        if (entityRef.equals(currentHeldItem)) {
+            relinkHeldItem = true;
+        }
     }
 
     void linkHeldItemLocationForLocalPlayer(EntityRef character, EntityRef newItem, EntityRef oldItem) {
-        if (character.equals(localPlayer.getCharacterEntity()) && !newItem.equals(oldItem)) {
+        if (!newItem.equals(oldItem)) {
             EntityRef camera = localPlayer.getCameraEntity();
             FirstPersonHeldItemMountPointComponent mountPointComponent = camera.getComponent(FirstPersonHeldItemMountPointComponent.class);
             if (mountPointComponent != null) {
@@ -151,9 +155,11 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                 if (oldItem != null && oldItem.exists()) {
                     Location.removeChild(mountPointComponent.mountPointEntity, oldItem);
                     oldItem.removeComponent(LocationComponent.class);
+                    oldItem.removeComponent(ItemIsHeldComponent.class);
                 } else {
                     Location.removeChild(mountPointComponent.mountPointEntity, getHandEntity());
                     getHandEntity().removeComponent(LocationComponent.class);
+                    getHandEntity().removeComponent(ItemIsHeldComponent.class);
                 }
 
                 // use the hand if there is no new item
@@ -164,6 +170,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
                 //ensure the item has a location
                 heldItem.addOrSaveComponent(new LocationComponent());
+                heldItem.addOrSaveComponent(new ItemIsHeldComponent());
 
                 FirstPersonHeldItemTransformComponent heldItemTransformComponent = heldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
                 if (heldItemTransformComponent == null) {
@@ -185,14 +192,37 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
      */
     @Override
     public void update(float delta) {
+        // relink the held item if its location got removed from an item transition that removed its location
+        if (relinkHeldItem) {
+            linkHeldItemLocationForLocalPlayer(localPlayer.getCharacterEntity(), currentHeldItem, null);
+            relinkHeldItem = false;
+        }
+
+        // ensure that there are no lingering items that are marked as still held. This situation happens with client side predicted items
+        for (EntityRef entityRef : entityManager.getEntitiesWith(ItemIsHeldComponent.class)) {
+            if (!entityRef.equals(currentHeldItem) && !entityRef.equals(handEntity)) {
+                entityRef.removeComponent(ItemIsHeldComponent.class);
+
+                // also remove the location if it is currently location linked to the mount point
+                EntityRef camera = localPlayer.getCameraEntity();
+                FirstPersonHeldItemMountPointComponent mountPointComponent = camera.getComponent(FirstPersonHeldItemMountPointComponent.class);
+                LocationComponent locationComponent = entityRef.getComponent(LocationComponent.class);
+                if (mountPointComponent != null && locationComponent != null && locationComponent.getParent().equals(mountPointComponent.mountPointEntity)) {
+                    entityRef.removeComponent(LocationComponent.class);
+                }
+            }
+        }
+
         // get the first person mount point and rotate it away from the camera
         CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
         FirstPersonHeldItemMountPointComponent mountPointComponent = localPlayer.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
-        LocationComponent locationComponent = mountPointComponent.mountPointEntity.getComponent(LocationComponent.class);
+        if (characterHeldItemComponent == null
+                || mountPointComponent == null) {
+            return;
+        }
 
-        if (characterHeldItemComponent == null ||
-                mountPointComponent == null ||
-                locationComponent == null) {
+        LocationComponent locationComponent = mountPointComponent.mountPointEntity.getComponent(LocationComponent.class);
+        if (locationComponent == null) {
             return;
         }
 

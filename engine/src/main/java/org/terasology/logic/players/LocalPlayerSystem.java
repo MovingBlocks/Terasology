@@ -46,7 +46,6 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.interactions.InteractionUtil;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -255,18 +254,20 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onTargetChanged(PlayerTargetChangedEvent event, EntityRef entity) {
         EntityRef target = event.getNewTarget();
         if (target.exists()) {
-            BlockComponent blockComp = target.getComponent(BlockComponent.class);
-            BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
-            if (blockComp != null || blockRegion != null) {
-                Vector3f blockPos = target.getComponent(LocationComponent.class).getWorldPosition();
-                Block block = worldProvider.getBlock(blockPos);
-                aabb = block.getBounds(blockPos);
-            } else {
-                MeshComponent mesh = target.getComponent(MeshComponent.class);
-                LocationComponent location = target.getComponent(LocationComponent.class);
-                if (mesh != null && mesh.mesh != null && location != null) {
-                    aabb = mesh.mesh.getAABB();
-                    aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+            LocationComponent location = target.getComponent(LocationComponent.class);
+            if (location != null) {
+                BlockComponent blockComp = target.getComponent(BlockComponent.class);
+                BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
+                if (blockComp != null || blockRegion != null) {
+                    Vector3f blockPos = location.getWorldPosition();
+                    Block block = worldProvider.getBlock(blockPos);
+                    aabb = block.getBounds(blockPos);
+                } else {
+                    MeshComponent mesh = target.getComponent(MeshComponent.class);
+                    if (mesh != null && mesh.mesh != null) {
+                        aabb = mesh.mesh.getAABB();
+                        aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+                    }
                 }
             }
         } else {
@@ -342,7 +343,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
 
-    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
             return;

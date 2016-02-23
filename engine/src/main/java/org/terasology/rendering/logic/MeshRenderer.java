@@ -171,7 +171,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         for (EntityRef entity : entityRefs) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-            if (meshComp.material.isRenderable()) {
+            if (meshComp != null && meshComp.material != null && meshComp.material.isRenderable()) {
                 meshComp.material.enable();
                 LocationComponent location = entity.getComponent(LocationComponent.class);
                 if (location == null) {

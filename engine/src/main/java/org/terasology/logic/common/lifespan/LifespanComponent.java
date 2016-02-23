@@ -27,6 +27,8 @@ public class LifespanComponent implements Component {
     // Lifespan in seconds
     @Replicate
     public float lifespan = 5;
+    @Replicate
+    public long deathTime;
 
     public LifespanComponent() {
     }

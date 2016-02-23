@@ -14,6 +14,7 @@ gradle.properties
 /out/
 modules/Core/Core.iml
 modules/CoreSampleGameplay/CoreSampleGameplay.iml
+modules/BuilderSampleGameplay/BuilderSampleGameplay.iml
 facades/PC/PC.iml
 facades/TeraEd/TeraEd.iml
 engine/engine.iml
@@ -69,6 +70,7 @@ extensions
 /modules/*
 !/modules/Core
 !/modules/CoreSampleGameplay
+!/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
 /meta/*
 !/meta/subprojects.gradle

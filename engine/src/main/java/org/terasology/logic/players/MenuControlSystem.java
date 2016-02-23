@@ -17,7 +17,6 @@
 package org.terasology.logic.players;
 
 import org.terasology.asset.Assets;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -28,18 +27,13 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
-import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.asset.UIData;
-import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
-import org.terasology.rendering.nui.layers.ingame.inventory.TransferItemCursor;
 import org.terasology.rendering.opengl.PostProcessor;
 
 /**
@@ -53,17 +47,6 @@ public class MenuControlSystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("toolbar");
-        TransferItemCursor cursor = new TransferItemCursor();
-        UIElement cursorElement = Assets.generateAsset(new ResourceUrn("engine:transferItemCursor"), new UIData(cursor), UIElement.class);
-        nuiManager.addOverlay(cursorElement, ControlWidget.class);
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onToggleInventory(InventoryButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
-            nuiManager.toggleScreen("engine:inventoryScreen");
-            event.consume();
-        }
     }
 
     @ReceiveEvent(components = ClientComponent.class)

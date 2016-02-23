@@ -16,14 +16,13 @@
 package org.terasology.logic.particles;
 
 import com.google.common.collect.Lists;
-
+import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.network.Replicate;
 import org.terasology.reflection.MappedContainer;
-import org.terasology.entitySystem.Component;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.world.block.family.BlockFamily;
 
 import java.util.List;
 
@@ -36,30 +35,46 @@ public final class BlockParticleEffectComponent implements Component {
         ADD
     }
 
+    @Replicate
     // Can be null for non-block particles
-    public BlockFamily blockType;
+    public String blockType;
     // If no texture is specified, the default block texture atlas is used
+    @Replicate
     public Texture texture;
 
+    @Replicate
     public int spawnCount = 16;
+    @Replicate
     public boolean destroyEntityOnCompletion;
+    @Replicate
     public Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    @Replicate
     public ParticleBlendMode blendMode = ParticleBlendMode.OPAQUE;
 
     // Initial conditions
+    @Replicate
     public Vector3f spawnRange = new Vector3f();
+    @Replicate
     public Vector3f initialVelocityRange = new Vector3f();
+    @Replicate
     public float minSize = 0.1f;
+    @Replicate
     public float maxSize = 1.0f;
+    @Replicate
     public float minLifespan;
+    @Replicate
     public float maxLifespan = 1.0f;
-
+    @Replicate
     public boolean randBlockTexDisplacement;
+    @Replicate
     public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
 
     // Lifetime conditions
+    @Replicate
     public Vector3f targetVelocity = new Vector3f();
+    @Replicate
     public Vector3f acceleration = new Vector3f();
+    @Replicate
     public boolean collideWithBlocks;
 
     public List<Particle> particles = Lists.newArrayList();

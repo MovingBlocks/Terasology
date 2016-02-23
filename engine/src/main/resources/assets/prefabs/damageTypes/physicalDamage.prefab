@@ -1,2 +1,5 @@
 {
+  "blockDamageModifier": {
+    "impulsePower": 30
+  }
 }

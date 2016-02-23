@@ -18,6 +18,7 @@ package org.terasology.physics.bullet;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.BroadphasePair;
+import com.bulletphysics.collision.broadphase.BroadphaseProxy;
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
@@ -48,6 +49,7 @@ import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +95,6 @@ import java.util.Set;
 
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet)
- *
  */
 public class BulletPhysics implements PhysicsEngine {
 
@@ -202,6 +203,11 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public HitResult rayTrace(org.terasology.math.geom.Vector3f from1, org.terasology.math.geom.Vector3f direction, float distance, CollisionGroup... collisionGroups) {
+        return rayTrace(from1, direction, distance, Sets.newHashSet(), collisionGroups);
+    }
+
+    @Override
+    public HitResult rayTrace(org.terasology.math.geom.Vector3f from1, org.terasology.math.geom.Vector3f direction, float distance, Set<EntityRef> excludedEntities, CollisionGroup... collisionGroups) {
         Vector3f to = new Vector3f(VecMath.to(direction));
         Vector3f from = VecMath.to(from1);
         to.scale(distance);
@@ -209,8 +215,22 @@ public class BulletPhysics implements PhysicsEngine {
 
         short filter = combineGroups(collisionGroups);
 
+        // lookup all the collision item ids for these entities
+        Set<Integer> excludedCollisionIds = Sets.newHashSet();
+        for (EntityRef excludedEntity : excludedEntities) {
+            if (entityRigidBodies.containsKey(excludedEntity)) {
+                excludedCollisionIds.add(entityRigidBodies.get(excludedEntity).rb.getBroadphaseHandle().getUid());
+            }
+            if (entityColliders.containsKey(excludedEntity)) {
+                excludedCollisionIds.add(entityColliders.get(excludedEntity).collider.getBroadphaseHandle().getUid());
+            }
+            if (entityTriggers.containsKey(excludedEntity)) {
+                excludedCollisionIds.add(entityTriggers.get(excludedEntity).getBroadphaseHandle().getUid());
+            }
+        }
+
         CollisionWorld.ClosestRayResultWithUserDataCallback closest =
-                new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
+                new ClosestRayResultWithUserDataCallbackExcludingCollisionIds(from, to, excludedCollisionIds);
         closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
         closest.collisionFilterMask = filter;
 
@@ -258,6 +278,10 @@ public class BulletPhysics implements PhysicsEngine {
         BulletRigidBody rigidBody = entityRigidBodies.remove(entity);
         if (rigidBody != null) {
             removeRigidBody(rigidBody);
+            // wake up this entities neighbors
+            float[] radius = new float[1];
+            rigidBody.rb.getCollisionShape().getBoundingSphere(new Vector3f(), radius);
+            awakenArea(rigidBody.getLocation(new org.terasology.math.geom.Vector3f()), radius[0]);
             return true;
         } else {
             logger.warn("Deleting non existing rigidBody from physics engine?! Entity: {}", entity);
@@ -283,16 +307,11 @@ public class BulletPhysics implements PhysicsEngine {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
             } else {
-                if (!rigidBody.rb.getAngularFactor().equals(rb.angularFactor)) {
-                    rigidBody.rb.setAngularFactor(VecMath.to(rb.angularFactor));
-                }
-                if (!rigidBody.rb.getLinearFactor().equals(rb.linearFactor)) {
-                    rigidBody.rb.setLinearFactor(VecMath.to(rb.linearFactor));
-                }
+                rigidBody.rb.setAngularFactor(VecMath.to(rb.angularFactor));
+                rigidBody.rb.setLinearFactor(VecMath.to(rb.linearFactor));
                 rigidBody.rb.setFriction(rb.friction);
             }
 
-            updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
             return true;
         } else {
             /*
@@ -717,6 +736,24 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     //********************Private helper classes*********************\\
+
+    private static class ClosestRayResultWithUserDataCallbackExcludingCollisionIds extends CollisionWorld.ClosestRayResultWithUserDataCallback {
+        Set<Integer> excludedIds;
+
+        public ClosestRayResultWithUserDataCallbackExcludingCollisionIds(Vector3f rayFromWorld, Vector3f rayToWorld, Set<Integer> excludedIds) {
+            super(rayFromWorld, rayToWorld);
+            this.excludedIds = excludedIds;
+        }
+
+        @Override
+        public boolean needsCollision(BroadphaseProxy proxy0) {
+            if (excludedIds.contains(proxy0.getUid())) {
+                return false;
+            } else {
+                return super.needsCollision(proxy0);
+            }
+        }
+    }
 
     private static class RigidBodyRequest {
         final BulletRigidBody body;

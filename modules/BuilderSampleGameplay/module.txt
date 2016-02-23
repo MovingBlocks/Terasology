@@ -1,0 +1,11 @@
+{
+    "id" : "BuilderSampleGameplay",
+    "version" : "0.1.0-SNAPSHOT",
+    "author" : "",
+    "displayName" : "Builder Sample Gameplay",
+    "description" : "The last item you pick up is what you can build with. No restrictions, build to your heart's content.  Also uses 64x64 pixel block tiles.",
+    "dependencies" : [],
+    "serverSideOnly" : false,
+    "isGameplay" : "true",
+    "defaultWorldGenerator" : "BuilderSampleGameplay:BuilderSampleWorld"
+}

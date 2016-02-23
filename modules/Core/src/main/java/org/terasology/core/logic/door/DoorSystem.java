@@ -21,9 +21,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
@@ -35,6 +37,7 @@ import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -61,6 +64,8 @@ public class DoorSystem extends BaseComponentSystem {
     private AudioManager audioManager;
     @In
     private InventoryManager inventoryManager;
+    @In
+    private EntitySystemLibrary entitySystemLibrary;
 
     @ReceiveEvent(components = {DoorComponent.class, ItemComponent.class})
     public void placeDoor(ActivateEvent event, EntityRef entity) {
@@ -128,7 +133,8 @@ public class DoorSystem extends BaseComponentSystem {
         worldProvider.getWorldEntity().send(blockEvent);
 
         if (!blockEvent.isConsumed()) {
-            EntityRef newDoor = entity.copy();
+            EntityRef newDoor = entityManager.create("DoorRegion");
+            entity.removeComponent(MeshComponent.class);
             newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
             Vector3f doorCenter = bottomBlockPos.toVector3f();
             doorCenter.y += 0.5f;
@@ -138,8 +144,7 @@ public class DoorSystem extends BaseComponentSystem {
             newDoorComp.openSide = attachSide.reverse();
             newDoorComp.isOpen = false;
             newDoor.saveComponent(newDoorComp);
-            newDoor.removeComponent(ItemComponent.class);
-            audioManager.playSound(Assets.getSound("engine:PlaceBlock").get(), 0.5f);
+            newDoor.send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
             logger.info("Closed Side: {}", newDoorComp.closedSide);
             logger.info("Open Side: {}", newDoorComp.openSide);
         }
@@ -185,8 +190,7 @@ public class DoorSystem extends BaseComponentSystem {
         worldProvider.setBlock(regionComp.region.max(), topBlock);
         StaticSound sound = (door.isOpen) ? door.closeSound : door.openSound;
         if (sound != null) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            audioManager.playSound(sound, loc.getWorldPosition(), 10, 1);
+            entity.send(new PlaySoundEvent(sound, 1f));
         }
 
         door.isOpen = !door.isOpen;

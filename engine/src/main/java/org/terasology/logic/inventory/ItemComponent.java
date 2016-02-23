@@ -33,15 +33,18 @@ public final class ItemComponent implements Component {
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public TextureRegionAsset<?> icon;
 
+    //TODO: move this to a separate component alongside the inventory system
     /**
      * If this item is stackable, it should have a unique ID (so alike stacks can be merged)
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String stackId = "";
 
+    //TODO: move this to a separate component alongside the inventory system
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public byte maxStackSize = 99;
 
+    //TODO: move this to a separate component alongside the inventory system
     /**
      * How many of said item are there in this stack
      */
@@ -65,16 +68,19 @@ public final class ItemComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public UsageType usage = UsageType.NONE;
 
+    //TODO: move this to a separate component
     /**
      * Does this item drop in quantity on usage (stacks of things would, tools would not)
      */
     public boolean consumedOnUse;
 
+    //TODO: move this to a separate component alongside the health system
     /**
      * Setting for how much damage would be inflicted on attack (for instance to damage a block)
      */
     public int baseDamage = 1;
 
+    //TODO: move this to a separate component alongside the health system
     public Prefab damageType;
 
     public Prefab pickupPrefab;

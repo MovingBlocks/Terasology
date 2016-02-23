@@ -28,5 +28,6 @@ public class BlockDamageModifierComponent implements Component {
     public float blockAnnihilationChance;
     public boolean skipPerBlockEffects;
     public boolean directPickup;
+    public float impulsePower = 0f;
 
 }
