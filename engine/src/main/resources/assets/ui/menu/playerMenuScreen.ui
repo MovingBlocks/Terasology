@@ -78,7 +78,7 @@
                             "text": "${engine:menu#settings-language}:"
                         },
                         {
-                            "type": "UIDropdown",
+                            "type": "UIDropdownScrollable",
                             "id": "language"
                         }
                     ]

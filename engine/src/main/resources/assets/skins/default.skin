@@ -164,6 +164,61 @@
                 }
             }
         },
+        "UIDropdownScrollable" : {
+            "text-align-horizontal" : "left",
+            "fixed-height" : 32,
+            "parts" : {
+                "base" : {
+                    "background" : "dropdown",
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 29
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 31
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "dropdownActive"
+                        }
+                    }
+                },
+                "list" : {
+                    "background" : "dropdownList",
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 3
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    }
+                },
+                "list-item" : {
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "hover" : {
+                            "text-color" : "FFFF00FF",
+                            "background" : "dropdownListItemActive"
+                        }
+                    }
+                }
+            }
+        },
         "UIButton" : {
             "text-align-horizontal" : "center",
             "text-align-vertical" : "middle",
