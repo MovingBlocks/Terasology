@@ -18,9 +18,8 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.AudioEndListener;
-import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
@@ -49,8 +48,6 @@ public class PlaySoundNode extends Node {
 
     public static class PlaySoundTask extends Task implements AudioEndListener {
         @In
-        private AudioManager audioManager;
-        @In
         private AssetManager assetManager;
         private boolean playing;
         private boolean finished;
@@ -65,12 +62,7 @@ public class PlaySoundNode extends Node {
             if (uri != null) {
                 Optional<StaticSound> snd = assetManager.getAsset(uri, StaticSound.class);
                 if (snd.isPresent()) {
-                    if (actor().hasLocation()) {
-                        Vector3f worldPosition = actor().location().getWorldPosition();
-                        audioManager.playSound(snd.get(), worldPosition, getNode().volume, AudioManager.PRIORITY_NORMAL, this);
-                    } else {
-                        audioManager.playSound(snd.get(), new Vector3f(), getNode().volume, AudioManager.PRIORITY_NORMAL, this);
-                    }
+                    actor().minion().send(new PlaySoundEvent(snd.get(), getNode().volume));
                     playing = true;
                 }
             }

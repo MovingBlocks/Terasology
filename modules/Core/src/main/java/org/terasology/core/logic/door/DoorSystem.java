@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -143,8 +144,7 @@ public class DoorSystem extends BaseComponentSystem {
             newDoorComp.openSide = attachSide.reverse();
             newDoorComp.isOpen = false;
             newDoor.saveComponent(newDoorComp);
-            newDoor.removeComponent(ItemComponent.class);
-            audioManager.playSound(Assets.getSound("engine:PlaceBlock").get(), 0.5f);
+            newDoor.send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
             logger.info("Closed Side: {}", newDoorComp.closedSide);
             logger.info("Open Side: {}", newDoorComp.openSide);
         }
@@ -190,8 +190,7 @@ public class DoorSystem extends BaseComponentSystem {
         worldProvider.setBlock(regionComp.region.max(), topBlock);
         StaticSound sound = (door.isOpen) ? door.closeSound : door.openSound;
         if (sound != null) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            audioManager.playSound(sound, loc.getWorldPosition(), 10, 1);
+            entity.send(new PlaySoundEvent(sound, 1f));
         }
 
         door.isOpen = !door.isOpen;

@@ -46,6 +46,7 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.tiles.WorldAtlas;
 
@@ -98,6 +99,9 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     @In
     private Config config;
 
+    @In
+    private BlockManager blockManager;
+
     private Random random = new FastRandom();
     private NearestSortingList sorter = new NearestSortingList();
     private int displayList;
@@ -141,8 +145,6 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
             if (particleEffect.particles.size() == 0 && particleEffect.destroyEntityOnCompletion) {
                 entity.destroy();
-            } else {
-                entity.saveComponent(particleEffect);
             }
         }
     }
@@ -174,7 +176,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
             final float tileSize = worldAtlas.getRelativeTileSize();
             p.texSize.set(tileSize, tileSize);
 
-            Block b = particleEffect.blockType.getArchetypeBlock();
+            Block b = blockManager.getBlock(particleEffect.blockType).getBlockFamily().getArchetypeBlock();
             p.texOffset.set(b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT));
 
             if (particleEffect.randBlockTexDisplacement) {
@@ -299,7 +301,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
             float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
                     worldPos.y + particle.position.y, worldPos.z + particle.position.z));
-            renderParticle(particle, particleEffect.blockType.getArchetypeBlock(), biome, light);
+            renderParticle(particle, blockManager.getBlock(particleEffect.blockType).getBlockFamily().getArchetypeBlock(), biome, light);
             glPopMatrix();
         }
         glPopMatrix();

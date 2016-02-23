@@ -23,6 +23,7 @@ import org.terasology.asset.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -365,7 +366,7 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
             if (characterSounds.lastSoundTime + CharacterSoundSystem.MIN_TIME < time.getGameTimeInMs()) {
                 StaticSound sound = random.nextItem(characterSounds.landingSounds);
                 if (sound != null) {
-                    entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume));
+                    entity.send(new PlaySoundEvent(sound, characterSounds.landingVolume));
                     characterSounds.lastSoundTime = time.getGameTimeInMs();
                     entity.saveComponent(characterSounds);
                 }
@@ -376,19 +377,27 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + CharacterSoundSystem.MIN_TIME < time.getGameTimeInMs()) {
+
+            // play the sound of damage hitting the character for everyone
             DamageSoundComponent damageSounds = event.getType().getComponent(DamageSoundComponent.class);
-            StaticSound sound = null;
             if (damageSounds != null && !damageSounds.sounds.isEmpty()) {
-                sound = random.nextItem(damageSounds.sounds);
-            } else if (!characterSounds.damageSounds.isEmpty()) {
-                sound = random.nextItem(characterSounds.damageSounds);
+                StaticSound sound = random.nextItem(damageSounds.sounds);
+                if (sound != null) {
+                    entity.send(new PlaySoundEvent(sound, 1f));
+                }
             }
 
-            if (sound != null) {
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.damageVolume));
-                characterSounds.lastSoundTime = time.getGameTimeInMs();
-                entity.saveComponent(characterSounds);
+            // play the sound of a client's character being damaged to the client
+            if (!characterSounds.damageSounds.isEmpty()) {
+                StaticSound sound = random.nextItem(characterSounds.damageSounds);
+                if (sound != null) {
+                    entity.send(new PlaySoundForOwnerEvent(sound, characterSounds.damageVolume));
+                }
             }
+
+            characterSounds.lastSoundTime = time.getGameTimeInMs();
+            entity.saveComponent(characterSounds);
+
         }
     }
 }

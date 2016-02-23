@@ -17,6 +17,7 @@ package org.terasology.logic.health;
 
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -74,7 +75,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity, BlockComponent blockComponent, LocationComponent locComp) {
-        onDamagedCommon(event, blockComponent.getBlock().getBlockFamily(), locComp.getWorldPosition());
+        onDamagedCommon(event, blockComponent.getBlock().getBlockFamily(), locComp.getWorldPosition(), entity);
         if (!entity.hasComponent(BlockDamagedComponent.class)) {
             entity.addComponent(new BlockDamagedComponent());
         }
@@ -83,26 +84,26 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity, ActAsBlockComponent blockComponent, LocationComponent locComp) {
         if (blockComponent.block != null) {
-            onDamagedCommon(event, blockComponent.block, locComp.getWorldPosition());
+            onDamagedCommon(event, blockComponent.block, locComp.getWorldPosition(), entity);
         }
 
     }
 
-    public void onDamagedCommon(OnDamagedEvent event, BlockFamily blockFamily, Vector3f location) {
+    public void onDamagedCommon(OnDamagedEvent event, BlockFamily blockFamily, Vector3f location, EntityRef entityRef) {
         BlockDamageModifierComponent blockDamageSettings = event.getType().getComponent(BlockDamageModifierComponent.class);
         boolean skipDamageEffects = false;
         if (blockDamageSettings != null) {
             skipDamageEffects = blockDamageSettings.skipPerBlockEffects;
         }
         if (!skipDamageEffects) {
-            onPlayBlockDamageCommon(blockFamily, location);
+            onPlayBlockDamageCommon(blockFamily, location, entityRef);
         }
     }
 
-    private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location) {
+    private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location, EntityRef entityRef) {
         EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
-        builder.getComponent(BlockParticleEffectComponent.class).blockType = family;
+        builder.getComponent(BlockParticleEffectComponent.class).blockType = family.getURI().toString();
         builder.build();
 
         if (family.getArchetypeBlock().isDebrisOnDestroy()) {
@@ -114,8 +115,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
         BlockSounds sounds = family.getArchetypeBlock().getSounds();
         if (!sounds.getDigSounds().isEmpty()) {
             StaticSound sound = random.nextItem(sounds.getDigSounds());
-            //TODO: this is where sounds only happen on the hosting client and should be sent out to the clients
-            audioManager.playSound(sound, location);
+            entityRef.send(new PlaySoundEvent(sound, 1f));
         }
     }
 

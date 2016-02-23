@@ -103,7 +103,7 @@ public class BlockItemSystem extends BaseComponentSystem {
                     event.consume();
                 }
             }
-            event.getInstigator().send(new PlaySoundEvent(event.getInstigator(), Assets.getSound("engine:PlaceBlock").get(), 0.5f));
+            event.getInstigator().send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
         } else {
             event.consume();
         }
