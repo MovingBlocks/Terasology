@@ -161,6 +161,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                     return result;
                 }
             });
+            worldGenerator.setVisibleOptions(3);
             worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
