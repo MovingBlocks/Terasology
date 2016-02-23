@@ -142,15 +142,11 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
                     // If outside location, then hide
                     try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
-                        canvas.drawBackground(itemRegion);
-                        optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
-                        canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+                        drawItem(canvas, itemMargin, i, itemRegion);
                     }
                 } else {
                     Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
-                    canvas.drawBackground(itemRegion);
-                    optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
-                    canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+                    drawItem(canvas, itemMargin, i, itemRegion);
                 }
 
             }
@@ -158,6 +154,12 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         } else {
             canvas.addInteractionRegion(mainListener);
         }
+    }
+
+    private void drawItem(Canvas canvas, Border itemMargin, int i, Rect2i itemRegion) {
+        canvas.drawBackground(itemRegion);
+        optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
+        canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
     }
 
     @Override
