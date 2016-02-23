@@ -101,58 +101,65 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             int optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : visibleOptionsNum;
 
             // Calculate total options height
-            int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            int height = itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
             // Dropdown Background Frame
             Rect2i frame = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height);
             canvas.drawBackground(frame);
-
-            int availableWidth = 0;
-            Rect2i scrollableArea = null;
-            if (options.get().size() > visibleOptionsNum) {
-                // Scrollable Area
-                scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
-
-                // Scrollbar Measurement
-                int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
-                int scrollbarHeight = frame.size().y - itemMargin.getTop();
-                availableWidth = frame.size().x - scrollbarWidth;
-                int scrollbarXPos = availableWidth - itemMargin.getRight();
-                int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
-
-                // Draw Scrollbar
-                Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
-                canvas.drawWidget(verticalBar, scrollbarRegion);
-            }
-
-            // Item
-            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
-
             canvas.setPart(LIST_ITEM);
-            for (int i = 0; i < optionListeners.size(); ++i) {
-                if (optionListeners.get(i).isMouseOver()) {
-                    canvas.setMode(HOVER_MODE);
-                } else {
-                    canvas.setMode(DEFAULT_MODE);
-                }
 
-                if (options.get().size() > visibleOptionsNum) {
-                    Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
-
-                    // If outside location, then hide
-                    try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
-                        drawItem(canvas, itemMargin, i, itemRegion);
-                    }
-                } else {
-                    Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
-                    drawItem(canvas, itemMargin, i, itemRegion);
-                }
-
+            if (options.get().size() > visibleOptionsNum) {
+                createScrollbarItems(canvas, frame, font, itemMargin, height, itemHeight);
+            } else {
+                createNoScrollItems(canvas, itemMargin, itemHeight);
             }
 
         } else {
             canvas.addInteractionRegion(mainListener);
+        }
+    }
+
+    private void createNoScrollItems(Canvas canvas, Border itemMargin, int itemHeight) {
+        for (int i = 0; i < optionListeners.size(); ++i) {
+            readItemMouseOver(canvas, i);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
+            drawItem(canvas, itemMargin, i, itemRegion);
+        }
+    }
+
+    private void createScrollbarItems(Canvas canvas, Rect2i frame, Font font, Border itemMargin, int height, int itemHeight) {
+        // Scrollable Area
+        Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
+
+        // Scrollbar Measurement
+        int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
+        int scrollbarHeight = frame.size().y - itemMargin.getTop();
+        int availableWidth = frame.size().x - scrollbarWidth;
+        int scrollbarXPos = availableWidth - itemMargin.getRight();
+        int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
+
+        // Draw Scrollbar
+        Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
+        canvas.drawWidget(verticalBar, scrollbarRegion);
+
+        for (int i = 0; i < optionListeners.size(); ++i) {
+            readItemMouseOver(canvas, i);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
+
+            // If outside location, then hide
+            try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
+                drawItem(canvas, itemMargin, i, itemRegion);
+            }
+        }
+    }
+
+    private void readItemMouseOver(Canvas canvas, int i) {
+        if (optionListeners.get(i).isMouseOver()) {
+            canvas.setMode(HOVER_MODE);
+        } else {
+            canvas.setMode(DEFAULT_MODE);
         }
     }
 
