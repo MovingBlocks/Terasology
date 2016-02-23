@@ -62,7 +62,7 @@
                             "horizontalSpacing" : 16,
                             "contents" : [
                                 {
-                                    "type" : "UIDropdown",
+                                    "type" : "UIDropdownScrollable",
                                     "id" : "gameplay",
                                     "layoutInfo" : {
                                         "relativeWidth" : 0.7

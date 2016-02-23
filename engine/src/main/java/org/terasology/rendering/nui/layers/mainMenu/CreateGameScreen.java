@@ -101,8 +101,9 @@ public class CreateGameScreen extends CoreScreenLayer {
             seed.setText(new FastRandom().nextString(32));
         }
 
-        final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
+        final UIDropdownScrollable<Module> gameplay = find("gameplay", UIDropdownScrollable.class);
         gameplay.setOptions(getGameplayModules());
+        gameplay.setVisibleOptions(3);
         gameplay.bindSelection(new Binding<Module>() {
             Module selected;
 
