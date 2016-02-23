@@ -43,10 +43,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.rendering.nui.widgets.*;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -141,7 +138,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         });
 
-        final UIDropdown<WorldGeneratorInfo> worldGenerator = find("worldGenerator", UIDropdown.class);
+        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerator", UIDropdownScrollable.class);
         if (worldGenerator != null) {
             worldGenerator.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
                 @Override
