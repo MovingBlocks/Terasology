@@ -108,15 +108,23 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             Rect2i frame = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height);
             canvas.drawBackground(frame);
 
-            // Scrollable Area
-            Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
+            int availableWidth = 0;
+            Rect2i scrollableArea = null;
+            if (options.get().size() > visibleOptionsNum) {
+                // Scrollable Area
+                scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
 
-            // Scrollbar Measurement
-            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
-            int scrollbarHeight = frame.size().y - itemMargin.getTop();
-            int availableWidth = frame.size().x - scrollbarWidth;
-            int scrollbarXPos = availableWidth - itemMargin.getRight();
-            int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
+                // Scrollbar Measurement
+                int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
+                int scrollbarHeight = frame.size().y - itemMargin.getTop();
+                availableWidth = frame.size().x - scrollbarWidth;
+                int scrollbarXPos = availableWidth - itemMargin.getRight();
+                int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
+
+                // Draw Scrollbar
+                Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
+                canvas.drawWidget(verticalBar, scrollbarRegion);
+            }
 
             // Item
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
@@ -129,20 +137,23 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                     canvas.setMode(DEFAULT_MODE);
                 }
 
-                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
+                if (options.get().size() > visibleOptionsNum) {
+                    Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
 
-                // If outside location, then hide
-                try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
+                    // If outside location, then hide
+                    try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
+                        canvas.drawBackground(itemRegion);
+                        optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
+                        canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
+                    }
+                } else {
+                    Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
                     canvas.drawBackground(itemRegion);
                     optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
                     canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
                 }
+
             }
-
-            // Draw Scrollbar
-            Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
-            canvas.drawWidget(verticalBar, scrollbarRegion);
-
 
         } else {
             canvas.addInteractionRegion(mainListener);
