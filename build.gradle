@@ -1,10 +1,3 @@
-/*
- * This is a Gradle build file:
- * - Gradle Homepage: http://gradle.org/
- * - Gradle Documentation: http://gradle.org/documentation
- * - View tasks for this project: $ gradlew tasks
- */
-
 // Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
 apply from: 'config/gradle/utility.gradle'
 apply from: 'config/gradle/ide.gradle'
@@ -24,8 +17,9 @@ import org.ajoberstar.gradle.git.tasks.*
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
-        mavenCentral()
+        // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -40,12 +34,6 @@ buildscript {
         classpath 'dom4j:dom4j:1.6.1'
     }
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
-}
-
-import org.apache.tools.ant.filters.FixCrLfFilter;
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
@@ -64,8 +52,10 @@ ext {
 
 // Declare remote repositories we're interested in - library files will be fetched from here
 repositories {
-    // Main Maven repo
+    // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
+    jcenter()
     mavenCentral()
+
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
@@ -146,7 +136,6 @@ def terasologyModules() {
 }
 
 // Helper that replaces the build.gradle under every module with a fresh copy from the Core module
-// TODO: Fix, not working well if at all :(
 task refreshModuleGradle << {
     File replacementGradle = new File(rootDir, 'modules/Core/build.gradle')
     terasologyModules().each {
