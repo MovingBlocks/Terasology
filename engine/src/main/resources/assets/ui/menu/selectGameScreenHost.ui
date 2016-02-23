@@ -37,7 +37,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle2",
                 "family" : "subtitle",
-                "text": "${engine:menu#select-singleplayer-game-sub-title}",
+                "text": "${engine:menu#select-host-game-sub-title}",
                 "layoutInfo" : {
                     "height" : 30,
                     "position-horizontal-center" : {},
