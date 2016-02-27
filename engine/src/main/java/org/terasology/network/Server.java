@@ -27,6 +27,8 @@ public interface Server extends ChunkReadyListener {
 
     EntityRef getClientEntity();
 
+    String getRemoteAddress();
+
     ServerInfoMessage getInfo();
 
     void send(Event event, EntityRef target);
