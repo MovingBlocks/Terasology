@@ -17,7 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 

@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;

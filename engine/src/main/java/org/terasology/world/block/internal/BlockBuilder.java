@@ -17,7 +17,7 @@ package org.terasology.world.block.internal;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector2f;

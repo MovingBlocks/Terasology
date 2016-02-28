@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.asset;
+package org.terasology.utilities;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.common.base.Preconditions;
@@ -26,6 +26,7 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.font.Font;
@@ -42,9 +43,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Assets provides a collection of static methods for obtaining assets and registering procedural assets
- *
+ * Provides a collection of static methods for obtaining assets and registering procedural assets.
  */
+@API
 public final class Assets {
 
     // Private constructor to prevent instantiation (static class)

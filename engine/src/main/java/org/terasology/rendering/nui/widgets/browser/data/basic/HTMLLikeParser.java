@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;

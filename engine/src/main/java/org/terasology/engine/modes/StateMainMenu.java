@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.modes;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;

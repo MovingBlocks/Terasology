@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
