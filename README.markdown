@@ -15,7 +15,7 @@ The [creators and maintainers](docs/Credits.md) are a diverse mix of software de
 
 Terasology is fully open source and licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology) 
 
-We encourage contributions from anybody and try to keep a warm and friendly community. See [our published code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/CONDUCT.md) adopted from the [template by the TODOGroup](https://github.com/todogroup/opencodeofconduct).
+We encourage contributions from anybody and try to keep a warm and friendly community. See [our published code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/Conduct.md) adopted from the [template by the TODOGroup](https://github.com/todogroup/opencodeofconduct).
 
 ![Terasology](/docs/images/menuBackground.jpg "Terasology")
 
