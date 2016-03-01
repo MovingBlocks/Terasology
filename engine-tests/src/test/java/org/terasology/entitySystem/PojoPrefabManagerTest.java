@@ -17,7 +17,7 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;

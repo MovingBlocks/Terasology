@@ -17,7 +17,7 @@ package org.terasology.rendering.backdrop;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;

@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.iconmesh;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;

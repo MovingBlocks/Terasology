@@ -20,7 +20,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;

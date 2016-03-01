@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.health;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**

@@ -101,52 +101,99 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             int optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : visibleOptionsNum;
 
             // Calculate total options height
-            int height = (font.getLineHeight() + itemMargin.getTotalHeight()) * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            int height = itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
             // Dropdown Background Frame
             Rect2i frame = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height);
             canvas.drawBackground(frame);
-
-            // Scrollable Area
-            Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
-
-            // Scrollbar Measurement
-            int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
-            int scrollbarHeight = frame.size().y - itemMargin.getTop();
-            int availableWidth = frame.size().x - scrollbarWidth;
-            int scrollbarXPos = availableWidth - itemMargin.getRight();
-            int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
-
-            // Item
-            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
-
             canvas.setPart(LIST_ITEM);
-            for (int i = 0; i < optionListeners.size(); ++i) {
-                if (optionListeners.get(i).isMouseOver()) {
-                    canvas.setMode(HOVER_MODE);
-                } else {
-                    canvas.setMode(DEFAULT_MODE);
-                }
 
-                Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
-
-                // If outside location, then hide
-                try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
-                    canvas.drawBackground(itemRegion);
-                    optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
-                    canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
-                }
+            if (options.get().size() > visibleOptionsNum) {
+                createScrollbarItems(canvas, frame, font, itemMargin, height, itemHeight);
+            } else {
+                createNoScrollItems(canvas, itemMargin, itemHeight);
             }
-
-            // Draw Scrollbar
-            Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
-            canvas.drawWidget(verticalBar, scrollbarRegion);
-
 
         } else {
             canvas.addInteractionRegion(mainListener);
         }
+    }
+
+    /**
+     * Located in the onDraw method, this draws the menu items when the scrollbar is unnecessary.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param itemMargin Margin around every menu item.
+     * @param itemHeight Height per menu item.
+     */
+    private void createNoScrollItems(Canvas canvas, Border itemMargin, int itemHeight) {
+        for (int i = 0; i < optionListeners.size(); ++i) {
+            readItemMouseOver(canvas, i);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
+            drawItem(canvas, itemMargin, i, itemRegion);
+        }
+    }
+
+    /**
+     * Located in the onDraw method, this draws the menu items with a scrollbar.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param frame Menu frame.
+     * @param font {@link Font} used in the menu.
+     * @param itemMargin Margin around every menu item.
+     * @param height Total menu height.
+     * @param itemHeight Height per menu item.
+     */
+    private void createScrollbarItems(Canvas canvas, Rect2i frame, Font font, Border itemMargin, int height, int itemHeight) {
+        // Scrollable Area
+        Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height - itemMargin.getBottom());
+
+        // Scrollbar Measurement
+        int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
+        int scrollbarHeight = frame.size().y - itemMargin.getTop();
+        int availableWidth = frame.size().x - scrollbarWidth;
+        int scrollbarXPos = availableWidth - itemMargin.getRight();
+        int scrollbarYPos = itemMargin.getTotalHeight() * 2 + font.getLineHeight();
+
+        // Draw Scrollbar
+        Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
+        canvas.drawWidget(verticalBar, scrollbarRegion);
+
+        for (int i = 0; i < optionListeners.size(); ++i) {
+            readItemMouseOver(canvas, i);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
+
+            // If outside location, then hide
+            try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
+                drawItem(canvas, itemMargin, i, itemRegion);
+            }
+        }
+    }
+
+    /**
+     * Looks for MouseOver event for every item in the menu.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param i Item index.
+     */
+    private void readItemMouseOver(Canvas canvas, int i) {
+        if (optionListeners.get(i).isMouseOver()) {
+            canvas.setMode(HOVER_MODE);
+        } else {
+            canvas.setMode(DEFAULT_MODE);
+        }
+    }
+
+    /**
+     * Draws the item on the {@link Canvas}.
+     * @param canvas {@link Canvas} from the onDraw method.
+     * @param itemMargin Margin around every menu item.
+     * @param i Item index.
+     * @param itemRegion Region of the item in the menu.
+     */
+    private void drawItem(Canvas canvas, Border itemMargin, int i, Rect2i itemRegion) {
+        canvas.drawBackground(itemRegion);
+        optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
+        canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
     }
 
     @Override

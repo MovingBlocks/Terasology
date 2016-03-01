@@ -63,6 +63,8 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkSerializer;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +132,16 @@ public class ServerImpl implements Server {
     @Override
     public EntityRef getClientEntity() {
         return networkSystem.getEntity(clientEntityNetId);
+    }
+
+    @Override
+    public String getRemoteAddress() {
+        SocketAddress socketAddress = channel.getRemoteAddress();
+
+        // Cast to InetSocketAddress to retrieve remote address
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
+
+        return inetSocketAddress.getHostName() + "-" + inetSocketAddress.getAddress().getHostAddress() + "-" + inetSocketAddress.getPort();
     }
 
     @Override

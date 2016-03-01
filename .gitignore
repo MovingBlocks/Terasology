@@ -1,10 +1,13 @@
 # Ignore general
-/.*
-!.gitattributes
-!.gitignore
 *~
 ._*
 *.bak
+/.*
+
+# Except this stuff
+!.gitattributes
+!.gitignore
+!.github
 
 # Ignore Gradle, including local override properties (template file available under /templates)
 build/

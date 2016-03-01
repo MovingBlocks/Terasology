@@ -16,7 +16,7 @@
 
 package org.terasology.audio.system;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
