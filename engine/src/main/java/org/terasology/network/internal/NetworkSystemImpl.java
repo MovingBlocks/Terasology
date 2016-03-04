@@ -136,6 +136,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private Time time;
     private long nextNetworkTick;
 
+    private boolean kicked = false;    
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
@@ -188,7 +189,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         for (InterfaceAddress ifadr : ifc.getInterfaceAddresses()) {
                             InetAddress adr = ifadr.getAddress();
                             logger.info("Listening on network interface \"{}\", hostname \"{}\" ({})",
-                                    ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
+                                ifc.getDisplayName(), adr.getCanonicalHostName(), adr.getHostAddress());
                         }
                     }
                 }
@@ -415,17 +416,17 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             netIdToEntityId.put(netComponent.getNetworkId(), entity.getId());
             switch (netComponent.replicateMode) {
                 case OWNER:
-                    NetClient clientPlayer = getNetOwner(entity);
-                    if (clientPlayer != null) {
-                        clientPlayer.setNetInitial(netComponent.getNetworkId());
-                    }
-                    break;
+                NetClient clientPlayer = getNetOwner(entity);
+                if (clientPlayer != null) {
+                    clientPlayer.setNetInitial(netComponent.getNetworkId());
+                }
+                break;
                 default:
-                    for (NetClient client : netClientList) {
+                for (NetClient client : netClientList) {
                         // TODO: Relevance Check
-                        client.setNetInitial(netComponent.getNetworkId());
-                    }
-                    break;
+                    client.setNetInitial(netComponent.getNetworkId());
+                }
+                break;
             }
             EntityRef owner = entity.getOwner();
             if (owner.exists()) {
@@ -606,19 +607,19 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             switch (mode) {
                 case LISTEN_SERVER:
                 case DEDICATED_SERVER:
-                    if (metadata.isReplicated()) {
-                        for (NetClient client : netClientList) {
-                            client.setComponentDirty(netComp.getNetworkId(), component);
-                        }
+                if (metadata.isReplicated()) {
+                    for (NetClient client : netClientList) {
+                        client.setComponentDirty(netComp.getNetworkId(), component);
                     }
-                    break;
+                }
+                break;
                 case CLIENT:
-                    if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getClientEntity())) {
-                        server.setComponentDirty(netComp.getNetworkId(), component);
-                    }
-                    break;
+                if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getClientEntity())) {
+                    server.setComponentDirty(netComp.getNetworkId(), component);
+                }
+                break;
                 default:
-                    break;
+                break;
             }
         }
         updatedOwnedEntities(entity, component, metadata);
@@ -643,18 +644,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         switch (mode) {
             case LISTEN_SERVER:
             case DEDICATED_SERVER:
-                int total = 0;
-                for (NetClient client : netClientList) {
-                    total += client.getMetrics().getReceivedMessagesSinceLastCall();
-                }
-                return total;
+            int total = 0;
+            for (NetClient client : netClientList) {
+                total += client.getMetrics().getReceivedMessagesSinceLastCall();
+            }
+            return total;
             case CLIENT:
-                if (server != null) {
-                    return server.getMetrics().getReceivedMessagesSinceLastCall();
-                }
-                return 0;
+            if (server != null) {
+                return server.getMetrics().getReceivedMessagesSinceLastCall();
+            }
+            return 0;
             default:
-                return 0;
+            return 0;
         }
     }
 
@@ -666,18 +667,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         switch (mode) {
             case LISTEN_SERVER:
             case DEDICATED_SERVER:
-                int total = 0;
-                for (NetClient client : netClientList) {
-                    total += client.getMetrics().getReceivedBytesSinceLastCall();
-                }
-                return total;
+            int total = 0;
+            for (NetClient client : netClientList) {
+                total += client.getMetrics().getReceivedBytesSinceLastCall();
+            }
+            return total;
             case CLIENT:
-                if (server != null) {
-                    return server.getMetrics().getReceivedBytesSinceLastCall();
-                }
-                return 0;
+            if (server != null) {
+                return server.getMetrics().getReceivedBytesSinceLastCall();
+            }
+            return 0;
             default:
-                return 0;
+            return 0;
         }
     }
 
@@ -686,18 +687,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         switch (mode) {
             case LISTEN_SERVER:
             case DEDICATED_SERVER:
-                int total = 0;
-                for (NetClient client : netClientList) {
-                    total += client.getMetrics().getSentMessagesSinceLastCall();
-                }
-                return total;
+            int total = 0;
+            for (NetClient client : netClientList) {
+                total += client.getMetrics().getSentMessagesSinceLastCall();
+            }
+            return total;
             case CLIENT:
-                if (server != null) {
-                    return server.getMetrics().getSentMessagesSinceLastCall();
-                }
-                return 0;
+            if (server != null) {
+                return server.getMetrics().getSentMessagesSinceLastCall();
+            }
+            return 0;
             default:
-                return 0;
+            return 0;
         }
     }
 
@@ -706,18 +707,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         switch (mode) {
             case LISTEN_SERVER:
             case DEDICATED_SERVER:
-                int total = 0;
-                for (NetClient client : netClientList) {
-                    total += client.getMetrics().getSentBytesSinceLastCall();
-                }
-                return total;
+            int total = 0;
+            for (NetClient client : netClientList) {
+                total += client.getMetrics().getSentBytesSinceLastCall();
+            }
+            return total;
             case CLIENT:
-                if (server != null) {
-                    return server.getMetrics().getSentBytesSinceLastCall();
-                }
-                return 0;
+            if (server != null) {
+                return server.getMetrics().getSentBytesSinceLastCall();
+            }
+            return 0;
             default:
-                return 0;
+            return 0;
         }
     }
 
@@ -745,8 +746,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void forceDisconnect(Client client) {
         if (client instanceof NetClient) {
             NetClient nc = (NetClient) client;
-            removeClient(nc);
+            removeKickedClient(nc);
         }
+    }
+
+    void removeKickedClient(NetClient client){
+        kicked = true;
+        disconnectedClients.offer(client);
     }
 
     void registerChannel(Channel channel) {
@@ -758,7 +764,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     void removeClient(NetClient client) {
-        disconnectedClients.offer(client);
+        if(!kicked)
+            disconnectedClients.offer(client);
     }
 
     private void processRemovedClient(Client client) {
@@ -779,7 +786,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         // log after connect so that the name has been set:
         logger.info("New client connected: {}", client.getName());
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
-                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
+            NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
         clientList.add(client);
         netClientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
@@ -792,14 +799,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (netComp.getNetworkId() != NULL_NET_ID) {
                 switch (netComp.replicateMode) {
                     case OWNER:
-                        if (client.equals(getOwner(netEntity))) {
-                            client.setNetInitial(netComp.getNetworkId());
-                        }
-                        break;
+                    if (client.equals(getOwner(netEntity))) {
+                        client.setNetInitial(netComp.getNetworkId());
+                    }
+                    break;
                     default:
                         // TODO: Relevance Check
-                        client.setNetInitial(netComp.getNetworkId());
-                        break;
+                    client.setNetInitial(netComp.getNetworkId());
+                    break;
                 }
             }
         }
@@ -827,8 +834,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder()
-                        .setModuleId(module.getId().toString())
-                        .setModuleVersion(module.getVersion().toString()).build());
+                    .setModuleId(module.getId().toString())
+                    .setModuleVersion(module.getVersion().toString()).build());
             }
         }
         for (Map.Entry<String, Short> blockMapping : blockManager.getBlockIdMap().entrySet()) {
@@ -855,8 +862,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ByteString.Output fieldIds = ByteString.newOutput();
             EventMetadata<?> metadata = eventLibrary.getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
-                    .setId(eventMapping.getValue())
-                    .setName(metadata.getUri().toString());
+            .setId(eventMapping.getValue())
+            .setName(metadata.getUri().toString());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -872,8 +879,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ByteString.Output fieldIds = ByteString.newOutput();
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
-                    .setId(componentIdMapping.getValue())
-                    .setName(metadata.getUri().toString());
+            .setId(componentIdMapping.getValue())
+            .setName(metadata.getUri().toString());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
