@@ -18,12 +18,32 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.module.sandbox.API;
 
 /**
+ * Status for a {@link Task}.
  */
 @API
 public enum Status {
-    INVALID,
+    /**
+     * A task which has never ticked
+     */
+    NOT_INITIALIZED,
+    /**
+     * Task finished with success but is not terminated
+     */
     SUCCESS,
+    /**
+     * Task finished with a failure but not terminated
+     */
     FAILURE,
+    /**
+     * Task is running
+     */
     RUNNING,
-    SUSPENDED
+    /**
+     * Task is suspended
+     */
+    SUSPENDED,
+    /**
+     * Terminated task
+     */
+    TERMINATED
 }

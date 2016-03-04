@@ -15,17 +15,18 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import java.util.Optional;
+
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
-
-import java.util.Optional;
 
 /**
  * <b>Properties</b>: <b>sound</b>, <b>volume</b><br>
@@ -65,8 +66,8 @@ public class PlaySoundNode extends Node {
             if (uri != null) {
                 Optional<StaticSound> snd = assetManager.getAsset(uri, StaticSound.class);
                 if (snd.isPresent()) {
-                    if (actor().hasLocation()) {
-                        Vector3f worldPosition = actor().location().getWorldPosition();
+                    if (actor().hasComponent(LocationComponent.class)) {
+                        Vector3f worldPosition = actor().getComponent(LocationComponent.class).getWorldPosition();
                         audioManager.playSound(snd.get(), worldPosition, getNode().volume, AudioManager.PRIORITY_NORMAL, this);
                     } else {
                         audioManager.playSound(snd.get(), new Vector3f(), getNode().volume, AudioManager.PRIORITY_NORMAL, this);
