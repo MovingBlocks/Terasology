@@ -751,7 +751,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
-    public void removeKickedClient(NetClient client){
+    void removeKickedClient(NetClient client){
         kicked = true;
         disconnectedClients.offer(client);
     }
