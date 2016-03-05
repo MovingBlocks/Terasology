@@ -36,6 +36,7 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
@@ -220,10 +221,29 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
+
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
             if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
+            AABB aabb;
+            MeshAnimation animation = skeletalMesh.animation;
+            if (animation != null) {
+                aabb = animation.getAabb();
+            } else {
+                aabb = skeletalMesh.mesh.getStaticAabb();
+            }
+            LocationComponent location = entity.getComponent(LocationComponent.class);
+            location.getWorldRotation(worldRot);
+            inverseWorldRot.inverse(worldRot);
+            location.getWorldPosition(worldPos);
+            float worldScale = location.getWorldScale();
+
+            aabb = aabb.transform(worldRot, worldPos, worldScale);
+            if (!worldRenderer.getActiveCamera().hasInSight(aabb)) {
+                continue;
+            }
+
             skeletalMesh.material.enable();
             skeletalMesh.material.setFloat("sunlight", 1.0f, true);
             skeletalMesh.material.setFloat("blockLight", 1.0f, true);
@@ -231,18 +251,13 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
 
-            LocationComponent location = entity.getComponent(LocationComponent.class);
 
-            location.getWorldRotation(worldRot);
-            inverseWorldRot.inverse(worldRot);
-            location.getWorldPosition(worldPos);
 
             Vector3f worldPositionCameraSpace = new Vector3f();
             worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
             worldPos.y -= skeletalMesh.heightOffset;
 
-            float worldScale = location.getWorldScale();
             Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
             Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
@@ -256,7 +271,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
             skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
-            // TODO: Add frustum culling here
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             for (Bone bone : skeletalMesh.mesh.getBones()) {

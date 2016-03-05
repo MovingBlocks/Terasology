@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,8 +133,8 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             frames.add(new MeshAnimationFrame(positions, rotations));
 
         }
-
-        return new MeshAnimationData(boneNames, boneParents, frames, timePerFrame);
+        AABB aabb = AABB.createEncompassing(Arrays.asList(md5.bounds));
+        return new MeshAnimationData(boneNames, boneParents, frames, timePerFrame, aabb);
     }
 
 

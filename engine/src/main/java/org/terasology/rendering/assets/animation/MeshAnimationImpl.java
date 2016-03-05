@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.animation;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.math.AABB;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
@@ -74,6 +75,11 @@ public class MeshAnimationImpl extends MeshAnimation {
     }
 
     @Override
+    public AABB getAabb() {
+        return data.getAabb();
+    }
+
+    @Override
     protected void doReload(MeshAnimationData newData) {
         this.data = newData;
     }
@@ -82,4 +88,5 @@ public class MeshAnimationImpl extends MeshAnimation {
     protected Optional<? extends Asset<MeshAnimationData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, MeshAnimationData> parentAssetType) {
         return Optional.of(new MeshAnimationImpl(copyUrn, parentAssetType, data));
     }
+
 }
