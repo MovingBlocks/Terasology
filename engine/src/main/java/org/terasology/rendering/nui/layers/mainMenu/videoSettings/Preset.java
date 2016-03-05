@@ -65,7 +65,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    INSANE("Insane!") {
+    INSANE("Insane") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -80,7 +80,7 @@ public enum Preset {
             renderConfig.setSsao(false);
         }
     },
-    UBER("Uber!") {
+    UBER("Uber") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
