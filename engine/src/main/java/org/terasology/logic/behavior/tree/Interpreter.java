@@ -15,14 +15,6 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
-import org.terasology.module.sandbox.API;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.registry.InjectionHelper;
-
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Deque;
@@ -30,6 +22,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.module.sandbox.API;
+import org.terasology.registry.InjectionHelper;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 
 /**
  * An interpreter evaluates a behavior tree. This is done by creating tasks for an actor for the nodes of the BT.
@@ -141,10 +143,15 @@ public class Interpreter {
         }
     }
 
-    public int tick(float dt) {
+    /**
+     * Executes one tick on the interpreter (one step)
+     * @param deltaSeconds Seconds since last update
+     * @return the number of started nodes
+     */
+    public int tick(float deltaSeconds) {
         if (debugger == null || debugger.beforeTick()) {
             startedNodes.clear();
-            while (step(dt)) {
+            while (step(deltaSeconds)) {
                 continue;
             }
             if (debugger != null) {
@@ -154,7 +161,11 @@ public class Interpreter {
         return startedNodes.size();
     }
 
-    public boolean step(float dt) {
+    /**
+     * @param deltaSeconds Seconds since last update
+     * @return false if no nodes were updated
+     */
+    public boolean step(float deltaSeconds) {
         Task current = tasks.pollFirst();
         if (current == TERMINAL) {
             tasks.addLast(TERMINAL);
@@ -167,7 +178,7 @@ public class Interpreter {
         }
         startedNodes.add(current.getNode());
 
-        current.tick(dt);
+        current.tick(deltaSeconds);
 
         if (current.getStatus() != Status.RUNNING) {
             if (debugger != null) {
@@ -191,7 +202,20 @@ public class Interpreter {
 
     @Override
     public String toString() {
-        return actor.component(DisplayNameComponent.class).name;
+        //try to find the best name for the entity.
+        //use display name first
+        if (actor.hasComponent(DisplayNameComponent.class)) {
+            return actor.getComponent(DisplayNameComponent.class).name;
+        }
+        //minimal name: id of the entity
+        String entityId = "entityId: " + actor.getEntity().getId();
+        //if possible, attach the prefab name for better readability
+        Prefab parentPrefab = actor.getEntity().getParentPrefab();
+        if (parentPrefab != null) {
+            return "prefab: " + parentPrefab.getName() + " " + entityId;
+        } else {
+            return entityId;
+        }
     }
 
     public interface Debugger {
