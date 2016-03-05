@@ -16,11 +16,10 @@
 package org.terasology.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.Lists;
-
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-
+import org.terasology.math.AABB;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
@@ -39,6 +38,8 @@ public class SkeletalMeshDataBuilder {
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
     private MeshBuilder.TextureMapper textureMapper;
+    private Vector3f minOfAABB = null;
+    private Vector3f maxOfAABB = null;
 
     public SkeletalMeshDataBuilder() {
 
@@ -52,6 +53,17 @@ public class SkeletalMeshDataBuilder {
     }
 
     public SkeletalMeshDataBuilder addWeight(BoneWeight boneWeight) {
+        Vector3f pos = boneWeight.getPosition();
+        if (minOfAABB == null) {
+            minOfAABB = new Vector3f(pos);
+        } else {
+            minOfAABB.min(pos);
+        }
+        if (maxOfAABB == null) {
+            maxOfAABB = new Vector3f(pos);
+        } else {
+            maxOfAABB.max(pos);
+        }
         weights.add(boneWeight);
         return this;
     }
@@ -77,7 +89,8 @@ public class SkeletalMeshDataBuilder {
             float x = meshVertices.get(i * 3);
             float y = meshVertices.get(i * 3 + 1);
             float z = meshVertices.get(i * 3 + 2);
-            BoneWeight weight = new BoneWeight(new Vector3f(x, y, z), 1, bone.getIndex());
+            Vector3f pos = new Vector3f(x, y, z);
+            BoneWeight weight = new BoneWeight(pos, 1, bone.getIndex());
             // TODO Meshes may contain normal vectors and we may copy them to the weight here
             //   - but they are recalculated later on in either case. needs some rework
             addWeight(weight);
@@ -126,9 +139,14 @@ public class SkeletalMeshDataBuilder {
         } else if (rootBones > 1) {
             throw new IllegalStateException("Cannot create a skeleton with multiple root bones");
         }
-
+        AABB staticAabb;
+        if (minOfAABB != null && maxOfAABB != null) {
+            staticAabb = AABB.createMinMax(minOfAABB, maxOfAABB);
+        } else {
+            staticAabb = AABB.createEmpty();
+        }
         // TODO: More validation
 
-        return new SkeletalMeshData(bones, weights, uvs, vertexStartWeights, vertexWeightCounts, indices);
+        return new SkeletalMeshData(bones, weights, uvs, vertexStartWeights, vertexWeightCounts, indices, staticAabb);
     }
 }

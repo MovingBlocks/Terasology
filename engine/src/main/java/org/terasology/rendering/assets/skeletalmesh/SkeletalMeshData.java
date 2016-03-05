@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
+import org.terasology.math.AABB;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -41,8 +42,10 @@ public class SkeletalMeshData implements AssetData {
     private TIntList vertexStartWeights = new TIntArrayList();
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
+    private AABB staticAABB;
 
-    public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights, List<Vector2f> uvs, TIntList vertexStartWeights, TIntList vertexWeightCounts, TIntList indices) {
+    public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights, List<Vector2f> uvs, TIntList vertexStartWeights,
+                            TIntList vertexWeightCounts, TIntList indices, AABB staticAABB) {
         for (Bone bone : bones) {
             if (bone.getParent() == null) {
                 rootBone = bone;
@@ -55,9 +58,12 @@ public class SkeletalMeshData implements AssetData {
         this.vertexStartWeights.addAll(vertexStartWeights);
         this.vertexWeightCounts.addAll(vertexWeightCounts);
         this.indices.addAll(indices);
+        this.staticAABB = staticAABB;
 
         calculateNormals();
     }
+
+
 
     public Collection<Bone> getBones() {
         return bones;
@@ -136,6 +142,10 @@ public class SkeletalMeshData implements AssetData {
 
     public List<Vector2f> getUVs() {
         return uvs;
+    }
+
+    public AABB getStaticAABB() {
+        return staticAABB;
     }
 
     private void calculateNormals() {
