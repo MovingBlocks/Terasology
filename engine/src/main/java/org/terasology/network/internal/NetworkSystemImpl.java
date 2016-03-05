@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2013 MovingBlocks
  *
@@ -137,7 +136,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private Time time;
     private long nextNetworkTick;
 
-    private boolean kicked = false;
+    private boolean kicked;
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
@@ -751,7 +750,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
-    void removeKickedClient(NetClient client){
+    void removeKickedClient(NetClient client) {
         kicked = true;
         disconnectedClients.offer(client);
     }
@@ -765,7 +764,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     void removeClient(NetClient client) {
-        if(!kicked){
+        if (!kicked) {
             disconnectedClients.offer(client);
         }
     }
