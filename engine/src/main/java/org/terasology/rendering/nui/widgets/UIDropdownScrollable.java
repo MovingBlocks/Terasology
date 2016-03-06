@@ -98,11 +98,11 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             Border itemMargin = canvas.getCurrentStyle().getMargin();
 
             // Limit number of visible options
-            int optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : visibleOptionsNum;
+            float optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : (visibleOptionsNum + 0.5f);
 
             // Calculate total options height
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
-            int height = itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+            int height = (int) (itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight());
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
             // Dropdown Background Frame
@@ -158,6 +158,10 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         // Draw Scrollbar
         Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
         canvas.drawWidget(verticalBar, scrollbarRegion);
+
+        // Set the range of Scrollbar
+        float maxVertBarDesired = itemHeight * (optionListeners.size() - visibleOptionsNum - 0.5f) + itemMargin.getBottom();
+        verticalBar.setRange((int)maxVertBarDesired);
 
         for (int i = 0; i < optionListeners.size(); ++i) {
             readItemMouseOver(canvas, i);
