@@ -14,7 +14,7 @@
                         "position-horizontal-center" : {},
                         "position-top" : {
                             "target" : "TOP",
-                            "offset" : 48
+                            "offset" : 40
                         }
                     }
                 },
@@ -24,11 +24,25 @@
                     "family" : "title",
                     "text" : "${engine:menu#select-modules-title}",
                     "layoutInfo" : {
-                        "height" : 48,
+                        "height" : 18,
                         "position-horizontal-center" : {},
                         "position-top" : {
                             "target" : "BOTTOM",
                             "widget" : "title"
+                        }
+                    }
+                },
+                {
+                    "type" : "UILabel",
+                    "id" : "warning",
+                    "text" : "WARNING: Enabling extra modules, especially all or those not in the stable lineup can cause game crashes or broken worlds.\n Please handle with care.",
+                    "layoutInfo" : {
+                        "height" : 12,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "widget" : "subtitle",
+                            "offset" : 36
                         }
                     }
                 },
@@ -40,8 +54,8 @@
                         "position-horizontal-center" : {},
                         "position-top" : {
                             "target" : "BOTTOM",
-                            "offset" : 16,
-                            "widget" : "subtitle"
+                            "offset" : 32,
+                            "widget" : "warning"
                         },
                         "position-bottom" : {
                             "target" : "TOP",

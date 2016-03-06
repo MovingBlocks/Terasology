@@ -46,6 +46,7 @@ import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.utilities.Assets;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
@@ -116,6 +117,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 modulesLookup.put(info.getMetadata().getId(), info);
                 sortedModules.add(info);
             }
+        }
+
+        UILabel warning = find("warning", UILabel.class);
+        if (warning != null) {
+            warning.setSkin(Assets.getSkin("engine:redTextColor").get());
         }
 
         Collections.sort(sortedModules, moduleInfoComparator);
