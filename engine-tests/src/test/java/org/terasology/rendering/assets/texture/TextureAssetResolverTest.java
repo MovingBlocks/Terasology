@@ -19,7 +19,7 @@ package org.terasology.rendering.assets.texture;
 import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.random.FastRandom;

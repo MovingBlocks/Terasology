@@ -16,7 +16,7 @@
 
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 

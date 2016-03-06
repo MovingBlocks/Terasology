@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering;
 
-import org.terasology.asset.Assets;
+import org.terasology.utilities.Assets;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.opengl.GLSLMaterial;
