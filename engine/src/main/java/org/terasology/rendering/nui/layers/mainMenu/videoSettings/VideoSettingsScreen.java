@@ -167,6 +167,35 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             });
         }
 
+        final UISlider particleEffectLimitSlider = find("particleEffectLimit", UISlider.class);
+
+        if (particleEffectLimitSlider != null) {
+            particleEffectLimitSlider.setIncrement(1.0f);
+            particleEffectLimitSlider.setPrecision(0);
+            particleEffectLimitSlider.setMinimum(0);
+            particleEffectLimitSlider.setRange(50);
+
+            particleEffectLimitSlider.setLabelFunction(input -> {
+                if (input == 0) {
+                    return " Off ";
+                } else {
+                    return String.valueOf(input.intValue());
+                }
+            });
+            particleEffectLimitSlider.bindValue(new Binding<Float>() {
+                @Override
+                public Float get() {
+                    return (float) config.getRendering().getParticleEffectLimit();
+                }
+
+                @Override
+                public void set(Float value) {
+                    int particleEffectLimit = value.intValue();
+                    config.getRendering().setParticleEffectLimit(particleEffectLimit);
+                }
+            });
+        }
+
         final UISlider fboScaleSlider = find("fboScale", UISlider.class);
         if (fboScaleSlider != null) {
             fboScaleSlider.setIncrement(5.0f);
@@ -192,9 +221,13 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             cameraSetting.setOptions(Arrays.asList(CameraSetting.values()));
             cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }
+
+
         WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("oculusVrSupport", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateGrass", BindHelper.bindBeanProperty("animateGrass", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateWater", BindHelper.bindBeanProperty("animateWater", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "volumetricFog", BindHelper.bindBeanProperty("volumetricFog", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "inscattering", BindHelper.bindBeanProperty("inscattering", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "cloudShadow", BindHelper.bindBeanProperty("cloudShadows", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "parallax", BindHelper.bindBeanProperty("parallaxMapping", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "filmGrain", BindHelper.bindBeanProperty("filmGrain", config.getRendering(), Boolean.TYPE));

@@ -72,6 +72,7 @@ public class RenderingConfig {
     private boolean clampLighting;
     private int fboScale;
     private boolean dumpShaders;
+    private boolean volumetricFog;
     private ScreenshotSize screenshotSize;
     private String screenshotFormat;
     private PerspectiveCameraSettings cameraSettings;
@@ -79,6 +80,7 @@ public class RenderingConfig {
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
     private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
 
     public PerspectiveCameraSettings getCameraSettings() {
         return cameraSettings;
@@ -466,4 +468,11 @@ public class RenderingConfig {
         this.propertyChangeSupport.removePropertyChangeListener(changeListener);
     }
 
+    public boolean isVolumetricFog() {
+        return volumetricFog;
+    }
+
+    public void setVolumetricFog(boolean volumetricFog) {
+        this.volumetricFog = volumetricFog;
+    }
 }

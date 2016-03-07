@@ -45,10 +45,10 @@ uniform sampler2D texEdges;
 uniform float outlineDepthThreshold;
 uniform float outlineThickness;
 
-# define OUTLINE_COLOR 0.0, 0.0, 0.0
+#define OUTLINE_COLOR 0.0, 0.0, 0.0
 #endif
 
-#if defined (VOLUMETRIC_FOG)
+#ifdef VOLUMETRIC_FOG
 #define VOLUMETRIC_FOG_COLOR 1.0, 1.0, 1.0
 
 uniform mat4 invViewProjMatrix;
@@ -68,7 +68,7 @@ void main() {
     vec4 colorTransparent = texture2D(texSceneReflectiveRefractive, gl_TexCoord[0].xy);
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
 
-#if defined (VOLUMETRIC_FOG)
+#ifdef VOLUMETRIC_FOG
     // TODO: As costly as in the deferred light geometry pass - frustum ray method would be great here
     vec3 worldPosition = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invViewProjMatrix);
 #endif
@@ -147,13 +147,14 @@ void main() {
     colorOpaque.rgb = mix(colorOpaque.rgb, vec3(OUTLINE_COLOR), outline);
 #endif
 
-#if defined (INSCATTERING)
+#ifdef INSCATTERING
     // No scattering in the sky please - otherwise we end up with an ugly blurry sky
     if (!epsilonEqualsOne(depthOpaque)) {
         // Sky inscattering using down-sampled sky band texture
         vec3 skyInscatteringColor = texture2D(texSceneSkyBand, gl_TexCoord[0].xy).rgb;
 
         float d = abs(linDepthViewingDistance(depthOpaque));
+
         float fogValue = clamp((1.0 - (skyInscatteringLength - d) / clamp(skyInscatteringLength - skyInscatteringThreshold, 0.0, 1.0)) * skyInscatteringStrength, 0.0, 1.0);
 
         colorOpaque.rgb = mix(colorOpaque.rgb, skyInscatteringColor, fogValue);
@@ -161,7 +162,7 @@ void main() {
     }
 #endif
 
-#if defined (VOLUMETRIC_FOG)
+#ifdef VOLUMETRIC_FOG
     // Use lightValueAtPlayerPos to avoid volumetric fog in caves
     float volumetricFogValue = volFogDensity *
         calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
