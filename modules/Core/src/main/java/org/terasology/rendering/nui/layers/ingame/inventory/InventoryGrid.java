@@ -51,6 +51,11 @@ public class InventoryGrid extends CoreWidget {
     private List<InventoryCell> cells = Lists.newArrayList();
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
 
+    /**
+     * Used to limit the number of zero division log warnings to one per instance
+     */
+    private Boolean zeroDivisionNotified = false;
+    
     @Override
     public void update(float delta) {
         super.update(delta);
@@ -103,7 +108,10 @@ public class InventoryGrid extends CoreWidget {
                 int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
                 return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
             } catch (ArithmeticException e) {
-                logger.warn("Attempted zero division - possible issue in layout definition");
+                if (!zeroDivisionNotified) {
+                    logger.warn("Attempted zero division - possible issue in layout definition", e);
+                    zeroDivisionNotified = true;
+                }
             }
         }
         return Vector2i.zero();
