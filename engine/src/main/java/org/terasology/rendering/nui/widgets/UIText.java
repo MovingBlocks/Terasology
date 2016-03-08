@@ -82,6 +82,7 @@ public class UIText extends CoreWidget {
 
     private List<ActivateEventListener> activationListeners = Lists.newArrayList();
     private List<CursorUpdateEventListener> cursorUpdateListeners = Lists.newArrayList();
+    private List<TextChangeEventListener> textChangeListeners = Lists.newArrayList();
 
     private int offset;
 
@@ -469,8 +470,17 @@ public class UIText extends CoreWidget {
     }
 
     public void setText(String val) {
+        String prevText = getText();
+        boolean callEvent = !prevText.equals(val);
+
         text.set(val != null ? val : "");
         correctCursor();
+
+        if (callEvent) {
+            for (TextChangeEventListener listener : textChangeListeners) {
+                listener.onTextChange(prevText, val);
+            }
+        }
     }
 
     public boolean isMultiline() {
@@ -507,6 +517,16 @@ public class UIText extends CoreWidget {
     public void unsubscribe(CursorUpdateEventListener listener) {
         Preconditions.checkNotNull(listener);
         cursorUpdateListeners.remove(listener);
+    }
+
+    public void subscribe(TextChangeEventListener listener) {
+        Preconditions.checkNotNull(listener);
+        textChangeListeners.add(listener);
+    }
+
+    public void unsubscribe(TextChangeEventListener listener) {
+        Preconditions.checkNotNull(listener);
+        textChangeListeners.remove(listener);
     }
 
     @Override

@@ -89,6 +89,18 @@
                             "family" : "description",
                             "contents" : [
                                 {
+                                    "type" : "UIText",
+                                    "id" : "moduleSearch",
+                                    "layoutInfo" : {
+                                        "width" : 200,
+                                        "use-content-height" : true,
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "TOP"
+                                        }
+                                    }
+                                },
+                                {
                                     "type" : "ScrollableArea",
                                     "content" : {
                                         "type" : "UIList",
@@ -99,7 +111,8 @@
 
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "TOP"
+                                            "target" : "TOP",
+                                            "offset" : 32
                                         },
                                         "position-bottom" : {
                                             "target" : "TOP",
