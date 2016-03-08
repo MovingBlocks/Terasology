@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -48,7 +49,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         super.applyParameters(program);
 
         int texId = 0;
-
         FrameBuffersManager frameBuffersManager = CoreRegistry.get(FrameBuffersManager.class);
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
@@ -78,27 +78,31 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneReflectiveRefractive", texId++, true);
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isLocalReflections()) {
+        RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
+        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+
+        if (renderingConfig == null || activeCamera == null) {
+            return;
+        }
+
+        if (renderingConfig.isLocalReflections()) {
             if (sceneReflectiveRefractive != null) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 sceneReflectiveRefractive.bindNormalsTexture();
                 program.setInt("texSceneReflectiveRefractiveNormals", texId++, true);
             }
 
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-            if (activeCamera != null) {
-                program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
-                program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
-            }
+            program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+            program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
+        if (renderingConfig.isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("ssaoBlurred");
             program.setInt("texSsao", texId++, true);
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
+        if (renderingConfig.isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("outline");
             program.setInt("texEdges", texId++, true);
@@ -107,13 +111,12 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setFloat("outlineThickness", outlineThickness, true);
         }
 
-        //TODO: Other parameters and volumetric fog test case is needed
-        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-        if (activeCamera != null && CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {
+        if (renderingConfig.isVolumetricFog()) {
             program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+            //TODO: Other parameters and volumetric fog test case is needed
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
+        if (renderingConfig.isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("sceneSkyBand1");
             program.setInt("texSceneSkyBand", texId++, true);
