@@ -35,7 +35,8 @@
                 {
                     "type" : "UILabel",
                     "id" : "warning",
-                    "text" : "WARNING: Enabling extra modules, especially all or those not in the stable lineup can cause game crashes or broken worlds.\n Please handle with care.",
+                    "text" : "${engine:menu#warn-modules}",
+                    "family" : "warning",
                     "layoutInfo" : {
                         "height" : 12,
                         "position-horizontal-center" : {},
@@ -89,6 +90,18 @@
                             "family" : "description",
                             "contents" : [
                                 {
+                                    "type" : "UIText",
+                                    "id" : "moduleSearch",
+                                    "layoutInfo" : {
+                                        "width" : 200,
+                                        "use-content-height" : true,
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "TOP"
+                                        }
+                                    }
+                                },
+                                {
                                     "type" : "ScrollableArea",
                                     "content" : {
                                         "type" : "UIList",
@@ -99,7 +112,8 @@
 
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "TOP"
+                                            "target" : "TOP",
+                                            "offset" : 32
                                         },
                                         "position-bottom" : {
                                             "target" : "TOP",

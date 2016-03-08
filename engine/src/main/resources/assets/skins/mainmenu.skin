@@ -50,6 +50,9 @@
                 "left" : 4
             }
         },
+        "warning": {
+            "text-color": "FF0000FF"
+        },
         "left-label": {
             "elements": {
                 "UILabel": {
