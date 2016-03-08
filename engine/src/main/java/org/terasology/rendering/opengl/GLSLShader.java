@@ -155,6 +155,10 @@ public class GLSLShader extends Shader {
         preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
 
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
+        if (renderConfig.isVolumetricFog()) {
+            builder.append("#define VOLUMETRIC_FOG");
+        }
+
         if (renderConfig.isAnimateGrass()) {
             builder.append("#define ANIMATED_GRASS \n");
         }

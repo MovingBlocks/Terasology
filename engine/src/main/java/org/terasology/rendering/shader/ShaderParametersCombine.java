@@ -107,6 +107,12 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setFloat("outlineThickness", outlineThickness, true);
         }
 
+        //TODO: Other parameters and volumetric fog test case is needed
+        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        if (activeCamera != null && CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {
+            program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+        }
+
         if (CoreRegistry.get(Config.class).getRendering().isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("sceneSkyBand1");

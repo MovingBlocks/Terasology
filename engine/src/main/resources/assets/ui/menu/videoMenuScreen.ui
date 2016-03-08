@@ -222,6 +222,22 @@
                                     "type": "UICheckbox",
                                     "id": "animateWater"
                                 },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#particle-effect-limit}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "particleEffectLimit"
+                                },
+                                {
+                                 "type": "UILabel",
+                                 "text": "${engine:menu#fog}: "
+                                },
+                                {
+                                 "type": "UICheckbox",
+                                 "id": "inscattering"
+                                }
                             ]
                         },
                         {
@@ -327,6 +343,14 @@
                                 {
                                   "type": "UICheckbox",
                                   "id": "flickeringLight"
+                                },
+                                {
+                                 "type": "UILabel",
+                                 "text": "${engine:menu#volumetric-fog}: "
+                                },
+                                {
+                                 "type": "UICheckbox",
+                                 "id": "volumetricFog"
                                 }
                             ]
                         },
