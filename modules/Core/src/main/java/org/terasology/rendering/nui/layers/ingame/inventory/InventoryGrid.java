@@ -103,7 +103,7 @@ public class InventoryGrid extends CoreWidget {
                 int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
                 return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
             } catch (ArithmeticException e) {
-                logger.warn("Attempted zero division - possible issue in layout definition", e);
+                logger.warn("Attempted zero division - possible issue in layout definition");
             }
         }
         return Vector2i.zero();
