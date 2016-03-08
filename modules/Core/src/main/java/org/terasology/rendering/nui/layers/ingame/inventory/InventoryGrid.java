@@ -18,8 +18,6 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.math.geom.Rect2i;
@@ -46,16 +44,9 @@ public class InventoryGrid extends CoreWidget {
     @LayoutConfig
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
 
-    private static final Logger logger = LoggerFactory.getLogger(InventoryGrid.class);
-
     private List<InventoryCell> cells = Lists.newArrayList();
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
 
-    /**
-     * Used to limit the number of zero division log warnings to one per instance
-     */
-    private Boolean zeroDivisionNotified = false;
-    
     @Override
     public void update(float delta) {
         super.update(delta);
@@ -85,36 +76,34 @@ public class InventoryGrid extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         int numSlots = getNumSlots();
-        if (numSlots != 0 && !cells.isEmpty()) {
-            Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-            if (cellSize.getX() != 0 && canvas.size().getX() != 0) {
-                int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
-                for (int i = 0; i < numSlots && i < cells.size(); ++i) {
-                    int horizPos = i % horizontalCells;
-                    int vertPos = i / horizontalCells;
-                    canvas.drawWidget(cells.get(i), Rect2i.createFromMinAndSize(horizPos * cellSize.x, vertPos * cellSize.y, cellSize.x, cellSize.y));
-                }
-            }
+        if (numSlots == 0 || cells.isEmpty()) {
+            return;
+        }
+        Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
+        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
+            return;
+        }
+        int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
+        for (int i = 0; i < numSlots && i < cells.size(); ++i) {
+            int horizPos = i % horizontalCells;
+            int vertPos = i / horizontalCells;
+            canvas.drawWidget(cells.get(i), Rect2i.createFromMinAndSize(horizPos * cellSize.x, vertPos * cellSize.y, cellSize.x, cellSize.y));
         }
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int numSlots = getNumSlots();
-        if (numSlots != 0 && !cells.isEmpty()) {
-            Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-            try {
-                int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
-                int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
-                return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
-            } catch (ArithmeticException e) {
-                if (!zeroDivisionNotified) {
-                    logger.warn("Attempted zero division - possible issue in layout definition", e);
-                    zeroDivisionNotified = true;
-                }
-            }
+        if (numSlots == 0 || cells.isEmpty()) {
+            return Vector2i.zero();
         }
-        return Vector2i.zero();
+        Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
+        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
+            return Vector2i.zero();
+        }
+        int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
+        int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
+        return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
     }
 
     @Override
@@ -144,6 +133,7 @@ public class InventoryGrid extends CoreWidget {
     }
 
     /**
+     *
      * @deprecated Use bindTargetEntity to assign a read only binding that is a getter
      */
     @Deprecated
