@@ -76,27 +76,34 @@ public class InventoryGrid extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         int numSlots = getNumSlots();
-        if (numSlots != 0 && !cells.isEmpty()) {
-            Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-            int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
-            for (int i = 0; i < numSlots && i < cells.size(); ++i) {
-                int horizPos = i % horizontalCells;
-                int vertPos = i / horizontalCells;
-                canvas.drawWidget(cells.get(i), Rect2i.createFromMinAndSize(horizPos * cellSize.x, vertPos * cellSize.y, cellSize.x, cellSize.y));
-            }
+        if (numSlots == 0 || cells.isEmpty()) {
+            return;
+        }
+        Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
+        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
+            return;
+        }
+        int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
+        for (int i = 0; i < numSlots && i < cells.size(); ++i) {
+            int horizPos = i % horizontalCells;
+            int vertPos = i / horizontalCells;
+            canvas.drawWidget(cells.get(i), Rect2i.createFromMinAndSize(horizPos * cellSize.x, vertPos * cellSize.y, cellSize.x, cellSize.y));
         }
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int numSlots = getNumSlots();
-        if (numSlots != 0 && !cells.isEmpty()) {
-            Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-            int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
-            int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
-            return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
+        if (numSlots == 0 || cells.isEmpty()) {
+            return Vector2i.zero();
         }
-        return Vector2i.zero();
+        Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
+        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
+            return Vector2i.zero();
+        }
+        int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
+        int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
+        return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
     }
 
     @Override
