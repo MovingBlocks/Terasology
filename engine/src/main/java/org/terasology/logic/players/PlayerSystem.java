@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem
 public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In
@@ -201,25 +201,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             SpawningClientInfo info = new SpawningClientInfo(entity, spawnPosition);
             clientsPreparingToSpawn.add(info);
         }
-    }
-
-    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        ClientComponent clientComp = sender.getComponent(ClientComponent.class);
-        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
-        if (location != null) {
-            // deactivate the character to reset the CharacterPredictionSystem,
-            // which would overwrite the character location
-            clientComp.character.send(BeforeDeactivateComponent.newInstance());
-
-            location.setWorldPosition(new Vector3f(x, y, z));
-            clientComp.character.saveComponent(location);
-
-            // re-active the character
-            clientComp.character.send(OnActivatedComponent.newInstance());
-        }
-        return "Teleported to " + x + " " + y + " " + z;
     }
 
     private void spawnPlayer(EntityRef clientEntity) {
