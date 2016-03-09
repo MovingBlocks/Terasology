@@ -34,9 +34,14 @@ public class MainMenuScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
-        WidgetUtil.trySubscribe(this, "singleplayer", button -> getManager().pushScreen("engine:selectGameScreen"));
+        WidgetUtil.trySubscribe(this, "singleplayer", button -> {
+            UIScreenLayer screen = getManager().pushScreen("engine:selectGameScreen");
+            if (screen instanceof SelectGameScreen) {
+                ((SelectGameScreen) screen).setLoadingAsServer(false);
+            }
+        });
         WidgetUtil.trySubscribe(this, "multiplayer", button -> {
-            UIScreenLayer screen = getManager().pushScreen("engine:selectGameScreenHost");
+            UIScreenLayer screen = getManager().pushScreen("engine:selectGameScreen");
             if (screen instanceof SelectGameScreen) {
                 ((SelectGameScreen) screen).setLoadingAsServer(true);
             }

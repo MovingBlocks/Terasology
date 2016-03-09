@@ -27,8 +27,10 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
 
@@ -47,6 +49,20 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
+        UILabel subtitle2 = find("subtitle2", UILabel.class);
+        if (subtitle2 != null) {
+            subtitle2.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    if (loadingAsServer) {
+                        return "Multiplayer";
+                    }
+                    return "Singleplayer";
+                }
+            });
+        }
+
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
