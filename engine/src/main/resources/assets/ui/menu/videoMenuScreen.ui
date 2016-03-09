@@ -205,7 +205,23 @@
                                 {
                                     "type": "UISlider",
                                     "id": "fboScale"
-                                }
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#animate-grass}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "animateGrass"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#animate-water}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "animateWater"
+                                },
                             ]
                         },
                         {
@@ -224,14 +240,6 @@
                             "horizontalSpacing": 8,
                             "family": "option-grid",
                             "contents": [
-                                {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#environment-effects}: "
-                                },
-                                {
-                                    "type": "UIDropdown",
-                                    "id": "environmentEffects"
-                                },
                                 {
                                     "type": "UILabel",
                                     "text": "${engine:menu#eye-adaption}: "
