@@ -21,12 +21,8 @@ import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.location.Location;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -36,7 +32,6 @@ import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
@@ -130,38 +125,6 @@ public class ServerCommands extends BaseComponentSystem {
         }
 
         throw new IllegalArgumentException("No such user '" + userName + "'");
-    }
-
-    @Command(value = "teleportUser", shortDescription = "Teleports another user to a location", runOnServer = true,
-            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
-    public String teleportCommandUser(@Sender EntityRef sender, @CommandParam("username") String username, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        
-        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
-            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
-
-            DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-            if (username.equals(name.name)) {
-                    return teleport(clientEntity, x, y, z);
-            }
-        }
-        throw new IllegalArgumentException("No such user '" + username + "'");
-    }
-
-    private String teleport(EntityRef user, float x, float y, float z) {
-        ClientComponent clientComp = user.getComponent(ClientComponent.class);
-        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
-        if (location != null) {
-            // deactivate the character to reset the CharacterPredictionSystem,
-            // which would overwrite the character location
-            clientComp.character.send(BeforeDeactivateComponent.newInstance());
-
-            location.setWorldPosition(new Vector3f(x, y, z));
-            clientComp.character.saveComponent(location);
-
-            // re-active the character
-            clientComp.character.send(OnActivatedComponent.newInstance());
-        }
-        return "User teleported to " + x + " " + y + " " + z;
     }
 
     @Command(shortDescription = "Kick user by ID", runOnServer = true,

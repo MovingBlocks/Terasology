@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In

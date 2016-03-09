@@ -156,11 +156,11 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
-        return command.getName().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*")
-                || command.getDescription().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*")
-                || command.getHelpText().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*")
-                || command.getUsage().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*")
-                || command.getRequiredPermission().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*");
+        return command.getName().toLowerCase().contains(searchLowercase)
+                || command.getDescription().toLowerCase().contains(searchLowercase)
+                || command.getHelpText().toLowerCase().contains(searchLowercase)
+                || command.getUsage().toLowerCase().contains(searchLowercase)
+                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
     }
 
     private List<String> findPrefabMatches(String searchLowercase) {
@@ -170,8 +170,8 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
-        return prefab.getName().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*")
-                || prefab.getUrn().toString().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*");
+        return prefab.getName().toLowerCase().contains(searchLowercase)
+                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     private List<String> findBlockMatches(String searchLowercase) {
@@ -182,7 +182,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
-        return def.getUrn().toString().toLowerCase().matches(".*\\b" + searchLowercase + "\\b.*");
+        return def.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     @Command(shortDescription = "Alter the rate of time")
