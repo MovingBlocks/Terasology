@@ -38,6 +38,9 @@
         "error": {
             "text-color": "FF4444FF"
         },
+        "warning": {
+            "text-color": "FF4500FF"
+        },
         "highlight": {
             "text-color": "FFFF00FF",
             "font" : "NotoSans-Bold"

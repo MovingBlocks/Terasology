@@ -132,6 +132,7 @@
     "view-distance-ultra": "Ultra", 
     "vignette": "Vignette",
     "volumetric-fog": "Volumetric Fog",
+    "warn-modules": "WARNING: Enabling extra modules, especially all or those not in the stable lineup can cause game crashes or broken worlds.\n Please handle with care.",
     "water-reflections": "Water Reflections", 
     "water-reflections-global": "Global", 
     "water-reflections-sky": "Sky Only", 
