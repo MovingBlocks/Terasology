@@ -22,6 +22,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -45,20 +46,26 @@ public class SelectGameScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    @In
+    private TranslationSystem translationSystem;
+
     private boolean loadingAsServer;
+
 
     @Override
     public void initialise() {
 
-        UILabel subtitle2 = find("subtitle2", UILabel.class);
-        if (subtitle2 != null) {
-            subtitle2.bindText(new ReadOnlyBinding<String>() {
+        UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
+        if (gameTypeTitle != null) {
+            gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
                     if (loadingAsServer) {
-                        return "Multiplayer";
+                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
                     }
-                    return "Singleplayer";
+                    else {
+                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
+                    }
                 }
             });
         }

@@ -35,7 +35,7 @@
 
              {
                 "type" : "UILabel",
-                "id" : "subtitle2",
+                "id" : "gameTypeTitle",
                 "family" : "subtitle",
                 "text": "${engine:menu#select-singleplayer-game-sub-title}",
                 "layoutInfo" : {
@@ -59,7 +59,7 @@
                     "position-top" : {
                         "target" : "BOTTOM",
                         "offset" : 16,
-                        "widget" : "subtitle2"
+                        "widget" : "gameTypeTitle"
                     },
                     "position-bottom" : {
                         "target" : "TOP",
