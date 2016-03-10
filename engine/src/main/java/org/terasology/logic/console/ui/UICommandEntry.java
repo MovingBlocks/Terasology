@@ -33,7 +33,7 @@ public class UICommandEntry extends UIText {
     private TabCompletionEngine tabCompletionEngine;
 
     public UICommandEntry() {
-        subscribe((oldPosition, newPosition) -> {
+        subscribe((int oldPosition, int newPosition) -> {
             if (tabCompletionEngine == null) {
                 return;
             }
