@@ -162,6 +162,7 @@ public class CharacterStateEvent extends NetworkEvent {
         this.footstepDelta = delta;
     }
 
-
-
+    public void setPosition(Vector3f position) {
+        this.position = position;
+    }
 }

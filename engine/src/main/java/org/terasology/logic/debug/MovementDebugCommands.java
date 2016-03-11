@@ -22,12 +22,14 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 
 import java.util.Optional;
@@ -70,6 +72,14 @@ public class MovementDebugCommands extends BaseComponentSystem {
         }
 
         return "";
+    }
+
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+        ClientComponent clientComp = sender.getComponent(ClientComponent.class);
+        clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
+        return "Teleporting  to " + x + " " + y + " " + z;
     }
 
     @Command(shortDescription = "Set jump speed", runOnServer = true,
