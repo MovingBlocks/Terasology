@@ -32,6 +32,21 @@
                     }
                 }
             },
+
+             {
+                "type" : "UILabel",
+                "id" : "gameTypeTitle",
+                "family" : "subtitle",
+                "text": "${engine:menu#select-singleplayer-game-sub-title}",
+                "layoutInfo" : {
+                    "height" : 30,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "subtitle"
+                    }
+                }
+            },
             {
                 "type" : "ScrollableArea",
                 "content" : {
@@ -44,7 +59,7 @@
                     "position-top" : {
                         "target" : "BOTTOM",
                         "offset" : 16,
-                        "widget" : "subtitle"
+                        "widget" : "gameTypeTitle"
                     },
                     "position-bottom" : {
                         "target" : "TOP",

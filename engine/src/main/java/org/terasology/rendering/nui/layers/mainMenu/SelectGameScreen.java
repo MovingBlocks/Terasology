@@ -22,13 +22,16 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
 
@@ -43,10 +46,29 @@ public class SelectGameScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    @In
+    private TranslationSystem translationSystem;
+
     private boolean loadingAsServer;
+
 
     @Override
     public void initialise() {
+
+        UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
+        if (gameTypeTitle != null) {
+            gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    if (loadingAsServer) {
+                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
+                    } else {
+                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
+                    }
+                }
+            });
+        }
+
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);

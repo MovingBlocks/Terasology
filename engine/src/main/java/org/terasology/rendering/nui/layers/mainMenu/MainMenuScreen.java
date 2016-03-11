@@ -19,7 +19,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import org.terasology.engine.GameEngine;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
@@ -33,13 +32,13 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
         find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
-        WidgetUtil.trySubscribe(this, "singleplayer", button -> getManager().pushScreen("engine:selectGameScreen"));
+        WidgetUtil.trySubscribe(this, "singleplayer", button -> {
+            getManager().pushScreen("engine:selectGameScreen", SelectGameScreen.class).setLoadingAsServer(false);
+        });
         WidgetUtil.trySubscribe(this, "multiplayer", button -> {
-            UIScreenLayer screen = getManager().pushScreen("engine:selectGameScreen");
-            if (screen instanceof SelectGameScreen) {
-                ((SelectGameScreen) screen).setLoadingAsServer(true);
-            }
+            getManager().pushScreen("engine:selectGameScreen", SelectGameScreen.class).setLoadingAsServer(true);
         });
         WidgetUtil.trySubscribe(this, "join", button -> getManager().pushScreen("engine:joinGameScreen"));
         WidgetUtil.trySubscribe(this, "settings", button -> getManager().pushScreen("engine:settingsMenuScreen"));
