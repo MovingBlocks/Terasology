@@ -16,11 +16,12 @@
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.terasology.config.RenderingConfig;
+import org.terasology.i18n.TranslationSystem;
 
 /**
  */
 public enum Preset {
-    MINIMAL("Minimal") {
+    MINIMAL("video-preset-minimal") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(false);
@@ -35,7 +36,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    NICE("Nice") {
+    NICE("video-preset-nice") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -50,7 +51,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    EPIC("Epic") {
+    EPIC("video-preset-epic") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -65,7 +66,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    INSANE("Insane") {
+    INSANE("video-preset-insane") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -80,7 +81,7 @@ public enum Preset {
             renderConfig.setSsao(false);
         }
     },
-    UBER("Uber") {
+    UBER("video-preset-uber") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -96,7 +97,7 @@ public enum Preset {
 
         }
     },
-    CUSTOM("Custom") {
+    CUSTOM("video-preset-custom") {
         @Override
         public void apply(RenderingConfig renderConfig) {
         }
@@ -109,9 +110,13 @@ public enum Preset {
     }
 
     public abstract void apply(RenderingConfig renderConfig);
+    private TranslationSystem translationSystem;
 
     @Override
     public String toString() {
-        return displayName;
+
+        // "${engine:menu#video-preset-custom}" basic format
+        //return translationSystem.translate("$engine:menu#"+displayName+"}"); //should be constructed properly
+        return translationSystem.translate("${engine:menu#video-preset-custom}"); //random test
     }
 }
