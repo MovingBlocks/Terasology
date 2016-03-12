@@ -19,7 +19,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * Used within the server to trigger a teleport of a character. Just chaning the position is not possible due to
+ * Used within the server to trigger a teleport of a character. Just chaining the position is not possible due to
  * movement prediction.
  */
 public class CharacterTeleportEvent implements Event {
