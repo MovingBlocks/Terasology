@@ -14,7 +14,7 @@
                         "position-horizontal-center" : {},
                         "position-top" : {
                             "target" : "TOP",
-                            "offset" : 48
+                            "offset" : 40
                         }
                     }
                 },
@@ -24,11 +24,26 @@
                     "family" : "title",
                     "text" : "${engine:menu#select-modules-title}",
                     "layoutInfo" : {
-                        "height" : 48,
+                        "height" : 18,
                         "position-horizontal-center" : {},
                         "position-top" : {
                             "target" : "BOTTOM",
                             "widget" : "title"
+                        }
+                    }
+                },
+                {
+                    "type" : "UILabel",
+                    "id" : "warning",
+                    "text" : "${engine:menu#warn-modules}",
+                    "family" : "warning",
+                    "layoutInfo" : {
+                        "height" : 12,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "widget" : "subtitle",
+                            "offset" : 36
                         }
                     }
                 },
@@ -40,8 +55,8 @@
                         "position-horizontal-center" : {},
                         "position-top" : {
                             "target" : "BOTTOM",
-                            "offset" : 16,
-                            "widget" : "subtitle"
+                            "offset" : 32,
+                            "widget" : "warning"
                         },
                         "position-bottom" : {
                             "target" : "TOP",
@@ -75,6 +90,18 @@
                             "family" : "description",
                             "contents" : [
                                 {
+                                    "type" : "UIText",
+                                     "id" : "moduleSearch",
+                                     "layoutInfo" : {
+                                         "width" : 200,
+                                         "use-content-height" : true,
+                                         "position-horizontal-center" : {},
+                                         "position-top" : {
+                                             "target" : "TOP"
+                                         }
+                                     }
+                                },
+                                {
                                     "type" : "ScrollableArea",
                                     "content" : {
                                         "type" : "UIList",
@@ -85,7 +112,8 @@
 
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "TOP"
+                                            "target" : "TOP",
+                                            "offset" : 32
                                         },
                                         "position-bottom" : {
                                             "target" : "TOP",

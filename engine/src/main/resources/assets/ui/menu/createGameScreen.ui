@@ -69,9 +69,18 @@
                                     }
                                 },
                                 {
-                                    "type" : "UIButton",
-                                    "text" : "${engine:menu#select-modules}",
-                                    "id" : "mods"
+                                    "type" : "ColumnLayout",
+                                    "contents" : [
+                                        {
+                                            "type" : "UIButton",
+                                            "text" : "${engine:menu#select-modules}",
+                                            "id" : "mods"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Advanced Usage!"
+                                        }
+                                    ]
                                 }
                             ]
                         },

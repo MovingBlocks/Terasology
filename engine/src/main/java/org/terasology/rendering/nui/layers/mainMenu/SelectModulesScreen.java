@@ -43,9 +43,11 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
@@ -82,6 +84,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
+    private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
     private ModuleListDownloader metaDownloader;
     private boolean needsUpdate = true;
@@ -119,6 +122,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
 
         Collections.sort(sortedModules, moduleInfoComparator);
+        allSortedModules = new ArrayList<>(sortedModules);
 
         final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
@@ -162,6 +166,22 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     select(item);
                 }
             });
+
+            UIText moduleSearch = find("moduleSearch", UIText.class);
+            if (moduleSearch != null) {
+                    moduleSearch.subscribe(new TextChangeEventListener() {
+                            @Override
+                            public void onTextChange(String oldText, String newText) {
+                                    sortedModules.clear();
+                                    for (ModuleSelectionInfo m : allSortedModules) {
+                                            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                                                    sortedModules.add(m);
+                                                }
+                                        }
+                                    moduleList.update(0.1f);
+                                }
+                        });
+                }
 
             final Binding<ModuleMetadata> moduleInfoBinding = new ReadOnlyBinding<ModuleMetadata>() {
                 @Override
