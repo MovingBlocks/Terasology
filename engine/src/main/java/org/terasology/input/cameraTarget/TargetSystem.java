@@ -87,7 +87,7 @@ public class TargetSystem {
         target = newTarget;
 
         LocationComponent location = target.getComponent(LocationComponent.class);
-        if(location != null && targetBlockPos != null) {
+        if (location != null && targetBlockPos != null) {
             location.setLocalPosition(targetBlockPos.toVector3f());
         }
 
