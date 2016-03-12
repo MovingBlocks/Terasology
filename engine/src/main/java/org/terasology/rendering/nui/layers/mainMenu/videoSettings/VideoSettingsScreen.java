@@ -22,6 +22,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.i18n.TranslationSystemImpl;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -67,24 +68,53 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
+            videoQuality.setOptionRenderer(new StringTextRenderer<Preset>() {
+                @Override
+                public String getString(Preset value) {
+                    return translationSystem.translate("${engine:menu#" + value.getDisplayName() + "}");
+                }
+            });
             videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 
         UIDropdown<ViewDistance> viewDistance = find("viewDistance", UIDropdown.class);
         if (viewDistance != null) {
+            viewDistance.setOptionRenderer(new StringTextRenderer<ViewDistance>() {
+                @Override
+                public String getString(ViewDistance value) {
+                    return translationSystem.translate("${engine:menu#" + value.getDisplayName() + "}");
+                }
+            });
             viewDistance.setOptions(Arrays.asList(ViewDistance.values()));
             viewDistance.bindSelection(BindHelper.bindBeanProperty("viewDistance", config.getRendering(), ViewDistance.class));
         }
 
         UIDropdown<WaterReflection> waterReflection = find("reflections", UIDropdown.class);
         if (waterReflection != null) {
+            waterReflection.setOptionRenderer(new StringTextRenderer<WaterReflection>() {
+                @Override
+                public String getString(WaterReflection value) {
+                    return translationSystem.translate("${engine:menu#" + value.getDisplayName() + "}");
+                }
+            });
             waterReflection.setOptions(Lists.newArrayList(WaterReflection.SKY, WaterReflection.GLOBAL, WaterReflection.LOCAL));
             waterReflection.bindSelection(new WaterReflectionBinding(config.getRendering()));
         }
 
         UIDropdown<ScreenshotSize> screenshotSize = find("screenshotSize", UIDropdown.class);
         if (screenshotSize != null) {
+            screenshotSize.setOptionRenderer(new StringTextRenderer<ScreenshotSize>() {
+                @Override
+                public String getString(ScreenshotSize value) {
+                    if ( value.getDisplayName().equals("1080p") || value.getDisplayName().equals("720p")) {
+                        return value.getDisplayName();
+                    }
+                    else {
+                        return translationSystem.translate("${engine:menu#" + value.getDisplayName() + "}");
+                    }
+                }
+            });
             screenshotSize.setOptions(Arrays.asList(ScreenshotSize.values()));
             screenshotSize.bindSelection(BindHelper.bindBeanProperty("screenshotSize", config.getRendering(), ScreenshotSize.class));
         }
@@ -100,18 +130,18 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             blur.setOptions(Lists.newArrayList(0, 1, 2, 3));
             blur.bindSelection(BindHelper.bindBeanProperty("blurIntensity", config.getRendering(), Integer.TYPE));
             blur.setOptionRenderer(new StringTextRenderer<Integer>() {
-
+            //similar format for the translate string
                 @Override
                 public String getString(Integer value) {
                     switch (value) {
                         case 1:
-                            return "Some";
+                            return translationSystem.translate("${engine:menu#" + "camera-blur-some" + "}");
                         case 2:
-                            return "Normal";
+                            return translationSystem.translate("${engine:menu#" + "camera-blur-normal" + "}");
                         case 3:
-                            return "Max";
+                            return translationSystem.translate("${engine:menu#" + "camera-blur-max" + "}");
                         default:
-                            return "Off";
+                            return translationSystem.translate("${engine:menu#" + "camera-blur-off" + "}");
                     }
                 }
             });
@@ -119,6 +149,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<DynamicShadows> dynamicShadows = find("shadows", UIDropdown.class);
         if (dynamicShadows != null) {
+            dynamicShadows.setOptionRenderer(new StringTextRenderer<DynamicShadows>() {
+                @Override
+                public String getString(DynamicShadows value) {
+                    return translationSystem.translate("${engine:menu#" + value.getDisplayName() + "}");
+                }
+            });
             dynamicShadows.setOptions(Arrays.asList(DynamicShadows.values()));
             dynamicShadows.bindSelection(new DynamicShadowsBinding(config.getRendering()));
         }

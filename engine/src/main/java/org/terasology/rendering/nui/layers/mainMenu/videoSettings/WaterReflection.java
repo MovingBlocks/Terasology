@@ -20,21 +20,21 @@ import org.terasology.config.RenderingConfig;
 /**
  */
 public enum WaterReflection {
-    SKY("Sky Only") {
+    SKY("water-reflections-sky") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setReflectiveWater(false);
             renderConfig.setLocalReflections(false);
         }
     },
-    GLOBAL("Global") {
+    GLOBAL("water-reflections-global") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setReflectiveWater(true);
             renderConfig.setLocalReflections(false);
         }
     },
-    LOCAL("SSR (EXPERIMENTAL)") {
+    LOCAL("water-reflections-ssr") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setReflectiveWater(false);
@@ -52,6 +52,10 @@ public enum WaterReflection {
 
     @Override
     public String toString() {
+        return displayName;
+    }
+
+    public String getDisplayName() {
         return displayName;
     }
 }

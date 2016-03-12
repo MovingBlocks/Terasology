@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.terasology.config.RenderingConfig;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.i18n.TranslationSystemImpl;
 
 /**
  */
@@ -109,14 +110,14 @@ public enum Preset {
         this.displayName = displayName;
     }
 
+    public String getDisplayName(){
+        return displayName;
+    }
+
     public abstract void apply(RenderingConfig renderConfig);
-    private TranslationSystem translationSystem;
 
     @Override
     public String toString() {
-
-        // "${engine:menu#video-preset-custom}" basic format
-        //return translationSystem.translate("$engine:menu#"+displayName+"}"); //should be constructed properly
-        return translationSystem.translate("${engine:menu#video-preset-custom}"); //random test
+        return displayName;
     }
 }
