@@ -124,6 +124,10 @@ public class BlockItemSystem extends BaseComponentSystem {
             return false;
         }
 
+        if (block.getBlockFamily().equals(adjBlock.getBlockFamily())) {
+            return false;
+        }
+
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
             Physics physics = CoreRegistry.get(Physics.class);
