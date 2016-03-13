@@ -90,12 +90,27 @@
                             "family" : "description",
                             "contents" : [
                                 {
-                                    "type" : "UIText",
-                                     "id" : "moduleSearch",
+                                    "type" : "RowLayout",
+                                    "id" : "searchLayout",
+                                    "contents" : [
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "${engine:menu#module-filter}: ",
+                                            "layoutInfo" : {
+                                                "relativeWidth" : 0.25
+                                            }
+                                        },
+                                        {
+                                            "type" : "UIText",
+                                            "id" : "moduleSearch",
+                                            "layoutInfo" : {
+                                                "relativeWidth" : 0.75,
+                                                "use-content-height" : true
+                                            }
+                                        }
+                                    ],
                                      "layoutInfo" : {
-                                         "width" : 200,
                                          "use-content-height" : true,
-                                         "position-horizontal-center" : {},
                                          "position-top" : {
                                              "target" : "TOP"
                                          }

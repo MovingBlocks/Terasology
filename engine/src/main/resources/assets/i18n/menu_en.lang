@@ -1,6 +1,7 @@
 {
     "activate-module": "Activate", 
-    "add-server": "Add New", 
+    "add-server": "Add New",
+    "advanced-usage": "Advanced Usage!",
     "audio-settings": "Audio", 
     "audio-settings-title": "Audio Settings",
     "animate-grass": "Animate Grass",
@@ -54,7 +55,8 @@
     "light-shafts": "Light Shafts", 
     "listed-servers": "Listed", 
     "load-game": "Load", 
-    "missing-name-message": "You must enter a name", 
+    "missing-name-message": "You must enter a name",
+    "module-filter": "Filter",
     "module-list": "Modules", 
     "module-name": "Name", 
     "module-status": "Status", 
