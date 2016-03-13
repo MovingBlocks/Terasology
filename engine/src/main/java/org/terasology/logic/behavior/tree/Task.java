@@ -15,18 +15,21 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.module.sandbox.API;
 
 /**
- * A task run by an interpreter for an actor.
+ * A task run by an {@link Interpreter} for an {@link Actor}.
  *
  */
 @API
 public abstract class Task {
+    private static final Logger LOG = LoggerFactory.getLogger(Task.class);
     private Interpreter interpreter;
     private Node node;
     private Actor actor;
-    private Status status = Status.INVALID;
+    private Status status = Status.NOT_INITIALIZED;
     private Task parent;
 
     protected Task(Node node) {
@@ -40,7 +43,13 @@ public abstract class Task {
     }
 
     /**
-     * Is called on each tick and return the new status
+     * Is called on each tick if the Task is {@link Status#RUNNING}
+     * @return the new Status, this should be one of
+     * <ul>
+     * <li>{@link Status#RUNNING} (continue execution)</li>
+     * <li>{@link Status#SUCCESS} (task finished with success)</li>
+     * <li>{@link Status#FAILURE} (task finished not / had an error)</li>
+     * </ul>
      */
     public abstract Status update(float dt);
 
@@ -55,15 +64,52 @@ public abstract class Task {
      */
     public abstract void handle(Status result);
 
-    public Status tick(float dt) {
-        if (status == Status.INVALID) {
-            onInitialize();
-        }
+    /**
+     * Executes on tick on the task, depending on the status:
+     * <ul>
+     * <li> {@link Status#NOT_INITIALIZED} : initialize ({@link #onInitialize()}) and set status to {@link Status#RUNNING}</li>
+     * <li> {@link Status#RUNNING} : {@link #update(float)} the task</li>
+     * <li> {@link Status#SUSPENDED} : do nothing</li>
+     * <li> {@link Status#SUCCESS} or {@link Status#FAILURE} : status will be terminated, success or failure can be handled in {@link #onTerminate(Status)}
+     * <li> {@link Status#TERMINATED} : terminated task</li>
+     * </ul>
+     * @param deltaSeconds Seconds since last engine update
+     * @return The updated status of the task
+     */
+    public Status tick(float deltaSeconds) {
+        switch (status) {
+            //not initialized: initialize and set running
+            case NOT_INITIALIZED: {
+                onInitialize();
+                status = Status.RUNNING;
+                break;
+            }
+                //running: update
+            case RUNNING: {
+                Status newStatus = update(deltaSeconds);
+                if (!(newStatus == Status.RUNNING || newStatus == Status.SUCCESS || newStatus == Status.FAILURE)) {
+                    LOG.warn("update of Task {} returned invalid state {}", this.getClass(), newStatus);
+                }
+                status = newStatus;
+                break;
+            }
+                //suspended: do nothing
+            case SUSPENDED:
+                break;
+            //end of running: terminate
+            case FAILURE:
+            case SUCCESS: {
+                onTerminate(status);
+                status = Status.TERMINATED;
+                break;
+            }
+                //terminated, do nothing
+            case TERMINATED: {
+                break;
+            }
+            default:
+                break;
 
-        status = update(dt);
-
-        if (status != Status.RUNNING) {
-            onTerminate(status);
         }
         return status;
     }

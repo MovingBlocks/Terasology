@@ -55,16 +55,16 @@ public class BehaviorEditor extends ZoomableLayout {
     private RenderableNode selectedNode;
     private RenderableNode newNode;
     private BehaviorTree tree;
-    private Vector2f mousePos = new Vector2f();
+    private Vector2f mouseWorldPosition = new Vector2f();
     private Binding<RenderableNode> selectionBinding;
 
     private BehaviorNodeFactory behaviorNodeFactory;
     private BehaviorSystem behaviorSystem;
 
-    private final InteractionListener moveOver = new BaseInteractionListener() {
+    private final InteractionListener mouseInteractionListener = new BaseInteractionListener() {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
-            mousePos = screenToWorld(event.getRelativeMousePosition());
+            mouseWorldPosition = screenToWorld(event.getRelativeMousePosition());
         }
 
         @Override
@@ -125,7 +125,7 @@ public class BehaviorEditor extends ZoomableLayout {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.addInteractionRegion(moveOver);
+        canvas.addInteractionRegion(mouseInteractionListener);
         try (SubRegion subRegion = canvas.subRegion(canvas.getRegion(), false)) {
             canvas.setDrawOnTop(true);
             for (UIWidget widget : getWidgets()) {
@@ -144,25 +144,14 @@ public class BehaviorEditor extends ZoomableLayout {
                 }
             }
             if (activeConnectionStart != null) {
-                drawConnection(canvas, activeConnectionStart, mousePos, Color.WHITE);
+                drawConnection(canvas, activeConnectionStart, mouseWorldPosition, Color.WHITE);
             }
             if (selectedNode != null) {
-                Vector2f size = selectedNode.getSize();
-                Vector2f topLeft = selectedNode.getPosition();
-                Vector2f topRight = new Vector2f(topLeft);
-                topRight.add(new Vector2f(size.x + .1f, 0));
-                Vector2f bottomLeft = new Vector2f(topLeft);
-                bottomLeft.add(new Vector2f(0, size.y + .1f));
-                Vector2f bottomRight = new Vector2f(topLeft);
-                bottomRight.add(new Vector2f(size.x + 0.1f, size.y + 0.1f));
-                drawConnection(canvas, topLeft, topRight, Color.GREEN);
-                drawConnection(canvas, topRight, bottomRight, Color.GREEN);
-                drawConnection(canvas, bottomRight, bottomLeft, Color.GREEN);
-                drawConnection(canvas, bottomLeft, topLeft, Color.GREEN);
+                renderNodeBorder(selectedNode, Color.GREEN, canvas);
             }
             if (newNode != null) {
-                Vector2i screenStart = worldToScreen(mousePos);
-                Vector2f worldEnd = new Vector2f(mousePos);
+                Vector2i screenStart = worldToScreen(mouseWorldPosition);
+                Vector2f worldEnd = new Vector2f(mouseWorldPosition);
                 worldEnd.add(newNode.getSize());
                 Vector2i screenEnd = worldToScreen(worldEnd);
                 canvas.drawWidget(newNode, Rect2i.createFromMinAndMax(screenStart, screenEnd));
@@ -170,6 +159,21 @@ public class BehaviorEditor extends ZoomableLayout {
 
             canvas.setDrawOnTop(false);
         }
+    }
+
+    private void renderNodeBorder(RenderableNode node, Color color, Canvas canvas) {
+        Vector2f size = node.getSize();
+        Vector2f topLeft = node.getPosition();
+        Vector2f topRight = new Vector2f(topLeft);
+        topRight.add(new Vector2f(size.x + .1f, 0));
+        Vector2f bottomLeft = new Vector2f(topLeft);
+        bottomLeft.add(new Vector2f(0, size.y + .1f));
+        Vector2f bottomRight = new Vector2f(topLeft);
+        bottomRight.add(new Vector2f(size.x + 0.1f, size.y + 0.1f));
+        drawConnection(canvas, topLeft, topRight, color);
+        drawConnection(canvas, topRight, bottomRight, color);
+        drawConnection(canvas, bottomRight, bottomLeft, color);
+        drawConnection(canvas, bottomLeft, topLeft, color);
     }
 
     public void portClicked(Port port) {

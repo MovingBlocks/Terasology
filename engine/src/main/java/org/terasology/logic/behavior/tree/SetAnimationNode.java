@@ -15,14 +15,14 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import java.util.List;
+import java.util.Random;
+
 import org.terasology.engine.ComponentFieldUri;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.rendering.nui.properties.OneOf;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * Plays a animation from a animation set and sets the animation pool to pick animation to play from.
@@ -54,10 +54,9 @@ public class SetAnimationNode extends Node {
             random = new Random();
         }
 
-
         @Override
         public void onInitialize() {
-            SkeletalMeshComponent skeletalMesh = actor().skeletalMesh();
+            SkeletalMeshComponent skeletalMesh = actor().getComponent(SkeletalMeshComponent.class);
             if (getNode().play != null) {
                 List<?> animationListToPlay = (List<?>) actor().getComponentField(getNode().play);
                 if (animationListToPlay != null) {
@@ -88,7 +87,7 @@ public class SetAnimationNode extends Node {
 
         @Override
         public Status update(float dt) {
-            return  Status.SUCCESS;
+            return Status.SUCCESS;
         }
 
         @Override

@@ -15,7 +15,11 @@
  */
 package org.terasology.logic.behavior.nui;
 
-import com.google.common.collect.Lists;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.util.List;
+
 import org.terasology.context.Context;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -25,6 +29,7 @@ import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.logic.behavior.tree.RepeatNode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
@@ -39,10 +44,7 @@ import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIList;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  */
@@ -55,7 +57,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
     private BehaviorEditor behaviorEditor;
     private PropertyLayout properties;
     private UIDropdown<BehaviorTree> selectTree;
-    private UIDropdown<Interpreter> selectEntity;
+    private UIDropdown<Interpreter> selectActorEntity;
     private UIList<BehaviorNodeComponent> palette;
     private BehaviorTree selectedTree;
     private Interpreter selectedInterpreter;
@@ -82,7 +84,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
         behaviorEditor = find("tree", BehaviorEditor.class);
         properties = find("properties", PropertyLayout.class);
         selectTree = find("select_tree", UIDropdown.class);
-        selectEntity = find("select_entity", UIDropdown.class);
+        selectActorEntity = find("select_entity", UIDropdown.class);
         palette = find("palette", UIList.class);
 
         behaviorEditor.initialize(context);
@@ -127,14 +129,14 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
             }
         });
 
-        selectEntity.bindOptions(new ReadOnlyBinding<List<Interpreter>>() {
+        selectActorEntity.bindOptions(new ReadOnlyBinding<List<Interpreter>>() {
             @Override
             public List<Interpreter> get() {
                 return behaviorSystem.getInterpreter();
             }
         });
 
-        selectEntity.bindSelection(new Binding<Interpreter>() {
+        selectActorEntity.bindSelection(new Binding<Interpreter>() {
             private PropertyProvider provider = new PropertyProvider();
 
             @Override
@@ -149,9 +151,9 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
                 }
                 selectedInterpreter = value;
                 if (selectedInterpreter != null) {
-                    EntityRef minion = value.actor().minion();
+                    EntityRef entity = value.actor().getEntity();
                     entityProperties.clear();
-                    for (Component component : minion.iterateComponents()) {
+                    for (Component component : entity.iterateComponents()) {
                         String name = component.getClass().getSimpleName().replace("Component", "");
                         entityProperties.addProperties(name, provider.createProperties(component));
                     }
@@ -171,7 +173,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
                 switch (value.name.substring(0, 2)) {
                     case PALETTE_ITEM_OPEN:
                         int pos = paletteItems.indexOf(value) + 1;
-                        while (pos < paletteItems.size() && !paletteItems.get(pos).name.startsWith(PALETTE_ITEM_OPEN)) {
+                        while (shouldCollapse(pos)) {
                             paletteItems.remove(pos);
                         }
                         paletteItems.remove(pos - 1);
@@ -188,6 +190,15 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
                         behaviorEditor.createNode(value);
                         break;
                 }
+            }
+
+            private boolean shouldCollapse(int pos) {
+                if (pos < paletteItems.size()) {
+                    String currentItemName = paletteItems.get(pos).name;
+                    return !currentItemName.startsWith(PALETTE_ITEM_OPEN) &&
+                           !currentItemName.startsWith(PALETTE_ITEM_CLOSE);
+                }
+                return false;
             }
         });
         palette.bindList(new ReadOnlyBinding<List<BehaviorNodeComponent>>() {
@@ -218,32 +229,31 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "new", button -> {
-            if (selectedNode != null) {
-                nuiManager.pushScreen("engine:enterTextPopup", EnterTextPopup.class).bindInput(new Binding<String>() {
-                    @Override
-                    public String get() {
-                        return null;
-                    }
+            nuiManager.pushScreen("engine:enterTextPopup", EnterTextPopup.class).bindInput(new Binding<String>() {
+                @Override
+                public String get() {
+                    return null;
+                }
 
-                    @Override
-                    public void set(String value) {
-                        behaviorSystem.createTree(value, selectedNode.getNode());
-                    }
-                });
-            }
+                @Override
+                public void set(String value) {
+                    BehaviorTree tree = behaviorSystem.createTree(value, new RepeatNode());
+                    selectTree.setSelection(tree);
+                }
+            });
         });
         WidgetUtil.trySubscribe(this, "assign", button -> {
             if (selectedTree != null && selectedInterpreter != null) {
-                EntityRef minion = selectedInterpreter.actor().minion();
-                minion.removeComponent(BehaviorComponent.class);
+                EntityRef entity = selectedInterpreter.actor().getEntity();
+                entity.removeComponent(BehaviorComponent.class);
                 BehaviorComponent component = new BehaviorComponent();
                 component.tree = selectedTree;
-                minion.addComponent(component);
+                entity.addComponent(component);
                 List<Interpreter> interpreter = behaviorSystem.getInterpreter();
-                selectEntity.setSelection(null);
+                selectActorEntity.setSelection(null);
                 for (Interpreter i : interpreter) {
-                    if (i.actor().minion() == minion) {
-                        selectEntity.setSelection(i);
+                    if (i.actor().getEntity().equals(entity)) {
+                        selectActorEntity.setSelection(i);
                         break;
                     }
                 }

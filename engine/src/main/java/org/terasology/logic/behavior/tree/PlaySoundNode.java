@@ -62,7 +62,7 @@ public class PlaySoundNode extends Node {
             if (uri != null) {
                 Optional<StaticSound> snd = assetManager.getAsset(uri, StaticSound.class);
                 if (snd.isPresent()) {
-                    actor().minion().send(new PlaySoundEvent(snd.get(), getNode().volume));
+                    actor().getEntity().send(new PlaySoundEvent(snd.get(), getNode().volume));
                     playing = true;
                 }
             }
