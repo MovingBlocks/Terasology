@@ -83,7 +83,7 @@ public class InventoryGrid extends CoreWidget {
         if (cellSize.getX() == 0 || cellSize.getY() == 0) {
             return;
         }
-        int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
+        int horizontalCells = Math.max(1, Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX()));
         for (int i = 0; i < numSlots && i < cells.size(); ++i) {
             int horizPos = i % horizontalCells;
             int vertPos = i / horizontalCells;
