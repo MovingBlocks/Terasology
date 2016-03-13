@@ -78,7 +78,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Advanced Usage!"
+                                            "text" : "${engine:menu#advanced-usage}"
                                         }
                                     ]
                                 }
