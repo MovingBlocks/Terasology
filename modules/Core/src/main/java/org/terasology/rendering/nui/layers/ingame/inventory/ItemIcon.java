@@ -84,6 +84,12 @@ public class ItemIcon extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
+        if (icon != null) {
+            TextureRegion texture = icon.get();
+            if  (texture != null) {
+                return texture.size();
+            }
+        }
         return new Vector2i();
     }
 
