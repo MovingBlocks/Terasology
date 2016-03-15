@@ -232,26 +232,29 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public BlockFamily getBlockFamily(BlockUri uri) {
-        if (uri.shape.isPresent() && uri.shape.get().equals(CUBE_SHAPE_URN)) {
-            return getBlockFamily(uri.getShapelessUri());
-        }
-        BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
-        if (family == null && generateNewIds) {
-            Optional<BlockFamily> newFamily = loadFamily(uri);
-            if (newFamily.isPresent()) {
-                lock.lock();
-                try {
-                    for (Block block : newFamily.get().getBlocks()) {
-                        block.setId(getNextId());
-                    }
-                    registerFamily(newFamily.get());
-                } finally {
-                    lock.unlock();
-                }
-                return newFamily.get();
+        while (true) {
+            if (uri.shape.isPresent() && uri.shape.get().equals(CUBE_SHAPE_URN)) {
+                uri = uri.getShapelessUri();
+                continue;
             }
+            BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
+            if (family == null && generateNewIds) {
+                Optional<BlockFamily> newFamily = loadFamily(uri);
+                if (newFamily.isPresent()) {
+                    lock.lock();
+                    try {
+                        for (Block block : newFamily.get().getBlocks()) {
+                            block.setId(getNextId());
+                        }
+                        registerFamily(newFamily.get());
+                    } finally {
+                        lock.unlock();
+                    }
+                    return newFamily.get();
+                }
+            }
+            return family;
         }
-        return family;
     }
 
     private Optional<BlockFamily> loadFamily(BlockUri uri) {
@@ -289,21 +292,25 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public Block getBlock(BlockUri uri) {
-        if (uri.shape.isPresent() && uri.shape.get().equals(CUBE_SHAPE_URN)) {
-            return getBlock(uri.getShapelessUri());
-        }
-        Block block = registeredBlockInfo.get().blocksByUri.get(uri);
-        if (block == null) {
-            // Check if partially registered by getting the block family
-            BlockFamily family = getBlockFamily(uri.getFamilyUri());
-            if (family != null) {
-                block = family.getBlockFor(uri);
+        while (true) {
+            if (uri.shape.isPresent() && uri.shape.get().equals(CUBE_SHAPE_URN)) {
+                uri = uri.getShapelessUri();
+                continue;
             }
+            Block block = registeredBlockInfo.get().blocksByUri.get(uri);
             if (block == null) {
-                return getBlock(AIR_ID);
+                // Check if partially registered by getting the block family
+                BlockFamily family = getBlockFamily(uri.getFamilyUri());
+                if (family != null) {
+                    block = family.getBlockFor(uri);
+                }
+                if (block == null) {
+                    uri = AIR_ID;
+                    continue;
+                }
             }
+            return block;
         }
-        return block;
     }
 
     @Override

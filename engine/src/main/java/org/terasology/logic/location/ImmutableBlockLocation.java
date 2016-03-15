@@ -62,11 +62,8 @@ public class ImmutableBlockLocation {
             return false;
         }
 
-        if (z != that.z) {
-            return false;
-        }
+        return z == that.z;
 
-        return true;
     }
 
     @Override

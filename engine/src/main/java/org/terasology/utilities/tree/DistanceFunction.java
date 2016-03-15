@@ -17,5 +17,13 @@ package org.terasology.utilities.tree;
 
 public interface DistanceFunction {
     float getDistance(float[] p1, float[] p2);
+
+    /** can early terminate as soon as non-zero component is computed */
+    boolean isDistanceZero(float[] p1, float[] p2);
+
     float getPointRegionDistance(float[] p1, float[] min, float[] max);
+
+    /** get distance if less than equal to a given max distance, otherwise return NaN */
+    float getDistanceLTE(float[] position, float[] position1, float maxDistance);
+
 }

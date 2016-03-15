@@ -116,9 +116,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         Optional<BlockTile> defaultTile = assetManager.getAsset(resourceUrn, BlockTile.class);
         if (defaultTile.isPresent()) {
             for (BlockPart part : BlockPart.values()) {
-                if (section.getBlockTiles().get(part) == null) {
-                    section.getBlockTiles().put(part, defaultTile.get());
-                }
+                section.getBlockTiles().putIfAbsent(part, defaultTile.get());
             }
         }
         if (section.getSounds() == null) {
@@ -368,7 +366,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                             return null;
                         } else {
                             String value = in.nextString();
-                            Optional<? extends Asset> asset = assetManager.getAsset(value, assetClass);
+                            Optional<? extends Asset> asset = assetManager.getAsset(value, (Class)assetClass);
                             if (asset.isPresent()) {
                                 return asset.get();
                             }

@@ -116,13 +116,10 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
         if (supportComponent.topAllowed && hasSupportFromBlockOnSide(blockPosition, Side.TOP, blockOverrides)) {
             return true;
         }
-        if (supportComponent.sideAllowed && (hasSupportFromBlockOnSide(blockPosition, Side.LEFT, blockOverrides)
+        return supportComponent.sideAllowed && (hasSupportFromBlockOnSide(blockPosition, Side.LEFT, blockOverrides)
                 || hasSupportFromBlockOnSide(blockPosition, Side.RIGHT, blockOverrides)
                 || hasSupportFromBlockOnSide(blockPosition, Side.FRONT, blockOverrides)
-                || hasSupportFromBlockOnSide(blockPosition, Side.BACK, blockOverrides))) {
-            return true;
-        }
-        return false;
+                || hasSupportFromBlockOnSide(blockPosition, Side.BACK, blockOverrides));
     }
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {

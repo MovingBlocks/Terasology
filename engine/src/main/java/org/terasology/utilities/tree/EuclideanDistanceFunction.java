@@ -15,12 +15,13 @@
  */
 package org.terasology.utilities.tree;
 
-public class EuclideanDistanceFunction implements DistanceFunction {
+public final class EuclideanDistanceFunction implements DistanceFunction {
     @Override
     public float getDistance(float[] p1, float[] p2) {
         float d = 0;
 
-        for (int i = 0; i < p1.length; i++) {
+        int len = p1.length;
+        for (int i = 0; i < len; i++) {
             float diff = (p1[i] - p2[i]);
             if (!Float.isNaN(diff)) {
                 d += diff * diff;
@@ -31,15 +32,52 @@ public class EuclideanDistanceFunction implements DistanceFunction {
     }
 
     @Override
+    public float getDistanceLTE(float[] p1, float[] p2, float maxDistance) {
+        final float maxDistanceSq = maxDistance * maxDistance;
+
+        float d = 0;
+
+        int len = p1.length;
+        for (int i = 0; i < len; i++) {
+            float diff = (p1[i] - p2[i]);
+            if (!Float.isNaN(diff)) {
+                d += diff * diff;
+                if (d > maxDistanceSq)
+                    return Float.NaN; //early termination, too far
+            }
+        }
+
+        return (float) Math.sqrt(d);
+    }
+
+    @Override
+    public boolean isDistanceZero(float[] p1, float[] p2) {
+
+        int len = p1.length;
+        for (int i = 0; i < len; i++) {
+            float diff = (p1[i] - p2[i]);
+            if (!Float.isNaN(diff) && diff!=0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public float getPointRegionDistance(float[] point, float[] min, float[] max) {
         float d = 0;
 
         for (int i = 0; i < point.length; i++) {
             float diff = 0;
-            if (point[i] > max[i]) {
-                diff = (point[i] - max[i]);
-            } else if (point[i] < min[i]) {
-                diff = (point[i] - min[i]);
+            float pi = point[i];
+            float maxi = max[i];
+            if (pi > maxi) {
+                diff = (pi - maxi);
+            } else {
+                float mini = min[i];
+                if (pi < mini) {
+                    diff = (pi - mini);
+                }
             }
 
             if (!Float.isNaN(diff)) {

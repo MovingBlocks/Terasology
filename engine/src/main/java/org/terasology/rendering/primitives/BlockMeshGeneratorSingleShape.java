@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.primitives;
 
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -29,8 +28,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.shapes.BlockMeshPart;
-
-import java.util.Map;
 
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     private static final Logger logger = LoggerFactory.getLogger(BlockMeshGeneratorSingleShape.class);

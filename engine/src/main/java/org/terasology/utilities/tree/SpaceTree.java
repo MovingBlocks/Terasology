@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Set;
 
+import static jdk.vm.ci.sparc.SPARC.o1;
+
 /**
  * A data structure that allows to add, remove and find nearest nodes in an N-dimensional space.
  * This can be used to locate entities (or block entities) nearest to player of a specific type, provided that system
@@ -121,7 +123,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             } else {
                 // This is a leaf so need to check bucket
                 for (NodeEntry<T> nodeEntry : rootNode.nodeBucket) {
-                    if (distanceFunction.getDistance(nodeEntry.position, position) == 0) {
+                    if (distanceFunction.isDistanceZero(nodeEntry.position, position)) {
                         rootNode.nodeBucket.remove(nodeEntry);
                         if (rootNode.nodeBucket.size() == 0) {
                             rootNode = null;
@@ -159,9 +161,11 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
     private void executeSearchInNode(float[] position, Node node, TreeSearch<T> treeSearch) {
         if (node.center != null) {
             // This is not a leaf
-            float distance = distanceFunction.getDistance(position, node.center);
-            if (distance <= treeSearch.maxDistance) {
-                treeSearch.addEntry(new Entry<>(distance, node.centerValue));
+            {
+                float distance = distanceFunction.getDistanceLTE(position, node.center, treeSearch.maxDistance);
+                if (Float.isFinite(distance)) {
+                    treeSearch.addEntry(new Entry<>(distance, node.centerValue));
+                }
             }
 
             for (Node subNode : node.subNodes) {
@@ -174,8 +178,8 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
         } else {
             // This is a leaf so need to check bucket
             for (NodeEntry<T> nodeEntry : node.nodeBucket) {
-                float distance = distanceFunction.getDistance(nodeEntry.position, position);
-                if (distance <= treeSearch.maxDistance) {
+                float distance = distanceFunction.getDistanceLTE(nodeEntry.position, position, treeSearch.maxDistance);
+                if (Float.isFinite(distance)) {
                     treeSearch.addEntry(new Entry<>(distance, nodeEntry.value));
                 }
             }
@@ -208,7 +212,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 } else {
                     // It is a leaf so need to check bucket
                     for (NodeEntry<T> nodeEntry : subNode.nodeBucket) {
-                        if (distanceFunction.getDistance(nodeEntry.position, position) == 0) {
+                        if (distanceFunction.isDistanceZero(nodeEntry.position, position)) {
                             subNode.nodeBucket.remove(nodeEntry);
                             if (subNode.nodeBucket.size() == 0) {
                                 processedNode.subNodes[processedSubNodeIndex] = null;
@@ -248,15 +252,17 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 } else {
                     Node subNode = processedNode.subNodes[subNodeIndex];
                     if (subNode == null) {
-                        float[] min = new float[dimensions];
-                        float[] max = new float[dimensions];
-                        for (int i = 0; i < dimensions; i++) {
-                            if (position[i] > processedNode.center[i]) {
-                                min[i] = processedNode.center[i];
+                        int dims = this.dimensions;
+                        float[] min = new float[dims];
+                        float[] max = new float[dims];
+                        for (int i = 0; i < dims; i++) {
+                            float pci = processedNode.center[i];
+                            if (position[i] > pci) {
+                                min[i] = pci;
                                 max[i] = processedNode.maxValues[i];
                             } else {
                                 min[i] = processedNode.minValues[i];
-                                max[i] = processedNode.center[i];
+                                max[i] = pci;
                             }
                         }
                         processedNode.subNodes[subNodeIndex] = createNewNode(position, min, max, value);
@@ -269,16 +275,17 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 // This is a leaf, so need to check bucket
 
                 // First check if the bucket already contains value for this position
-                for (NodeEntry<T> nodeEntry : processedNode.nodeBucket) {
-                    if (distanceFunction.getDistance(nodeEntry.position, position) == 0) {
-                        processedNode.nodeBucket.remove(nodeEntry);
-                        processedNode.nodeBucket.add(new NodeEntry<>(position, value));
+                Set<NodeEntry<T>> bucket = processedNode.nodeBucket;
+                for (NodeEntry<T> nodeEntry : bucket) {
+                    if (distanceFunction.isDistanceZero(nodeEntry.position, position)) {
+                        bucket.remove(nodeEntry);
+                        bucket.add(new NodeEntry<>(position, value));
                         return nodeEntry.value;
                     }
                 }
 
-                processedNode.nodeBucket.add(new NodeEntry<>(position, value));
-                if (processedNode.nodeBucket.size() > bucketSize) {
+                bucket.add(new NodeEntry<>(position, value));
+                if (bucket.size() > bucketSize) {
                     processedNode.splitNode();
                 }
 
@@ -290,6 +297,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
     private int getSubNodeIndex(float[] position, float[] center) {
         int index = 0;
         int increment = 1;
+        int dimensions = this.dimensions;
         for (int i = 0; i < dimensions; i++) {
             if (position[i] > center[i]) {
                 index += increment;
@@ -298,7 +306,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
         }
 
         if (index == 0) {
-            if (distanceFunction.getDistance(position, center) == 0) {
+            if (distanceFunction.isDistanceZero(position, center)) {
                 return -1;
             }
         }
@@ -306,6 +314,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
     }
 
     private Node createNewNode(float[] position, float[] min, float[] max, T value) {
+        int dimensions = this.dimensions;
         float[] positionCopy = new float[dimensions];
         System.arraycopy(position, 0, positionCopy, 0, dimensions);
         return new Node(positionCopy, value, min, max);
@@ -319,14 +328,9 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
 
     private static final class TreeSearch<T> {
         private float maxDistance;
-        private int maxCapacity;
-        private TreeMultimap<Float, Entry<T>> results = TreeMultimap.create(
-                new Comparator<Float>() {
-                    @Override
-                    public int compare(Float o1, Float o2) {
-                        return o1.compareTo(o2);
-                    }
-                }, Ordering.arbitrary());
+        private final int maxCapacity;
+        private final TreeMultimap<Float, Entry<T>> results = TreeMultimap.create(
+                FloatComparator, Ordering.arbitrary());
 
         private TreeSearch(float maxDistance, int maxCapacity) {
             this.maxDistance = maxDistance;
@@ -343,11 +347,19 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 if (entriesAtThisDistance.size() == 0) {
                     results.removeAll(maxDistanceInResults);
                 }
-                maxDistance = results.keySet().last();
-            } else if (size == maxCapacity) {
-                maxDistance = results.keySet().last();
-            }
+
+            } /*else if (size == maxCapacity) {
+
+            }*/
+            maxDistance = results.keySet().last();
         }
+
+        private static final Comparator<Float> FloatComparator = new Comparator<Float>() {
+            @Override
+            public int compare(Float o1, Float o2) {
+                return o1.compareTo(o2);
+            }
+        };
     }
 
     private static final class NodeEntry<T> {

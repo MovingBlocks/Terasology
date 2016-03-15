@@ -54,6 +54,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * GLSL Shader Program Instance class.
@@ -65,6 +67,7 @@ import java.util.Set;
 public class GLSLShader extends Shader {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
+    private static final Pattern COLON = Pattern.compile(":", Pattern.LITERAL);
 
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
@@ -309,7 +312,7 @@ public class GLSLShader extends Shader {
         }
 
         // Dump all final shader sources to the log directory
-        final String strippedTitle = getUrn().toString().replace(":", "-");
+        final String strippedTitle = COLON.matcher(getUrn().toString()).replaceAll(Matcher.quoteReplacement("-"));
 
         // example: fragment_shader-engine-font_0.glsl
         String fname = debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl";

@@ -139,9 +139,7 @@ public class Voronoi {
                     index--;
                 }
 
-                for (int i = results.length - 1; i > index; i--) {
-                    results[i] = results[i - 1];
-                }
+                System.arraycopy(results, index, results, index + 1, results.length - 1 - index);
                 results[index].distance = dist;
                 results[index].delta = new Vector2f(delta);
                 results[index].id = (int) id;

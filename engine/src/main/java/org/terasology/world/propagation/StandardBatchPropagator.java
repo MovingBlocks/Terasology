@@ -25,7 +25,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
