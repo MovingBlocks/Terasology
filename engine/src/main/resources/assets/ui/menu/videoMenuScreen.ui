@@ -205,6 +205,38 @@
                                 {
                                     "type": "UISlider",
                                     "id": "fboScale"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#animate-grass}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "animateGrass"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#animate-water}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "animateWater"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#particle-effect-limit}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "particleEffectLimit"
+                                },
+                                {
+                                 "type": "UILabel",
+                                 "text": "${engine:menu#fog}: "
+                                },
+                                {
+                                 "type": "UICheckbox",
+                                 "id": "inscattering"
                                 }
                             ]
                         },
@@ -224,14 +256,6 @@
                             "horizontalSpacing": 8,
                             "family": "option-grid",
                             "contents": [
-                                {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#environment-effects}: "
-                                },
-                                {
-                                    "type": "UIDropdown",
-                                    "id": "environmentEffects"
-                                },
                                 {
                                     "type": "UILabel",
                                     "text": "${engine:menu#eye-adaption}: "
@@ -319,6 +343,14 @@
                                 {
                                   "type": "UICheckbox",
                                   "id": "flickeringLight"
+                                },
+                                {
+                                 "type": "UILabel",
+                                 "text": "${engine:menu#volumetric-fog}: "
+                                },
+                                {
+                                 "type": "UICheckbox",
+                                 "id": "volumetricFog"
                                 }
                             ]
                         },

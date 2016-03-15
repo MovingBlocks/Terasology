@@ -138,6 +138,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
+                relMove.y += relativeMovement.y;
                 break;
             default:
                 viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);

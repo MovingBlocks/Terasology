@@ -136,6 +136,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private Time time;
     private long nextNetworkTick;
 
+    private boolean kicked;
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
@@ -745,8 +746,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void forceDisconnect(Client client) {
         if (client instanceof NetClient) {
             NetClient nc = (NetClient) client;
-            removeClient(nc);
+            removeKickedClient(nc);
         }
+    }
+
+    void removeKickedClient(NetClient client) {
+        kicked = true;
+        disconnectedClients.offer(client);
     }
 
     void registerChannel(Channel channel) {
@@ -758,7 +764,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     void removeClient(NetClient client) {
-        disconnectedClients.offer(client);
+        if (!kicked) {
+            disconnectedClients.offer(client);
+        }
     }
 
     private void processRemovedClient(Client client) {

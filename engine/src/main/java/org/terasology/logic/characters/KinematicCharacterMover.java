@@ -703,13 +703,20 @@ public class KinematicCharacterMover implements CharacterMover {
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
         boolean clearMovementToDirection = !state.isGrounded();
+        boolean jumpOrCrouchActive = desiredVelocity.y != 0;
 
         // facing the ladder or looking down or up
         if (angleToClimbDirection < Math.PI / 4.0 || Math.abs(input.getPitch()) > 60f) {
-            float pitchAmount = state.isGrounded() ? 45f : 90f;
-            float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
-            rotation.rotate(desiredVelocity, desiredVelocity);
+            if (jumpOrCrouchActive) {
+                desiredVelocity.x = 0;
+                desiredVelocity.z = 0;
+                clearMovementToDirection = false;
+            } else {
+                float pitchAmount = state.isGrounded() ? 45f : 90f;
+                float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
+                rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
+                rotation.rotate(desiredVelocity, desiredVelocity);
+            }
 
             // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
@@ -718,9 +725,13 @@ public class KinematicCharacterMover implements CharacterMover {
             rotation.rotate(climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
-            rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
-                    TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
-            );
+            if (jumpOrCrouchActive) {
+                rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            } else {
+                rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                        TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
+                );
+            }
             rotation.rotate(desiredVelocity, desiredVelocity);
 
             // facing away from ladder

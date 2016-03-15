@@ -10,11 +10,11 @@
     </encoder>
   </appender>
 
-  <root level="debug">
+  <root level="${logOverrideLevel:-debug}">
     <appender-ref ref="CONSOLE" />
   </root>
 
-  <logger name="org.terasology" level="INFO" />
-  <logger name="org.reflections.Reflections" level="WARN" />
+  <logger name="org.terasology" level="${logOverrideLevel:-info}" />
+  <logger name="org.reflections.Reflections" level="${logOverrideLevel:-warn}" />
 
 </configuration>
