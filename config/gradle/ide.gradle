@@ -435,6 +435,32 @@ ext {
             </configuration>
         '''))
 
+        // Run config for a single module's tests *without* running all engine tests (good template for making other single-module-only test run configs)
+        // Naturally won't work unless you actually have the NameGenerator module present locally
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="All in NameGenerator" type="JUnit" factoryName="JUnit">
+              <extension name="coverage" enabled="false" merge="false" runner="idea" />
+              <module name="NameGenerator" />
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+              <option name="ALTERNATIVE_JRE_PATH" />
+              <option name="PACKAGE_NAME" value="" />
+              <option name="MAIN_CLASS_NAME" value="" />
+              <option name="METHOD_NAME" value="" />
+              <option name="TEST_OBJECT" value="package" />
+              <option name="VM_PARAMETERS" value="" />
+              <option name="PARAMETERS" value="" />
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+              <option name="ENV_VARIABLES" />
+              <option name="PASS_PARENT_ENVS" value="true" />
+              <option name="TEST_SEARCH_SCOPE">
+                <value defaultName="singleModule" />
+              </option>
+              <envs />
+              <patterns />
+              <method />
+            </configuration>
+        '''))
+
         // Run config for engine tests with JaCoCo set for code coverage
         runManager.append(new XmlParser().parseText('''
             <configuration default="false" name="engine-tests with JaCoCo" type="JUnit" factoryName="JUnit">
