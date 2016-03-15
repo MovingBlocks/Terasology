@@ -23,60 +23,227 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
 
+/**
+ * Implementations of this class are responsible for rendering the whole 3D world,
+ * inclusive of background.
+ *
+ * While 2D GUIs are dealt with elsewhere, it is in the remit of implementations of this class
+ * to provide Augmented-Reality-Style user interfaces, i.e. boxes around selected objects
+ * 3d-positioned labels above player's heads or held-in-hand tools.
+ *
+ * If this is the first time you look into this interface, you should probably look at the
+ * following methods as they are the most important.
+ *
+ * <ul>
+ *     <li>update(float)</li>
+ *     <li>render(WorldRenderingStage)</li>
+ * </ul>
+ *
+ *
+ */
 public interface WorldRenderer {
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 1.25f;
 
+    /**
+     * This method is triggered when a chunk has been loaded.
+     *
+     * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been loaded.
+     */
     void onChunkLoaded(Vector3i chunkPos);
 
+    /**
+     * This method is triggered when a chunk has been unloaded.
+     *
+     * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been unloaded.
+     */
     void onChunkUnloaded(Vector3i chunkPos);
 
-    public enum WorldRenderingStage {
+    /**
+     * Lists the stages the rendering engine may go through on a given frame.
+     *
+     * At the time of the writing the rendering engine works in two conceptual modes: mono or stereo.
+     *
+     * In mono mode, used to render to a standard monitor, the rendering engine goes through
+     * a single rendering stage every frame, called MONO.
+     *
+     * Stereo mode is for stereoscopic displays: every frame the rendering engine first go through
+     * the LEFT_EYE rendering stage and then the RIGHT_EYE rendering stage. Each stage produces
+     * an image and the two are then combined at the end of the RIGHT_EYE stage.
+     *
+     * Notice that the renderer has no explicit notion of mono/stereo. It only knows which stage is the current one.
+     */
+    // TODO: candidate for renaming simply to RenderingStage
+    enum WorldRenderingStage {
         MONO,
         LEFT_EYE,
         RIGHT_EYE
     }
 
+    /**
+     * Retrieves the camera the world is being rendered from.
+     *
+     * @return a Camera object
+     */
     Camera getActiveCamera();
 
+    /**
+     * Retrieves the camera positioned and oriented to look down on the world from the point of view
+     * of the main light source. This camera is used to produce the shadow map.
+     *
+     * @return a Camera object
+     */
     Camera getLightCamera();
 
+    /**
+     * Retrieves the chunk provider currently in use by the renderer.
+     *
+     * @return a ChunkProvider object.
+     */
+    // TODO: candidate for removal - can be obtained through a context object.
     ChunkProvider getChunkProvider();
 
+    // TODO: candidate for removal - nothing in the engine seems to use it
     void setPlayer(LocalPlayer localPlayer);
 
+    /**
+     * Called potentially multiple times per frame, this method triggers the update of any data structure
+     * the renderer might need. The rendering itself happens only in the "render" method.
+     *
+     * @param delta The elapsed time, in seconds, since the previous update.
+     */
     void update(float delta);
 
+    /**
+     * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
+     * or to a file, when grabbing a screenshot.
+     *
+     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
+     */
     void render(WorldRenderingStage renderingStage);
 
+    /**
+     * Gives the chance to an implementation to dispose any internal reference that might need a more careful disposal.
+     */
     void dispose();
 
+    /**
+     * Used only during the early part of the WorldRenderer lifecycle, this method triggers the loading of
+     * chunks around the camera and the generation of their meshes.
+     *
+     * @return Returns True if all necessary chunks have been loaded and their meshes have been generated, False otherwise.
+     */
+    // TODO: it might be desirable to separate the loading of chunks and mesh generation. The former may concern
+    // TODO: systems dealing with beyond-the-horizon simulations. The latter usually only concerns the renderer.
     boolean pregenerateChunks();
 
+    /**
+     * Returns a reference to the WorldProvider in use by the WorldRenderer.
+     *
+     * @return a WorldProvider instance
+     */
+    // TODO: candidate for removal: nothing uses it and can be obtained through the context
     WorldProvider getWorldProvider();
 
+    /**
+     * Provided a viewDistance value this method triggers the change in how far
+     * from the camera chunks are kept in memory and displayed.
+     *
+     * @param viewDistance a new viewDistance value.
+     */
+    // TODO: rename to setViewDistance - ensure it does nothing if the viewDistance hasn't changed.
     void changeViewDistance(ViewDistance viewDistance);
 
+    /**
+     * Returns the intensity of light at the current camera position due to the main light source (sun or moon).
+     *
+     * @return a float value
+     */
+    // TODO: candidate for removal - use getSunlightValueAt instead.
     float getSunlightValue();
 
+    /**
+     * Returns the intensity of the light at the current camera position due to sources in the scene, i.e. torches,
+     *
+     * @return a float value
+     */
+    // TODO: candidate for removal - use getBlocklightValueAt instead.
     float getBlockLightValue();
 
-    float getRenderingLightValueAt(Vector3f vector3f);
+    /**
+     * Returns the intensity of the light at a given location due to the combination of main light (sun or moon)
+     * and in-scene light sources, i.e. torches.
+     *
+     * @param coordinates a Vector3f providing the coordinates of the block to calculate the light intensity from.
+     * @return a float value representing the intensity of the main light and in-scene lights combined
+     */
+    float getRenderingLightValueAt(Vector3f coordinates);
 
-    float getSunlightValueAt(Vector3f worldPos);
+    /**
+     * Returns the intensity of the main light (sun or moon) at the given location
+     *
+     * @param coordinates a vector3f providing the coordinates of the block to sample the intensity of the main light from
+     * @return a float value representing the intensity of the main light at the given coordinates
+     */
+    float getSunlightValueAt(Vector3f coordinates);
 
-    float getBlockLightValueAt(Vector3f worldPos);
+    /**
+     * Returns the intensity of the light at the given location due to in-scene sources,
+     *
+     * @param coordinates a vector3f providing the coordinates of the block to sample the intensity of in-scene sources from
+     * @return a float value representing the total light intensity of the in-scene sources, at the given coordinates
+     */
+    float getBlockLightValueAt(Vector3f coordinates);
 
+    /**
+     * Returns the time-smoothed intensity of the main light (sun or moon) at the camera's location
+     *
+     * @return a float value representing the time-smoothed light intensity of the main light at the camera's coordinates
+     */
+    // TODO: rename to getTimeSmoothedSunlightValue
     float getSmoothedPlayerSunlightValue();
 
+    /**
+     * Returns True if the head of the player is underwater. False otherwise.
+     *
+     * @return True if the head of the player is underwater. False otherwise.
+     */
     boolean isHeadUnderWater();
 
+    /**
+     * Returns the tint at the camera's current position.
+     *
+     * @return a Vector3f providing the ting at the camera's coordinates.
+     */
+    // TODO: candidate for removal: can be obtained through the worldProvider.getBlock(coords).getTint() methods
     Vector3f getTint();
 
+    /**
+     * Returns the current tick, an always progressing time value animations are based on.
+     *
+     * @return the number of milliseconds since the renderer starter rendering the first frame.
+     */
+    // TODO: candidate for renaming: getMillisecondsSinceRenderingStart()
     float getTick();
 
+    /**
+     * Returns the current rendering stage, i.e. mono, left eye or right eye.
+     *
+     * @return the current WorldRenderingStage
+     */
     WorldRenderingStage getCurrentRenderStage();
 
+    /**
+     * Returns a string containing a number of metrics in the format:
+     *
+     * metric label 1: value1\n
+     * metric label 2: value2\n
+     * .
+     * .
+     * metric label N: value3\n
+     *
+     * @return a string containing metrics labels and values separated by new lines.
+     */
     String getMetrics();
 }
