@@ -38,6 +38,8 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     private Block block;
     private Mesh mesh;
 
+    final Block[] adjacent = new Block[6];
+
     public BlockMeshGeneratorSingleShape(Block block) {
         this.block = block;
     }
@@ -47,14 +49,21 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         Biome selfBiome = view.getBiome(x, y, z);
         Block selfBlock = view.getBlock(x, y, z);
 
+        // Gather adjacent blocks
+        //Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
+
+        Block[] adjacent = this.adjacent;
+        int n = 0;
+        for (Side side : Side.values()) {
+            Vector3i offset = side.getVector3i();
+            adjacent[n++] = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
+        }
+
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
         ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
         if (selfBlock.isWater()) {
-            if (view.getBlock(x, y + 1, z).isWater()) {
-                vertexFlag = ChunkVertexFlag.WATER;
-            } else {
-                vertexFlag = ChunkVertexFlag.WATER_SURFACE;
-            }
+            vertexFlag = adjacent[0 /*TOP */].isWater() ?
+                    ChunkVertexFlag.WATER : ChunkVertexFlag.WATER_SURFACE;
         } else if (selfBlock.isLava()) {
             vertexFlag = ChunkVertexFlag.LAVA;
         } else if (selfBlock.isWaving() && selfBlock.isDoubleSided()) {
@@ -63,15 +72,9 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             vertexFlag = ChunkVertexFlag.WAVING_BLOCK;
         }
 
-        // Gather adjacent blocks
-        Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
-        for (Side side : Side.values()) {
-            Vector3i offset = side.getVector3i();
-            Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
-            adjacentBlocks.put(side, blockToCheck);
-        }
 
-        BlockAppearance blockAppearance = selfBlock.getAppearance(adjacentBlocks);
+
+        BlockAppearance blockAppearance = selfBlock.getAppearance(adjacent);
 
         /*
          * Determine the render process.
@@ -89,35 +92,39 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             renderType = ChunkMesh.RenderType.BILLBOARD;
         }
 
-        if (blockAppearance.getPart(BlockPart.CENTER) != null) {
+        BlockMeshPart centerPart = blockAppearance.getPart(BlockPart.CENTER);
+        if (centerPart != null) {
             Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
+            centerPart.appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
         }
 
         boolean[] drawDir = new boolean[6];
 
         for (Side side : Side.values()) {
-            drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side);
+            int sideOrd = side.ordinal();
+            drawDir[sideOrd] = blockAppearance.getPart(BlockPart.fromSide(side)) != null &&
+                    isSideVisibleForBlockTypes(adjacent[sideOrd], selfBlock, side);
         }
 
         // If the selfBlock is lowered, some more faces may have to be drawn
         if (selfBlock.isLiquid()) {
-            Block bottomBlock = adjacentBlocks.get(Side.BOTTOM);
+            Block bottomBlock = adjacent[1 /* BOTTOM */];
             // Draw horizontal sides if visible from below
             for (Side side : Side.horizontalSides()) {
                 Vector3i offset = side.getVector3i();
                 Block adjacentBelow = view.getBlock(x + offset.x, y - 1, z + offset.z);
-                Block adjacent = adjacentBlocks.get(side);
+                int sideOrd = side.ordinal();
+                Block adj = adjacent[sideOrd];
 
                 boolean visible = (blockAppearance.getPart(BlockPart.fromSide(side)) != null
-                        && isSideVisibleForBlockTypes(adjacentBelow, selfBlock, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
-                drawDir[side.ordinal()] |= visible;
+                        && isSideVisibleForBlockTypes(adjacentBelow, selfBlock, side) && !isSideVisibleForBlockTypes(bottomBlock, adj, side.reverse()));
+                drawDir[sideOrd] |= visible;
             }
 
             // Draw the top if below a non-lowered selfBlock
             // TODO: Don't need to render the top if each side and the selfBlock above each side are either liquid or opaque solids.
-            Block blockToCheck = adjacentBlocks.get(Side.TOP);
-            drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
+            Block blockToCheck = adjacent[0 /* TOP */];
+            drawDir[0 /* TOP */] |= !blockToCheck.isLiquid();
 
             if (bottomBlock.isLiquid() || bottomBlock.getMeshGenerator() == null) {
                 for (Side dir : Side.values()) {
@@ -173,14 +180,16 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     @Override
     public Mesh getStandaloneMesh() {
-        if (mesh == null || mesh.isDisposed()) {
-            generateMesh();
+        Mesh m = this.mesh;
+        if (m == null || m.isDisposed()) {
+            return generateMesh();
         }
-        return mesh;
+        return m;
     }
 
-    private void generateMesh() {
+    private Mesh generateMesh() {
         Tessellator tessellator = new Tessellator();
+        Block block = this.block;
         for (BlockPart dir : BlockPart.values()) {
             BlockMeshPart part = block.getPrimaryAppearance().getPart(dir);
             if (part != null) {
@@ -191,6 +200,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 }
             }
         }
-        mesh = tessellator.generateMesh(new ResourceUrn("engine", "blockmesh", block.getURI().toString()));
+        return this.mesh = tessellator.generateMesh(new ResourceUrn("engine", "blockmesh", block.getURI().toString()));
     }
 }

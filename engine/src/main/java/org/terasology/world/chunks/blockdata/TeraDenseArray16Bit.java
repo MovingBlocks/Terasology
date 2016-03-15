@@ -68,6 +68,7 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
 
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
+        short[] data = this.data;
         if (data == null) {
             return 4;
         } else {
@@ -88,6 +89,7 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
     @Override
     public int set(int x, int y, int z, int value) {
         int pos = pos(x, y, z);
+        short[] data = this.data;
         int old = data[pos];
         data[pos] = (short) value;
         return old;
@@ -96,6 +98,7 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
     @Override
     public boolean set(int x, int y, int z, int value, int expected) {
         int pos = pos(x, y, z);
+        short[] data = this.data;
         int old = data[pos];
         if (old == expected) {
             data[pos] = (short) value;

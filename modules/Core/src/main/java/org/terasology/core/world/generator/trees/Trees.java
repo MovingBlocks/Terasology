@@ -35,8 +35,8 @@ public final class Trees {
             .put('A', new LSystemRule("[&FFBFA]////[&BFFFA]////[&FBFFA]", 1.0f))
             .put('B', new LSystemRule("[&FFFA]////[&FFFA]////[&FFFA]", 0.8f)).build(),
             4, (float) Math.toRadians(30))
-            .setLeafType(new BlockUri("core:GreenLeaf"))
-            .setBarkType(new BlockUri("core:OakTrunk"));
+            .setLeafType(BlockUri.get("core:GreenLeaf"))
+            .setBarkType(BlockUri.get("core:OakTrunk"));
     }
 
     public static TreeGenerator oakVariationTree() {
@@ -45,8 +45,8 @@ public final class Trees {
             .put('A', new LSystemRule("[&FFBFA]////[&BFFFA]////[&FBFFAFFA]", 1.0f))
             .put('B', new LSystemRule("[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]", 0.8f)).build(),
             4, (float) Math.toRadians(35))
-            .setLeafType(new BlockUri("core:GreenLeaf"))
-            .setBarkType(new BlockUri("core:OakTrunk"));
+            .setLeafType(BlockUri.get("core:GreenLeaf"))
+            .setBarkType(BlockUri.get("core:OakTrunk"));
     }
 
     public static TreeGenerator pineTree() {
@@ -54,8 +54,8 @@ public final class Trees {
             "FFFFAFFFFFFFAFFFFA", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFFFFA]////[&FFFFFA]////[&FFFFFA]", 1.0f)).build(),
             4, (float) Math.toRadians(35))
-            .setLeafType(new BlockUri("core:DarkLeaf"))
-            .setBarkType(new BlockUri("core:PineTrunk"));
+            .setLeafType(BlockUri.get("core:DarkLeaf"))
+            .setBarkType(BlockUri.get("core:PineTrunk"));
     }
 
     public static TreeGenerator birchTree() {
@@ -63,20 +63,20 @@ public final class Trees {
             "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", 1.0f))
             .put('B', new LSystemRule("[&FAF]////[&FAF]////[&FAF]", 0.8f)).build(), 4, (float) Math.toRadians(35))
-            .setLeafType(new BlockUri("core:DarkLeaf"))
-            .setBarkType(new BlockUri("core:BirchTrunk"));
+            .setLeafType(BlockUri.get("core:DarkLeaf"))
+            .setBarkType(BlockUri.get("core:BirchTrunk"));
     }
 
     public static TreeGenerator redTree() {
         return new TreeGeneratorLSystem("FFFFFAFAFAF", ImmutableMap.<Character, LSystemRule>builder()
             .put('A', new LSystemRule("[&FFAFF]////[&FFAFF]////[&FFAFF]", 1.0f)).build(),
             4, (float) Math.toRadians(40))
-            .setLeafType(new BlockUri("core:RedLeaf"))
-            .setBarkType(new BlockUri("core:OakTrunk"));
+            .setLeafType(BlockUri.get("core:RedLeaf"))
+            .setBarkType(BlockUri.get("core:OakTrunk"));
     }
 
     public static TreeGenerator cactus() {
         return new TreeGeneratorCactus()
-            .setTrunkType(new BlockUri("core:Cactus"));
+            .setTrunkType(BlockUri.get("core:Cactus"));
     }
 }

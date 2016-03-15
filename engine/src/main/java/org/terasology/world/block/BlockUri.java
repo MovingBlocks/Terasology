@@ -42,8 +42,13 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     public static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
 
     private final ResourceUrn blockFamilyDefinition;
-    private final Optional<ResourceUrn> shape;
-    private final Name blockName;
+    public final Optional<ResourceUrn> shape;
+    public final Name blockName;
+    private final int hash;
+
+    public static BlockUri get(String uri) throws BlockUriParseException {
+        return new BlockUri(uri);
+    }
 
     public BlockUri(String uri) throws BlockUriParseException {
         try {
@@ -52,26 +57,36 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
                 throw new BlockUriParseException("Could not parse block uri: '" + uri + "'");
             }
             Name blockFamilyDefModule = new Name(split[0]);
+            ResourceUrn d;
+            Optional<ResourceUrn> s;
+            Name n;
             if (split.length == 4) {
-                blockFamilyDefinition = new ResourceUrn(blockFamilyDefModule, new Name(split[1]));
+                d = new ResourceUrn(blockFamilyDefModule, new Name(split[1]));
                 Name shapeModuleName = new Name(split[2]);
                 split = split[3].split(IDENTIFIER_SEPARATOR_REGEX, 2);
-                shape = Optional.of(new ResourceUrn(shapeModuleName, new Name(split[0])));
+                s = Optional.of(new ResourceUrn(shapeModuleName, new Name(split[0])));
                 if (split.length > 1) {
-                    blockName = new Name(split[1]);
+                    n = new Name(split[1]);
                 } else {
-                    blockName = Name.EMPTY;
+                    n = Name.EMPTY;
                 }
             } else {
-                shape = Optional.empty();
+                s = Optional.empty();
                 split = split[1].split(IDENTIFIER_SEPARATOR_REGEX, 2);
-                blockFamilyDefinition = new ResourceUrn(blockFamilyDefModule, new Name(split[0]));
+                d = new ResourceUrn(blockFamilyDefModule, new Name(split[0]));
                 if (split.length > 1) {
-                    blockName = new Name(split[1]);
+                    n = new Name(split[1]);
                 } else {
-                    blockName = Name.EMPTY;
+                    n = Name.EMPTY;
                 }
             }
+            //return new BlockUri(d, s ,n);
+
+            this.hash = hash(d, s, n);
+            this.blockFamilyDefinition = d;
+            this.shape = s;
+            this.blockName = n;
+
         } catch (InvalidUrnException e) {
             throw new BlockUriParseException("Could not parse block uri: '" + uri + "'", e);
         }
@@ -94,13 +109,18 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     }
 
     public BlockUri(BlockUri parentUri, Name blockName) {
-        this(parentUri.getBlockFamilyDefinitionUrn(), parentUri.getShapeUrn(), blockName);
+        this(parentUri.getBlockFamilyDefinitionUrn(), parentUri.shape, blockName);
     }
 
     private BlockUri(ResourceUrn blockFamilyDefinition, Optional<ResourceUrn> shape, Name blockName) {
         this.blockFamilyDefinition = blockFamilyDefinition;
         this.shape = shape;
         this.blockName = blockName;
+        this.hash = hash(blockFamilyDefinition, shape, blockName);
+    }
+
+    private int hash(ResourceUrn blockFamilyDefinition, Optional<ResourceUrn> shape, Name blockName) {
+        return Objects.hashCode(blockFamilyDefinition, shape, blockName);
     }
 
     @Override
@@ -115,14 +135,6 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
 
     public ResourceUrn getBlockFamilyDefinitionUrn() {
         return blockFamilyDefinition;
-    }
-
-    public Optional<ResourceUrn> getShapeUrn() {
-        return shape;
-    }
-
-    public Name getIdentifier() {
-        return blockName;
     }
 
     /**
@@ -178,7 +190,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(blockFamilyDefinition, shape, blockName);
+        return hash;
     }
 
     @Override
@@ -197,10 +209,12 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
                 }
             }
         }
+        Name n = this.blockName;
+
         if (result == 0) {
-            if (!blockName.isEmpty()) {
+            if (!n.isEmpty()) {
                 if (!o.blockName.isEmpty()) {
-                    result = blockName.compareTo(o.blockName);
+                    result = n.compareTo(o.blockName);
                 } else {
                     return 1;
                 }
@@ -214,10 +228,11 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     }
 
     public BlockUri getShapelessUri() {
-        if (!getIdentifier().isEmpty()) {
-            return new BlockUri(blockFamilyDefinition, getIdentifier());
+        ResourceUrn def = this.blockFamilyDefinition;
+        if (!blockName.isEmpty()) {
+            return new BlockUri(def, blockName);
         } else {
-            return new BlockUri(blockFamilyDefinition);
+            return new BlockUri(def);
         }
     }
 }

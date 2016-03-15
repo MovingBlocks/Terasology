@@ -30,7 +30,8 @@ import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
  * Created by manu on 15.03.2015.
  */
 public class PBO {
-    private int pboId;
+    private ByteBuffer resultBuffer = null;
+    private final int pboId;
     private ByteBuffer cachedBuffer;
 
     public PBO(int width, int height) {
@@ -38,6 +39,7 @@ public class PBO {
 
         int byteSize = width * height * 4;
         cachedBuffer = BufferUtils.createByteBuffer(byteSize);
+
 
         bind();
         glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, byteSize, GL_STREAM_READ_ARB);
@@ -65,8 +67,12 @@ public class PBO {
 
         cachedBuffer = glMapBufferARB(GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
 
+        int bufferCapacity = cachedBuffer.capacity();
+        if (resultBuffer == null || resultBuffer.capacity()!= bufferCapacity)
+            resultBuffer = BufferUtils.createByteBuffer(bufferCapacity);
+
         // Maybe fix for the issues appearing on some platforms where accessing the "cachedBuffer" causes a JVM exception and therefore a crash...
-        ByteBuffer resultBuffer = BufferUtils.createByteBuffer(cachedBuffer.capacity());
+        resultBuffer.rewind();
         resultBuffer.put(cachedBuffer);
         cachedBuffer.rewind();
         resultBuffer.flip();

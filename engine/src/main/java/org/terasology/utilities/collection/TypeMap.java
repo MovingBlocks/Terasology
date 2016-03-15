@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * TypeMap is a map-like class specialised for holding a set of objects by their class. So it is a {@code Map<Class<? extends T>, T>} where the value is guaranteed to be
@@ -70,7 +71,13 @@ public final class TypeMap<T> {
         }
         return null;
     }
-
+    public <U extends T> U get(Class<U> key, Function<? super Class<? extends T>, ? extends T> ifAbsentPut) {
+        T value = inner.computeIfAbsent(key, ifAbsentPut);
+        if (value != null) {
+            return key.cast(value);
+        }
+        return null;
+    }
     public <U extends T> U put(Class<U> key, U value) {
         return key.cast(inner.put(key, value));
     }

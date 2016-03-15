@@ -43,15 +43,17 @@ public class RegionImpl implements Region, GeneratingRegion {
 
     @Override
     public <T extends WorldFacet> T getFacet(Class<T> dataType) {
-        T facet = generatedFacets.get(dataType);
-        if (facet == null) {
-            facetProviderChains.get(dataType).stream().filter(provider -> !processedProviders.contains(provider)).forEach(provider -> {
+
+        T facet = generatedFacets.get(dataType, (d) -> {
+            Set<FacetProvider> pp = this.processedProviders;
+            facetProviderChains.get(d).stream().filter(provider -> {
+                return !pp.contains(provider);
+            }).forEach(provider -> {
                 provider.process(this);
-                processedProviders.add(provider);
+                pp.add(provider);
             });
-            facet = generatingFacets.get(dataType);
-            generatedFacets.put(dataType, facet);
-        }
+            return generatingFacets.get(d);
+        });
         return facet;
     }
 
@@ -73,10 +75,6 @@ public class RegionImpl implements Region, GeneratingRegion {
 
     @Override
     public Border3D getBorderForFacet(Class<? extends WorldFacet> type) {
-        if (borders.containsKey(type)) {
-            return borders.get(type);
-        } else {
-            return new Border3D(0, 0, 0);
-        }
+        return borders.getOrDefault(type,Border3D.ZERO);
     }
 }
