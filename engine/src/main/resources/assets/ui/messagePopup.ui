@@ -39,7 +39,7 @@
                             },
                             {
                                 "type" : "UIButton",
-                                "text" : "Ok",
+                                "text" : "${engine:menu#dialog-ok}",
                                 "id" : "ok"
                             }
                         ]

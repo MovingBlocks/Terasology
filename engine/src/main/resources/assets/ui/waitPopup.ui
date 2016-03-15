@@ -39,7 +39,7 @@
                             },
                             {
                                 "type" : "UIButton",
-                                "text" : "Cancel",
+                                "text" : "${engine:menu#dialog-cancel}",
                                 "id" : "cancel"
                             }
                         ]

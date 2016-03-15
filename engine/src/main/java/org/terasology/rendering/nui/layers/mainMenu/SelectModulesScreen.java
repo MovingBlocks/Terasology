@@ -215,7 +215,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (sel == null) {
                             return "";
                         }
-                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : "none";
+                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : translationSystem.translate("${engine:menu#module-version-installed-none}");
                     }
                 });
             }
@@ -267,17 +267,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         if (info != null) {
                             if (isSelectedGameplayModule(info)) {
-                                return "Active gameplay";
+                                return translationSystem.translate("${engine:menu#module-status-activegameplay}");
                             } else if (info.isSelected() && info.isExplicitSelection()) {
-                                return "Activated";
+                                return translationSystem.translate("${engine:menu#module-status-activated}");
                             } else if (info.isSelected()) {
-                                return "Dependency";
+                                return translationSystem.translate("${engine:menu#module-status-dependency}");
                             } else if (!info.isPresent()) {
-                                return "Not present";
+                                return translationSystem.translate("${engine:menu#module-status-notpresent}");
                             } else if (info.isValidToSelect()) {
-                                return "Available";
+                                return translationSystem.translate("${engine:menu#module-status-available}");
                             } else {
-                                return "Incompatible or unresolved dependencies";
+                                return translationSystem.translate("${engine:menu#module-status-error}");
                             }
                         }
                         return "";
@@ -311,12 +311,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         if (moduleList.getSelection() != null) {
                             if (moduleList.getSelection().isExplicitSelection()) {
-                                return "Deactivate";
+                                return translationSystem.translate("${engine:menu#deactivate-module}");
                             } else {
-                                return "Activate";
+                                return translationSystem.translate("${engine:menu#activate-module}");
                             }
                         }
-                        return "Activate";  // button should be disabled
+                        return translationSystem.translate("${engine:menu#activate-module}");  // button should be disabled
                     }
                 });
             }
@@ -336,9 +336,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         if (info != null && !info.isPresent()) {
-                            return "Download";
+                            return translationSystem.translate("${engine:menu#download-module}");
                         } else {
-                            return "Update";
+                            return translationSystem.translate("${engine:menu#update-module}");
                         }
                     }
                 });

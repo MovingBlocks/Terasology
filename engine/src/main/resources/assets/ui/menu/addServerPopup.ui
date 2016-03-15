@@ -96,7 +96,7 @@
                             },
                             {
                                "type" : "UILabel",
-                                "text" : "You can press ENTER to copy the name to the address field"
+                                "text" : "${engine:menu#add-server-tip}"
                             },
                             {
                                 "type" : "UISpace",

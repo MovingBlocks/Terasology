@@ -23,6 +23,7 @@ import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
@@ -70,6 +71,9 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private ModuleManager moduleManager;
+
+    @In
+    private TranslationSystem translationSystem;
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -172,13 +176,13 @@ public class JoinGameScreen extends CoreScreenLayer {
         };
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
+        popup.setMessage(translationSystem.translate("${engine:menu#join-game-online}"), translationSystem.translate("${engine:menu#connecting-to}") + " '" + address + ":" + port + "' - " + translationSystem.translate("${engine:menu#please-wait}"));
         popup.onSuccess(result -> {
             if (result.getStatus() != JoinStatus.Status.FAILED) {
                 engine.changeState(new StateLoading(result));
             } else {
                 MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
+                screen.setMessage(translationSystem.translate("${engine:menu#failed-to-join}"), translationSystem.translate("${engine:menu#could-not-connect-to-server}") + " - " + result.getErrorMessage());
             }
         });
         popup.startOperation(operation, true);
@@ -242,7 +246,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     if (info.isDone()) {
                         return getModulesText(info);
                     } else {
-                        return "requested";
+                        return translationSystem.translate("${engine:menu#join-server-requested}");
                     }
                 }
                 return null;
@@ -258,7 +262,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     if (info.isDone()) {
                         return getWorldText(info);
                     } else {
-                        return "requested";
+                        return translationSystem.translate("${engine:menu#join-server-requested}");
                     }
                 }
                 return null;
@@ -353,7 +357,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
             return Joiner.on('\n').join(codedWorldInfo);
         } catch (ExecutionException | InterruptedException e) {
-            return FontColor.getColored("Connection Failed!", Color.RED);
+            return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
         }
     }
 
@@ -371,7 +375,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
             return Joiner.on('\n').join(codedModInfo);
         } catch (ExecutionException | InterruptedException e) {
-            return FontColor.getColored("Connection Failed!", Color.RED);
+            return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
         }
     }
 

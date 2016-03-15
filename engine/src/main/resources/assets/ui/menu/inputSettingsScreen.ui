@@ -21,7 +21,7 @@
             {
                 "type": "UILabel",
                 "family": "title",
-                "text": "Input Settings",
+                "text": "${engine:menu#input-settings-title}",
                 "id": "subtitle",
                 "layoutInfo": {
                     "height": 48,
@@ -57,7 +57,7 @@
                 "contents" : [
                     {
                         "type" : "UIButton",
-                        "text" : "Restore Defaults",
+                        "text" : "${engine:menu#restore-defaults}",
                         "id" : "reset"
                     },
                     {
