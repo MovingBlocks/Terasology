@@ -26,8 +26,6 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Set;
 
-import static jdk.vm.ci.sparc.SPARC.o1;
-
 /**
  * A data structure that allows to add, remove and find nearest nodes in an N-dimensional space.
  * This can be used to locate entities (or block entities) nearest to player of a specific type, provided that system
