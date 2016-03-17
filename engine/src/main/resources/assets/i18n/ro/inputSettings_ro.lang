@@ -1,0 +1,11 @@
+{
+    "default-binding": "Legătura implicită",
+    "input-settings-title": "Input Settings",
+    "invert-mouse": "Invert Mouse:",
+    "mouse": "Mouse",
+    "mouse-sensitivity": "Mouse Sensitivity:",
+    "new-binding": "Legătură nouă",
+    "none": "<none>",
+    "not-bound": "<not bound>",
+    "remove-binding": "Elimină"
+}

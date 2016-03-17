@@ -1,0 +1,11 @@
+{
+    "default-binding": "Standardní spojování",
+    "input-settings-title": "Input Settings",
+    "invert-mouse": "Invert Mouse:",
+    "mouse": "Mouse",
+    "mouse-sensitivity": "Mouse Sensitivity:",
+    "new-binding": "Nové spojení",
+    "none": "<none>",
+    "not-bound": "<not bound>",
+    "remove-binding": "Odebrat"
+}

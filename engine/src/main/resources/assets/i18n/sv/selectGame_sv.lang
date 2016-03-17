@@ -1,0 +1,8 @@
+{
+    "create-game": "Skapa",
+    "delete-game": "Radera",
+    "load-game": "Ladda",
+    "select-game-title": "Välj Spel",
+    "select-singleplayer-game-sub-title": "Singleplayer",
+    "select-multiplayer-game-sub-title": "Multiplayer"
+}

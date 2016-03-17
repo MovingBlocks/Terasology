@@ -21,7 +21,7 @@
             {
                 "type": "UILabel",
                 "family": "title",
-                "text": "${engine:menu#input-settings-title}",
+                "text": "${engine:inputSettings#input-settings-title}",
                 "id": "subtitle",
                 "layoutInfo": {
                     "height": 48,

@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Créer une partie",
+    "game-name": "Nom de la partie",
+    "gameplay": "Modèle de jeu",
+    "gameplay-info": "Vous pouvez cliquer sur 'modules' pour les paramètres avancés",
+    "select-modules": "Modules...",
+    "select-world-gen": "Choisir le générateur du monde",
+    "select-world-gen-info": "Activer des modules peut en ajouter plus",
+    "start-game": "Jouer",
+    "world-config-preview": "Détails...",
+    "world-seed": "Graine"
+}

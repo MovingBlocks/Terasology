@@ -1,0 +1,8 @@
+{
+    "create-game": "Creează",
+    "delete-game": "Sterge",
+    "load-game": "Încarcă",
+    "select-game-title": "Selectează Joc",
+    "select-singleplayer-game-sub-title": "Singleplayer",
+    "select-multiplayer-game-sub-title": "Multiplayer"
+}

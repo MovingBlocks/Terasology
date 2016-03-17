@@ -19,7 +19,7 @@
                         "contents" : [
                             {
                                 "type" : "UILabel",
-                                "text" : "${engine:menu#edit-server-title}",
+                                "text" : "${engine:joinGame#edit-server-title}",
                                 "family" : "title"
                             },
                             {
@@ -31,7 +31,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "${engine:menu#server-name}: ",
+                                        "text" : "${engine:joinGame#server-name}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -48,7 +48,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "${engine:menu#server-owner}: ",
+                                        "text" : "${engine:joinGame#server-owner}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -65,7 +65,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "${engine:menu#server-address}: ",
+                                        "text" : "${engine:joinGame#server-address}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -82,7 +82,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "${engine:menu#server-port}: ",
+                                        "text" : "${engine:joinGame#server-port}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.3
@@ -96,7 +96,7 @@
                             },
                             {
                                "type" : "UILabel",
-                                "text" : "${engine:menu#add-server-tip}"
+                                "text" : "${engine:joinGame#add-server-tip}"
                             },
                             {
                                 "type" : "UISpace",

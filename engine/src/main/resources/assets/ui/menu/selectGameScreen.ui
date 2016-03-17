@@ -22,7 +22,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle",
                 "family" : "title",
-                "text": "${engine:menu#select-game-title}",
+                "text": "${engine:selectGame#select-game-title}",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},
@@ -37,7 +37,7 @@
                 "type" : "UILabel",
                 "id" : "gameTypeTitle",
                 "family" : "subtitle",
-                "text": "${engine:menu#select-singleplayer-game-sub-title}",
+                "text": "${engine:selectGame#select-singleplayer-game-sub-title}",
                 "layoutInfo" : {
                     "height" : 30,
                     "position-horizontal-center" : {},
@@ -76,17 +76,17 @@
                     {
                         "type" : "UIButton",
                         "id" : "create",
-                        "text" : "${engine:menu#create-game}"
+                        "text" : "${engine:selectGame#create-game}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "load",
-                        "text" : "${engine:menu#load-game}"
+                        "text" : "${engine:selectGame#load-game}"
                     },
                     {
                         "type" : "UIButton",
                         "id" : "delete",
-                        "text" : "${engine:menu#delete-game}"
+                        "text" : "${engine:selectGame#delete-game}"
                     }
                 ],
                 "layoutInfo" : {

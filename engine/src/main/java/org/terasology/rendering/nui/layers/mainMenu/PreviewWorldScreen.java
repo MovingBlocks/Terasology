@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -87,6 +88,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @In
     private Context context;
+
+    @In
+    private TranslationSystem translationSystem;
 
     private WorldGenerator worldGenerator;
 
@@ -261,10 +265,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         final NUIManager manager = context.get(NUIManager.class);
         final WaitPopup<TextureData> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage("Updating Preview", "Please wait ...");
+        popup.setMessage(translationSystem.translate("${engine:previewWorld#updating-preview}"), translationSystem.translate("${engine:menu#please-wait}"));
 
         ProgressListener progressListener = progress ->
-                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+                popup.setMessage(translationSystem.translate("${engine:previewWorld#updating-preview}"), String.format(translationSystem.translate("${engine:menu#please-wait}") + "\n%d%%", (int) (progress * 100f)));
 
         Callable<TextureData> operation = () -> {
             if (seed != null) {

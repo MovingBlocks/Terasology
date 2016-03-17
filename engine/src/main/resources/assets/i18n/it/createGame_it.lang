@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Crea gioco",
+    "game-name": "Nome del gioco",
+    "gameplay": "Gameplay template",
+    "gameplay-info": "puoi cliccare 'moduli' per personalizzarli ulteriormente",
+    "select-modules": "Moduli...",
+    "select-world-gen": "Scegli il generatore del mondo",
+    "select-world-gen-info": "Consentendo i moduli è possibile aggiungerne ulteriormente",
+    "start-game": "Gioca",
+    "world-config-preview": "Dettagli...",
+    "world-seed": "Seed"
+}

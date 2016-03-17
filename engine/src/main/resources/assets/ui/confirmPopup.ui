@@ -43,12 +43,12 @@
                                 "contents" : [
                                     {
                                         "type" : "UIButton",
-                                        "text" : "Cancel",
+                                        "text" : "${engine:menu#dialog-cancel}",
                                         "id" : "cancel"
                                     },
                                     {
                                         "type" : "UIButton",
-                                        "text" : "Ok",
+                                        "text" : "${engine:menu#dialog-ok}",
                                         "id" : "ok"
                                     }
                                 ],

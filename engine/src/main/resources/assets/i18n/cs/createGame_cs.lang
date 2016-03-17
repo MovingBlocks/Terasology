@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Vytvořit Hru",
+    "game-name": "Jméno hry",
+    "gameplay": "Šablona hry",
+    "gameplay-info": "klikni na  'moduly' pro další úpravy",
+    "select-modules": "Moduly...",
+    "select-world-gen": "Vyber Generátor Světa",
+    "select-world-gen-info": "zapnutí modulů může přidat další",
+    "start-game": "Hrát",
+    "world-config-preview": "Detaily...",
+    "world-seed": "Zdroj"
+}

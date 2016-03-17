@@ -22,7 +22,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle",
                 "family" : "title",
-                "text" : "${engine:menu#preview-world-title}",
+                "text" : "${engine:previewWorld#preview-world-title}",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},
@@ -82,7 +82,7 @@
                         "contents" : [
                             {
                                 "type" : "UILabel",
-                                "text" : "${engine:menu#preview-zoom-factor}:",
+                                "text" : "${engine:previewWorld#preview-zoom-factor}:",
                                 "id" : "zoomLabel",
                                 "layoutInfo" : {
                                     "use-content-height" : true,
@@ -111,7 +111,7 @@
                             {
                                 "type" : "UILabel",
                                 "id" : "seedLabel",
-                                "text" : "${engine:menu#world-seed}:",
+                                "text" : "${engine:createGame#world-seed}:",
                                 "layoutInfo" : {
                                     "use-content-height" : true,
                                     "position-top" : {
@@ -155,7 +155,7 @@
                             },
                             {
                                 "type" : "UIButton",
-                                "text" : "${engine:menu#create-preview}",
+                                "text" : "${engine:previewWorld#create-preview}",
                                 "id" : "apply",
                                 "layoutInfo" : {
                                     "height" : 32,

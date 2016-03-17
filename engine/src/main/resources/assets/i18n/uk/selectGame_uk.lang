@@ -1,0 +1,8 @@
+{
+    "create-game": "Створити",
+    "delete-game": "Видалити",
+    "load-game": "Завантажити",
+    "select-game-title": "Вибрати гру",
+    "select-singleplayer-game-sub-title": "Singleplayer",
+    "select-multiplayer-game-sub-title": "Multiplayer"
+}

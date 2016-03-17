@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
@@ -49,6 +50,9 @@ public class ChangeBindingPopup extends CoreScreenLayer {
     @In
     private Context context;
 
+    @In
+    private TranslationSystem translationSystem;
+
     private UIInputBind bindButton;
 
     private BindsConfig defaultBinds;
@@ -72,7 +76,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
         bindButton.bindInput(new InputConfigBinding(bindConfig, uri, index));
         List<Input> defaults = defaultBinds.getBinds(uri);
         find("default-binding", UILabel.class).setText(
-                defaults.size() > index ? defaults.get(index).getDisplayName() : "<none>");
+                defaults.size() > index ? defaults.get(index).getDisplayName() : translationSystem.translate("${engine:inputSettings#none}"));
         find("default", UIButton.class).subscribe(e -> bindButton.setNewInput(
                 defaults.size() > index ? defaults.get(index) : null));
     }

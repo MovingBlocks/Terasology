@@ -22,7 +22,7 @@
                     "type" : "UILabel",
                     "id" : "subtitle",
                     "family" : "title",
-                    "text" : "${engine:menu#join-server-title}",
+                    "text" : "${engine:joinGame#join-server-title}",
                     "layoutInfo" : {
                         "height" : 48,
                         "position-horizontal-center" : {},
@@ -81,7 +81,7 @@
                                     {
                                         "type" : "UIButton",
                                         "id" : "onlineButton",
-                                        "text": "${engine:menu#listed-servers}",
+                                        "text": "${engine:joinGame#listed-servers}",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.5
                                         }
@@ -89,7 +89,7 @@
                                     {
                                         "type": "UIButton",
                                         "id": "customButton",
-                                        "text": "${engine:menu#custom-servers}"
+                                        "text": "${engine:joinGame#custom-servers}"
                                     }
                                     ],
                                     "layoutInfo" : {
@@ -129,7 +129,7 @@
                                             {
                                                 "type" : "UIButton",
                                                 "id" : "edit",
-                                                "text" : "${engine:menu#edit-server}",
+                                                "text" : "${engine:joinGame#edit-server}",
                                                 "layoutInfo" : {
                                                     "use-content-height" : true,
                                                     "width" : 135,
@@ -143,7 +143,7 @@
                                             {
                                                 "type" : "UIButton",
                                                 "id" : "remove",
-                                                "text" : "${engine:menu#remove-server}",
+                                                "text" : "${engine:joinGame#remove-server}",
                                                 "layoutInfo" : {
                                                     "use-content-height" : true,
                                                     "position-left" : {
@@ -161,7 +161,7 @@
                                             {
                                                 "type" : "UIButton",
                                                 "id" : "add",
-                                                "text" : "${engine:menu#add-server}",
+                                                "text" : "${engine:joinGame#add-server}",
                                                 "layoutInfo" : {
                                                     "use-content-height" : true,
                                                     "position-bottom" : {
@@ -234,7 +234,7 @@
                                     "contents" : [
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#server-name}: "
+                                            "text" : "${engine:joinGame#server-name}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -243,7 +243,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#server-owner}: "
+                                            "text" : "${engine:joinGame#server-owner}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -252,7 +252,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#server-address}: "
+                                            "text" : "${engine:joinGame#server-address}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -261,7 +261,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#server-port}: "
+                                            "text" : "${engine:joinGame#server-port}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -270,7 +270,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#game-worlds}: "
+                                            "text" : "${engine:joinGame#game-worlds}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -279,7 +279,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#module-list}: "
+                                            "text" : "${engine:joinGame#module-list}: "
                                         },
                                         {
                                             "type" : "ScrollableArea",
@@ -306,7 +306,7 @@
                                 {
                                     "type" : "UIButton",
                                     "id" : "join",
-                                    "text" : "${engine:menu#join-server-action}",
+                                    "text" : "${engine:joinGame#join-server-action}",
                                     "family" : "highlight",
                                     "layoutInfo" : {
                                         "height" : 40,
