@@ -28,6 +28,7 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
@@ -76,6 +77,9 @@ public class CreateGameScreen extends CoreScreenLayer {
     private GameEngine gameEngine;
 
     @In
+    private TranslationSystem translationSystem;
+
+    @In
     private Config config;
 
     private boolean loadingAsServer;
@@ -83,6 +87,21 @@ public class CreateGameScreen extends CoreScreenLayer {
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
+
+        UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
+        if (gameTypeTitle != null) {
+            gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    if (loadingAsServer) {
+                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
+                    } else {
+                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
+                    }
+                }
+            });
+        }
+
         final UIText worldName = find("worldName", UIText.class);
         if (worldName != null) {
             int gameNum = 1;
