@@ -103,7 +103,7 @@ public class PostProcessor {
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
     @Range(min = 0.0f, max = 5.0f)
-    private float bloomHighPassThreshold = 0.75f;
+    private float bloomHighPassThreshold =.05f;
     @Range(min = 0.0f, max = 32.0f)
     private float bloomBlurRadius = 12.0f;
 
