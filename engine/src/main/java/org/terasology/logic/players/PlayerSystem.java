@@ -48,6 +48,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Iterator;
@@ -62,13 +63,13 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     private EntityManager entityManager;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private WorldGenerator worldGenerator;
 
     @In
     private WorldProvider worldProvider;
+
+    @In
+    private ChunkProvider chunkProvider;
 
     @In
     private NetworkSystem networkSystem;
@@ -165,12 +166,12 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.saveComponent(relevanceRegion);
-        worldRenderer.getChunkProvider().updateRelevanceEntity(entity, chunkDistance);
+        chunkProvider.updateRelevanceEntity(entity, chunkDistance);
     }
 
     private void removeRelevanceEntity(EntityRef entity) {
         //entity.removeComponent(RelevanceRegionComponent.class);
-        worldRenderer.getChunkProvider().removeRelevanceEntity(entity);
+        chunkProvider.removeRelevanceEntity(entity);
     }
 
 
@@ -178,7 +179,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.addComponent(relevanceRegion);
-        worldRenderer.getChunkProvider().addRelevanceEntity(entity, chunkDistance, owner);
+        chunkProvider.addRelevanceEntity(entity, chunkDistance, owner);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
