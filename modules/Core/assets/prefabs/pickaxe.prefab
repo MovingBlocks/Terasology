@@ -6,5 +6,6 @@
     "Item": {
         "icon": "engine:items#pick",
         "damageType": "pickaxeDamage"
-    }
+    },
+    "mass": 42
 }
