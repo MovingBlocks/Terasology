@@ -20,7 +20,13 @@ import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
+import java.util.Collection;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -77,14 +83,6 @@ import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-
 /**
  * <p>
  * This GameEngine implementation is the heart of Terasology.
@@ -114,7 +112,7 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
-    private static final int ONE_MEBIBYTE = 1024 * 1024;
+    private static final int ONE_MEBIBYTE = 1048576; // 1024 * 1024;
 
     private GameState currentState;
     private GameState pendingState;
