@@ -82,6 +82,7 @@ public abstract class Task {
             case NOT_INITIALIZED: {
                 onInitialize();
                 status = Status.RUNNING;
+                status = this.tick(deltaSeconds);
                 break;
             }
                 //running: update
@@ -91,6 +92,10 @@ public abstract class Task {
                     LOG.warn("update of Task {} returned invalid state {}", this.getClass(), newStatus);
                 }
                 status = newStatus;
+                if(newStatus == Status.FAILURE || newStatus == Status.SUCCESS) {
+                    onTerminate(status);
+                }
+
                 break;
             }
                 //suspended: do nothing
@@ -99,7 +104,7 @@ public abstract class Task {
             //end of running: terminate
             case FAILURE:
             case SUCCESS: {
-                onTerminate(status);
+               // onTerminate(status);
                 status = Status.TERMINATED;
                 break;
             }
