@@ -63,7 +63,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getStringCount() > 1) {
             throw new IllegalStateException("Data is an array of size != 1");
         } else if (!isNull()) {
-            throw new ClassCastException("Data is not a String");
+            throw new ClassCastException("Data is not a String: " + data.toString());
         }
         return null;
     }
@@ -81,7 +81,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getDoubleCount() + data.getFloatCount() + data.getIntegerCount() + data.getLongCount() > 1) {
             throw new IllegalStateException("Data is an array of size != 1");
         } else {
-            throw new ClassCastException("Data is not a number" + data.toString());
+            throw new ClassCastException("Data is not a number: " + data.toString());
         }
     }
 
@@ -98,7 +98,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getDoubleCount() + data.getFloatCount() + data.getIntegerCount() + data.getLongCount() > 1) {
             throw new IllegalStateException("Data is an array of size != 1");
         } else {
-            throw new ClassCastException("Data is not a number" + data.toString());
+            throw new ClassCastException("Data is not a number: " + data.toString());
         }
     }
 
@@ -115,7 +115,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getDoubleCount() + data.getFloatCount() + data.getIntegerCount() + data.getLongCount() > 1) {
             throw new IllegalStateException("Data is an array of size != 1");
         } else {
-            throw new ClassCastException("Data is not a number" + data.toString());
+            throw new ClassCastException("Data is not a number: " + data.toString());
         }
     }
 
@@ -132,7 +132,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getDoubleCount() + data.getFloatCount() + data.getIntegerCount() + data.getLongCount() > 1) {
             throw new IllegalStateException("Data is an array of size != 1");
         } else {
-            throw new ClassCastException("Data is not a number" + data.toString());
+            throw new ClassCastException("Data is not a number: " + data.toString());
         }
     }
 
@@ -143,7 +143,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getBooleanCount() > 1) {
             throw new IllegalStateException("Data is an array of size != 1");
         } else {
-            throw new ClassCastException("Data is not a boolean" + data.toString());
+            throw new ClassCastException("Data is not a boolean: " + data.toString());
         }
     }
 
@@ -152,7 +152,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         if (data.hasBytes()) {
             return data.getBytes().toByteArray();
         } else if (!isNull()) {
-            throw new DeserializationException("Data is not bytes" + data.toString());
+            throw new DeserializationException("Data is not bytes: " + data.toString());
         } else {
             return new byte[0];
         }
@@ -163,7 +163,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         if (data.hasBytes()) {
             return data.getBytes().asReadOnlyByteBuffer();
         } else if (!isNull()) {
-            throw new DeserializationException("Data is not bytes" + data.toString());
+            throw new DeserializationException("Data is not bytes: " + data.toString());
         } else {
             return ByteBuffer.wrap(new byte[0]);
         }
@@ -185,7 +185,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
                 result.put(data.getNameValue(i).getName(), new ProtobufPersistedData(data.getNameValue(i).getValue()));
             }
         } else if (!isNull()) {
-            throw new IllegalStateException("Data is not a value map" + data.toString());
+            throw new IllegalStateException("Data is not a value map: " + data.toString());
         }
         return new PersistedMap(result);
     }
@@ -254,7 +254,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
         } else if (data.getStringCount() > 0) {
             return new PersistedString(data.getString(index));
         } else if (data.hasBytes()) {
-            throw new IllegalStateException("Data is not an array");
+            throw new IllegalStateException("Data is not an array: " + data.toString());
         }
         throw new IndexOutOfBoundsException(index + " exceeds size of array data");
     }
