@@ -512,7 +512,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     int pos = Collections.binarySearch(sortedModules, info, moduleInfoComparator);
                     if (pos < 0) {                             // not yet in the (sorted) list
                         sortedModules.add(-pos - 1, info);     // use "insertion point" to keep the list sorted
-                        allSortedModules = new ArrayList<>(sortedModules);
+                        allSortedModules.clear();
+                        allSortedModules.addAll(sortedModules);
                     }
                 }
                 info.setOnlineVersion(remote);
