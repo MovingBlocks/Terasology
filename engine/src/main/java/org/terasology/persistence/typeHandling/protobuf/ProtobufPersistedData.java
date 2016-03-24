@@ -26,10 +26,7 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
-import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
@@ -42,6 +39,11 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedLong;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.protobuf.EntityData;
+
+import java.nio.ByteBuffer;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  */

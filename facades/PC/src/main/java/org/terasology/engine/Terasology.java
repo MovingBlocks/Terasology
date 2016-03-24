@@ -17,14 +17,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -55,6 +48,15 @@ import org.terasology.splash.overlay.ImageOverlay;
 import org.terasology.splash.overlay.RectOverlay;
 import org.terasology.splash.overlay.TextOverlay;
 import org.terasology.splash.overlay.TriggerImageOverlay;
+
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
