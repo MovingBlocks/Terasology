@@ -47,6 +47,7 @@ import org.terasology.splash.overlay.ImageOverlay;
 import org.terasology.splash.overlay.RectOverlay;
 import org.terasology.splash.overlay.TextOverlay;
 import org.terasology.splash.overlay.TriggerImageOverlay;
+
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
