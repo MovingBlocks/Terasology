@@ -17,7 +17,6 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -48,7 +47,6 @@ import org.terasology.splash.overlay.ImageOverlay;
 import org.terasology.splash.overlay.RectOverlay;
 import org.terasology.splash.overlay.TextOverlay;
 import org.terasology.splash.overlay.TriggerImageOverlay;
-
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;

@@ -58,7 +58,12 @@ Icon
 .DS_Store
 .DS_Store?
 .Spotlight-V100
+.DocumentRevisions-V100
+.TemporaryItems
 .Trashes
+.dbfseventsd
+.fseventsd
+.VolumeIcon.icns
 
 #Ignore Windows
 ehthumbs.db
