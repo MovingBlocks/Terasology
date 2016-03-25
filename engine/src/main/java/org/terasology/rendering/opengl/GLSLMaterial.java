@@ -160,7 +160,7 @@ public class GLSLMaterial extends BaseMaterial {
         //resolves #966
         //Some of the uniforms are not updated constantly between frames
         //this function will rebind any uniforms that are not bound
-        rebindVaribles(materialData);
+        rebindVariables(materialData);
 
     }
 
@@ -173,7 +173,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 shader = (GLSLShader) data.getShader();
                 recompile();
-                rebindVaribles(data);
+                rebindVariables(data);
 
             });
         } catch (InterruptedException e) {
@@ -181,13 +181,7 @@ public class GLSLMaterial extends BaseMaterial {
         }
     }
 
-    /**
-     * Rebindes all the varibles from MaterialData this is only called when the shader first loads
-     * and then it get's recompiled.
-     * @param data
-     */
-    private void rebindVaribles(MaterialData data)
-    {
+    private void rebindVariables(MaterialData data) {
         for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
             setTexture(entry.getKey(), entry.getValue());
         }
@@ -201,18 +195,19 @@ public class GLSLMaterial extends BaseMaterial {
         }
 
         for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
-            switch (entry.getValue().length) {
+            float[] value = entry.getValue();
+            switch (value.length) {
                 case 1:
-                    setFloat(entry.getKey(), entry.getValue()[0]);
+                    setFloat(entry.getKey(), value[0]);
                     break;
                 case 2:
-                    setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                    setFloat2(entry.getKey(), value[0], value[1]);
                     break;
                 case 3:
-                    setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                    setFloat3(entry.getKey(), value[0], value[1], value[2]);
                     break;
                 case 4:
-                    setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                    setFloat4(entry.getKey(), value[0], value[1], value[2], value[3]);
                     break;
                 default:
                     logger.error("MaterialData contains float array entry of size > 4");
@@ -220,8 +215,6 @@ public class GLSLMaterial extends BaseMaterial {
             }
         }
     }
-
-
 
     @Override
     public void setTexture(String desc, Texture texture) {
