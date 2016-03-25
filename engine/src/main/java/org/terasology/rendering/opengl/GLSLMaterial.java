@@ -61,6 +61,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<>();
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<>();
+
     private GLSLShader shader;
     private boolean activeFeaturesChanged;
     private TObjectIntMap<UniformId> uniformLocationMap = new TObjectIntHashMap<>();
@@ -72,11 +73,13 @@ public class GLSLMaterial extends BaseMaterial {
     private ShaderParameters shaderParameters;
 
     private DisposalAction disposalAction;
+    private MaterialData materialData;
 
     public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
         super(urn, assetType);
         disposalAction = new DisposalAction(urn);
         getDisposalHook().setDisposeAction(disposalAction);
+        this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
         reload(data);
     }
@@ -143,6 +146,7 @@ public class GLSLMaterial extends BaseMaterial {
         }
         disposalAction.shaderPrograms.clear();
         uniformLocationMap.clear();
+        bindMap.clear();
 
         disposalAction.shaderPrograms.put(0, shader.linkShaderProgram(0));
         for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
@@ -152,6 +156,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (shaderParameters != null) {
             shaderParameters.initialParameters(this);
         }
+
+        //resolves #966
+        //Some of the uniforms are not updated constantly between frames
+        //this function will rebind any uniforms that are not bound
+        rebindVaribles(materialData);
+
     }
 
     @Override
@@ -163,43 +173,54 @@ public class GLSLMaterial extends BaseMaterial {
 
                 shader = (GLSLShader) data.getShader();
                 recompile();
+                rebindVaribles(data);
 
-                for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
-                    setTexture(entry.getKey(), entry.getValue());
-                }
-
-                for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
-                    setFloat(entry.getKey(), entry.getValue());
-                }
-
-                for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
-                    setInt(entry.getKey(), entry.getValue());
-                }
-
-                for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
-                    switch (entry.getValue().length) {
-                        case 1:
-                            setFloat(entry.getKey(), entry.getValue()[0]);
-                            break;
-                        case 2:
-                            setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
-                            break;
-                        case 3:
-                            setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
-                            break;
-                        case 4:
-                            setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
-                            break;
-                        default:
-                            logger.error("MaterialData contains float array entry of size > 4");
-                            break;
-                    }
-                }
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);
         }
     }
+
+    /**
+     * Rebindes all the varibles from MaterialData this is only called when the shader first loads
+     * and then it get's recompiled.
+     * @param data
+     */
+    private void rebindVaribles(MaterialData data)
+    {
+        for (Map.Entry<String, Texture> entry : data.getTextures().entrySet()) {
+            setTexture(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<String, Float> entry : data.getFloatParams().entrySet()) {
+            setFloat(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<String, Integer> entry : data.getIntegerParams().entrySet()) {
+            setInt(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<String, float[]> entry : data.getFloatArrayParams().entrySet()) {
+            switch (entry.getValue().length) {
+                case 1:
+                    setFloat(entry.getKey(), entry.getValue()[0]);
+                    break;
+                case 2:
+                    setFloat2(entry.getKey(), entry.getValue()[0], entry.getValue()[1]);
+                    break;
+                case 3:
+                    setFloat3(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+                    break;
+                case 4:
+                    setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
+                    break;
+                default:
+                    logger.error("MaterialData contains float array entry of size > 4");
+                    break;
+            }
+        }
+    }
+
 
 
     @Override
