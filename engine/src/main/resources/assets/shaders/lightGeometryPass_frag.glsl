@@ -147,7 +147,7 @@ void main() {
     //ref: https://imdoingitwrong.wordpress.com/2011/01/31/light-attenuation/
     // TODO: Make cutoff a shader parameter
     const float cutoff= 0.005;
-    const float radius = 1.5;
+    const float radius = 3.0;
     // calculate basic attenuation
     float denom = lightDist/radius + 1;
     float attenuation = 1.0/(denom*denom);
