@@ -16,6 +16,7 @@
 
 package org.terasology.logic.inventory;
 
+import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.engine.Time;
@@ -215,6 +216,12 @@ public class CharacterInventorySystem extends BaseComponentSystem {
                 event.setHandled(true);
             }
         }
+    }
+
+    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
+    public void onPlayerDeath(DeathEvent event, EntityRef entity)
+    {
+        resetDropMark();
     }
 
 }
