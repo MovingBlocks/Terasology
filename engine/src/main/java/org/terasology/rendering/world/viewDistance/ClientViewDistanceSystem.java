@@ -58,7 +58,7 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
         ViewDistance viewDistance = config.getRendering().getViewDistance();
 
         if (worldRenderer != null) {
-            worldRenderer.changeViewDistance(viewDistance);
+            worldRenderer.setViewDistance(viewDistance);
         }
 
         EntityRef clientEntity = localPlayer.getClientEntity();
