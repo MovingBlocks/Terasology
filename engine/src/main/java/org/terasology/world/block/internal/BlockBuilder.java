@@ -146,7 +146,7 @@ public class BlockBuilder implements BlockBuilderHelper {
         block.setPenetrable(def.isPenetrable());
         block.setTargetable(def.isTargetable());
         block.setClimbable(def.isClimbable());
-        if(def.isInvisible()) {
+        if (def.isInvisible()) {
             block.setMeshGenerator(null);
         }
         block.setTranslucent(def.isTranslucent());

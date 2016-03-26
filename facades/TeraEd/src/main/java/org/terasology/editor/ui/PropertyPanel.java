@@ -25,9 +25,6 @@ import java.awt.*;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author Benjamin Glatzel
- */
 public class PropertyPanel extends JPanel {
 
     private static final long serialVersionUID = 6844552770055484579L;

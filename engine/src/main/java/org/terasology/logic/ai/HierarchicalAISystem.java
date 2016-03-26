@@ -125,17 +125,17 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
 
             // if our AI is aggressive or hunter go and hunt player else run away
             // if wild
-            if (ai.aggressive) {
+            /*if (ai.aggressive) {
                 // TODO fix this to proper attacking
                 // TODO since health is no longer an engine system, the worst an AI can do is give you a hug.
-                /*if (distanceToPlayer <= ai.attackDistance) {
+                if (distanceToPlayer <= ai.attackDistance) {
                     if (tempTime - lastAttack > ai.damageFrequency) {
                         localPlayer.getCharacterEntity().send(
                                 new DoDamageEvent(ai.damage, EngineDamageTypes.PHYSICAL.get(), entity));
                         lastAttack = time.getGameTimeInMs();
                     }
-                }*/
-            }
+                }
+            } // */
 
             //update
             if (tempTime - ai.lastChangeOfDangerAt > dangerChangeTime) {

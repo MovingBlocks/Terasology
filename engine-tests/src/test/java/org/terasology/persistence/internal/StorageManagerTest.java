@@ -27,14 +27,12 @@ import org.mockito.Matchers;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -129,9 +127,9 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));
-        BiomeManager biomeManager = mock(BiomeManager.class);
-        when(biomeManager.getBiomes()).thenReturn(Collections.<Biome>emptyList());
-        context.put(BiomeManager.class, biomeManager);
+        BiomeManager biomeManagerLocal = mock(BiomeManager.class);
+        when(biomeManagerLocal.getBiomes()).thenReturn(Collections.<Biome>emptyList());
+        context.put(BiomeManager.class, biomeManagerLocal);
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         context.put(WorldProvider.class, worldProvider);
@@ -233,7 +231,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,  blockManager,
-                biomeManager,false);
+                biomeManager, false);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);

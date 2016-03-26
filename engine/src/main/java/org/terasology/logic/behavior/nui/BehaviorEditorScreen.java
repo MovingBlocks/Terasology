@@ -195,8 +195,8 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
             private boolean shouldCollapse(int pos) {
                 if (pos < paletteItems.size()) {
                     String currentItemName = paletteItems.get(pos).name;
-                    return !currentItemName.startsWith(PALETTE_ITEM_OPEN) &&
-                           !currentItemName.startsWith(PALETTE_ITEM_CLOSE);
+                    return !currentItemName.startsWith(PALETTE_ITEM_OPEN)
+                            && !currentItemName.startsWith(PALETTE_ITEM_CLOSE);
                 }
                 return false;
             }

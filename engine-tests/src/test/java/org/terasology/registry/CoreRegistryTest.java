@@ -24,9 +24,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-/**
- * @author Sk0ut
- */
 public class CoreRegistryTest {
     private Context context;
 

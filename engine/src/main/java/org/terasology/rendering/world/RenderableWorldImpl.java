@@ -44,9 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-/**
- * Created by manu on 24.12.2014.
- */
 public class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;

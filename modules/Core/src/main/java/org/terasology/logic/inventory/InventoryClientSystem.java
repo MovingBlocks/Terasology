@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 @Share(value = InventoryManager.class)
 public class InventoryClientSystem extends BaseComponentSystem implements InventoryManager {
@@ -65,7 +63,8 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void inventoryChangeAcknowledge(InventoryChangeAcknowledgedRequest event, EntityRef entity) {
-        //TODO: This does not ever get triggered because the event is sent to the client,  not the character.  If it did get triggered,  it causes a mess of question mark items.
+        //TODO: This does not ever get triggered because the event is sent to the client,  not the character.
+        //      If it did get triggered,  it causes a mess of question mark items.
         AbstractMoveItemRequest removedRequest = pendingMoves.remove(event.getChangeId());
         if (removedRequest != null) {
             destroyClientTempEntities(removedRequest);

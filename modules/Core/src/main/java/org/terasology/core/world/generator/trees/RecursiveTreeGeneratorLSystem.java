@@ -29,9 +29,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.CoreChunk;
 
 /**
- * @author Michael
- *
- * Encapsulates the recursive algorithm for the generation of trees 
+ * Encapsulates the recursive algorithm for the generation of trees
  */
 
 public class RecursiveTreeGeneratorLSystem {

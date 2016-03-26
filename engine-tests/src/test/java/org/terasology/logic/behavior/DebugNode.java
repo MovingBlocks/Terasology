@@ -19,9 +19,6 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.Task;
 
-/**
- * Created by synopia on 18.01.14.
- */
 public class DebugNode extends Node {
     public DebugTask lastTask;
     public DebugTask lastTask2;

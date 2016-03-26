@@ -26,9 +26,6 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
 
 import java.util.List;
 
-/**
- * @author Benjamin Glatzel
- */
 public class SceneProperties implements PropertyProvider {
 
     private final TerasologyEngine engine;

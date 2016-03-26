@@ -46,8 +46,6 @@ import java.util.ArrayList;
 
 /**
  * TeraEd main class.
- *
- * @author Benjamin Glatzel
  */
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame implements ActionListener, WindowListener, StateChangeSubscriber {

@@ -20,10 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Encapsulates climate distance calculations for the climate simulator 
- * 
- * @author Michael
- *
+ * Encapsulates climate distance calculations for the climate simulator
  */
 public class ClimateSimulatorData {
     private static final Logger logger = LoggerFactory.getLogger(ClimateSimulator.class);
@@ -46,8 +43,7 @@ public class ClimateSimulatorData {
     public float[][] initDist(String fromWhat) {
 
         float[][] distArr = new float[size][size];
-        switch(fromWhat)
-        {
+        switch(fromWhat) {
         case "water":
             distanceFromWater(distArr);
             break;

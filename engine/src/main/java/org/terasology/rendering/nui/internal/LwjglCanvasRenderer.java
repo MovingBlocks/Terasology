@@ -139,8 +139,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
         currentTextureCropRegion = requestedCropRegion;
-        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1
-                , requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
     }
 
     @Override
@@ -306,8 +306,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                 float texBorderX = (scale.x - absoluteRegion.width()) / scale.x * uw;
                 float texBorderY = (scale.y - absoluteRegion.height()) / scale.y * uh;
 
-                textureMat.setFloat2("texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width()
-                        , textureArea.minY() + (uy + 0.5f * texBorderY) * textureArea.height());
+                textureMat.setFloat2("texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width(),
+                        textureArea.minY() + (uy + 0.5f * texBorderY) * textureArea.height());
                 textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.width(), (uh - texBorderY) * textureArea.height());
                 break;
             }

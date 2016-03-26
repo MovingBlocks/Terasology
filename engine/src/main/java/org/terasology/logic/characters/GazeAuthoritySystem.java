@@ -38,7 +38,8 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
     EntityManager entityManager;
 
     @ReceiveEvent
-    public void ensureGazeContainerEntitiesCreated(OnActivatedComponent event, EntityRef entityRef, GazeMountPointComponent gazeMountPointComponent, LocationComponent locationComponent) {
+    public void ensureGazeContainerEntitiesCreated(OnActivatedComponent event, EntityRef entityRef, GazeMountPointComponent gazeMountPointComponent,
+            LocationComponent locationComponent) {
         if (!gazeMountPointComponent.gazeEntity.exists()) {
             gazeMountPointComponent.gazeEntity = createGazeEntity();
             entityRef.saveComponent(gazeMountPointComponent);

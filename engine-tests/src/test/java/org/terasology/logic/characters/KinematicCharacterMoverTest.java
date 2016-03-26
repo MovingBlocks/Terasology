@@ -17,9 +17,6 @@ package org.terasology.logic.characters;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.terasology.logic.behavior.DebugNode;
-import org.terasology.logic.behavior.tree.CounterNode;
-import org.terasology.logic.behavior.tree.Interpreter;
 
 /**
  */

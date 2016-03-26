@@ -51,11 +51,11 @@ public class NoiseTest {
     @Parameters(name = "{0}")
     public static Collection<Noise[]> data() {
         return Arrays.asList(new Noise[][]{
-                { new WhiteNoise(0xCAFE) },
-                { new DiscreteWhiteNoise(0xCAFE) },
-                { new SimplexNoise(0xCAFE) },
-                { new PerlinNoise(0xCAFE) },
-                { new BrownianNoise(new WhiteNoise(0xCAFE), 3) }
+                {new WhiteNoise(0xCAFE) },
+                {new DiscreteWhiteNoise(0xCAFE) },
+                {new SimplexNoise(0xCAFE) },
+                {new PerlinNoise(0xCAFE) },
+                {new BrownianNoise(new WhiteNoise(0xCAFE), 3) }
         });
     }
 

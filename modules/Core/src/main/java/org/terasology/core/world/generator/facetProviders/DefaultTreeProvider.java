@@ -18,8 +18,6 @@ package org.terasology.core.world.generator.facetProviders;
 import java.util.List;
 
 import org.terasology.core.world.CoreBiome;
-import org.terasology.core.world.generator.facetProviders.PositionFilters;
-import org.terasology.core.world.generator.facetProviders.SurfaceObjectProvider;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;

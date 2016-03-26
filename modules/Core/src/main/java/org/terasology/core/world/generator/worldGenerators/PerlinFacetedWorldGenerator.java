@@ -48,12 +48,12 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     private final FixedSpawner spawner = new FixedSpawner(0, 0);
 
+    @In
+    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
+
     public PerlinFacetedWorldGenerator(SimpleUri uri) {
         super(uri);
     }
-
-    @In
-    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
 
     @Override
     public Vector3f getSpawnPosition(EntityRef entity) {

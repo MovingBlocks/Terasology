@@ -17,9 +17,6 @@ package org.terasology.editor.properties;
 
 import java.util.List;
 
-/**
- * @author Benjamin Glatzel
- */
 public interface PropertyProvider<T> {
     /**
      * Adds the properties of this Object to the given property list.

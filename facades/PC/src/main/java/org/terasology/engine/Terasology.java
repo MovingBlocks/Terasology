@@ -87,10 +87,6 @@ import java.util.List;
  * <br><br>
  * terasology -help    or    terasology /?
  * <br><br>
- *
- * @author Benjamin Glatzel
- * @author Anton Kireev
- * @author and many others
  */
 
 public final class Terasology {

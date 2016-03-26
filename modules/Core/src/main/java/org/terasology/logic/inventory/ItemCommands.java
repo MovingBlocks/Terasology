@@ -22,7 +22,6 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -35,8 +34,6 @@ import org.terasology.world.block.entity.BlockCommands;
 
 import java.util.Set;
 
-/**
- */
 @RegisterSystem
 public class ItemCommands extends BaseComponentSystem {
 

@@ -36,12 +36,12 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 @RegisterWorldGenerator(id = "flat", displayName = "Flat")
 public class FlatWorldGenerator extends BaseFacetedWorldGenerator {
 
+    @In
+    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
+
     public FlatWorldGenerator(SimpleUri uri) {
         super(uri);
     }
-
-    @In
-    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
 
     @Override
     protected WorldBuilder createWorld() {
