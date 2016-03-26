@@ -423,10 +423,7 @@ public final class AABB {
             return false;
         }
 
-        if (tmin > tmax) {
-            return false;
-        }
+        return tmin <= tmax;
 
-        return true;
     }
 }

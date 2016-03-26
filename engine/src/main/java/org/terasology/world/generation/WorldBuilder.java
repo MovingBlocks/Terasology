@@ -266,10 +266,7 @@ public class WorldBuilder {
 
     private boolean producesFacet(FacetProvider provider, Class<? extends WorldFacet> facet) {
         Produces produces = provider.getClass().getAnnotation(Produces.class);
-        if (produces != null && Arrays.asList(produces.value()).contains(facet)) {
-            return true;
-        }
-        return false;
+        return produces != null && Arrays.asList(produces.value()).contains(facet);
     }
 
     private boolean updatesFacet(FacetProvider provider, Class<? extends WorldFacet> facet) {

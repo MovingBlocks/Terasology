@@ -347,7 +347,7 @@ public class ServerImpl implements Server {
                 logger.error("Received empty block registration");
             } else {
                 try {
-                    BlockUri family = new BlockUri(blockFamily.getBlockUri(0)).getFamilyUri();
+                    BlockUri family = BlockUri.get(blockFamily.getBlockUri(0)).getFamilyUri();
                     Map<String, Integer> registrationMap = Maps.newHashMap();
                     for (int i = 0; i < blockFamily.getBlockIdCount(); ++i) {
                         registrationMap.put(blockFamily.getBlockUri(i), blockFamily.getBlockId(i));

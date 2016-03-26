@@ -27,8 +27,6 @@ import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**

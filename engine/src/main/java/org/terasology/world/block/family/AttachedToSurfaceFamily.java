@@ -68,7 +68,7 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
-                Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
+                Side side = Side.valueOf(blockUri.blockName.toString().toUpperCase(Locale.ENGLISH));
                 return blocks.get(side);
             } catch (IllegalArgumentException e) {
                 return null;

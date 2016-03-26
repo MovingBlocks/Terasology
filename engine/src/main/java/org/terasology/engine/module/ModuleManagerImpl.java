@@ -42,10 +42,14 @@ import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
 import java.security.Policy;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModuleManagerImpl implements ModuleManager {
+
+    /** environment variable to set to non-empty value in order to totally disable security policies for modules */
+    public static final String TERASOLOGY_SECURITY_DISABLED_env = "TERASOLOGY_SECURITY_DISABLED";
 
     private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
 
@@ -97,8 +101,14 @@ public class ModuleManagerImpl implements ModuleManager {
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
 
-        Policy.setPolicy(new ModuleSecurityPolicy());
-        System.setSecurityManager(new ModuleSecurityManager());
+
+        if (!Objects.equals(null, System.getProperty(TERASOLOGY_SECURITY_DISABLED_env))) {
+            Policy.setPolicy(new ModuleSecurityPolicy());
+            System.setSecurityManager(new ModuleSecurityManager());
+        } else {
+            permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.io");
+            permissionProviderFactory.getBasePermissionSet().addAPIPackage("java.net");
+        }
     }
 
     @Override

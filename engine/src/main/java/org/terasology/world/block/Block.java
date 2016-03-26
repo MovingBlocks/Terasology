@@ -526,7 +526,7 @@ public final class Block {
         return primaryAppearance;
     }
 
-    public BlockAppearance getAppearance(Map<Side, Block> adjacentBlocks) {
+    public BlockAppearance getAppearance(Block[] adjacentBlocks) {
         return primaryAppearance;
     }
 

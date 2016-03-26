@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Importer for Collada data exchange model files.
@@ -62,6 +63,10 @@ import java.util.Map;
 public class ColladaLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(ColladaLoader.class);
+    private static final Pattern NEWLINE = Pattern.compile("\n");
+    private static final Pattern TAB = Pattern.compile("\t");
+    private static final Pattern RETURN = Pattern.compile("\r");
+    private static final Pattern DOUBLESPACE = Pattern.compile("  ");
 
     protected TFloatList vertices;
     protected TFloatList texCoord0;
@@ -946,9 +951,7 @@ public class ColladaLoader {
                         + " name="
                         + sourceElement.name());
             }
-            for (int i = 0; i < nameStrings.length; i++) {
-                source.nameValues[i] = nameStrings[i];
-            }
+            System.arraycopy(nameStrings, 0, source.nameValues, 0, nameStrings.length);
         } else {
             throw new ColladaParseException("Unsupported parameter type " + source.parameterTypes[0]);
         }
@@ -956,11 +959,11 @@ public class ColladaLoader {
     }
 
     private String[] getItemsInString(String dataString) {
-        String string = dataString.replaceAll("\n", " ");
-        string = string.replaceAll("\t", " ");
-        string = string.replaceAll("\r", " ");
+        String string = NEWLINE.matcher(dataString).replaceAll(" ");
+        string = TAB.matcher(string).replaceAll(" ");
+        string = RETURN.matcher(string).replaceAll(" ");
         while (string.contains("  ")) {
-            string = string.replaceAll("  ", " ");
+            string = DOUBLESPACE.matcher(string).replaceAll(" ");
         }
         string = string.trim();
         String[] floatStrings = string.split(" ");

@@ -25,7 +25,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,8 +78,11 @@ public class StandardBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void process(BlockChange... changes) {
-        process(Arrays.asList(changes));
+    public void process(BlockChange... blockChanges) {
+        for (BlockChange blockChange : blockChanges) {
+            reviewChange(blockChange);
+        }
+        afterProcess();
     }
 
     @Override
@@ -89,6 +91,10 @@ public class StandardBatchPropagator implements BatchPropagator {
             reviewChange(blockChange);
         }
 
+        afterProcess();
+    }
+
+    private void afterProcess() {
         processReduction();
         processIncrease();
         cleanUp();
@@ -177,16 +183,22 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private void processIncrease() {
         int depth = 0;
-        while (depth < rules.getMaxValue() - 1) {
-            byte value = (byte) (rules.getMaxValue() - depth);
-            Set<Vector3i> toProcess = increaseQueues[depth];
-            if (!toProcess.isEmpty()) {
-                increaseQueues[depth] = Sets.newLinkedHashSetWithExpectedSize(toProcess.size());
+        int max;
 
-                for (Vector3i pos : toProcess) {
+        Set<Vector3i>[] increaseQueues = this.increaseQueues;
+        PropagationRules rules = this.rules;
+
+        while (depth < (max= rules.getMaxValue()) - 1) {
+            byte value = (byte) (max - depth);
+
+            Set<Vector3i> q = increaseQueues[depth];
+
+            if (!q.isEmpty()) {
+                increaseQueues[depth] = q = Sets.newLinkedHashSetWithExpectedSize(q.size());
+                for (Vector3i pos : q) {
                     push(pos, value);
                 }
-                if (increaseQueues[depth].isEmpty()) {
+                if (q.isEmpty()) {
                     depth++;
                 }
             } else {

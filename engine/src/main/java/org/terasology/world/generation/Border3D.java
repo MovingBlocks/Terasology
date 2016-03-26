@@ -25,6 +25,9 @@ import java.util.Objects;
 /**
  */
 public class Border3D {
+
+    public static final Border3D ZERO = new Border3D(0, 0, 0);
+
     private final int top;
     private final int bottom;
     private final int sides;

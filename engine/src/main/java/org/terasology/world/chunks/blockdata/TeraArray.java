@@ -123,8 +123,7 @@ public abstract class TeraArray {
 
     @Override
     public String toString() {
-        return getClass().getName() + "(" + getSizeX() + ", " + getSizeY() + ", " + getSizeZ() + ", "
-                + (isSparse() ? "sparse" : "dense") + ", " + getElementSizeInBits() + "bit, " + getEstimatedMemoryConsumptionInBytes() + "byte)";
+        return new StringBuilder().append(getClass().getName()).append("(").append(getSizeX()).append(", ").append(getSizeY()).append(", ").append(getSizeZ()).append(", ").append(isSparse() ? "sparse" : "dense").append(", ").append(getElementSizeInBits()).append("bit, ").append(getEstimatedMemoryConsumptionInBytes()).append("byte)").toString();
     }
 
     public abstract boolean isSparse();

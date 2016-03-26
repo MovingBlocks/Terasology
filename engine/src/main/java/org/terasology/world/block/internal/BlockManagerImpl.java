@@ -60,6 +60,8 @@ public class BlockManagerImpl extends BlockManager {
     private static final int MAX_ID = 65534;
     private static final ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
 
+    private final Block AIR_BLOCK;
+
     private AssetManager assetManager;
 
     private BlockBuilder blockBuilder;
@@ -83,6 +85,7 @@ public class BlockManagerImpl extends BlockManager {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
         this.blockBuilder = new BlockBuilder(atlas);
+        this.AIR_BLOCK = getBlock(AIR_ID);
     }
 
     public void initialise(List<String> registeredBlockFamilies,
@@ -97,7 +100,7 @@ public class BlockManagerImpl extends BlockManager {
 
         for (String rawFamilyUri : registeredBlockFamilies) {
             try {
-                BlockUri familyUri = new BlockUri(rawFamilyUri);
+                BlockUri familyUri = BlockUri.get(rawFamilyUri);
                 Optional<BlockFamily> family = loadFamily(familyUri);
                 if (family.isPresent()) {
                     for (Block block : family.get().getBlocks()) {
@@ -218,7 +221,7 @@ public class BlockManagerImpl extends BlockManager {
             }
         } else {
             try {
-                BlockUri blockUri = new BlockUri(uri);
+                BlockUri blockUri = BlockUri.get(uri);
                 return getBlockFamily(blockUri);
             } catch (BlockUriParseException e) {
                 logger.error("Failed to resolve block family '{}', invalid uri", uri);
@@ -229,26 +232,29 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public BlockFamily getBlockFamily(BlockUri uri) {
-        if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
-            return getBlockFamily(uri.getShapelessUri());
-        }
-        BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
-        if (family == null && generateNewIds) {
-            Optional<BlockFamily> newFamily = loadFamily(uri);
-            if (newFamily.isPresent()) {
-                lock.lock();
-                try {
-                    for (Block block : newFamily.get().getBlocks()) {
-                        block.setId(getNextId());
-                    }
-                    registerFamily(newFamily.get());
-                } finally {
-                    lock.unlock();
-                }
-                return newFamily.get();
+        while (true) {
+            if (uri.shape.isPresent() && uri.shape.get().equals(CUBE_SHAPE_URN)) {
+                uri = uri.getShapelessUri();
+                continue;
             }
+            BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
+            if (family == null && generateNewIds) {
+                Optional<BlockFamily> newFamily = loadFamily(uri);
+                if (newFamily.isPresent()) {
+                    lock.lock();
+                    try {
+                        for (Block block : newFamily.get().getBlocks()) {
+                            block.setId(getNextId());
+                        }
+                        registerFamily(newFamily.get());
+                    } finally {
+                        lock.unlock();
+                    }
+                    return newFamily.get();
+                }
+            }
+            return family;
         }
-        return family;
     }
 
     private Optional<BlockFamily> loadFamily(BlockUri uri) {
@@ -256,8 +262,8 @@ public class BlockManagerImpl extends BlockManager {
         if (familyDef.isPresent() && familyDef.get().isLoadable()) {
             if (familyDef.get().isFreeform()) {
                 ResourceUrn shapeUrn;
-                if (uri.getShapeUrn().isPresent()) {
-                    shapeUrn = uri.getShapeUrn().get();
+                if (uri.shape.isPresent()) {
+                    shapeUrn = uri.shape.get();
                 } else {
                     shapeUrn = CUBE_SHAPE_URN;
                 }
@@ -277,7 +283,7 @@ public class BlockManagerImpl extends BlockManager {
     @Override
     public Block getBlock(String uri) {
         try {
-            return getBlock(new BlockUri(uri));
+            return getBlock(BlockUri.get(uri));
         } catch (BlockUriParseException e) {
             logger.error("Attempt to fetch block with illegal uri '{}'", uri);
             return getBlock(AIR_ID);
@@ -286,30 +292,31 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public Block getBlock(BlockUri uri) {
-        if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
-            return getBlock(uri.getShapelessUri());
-        }
-        Block block = registeredBlockInfo.get().blocksByUri.get(uri);
-        if (block == null) {
-            // Check if partially registered by getting the block family
-            BlockFamily family = getBlockFamily(uri.getFamilyUri());
-            if (family != null) {
-                block = family.getBlockFor(uri);
+        while (true) {
+            if (uri.shape.isPresent() && uri.shape.get().equals(CUBE_SHAPE_URN)) {
+                uri = uri.getShapelessUri();
+                continue;
             }
+            Block block = registeredBlockInfo.get().blocksByUri.get(uri);
             if (block == null) {
-                return getBlock(AIR_ID);
+                // Check if partially registered by getting the block family
+                BlockFamily family = getBlockFamily(uri.getFamilyUri());
+                if (family != null) {
+                    block = family.getBlockFor(uri);
+                }
+                if (block == null) {
+                    uri = AIR_ID;
+                    continue;
+                }
             }
+            return block;
         }
-        return block;
     }
 
     @Override
-    public Block getBlock(short id) {
+    public final Block getBlock(short id) {
         Block result = registeredBlockInfo.get().blocksById.get(id);
-        if (result == null) {
-            return getBlock(AIR_ID);
-        }
-        return result;
+        return result == null ? AIR_BLOCK : result;
     }
 
     @Override

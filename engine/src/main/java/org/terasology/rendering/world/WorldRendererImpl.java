@@ -248,11 +248,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         resetStats();
 
         currentRenderingStage = renderingStage;
-        if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.LEFT_EYE) {
-            isFirstRenderingStageForCurrentFrame = true;
-        } else {
-            isFirstRenderingStageForCurrentFrame = false;
-        }
+        isFirstRenderingStageForCurrentFrame = currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.LEFT_EYE;
 
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.

@@ -64,12 +64,14 @@ public final class InternalLightProcessor {
         PropagationRules sunlightRules = new SunlightPropagationRules(chunk);
         BatchPropagator lightPropagator = new StandardBatchPropagator(sunlightRules, new SingleChunkView(sunlightRules, chunk));
 
+        Vector3i pos = new Vector3i();
         for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
             for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
                 for (int y = 0; y < ChunkConstants.MAX_SUNLIGHT; ++y) {
-                    Vector3i pos = new Vector3i(x, y, z);
-                    Block block = chunk.getBlock(x, y, z);
-                    byte light = sunlightRules.getFixedValue(block, pos);
+
+                    byte light = sunlightRules.getFixedValue(
+                            chunk.getBlock(x, y, z),
+                            pos.set(x, y, z));
                     if (light > 0) {
                         chunk.setSunlight(x, y, z, light);
                         lightPropagator.propagateFrom(pos, light);

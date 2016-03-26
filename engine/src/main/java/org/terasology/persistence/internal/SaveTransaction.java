@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.nio.zipfs.ZipFileSystemProvider;
+import gnu.trove.set.TLongSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -48,12 +49,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -230,13 +226,16 @@ public class SaveTransaction extends AbstractTask {
 
 
     private void applyDeltaToPrivateEntityManager() {
+        EngineEntityManager privateEntityManager = this.privateEntityManager;
+
         deltaToSave.getEntityDeltas().forEachEntry((entityId, delta) -> {
             if (entityId >= privateEntityManager.getNextId()) {
-                privateEntityManager.setNextId(entityId + 1);
+                this.privateEntityManager.setNextId(entityId + 1);
             }
             return true;
         });
-        deltaToSave.getDestroyedEntities().forEach(entityId -> {
+        TLongSet destroyedEntities = deltaToSave.getDestroyedEntities();
+        destroyedEntities.forEach(entityId -> {
             if (entityId >= privateEntityManager.getNextId()) {
                 privateEntityManager.setNextId(entityId + 1);
             }
@@ -256,8 +255,8 @@ public class SaveTransaction extends AbstractTask {
 
             return true;
         });
-        final List<EntityRef> entitiesToDestroy = Lists.newArrayList();
-        deltaToSave.getDestroyedEntities().forEach(entityId -> {
+        final List<EntityRef> entitiesToDestroy = new ArrayList(destroyedEntities.size());
+        destroyedEntities.forEach(entityId -> {
             EntityRef entityToDestroy;
             if (privateEntityManager.isActiveEntity(entityId)) {
                 entityToDestroy = privateEntityManager.getEntity(entityId);
@@ -341,6 +340,7 @@ public class SaveTransaction extends AbstractTask {
 
     private void writeGlobalStore() throws IOException {
         Path path = storagePathProvider.getGlobalEntityStoreTempPath();
+        EntityData.GlobalStore globalStore = this.globalStore;
         try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
             globalStore.writeTo(out);
         }
@@ -378,16 +378,7 @@ public class SaveTransaction extends AbstractTask {
                 if (Files.isRegularFile(oldChunkZipPath)) {
                     try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, null)) {
                         for (Path root : oldZip.getRootDirectories()) {
-                            Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
-                                @Override
-                                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                                        throws IOException {
-                                    if (!Files.isRegularFile(zip.getPath(file.toString()))) {
-                                        Files.copy(file, zip.getPath(file.toString()));
-                                    }
-                                    return FileVisitResult.CONTINUE;
-                                }
-                            });
+                            Files.walkFileTree(root, new CopyZipVisitor(zip));
                         }
                     }
                 }
@@ -432,4 +423,22 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
+    private static class CopyZipVisitor extends SimpleFileVisitor<Path> {
+        private final FileSystem zip;
+
+        public CopyZipVisitor(FileSystem zip) {
+            this.zip = zip;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
+            String fileString = file.toString();
+            Path zipPath = zip.getPath(fileString);
+            if (!Files.isRegularFile(zipPath)) {
+                Files.copy(file, zipPath);
+            }
+            return FileVisitResult.CONTINUE;
+        }
+    }
 }
