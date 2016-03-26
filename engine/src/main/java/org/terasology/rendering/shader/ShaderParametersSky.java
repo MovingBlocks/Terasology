@@ -38,7 +38,7 @@ public class ShaderParametersSky extends ShaderParametersBase {
     @Range(min = 1.0f, max = 8192.0f)
     private float moonExponent = 256.0f;
     @Range(min = 0.0f, max = 10.0f)
-    private float skyDaylightBrightness = 1.3f;
+    private float skyDaylightBrightness = 0.6f;
     @Range(min = 0.0f, max = 10.0f)
     private float skyNightBrightness = 1.0f;
 

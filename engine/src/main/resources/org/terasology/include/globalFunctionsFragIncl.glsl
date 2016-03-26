@@ -63,6 +63,18 @@ float expBlockLightValue(float light) {
 	return pow(BLOCK_LIGHT_POW, lightScaled) * light * BLOCK_INTENSITY_FACTOR;
 }
 
+float rescaleRange(float inputvalue, float oldMin,float oldMax, float newMin,float newMax)
+{
+    float oldRange = (oldMax - oldMin);
+    if (oldRange == 0)
+        return newMin;
+    else
+    {
+        float newRange = (newMax - newMin);
+        return (((inputvalue - oldMin) * newRange) / oldRange) + newMin;
+    }
+}
+
 float expLightValue(float light) {
 	float lightScaled = (1.0 - light) * 16.0;
 	return pow(BLOCK_LIGHT_SUN_POW, lightScaled) * light;
@@ -165,7 +177,7 @@ vec3 calcBlocklightColor(float blocklightValue
     // Calculate the final block light brightness
     float blockBrightness = expBlockLightValue(blocklightValue);
 #if defined (FLICKERING_LIGHT)
-    blockBrightness -= flickeringLightOffset * blocklightValue;
+    blockBrightness -= clamp(flickeringLightOffset,0,1) * blocklightValue;
 #endif
 
     // Calculate the final blocklight color value and add a slight reddish tint to it

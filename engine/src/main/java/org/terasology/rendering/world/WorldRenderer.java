@@ -26,7 +26,7 @@ import org.terasology.world.chunks.ChunkProvider;
 public interface WorldRenderer {
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
-    float BLOCK_INTENSITY_FACTOR = 1.25f;
+    float BLOCK_INTENSITY_FACTOR = 0.7f;
 
     void onChunkLoaded(Vector3i chunkPos);
 

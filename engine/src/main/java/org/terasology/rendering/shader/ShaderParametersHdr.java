@@ -31,7 +31,7 @@ public class ShaderParametersHdr extends ShaderParametersBase {
     @Range(min = 0.0f, max = 10.0f)
     private float exposureBias = 1.0f;
     @Range(min = 0.0f, max = 100.0f)
-    private float whitePoint = 5.0f;
+    private float whitePoint = 9f;
 
     @Override
     public void applyParameters(Material program) {

@@ -40,5 +40,5 @@
 #define D 0.20
 #define E 0.02
 #define F 0.30
-#define W 11.2
+#define W 1
 
