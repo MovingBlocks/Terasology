@@ -172,9 +172,6 @@ public class OculusStereoCamera extends Camera {
         return null;
     }
 
-    /**
-     * @deprecated
-     */
     @Override
     @Deprecated
     public void loadProjectionMatrix() {
@@ -183,9 +180,6 @@ public class OculusStereoCamera extends Camera {
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
-    /**
-     * @deprecated
-     */
     @Override
     @Deprecated
     public void loadModelViewMatrix() {
@@ -193,9 +187,6 @@ public class OculusStereoCamera extends Camera {
         GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
     }
 
-    /**
-     * @deprecated
-     */
     @Override
     @Deprecated
     public void loadNormalizedModelViewMatrix() {

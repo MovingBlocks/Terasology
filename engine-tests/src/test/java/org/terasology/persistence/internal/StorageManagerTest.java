@@ -127,9 +127,9 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));
-        BiomeManager biomeManagerLocal = mock(BiomeManager.class);
-        when(biomeManagerLocal.getBiomes()).thenReturn(Collections.<Biome>emptyList());
-        context.put(BiomeManager.class, biomeManagerLocal);
+        BiomeManager mockBiomeManager = mock(BiomeManager.class);
+        when(mockBiomeManager.getBiomes()).thenReturn(Collections.<Biome>emptyList());
+        context.put(BiomeManager.class, mockBiomeManager);
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         context.put(WorldProvider.class, worldProvider);
