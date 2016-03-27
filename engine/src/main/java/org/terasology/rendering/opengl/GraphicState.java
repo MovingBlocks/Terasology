@@ -463,20 +463,19 @@ public class GraphicState {
         int attachmentId = 0;
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-
-        if (fbo.colorBufferTextureId != 0) {
+        if (fbo.getTextureBuffer(FBO.BaseFboBuffer.COLOR_TEXTURE) != null) {
             if (color) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
             attachmentId++;
         }
-        if (fbo.normalsBufferTextureId != 0) {
+        if (fbo.getTextureBuffer(FBO.BaseFboBuffer.NORMAL_BUFFER_TEXTURE) != null) {
             if (normal) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
             attachmentId++;
         }
-        if (fbo.lightBufferTextureId != 0) {
+        if (fbo.getTextureBuffer(FBO.BaseFboBuffer.LIGHT_BUFFER_TEXTURE) != null) {
             if (lightBuffer) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }

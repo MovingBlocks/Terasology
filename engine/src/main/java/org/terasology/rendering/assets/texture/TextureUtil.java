@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 public final class TextureUtil {
     public static final Name COLOR_RESOURCE_NAME = new Name("Color");
     public static final Name NOISE_RESOURCE_NAME = new Name("Noise");
+    public static final Name EMPTY_RESOURCE_NAME = new Name("Empty");
 
     private TextureUtil() {
     }
@@ -57,6 +58,14 @@ public final class TextureUtil {
         String name = String.format("%s.%d.%d.%d.%d", "white", size, seed, min, max);
 
         return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, NOISE_RESOURCE_NAME, new Name(name));
+    }
+
+
+    public static ResourceUrn getTextureUriForEmpty(int width,int height,String identifier) {
+
+        String name = String.format("%d.%d.%s",width,height,identifier);
+
+        return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, EMPTY_RESOURCE_NAME, new Name(name));
     }
 
     private static String getColorName(Color color) {
