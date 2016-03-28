@@ -299,7 +299,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
             OpenGLUtil.applyBillboardOrientation();
             glScalef(particle.size, particle.size, particle.size);
 
-            float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
+            float light = worldRenderer.getRenderingLightIntensityAt(new Vector3f(worldPos.x + particle.position.x,
                     worldPos.y + particle.position.y, worldPos.z + particle.position.z));
             renderParticle(particle, blockManager.getBlock(particleEffect.blockType).getBlockFamily().getArchetypeBlock(), biome, light);
             glPopMatrix();
@@ -317,7 +317,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
             OpenGLUtil.applyBillboardOrientation();
             glScalef(particle.size, particle.size, particle.size);
 
-            float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
+            float light = worldRenderer.getRenderingLightIntensityAt(new Vector3f(worldPos.x + particle.position.x,
                     worldPos.y + particle.position.y, worldPos.z + particle.position.z));
 
             renderParticle(particle, light);

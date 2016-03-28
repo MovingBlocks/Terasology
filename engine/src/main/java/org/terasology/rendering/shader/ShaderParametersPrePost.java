@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector3f;
@@ -26,6 +27,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import java.util.Optional;
 
@@ -50,8 +52,10 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         super.applyParameters(program);
 
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
+        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-        Vector3f tint = CoreRegistry.get(WorldRenderer.class).getTint();
+        Vector3f tint = worldProvider.getBlock(activeCamera.getPosition()).getTint();
         program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
 
         int texId = 0;

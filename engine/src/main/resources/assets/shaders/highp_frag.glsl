@@ -28,10 +28,16 @@ void main() {
     //    discard;
     //}
 
-    vec3 brightColor = max(color.rgb - vec3(highPassThreshold), vec3(0.0));
-    float bright = dot(brightColor, vec3(1.0));
-    bright = smoothstep(0.0, 0.5, bright);
+   // vec3 brightColor = max(color.rgb - vec3(highPassThreshold), vec3(0.0));
+    float relativeLuminance = dot(vec3(0.2126, 0.7152, 0.0722),color.rgb - vec3(highPassThreshold));
+    //bright = smoothstep(0.0, 0.5, bright);
 
-    gl_FragData[0].rgb = mix(vec3(0.0), color.rgb, bright).rgb;
-    gl_FragData[0].a = 1.0;
+    if(relativeLuminance * highPassThreshold > 1.0)
+    {
+        gl_FragData[0].rgba = vec4( color.rgb,1);
+    }
+    else
+    {
+        gl_FragData[0].rgba = vec4(0);
+    }
 }

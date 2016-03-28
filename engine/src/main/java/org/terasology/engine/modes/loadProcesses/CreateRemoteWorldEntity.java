@@ -18,8 +18,8 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
+import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * Quick and dirty load step to create a dummy world entity on remote clients
@@ -29,6 +29,8 @@ import org.terasology.world.WorldComponent;
 public class CreateRemoteWorldEntity extends SingleStepLoadProcess {
 
     private final Context context;
+    private EntityManager entityManager;
+    private ChunkProvider chunkProvider;
 
     public CreateRemoteWorldEntity(Context context) {
         this.context = context;
@@ -40,13 +42,16 @@ public class CreateRemoteWorldEntity extends SingleStepLoadProcess {
     }
 
     @Override
-    public boolean step() {
-        EntityManager entityManager = context.get(EntityManager.class);
-        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
+    public void begin() {
+        entityManager = context.get(EntityManager.class);
+        chunkProvider = context.get(ChunkProvider.class);
+    }
 
+    @Override
+    public boolean step() {
         EntityRef worldEntity = entityManager.create();
         worldEntity.addComponent(new WorldComponent());
-        worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+        chunkProvider.setWorldEntity(worldEntity);
         return true;
     }
 
