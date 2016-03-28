@@ -176,13 +176,13 @@ public class JoinGameScreen extends CoreScreenLayer {
         };
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage(translationSystem.translate("${engine:menu#join-game-online}"), translationSystem.translate("${engine:menu#connecting-to}") + " '" + address + ":" + port + "' - " + translationSystem.translate("${engine:menu#please-wait}"));
+        popup.setMessage(translationSystem.translate("${engine:joinGame#join-game}"), translationSystem.translate("${engine:joinGame#connecting-to}") + " '" + address + ":" + port + "' - " + translationSystem.translate("${engine:menu#please-wait}"));
         popup.onSuccess(result -> {
             if (result.getStatus() != JoinStatus.Status.FAILED) {
                 engine.changeState(new StateLoading(result));
             } else {
                 MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                screen.setMessage(translationSystem.translate("${engine:menu#failed-to-join}"), translationSystem.translate("${engine:menu#could-not-connect-to-server}") + " - " + result.getErrorMessage());
+                screen.setMessage(translationSystem.translate("${engine:joinGame#failed-to-join}"), translationSystem.translate("${engine:joinGame#could-not-connect-to-server}") + " - " + result.getErrorMessage());
             }
         });
         popup.startOperation(operation, true);
@@ -246,7 +246,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     if (info.isDone()) {
                         return getModulesText(info);
                     } else {
-                        return translationSystem.translate("${engine:menu#join-server-requested}");
+                        return translationSystem.translate("${engine:joinGame#join-server-requested}");
                     }
                 }
                 return null;
@@ -262,7 +262,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     if (info.isDone()) {
                         return getWorldText(info);
                     } else {
-                        return translationSystem.translate("${engine:menu#join-server-requested}");
+                        return translationSystem.translate("${engine:joinGame#join-server-requested}");
                     }
                 }
                 return null;
@@ -342,7 +342,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             downloadLabel.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return downloader.getStatus();
+                    return translationSystem.translate(downloader.getStatus());
                 }
             });
         }
@@ -357,7 +357,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             }
             return Joiner.on('\n').join(codedWorldInfo);
         } catch (ExecutionException | InterruptedException e) {
-            return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+            return FontColor.getColored(translationSystem.translate("${engine:joinGame#connection-failed}"), Color.RED);
         }
     }
 
@@ -375,7 +375,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             Collections.sort(codedModInfo, String.CASE_INSENSITIVE_ORDER);
             return Joiner.on('\n').join(codedModInfo);
         } catch (ExecutionException | InterruptedException e) {
-            return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+            return FontColor.getColored(translationSystem.translate("${engine:joinGame#connection-failed}"), Color.RED);
         }
     }
 

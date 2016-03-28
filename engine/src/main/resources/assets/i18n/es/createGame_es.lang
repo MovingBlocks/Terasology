@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Crear Partida",
+    "game-name": "Nombre del Juego",
+    "gameplay": "Plantilla de Jugabilidad",
+    "gameplay-info": "puedes cliquear 'módulos' para personalizar más",
+    "select-modules": "Módulos...",
+    "select-world-gen": "Elije Generador de Mundo",
+    "select-world-gen-info": "activar módulos puede activar otros",
+    "start-game": "Jugar",
+    "world-config-preview": "Detálles...",
+    "world-seed": "Semilla"
+}

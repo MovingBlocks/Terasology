@@ -26,6 +26,7 @@ import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
@@ -78,6 +79,9 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @In
     private Context context;
 
+    @In
+    private TranslationSystem translationSystem;
+
     @Override
     public void initialise() {
         ColumnLayout mainLayout = new ColumnLayout();
@@ -93,11 +97,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
         mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
 
-        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", "Mouse"));
-        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity)
+        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:inputSettings#mouse}")));
+        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:inputSettings#mouse-sensitivity}")), mouseSensitivity)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), mouseInverted)
+        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:inputSettings#invert-mouse}")), mouseInverted)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -281,7 +285,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
                     return input.getDisplayName();
                 }
             }
-            return "<not bound>";
+            return translationSystem.translate("${engine:inputSettings#not-bound}");
         }
     }
 

@@ -20,7 +20,7 @@
             },
             {
                 "type" : "UILabel",
-                "text": "${engine:menu#player-settings-title}",
+                "text": "${engine:playerSettings#player-settings-title}",
                 "family" : "title",
                 "id" : "subtitle",
                 "layoutInfo" : {
@@ -45,7 +45,7 @@
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#player-name}:"
+                            "text" : "${engine:playerSettings#player-name}:"
                         },
                         {
                             "type" : "UIText",
@@ -53,7 +53,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#player-color}:"
+                            "text" : "${engine:playerSettings#player-color}:"
                         },
                         {
                             "type" : "RowLayout",
@@ -75,7 +75,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#settings-language}:"
+                            "text": "${engine:playerSettings#settings-language}:"
                         },
                         {
                             "type": "UIDropdownScrollable",

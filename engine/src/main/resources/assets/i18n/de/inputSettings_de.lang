@@ -1,0 +1,11 @@
+{
+    "default-binding": "Default binding",
+    "input-settings-title": "Input Settings",
+    "invert-mouse": "Invert Mouse:",
+    "mouse": "Mouse",
+    "mouse-sensitivity": "Mouse Sensitivity:",
+    "new-binding": "New binding",
+    "none": "<none>",
+    "not-bound": "<not bound>",
+    "remove-binding": "Löschen"
+}

@@ -133,7 +133,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private String validateScreen() {
         if (nametext != null && Strings.isNullOrEmpty(nametext.getText())) {
-            return translationSystem.translate("${engine:menu#missing-name-message}");
+            return translationSystem.translate("${engine:playerSettings#missing-name-message}");
         }
         return null;
     }

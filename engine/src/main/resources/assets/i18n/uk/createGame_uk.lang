@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Створити гру",
+    "game-name": "Ім’я гри",
+    "gameplay": "Шаблон ігроладу",
+    "gameplay-info": "натисніть 'модулі' для подальшого налаштування",
+    "select-modules": "Модулі...",
+    "select-world-gen": "Виберіть генератор світу",
+    "select-world-gen-info": "модулі можуть додавати нові",
+    "start-game": "Грати",
+    "world-config-preview": "Деталі...",
+    "world-seed": "Зерно"
+}

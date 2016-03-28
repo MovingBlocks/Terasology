@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Creează joc",
+    "game-name": "Nume joc",
+    "gameplay": "Gameplay Template",
+    "gameplay-info": "poți apăsa pe 'module' pentru a personaliza",
+    "select-modules": "Module...",
+    "select-world-gen": "Alege generatorul de lume",
+    "select-world-gen-info": "Adaugarea modulelor poate adăuga",
+    "start-game": "Joacă",
+    "world-config-preview": "Detalii...",
+    "world-seed": "Seed"
+}

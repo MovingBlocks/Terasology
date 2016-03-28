@@ -88,7 +88,6 @@ public class CreateGameScreen extends CoreScreenLayer {
     @SuppressWarnings("unchecked")
     public void initialise() {
 
-
         UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
         if (gameTypeTitle != null) {
             gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
@@ -102,7 +101,6 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             });
         }
-
 
         final UIText worldName = find("worldName", UIText.class);
         if (worldName != null) {

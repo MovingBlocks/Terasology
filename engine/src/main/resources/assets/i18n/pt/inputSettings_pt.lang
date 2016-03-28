@@ -1,0 +1,11 @@
+{
+    "default-binding": "Mapeamento Padrão",
+    "input-settings-title": "Configurações de Entrada",
+    "invert-mouse": "Inverter Mouse:",
+    "mouse": "Mouse",
+    "mouse-sensitivity": "Sensitividade do Mouse:",
+    "new-binding": "Novo mapeamento",
+    "none": "<nenhum>",
+    "not-bound": "<não atribuído>",
+    "remove-binding": "Remover"
+}

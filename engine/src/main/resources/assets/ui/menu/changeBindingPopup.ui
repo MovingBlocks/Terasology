@@ -34,7 +34,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "${engine:menu#new-binding}: ",
+                                        "text" : "${engine:inputSettings#new-binding}: ",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.4
                                         }
@@ -48,7 +48,7 @@
                                     },
                                     {
                                         "type" : "UIButton",
-                                        "text" : "${engine:menu#remove-binding}",
+                                        "text" : "${engine:inputSettings#remove-binding}",
                                         "id" : "remove"
                                     }
                                 ]
@@ -59,7 +59,7 @@
                                 "contents" : [
                                     {
                                         "type" : "UILabel",
-                                        "text" : "${engine:menu#default-binding}: ",
+                                        "text" : "${engine:inputSettings#default-binding}: ",
                                         "family" : "option-grid",
                                         "layoutInfo" : {
                                             "relativeWidth" : 0.4

@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Создать игру",
+    "game-name": "Название игры",
+    "gameplay": "Геймплей",
+    "gameplay-info": "нажмите кнопку «модули» для дальнейшей настройки",
+    "select-modules": "Модули",
+    "select-world-gen": "Выберите генератор мира",
+    "select-world-gen-info": "включение модулей дает больше возможностей в игре",
+    "start-game": "Играть",
+    "world-config-preview": "Детали",
+    "world-seed": "Семя"
+}

@@ -214,7 +214,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (sel == null) {
                             return "";
                         }
-                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : translationSystem.translate("${engine:menu#module-version-installed-none}");
+                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : translationSystem.translate("${engine:selectModules#module-version-installed-none}");
                     }
                 });
             }
@@ -244,12 +244,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             String dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && dependencies.size() > 0) {
-                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
+                                dependenciesNames = translationSystem.translate("${engine:selectModules#module-dependencies-exist}") + ":" + '\n';
                                 for (DependencyInfo dependency : dependencies) {
                                     dependenciesNames += "   " + dependency.getId().toString() + '\n';
                                 }
                             } else {
-                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-empty}") + ".";
+                                dependenciesNames = translationSystem.translate("${engine:selectModules#module-dependencies-empty}") + ".";
                             }
                             return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
@@ -266,17 +266,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         if (info != null) {
                             if (isSelectedGameplayModule(info)) {
-                                return translationSystem.translate("${engine:menu#module-status-activegameplay}");
+                                return translationSystem.translate("${engine:selectModules#module-status-activegameplay}");
                             } else if (info.isSelected() && info.isExplicitSelection()) {
-                                return translationSystem.translate("${engine:menu#module-status-activated}");
+                                return translationSystem.translate("${engine:selectModules#module-status-activated}");
                             } else if (info.isSelected()) {
-                                return translationSystem.translate("${engine:menu#module-status-dependency}");
+                                return translationSystem.translate("${engine:selectModules#module-status-dependency}");
                             } else if (!info.isPresent()) {
-                                return translationSystem.translate("${engine:menu#module-status-notpresent}");
+                                return translationSystem.translate("${engine:selectModules#module-status-notpresent}");
                             } else if (info.isValidToSelect()) {
-                                return translationSystem.translate("${engine:menu#module-status-available}");
+                                return translationSystem.translate("${engine:selectModules#module-status-available}");
                             } else {
-                                return translationSystem.translate("${engine:menu#module-status-error}");
+                                return translationSystem.translate("${engine:selectModules#module-status-error}");
                             }
                         }
                         return "";
@@ -310,12 +310,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         if (moduleList.getSelection() != null) {
                             if (moduleList.getSelection().isExplicitSelection()) {
-                                return translationSystem.translate("${engine:menu#deactivate-module}");
+                                return translationSystem.translate("${engine:selectModules#deactivate-module}");
                             } else {
-                                return translationSystem.translate("${engine:menu#activate-module}");
+                                return translationSystem.translate("${engine:selectModules#activate-module}");
                             }
                         }
-                        return translationSystem.translate("${engine:menu#activate-module}");  // button should be disabled
+                        return translationSystem.translate("${engine:selectModules#activate-module}");  // button should be disabled
                     }
                 });
             }
@@ -335,9 +335,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         if (info != null && !info.isPresent()) {
-                            return translationSystem.translate("${engine:menu#download-module}");
+                            return translationSystem.translate("${engine:selectModules#download-module}");
                         } else {
-                            return translationSystem.translate("${engine:menu#update-module}");
+                            return translationSystem.translate("${engine:selectModules#update-module}");
                         }
                     }
                 });
@@ -360,14 +360,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
             modulesToDownload = getModulesRequiredToDownloadFor(moduleMetadata);
         } catch (DependencyResolutionFailed e) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            messagePopup.setMessage("Depedency resolution failed", e.getMessage());
+            messagePopup.setMessage(translationSystem.translate("${engine:selectModules#dependency-resolution-failed}"), e.getMessage());
             return;
         }
 
         Map<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
 
         ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
-        confirmPopup.setMessage("Confirm Download", modulesToDownload.size()  + " modules will be downloaded");
+        confirmPopup.setMessage(translationSystem.translate("${engine:selectModules#confirm-download}"), String.format(translationSystem.translate("${engine:selectModules#n-modules-will-be-downloaded}"),modulesToDownload.size()));
         confirmPopup.setOkHandler(() -> downloadModules(urlToTargetMap));
     }
 
@@ -389,7 +389,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 }
             });
         ProgressListener progressListener = progress ->
-                popup.setMessage("Downloading required modules", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+                popup.setMessage(translationSystem.translate("${engine:selectModules#downloading-required-modules}"), translationSystem.translate("${engine:menu#please-wait}") + String.format("\n%d%%", (int) (progress * 100f)));
         // to ensure that the initial message gets set:
         progressListener.onProgress(0);
         MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, progressListener);

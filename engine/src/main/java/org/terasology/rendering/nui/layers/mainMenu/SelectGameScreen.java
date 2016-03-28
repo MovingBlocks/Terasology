@@ -61,9 +61,9 @@ public class SelectGameScreen extends CoreScreenLayer {
                 @Override
                 public String get() {
                     if (loadingAsServer) {
-                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
+                        return translationSystem.translate("${engine:selectGame#select-multiplayer-game-sub-title}");
                     } else {
-                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
+                        return translationSystem.translate("${engine:selectGame#select-singleplayer-game-sub-title}");
                     }
                 }
             });

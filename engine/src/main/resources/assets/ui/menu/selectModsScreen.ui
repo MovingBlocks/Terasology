@@ -22,7 +22,7 @@
                     "type" : "UILabel",
                     "id" : "subtitle",
                     "family" : "title",
-                    "text" : "${engine:menu#select-modules-title}",
+                    "text" : "${engine:selectModules#select-modules-title}",
                     "layoutInfo" : {
                         "height" : 18,
                         "position-horizontal-center" : {},
@@ -35,7 +35,7 @@
                 {
                     "type" : "UILabel",
                     "id" : "warning",
-                    "text" : "${engine:menu#warn-modules}",
+                    "text" : "${engine:selectModules#warn-modules}",
                     "family" : "warning",
                     "layoutInfo" : {
                         "height" : 12,
@@ -95,7 +95,7 @@
                                     "contents" : [
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#module-filter}: ",
+                                            "text" : "${engine:selectModules#module-filter}: ",
                                             "layoutInfo" : {
                                                 "relativeWidth" : 0.25
                                             }
@@ -145,7 +145,7 @@
                                         {
                                             "type" : "UIButton",
                                             "id" : "disableAll",
-                                            "text" : "${engine:menu#disable-all-modules}"
+                                            "text" : "${engine:selectModules#disable-all-modules}"
                                         }
                                     ],
                                     "layoutInfo" : {
@@ -172,7 +172,7 @@
                                     "contents" : [
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#module-name}: "
+                                            "text" : "${engine:selectModules#module-name}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -181,7 +181,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#module-version-installed}: "
+                                            "text" : "${engine:selectModules#module-version-installed}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -190,7 +190,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#module-version-available}: "
+                                            "text" : "${engine:selectModules#module-version-available}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -199,7 +199,7 @@
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#module-status}: "
+                                            "text" : "${engine:selectModules#module-status}: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -246,12 +246,12 @@
                                         {
                                             "type" : "UIButton",
                                             "id" : "toggleActivation",
-                                            "text" : "${engine:menu#activate-module}"
+                                            "text" : "${engine:selectModules#activate-module}"
                                         },
                                         {
                                             "type" : "UIButton",
                                             "id" : "download",
-                                            "text" : "${engine:menu#download-module}"
+                                            "text" : "${engine:selectModules#download-module}"
                                         }
                                     ],
                                     "layoutInfo" : {

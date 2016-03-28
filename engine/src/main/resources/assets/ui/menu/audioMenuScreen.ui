@@ -20,7 +20,7 @@
             },
             {
                 "type" : "UILabel",
-                "text": "${engine:menu#audio-settings-title}",
+                "text": "${engine:audioSettings#audio-settings-title}",
                 "family" : "title",
                 "id" : "subtitle",
                 "layoutInfo" : {
@@ -59,7 +59,7 @@
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#sound-volume}:"
+                            "text" : "${engine:audioSettings#sound-volume}:"
                         },
                         {
                             "type" : "UISlider",
@@ -67,7 +67,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#music-volume}:"
+                            "text" : "${engine:audioSettings#music-volume}:"
                         },
                         {
                             "type" : "UISlider",

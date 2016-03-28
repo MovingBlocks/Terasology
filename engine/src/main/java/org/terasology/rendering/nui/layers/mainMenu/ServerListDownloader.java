@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.NetworkConfig;
 import org.terasology.config.ServerInfo;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.registry.In;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,6 +42,9 @@ import com.google.gson.stream.JsonReader;
  * Downloads a list of servers from a given URL.
  */
 class ServerListDownloader {
+
+    @In
+    private TranslationSystem translationSystem;
 
     private static final Logger logger = LoggerFactory.getLogger(ServerListDownloader.class);
 
@@ -97,7 +102,7 @@ class ServerListDownloader {
                 }
             }
         } catch (Exception e) {
-            status = "Error downloading server list!";
+            status = "${engine:joinGame#error-downloading-server-list}";
             // we catch Exception here to make sure that it's being logged
             // alternative: re-throw as RuntimeException and use
             // Thread.setUncaughtExceptionHandler()
@@ -106,13 +111,13 @@ class ServerListDownloader {
     }
 
     private void download(String address) throws IOException {
-        status = "Downloading server list ..";
+        status = "${engine:joinGame#downloading-server-list}";
 
         URL url = new URL("http", address, "/servers/list");
         try (Reader reader = new InputStreamReader(url.openStream(), charset);
                 JsonReader jsonReader = new JsonReader(reader)) {
 
-            status = "Parsing content ..";
+            status = "${engine:joinGame#parsing-content}";
 
             jsonReader.beginArray();
 
@@ -133,7 +138,7 @@ class ServerListDownloader {
 
             jsonReader.endArray();
 
-            status = String.format("Server list complete");
+            status = "${engine:joinGame#server-list-complete}";
         }
     }
 }

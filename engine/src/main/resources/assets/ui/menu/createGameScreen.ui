@@ -22,7 +22,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle",
                 "family" : "title",
-                "text" : "${engine:menu#create-game-title}",
+                "text" : "${engine:createGame#create-game-title}",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},
@@ -33,7 +33,7 @@
                 }
             },
             {
-                "type" : "UILabel",
+			"type" : "UILabel",
                 "id" : "gameTypeTitle",
                 "family" : "subtitle",
                 "text": "${engine:menu#select-singleplayer-game-sub-title}",
@@ -57,7 +57,7 @@
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#game-name}:"
+                            "text" : "${engine:createGame#game-name}:"
                         },
                         {
                             "type" : "UIText",
@@ -69,7 +69,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#gameplay} (${engine:menu#gameplay-info}):"
+                            "text" : "${engine:createGame#gameplay} (${engine:createGame#gameplay-info}):"
                         },
                         {
                             "type" : "RowLayout",
@@ -87,12 +87,12 @@
                                     "contents" : [
                                         {
                                             "type" : "UIButton",
-                                            "text" : "${engine:menu#select-modules}",
+                                            "text" : "${engine:createGame#select-modules}",
                                             "id" : "mods"
                                         },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "${engine:menu#advanced-usage}"
+                                            "text" : "${engine:createGame#advanced-usage}"
                                         }
                                     ]
                                 }
@@ -112,7 +112,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#world-seed}:"
+                            "text" : "${engine:createGame#world-seed}:"
                         },
                         {
                             "type" : "RowLayout",
@@ -127,7 +127,7 @@
                                 },
                                 {
                                     "type" : "UIButton",
-                                    "text" : "${engine:menu#world-config-preview}",
+                                    "text" : "${engine:createGame#world-config-preview}",
                                     "id" : "previewSeed"
                                 }
                             ]
@@ -138,7 +138,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "${engine:menu#select-world-gen} (${engine:menu#select-world-gen-info}):"
+                            "text" : "${engine:createGame#select-world-gen} (${engine:createGame#select-world-gen-info}):"
                         },
                         {
                             "type" : "RowLayout",
@@ -162,7 +162,7 @@
                     "position-top" : {
                         "target" : "BOTTOM",
                         "offset" : 16,
-                        "widget" : "gameTypeTitle"
+                        "widget" : "subtitle"
                     }
                 }
             },
@@ -173,7 +173,7 @@
                 "contents" : [
                     {
                         "type" : "UIButton",
-                        "text" : "${engine:menu#start-game}",
+                        "text" : "${engine:createGame#start-game}",
                         "id" : "play"
                     },
                     {

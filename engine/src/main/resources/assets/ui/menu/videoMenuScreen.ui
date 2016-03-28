@@ -21,7 +21,7 @@
             {
                 "type": "UILabel",
                 "family": "title",
-                "text": "${engine:menu#video-settings-title}",
+                "text": "${engine:videoSettings#video-settings-title}",
                 "id": "subtitle",
                 "layoutInfo": {
                     "height": 48,
@@ -42,7 +42,7 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
-                            "text": "${engine:menu#video-graphic-settings}"
+                            "text": "${engine:videoSettings#video-graphic-settings}"
                         },
                         {
                             "type": "ColumnLayout",
@@ -53,7 +53,7 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#video-preset}: "
+                                    "text": "${engine:videoSettings#video-preset}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -61,7 +61,7 @@
                                 },
                                 {
                                     "type" : "UILabel",
-                                    "text" : "${engine:menu#screenshot-size}: "
+                                    "text" : "${engine:videoSettings#screenshot-size}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -69,7 +69,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#video-fullscreen}: "
+                                    "text": "${engine:videoSettings#video-fullscreen}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -77,7 +77,7 @@
                                 },
                                 {
                                     "type" : "UILabel",
-                                    "text" : "${engine:menu#screenshot-format}: "
+                                    "text" : "${engine:videoSettings#screenshot-format}: "
                                 },
                                 {
                                     "type" : "UIDropdown",
@@ -85,7 +85,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#video-vsync}: "
+                                    "text": "${engine:videoSettings#video-vsync}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -100,7 +100,7 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
-                            "text": "${engine:menu#camera-details-settings}"
+                            "text": "${engine:videoSettings#camera-details-settings}"
                         },
                         {
                             "type": "ColumnLayout",
@@ -111,7 +111,7 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#camera-blur}: "
+                                    "text": "${engine:videoSettings#camera-blur}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -119,7 +119,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#camera-setting}: "
+                                    "text": "${engine:videoSettings#camera-setting}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -127,7 +127,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#outline}: "
+                                    "text": "${engine:videoSettings#outline}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -135,7 +135,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#cloud-shadows}: "
+                                    "text": "${engine:videoSettings#cloud-shadows}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -143,7 +143,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#parallax-mapping}: "
+                                    "text": "${engine:videoSettings#parallax-mapping}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -151,7 +151,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#camera-film-grain}: "
+                                    "text": "${engine:videoSettings#camera-film-grain}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -159,7 +159,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#bobbing}: "
+                                    "text": "${engine:videoSettings#bobbing}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -167,7 +167,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#fov-amount}: "
+                                    "text": "${engine:videoSettings#fov-amount}: "
                                 },
                                 {
                                     "type": "UISlider",
@@ -175,7 +175,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#view-distance}: "
+                                    "text": "${engine:videoSettings#view-distance}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -187,12 +187,12 @@
                                 },
                                 {
                                     "type": "UIButton",
-                                    "text": "${engine:menu#reset-fov-amount}",
+                                    "text": "${engine:videoSettings#reset-fov-amount}",
                                     "id": "fovReset"
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#framerate-limit}: "
+                                    "text": "${engine:videoSettings#framerate-limit}: "
                                 },
                                 {
                                     "type": "UISlider",
@@ -200,7 +200,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#resolution-scale}: "
+                                    "text": "${engine:videoSettings#resolution-scale}: "
                                 },
                                 {
                                     "type": "UISlider",
@@ -208,7 +208,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#animate-grass}: "
+                                    "text": "${engine:videoSettings#animate-grass}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -216,7 +216,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#animate-water}: "
+                                    "text": "${engine:videoSettings#animate-water}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -224,7 +224,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#particle-effect-limit}: "
+                                    "text": "${engine:videoSettings#particle-effect-limit}: "
                                 },
                                 {
                                     "type": "UISlider",
@@ -232,7 +232,7 @@
                                 },
                                 {
                                  "type": "UILabel",
-                                 "text": "${engine:menu#fog}: "
+                                 "text": "${engine:videoSettings#fog}: "
                                 },
                                 {
                                  "type": "UICheckbox",
@@ -247,7 +247,7 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
-                            "text": "${engine:menu#video-high-end-settings}"
+                            "text": "${engine:videoSettings#video-high-end-settings}"
                         },
                         {
                             "type": "ColumnLayout",
@@ -258,7 +258,7 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#eye-adaption}: "
+                                    "text": "${engine:videoSettings#eye-adaption}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -266,7 +266,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#motion-blur}: "
+                                    "text": "${engine:videoSettings#motion-blur}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -274,7 +274,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#water-reflections}: "
+                                    "text": "${engine:videoSettings#water-reflections}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -282,7 +282,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#shadows}: "
+                                    "text": "${engine:videoSettings#shadows}: "
                                 },
                                 {
                                     "type": "UIDropdown",
@@ -290,7 +290,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#oculus-rift-support}: "
+                                    "text": "${engine:videoSettings#oculus-rift-support}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -298,7 +298,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#ssao}: "
+                                    "text": "${engine:videoSettings#ssao}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -306,7 +306,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#clamp-lighting}: "
+                                    "text": "${engine:videoSettings#clamp-lighting}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -314,7 +314,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#bloom-effect}: "
+                                    "text": "${engine:videoSettings#bloom-effect}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -322,7 +322,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#light-shafts}: "
+                                    "text": "${engine:videoSettings#light-shafts}: "
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -330,7 +330,7 @@
                                 },
                                 {
                                    "type": "UILabel",
-                                   "text": "${engine:menu#vignette}: "
+                                   "text": "${engine:videoSettings#vignette}: "
                                 },
                                 {
                                    "type": "UICheckbox",
@@ -338,7 +338,7 @@
                                 },
                                 {
                                   "type": "UILabel",
-                                  "text": "${engine:menu#flickering-lights}: "
+                                  "text": "${engine:videoSettings#flickering-lights}: "
                                 },
                                 {
                                   "type": "UICheckbox",
@@ -346,7 +346,7 @@
                                 },
                                 {
                                  "type": "UILabel",
-                                 "text": "${engine:menu#volumetric-fog}: "
+                                 "text": "${engine:videoSettings#volumetric-fog}: "
                                 },
                                 {
                                  "type": "UICheckbox",

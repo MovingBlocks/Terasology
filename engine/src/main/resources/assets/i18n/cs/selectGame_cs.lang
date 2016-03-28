@@ -1,0 +1,8 @@
+{
+    "create-game": "Vytvořit",
+    "delete-game": "Smazat",
+    "load-game": "Nahrát",
+    "select-game-title": "Vybrat hru",
+    "select-singleplayer-game-sub-title": "Singleplayer",
+    "select-multiplayer-game-sub-title": "Multiplayer"
+}

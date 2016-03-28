@@ -1,0 +1,13 @@
+{
+    "advanced-usage": "Advanced Usage!",
+    "create-game-title": "Skapa Spel",
+    "game-name": "Spelets namn",
+    "gameplay": "Gameplay Mall",
+    "gameplay-info": "kan klicka 'moduler' för att skräddarsy vidare",
+    "select-modules": "Moduler...",
+    "select-world-gen": "Välj Värld Generator",
+    "select-world-gen-info": "aktivering av moduler kan lägga till fler",
+    "start-game": "Spela",
+    "world-config-preview": "Detaljer...",
+    "world-seed": "Frö"
+}

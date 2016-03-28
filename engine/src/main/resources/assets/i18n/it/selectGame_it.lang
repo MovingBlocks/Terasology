@@ -1,0 +1,8 @@
+{
+    "create-game": "Crea",
+    "delete-game": "Cancella",
+    "load-game": "Carica",
+    "select-game-title": "Seleziona gioco",
+    "select-singleplayer-game-sub-title": "Singleplayer",
+    "select-multiplayer-game-sub-title": "Multiplayer"
+}

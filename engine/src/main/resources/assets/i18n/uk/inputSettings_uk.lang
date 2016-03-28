@@ -1,0 +1,11 @@
+{
+    "default-binding": "Прив’язка за замовчуванням",
+    "input-settings-title": "Input Settings",
+    "invert-mouse": "Invert Mouse:",
+    "mouse": "Mouse",
+    "mouse-sensitivity": "Mouse Sensitivity:",
+    "new-binding": "Нова прив’язка",
+    "none": "<none>",
+    "not-bound": "<not bound>",
+    "remove-binding": "Скинути"
+}
