@@ -36,7 +36,6 @@ import java.nio.IntBuffer;
 import java.util.Map;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
-import static org.lwjgl.opengl.GL11.glGenTextures;
 
 /**
  * FBO - Frame Buffer Object
@@ -173,7 +172,6 @@ public final class FBO {
         return  this.getTextureBuffer(buffer.getIdentifier());
     }
 
-
     /**
      * Binds the color attachment to the currently active texture unit.
      * Once a texture is bound it can be sampled by shaders.
@@ -199,7 +197,6 @@ public final class FBO {
     public void bindNormalsTexture() {
         Texture texture = this.getTextureBuffer(BaseFboBuffer.NORMAL_BUFFER_TEXTURE);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
-
     }
 
     /**
@@ -210,7 +207,6 @@ public final class FBO {
         Texture texture = this.getTextureBuffer(BaseFboBuffer.LIGHT_BUFFER_TEXTURE);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
     }
-
 
     /**
      * Unbinds the texture attached to the currently active texture unit.
@@ -232,7 +228,6 @@ public final class FBO {
         target.bind();
 
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthStencilRboId);
-
         Texture texture = this.getTextureBuffer(BaseFboBuffer.DEPTH_STENCIL_TEXTURE);
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, texture.getId(), 0);
 
@@ -246,8 +241,7 @@ public final class FBO {
     public void dispose() {
         glDeleteFramebuffersEXT(fboId);
         glDeleteRenderbuffersEXT(depthStencilRboId);
-        for (Map.Entry<String, Texture> texture :textureMapping.entrySet())
-        {
+        for (Map.Entry<String, Texture> texture :textureMapping.entrySet()) {
             texture.getValue().dispose();
         }
         status = Status.DISPOSED;
