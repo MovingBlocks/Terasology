@@ -23,8 +23,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.NetworkComponent;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -49,13 +49,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         EntityManager entityManager = context.get(EntityManager.class);
-        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
 
         Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
-        // TODO: Move the world renderer bits elsewhere
         if (worldEntityIterator.hasNext()) {
             EntityRef worldEntity = worldEntityIterator.next();
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+            chunkProvider.setWorldEntity(worldEntity);
 
             // get the world generator config from the world entity
             // replace the world generator values from the components in the world entity
@@ -75,7 +74,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             NetworkComponent networkComponent = new NetworkComponent();
             networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
             worldEntity.addComponent(networkComponent);
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+            chunkProvider.setWorldEntity(worldEntity);
 
             // transfer all world generation parameters from Config to WorldEntity
             WorldGenerator worldGenerator = context.get(WorldGenerator.class);

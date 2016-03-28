@@ -23,13 +23,14 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.chunks.ChunkProvider;
 
 /**
  */
 public class AwaitCharacterSpawn implements LoadProcess {
 
     private final Context context;
-    private WorldRenderer worldRenderer;
+    private ChunkProvider chunkProvider;
 
     public AwaitCharacterSpawn(Context context) {
         this.context = context;
@@ -49,18 +50,17 @@ public class AwaitCharacterSpawn implements LoadProcess {
         LocalPlayer localPlayer = context.get(LocalPlayer.class);
         ClientComponent client = localPlayer.getClientEntity().getComponent(ClientComponent.class);
         if (client != null && client.character.exists()) {
-            worldRenderer.setPlayer(context.get(LocalPlayer.class));
             return true;
         } else {
-            worldRenderer.getChunkProvider().completeUpdate();
-            worldRenderer.getChunkProvider().beginUpdate();
+            chunkProvider.completeUpdate();
+            chunkProvider.beginUpdate();
         }
         return false;
     }
 
     @Override
     public void begin() {
-        worldRenderer = context.get(WorldRenderer.class);
+        chunkProvider = context.get(ChunkProvider.class);
     }
 
     @Override

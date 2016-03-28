@@ -35,6 +35,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -730,7 +731,7 @@ public class PostProcessor {
      *                       file only when the value passed in is RIGHT_EYE, as the processing for
      *                       the LEFT_EYE comes first and leads to an incomplete image.
      */
-    public void finalPostProcessing(WorldRenderer.WorldRenderingStage renderingStage) {
+    public void finalPostProcessing(RenderingStage renderingStage) {
         PerformanceMonitor.startActivity("Rendering final scene");
 
         if (!renderingDebugConfig.isEnabled()) {
@@ -772,7 +773,7 @@ public class PostProcessor {
 
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
-    private void renderFinalStereoImage(WorldRenderer.WorldRenderingStage renderingStage) {
+    private void renderFinalStereoImage(RenderingStage renderingStage) {
         if (isNotTakingScreenshot()) {
             buffers.sceneFinal.bind();
         } else {
@@ -817,21 +818,21 @@ public class PostProcessor {
         materials.ocDistortion.setInt("texInputBuffer", texId, true);
 
         if (isNotTakingScreenshot()) {
-            updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
+            updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.LEFT_EYE);
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
-            updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
+            updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.RIGHT_EYE);
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
         } else {
             // what follows -should- work also when there is no screenshot being taken, but somehow it doesn't, hence the block above
-            updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.LEFT_EYE);
+            updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.LEFT_EYE);
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
-            updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), WorldRenderer.WorldRenderingStage.RIGHT_EYE);
+            updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.RIGHT_EYE);
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
         }
     }
 
-    private void updateOcShaderParametersForVP(int vpX, int vpY, int vpWidth, int vpHeight, WorldRenderer.WorldRenderingStage renderingStage) {
+    private void updateOcShaderParametersForVP(int vpX, int vpY, int vpWidth, int vpHeight, RenderingStage renderingStage) {
         float w = (float) vpWidth / fullScale.width();
         float h = (float) vpHeight / fullScale.height();
         float x = (float) vpX / fullScale.width();
@@ -842,7 +843,7 @@ public class PostProcessor {
         materials.ocDistortion.setFloat4("ocHmdWarpParam", OculusVrHelper.getDistortionParams()[0], OculusVrHelper.getDistortionParams()[1],
                 OculusVrHelper.getDistortionParams()[2], OculusVrHelper.getDistortionParams()[3], true);
 
-        float ocLensCenter = (renderingStage == WorldRenderer.WorldRenderingStage.RIGHT_EYE)
+        float ocLensCenter = (renderingStage == RenderingStage.RIGHT_EYE)
                 ? -1.0f * OculusVrHelper.getLensViewportShift() : OculusVrHelper.getLensViewportShift();
 
         materials.ocDistortion.setFloat2("ocLensCenter", x + (w + ocLensCenter * 0.5f) * 0.5f, y + h * 0.5f, true);

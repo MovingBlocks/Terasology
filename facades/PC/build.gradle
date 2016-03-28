@@ -81,11 +81,33 @@ task game(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
+task debug(type:JavaExec) {
+    description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    jvmArgs = ["-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"]
+    main = mainClassName
+    workingDir = rootDir
+    String[] runArgs = ["-homedir"]
+    args runArgs
+
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.resourcesDir
+    classpath project(':engine').sourceSets.main.output.classesDir
+    classpath project(':engine').configurations.runtime
+}
+
 // By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
 // TODO: This is not the Gradle Way. Needs more declared output-fu to determine up-to-date instead of the if
 task setupServerConfig() << {
     description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
-    
+
     def json = new JsonBuilder()
 
     def serverRoot = rootProject.file(localServerDataPath);

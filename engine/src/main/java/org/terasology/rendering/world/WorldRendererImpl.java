@@ -26,7 +26,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -34,7 +33,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
@@ -59,6 +57,18 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 /**
+ * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
+ *
+ * This implementation includes support for Oculus VR, a head mounted display. No other stereoscopic displays are
+ * supported at this stage: see https://github.com/MovingBlocks/Terasology/issues/2111 for updates.
+ *
+ * This implementation works closely with a number of support objects, in particular:
+ *
+ * - a FrameBuffersManager instance, holding handles to GPU buffers used as input and output of rendering steps<br/>
+ * - a GraphicState instance, providing a number of methods to affect the OpenGL state<br/>
+ * - a PostProcessor instance, taking care of (mostly) 2D processing on the content of the GPU buffers<br/>
+ * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
+ *
  */
 public final class WorldRendererImpl implements WorldRenderer {
 
@@ -71,17 +81,15 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
 
-    private LocalPlayer player;
-
     private final Camera playerCamera;
     private final Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
-    private float smoothedPlayerSunlightValue;
+    private float timeSmoothedMainLightIntensity;
 
     private final RenderQueuesHelper renderQueues;
-    private WorldRenderingStage currentRenderingStage;
+    private RenderingStage currentRenderingStage;
     private boolean isFirstRenderingStageForCurrentFrame;
 
     private Material chunkShader;
@@ -89,13 +97,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     // private Material simpleShader; // in use by the currently commented out light stencil pass
     private Material shadowMapShader;
 
-    private float tick;
+    private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
 
     private int statChunkMeshEmpty;
     private int statChunkNotReady;
     private int statRenderedTriangles;
 
+    // TODO: to be documented (when understood in more detail)
     public enum ChunkRenderMode {
         DEFAULT,
         REFLECTION,
@@ -105,7 +114,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private ComponentSystemManager systemManager;
 
-    private final Config config;
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
 
@@ -113,38 +121,52 @@ public final class WorldRendererImpl implements WorldRenderer {
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
+    /**
+     * Instantiates a WorldRenderer implementation.
+     *
+     * This particular implementation works as deferred shader. The scene is rendered multiple times per frame
+     * in a number of separate passes (each stored in GPU buffers) and the passes are combined throughout the
+     * rendering pipeline to calculate per-pixel lighting and other effects.
+     *
+     * Transparencies are handled through alpha rejection (i.e. ground plants) and alpha-based blending.
+     * An exception to this is water, which is handled separately to allow for reflections and refractions, if enabled.
+     *
+     * By the time it is fully instantiated this implementation is already connected to all the support objects
+     * it requires and is ready to render via the render(RenderingStage) method.
+     *
+     * @param context a context object, to obtain instances of classes such as the rendering config.
+     * @param bufferPool a GLBufferPool, to be passed to the RenderableWorld instance used by this implementation.
+     */
     public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
         this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.backdropRenderer = context.get(BackdropRenderer.class);
-        this.config = context.get(Config.class);
-        this.renderingConfig = config.getRendering();
+        this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.systemManager = context.get(ComponentSystemManager.class);
 
-        // TODO: won't need localPlayerSystem here once camera is in the ES proper
         if (renderingConfig.isOculusVrSupport()) {
             playerCamera = new OculusStereoCamera();
-            currentRenderingStage = WorldRenderingStage.LEFT_EYE;
+            currentRenderingStage = RenderingStage.LEFT_EYE;
 
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
-            currentRenderingStage = WorldRenderingStage.MONO;
+            currentRenderingStage = RenderingStage.MONO;
         }
+
+        // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        initMainDirectionalLight();
-
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-
-        renderableWorld = new RenderableWorldImpl(worldProvider, chunkProvider, bufferPool, playerCamera, shadowMapCamera);
+        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera, shadowMapCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
+        initMainDirectionalLight();
         initRenderingSupport();
     }
 
+    // TODO: one day the main light (sun/moon) should be just another light in the scene.
     private void initMainDirectionalLight() {
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
         mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
@@ -193,9 +215,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.onChunkUnloaded(pos);
     }
 
-    /**
-     * @return true if pregeneration is complete
-     */
     @Override
     public boolean pregenerateChunks() {
         return renderableWorld.pregenerateChunks();
@@ -206,7 +225,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         secondsSinceLastFrame += deltaInSeconds;
     }
 
-    public void positionShadowMapCamera() {
+    private void positionShadowMapCamera() {
         // Shadows are rendered around the player so...
         Vector3f lightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z);
 
@@ -244,11 +263,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         statRenderedTriangles = 0;
     }
 
-    private void preRenderUpdate(WorldRenderingStage renderingStage) {
+    private void preRenderUpdate(RenderingStage renderingStage) {
         resetStats();
 
         currentRenderingStage = renderingStage;
-        if (currentRenderingStage == WorldRenderingStage.MONO || currentRenderingStage == WorldRenderingStage.LEFT_EYE) {
+        if (currentRenderingStage == RenderingStage.MONO || currentRenderingStage == RenderingStage.LEFT_EYE) {
             isFirstRenderingStageForCurrentFrame = true;
         } else {
             isFirstRenderingStageForCurrentFrame = false;
@@ -257,8 +276,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
-            tick += secondsSinceLastFrame * 1000;  // Updates the tick variable that animation is based on.
-            smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), secondsSinceLastFrame);
+            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
             positionShadowMapCamera();
@@ -269,9 +287,11 @@ public final class WorldRendererImpl implements WorldRenderer {
             secondsSinceLastFrame = 0;
 
             buffersManager.preRenderUpdate();
+
+            millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }
 
-        if (currentRenderingStage != WorldRenderingStage.MONO) {
+        if (currentRenderingStage != RenderingStage.MONO) {
             playerCamera.updateFrustum();
         }
 
@@ -280,10 +300,20 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     /**
-     * Renders the world.
+     * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
+     * or to a file, when grabbing a screenshot.
+     *
+     * In this particular implementation this method can be called once per frame, when rendering to a standard display,
+     * or twice, each time with a different rendering stage, when rendering to the OculusVR head mounted display.
+     *
+     * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes,
+     * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
+     * reflections, 2D filters...).
+     *
+     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
      */
     @Override
-    public void render(WorldRenderingStage renderingStage) {
+    public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
         renderShadowMap();          // into shadowMap buffer
@@ -311,10 +341,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
-
-        postProcessor.generateOutline();                      // into outline buffer
+        postProcessor.generateOutline();                    // into outline buffer
         postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
-        postProcessor.generatePrePostComposite();              // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
+        postProcessor.generatePrePostComposite();           // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
         PerformanceMonitor.endActivity();
 
         renderSimpleBlendMaterials();                       // into sceneOpaque buffer
@@ -360,7 +389,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
     }
 
-    public void renderWorldReflection() {
+    private void renderWorldReflection() {
         PerformanceMonitor.startActivity("Render World (Reflection)");
 
         graphicState.preRenderSetupReflectedScene();
@@ -370,15 +399,15 @@ public final class WorldRendererImpl implements WorldRenderer {
         backdropRenderer.render(playerCamera);
         playerCamera.lookThrough();
 
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-
         if (renderingConfig.isReflectiveWater()) {
+            chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+
             while (renderQueues.chunksOpaqueReflection.size() > 0) {
                 renderChunk(renderQueues.chunksOpaqueReflection.poll(), ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.REFLECTION);
             }
-        }
 
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+            chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        }
 
         playerCamera.setReflected(false);
         graphicState.postRenderCleanupReflectedScene();
@@ -417,6 +446,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
+    // Alpha reject is used for semi-transparent billboards, which in turn are used for ground plants.
     private void renderChunksAlphaReject() {
         PerformanceMonitor.startActivity("Render Chunks (Alpha Reject)");
         while (renderQueues.chunksAlphaReject.size() > 0) {
@@ -625,7 +655,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 shadowMapShader.enable();
 
             } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
-                CoreRegistry.get(ShaderManager.class).disableShader();
+                context.get(ShaderManager.class).disableShader();
             }
 
             graphicState.preRenderSetupChunk(chunkPositionRelativeToCamera);
@@ -657,7 +687,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     /**
-     * Disposes this world.
+     * Disposes of support objects used by this implementation.
      */
     @Override
     public void dispose() {
@@ -667,23 +697,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.dispose();
     }
 
-    /**
-     * Sets a new player and spawns him at the spawning point.
-     *
-     * @param p The player
-     */
     @Override
-    public void setPlayer(LocalPlayer p) {
-        player = p;
-        renderableWorld.updateChunksInProximity(renderingConfig.getViewDistance());
+    public void setViewDistance(ViewDistance viewDistance) {
+        renderableWorld.updateChunksInProximity(viewDistance);
     }
 
-    @Override
-    public void changeViewDistance(ViewDistance viewingDistance) {
-        renderableWorld.updateChunksInProximity(viewingDistance);
-    }
-
-    public boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
+    private boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
         return component.lightType == LightComponent.LightType.DIRECTIONAL
                 || playerCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
 
@@ -705,22 +724,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public float getSmoothedPlayerSunlightValue() {
-        return smoothedPlayerSunlightValue;
+    public float getTimeSmoothedMainLightIntensity() {
+        return timeSmoothedMainLightIntensity;
     }
 
     @Override
-    public float getSunlightValue() {
-        return getSunlightValueAt(playerCamera.getPosition());
-    }
-
-    @Override
-    public float getBlockLightValue() {
-        return getBlockLightValueAt(playerCamera.getPosition());
-    }
-
-    @Override
-    public float getRenderingLightValueAt(Vector3f pos) {
+    public float getRenderingLightIntensityAt(Vector3f pos) {
         float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
         float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
 
@@ -736,12 +745,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public float getSunlightValueAt(Vector3f position) {
+    public float getMainLightIntensityAt(Vector3f position) {
         return backdropProvider.getDaylight() * worldProvider.getSunlight(position) / 15.0f;
     }
 
     @Override
-    public float getBlockLightValueAt(Vector3f position) {
+    public float getBlockLightIntensityAt(Vector3f position) {
         return worldProvider.getLight(position) / 15.0f;
     }
 
@@ -761,23 +770,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         return builder.toString();
     }
 
-    public LocalPlayer getPlayer() {
-        return player;
-    }
-
     @Override
-    public WorldProvider getWorldProvider() {
-        return worldProvider;
-    }
-
-    @Override
-    public ChunkProvider getChunkProvider() {
-        return renderableWorld.getChunkProvider();
-    }
-
-    @Override
-    public float getTick() {
-        return tick;
+    public float getMillisecondsSinceRenderingStart() {
+        return millisecondsSinceRenderingStart;
     }
 
     @Override
@@ -791,12 +786,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public WorldRenderingStage getCurrentRenderStage() {
+    public RenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
-    }
-
-    @Override
-    public Vector3f getTint() {
-        return worldProvider.getBlock(playerCamera.getPosition()).getTint();
     }
 }
