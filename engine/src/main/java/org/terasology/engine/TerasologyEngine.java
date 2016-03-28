@@ -114,7 +114,7 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
-    private static final int ONE_MEBIBYTE = 1048576; // 1024 * 1024;
+    private static final int ONE_MEBIBYTE = 1024 * 1024;
 
     private GameState currentState;
     private GameState pendingState;
