@@ -137,7 +137,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                     } else {
                         return path.getName(2).toString().equals("textures");
                     }
-                }));
+                    }));
         assetTypeManager.registerCoreFormat(Texture.class,
                 new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> {
                     if (path.getName(1).toString().equals(ModuleAssetDataProducer.OVERRIDE_FOLDER)) {

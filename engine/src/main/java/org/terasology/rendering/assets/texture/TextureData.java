@@ -53,8 +53,12 @@ public class TextureData implements AssetData {
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Width and height must be positive");
         }
+        if (mipmaps[0].limit() % BYTES_PER_PIXEL != 0) {
+            throw new IllegalArgumentException("Texture data format incorrect, must be a set of RGBA values for each pixel");
+        }
         if (mipmaps[0].limit() != width * height * BYTES_PER_PIXEL) {
-            throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height)");
+            throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (given "
+                                               + mipmaps[0].limit() + ", expected " + width * height * BYTES_PER_PIXEL + ")");
         }
         if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height))) {
             throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
