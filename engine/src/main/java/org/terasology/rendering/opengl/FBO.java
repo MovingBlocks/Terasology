@@ -56,22 +56,14 @@ public final class FBO {
 
     public int fboId;
     public enum BaseFboBuffer {
-        COLOR_TEXTURE("COLOR_TEXTURE"),
-        DEPTH_STENCIL_TEXTURE("DEPTH_STENCIL_TEXTURE"),
-        NORMAL_BUFFER_TEXTURE("NORMAL_BUFFER_TEXTURE"),
-        LIGHT_BUFFER_TEXTURE("LIGHT_BUFFER_TEXTURE");
-        String identifier;
-        private BaseFboBuffer(String identifier) {
-            this.identifier = identifier;
-        }
-        public String getIdentifier() {
-            return this.identifier;
-        }
+        COLOR_TEXTURE,
+        DEPTH_STENCIL_TEXTURE,
+        NORMAL_BUFFER_TEXTURE,
+        LIGHT_BUFFER_TEXTURE
     }
 
     public int depthStencilRboId;
     private Map<String,Texture> textureMapping = Maps.newHashMap();
-
     private final Dimensions dimensions;
 
     private Status status;
@@ -148,7 +140,7 @@ public final class FBO {
      */
     //TODO: needs a method to bind the texture to the FBO
     private Texture getTextureInstance(BaseFboBuffer buffer) {
-        return  this.getTextureBuffer(buffer.getIdentifier());
+        return  this.getTextureInstance(buffer.name());
     }
 
     /**
@@ -158,8 +150,10 @@ public final class FBO {
      */
     public Texture getTextureBuffer(String identifier) {
         ResourceUrn resource = this.getTextureUrn(dimensions,this,identifier);
-        if(this.textureMapping.containsKey(resource.toString()))
+        if(!this.textureMapping.containsKey(resource.toString())) {
+            logger.error("can't find fbo texture with identifier:" + resource.toString());
             return null;
+        }
         return this.textureMapping.get(resource.toString());
     }
 
@@ -169,7 +163,7 @@ public final class FBO {
      * @return
      */
     public Texture getTextureBuffer(BaseFboBuffer buffer) {
-        return  this.getTextureBuffer(buffer.getIdentifier());
+        return  this.getTextureBuffer(buffer.name());
     }
 
     /**
