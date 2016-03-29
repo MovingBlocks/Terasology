@@ -151,8 +151,7 @@ public final class FBO {
     public Texture getTextureBuffer(String identifier) {
         ResourceUrn resource = this.getTextureUrn(dimensions,this,identifier);
         if(!this.textureMapping.containsKey(resource.toString())) {
-            logger.error("can't find fbo texture with identifier:" + resource.toString());
-            return null;
+             return null;
         }
         return this.textureMapping.get(resource.toString());
     }
