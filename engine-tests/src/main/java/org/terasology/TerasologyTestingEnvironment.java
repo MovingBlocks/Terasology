@@ -104,7 +104,7 @@ public abstract class TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         engineEntityManager = context.get(EngineEntityManager.class);
-        BlockManager mockBlockManager = context.get(BlockManager.class); // added Local to avoid HiddenFieldCheck
+        BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
         BiomeManager biomeManager = context.get(BiomeManager.class);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");

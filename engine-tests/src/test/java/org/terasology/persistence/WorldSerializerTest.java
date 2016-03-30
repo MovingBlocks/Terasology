@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,16 +27,14 @@ import org.terasology.protobuf.EntityData;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- */
 public class WorldSerializerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testNotPersistedIfFlagedOtherwise() throws Exception {
         EngineEntityManager entityManager = context.get(EngineEntityManager.class);
         EntityBuilder entityBuilder = entityManager.newBuilder();
-        WorldSerializer worldSerializer =
-                new WorldSerializerImpl(entityManager, new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary()));
+        PrefabSerializer prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
+        WorldSerializer worldSerializer = new WorldSerializerImpl(entityManager, prefabSerializer);
         entityBuilder.setPersistent(false);
         @SuppressWarnings("unused") // just used to express that an entity got created
                 EntityRef entity = entityBuilder.build();
