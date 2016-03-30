@@ -15,22 +15,12 @@
  */
 package org.terasology.world.generation;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  */
@@ -118,11 +108,12 @@ public class WorldBuilder {
             for (FacetProvider facetProvider : providerChains.values()) {
                 // Find all facets that require it
                 Requires requires = facetProvider.getClass().getAnnotation(Requires.class);
+                Produces produces = facetProvider.getClass().getAnnotation(Produces.class);
+                Updates updates = facetProvider.getClass().getAnnotation(Updates.class);
                 if (requires != null) {
                     for (Facet requiredFacet : requires.value()) {
                         if (requiredFacet.value() == facet) {
-                            Produces produces = facetProvider.getClass().getAnnotation(Produces.class);
-                            Updates updates = facetProvider.getClass().getAnnotation(Updates.class);
+
 
                             FacetBorder requiredBorder = requiredFacet.border();
 
@@ -148,6 +139,35 @@ public class WorldBuilder {
                                             borderForProducedFacet.getSides() + requiredBorder.sides() + borderForFacetAnnotation.sides());
                                 }
                             }
+                        }
+                    }
+                } else if (updates != null) {
+                    for (Facet producedFacetAnnotation : updates.value()) {
+                        if (producedFacetAnnotation.value() == facet) {
+
+                            Class<? extends WorldFacet> updatesFacet = producedFacetAnnotation.value();
+                            FacetBorder borderForFacetAnnotation = producedFacetAnnotation.border();
+
+                            Border3D updatesBorder = borders.get(updatesFacet);
+                            if (updatesBorder == null) {
+
+                                if (providerChains.containsEntry(updatesFacet, facetProvider)) {
+                                    ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChainsModded = ArrayListMultimap.create();
+                                    providerChainsModded.putAll(providerChains);
+                                    providerChainsModded.remove(updatesFacet, facetProvider);
+                                    ensureBorderCalculatedForFacet(updatesFacet, providerChainsModded, borders);
+                                    updatesBorder = borders.get(updatesFacet);
+                                    }
+                            }
+
+
+                            if (updatesBorder != null) {
+                                border = border.maxWith(
+                                        updatesBorder.getTop() + borderForFacetAnnotation.top(),
+                                        updatesBorder.getBottom() + borderForFacetAnnotation.bottom(),
+                                        updatesBorder.getSides() + borderForFacetAnnotation.sides());
+                            }
+
                         }
                     }
                 }
