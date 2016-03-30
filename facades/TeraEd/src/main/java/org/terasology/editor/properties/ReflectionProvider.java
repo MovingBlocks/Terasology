@@ -36,10 +36,6 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withType;
 
-
-/**
- * @author Immortius
- */
 public class ReflectionProvider<T> implements PropertyProvider<T> {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionProvider.class);
 

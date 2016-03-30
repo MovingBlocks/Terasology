@@ -23,8 +23,6 @@ import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 @API
 public class OneOfProviderFactory {
     private Map<String, Binding<?>> provider = Maps.newHashMap();

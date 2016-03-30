@@ -63,7 +63,7 @@ public class BasicTextureRegion implements TextureRegion {
 
     @Override
     public Rect2i getPixelRegion() {
-        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(region.minX() * texture.getWidth())
-                , TeraMath.floorToInt(region.minY() * texture.getHeight()), getWidth(), getHeight());
+        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(region.minX() * texture.getWidth()),
+                TeraMath.floorToInt(region.minY() * texture.getHeight()), getWidth(), getHeight());
     }
 }

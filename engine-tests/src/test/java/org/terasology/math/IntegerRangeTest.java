@@ -85,9 +85,9 @@ public class IntegerRangeTest {
     @Test
     public void twoRangesAtTheMaxInt() {
         IntegerRange range = new IntegerRange();
-        range.addNumbers(Integer.MAX_VALUE-3, Integer.MAX_VALUE);
-        range.addNumbers(Integer.MAX_VALUE-1, Integer.MAX_VALUE);
-        validateRange(range, Integer.MAX_VALUE-3, Integer.MAX_VALUE-2, Integer.MAX_VALUE-1, Integer.MAX_VALUE);
+        range.addNumbers(Integer.MAX_VALUE - 3, Integer.MAX_VALUE);
+        range.addNumbers(Integer.MAX_VALUE - 1, Integer.MAX_VALUE);
+        validateRange(range, Integer.MAX_VALUE - 3, Integer.MAX_VALUE - 2, Integer.MAX_VALUE - 1, Integer.MAX_VALUE);
     }
 
     private void validateRange(IntegerRange range, Integer...numbers) {

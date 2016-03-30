@@ -25,12 +25,12 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 @RegisterWorldGenerator(id = "builderSampleWorld", displayName = "Builder Sample World")
 public class BuilderWorldGenerator extends BaseFacetedWorldGenerator {
 
+    @In
+    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
+
     public BuilderWorldGenerator(SimpleUri uri) {
         super(uri);
     }
-
-    @In
-    private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
 
     @Override
     protected WorldBuilder createWorld() {

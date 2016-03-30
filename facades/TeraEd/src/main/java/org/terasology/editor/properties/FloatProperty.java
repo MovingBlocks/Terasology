@@ -19,9 +19,6 @@ import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.text.DecimalFormat;
 
-/**
- * @author Immortius
- */
 public class FloatProperty<T> implements Property<Float> {
 
     private static final DecimalFormat DEFAULT_DECIMAL_FORMAT = new DecimalFormat("0.0000000");

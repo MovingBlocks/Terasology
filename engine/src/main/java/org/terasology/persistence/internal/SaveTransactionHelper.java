@@ -103,7 +103,7 @@ public class SaveTransactionHelper {
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 try {
                     Files.delete(dir);
-                }catch (DirectoryNotEmptyException e) {
+                } catch (DirectoryNotEmptyException e) {
                     /**
                      * Happens rarely for some players on windows (See issue #2160). Exact reason for this behavior is
                      * unknown. Maybe they have some kind of background task that processes that creates a temporary

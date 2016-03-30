@@ -54,15 +54,15 @@ public class UILoadBar extends CoreWidget {
             // Draw Offset
             if (offset != 0) {
                 int drawWidth = Math.min(size, offset);
-                canvas.drawTextureRaw(fillTexture, Rect2i.createFromMinAndSize(0, 0, drawWidth, canvas.size().y)
-                        , ScaleMode.STRETCH, barWidth - offset, 0, drawWidth, canvas.size().y);
+                canvas.drawTextureRaw(fillTexture, Rect2i.createFromMinAndSize(0, 0, drawWidth, canvas.size().y),
+                        ScaleMode.STRETCH, barWidth - offset, 0, drawWidth, canvas.size().y);
                 drawnWidth += drawWidth;
             }
             // Draw Remainder
             while (drawnWidth < size) {
                 int drawWidth = Math.min(size - drawnWidth, barWidth);
-                canvas.drawTextureRaw(fillTexture, Rect2i.createFromMinAndSize(drawnWidth, 0, drawWidth, canvas.size().y)
-                        , ScaleMode.STRETCH, 0, 0, drawWidth, canvas.size().y);
+                canvas.drawTextureRaw(fillTexture, Rect2i.createFromMinAndSize(drawnWidth, 0, drawWidth, canvas.size().y),
+                        ScaleMode.STRETCH, 0, 0, drawWidth, canvas.size().y);
                 drawnWidth += drawWidth;
             }
         }

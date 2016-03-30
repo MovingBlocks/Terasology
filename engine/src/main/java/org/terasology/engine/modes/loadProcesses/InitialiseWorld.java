@@ -133,8 +133,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(
                 new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.UNLOADED_ID),
-                        context)
-                , context);
+                        context),
+                context);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         context.put(WorldProvider.class, worldProvider);
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);

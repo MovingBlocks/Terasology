@@ -16,8 +16,6 @@
 package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetName;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;

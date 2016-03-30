@@ -92,7 +92,7 @@ public abstract class Task {
                     LOG.warn("update of Task {} returned invalid state {}", this.getClass(), newStatus);
                 }
                 status = newStatus;
-                if(newStatus == Status.FAILURE || newStatus == Status.SUCCESS) {
+                if (newStatus == Status.FAILURE || newStatus == Status.SUCCESS) {
                     onTerminate(status);
                 }
 

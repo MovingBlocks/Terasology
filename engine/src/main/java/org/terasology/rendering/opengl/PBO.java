@@ -26,9 +26,6 @@ import static org.lwjgl.opengl.EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT;
 import static org.lwjgl.opengl.GL11.glReadPixels;
 import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 
-/**
- * Created by manu on 15.03.2015.
- */
 public class PBO {
     private int pboId;
     private ByteBuffer cachedBuffer;

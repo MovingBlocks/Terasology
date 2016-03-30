@@ -104,7 +104,7 @@ public class PostProcessor {
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
     @Range(min = 0.0f, max = 5.0f)
-    private float bloomHighPassThreshold =.05f;
+    private float bloomHighPassThreshold = 0.05f;
     @Range(min = 0.0f, max = 32.0f)
     private float bloomBlurRadius = 12.0f;
 
@@ -122,12 +122,12 @@ public class PostProcessor {
     private Materials materials = new Materials();
     private Buffers buffers = new Buffers();
 
-    ThreadManager threadManager = CoreRegistry.get(ThreadManager.class);
-
     private boolean isTakingScreenshot;
 
     private RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
     private RenderingDebugConfig renderingDebugConfig = renderingConfig.getDebug();
+
+    ThreadManager threadManager = CoreRegistry.get(ThreadManager.class);
 
     /**
      * Returns a PostProcessor instance. On instantiation the returned instance is not
@@ -961,7 +961,7 @@ public class PostProcessor {
      */
     public void saveScreenshot() {
         final ByteBuffer buffer = buffersManager.getSceneFinalRawData();
-        if(buffer == null) {
+        if (buffer == null) {
             logger.error("No screenshot data available. No screenshot will be saved.");
             return;
         }

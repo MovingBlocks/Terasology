@@ -20,9 +20,6 @@ import org.terasology.rendering.nui.widgets.UIList;
 
 import java.util.Arrays;
 
-/**
- * Created by synopia on 06.01.14.
- */
 public class MigTestScreen extends CoreScreenLayer {
     @Override
     public void initialise() {

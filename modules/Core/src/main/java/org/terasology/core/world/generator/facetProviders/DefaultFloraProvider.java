@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.terasology.core.world.CoreBiome;
-import org.terasology.core.world.generator.facetProviders.PositionFilters;
-import org.terasology.core.world.generator.facetProviders.SurfaceObjectProvider;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.core.world.generator.rasterizers.FloraType;

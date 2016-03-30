@@ -46,8 +46,6 @@ import org.terasology.world.block.BlockManager;
 import java.util.List;
 import java.util.Optional;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ExplosionAuthoritySystem extends BaseComponentSystem {
     static final String DELAYED_EXPLOSION_ACTION_ID = "Delayed Explosion";
@@ -144,7 +142,8 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = ItemComponent.class)
     public void onActivateFuseOnBlock(ActivateEvent event, EntityRef entityRef, TimedExplosionComponent timedExplosionComponent) {
-        if (event.getTarget().hasComponent(BlockComponent.class) && event.getTarget().hasComponent(ExplosionActionComponent.class) && !event.getTarget().hasComponent(TimedExplosionComponent.class)) {
+        if (event.getTarget().hasComponent(BlockComponent.class) && event.getTarget().hasComponent(ExplosionActionComponent.class)
+                && !event.getTarget().hasComponent(TimedExplosionComponent.class)) {
             Optional<StaticSound> fuseBurningSound = Assets.getSound("core:FuseBurning");
             if (fuseBurningSound.isPresent()) {
                 event.getTarget().send(new PlaySoundEvent(fuseBurningSound.get(), 1f));
