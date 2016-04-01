@@ -20,12 +20,8 @@ import java.math.RoundingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.events.FootstepEvent;
-import org.terasology.logic.characters.events.HorizontalCollisionEvent;
-import org.terasology.logic.characters.events.JumpEvent;
-import org.terasology.logic.characters.events.OnEnterBlockEvent;
-import org.terasology.logic.characters.events.SwimStrokeEvent;
-import org.terasology.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.logic.characters.events.*;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
@@ -38,6 +34,7 @@ import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+
 
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
@@ -89,6 +86,9 @@ public class KinematicCharacterMover implements CharacterMover {
     private WorldProvider worldProvider;
     private PhysicsEngine physics;
 
+    // Movement Modifier
+    private float movementModifier = 1.0f;
+
     public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
         physics = physicsEngine;
@@ -125,6 +125,11 @@ public class KinematicCharacterMover implements CharacterMover {
         GetMaxSpeedEvent speedEvent = new GetMaxSpeedEvent(characterMovement.mode.maxSpeed, characterMovement.mode);
         character.send(speedEvent);
         return Math.max(0, speedEvent.getResultValue());
+    }
+
+    @ReceiveEvent
+    public void onSetSpeedModifierEvent(SetSpeedModifierEvent event, EntityRef character) {
+        movementModifier = event.getFactor(SetSpeedModifierEvent.FactorType.UNHINGED);
     }
 
     /*
@@ -588,6 +593,10 @@ public class KinematicCharacterMover implements CharacterMover {
         float maxSpeed = getMaxSpeed(entity, movementComp);
         if (input.isRunning()) {
             maxSpeed *= movementComp.runFactor;
+        }
+
+        if (input.isRunning() && movementComp.mode == MovementMode.UNHINGED) {
+            maxSpeed *=  movementModifier;
         }
 
         // As we can't use it, remove the y component of desired movement while maintaining speed.

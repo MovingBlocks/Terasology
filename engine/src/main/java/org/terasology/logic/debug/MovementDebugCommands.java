@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.debug;
 
+import org.terasology.logic.characters.events.SetSpeedModifierEvent;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -55,6 +56,23 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Flight mode toggled";
     }
 
+    @Command(shortDescription = "Turbo speed movement", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String unhinged(@Sender EntityRef client) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.UNHINGED));
+
+        return "Unhinged mode toggled";
+    }
+
+    @Command(shortDescription = "Turbo speed modifier", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String setSpeedModifier(@Sender EntityRef client, @CommandParam("amount") float amount) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        clientComp.character.send(new SetSpeedModifierEvent(amount));
+
+        return "Speed multiplier set to " + amount ;
+    }
 
     @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
