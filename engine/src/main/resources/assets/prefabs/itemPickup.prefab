@@ -8,7 +8,7 @@
         "lifespan": 30
     },
     "RigidBody" : {
-        "mass" : 1,
+        "mass" : 10,
         "collisionGroup" : "engine:debris",
         "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
     }

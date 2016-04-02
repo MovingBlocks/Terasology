@@ -17,5 +17,6 @@
 {
     "shape" : "door",
     "rotation" : "horizontal",
-    "attachmentAllowed" : false
+    "attachmentAllowed" : false,
+    "mass" : 40
 }
