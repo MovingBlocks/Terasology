@@ -37,7 +37,7 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
     private final int marginRight;
 
     protected StringTextIconRenderer() {
-        this(false, 5, 5, 5, 10);
+        this(true, 5, 5, 5, 10);
     }
 
     protected StringTextIconRenderer(boolean wrap, int marginTop, int marginBottom, int marginLeft, int marginRight) {
