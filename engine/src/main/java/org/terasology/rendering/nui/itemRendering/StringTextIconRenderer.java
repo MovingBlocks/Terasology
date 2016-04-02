@@ -37,7 +37,7 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
     private final int marginRight;
 
     protected StringTextIconRenderer() {
-        this(true, 5, 5, 5, 10);
+        this(false, 5, 5, 5, 10);
     }
 
     protected StringTextIconRenderer(boolean wrap, int marginTop, int marginBottom, int marginLeft, int marginRight) {
@@ -66,25 +66,28 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
         // Drawing the text, adjusting for icon width
         String text = getString(value);
         int iconWidth = marginLeft + texture.getWidth() + marginRight;
+        Rect2i textRegion =  Rect2i.createFromMinAndSize(iconWidth, 0, canvas.getRegion().width() - iconWidth, canvas.getRegion().height());
 
         if (wrap) {
-            canvas.drawText(text, Rect2i.createFromMinAndSize(iconWidth, 0, canvas.getRegion().width() - iconWidth, canvas.getRegion().height()));
+            canvas.drawText(text, textRegion);
         } else {
-            int width = canvas.size().x - iconWidth;
+            int maxTextWidth = canvas.size().x - iconWidth;
             Font font = canvas.getCurrentStyle().getFont();
-            if (font.getWidth(text) <= width) {
-                canvas.drawText(text);
+
+            // If text does not horizontally fit within the canvas, shrink it
+            if (font.getWidth(text) <= maxTextWidth) {
+                canvas.drawText(text, textRegion);
             } else {
                 String shortText = "...";
                 StringBuilder sb = new StringBuilder(text);
                 while (sb.length() > 0) {
                     shortText = sb.toString() + "...";
-                    if (font.getWidth(shortText) <= width) {
+                    if (font.getWidth(shortText) <= maxTextWidth) {
                         break;
                     }
                     sb.setLength(sb.length() - 1);
                 }
-                canvas.drawText(shortText, Rect2i.createFromMinAndSize(iconWidth, 0, canvas.getRegion().width() - iconWidth, canvas.getRegion().height()));
+                canvas.drawText(shortText, textRegion);
             }
         }
     }
