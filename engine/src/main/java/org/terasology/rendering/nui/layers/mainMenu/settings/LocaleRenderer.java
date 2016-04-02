@@ -16,15 +16,18 @@
 
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
-import java.util.Locale;
-
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.itemRendering.StringTextIconRenderer;
+import org.terasology.utilities.Assets;
+
+import java.util.Locale;
+import java.util.Optional;
 
 /**
- * Renders locale in the format "{@literal <native name> (<English name>)}".
+ * Renders locale in the format "{@literal <native name> (<English name>)}" along with a flag icon.
  */
-public class LocaleRenderer extends StringTextRenderer<Locale> {
+public class LocaleRenderer extends StringTextIconRenderer<Locale> {
 
     private final TranslationSystem translationSystem;
 
@@ -42,5 +45,13 @@ public class LocaleRenderer extends StringTextRenderer<Locale> {
         return String.format("%s (%s)", nat, eng);
     }
 
-
+    @Override
+    public Texture getTexture(Locale value) {
+        Optional<Texture> texture = Assets.getTexture(String.format("engine:flag_%s", value.getLanguage()));
+        if (texture.isPresent()) {
+            return texture.get();
+        } else {
+            return Assets.getTexture("engine:flag_fallback").get();
+        }
+    }
 }
