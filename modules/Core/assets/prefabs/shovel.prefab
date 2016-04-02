@@ -6,6 +6,5 @@
     "Item": {
         "icon": "engine:items#shovel",
         "damageType": "shovelDamage"
-    },
-    "mass": 42
+    }
 }

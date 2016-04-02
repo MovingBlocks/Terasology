@@ -6,6 +6,5 @@
     "Item" : {
         "icon" : "engine:items#axe",
         "damageType" : "axeDamage"
-    },
-    "mass": 42
+    }
 }
