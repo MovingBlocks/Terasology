@@ -126,9 +126,9 @@ public class TreeTests {
             };
 
             Random random = new MersenneRandom(seed);
-            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+            BlockManager blockManagerLocal = CoreRegistry.get(BlockManager.class);
             Vector3i relPos = chunk.chunkToWorldPosition(0, 0, 0).sub(pos).invert();
-            treeGen.generate(blockManager, chunk, random, relPos.x, relPos.y, relPos.z);
+            treeGen.generate(blockManagerLocal, chunk, random, relPos.x, relPos.y, relPos.z);
         }
 
         Vector3i ext = new Vector3i(max).sub(min);

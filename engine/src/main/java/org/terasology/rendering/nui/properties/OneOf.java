@@ -15,10 +15,6 @@
  */
 package org.terasology.rendering.nui.properties;
 
-/**
- * Created by synopia on 03.01.14.
- */
-
 import org.terasology.module.sandbox.API;
 
 import java.lang.annotation.ElementType;
@@ -33,7 +29,7 @@ public interface OneOf {
     @API
     public @interface Enum {
         String label() default "";
-        
+
         String description() default "";
     }
 
@@ -42,7 +38,7 @@ public interface OneOf {
     @API
     public @interface List {
         String label() default "";
-        
+
         String description() default "";
 
         String[] items();
@@ -53,7 +49,7 @@ public interface OneOf {
     @API
     public @interface Provider {
         String label() default "";
-        
+
         String description() default "";
 
         String name();

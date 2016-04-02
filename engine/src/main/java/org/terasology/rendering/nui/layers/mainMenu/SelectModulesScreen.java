@@ -178,7 +178,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
                                                     sortedModules.add(m);
                                                 }
                                         }
-                                    moduleList.update(0.1f);
                                 }
                         });
                 }
@@ -513,6 +512,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     int pos = Collections.binarySearch(sortedModules, info, moduleInfoComparator);
                     if (pos < 0) {                             // not yet in the (sorted) list
                         sortedModules.add(-pos - 1, info);     // use "insertion point" to keep the list sorted
+                        allSortedModules.clear();
+                        allSortedModules.addAll(sortedModules);
                     }
                 }
                 info.setOnlineVersion(remote);

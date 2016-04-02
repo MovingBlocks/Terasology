@@ -23,9 +23,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 
-/**
- * @author Benjamin Glatzel
- */
 public class PropertySlider extends JPanel implements ChangeListener {
 
     private static final long serialVersionUID = 3157887601371629996L;

@@ -19,12 +19,6 @@ package org.terasology.physics.events;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3f;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Pencilcheck
- * Date: 12/23/12
- * Time: 12:30 AM
- */
 public class MovedEvent implements Event {
     private Vector3f delta;
     private Vector3f finalPosition;

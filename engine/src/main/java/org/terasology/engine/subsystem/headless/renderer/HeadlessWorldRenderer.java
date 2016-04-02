@@ -82,22 +82,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public ChunkProvider getChunkProvider() {
-        return chunkProvider;
-    }
-
-    @Override
-    public WorldProvider getWorldProvider() {
-        return worldProvider;
-    }
-
-    @Override
-    public void setPlayer(LocalPlayer localPlayer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void update(float delta) {
 
         worldProvider.processPropagation();
@@ -114,7 +98,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void render(WorldRenderingStage mono) {
+    public void render(RenderingStage mono) {
         // TODO Auto-generated method stub
 
     }
@@ -132,43 +116,31 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void changeViewDistance(ViewDistance viewDistance) {
+    public void setViewDistance(ViewDistance viewDistance) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public float getSunlightValue() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public float getBlockLightValue() {
+    public float getRenderingLightIntensityAt(Vector3f vector3f) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public float getRenderingLightValueAt(Vector3f vector3f) {
+    public float getMainLightIntensityAt(Vector3f worldPos) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public float getSunlightValueAt(Vector3f worldPos) {
+    public float getBlockLightIntensityAt(Vector3f worldPos) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public float getBlockLightValueAt(Vector3f worldPos) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public float getSmoothedPlayerSunlightValue() {
+    public float getTimeSmoothedMainLightIntensity() {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -180,19 +152,13 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public Vector3f getTint() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public float getTick() {
+    public float getMillisecondsSinceRenderingStart() {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public WorldRenderingStage getCurrentRenderStage() {
+    public RenderingStage getCurrentRenderStage() {
         // TODO Auto-generated method stub
         return null;
     }

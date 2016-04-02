@@ -9,6 +9,22 @@
 !.gitignore
 !.github
 
+# Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
+extensions
+/facades/*
+!/facades/PC
+!/facades/TeraEd
+!/facades/subprojects.gradle
+/modules/*
+!/modules/Core
+!/modules/CoreSampleGameplay
+!/modules/BuilderSampleGameplay
+!/modules/subprojects.gradle
+/meta/*
+!/meta/subprojects.gradle
+/libs/*
+!/libs/subprojects.gradle
+
 # Ignore Gradle, including local override properties (template file available under /templates)
 build/
 gradle.properties
@@ -39,6 +55,15 @@ facades/PC/Terasology.launch
 
 #Ignore OSX
 Icon
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.DocumentRevisions-V100
+.TemporaryItems
+.Trashes
+.dbfseventsd
+.fseventsd
+.VolumeIcon.icns
 
 #Ignore Windows
 ehthumbs.db
@@ -64,25 +89,5 @@ entityDump.txt
 /natives/
 config/metrics/
 
-# Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
-extensions
-/facades/*
-!/facades/PC
-!/facades/TeraEd
-!/facades/subprojects.gradle
-/modules/*
-!/modules/Core
-!/modules/CoreSampleGameplay
-!/modules/BuilderSampleGameplay
-!/modules/subprojects.gradle
-/meta/*
-!/meta/subprojects.gradle
-/libs/*
-!/libs/subprojects.gradle
 
 # Ignore weird stuff that might be obsolete
-.DS_Store
-.DS_Store?
-.Spotlight-V100
-.Trashes
-

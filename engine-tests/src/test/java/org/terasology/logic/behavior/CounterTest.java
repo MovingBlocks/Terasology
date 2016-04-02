@@ -20,9 +20,6 @@ import org.junit.Test;
 import org.terasology.logic.behavior.tree.CounterNode;
 import org.terasology.logic.behavior.tree.Interpreter;
 
-/**
- * Created by synopia on 11.01.14.
- */
 public class CounterTest {
 
     @Test

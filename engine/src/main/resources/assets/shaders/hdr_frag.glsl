@@ -19,7 +19,7 @@
 // #define BURGESS_TONEMAP
 
 uniform sampler2D texScene;
-uniform float exposure = 1.0;
+uniform float exposure = 1;
 uniform float whitePoint = W;
 
 void main(){
@@ -31,11 +31,9 @@ void main(){
 #endif
 
 #ifdef UNCHARTED_2_TONEMAP
-    color.rgb *= exposure;
-    vec3 adjColor = uncharted2Tonemap(color.rgb);
-    vec3 whiteScale = 1.0/uncharted2Tonemap(vec3(whitePoint));
-    vec3 finalColor = adjColor*whiteScale;
-    color.rgb = finalColor;
+    //HDR tone mapping using Uncharted 2 method
+    // http://frictionalgames.blogspot.com/2012/09/tech-feature-hdr-lightning.html
+    color.rgb = uncharted2Tonemap(color.rgb * exposure) / uncharted2Tonemap(vec3(whitePoint));
 #endif
 
 #ifdef BURGESS_TONEMAP

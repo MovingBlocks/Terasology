@@ -19,9 +19,6 @@ import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.PriorityQueue;
 
-/**
- * Created by manu on 25.12.2014.
- */
 public class RenderQueuesHelper {
     public final PriorityQueue<RenderableChunk> chunksOpaque;
     public final PriorityQueue<RenderableChunk> chunksOpaqueShadow;

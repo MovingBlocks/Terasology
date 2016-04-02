@@ -21,9 +21,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
 
-/**
- * Created by synopia on 06.01.14.
- */
 public class MigComponent implements ComponentWrapper {
     private Vector2i pos = new Vector2i();
     private Vector2i size = new Vector2i();

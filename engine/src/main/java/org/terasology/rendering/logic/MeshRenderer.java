@@ -198,8 +198,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
                     meshComp.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
                     meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
-                    meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
-                    meshComp.material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
+                    meshComp.material.setFloat("light", worldRenderer.getRenderingLightIntensityAt(worldPos), true);
+                    meshComp.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
 
                     OpenGLMesh mesh = (OpenGLMesh) meshComp.mesh;
                     meshComp.material.bindTextures();
@@ -288,8 +288,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
-                        material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
-                        material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
+                        material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
+                        material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
                         lastMesh.doRender();
                     }

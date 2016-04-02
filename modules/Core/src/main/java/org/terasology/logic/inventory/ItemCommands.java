@@ -16,10 +16,12 @@
 
 package org.terasology.logic.inventory;
 
+import com.google.common.base.Joiner;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -30,8 +32,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
 
-/**
- */
+import java.util.Set;
+
 @RegisterSystem
 public class ItemCommands extends BaseComponentSystem {
 
@@ -42,10 +44,10 @@ public class ItemCommands extends BaseComponentSystem {
     private InventoryManager inventoryManager;
 
     @In
-    private PrefabManager prefabManager;
+    private EntityManager entityManager;
 
     @In
-    private EntityManager entityManager;
+    private AssetManager assetManager;
 
     @Command(shortDescription = "Adds an item to your inventory", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -53,16 +55,30 @@ public class ItemCommands extends BaseComponentSystem {
             @Sender EntityRef client,
             @CommandParam("prefabId or blockName") String itemPrefabName,
             @CommandParam(value = "amount", required = false) Integer amount) {
-        Prefab prefab = prefabManager.getPrefab(itemPrefabName);
-        if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
-            EntityRef item = entityManager.create(prefab);
-            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-            if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
-                item.destroy();
-            }
-            return "You received an item of " + prefab.getName();
-        } else {
-            return blockCommands.giveBlock(client, itemPrefabName, amount, null);
+        Set<ResourceUrn> matches = assetManager.resolve(itemPrefabName, Prefab.class);
+        switch(matches.size()) {
+            case 0:
+                return "Could not find any item matching \"" + itemPrefabName + "\"";
+            case 1:
+                Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
+                if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
+                    EntityRef item = entityManager.create(prefab);
+                    EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+                    if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
+                        item.destroy();
+                    }
+                    return "You received an item of " + prefab.getName();
+                } else {
+                    return blockCommands.giveBlock(client, itemPrefabName, amount, null);
+                }
+            default:
+                StringBuilder builder = new StringBuilder();
+                builder.append("Requested item \"");
+                builder.append(itemPrefabName);
+                builder.append("\": matches ");
+                Joiner.on(" and ").appendTo(builder, matches);
+                builder.append(". Please fully specify one.");
+                return builder.toString();
         }
     }
 

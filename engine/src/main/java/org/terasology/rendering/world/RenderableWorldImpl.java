@@ -44,9 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-/**
- * Created by manu on 24.12.2014.
- */
 public class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
@@ -63,9 +60,9 @@ public class RenderableWorldImpl implements RenderableWorld {
 
     private ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
-    // TODO: Review usage of ChunkImpl throughout WorldRenderer
     private final List<RenderableChunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private Region3i renderableRegion = Region3i.EMPTY;
+    private ViewDistance currentViewDistance = null;
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
@@ -224,9 +221,14 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     @Override
-    public boolean updateChunksInProximity(ViewDistance viewDistance) {
-        logger.info("New Viewing Distance: {}", viewDistance);
-        return updateChunksInProximity(calculateRenderableRegion(viewDistance));
+    public boolean updateChunksInProximity(ViewDistance newViewDistance) {
+        if(newViewDistance != currentViewDistance) {
+            logger.info("New Viewing Distance: {}", newViewDistance);
+            currentViewDistance = newViewDistance;
+            return updateChunksInProximity(calculateRenderableRegion(newViewDistance));
+        } else {
+            return false;
+        }
     }
 
     private Region3i calculateRenderableRegion(ViewDistance newViewDistance) {

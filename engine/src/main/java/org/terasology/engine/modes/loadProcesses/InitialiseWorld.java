@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
@@ -63,8 +64,6 @@ import org.terasology.world.sun.DefaultCelestialSystem;
 import java.io.IOException;
 import java.nio.file.Path;
 
-/**
- */
 public class InitialiseWorld extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(InitialiseWorld.class);
@@ -131,10 +130,9 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
                 blockManager, biomeManager);
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(
-                new WorldProviderCoreImpl(worldInfo, chunkProvider, blockManager.getBlock(BlockManager.UNLOADED_ID),
-                        context)
-                , context);
+        Block unloadedBlock = blockManager.getBlock(BlockManager.UNLOADED_ID);
+        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock, context);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
         context.put(WorldProvider.class, worldProvider);
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);

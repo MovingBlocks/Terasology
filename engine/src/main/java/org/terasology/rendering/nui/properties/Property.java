@@ -21,9 +21,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 
 import com.google.common.base.Preconditions;
 
-/**
- * Created by synopia on 03.01.14.
- */
 public class Property<P, UI extends UIWidget> {
     private final Binding<P> binding;
     private final UI editor;
@@ -32,7 +29,7 @@ public class Property<P, UI extends UIWidget> {
 
     public Property(String labelText, Binding<P> binding, UI editor, String description) {
         Preconditions.checkArgument(editor != null, "editor must not be null");
-        
+
         this.binding = binding;
         this.editor = editor;
         this.description = description;
@@ -49,7 +46,7 @@ public class Property<P, UI extends UIWidget> {
     public Binding<P> getBinding() {
         return binding;
     }
-    
+
     public String getDescription() {
         return description;
     }

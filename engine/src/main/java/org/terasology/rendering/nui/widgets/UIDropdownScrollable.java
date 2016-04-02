@@ -161,7 +161,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
         // Set the range of Scrollbar
         float maxVertBarDesired = itemHeight * (optionListeners.size() - visibleOptionsNum - 0.5f) + itemMargin.getBottom();
-        verticalBar.setRange((int)maxVertBarDesired);
+        verticalBar.setRange((int) maxVertBarDesired);
 
         for (int i = 0; i < optionListeners.size(); ++i) {
             readItemMouseOver(canvas, i);

@@ -21,8 +21,6 @@ import org.terasology.world.ChunkView;
 
 /**
  * This is used to generate Mesh data from a block in a chunk to a ChunkMesh output.
- *
- * Created by overminddl1 on 4/15/15.
  */
 @API
 public interface BlockMeshGenerator {

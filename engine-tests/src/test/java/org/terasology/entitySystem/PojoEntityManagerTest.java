@@ -64,9 +64,9 @@ import static org.mockito.Mockito.verify;
  */
 public class PojoEntityManagerTest {
 
+    private static Context context;
     private PojoEntityManager entityManager;
     private Prefab prefab;
-    private static Context context;
 
     @BeforeClass
     public static void setupClass() throws Exception {

@@ -16,12 +16,8 @@
 package org.terasology.logic.behavior;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.logic.behavior.nui.Port;
 import org.terasology.logic.behavior.nui.PortList;
 import org.terasology.logic.behavior.nui.RenderableNode;
@@ -29,9 +25,6 @@ import org.terasology.logic.behavior.tree.CompositeNode;
 import org.terasology.logic.behavior.tree.DecoratorNode;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Task;
-import org.terasology.registry.CoreRegistry;
-
-import static org.mockito.Mockito.mock;
 
 /**
  */

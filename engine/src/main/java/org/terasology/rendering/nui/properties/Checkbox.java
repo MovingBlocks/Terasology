@@ -22,14 +22,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Created by synopia on 03.01.14.
- */
 @API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Checkbox {
     String label() default "";
-    
+
     String description() default "";
 }

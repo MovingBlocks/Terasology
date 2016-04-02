@@ -56,8 +56,8 @@ import static org.mockito.Mockito.mock;
  *
  */
 public abstract class TerasologyTestingEnvironment {
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
     protected static Context context;
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
     private static BlockManager blockManager;
     private static Config config;
@@ -104,12 +104,12 @@ public abstract class TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         engineEntityManager = context.get(EngineEntityManager.class);
-        BlockManager blockManager = context.get(BlockManager.class);
+        BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
         BiomeManager biomeManager = context.get(BiomeManager.class);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, biomeManager));
+                engineEntityManager, mockBlockManager, biomeManager));
 
         componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);

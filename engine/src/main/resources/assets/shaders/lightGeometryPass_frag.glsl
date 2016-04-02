@@ -89,8 +89,9 @@ void main() {
 
 #if defined (CLOUD_SHADOWS) && !defined (VOLUMETRIC_LIGHTING)
         // TODO: Add shader parameters for this...
-        float cloudOcclusion = clamp(1.0 - texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 5.0, 0.0, 1.0);
-        shadowTerm *= clamp(1.0 - cloudOcclusion + 0.25, 0.0, 1.0);
+        float cloudOcclusion = clamp(texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 4,0,.4);
+
+        shadowTerm *= rescaleRange(cloudOcclusion,0,1,0,shadowTerm);
 #endif
    }
 #endif
@@ -111,7 +112,7 @@ void main() {
     vec3 lightDirNorm = lightDir / lightDist;
 
     float ambTerm = lightAmbientIntensity;
-    float lambTerm = calcLambLight(normal, lightDirNorm);
+    float lambTerm = clamp(calcLambLight(normal, lightDirNorm) / (length(lightDirNorm) * length(normal)),0,1);
 
     // Apply "back light"
     // TODO: Make intensity a shader parameter
@@ -133,7 +134,7 @@ void main() {
 
 #if defined (FEATURE_LIGHT_POINT)
     vec3 color = ambTerm * lightColorAmbient;
-    color += lightColorDiffuse * lightDiffuseIntensity * lambTerm;
+    color *= lightColorDiffuse * lightDiffuseIntensity * lambTerm;
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
     vec3 color = calcSunlightColorDeferred(normalBuffer.a, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
 #else
@@ -141,16 +142,28 @@ void main() {
 #endif
 
 #if defined (FEATURE_LIGHT_POINT)
-    //float attenuation = clamp (1.0 - ((lightDist * lightDist) / (lightAttenuationRange * lightAttenuationRange)), 0.0, 1.0);
-    float attenuation = clamp(1.0 - (pow (lightDist, lightAttenuationFalloff) / lightAttenuationRange), 0.0, 1.0);
 
-    specular *= attenuation;
-    color *= attenuation;
+
+    //ref: https://imdoingitwrong.wordpress.com/2011/01/31/light-attenuation/
+    // TODO: Make cutoff a shader parameter
+    const float cutoff= 0.005;
+    const float radius = 3.0;
+    // calculate basic attenuation
+    float denom = lightDist/radius + 1;
+    float attenuation = 1.0/(denom*denom);
+    //float attenuation = clamp (1.0 - ((lightDist * lightDist) / (lightAttenuationRange * lightAttenuationRange)), 0.0, 1.0);
+    //float attenuation = 1.0 - (pow (lightDist, lightAttenuationFalloff) / lightAttenuationRange);
+
+    attenuation = (attenuation - cutoff)/(1.0-cutoff);
+    attenuation = max(attenuation,0);
+
+    specular *= attenuation  * max(dot(lightDir/ lightDist, normal), 0);
+    color *= attenuation * max(dot(lightDir/ lightDist, normal), 0);
 #endif
 
 // TODO A 3D wizard should take a look at this. Configurable for the moment to make better comparisons possible.
 #if defined (CLAMP_LIGHTING)
-    gl_FragData[0].rgba = clamp(vec4(color.r, color.g, color.b, specular), 0.0, 1.05);
+    gl_FragData[0].rgba = clamp(vec4(color.r, color.g, color.b, specular), 0.0, 1.0);
 #else
     gl_FragData[0].rgba = vec4(color.r, color.g, color.b, specular);
 #endif

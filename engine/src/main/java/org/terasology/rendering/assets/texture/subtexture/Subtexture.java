@@ -68,8 +68,8 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     @Override
     public Rect2i getPixelRegion() {
-        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(subregion.minX() * texture.getWidth())
-                , TeraMath.floorToInt(subregion.minY() * texture.getHeight()), getWidth(), getHeight());
+        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(subregion.minX() * texture.getWidth()),
+                TeraMath.floorToInt(subregion.minY() * texture.getHeight()), getWidth(), getHeight());
     }
 
     @Override

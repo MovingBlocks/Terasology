@@ -176,13 +176,15 @@ public class JoinGameScreen extends CoreScreenLayer {
         };
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage(translationSystem.translate("${engine:menu#join-game-online}"), translationSystem.translate("${engine:menu#connecting-to}") + " '" + address + ":" + port + "' - " + translationSystem.translate("${engine:menu#please-wait}"));
+        popup.setMessage(translationSystem.translate("${engine:menu#join-game-online}"),
+                translationSystem.translate("${engine:menu#connecting-to}") + " '" + address + ":" + port + "' - " + translationSystem.translate("${engine:menu#please-wait}"));
         popup.onSuccess(result -> {
             if (result.getStatus() != JoinStatus.Status.FAILED) {
                 engine.changeState(new StateLoading(result));
             } else {
                 MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                screen.setMessage(translationSystem.translate("${engine:menu#failed-to-join}"), translationSystem.translate("${engine:menu#could-not-connect-to-server}") + " - " + result.getErrorMessage());
+                screen.setMessage(translationSystem.translate("${engine:menu#failed-to-join}"),
+                        translationSystem.translate("${engine:menu#could-not-connect-to-server}") + " - " + result.getErrorMessage());
             }
         });
         popup.startOperation(operation, true);

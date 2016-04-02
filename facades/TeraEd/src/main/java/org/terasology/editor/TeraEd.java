@@ -37,8 +37,6 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 /**
  * TeraEd main class.
- *
- * @author Benjamin Glatzel
  */
 @SuppressWarnings("serial")
 public final class TeraEd extends JWindow {

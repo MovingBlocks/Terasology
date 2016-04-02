@@ -15,9 +15,6 @@
  */
 package org.terasology.editor.properties;
 
-/**
- * @author Benjamin Glatzel
- */
 public interface Property<T> {
 
     T getValue();
