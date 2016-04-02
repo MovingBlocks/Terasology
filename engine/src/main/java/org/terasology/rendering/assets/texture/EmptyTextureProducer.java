@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.collect.ImmutableSet;
@@ -30,17 +29,10 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Resolves references to <code>engine:noise</code> texture assets,
- * <br><br>
- * The noise parameters are parsed from the name of the asset, then TextureDataFactory is used to create
- * a TextureData object which is used to build the Texture.
- *
- */
 @RegisterAssetDataProducer
-public class NoiseTextureProducer implements AssetDataProducer<TextureData> {
+public class EmptyTextureProducer implements AssetDataProducer<TextureData> {
 
-    private static final Logger logger = LoggerFactory.getLogger(NoiseTextureProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(EmptyTextureProducer.class);
 
     @Override
     public Set<ResourceUrn> getAvailableAssetUrns() {
@@ -49,7 +41,7 @@ public class NoiseTextureProducer implements AssetDataProducer<TextureData> {
 
     @Override
     public Set<Name> getModulesProviding(Name resourceName) {
-        if (TextureUtil.NOISE_RESOURCE_NAME.equals(resourceName)) {
+        if (TextureUtil.EMPTY_RESOURCE_NAME.equals(resourceName)) {
             return ImmutableSet.of(TerasologyConstants.ENGINE_MODULE);
         }
         return Collections.emptySet();
@@ -62,21 +54,14 @@ public class NoiseTextureProducer implements AssetDataProducer<TextureData> {
 
     @Override
     public Optional<TextureData> getAssetData(ResourceUrn urn) throws IOException {
-        if (TerasologyConstants.ENGINE_MODULE.equals(urn.getModuleName()) && TextureUtil.NOISE_RESOURCE_NAME.equals(urn.getResourceName())) {
+        if (TerasologyConstants.ENGINE_MODULE.equals(urn.getModuleName()) && TextureUtil.EMPTY_RESOURCE_NAME.equals(urn.getResourceName())) {
             Name fragmentName = urn.getFragmentName();
             if (!fragmentName.isEmpty()) {
                 String[] parts = fragmentName.toLowerCase().split("\\.");
-                if (parts.length == 5) {
-                    String type = parts[0];
-                    int size = Integer.parseInt(parts[1]);
-                    long seed = Long.parseLong(parts[2]);
-                    int min = Integer.parseInt(parts[3]);
-                    int max = Integer.parseInt(parts[4]);
-                    TextureData textureData;
-                    switch (type) {
-                        case "white":
-                            return Optional.of(TextureDataFactory.createWhiteNoiseTexture(size, seed, min, max));
-                    }
+                if (parts.length == 3) {
+                    int width = Integer.parseInt(parts[0]);
+                    int height = Integer.parseInt(parts[1]);
+                    return Optional.of(new TextureData(width,height, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR));
                 }
             }
         }

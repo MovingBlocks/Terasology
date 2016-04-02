@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector4f;
@@ -92,43 +93,48 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
 
+        FBO sceneReflected = buffersManager.getFBO("sceneReflected");
+        FBO sceneOpaque = buffersManager.getFBO("sceneOpaque");
+
         int texId = 0;
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, terrain.get().getId());
-        program.setInt("textureAtlas", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, water.get().getId());
-        program.setInt("textureWater", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, lava.get().getId());
-        program.setInt("textureLava", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.get().getId());
-        program.setInt("textureWaterNormal", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.get().getId());
-        program.setInt("textureWaterNormalAlt", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        glBindTexture(GL11.GL_TEXTURE_2D, effects.get().getId());
-        program.setInt("textureEffects", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffersManager.bindFboColorTexture("sceneReflected");
-        program.setInt("textureWaterReflection", texId++, true);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffersManager.bindFboColorTexture("sceneOpaque");
-        program.setInt("texSceneOpaque", texId++, true);
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //glBindTexture(GL11.GL_TEXTURE_2D, terrain.get().getId());
+        program.setTexture("textureAtlas", terrain.get());
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //glBindTexture(GL11.GL_TEXTURE_2D, water.get().getId());
+        program.setTexture("textureWater",water.get());
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //glBindTexture(GL11.GL_TEXTURE_2D, lava.get().getId());
+        program.setTexture("textureLava", lava.get());
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.get().getId());
+        program.setTexture("textureWaterNormal",waterNormal.get());
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.get().getId());
+        program.setTexture("textureWaterNormalAlt", waterNormalAlt.get());
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //glBindTexture(GL11.GL_TEXTURE_2D, effects.get().getId());
+        program.setTexture("textureEffects", effects.get());
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //buffersManager.bindFboColorTexture("sceneReflected");
+        program.setTexture("textureWaterReflection", sceneReflected.getTextureBuffer(FBO.BaseFboBuffer.COLOR_TEXTURE));
+        //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        //buffersManager.bindFboColorTexture("sceneOpaque");
+        program.setTexture("texSceneOpaque", sceneOpaque.getTextureBuffer(FBO.BaseFboBuffer.COLOR_TEXTURE));
 
         if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.get().getId());
-            program.setInt("textureAtlasNormal", texId++, true);
+            //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+            //glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.get().getId());
+            program.setTexture("textureAtlasNormal", terrainNormal.get());
 
             if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()) {
-                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.get().getId());
-                program.setInt("textureAtlasHeight", texId++, true);
+                //GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+                //glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.get().getId());
+                program.setTexture("textureAtlasHeight", terrainHeight.get());
             }
         }
+
+        program.bindTextures();
 
         Vector4f lightingSettingsFrag = new Vector4f();
         lightingSettingsFrag.z = waterSpecExp;

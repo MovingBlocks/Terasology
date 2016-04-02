@@ -227,10 +227,10 @@ public class GLSLMaterial extends BaseMaterial {
             texId = bindMap.get(desc);
         } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
-            ShaderParameterMetadata metadata = shader.getParameter(desc);
-            if (metadata == null || !metadata.getType().isTexture()) {
-                return;
-            }
+           // ShaderParameterMetadata metadata = shader.getParameter(desc);
+           // if (metadata == null || !metadata.getType().isTexture()) {
+           //     return;
+           // }
             texId = textureIndex++;
 
             // Make sure to bind the texture for all permutations

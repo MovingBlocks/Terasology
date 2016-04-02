@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBHalfFloatPixel;
 import org.lwjgl.opengl.ARBTextureFloat;
@@ -25,12 +26,16 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureUtil;
+import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Map;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
-import static org.lwjgl.opengl.GL11.glGenTextures;
 
 /**
  * FBO - Frame Buffer Object
@@ -50,12 +55,15 @@ public final class FBO {
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 
     public int fboId;
-    public int colorBufferTextureId;
-    public int depthStencilTextureId;
-    public int depthStencilRboId;
-    public int normalsBufferTextureId;
-    public int lightBufferTextureId;
+    public enum BaseFboBuffer {
+        COLOR_TEXTURE,
+        DEPTH_STENCIL_TEXTURE,
+        NORMAL_BUFFER_TEXTURE,
+        LIGHT_BUFFER_TEXTURE
+    }
 
+    public int depthStencilRboId;
+    private Map<String,Texture> textureMapping = Maps.newHashMap();
     private final Dimensions dimensions;
 
     private Status status;
@@ -100,12 +108,70 @@ public final class FBO {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
+
+
+    /**
+     *  Get the texture ID for the identifier
+     * @param identifier
+     * @return
+     */
+    public static ResourceUrn getTextureUrn(Dimensions dimensions, FBO fboId, String identifier) {
+        return TextureUtil.getTextureUriForEmpty(dimensions.width(),dimensions.height(),"fbo_"+fboId.fboId+"_" + identifier);
+    }
+
+    /**
+     * returns an existing texture in Assets or creates a new instance if one does not exist
+     * @param identifier
+     * @return
+     */
+    //TODO: need a method to bind the texture to the FBO
+    private Texture getTextureInstance(String identifier) {
+        ResourceUrn urn = FBO.getTextureUrn(dimensions,this,identifier);
+
+        Texture texture = Assets.getTexture(urn).get();
+        this.textureMapping.put(urn.toString(),texture);
+        return texture;
+    }
+
+    /**
+     *   returns an existing texture in Assets or creates a new instance if one does not exist
+     * @param buffer
+     * @return
+     */
+    //TODO: needs a method to bind the texture to the FBO
+    private Texture getTextureInstance(BaseFboBuffer buffer) {
+        return  this.getTextureInstance(buffer.name());
+    }
+
+    /**
+     * returns a texture object for the identifier else returns null if one does not exist
+     * @param identifier
+     * @return a texture bound to fhte FBO
+     */
+    public Texture getTextureBuffer(String identifier) {
+        ResourceUrn resource = this.getTextureUrn(dimensions,this,identifier);
+        if(!this.textureMapping.containsKey(resource.toString())) {
+             return null;
+        }
+        return this.textureMapping.get(resource.toString());
+    }
+
+    /**
+     * get a texture Instance
+     * @param buffer
+     * @return
+     */
+    public Texture getTextureBuffer(BaseFboBuffer buffer) {
+        return  this.getTextureBuffer(buffer.name());
+    }
+
     /**
      * Binds the color attachment to the currently active texture unit.
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorBufferTextureId);
+        Texture texture = this.getTextureBuffer(BaseFboBuffer.COLOR_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
     }
 
     /**
@@ -113,7 +179,8 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindDepthTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
+        Texture texture = this.getTextureBuffer(BaseFboBuffer.DEPTH_STENCIL_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
     }
 
     /**
@@ -121,7 +188,8 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindNormalsTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsBufferTextureId);
+        Texture texture = this.getTextureBuffer(BaseFboBuffer.NORMAL_BUFFER_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
     }
 
     /**
@@ -129,7 +197,8 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindLightBufferTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
+        Texture texture = this.getTextureBuffer(BaseFboBuffer.LIGHT_BUFFER_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
     }
 
     /**
@@ -152,7 +221,8 @@ public final class FBO {
         target.bind();
 
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthStencilRboId);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, depthStencilTextureId, 0);
+        Texture texture = this.getTextureBuffer(BaseFboBuffer.DEPTH_STENCIL_TEXTURE);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, texture.getId(), 0);
 
         target.unbind();
     }
@@ -164,9 +234,9 @@ public final class FBO {
     public void dispose() {
         glDeleteFramebuffersEXT(fboId);
         glDeleteRenderbuffersEXT(depthStencilRboId);
-        GL11.glDeleteTextures(normalsBufferTextureId);
-        GL11.glDeleteTextures(depthStencilTextureId);
-        GL11.glDeleteTextures(colorBufferTextureId);
+        for (Map.Entry<String, Texture> texture :textureMapping.entrySet()) {
+            texture.getValue().dispose();
+        }
         status = Status.DISPOSED;
     }
 
@@ -285,6 +355,7 @@ public final class FBO {
         }
         bufferIds.flip();
 
+
         if (bufferIds.limit() == 0) {
             GL11.glReadBuffer(GL11.GL_NONE);
             GL20.glDrawBuffers(GL11.GL_NONE);
@@ -358,9 +429,11 @@ public final class FBO {
         }
     }
 
+
     private static void createColorBuffer(FBO fbo, Dimensions dimensions, Type type) {
-        fbo.colorBufferTextureId = glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.colorBufferTextureId);
+
+        Texture texture = fbo.getTextureInstance(BaseFboBuffer.COLOR_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
 
         setTextureParameters(GL11.GL_LINEAR);
 
@@ -370,23 +443,23 @@ public final class FBO {
             allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
         }
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.colorBufferTextureId, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, texture.getId(), 0);
     }
 
     private static void createNormalsBuffer(FBO fbo, Dimensions dimensions) {
-        fbo.normalsBufferTextureId = glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsBufferTextureId);
+        Texture texture = fbo.getTextureInstance(BaseFboBuffer.NORMAL_BUFFER_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
 
         setTextureParameters(GL11.GL_LINEAR);
 
         allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsBufferTextureId, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, texture.getId(), 0);
     }
 
     private static void createLightBuffer(FBO fbo, Dimensions dimensions, Type type) {
-        fbo.lightBufferTextureId = glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId);
+        Texture texture = fbo.getTextureInstance(BaseFboBuffer.LIGHT_BUFFER_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
 
         setTextureParameters(GL11.GL_LINEAR);
 
@@ -396,12 +469,12 @@ public final class FBO {
             allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
         }
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D,texture.getId(), 0);
     }
 
     private static void createDepthBuffer(FBO fbo, Dimensions dimensions, boolean useStencilBuffer) {
-        fbo.depthStencilTextureId = glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId);
+        Texture texture = fbo.getTextureInstance(BaseFboBuffer.DEPTH_STENCIL_TEXTURE);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
 
         setTextureParameters(GL11.GL_NEAREST);
 
@@ -426,10 +499,10 @@ public final class FBO {
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D,  texture.getId(), 0);
 
         if (useStencilBuffer) {
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D,  texture.getId(), 0);
         }
     }
 

@@ -38,6 +38,7 @@ public class TextureData implements AssetData {
         this.height = height;
         this.wrapMode = wrapMode;
         this.filterMode = filterMode;
+        this.data = new ByteBuffer[0];
     }
 
     public TextureData(int width, int height, ByteBuffer[] mipmaps, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, Texture.Type type) {
