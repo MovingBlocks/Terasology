@@ -15,35 +15,17 @@
  */
 package org.terasology.rendering.nui.animation;
 
-/*
- * Base linear interpolator, should typically be extended from.
- */
-public class BaseInterpolator implements Interpolator {
-    protected float start;
-    protected float end;
+import org.terasology.rendering.nui.Color;
 
-    public BaseInterpolator() {
-        start = 0;
-        end = 1;
-    }
-
-    public float getInterpolation(float v) {
-        return v * (end - start) + start;
-    }
-
-    public void setStart(float v) {
-        this.start = v;
-    }
-
-    public float getStart() {
-        return start;
-    }
-
-    public void setEnd(float v) {
-        this.end = v;
-    }
-
-    public float getEnd() {
-        return end;
+public abstract class ColorInterpolator implements Frame.FrameComponentInterface {
+    public Object computeInterpolation(float v, Object theFrom, Object theTo) {
+        Color f = (Color) theFrom;
+        Color t = (Color) theTo;
+        return new Color(
+            v * (t.r() - f.r()) + f.r(),
+            v * (t.g() - f.g()) + f.g(),
+            v * (t.b() - f.b()) + f.b(),
+            v * (t.a() - f.a()) + f.a()
+        );
     }
 }

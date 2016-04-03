@@ -15,14 +15,12 @@
  */
 package org.terasology.rendering.nui.animation;
 
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-
 import java.util.List;
 import java.util.ArrayList;
 
 /*
  */
-public abstract class AbstractAnimation implements UpdateSubscriberSystem {
+public class Animation {
     private List<AnimationListener> listeners;
     private List<Frame> frames;
     private int repeat;
@@ -31,11 +29,11 @@ public abstract class AbstractAnimation implements UpdateSubscriberSystem {
     private int currentRepeatCount;
 
     private enum AnimState {
-        STOPPED, PAUSED, RUNNING
+        STOPPED, PAUSED, RUNNING, FINISHED
     }
     private AnimState currentState;
 
-    public AbstractAnimation() {
+    public Animation() {
         listeners = new ArrayList<AnimationListener>();
         frames = new ArrayList<Frame>();
         currentState = AnimState.STOPPED;
@@ -53,6 +51,8 @@ public abstract class AbstractAnimation implements UpdateSubscriberSystem {
         for (AnimationListener li : this.listeners) {
             li.onStart();
         }
+        // AnimationSystem.addInstance(this);
+        // TODO: Find way to start animation
     }
 
     public void update(float delta) {
@@ -75,7 +75,7 @@ public abstract class AbstractAnimation implements UpdateSubscriberSystem {
     }
 
     private void onEnd() {
-        this.currentState = AnimState.STOPPED;
+        this.currentState = AnimState.FINISHED;
         for (AnimationListener li : this.listeners) {
             li.onEnd(this.currentRepeatCount);
         }
@@ -87,6 +87,10 @@ public abstract class AbstractAnimation implements UpdateSubscriberSystem {
 
     public void removeListener(AnimationListener li) {
         this.listeners.remove(li);
+    }
+
+    public boolean isFinished() {
+        return currentState.equals(AnimState.FINISHED);
     }
 
     public interface AnimationListener {
