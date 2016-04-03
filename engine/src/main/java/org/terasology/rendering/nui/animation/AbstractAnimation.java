@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,60 +15,58 @@
  */
 package org.terasology.rendering.nui.animation;
 
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+
 import java.util.List;
 import java.util.ArrayList;
 
 /*
  */
-public abstract class AbstractAnimation {
-    private List<AnimationListener> myListeners;
-    private List<AbstractFrame> myFrames;
+public abstract class AbstractAnimation implements UpdateSubscriberSystem {
+    private List<AnimationListener> listeners;
+    private List<Frame> frames;
+    private int repeat;
 
-    /** If the current frame starts from the last */
-    private AbstractFrame myLastFrame;
-
-    private float myCurrentDuration;
-    private int myCurrentRepeatCount;
-
-    private RepeatType myRepeatType;
-    private int myRepeatCount;
+    private float elapsedTime;
+    private int currentRepeatCount;
 
     private enum AnimState {
-        STOPPED, RUNNING
+        STOPPED, PAUSED, RUNNING
     }
-    private AnimState myState;
+    private AnimState currentState;
 
     public AbstractAnimation() {
-        myListeners = new ArrayList<AnimationListener>();
-        myFrames = new ArrayList<AbstractFrame>();
-        myLastFrame = null;
-        myState = AnimState.STOPPED;
+        listeners = new ArrayList<AnimationListener>();
+        frames = new ArrayList<Frame>();
+        currentState = AnimState.STOPPED;
+        repeat = 0;
     }
 
-    public void addFrame(AbstractFrame theFrame) {
-        myFrames.add(theFrame);
+    public void addFrame(Frame frame) {
+        this.frames.add(frame);
     }
 
     public void start() {
-        myState = AnimState.RUNNING;
-        for (AnimationListener li : myListeners) {
+        elapsedTime = 0;
+        currentRepeatCount = 0;
+        this.currentState = AnimState.RUNNING;
+        for (AnimationListener li : this.listeners) {
             li.onStart();
         }
     }
 
-    public void update(float dt) {
-        switch (myState) {
-        case STOPPED:
+    public void update(float delta) {
+        switch (this.currentState) {
+        case PAUSED: case STOPPED:
             return;
         case RUNNING: {
-            if (myFrames.size() == 0) {
+            if (this.frames.size() == 0) {
                 onEnd();
                 return;
             }
-            myCurrentDuration += dt;
-            if (myCurrentDuration >= myFrames.get(0).getDuration()) {
-                myLastFrame = myFrames.get(0);
-                myFrames.remove(0);
+            elapsedTime += delta;
+            if (elapsedTime >= frames.get(0).getDuration()) {
+                frames.remove(0);
                 return;
             }
             break;
@@ -77,60 +75,18 @@ public abstract class AbstractAnimation {
     }
 
     private void onEnd() {
-        myState = AnimState.STOPPED;
-        for (AnimationListener li : myListeners) {
-            li.onEnd(myRepeatCount);
+        this.currentState = AnimState.STOPPED;
+        for (AnimationListener li : this.listeners) {
+            li.onEnd(this.currentRepeatCount);
         }
     }
 
     public void addListener(AnimationListener li) {
-        myListeners.add(li);
+        this.listeners.add(li);
     }
 
     public void removeListener(AnimationListener li) {
-        myListeners.remove(li);
-    }
-
-    public enum RepeatType {
-        REPEAT, REVERSE
-    }
-
-    public interface InterpolatorInterface {
-        /**
-         * Returns where an interpolated value should be based on
-         * where the position an animation is in.
-         *
-         * @param v position of the animation between the start and end [0:1]
-         * Or between [setStart:setEnd] if they have been called.
-         *
-         * @return where the interpolated value should be
-         */
-        float getInterpolation(float v);
-
-        void setStart(float v);
-        float getStart();
-
-        void setEnd(float v);
-        float getEnd();
-    }
-
-    public interface FrameComponentInterface<T> {
-        void setInterpolation(float v, T theFrom, T theTo);
-    }
-
-    public static class AbstractFrame {
-        private List<Object> myFromComponents;
-        private List<Object> myToComponents;
-        private FrameComponentInterface myInterface;
-        private InterpolatorInterface myInterpolation;
-
-        private RepeatType myRepeatType;
-        private int myRepeatCount;
-        private float myStartDelay;
-        private float myDuration;
-        private boolean myStartUseLastFrame;
-
-        public final float getDuration() { return myDuration; }
+        this.listeners.remove(li);
     }
 
     public interface AnimationListener {
