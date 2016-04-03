@@ -53,6 +53,10 @@ public class Frame {
         duration = 1000;
     }
 
+    public Frame() {
+        this(null);
+    }
+
     /**
      * Adds a new component to be animated for frames that do not start
      * from a previous frame. Could be a position, color, sound,
@@ -154,7 +158,16 @@ public class Frame {
          * @param v the intermediate interpolation value
          * @param theFrom the left hand value to interpolate between
          * @param toFrom the right hand value to interpolate between
+         *
+         * @return the computed interpolated value
          */
-        void setInterpolation(float v, Object theFrom, Object theTo);
+        Object computeInterpolation(float v, Object theFrom, Object theTo);
+
+        /**
+         * Recieves a computed interpolation value.
+         *
+         * @param value the interpolated value
+         */
+        void setValue(Object value);
     }
 }
