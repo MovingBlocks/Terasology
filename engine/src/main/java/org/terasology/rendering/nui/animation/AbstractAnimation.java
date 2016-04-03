@@ -21,66 +21,11 @@ import java.util.ArrayList;
 /*
  */
 public abstract class AbstractAnimation {
-    public static enum RepeatType {
-        REPEAT, REVERSE
-    }
-
-    public static interface InterpolatorInterface {
-        /**
-         * Returns where an interpolated value should be based on
-         * where the position an animation is in.
-         *
-         * @param v position of the animation between the start and end [0:1]
-         * Or between [setStart:setEnd] if they have been called.
-         *
-         * @return where the interpolated value should be
-         */
-        float getInterpolation(float v);
-
-        void setStart(float v);
-        float getStart();
-
-        void setEnd(float v);
-        float getEnd();
-    }
-
-    public static interface FrameComponentInterface<T> {
-        void setInterpolation(float v, T theFrom, T theTo);
-    }
-
-    public static class AbstractFrame {
-        private List<Object> myFromComponents;
-        private List<Object> myToComponents;
-        private FrameComponentInterface myInterface;
-        private InterpolatorInterface myInterpolation;
-
-        private RepeatType myRepeatType;
-        private int myRepeatCount;
-        private float myStartDelay, myDuration;
-        private boolean myStartUseLastFrame;
-    }
-
-    public static interface AnimationListener {
-        void onStart();
-        void onFrameStart();
-        void onStep(float v);
-        void onFrameEnd(int repeatCount);
-        void onEnd(int repeatCount);
-    }
-
-    public static class AnimationAdapter implements AnimationListener {
-        public void onStart() {}
-        public void onFrameStart() {}
-        public void onStep(float v) {}
-        public void onFrameEnd(int repeatCount) {}
-        public void onEnd(int repeatCount) {}
-    }
-
     private List<AnimationListener> myListeners;
     private List<AbstractFrame> myFrames;
 
     /** If the current frame starts from the last */
-    private List<AbstractFrame> myLastFrame;
+    private AbstractFrame myLastFrame;
 
     private float myCurrentDuration;
     private int myCurrentRepeatCount;
@@ -88,7 +33,7 @@ public abstract class AbstractAnimation {
     private RepeatType myRepeatType;
     private int myRepeatCount;
 
-    private static enum AnimState {
+    private enum AnimState {
         STOPPED, RUNNING
     }
     private AnimState myState;
@@ -144,5 +89,63 @@ public abstract class AbstractAnimation {
 
     public void removeListener(AnimationListener li) {
         myListeners.remove(li);
+    }
+
+    public enum RepeatType {
+        REPEAT, REVERSE
+    }
+
+    public interface InterpolatorInterface {
+        /**
+         * Returns where an interpolated value should be based on
+         * where the position an animation is in.
+         *
+         * @param v position of the animation between the start and end [0:1]
+         * Or between [setStart:setEnd] if they have been called.
+         *
+         * @return where the interpolated value should be
+         */
+        float getInterpolation(float v);
+
+        void setStart(float v);
+        float getStart();
+
+        void setEnd(float v);
+        float getEnd();
+    }
+
+    public interface FrameComponentInterface<T> {
+        void setInterpolation(float v, T theFrom, T theTo);
+    }
+
+    public static class AbstractFrame {
+        private List<Object> myFromComponents;
+        private List<Object> myToComponents;
+        private FrameComponentInterface myInterface;
+        private InterpolatorInterface myInterpolation;
+
+        private RepeatType myRepeatType;
+        private int myRepeatCount;
+        private float myStartDelay;
+        private float myDuration;
+        private boolean myStartUseLastFrame;
+
+        public final float getDuration() { return myDuration; }
+    }
+
+    public interface AnimationListener {
+        void onStart();
+        void onFrameStart();
+        void onStep(float v);
+        void onFrameEnd(int repeatCount);
+        void onEnd(int repeatCount);
+    }
+
+    public static class AnimationAdapter implements AnimationListener {
+        public void onStart() { }
+        public void onFrameStart() { }
+        public void onStep(float v) { }
+        public void onFrameEnd(int repeatCount) { }
+        public void onEnd(int repeatCount) { }
     }
 }
