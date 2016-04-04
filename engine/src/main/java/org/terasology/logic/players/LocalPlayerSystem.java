@@ -319,7 +319,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
 
         if (charMovementComp.mode == MovementMode.GHOSTING) {
-            playerCamera.extendFov(-24);
+            playerCamera.extendFov(24);
         } else {
             playerCamera.resetFov();
         }
