@@ -15,12 +15,17 @@
  */
 package org.terasology.rendering.nui.animation;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
+
+import java.util.Collections;
+import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
 /*
  */
-public class Animation {
+public class Animation implements Component {
     private List<AnimationListener> listeners;
     private List<Frame> frames;
     private int repeat;
