@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.animation;
 
+import org.terasology.assets.AssetData;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 
 /*
  */
-public class Animation implements Component {
+public class Animation implements Component, AssetData {
     private List<AnimationListener> listeners;
     private List<Frame> frames;
     private int repeat;
