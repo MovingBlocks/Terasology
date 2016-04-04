@@ -17,6 +17,7 @@
 package org.terasology.rendering.nui.animation;
 
 
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -43,16 +44,14 @@ import java.util.Optional;
 /**
  */
 @RegisterAssetFileFormat
-public class MaterialFormat extends AbstractAssetFileFormat<MaterialData> {
+public class AnimationFormat extends AbstractAssetFileFormat<Animation> {
 
     private final Gson gson;
-    private final AssetManager assetManager;
 
-    public MaterialFormat(AssetManager assetManager) {
+    public AnimationFormat() {
         super("anim");
         this.gson = new GsonBuilder().registerTypeAdapter
-            (Animation.class, new AnimationMetadataHandler()).create();
-        this.assetManager = assetManager;
+            (Animation.class, new AnimationHandler()).create();
     }
 
     @Override
@@ -103,3 +102,5 @@ public class MaterialFormat extends AbstractAssetFileFormat<MaterialData> {
             // }
             return metadata;
         }
+    }
+}
