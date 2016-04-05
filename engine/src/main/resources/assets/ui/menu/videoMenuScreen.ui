@@ -350,7 +350,8 @@
                                 },
                                 {
                                  "type": "UICheckbox",
-                                 "id": "volumetricFog"
+                                 "id": "volumetricFog",
+                                 "enabled": false
                                 }
                             ]
                         },
