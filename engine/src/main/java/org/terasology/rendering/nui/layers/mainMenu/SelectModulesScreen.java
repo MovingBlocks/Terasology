@@ -148,7 +148,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     } else {
                         canvas.setMode("available");
                     }
-                    canvas.drawText(getString(value), canvas.getRegion());
+                    canvas.drawText(getString(value), canvas.getRegion(), true);
                 }
 
                 @Override

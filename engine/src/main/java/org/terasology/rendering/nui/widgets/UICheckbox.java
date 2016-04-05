@@ -30,15 +30,18 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 public class UICheckbox extends CoreWidget {
     public static final String HOVER_ACTIVE_MODE = "hover-active";
 
-    private Binding<Boolean> active = new DefaultBinding<>(false);
+    private Binding<Boolean> active = new DefaultBinding<>(!this.isEnabled());
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                active.set(!active.get());
-                return true;
+            if (isEnabled()) {
+                if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                    active.set(!active.get());
+                    return true;
+                }
+                return false;
             }
             return false;
         }
@@ -50,6 +53,7 @@ public class UICheckbox extends CoreWidget {
 
     public UICheckbox(String id) {
         super(id);
+
     }
 
     @Override

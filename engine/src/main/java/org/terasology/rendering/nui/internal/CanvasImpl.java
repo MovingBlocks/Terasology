@@ -422,17 +422,23 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawText(String text) {
-        drawText(text, state.getRelativeRegion());
+        drawText(text, state.getRelativeRegion(), true);
     }
 
     @Override
-    public void drawText(String text, Rect2i region) {
+    public void drawText(String text, boolean enabled) {
+        drawText(text, state.getRelativeRegion(), enabled);
+    }
+
+    @Override
+    public void drawText(String text, Rect2i region, boolean enabled) {
         UIStyle style = getCurrentStyle();
+
         if (style.isTextShadowed()) {
-            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(),
+            drawTextRawShadowed(text, style.getFont(), style.getTextColor(enabled), style.getTextShadowColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(),
                     style.getVerticalTextAlignment());
         } else {
-            drawTextRaw(text, style.getFont(), style.getTextColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
+            drawTextRaw(text, style.getFont(), style.getTextColor(enabled), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }
     }
 

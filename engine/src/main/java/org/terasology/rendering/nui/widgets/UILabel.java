@@ -77,7 +77,7 @@ public class UILabel extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.drawText(getText());
+        canvas.drawText(getText(), this.isEnabled());
     }
 
     @Override
