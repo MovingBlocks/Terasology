@@ -35,14 +35,14 @@ public class Animation implements Component, AssetData {
     private int currentRepeatCount;
 
     private enum AnimState {
-        STOPPED, PAUSED, RUNNING, FINISHED
+        PRESTART, PAUSED, RUNNING, FINISHED
     }
     private AnimState currentState;
 
     public Animation() {
         listeners = new ArrayList<AnimationListener>();
         frames = new ArrayList<Frame>();
-        currentState = AnimState.STOPPED;
+        currentState = AnimState.PRESTART;
         repeat = 0;
     }
 
@@ -50,40 +50,53 @@ public class Animation implements Component, AssetData {
         this.frames.add(frame);
     }
 
-    public void start() {
-        elapsedTime = 0;
-        currentRepeatCount = 0;
-        this.currentState = AnimState.RUNNING;
-        for (AnimationListener li : this.listeners) {
-            li.onStart();
-        }
-        // AnimationSystem.addInstance(this);
-        // TODO: Find way to start animation
-    }
-
     public void update(float delta) {
         switch (this.currentState) {
-        case PAUSED: case STOPPED:
-            return;
         case RUNNING: {
             if (this.frames.size() == 0) {
-                onEnd();
+                end();
                 return;
             }
-            elapsedTime += delta;
-            if (elapsedTime >= frames.get(0).getDuration()) {
+            frames.get(0).update(delta);
+            if (frames.get(0).isFinished()) {
                 frames.remove(0);
                 return;
             }
             break;
         }
+        default: break;
         }
     }
 
-    private void onEnd() {
-        this.currentState = AnimState.FINISHED;
-        for (AnimationListener li : this.listeners) {
-            li.onEnd(this.currentRepeatCount);
+    public void start() {
+        if (this.currentState.equals(AnimState.PRESTART)) {
+            elapsedTime = 0;
+            currentRepeatCount = 0;
+            this.currentState = AnimState.RUNNING;
+            for (AnimationListener li : this.listeners) {
+                li.onStart();
+            }
+        }
+    }
+
+    public void end() {
+        if (this.currentState.equals(AnimState.RUNNING)) {
+            this.currentState = AnimState.FINISHED;
+            for (AnimationListener li : this.listeners) {
+                li.onEnd(this.currentRepeatCount);
+            }
+        }
+    }
+
+    public void pause() {
+        if (this.currentState.equals(AnimState.RUNNING)) {
+            this.currentState = AnimState.PAUSED;
+        }
+    }
+
+    public void resume() {
+        if (this.currentState.equals(AnimState.PAUSED)) {
+            this.currentState = AnimState.RUNNING;
         }
     }
 

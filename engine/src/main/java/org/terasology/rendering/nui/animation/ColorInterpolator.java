@@ -18,14 +18,24 @@ package org.terasology.rendering.nui.animation;
 import org.terasology.rendering.nui.Color;
 
 public abstract class ColorInterpolator implements Frame.FrameComponentInterface {
-    public Object computeInterpolation(float v, Object theFrom, Object theTo) {
+    public void computeInterpolation(float v, Object theFrom, Object theTo) {
         Color f = (Color) theFrom;
         Color t = (Color) theTo;
-        return new Color(
-            v * (t.r() - f.r()) + f.r(),
-            v * (t.g() - f.g()) + f.g(),
-            v * (t.b() - f.b()) + f.b(),
-            v * (t.a() - f.a()) + f.a()
-        );
+        setValue(new Color(
+            clamp(v * (t.r() - f.r()) + f.r()),
+            clamp(v * (t.g() - f.g()) + f.g()),
+            clamp(v * (t.b() - f.b()) + f.b()),
+            clamp(v * (t.a() - f.a()) + f.a())
+        ));
+    }
+
+    private static int clamp(float c) {
+        if (c < 0) {
+            c = 0;
+        } else if (c > 255) {
+            c = 255;
+        }
+
+        return (int) c;
     }
 }

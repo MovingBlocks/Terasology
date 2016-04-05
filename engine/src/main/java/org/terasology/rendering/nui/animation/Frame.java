@@ -24,7 +24,7 @@ public class Frame {
     private List<Object> fromComponents;
     private List<Object> toComponents;
     private List<FrameComponentInterface> compInterfaces;
-    private Interpolator interpolator;
+    private List<Interpolator> compInterpolators;
 
     private int repeat;
     private float startDelay;
@@ -32,6 +32,9 @@ public class Frame {
 
     /** If the frame starts from the last, override fromComponents */
     private Frame lastFrame;
+
+    private float elapsedTime;
+    private int repeatCount;
 
     /**
      * Constructs a new linear-interpolated, 1 sec animation frame.
@@ -47,14 +50,43 @@ public class Frame {
         }
         toComponents = new ArrayList<Object>();
         compInterfaces = new ArrayList<FrameComponentInterface>();
-        interpolator = new BaseInterpolator();
+        compInterpolators = new ArrayList<Interpolator>();
         repeat = 0;
+        repeatCount = 0;
         startDelay = 0;
         duration = 1000;
+        elapsedTime = 0;
     }
 
     public Frame() {
         this(null);
+    }
+
+    public void update(float delta) {
+        elapsedTime += delta;
+        if (elapsedTime > startDelay) {
+            float tval = (elapsedTime - startDelay) / duration;
+            if (lastFrame == null) {
+                for (int i = 0; i < compInterfaces.size(); i++) {
+                    float val = compInterpolators.get(i)
+                        .getInterpolation(tval);
+                    compInterfaces.get(i)
+                        .computeInterpolation(val,
+                                              fromComponents.get(i),
+                                              toComponents.get(i));
+                }
+            } else {
+                for (int i = 0; i < compInterfaces.size(); i++) {
+                    float val = compInterpolators.get(i)
+                        .getInterpolation(tval);
+                    compInterfaces.get(i)
+                        .computeInterpolation(val,
+                                              lastFrame.toComponents.get(i),
+                                              toComponents.get(i));
+                }
+            }
+            repeatCount++;
+        }
     }
 
     /**
@@ -68,12 +100,30 @@ public class Frame {
      */
     public void addComponent(Object from, Object to,
                              FrameComponentInterface compInterface) {
+        addComponent(from, to, compInterface, new BaseInterpolator());
+    }
+
+    /**
+     * Adds a new component to be animated for frames that do not start
+     * from a previous frame. Could be a position, color, sound,
+     * texture, etc.
+     *
+     * @param from the component to start from
+     * @param to the component to end at
+     * @param compInterface the component interpolation interface
+     */
+    public void addComponent(Object from, Object to,
+                             FrameComponentInterface compInterface, Interpolator interpolator) {
         if (lastFrame != null) {
             throw new IllegalStateException("Cannot add from components when using last frame");
+        }
+        if (interpolator == null) {
+            throw new NullPointerException("interpolator must not be null");
         }
         fromComponents.add(from);
         toComponents.add(to);
         compInterfaces.add(compInterface);
+        compInterpolators.add(interpolator);
     }
 
     /**
@@ -84,24 +134,16 @@ public class Frame {
      * @param to the component to end at
      * @param compInterface the component interpolation interface
      */
-    public void addComponent(Object to, FrameComponentInterface compInterface) {
+    public void addComponent(Object to, FrameComponentInterface compInterface, Interpolator interpolator) {
         if (lastFrame == null) {
             throw new IllegalStateException("Must have a start frame to add from components");
         }
-        toComponents.add(to);
-        compInterfaces.add(compInterface);
-    }
-
-    /**
-     * Sets the interpolator this frame uses.
-     *
-     * @param interpolator the interpolator this frame uses.
-     */
-    public void setInterpolator(Interpolator interpolator) {
         if (interpolator == null) {
             throw new NullPointerException("interpolator must not be null");
         }
-        this.interpolator = interpolator;
+        toComponents.add(to);
+        compInterfaces.add(compInterface);
+        compInterpolators.add(interpolator);
     }
 
     /**
@@ -151,6 +193,20 @@ public class Frame {
         return duration;
     }
 
+    public final boolean isFinished() {
+        int repeatFinished = repeat;
+        if (repeat < 0) {
+            if (repeat == -1) {
+                return false;
+            } else {
+                repeatFinished = -(repeat + 1);
+            }
+        } else if (repeat == 0) {
+            return false;
+        }
+        return elapsedTime > startDelay + duration * repeatFinished;
+    }
+
     public interface FrameComponentInterface {
         /**
          * Interpolates between two values on a linear scale.
@@ -161,7 +217,7 @@ public class Frame {
          *
          * @return the computed interpolated value
          */
-        Object computeInterpolation(float v, Object theFrom, Object theTo);
+        void computeInterpolation(float v, Object theFrom, Object theTo);
 
         /**
          * Recieves a computed interpolation value.
