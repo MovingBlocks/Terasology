@@ -136,7 +136,7 @@ public class UIText extends CoreWidget {
 
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
-            canvas.drawText(text.get(), canvas.getRegion());
+            canvas.drawText(text.get(), canvas.getRegion(), true);
             if (isFocused()) {
                 if (hasSelection()) {
                     drawSelection(canvas);

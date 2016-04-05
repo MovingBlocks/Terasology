@@ -45,6 +45,7 @@ public class UIStyle {
 
     private Font font = Assets.getFont("engine:default").get();
     private Color textColor = Color.WHITE;
+    private Color disabledTextColor = Color.GREY;
     private Color textShadowColor = Color.BLACK;
     private HorizontalAlign textAlignmentH = HorizontalAlign.CENTER;
     private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
@@ -159,10 +160,20 @@ public class UIStyle {
     }
 
     /**
-     * @return The color of any drawn text
+     * @return The color of any drawn text with default enabled color
      */
     public Color getTextColor() {
         return textColor;
+    }
+
+    /**
+     * @return The color of any drawn text
+     */
+    public Color getTextColor(boolean enabled) {
+        if (enabled)
+            return textColor;
+        else
+            return disabledTextColor;
     }
 
     public void setTextColor(Color textColor) {

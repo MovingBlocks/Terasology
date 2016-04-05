@@ -43,6 +43,9 @@ public abstract class AbstractWidget implements UIWidget {
     private Binding<Boolean> visible = new DefaultBinding<>(true);
 
     @LayoutConfig
+    private Binding<Boolean> enabled = new DefaultBinding<>(true);
+
+    @LayoutConfig
     private Binding<UIWidget> tooltip = new DefaultBinding<>();
 
     @LayoutConfig
@@ -139,6 +142,14 @@ public abstract class AbstractWidget implements UIWidget {
 
     public void setVisible(boolean visible) {
         this.visible.set(visible);
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
+    }
+
+    public boolean isEnabled() {
+        return this.enabled.get();
     }
 
     public void bindVisible(Binding<Boolean> bind) {

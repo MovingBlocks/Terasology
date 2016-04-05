@@ -346,10 +346,12 @@
                                 },
                                 {
                                  "type": "UILabel",
+                                 "enabled": false,
                                  "text": "${engine:menu#volumetric-fog}: "
                                 },
                                 {
                                  "type": "UICheckbox",
+                                 "enabled": false,
                                  "id": "volumetricFog"
                                 }
                             ]

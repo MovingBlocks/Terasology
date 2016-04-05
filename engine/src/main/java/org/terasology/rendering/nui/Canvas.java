@@ -145,11 +145,19 @@ public interface Canvas {
     void drawWidget(UIWidget element, Rect2i region);
 
     /**
-     * Draws test, using the current style.
+     * Draws text, using the current style.
      *
      * @param text
      */
     void drawText(String text);
+
+
+    /**
+     * Draws text, using the current style.
+     *
+     * @param text
+     */
+    void drawText(String text, boolean enabled);
 
     /**
      * Draws text to the given region, using the current style
@@ -157,7 +165,7 @@ public interface Canvas {
      * @param text
      * @param region
      */
-    void drawText(String text, Rect2i region);
+    void drawText(String text, Rect2i region, boolean enabled);
 
     /**
      * Draws a texture filling the canvas using the current style.
