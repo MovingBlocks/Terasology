@@ -19,6 +19,7 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.nui.animation.Animation;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -107,4 +108,11 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     float getTooltipDelay();
 
+    void startAnimation(Animation anim);
+
+    void endAnimation();
+
+    void pauseAnimation();
+
+    void resumeAnimation();
 }

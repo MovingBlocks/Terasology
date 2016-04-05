@@ -69,6 +69,16 @@ public class UIButton extends CoreWidget {
         public boolean onMouseClick(NUIMouseClickEvent event) {
             if (enabled.get() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 down = true;
+                Animation testAnimation = new Animation();
+                Frame testFrame = new Frame();
+                testFrame.addComponent(new Color(255, 0, 0),
+                                       new Color(0, 0, 255),
+                                       new ColorInterpolator() {
+                        @Override public void setValue(Object value) {
+                            testColor = (Color) value;
+                        }});
+                testAnimation.addFrame(testFrame);
+                startAnimation(testAnimation);
                 return true;
             }
             return false;
@@ -198,18 +208,6 @@ public class UIButton extends CoreWidget {
 
     public void setEnabled(boolean enabled) {
         this.enabled.set(enabled);
-        Animation testAnimation = new Animation();
-        Frame testFrame = new Frame();
-        testFrame.addComponent(new Color(255, 0, 0),
-                               new Color(0, 0, 255),
-                               new ColorInterpolator() {
-                @Override public void setValue(Object value) {
-                    testColor = (Color) value;
-                }
-            });
-        testAnimation.addFrame(testFrame);
-        // testAnimation.start();
-        // TODO: Find way to start animation
     }
 
     public void subscribe(ActivateEventListener listener) {
