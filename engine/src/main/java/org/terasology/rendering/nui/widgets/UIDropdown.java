@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -39,20 +40,27 @@ import java.util.List;
 public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
+    public static final String DISABLED_MODE = "disabled";
+
+    @LayoutConfig
+    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            opened = !opened;
-            optionListeners.clear();
-            if (opened) {
-                for (int i = 0; i < getOptions().size(); ++i) {
-                    optionListeners.add(new ItemListener(i));
+            if (enabled.get()) {
+                opened = !opened;
+                optionListeners.clear();
+                if (opened) {
+                    for (int i = 0; i < getOptions().size(); ++i) {
+                        optionListeners.add(new ItemListener(i));
+                    }
                 }
+                return true;
             }
-            return true;
+            return false;
         }
     };
     private List<InteractionListener> optionListeners = Lists.newArrayList();
@@ -120,7 +128,9 @@ public class UIDropdown<T> extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (opened) {
+        if (!enabled.get()) {
+            return DISABLED_MODE;
+        } else if (opened) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;
@@ -154,6 +164,14 @@ public class UIDropdown<T> extends CoreWidget {
 
     public void setSelection(T value) {
         selection.set(value);
+    }
+
+    public boolean isEnabled() {
+        return enabled.get();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
     }
 
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
