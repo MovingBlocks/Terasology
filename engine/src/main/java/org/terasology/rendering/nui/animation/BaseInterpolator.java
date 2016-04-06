@@ -23,8 +23,8 @@ public class BaseInterpolator implements Interpolator {
     protected float end;
 
     public BaseInterpolator() {
-        start = 0;
-        end = 1;
+        start = 0.f;
+        end = 1.f;
     }
 
     public float getInterpolation(float v) {
