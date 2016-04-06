@@ -87,7 +87,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private Context context;
 
     private Animation closeAnim;
-    Rect2i animRegion;
+    Rect2i animRegion, animCanvasSize;
 
     public NUIManagerInternal(CanvasRenderer renderer, Context context) {
         this.context = context;
@@ -100,7 +100,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         TranslationSystem system = context.get(TranslationSystem.class);
         system.subscribe(proj -> invalidate());
-        animRegion = Rect2i.createFromMinAndSize(1, 1, 200, 200);
+        animRegion = Rect2i.createFromMinAndMax(0, 0, 1, 1);
+        animCanvasSize = animRegion;
     }
 
     public void refreshWidgetsLibrary() {
@@ -174,7 +175,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private void closeScreen(ResourceUrn screenUri, boolean sendEvents) {
         UIScreenLayer screen = getScreen(screenUri);
         if (screen != null) {
-            Animation closeAnim = new Animation();
+            closeAnim = new Animation();
             Frame frm = new Frame();
             frm.addComponent(new Color(255, 0, 0),
                              new Color(0, 0, 255),
@@ -308,20 +309,42 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (uri != null) {
             screenLookup.put(uri, screen);
         }
-        Animation closeAnim = new Animation();
+        closeAnim = new Animation();
         Frame frm = new Frame();
-        frm.addComponent(Rect2i.createFromMinAndSize(0, 0, 200, 200),
-                         Rect2i.createFromMinAndSize(0, 0, 500, 500),
-                         new RectiInterpolator() {
+        // Stretch to right side
+        frm.addComponent(new Float(0),
+                         new Float(1),
+                         new FloatInterpolator() {
                 public void setValue(Object value) {
-                    animRegion = (Rect2i) value;
+                    float v = ((Float) value).floatValue();
+                    animRegion = Rect2i.createFromMinAndMax(
+                        -animCanvasSize.maxX(), animCanvasSize.minY(),
+                        (int) (animCanvasSize.maxX() * v), animCanvasSize.maxY());
                 }
             });
+        //frm.setDuration(.5f);
+        frm.setRepeat(1);
+        closeAnim.addFrame(frm);
+        frm = new Frame();
+        // Stretch the left side to the begining of the screen
+        frm.addComponent(new Float(1),
+                         new Float(0),
+                         new FloatInterpolator() {
+                public void setValue(Object value) {
+                    float v = ((Float) value).floatValue();
+                    animRegion = Rect2i.createFromMinAndMax(
+                        (int) (-animCanvasSize.maxX() * v), animCanvasSize.minY(),
+                        animCanvasSize.maxX(), animCanvasSize.maxY());
+                }
+            });
+        //frm.setDuration(.25f);
+        frm.setRepeat(1);
         closeAnim.addFrame(frm);
         closeAnim.addListener(new Animation.AnimationAdapter() {
                 @Override public void onEnd(int ignore) {
                 }
             });
+        closeAnim.setRepeat(1);
         closeAnim.start();
     }
 
@@ -403,6 +426,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void render() {
         canvas.preRender();
+        if (closeAnim != null) {
+            animCanvasSize = canvas.getRegion();
+        } else {
+            animRegion = canvas.getRegion();
+        }
         Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
         for (UIScreenLayer layer : screens) {
             screensToRender.push(layer);
@@ -410,13 +438,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 break;
             }
         }
+        if (animRegion == null) {
+            animRegion = animCanvasSize;
+        }
         for (UIScreenLayer screen : screensToRender) {
-            canvas.drawWidget(screen, animRegion);//canvas.getRegion());
-            throw new IllegalStateException("minx=" + canvas.getRegion().minX()
-                                            + " miny=" + canvas.getRegion().minY()
-                                            + " maxx=" + canvas.getRegion().maxX()
-                                            + " maxy=" + canvas.getRegion().maxY()
-            );
+            canvas.drawWidget(screen, animRegion);
         }
         for (ControlWidget overlay : overlays.values()) {
             canvas.drawWidget(overlay);
@@ -426,8 +452,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        if (closeAnim != null)
+        if (closeAnim != null) {
             closeAnim.update(delta);
+            if (closeAnim.isFinished())
+                closeAnim = null;
+        } else {
+            //throw new IllegalStateException("awdc");
+        }
         canvas.processMousePosition(mouse.getPosition());
 
         // part of the update could be adding/removing screens

@@ -32,6 +32,7 @@ public class Animation implements Component, AssetData {
     private int repeat;
 
     private float elapsedTime;
+    private int currentFrame;
     private int currentRepeatCount;
 
     private enum AnimState {
@@ -44,23 +45,34 @@ public class Animation implements Component, AssetData {
         frames = new ArrayList<Frame>();
         currentState = AnimState.PRESTART;
         repeat = 0;
+        elapsedTime = 0;
+        currentFrame = 0;
     }
 
     public void addFrame(Frame frame) {
         this.frames.add(frame);
     }
 
+    public void setRepeat(int repeat) {
+        this.repeat = repeat;
+    }
+
     public void update(float delta) {
         switch (this.currentState) {
         case RUNNING: {
-            if (this.frames.size() == 0) {
-                end();
-                return;
-            }
-            frames.get(0).update(delta);
-            if (frames.get(0).isFinished()) {
-                frames.remove(0);
-                return;
+            frames.get(currentFrame).update(delta);
+            if (frames.get(currentFrame).isFinished()) {
+                currentFrame++;
+                if (currentFrame >= frames.size()) {
+                    currentRepeatCount++;
+                    if (currentRepeatCount >= repeat ||
+                        currentRepeatCount >= -(repeat + 1)) {
+                        end();
+                    } else { // if repeating forever or still able to repeat
+                        currentFrame = 0;
+                        elapsedTime = 0;//startDelay;
+                    }
+                }
             }
             break;
         }
