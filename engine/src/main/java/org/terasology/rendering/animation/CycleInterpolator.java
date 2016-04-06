@@ -13,37 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.animation;
+package org.terasology.rendering.animation;
 
 /*
- * Base linear interpolator, should typically be extended from.
+ * Cycle interpolator, interpolates between start and end a float
+ * amount of times.
  */
-public class BaseInterpolator implements Interpolator {
-    protected float start;
-    protected float end;
+public class CycleInterpolator extends BaseInterpolator {
+    private float factor;
 
-    public BaseInterpolator() {
-        start = 0.f;
-        end = 1.f;
+    public CycleInterpolator() {
+        super();
+        factor = 1;
+    }
+
+    public CycleInterpolator(float cycles) {
+        super();
+        this.factor = cycles;
     }
 
     public float getInterpolation(float v) {
-        return v * (end - start) + start;
-    }
-
-    public void setStart(float v) {
-        this.start = v;
-    }
-
-    public float getStart() {
-        return start;
-    }
-
-    public void setEnd(float v) {
-        this.end = v;
-    }
-
-    public float getEnd() {
-        return end;
+        return (float) Math.sin(2 * Math.PI * factor * v) * (end - start) + start;
     }
 }
