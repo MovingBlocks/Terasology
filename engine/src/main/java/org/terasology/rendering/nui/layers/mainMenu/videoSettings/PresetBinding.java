@@ -32,18 +32,18 @@ public class PresetBinding implements Binding<Preset> {
         if (config.isFlickeringLight() && config.isVignette() && config.isEyeAdaptation() && config.isFilmGrain()) {
             if (config.isSsao()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts() && config.isCloudShadows()) {
-                    return Preset.UBER;
+                    return Preset.ULTRA;
                 }
             } else if (config.isCloudShadows()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts()) {
-                    return Preset.INSANE;
+                    return Preset.HIGH;
                 }
             } else if (config.isBloom()) {
                 if (!config.isMotionBlur() && !config.isLightShafts()) {
-                    return Preset.EPIC;
+                    return Preset.MEDIUM;
                 }
             } else if (!config.isMotionBlur() && !config.isLightShafts()) {
-                return Preset.NICE;
+                return Preset.LOW;
             }
         } else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight() && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
             return Preset.MINIMAL;

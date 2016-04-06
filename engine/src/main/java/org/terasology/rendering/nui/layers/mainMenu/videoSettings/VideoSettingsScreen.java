@@ -66,7 +66,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     public void initialise() {
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
-            videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
+            videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.LOW, Preset.MEDIUM, Preset.HIGH, Preset.ULTRA));
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 

@@ -35,7 +35,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    NICE("Nice") {
+    LOW("Low") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -50,7 +50,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    EPIC("Epic") {
+    MEDIUM("Medium") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -65,7 +65,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    INSANE("Insane") {
+    HIGH("High") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -80,7 +80,7 @@ public enum Preset {
             renderConfig.setSsao(false);
         }
     },
-    UBER("Uber") {
+    ULTRA("Ultra") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
