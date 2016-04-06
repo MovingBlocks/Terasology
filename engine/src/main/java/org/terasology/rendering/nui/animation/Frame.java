@@ -64,16 +64,17 @@ public class Frame {
 
     public void update(float delta) {
         elapsedTime += delta;
-        if (elapsedTime > startDelay) {
+        //if (elapsedTime > startDelay) {
             float tval = (elapsedTime - startDelay) / duration;
             if (lastFrame == null) {
                 for (int i = 0; i < compInterfaces.size(); i++) {
-                    float val = compInterpolators.get(i)
-                        .getInterpolation(tval);
-                    compInterfaces.get(i)
+                    float val = .5f;//compInterpolators.get(i)
+                    //.getInterpolation(tval);
+                    Object oval = compInterfaces.get(i)
                         .computeInterpolation(val,
                                               fromComponents.get(i),
                                               toComponents.get(i));
+                    compInterfaces.get(i).setValue(oval);
                 }
             } else {
                 for (int i = 0; i < compInterfaces.size(); i++) {
@@ -86,7 +87,7 @@ public class Frame {
                 }
             }
             repeatCount++;
-        }
+            //}
     }
 
     /**
@@ -184,27 +185,28 @@ public class Frame {
         this.duration = duration;
     }
 
-    /**
-     * Returns the duration this frame will take to complete.
-     *
-     * @return the duration this frame will take to complete
-     */
-    public final float getDuration() {
-        return duration;
-    }
+    // /**
+    //  * Returns the duration this frame will take to complete.
+    //  *
+    //  * @return the duration this frame will take to complete
+    //  */
+    // public final float getDuration() {
+    //     return duration;
+    // }
 
     public final boolean isFinished() {
-        int repeatFinished = repeat;
-        if (repeat < 0) {
-            if (repeat == -1) {
-                return false;
-            } else {
-                repeatFinished = -(repeat + 1);
-            }
-        } else if (repeat == 0) {
-            return false;
-        }
-        return elapsedTime > startDelay + duration * repeatFinished;
+        return false;
+        // int repeatFinished = repeat;
+        // if (repeat < 0) {
+        //     if (repeat == -1) {
+        //         return false;
+        //     } else {
+        //         repeatFinished = -(repeat + 1);
+        //     }
+        // } else if (repeat == 0) {
+        //     return false;
+        // }
+        // return elapsedTime > startDelay + duration * repeatFinished;
     }
 
     public interface FrameComponentInterface {
@@ -217,7 +219,7 @@ public class Frame {
          *
          * @return the computed interpolated value
          */
-        void computeInterpolation(float v, Object theFrom, Object theTo);
+        Object computeInterpolation(float v, Object theFrom, Object theTo);
 
         /**
          * Recieves a computed interpolation value.

@@ -54,9 +54,12 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.animation.*;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
+import org.terasology.rendering.nui.Color;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -83,6 +86,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
 
+    private Animation closeAnim;
+    Rect2i animRegion;
+
     public NUIManagerInternal(CanvasRenderer renderer, Context context) {
         this.context = context;
         this.hudScreenLayer = new HUDScreenLayer();
@@ -94,6 +100,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         TranslationSystem system = context.get(TranslationSystem.class);
         system.subscribe(proj -> invalidate());
+        animRegion = Rect2i.createFromMinAndSize(1, 1, 200, 200);
     }
 
     public void refreshWidgetsLibrary() {
@@ -165,10 +172,25 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void closeScreen(ResourceUrn screenUri, boolean sendEvents) {
-        UIScreenLayer screen = screenLookup.remove(screenUri);
+        UIScreenLayer screen = getScreen(screenUri);
         if (screen != null) {
-            screens.remove(screen);
-            onCloseScreen(screen, screenUri, sendEvents);
+            Animation closeAnim = new Animation();
+            Frame frm = new Frame();
+            frm.addComponent(new Color(255, 0, 0),
+                             new Color(0, 0, 255),
+                             new ColorInterpolator() {
+                    public void setValue(Object value) {
+                    }
+                });
+            closeAnim.addFrame(frm);
+            closeAnim.addListener(new Animation.AnimationAdapter() {
+                    @Override public void onEnd(int ignore) {
+                        screenLookup.remove(screenUri);
+                        screens.remove(screen);
+                        onCloseScreen(screen, screenUri, sendEvents);
+                    }
+                });
+            closeAnim.start();
         }
     }
 
@@ -280,12 +302,27 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void pushScreen(CoreScreenLayer screen, ResourceUrn uri) {
-        screen.setManager(this);
+        screen.setManager(NUIManagerInternal.this);
         prepare(screen);
         screens.push(screen);
         if (uri != null) {
             screenLookup.put(uri, screen);
         }
+        Animation closeAnim = new Animation();
+        Frame frm = new Frame();
+        frm.addComponent(Rect2i.createFromMinAndSize(0, 0, 200, 200),
+                         Rect2i.createFromMinAndSize(0, 0, 500, 500),
+                         new RectiInterpolator() {
+                public void setValue(Object value) {
+                    animRegion = (Rect2i) value;
+                }
+            });
+        closeAnim.addFrame(frm);
+        closeAnim.addListener(new Animation.AnimationAdapter() {
+                @Override public void onEnd(int ignore) {
+                }
+            });
+        closeAnim.start();
     }
 
     @Override
@@ -374,7 +411,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         for (UIScreenLayer screen : screensToRender) {
-            canvas.drawWidget(screen, canvas.getRegion());
+            canvas.drawWidget(screen, animRegion);//canvas.getRegion());
+            throw new IllegalStateException("minx=" + canvas.getRegion().minX()
+                                            + " miny=" + canvas.getRegion().minY()
+                                            + " maxx=" + canvas.getRegion().maxX()
+                                            + " maxy=" + canvas.getRegion().maxY()
+            );
         }
         for (ControlWidget overlay : overlays.values()) {
             canvas.drawWidget(overlay);
@@ -384,6 +426,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
+        if (closeAnim != null)
+            closeAnim.update(delta);
         canvas.processMousePosition(mouse.getPosition());
 
         // part of the update could be adding/removing screens
@@ -397,7 +441,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
         InputSystem inputSystem = context.get(InputSystem.class);
         inputSystem.getMouseDevice().setGrabbed(inputSystem.isCapturingMouse() && !(this.isReleasingMouse()));
-
     }
 
     @Override

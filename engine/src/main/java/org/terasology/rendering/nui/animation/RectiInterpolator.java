@@ -15,29 +15,18 @@
  */
 package org.terasology.rendering.nui.animation;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.math.geom.Rect2i;
 
-public abstract class ColorInterpolator implements Frame.FrameComponentInterface {
+public abstract class RectiInterpolator implements Frame.FrameComponentInterface {
     @Override
     public Object computeInterpolation(float v, Object theFrom, Object theTo) {
-        Color f = (Color) theFrom;
-        Color t = (Color) theTo;
-        return new Color(
-            255,//clamp(v * (t.rf() - f.rf()) + f.rf()),
-            0,//clamp(v * (t.gf() - f.gf()) + f.gf()),
-            0,//clamp(v * (t.bf() - f.bf()) + f.bf()),
-            255//clamp(v * (t.af() - f.af()) + f.af())
+        Rect2i f = (Rect2i) theFrom;
+        Rect2i t = (Rect2i) theTo;
+        return Rect2i.createFromMinAndMax(
+            0,//(int) (v * (t.minX() - f.minX()) + f.minX()),
+            0,//(int) (v * (t.minY() - f.minY()) + f.minY()),
+            1,//680,//(int) (v * (t.maxX() - f.maxX()) + f.maxX()),
+            1//745//(int) (v * (t.maxY() - f.maxY()) + f.maxY())
         );
-    }
-
-    private static float clamp(float c) {
-        //return c;
-         if (c > 1) {
-             c = 1;
-        // } else if (c > 255) {
-        //     c = 255;
-        }
-
-         return c;
     }
 }

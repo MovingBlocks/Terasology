@@ -269,6 +269,15 @@ public abstract class AbstractWidget implements UIWidget {
         }
     }
 
+    @Override
+    public final boolean isAnimating() {
+        boolean ret = currentAnimation != null;
+        for (UIWidget item : this) {
+            ret |= item.isAnimating();
+        }
+        return ret;
+    }
+
     private static class TooltipLabelBinding extends ReadOnlyBinding<UIWidget> {
 
         private UILabel tooltipLabel = new UILabel();

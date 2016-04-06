@@ -116,4 +116,6 @@ public interface UIWidget extends Iterable<UIWidget> {
     void pauseAnimation();
 
     void resumeAnimation();
+
+    boolean isAnimating();
 }
