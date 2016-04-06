@@ -250,12 +250,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 updateAdjacentChunksReadyFieldOf(chunk);
                 updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
 
-                if (!readyChunkInfo.isNewChunk()) {
-                    PerformanceMonitor.startActivity("Generating Block Entities");
-                    generateBlockEntities(chunk);
-                    PerformanceMonitor.endActivity();
-                }
-
                 if (readyChunkInfo.isNewChunk()) {
                     PerformanceMonitor.startActivity("Generating queued Entities");
                     readyChunkInfo.getEntities().forEach(this::generateQueuedEntities);
@@ -495,16 +489,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
         lightMerger.beginMerge(chunk, readyChunkInfo);
         return true;
-    }
-
-    // Generates all non-temporary block entities
-    private void generateBlockEntities(Chunk chunk) {
-        ChunkBlockIterator i = chunk.getBlockIterator();
-        while (i.next()) {
-            if (i.getBlock().isKeepActive()) {
-                registry.getBlockEntityAt(i.getBlockPos());
-            }
-        }
     }
 
     void gatherBlockPositionsForDeactivate(Chunk chunk) {
