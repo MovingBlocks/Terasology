@@ -18,7 +18,13 @@ package org.terasology.rendering.nui;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.animation.Animation;
+import org.terasology.rendering.animation.Frame;
+import org.terasology.rendering.animation.FloatInterpolator;
+import org.terasology.rendering.animation.AccelerateInterpolator;
+import org.terasology.rendering.animation.DecelerateInterpolator;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
@@ -30,6 +36,9 @@ import java.util.Iterator;
 /**
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
+
+    private Rect2i animRegion, animCanvasSize;
+    private Animation sizeAnim;
 
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
@@ -50,10 +59,14 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private boolean initialised;
 
     public CoreScreenLayer() {
+        animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
+        animCanvasSize = animRegion;
     }
 
     public CoreScreenLayer(String id) {
         super(id);
+        animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
+        animCanvasSize = animRegion;
     }
 
     @Override
@@ -100,16 +113,23 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
+        if (sizeAnim != null && !sizeAnim.isFinished()) {
+            animCanvasSize = canvas.getRegion();
+        } else if (animCanvasSize == null) {
+            animRegion = canvas.getRegion();
+        }
+
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener());
         }
         if (contents != null) {
-            canvas.drawWidget(contents, canvas.getRegion());
+            canvas.drawWidget(contents, animRegion);
         }
     }
 
     @Override
     public void update(float delta) {
+        super.update(delta);
         if (contents != null) {
             contents.update(delta);
         }
@@ -185,5 +205,74 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             return Collections.emptyIterator();
         }
         return Arrays.asList(contents).iterator();
+    }
+
+    @Override
+    public Animation getOpenAnimation() {
+        sizeAnim = new Animation();
+        Frame frm = new Frame();
+        // Move into view from left side (l to r)
+        frm.addComponent(new Float(0),
+                         new Float(1),
+                         new FloatInterpolator() {
+                public void setValue(Object value) {
+                    float v = ((Float) value).floatValue();
+                    animRegion = Rect2i.createFromMinAndMax(
+                        (int) (-animCanvasSize.maxX() * (1 - v)),
+                        animCanvasSize.minY(),
+                        (int) (animCanvasSize.maxX() * v),
+                        animCanvasSize.maxY());
+                }
+            }, new DecelerateInterpolator());
+        frm.setDuration(.75f);
+        frm.setRepeat(1);
+        sizeAnim.addFrame(frm);
+        sizeAnim.setRepeat(1);
+        sizeAnim.addListener(new Animation.ListenerAdapter() {
+                @Override public void onStart() {
+                    animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
+                    animCanvasSize = animRegion;
+                }
+                @Override public void onEnd(int ignore) {
+                    sizeAnim = null;
+                    animRegion = null;
+                    animCanvasSize = null;
+                }
+            });
+        return sizeAnim;
+    }
+
+    @Override
+    public Animation getCloseAnimation() {
+        sizeAnim = new Animation();
+        Frame frm = new Frame();
+        // Move into view out of right side (r to inf)
+        frm.addComponent(new Float(0),
+                         new Float(1),
+                         new FloatInterpolator() {
+                public void setValue(Object value) {
+                    float v = ((Float) value).floatValue();
+                    animRegion = Rect2i.createFromMinAndMax(
+                        (int) (animCanvasSize.maxX() * v),
+                        animCanvasSize.minY(),
+                        (int) (animCanvasSize.maxX() * (v + 1)),
+                        animCanvasSize.maxY());
+                }
+            }, new AccelerateInterpolator());
+        frm.setDuration(.75f);
+        frm.setRepeat(1);
+        sizeAnim.addFrame(frm);
+        sizeAnim.setRepeat(1);
+        sizeAnim.addListener(new Animation.ListenerAdapter() {
+                @Override public void onStart() {
+                    animCanvasSize = animRegion;
+                }
+                @Override public void onEnd(int ignore) {
+                    sizeAnim = null;
+                    animRegion = null;
+                    animCanvasSize = null;
+                }
+            });
+        return sizeAnim;
     }
 }

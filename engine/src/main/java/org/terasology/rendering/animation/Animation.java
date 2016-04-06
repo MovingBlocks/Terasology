@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.animation;
+package org.terasology.rendering.animation;
 
 import org.terasology.assets.AssetData;
 import org.terasology.entitySystem.Component;
@@ -132,7 +132,7 @@ public class Animation implements Component, AssetData {
         void onEnd(int repeatCount);
     }
 
-    public static class AnimationAdapter implements AnimationListener {
+    public static class ListenerAdapter implements AnimationListener {
         public void onStart() { }
         public void onFrameStart() { }
         public void onStep(float v) { }

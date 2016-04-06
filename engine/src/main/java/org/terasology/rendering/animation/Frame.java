@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.animation;
+package org.terasology.rendering.animation;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -63,13 +63,14 @@ public class Frame {
     }
 
     public void update(float delta) {
+        elapsedTime += delta;
+        float tval = (elapsedTime - startDelay) / duration;
         if (elapsedTime > startDelay + duration) {
             repeatCount++;
-            elapsedTime = startDelay;
+            tval = 1;
+            elapsedTime = 0;
         }
-        elapsedTime += delta;
         if (elapsedTime >= startDelay) {
-            float tval = (elapsedTime - startDelay) / duration;
             if (lastFrame == null) {
                 for (int i = 0; i < compInterfaces.size(); i++) {
                     float val = compInterpolators.get(i)
@@ -208,7 +209,7 @@ public class Frame {
         } else if (repeat == 0) {
             return false;
         }
-        return elapsedTime > startDelay + duration * repeatFinished;
+        return repeatCount >= repeatFinished;
     }
 
     public interface FrameComponentInterface {

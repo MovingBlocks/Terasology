@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.animation;
+package org.terasology.rendering.animation;
 
-/*
- * Deceleration interpolator, starts fast and ends slow.
- */
-public class DecelerateInterpolator extends BaseInterpolator {
-    private float factor;
-
-    public DecelerateInterpolator() {
-        super();
-        factor = 1;
-    }
-
-    public DecelerateInterpolator(float factor) {
-        super();
-        this.factor = factor;
-    }
-
-    public float getInterpolation(float v) {
-        return (float) Math.pow(1 - v, factor) * (end - start) + start;
+public abstract class FloatInterpolator implements Frame.FrameComponentInterface {
+    @Override
+    public Object computeInterpolation(float v, Object theFrom, Object theTo) {
+        float f = ((Float) theFrom).floatValue();
+        float t = ((Float) theTo).floatValue();
+        return new Float(v * (t - f) + f);
     }
 }

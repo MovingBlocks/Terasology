@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui.animation;
+package org.terasology.rendering.animation;
 
 
 import com.google.common.base.Charsets;

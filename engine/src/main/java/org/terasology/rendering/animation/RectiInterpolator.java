@@ -13,13 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.animation;
+package org.terasology.rendering.animation;
 
-public abstract class FloatInterpolator implements Frame.FrameComponentInterface {
+import org.terasology.math.geom.Rect2i;
+
+public abstract class RectiInterpolator implements Frame.FrameComponentInterface {
     @Override
     public Object computeInterpolation(float v, Object theFrom, Object theTo) {
-        float f = ((Float) theFrom).floatValue();
-        float t = ((Float) theTo).floatValue();
-        return new Float(v * (t - f) + f);
+        Rect2i f = (Rect2i) theFrom;
+        Rect2i t = (Rect2i) theTo;
+        return Rect2i.createFromMinAndMax(
+            (int) (v * (t.minX() - f.minX()) + f.minX()),
+            (int) (v * (t.minY() - f.minY()) + f.minY()),
+            (int) (v * (t.maxX() - f.maxX()) + f.maxX()),
+            (int) (v * (t.maxY() - f.maxY()) + f.maxY())
+        );
     }
 }
