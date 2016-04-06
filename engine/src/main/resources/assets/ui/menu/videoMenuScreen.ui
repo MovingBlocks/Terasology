@@ -42,6 +42,28 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
+                            "text": "${engine:menu#video-preset}"
+                        },
+                        {
+                            "type": "ColumnLayout",
+                            "columns": 1,
+                            "verticalSpacing": 4,
+                            "horizontalSpacing": 4,
+                            "family": "option-grid",
+                            "contents": [
+                                {
+                                    "type": "UIDropdown",
+                                    "id": "graphicsPreset"
+                                },
+                            ]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 12]
+                        },
+                        {
+                            "type": "UILabel",
+                            "family": "subheading",
                             "text": "${engine:menu#video-graphic-settings}"
                         },
                         {
@@ -52,14 +74,6 @@
                             "family": "option-grid",
                             "contents": [
                                 {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#video-preset}: "
-                                },
-                                {
-                                    "type": "UIDropdown",
-                                    "id": "graphicsPreset"
-                                },
-                                {
                                     "type" : "UILabel",
                                     "text" : "${engine:menu#screenshot-size}: "
                                 },
@@ -68,20 +82,20 @@
                                     "id" : "screenshotSize"
                                 },
                                 {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#video-fullscreen}: "
-                                },
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "fullscreen"
-                                },
-                                {
                                     "type" : "UILabel",
                                     "text" : "${engine:menu#screenshot-format}: "
                                 },
                                 {
                                     "type" : "UIDropdown",
                                     "id" : "screenshotFormat"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#video-fullscreen}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "fullscreen"
                                 },
                                 {
                                     "type": "UILabel",
