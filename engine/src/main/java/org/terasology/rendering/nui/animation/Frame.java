@@ -54,7 +54,7 @@ public class Frame {
         repeat = 0;
         repeatCount = 0;
         startDelay = 0;
-        duration = 1000;
+        duration = 1;
         elapsedTime = 0;
     }
 
@@ -63,13 +63,17 @@ public class Frame {
     }
 
     public void update(float delta) {
+        if (elapsedTime > startDelay + duration) {
+            repeatCount++;
+            elapsedTime = startDelay;
+        }
         elapsedTime += delta;
-        //if (elapsedTime > startDelay) {
+        if (elapsedTime >= startDelay) {
             float tval = (elapsedTime - startDelay) / duration;
             if (lastFrame == null) {
                 for (int i = 0; i < compInterfaces.size(); i++) {
-                    float val = .5f;//compInterpolators.get(i)
-                    //.getInterpolation(tval);
+                    float val = compInterpolators.get(i)
+                        .getInterpolation(tval);
                     Object oval = compInterfaces.get(i)
                         .computeInterpolation(val,
                                               fromComponents.get(i),
@@ -86,8 +90,7 @@ public class Frame {
                                               toComponents.get(i));
                 }
             }
-            repeatCount++;
-            //}
+        }
     }
 
     /**
@@ -195,18 +198,17 @@ public class Frame {
     // }
 
     public final boolean isFinished() {
-        return false;
-        // int repeatFinished = repeat;
-        // if (repeat < 0) {
-        //     if (repeat == -1) {
-        //         return false;
-        //     } else {
-        //         repeatFinished = -(repeat + 1);
-        //     }
-        // } else if (repeat == 0) {
-        //     return false;
-        // }
-        // return elapsedTime > startDelay + duration * repeatFinished;
+        int repeatFinished = repeat;
+        if (repeat < 0) {
+            if (repeat == -1) {
+                return false;
+            } else {
+                repeatFinished = -(repeat + 1);
+            }
+        } else if (repeat == 0) {
+            return false;
+        }
+        return elapsedTime > startDelay + duration * repeatFinished;
     }
 
     public interface FrameComponentInterface {
