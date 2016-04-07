@@ -28,10 +28,10 @@ public class AccelerateInterpolator extends BaseInterpolator {
 
     public AccelerateInterpolator(float factor) {
         super();
-        this.factor = factor * 2;
+        this.factor = factor;
     }
 
     public float getInterpolation(float v) {
-        return (float) Math.pow(v, factor) * (end - start) + start;
+        return (float) factor * v * v * (end - start) + start;
     }
 }

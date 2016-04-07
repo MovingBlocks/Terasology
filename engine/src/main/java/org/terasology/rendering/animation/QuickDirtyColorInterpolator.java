@@ -17,27 +17,16 @@ package org.terasology.rendering.animation;
 
 import org.terasology.rendering.nui.Color;
 
-public abstract class ColorInterpolator implements Frame.FrameComponentInterface {
+public abstract class QuickDirtyColorInterpolator implements Frame.FrameComponentInterface {
     @Override
     public Object computeInterpolation(float v, Object theFrom, Object theTo) {
         Color f = (Color) theFrom;
         Color t = (Color) theTo;
         return new Color(
-            255,//clamp(v * (t.rf() - f.rf()) + f.rf()),
-            0,//clamp(v * (t.gf() - f.gf()) + f.gf()),
-            0,//clamp(v * (t.bf() - f.bf()) + f.bf()),
-            255//clamp(v * (t.af() - f.af()) + f.af())
+            v * (t.rf() - f.rf()) + f.rf(),
+            v * (t.gf() - f.gf()) + f.gf(),
+            v * (t.bf() - f.bf()) + f.bf(),
+            v * (t.af() - f.af()) + f.af()
         );
-    }
-
-    private static float clamp(float c) {
-        //return c;
-         if (c > 1) {
-             c = 1;
-        // } else if (c > 255) {
-        //     c = 255;
-        }
-
-         return c;
     }
 }

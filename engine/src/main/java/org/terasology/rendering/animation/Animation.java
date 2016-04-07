@@ -26,10 +26,12 @@ import java.util.ArrayList;
 
 /*
  */
-public class Animation implements Component, AssetData {
-    private List<AnimationListener> listeners;
-    private List<Frame> frames;
-    private int repeat;
+public class Animation {
+
+    private final List<AnimationListener> listeners = new ArrayList<AnimationListener>();
+    private final List<Frame> frames = new ArrayList<Frame>();
+    private int repeatCount;
+    private RepeatMode repeatMode;
 
     private float elapsedTime;
     private int currentFrame;
@@ -41,20 +43,27 @@ public class Animation implements Component, AssetData {
     private AnimState currentState;
 
     public Animation() {
-        listeners = new ArrayList<AnimationListener>();
-        frames = new ArrayList<Frame>();
         currentState = AnimState.PRESTART;
-        repeat = 0;
+        currentRepeatCount = 0;
+        repeatCount = 0;
         elapsedTime = 0;
         currentFrame = 0;
+        repeatMode = RepeatMode.REPEAT_INFINITE;
     }
 
     public void addFrame(Frame frame) {
         this.frames.add(frame);
     }
 
-    public void setRepeat(int repeat) {
-        this.repeat = repeat;
+    public void setRepeatCount(int repeat) {
+        if (!(repeat > 0)) {
+            throw new IllegalArgumentException("repeat must be positive");
+        }
+        this.repeatCount = repeat;
+    }
+
+    public void setRepeatMode(RepeatMode repeat) {
+        this.repeatMode = repeat;
     }
 
     public void update(float delta) {
@@ -65,12 +74,21 @@ public class Animation implements Component, AssetData {
                 currentFrame++;
                 if (currentFrame >= frames.size()) {
                     currentRepeatCount++;
-                    if (currentRepeatCount >= repeat ||
-                        currentRepeatCount >= -(repeat + 1)) {
+                    switch (repeatMode) {
+                    case RUN_ONCE:
                         end();
-                    } else { // if repeating forever or still able to repeat
+                        break;
+                    case REPEAT: case INVERSE:
+                        if (currentRepeatCount >= repeatCount) {
+                            end();
+                            break;
+                        }
+                    case REPEAT_INFINITE: case INVERSE_INFINITE:
+                        if (repeatMode.equals(RepeatMode.INVERSE) || repeatMode.equals(RepeatMode.INVERSE_INFINITE))
+                            flipFrames();
                         currentFrame = 0;
-                        elapsedTime = 0;//startDelay;
+                        elapsedTime = 0;
+                        break;
                     }
                 }
             }
@@ -78,6 +96,12 @@ public class Animation implements Component, AssetData {
         }
         default: break;
         }
+    }
+
+    public void flipFrames() {
+        Collections.reverse(frames);
+        for (int i = 0; i < frames.size(); i++)
+            frames.get(i).reverse();
     }
 
     public void start() {

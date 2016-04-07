@@ -25,6 +25,7 @@ import org.terasology.rendering.animation.Frame;
 import org.terasology.rendering.animation.FloatInterpolator;
 import org.terasology.rendering.animation.AccelerateInterpolator;
 import org.terasology.rendering.animation.DecelerateInterpolator;
+import org.terasology.rendering.animation.RepeatMode;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
@@ -225,9 +226,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 }
             }, new DecelerateInterpolator());
         frm.setDuration(.75f);
-        frm.setRepeat(1);
+        frm.setRepeatCount(1);
         sizeAnim.addFrame(frm);
-        sizeAnim.setRepeat(1);
+        sizeAnim.setRepeatCount(1);
+        sizeAnim.setRepeatMode(RepeatMode.RUN_ONCE);
         sizeAnim.addListener(new Animation.ListenerAdapter() {
                 @Override public void onStart() {
                     animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
@@ -260,9 +262,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 }
             }, new AccelerateInterpolator());
         frm.setDuration(.75f);
-        frm.setRepeat(1);
+        frm.setRepeatCount(1);
         sizeAnim.addFrame(frm);
-        sizeAnim.setRepeat(1);
+        sizeAnim.setRepeatCount(1);
+        sizeAnim.setRepeatMode(RepeatMode.RUN_ONCE);
         sizeAnim.addListener(new Animation.ListenerAdapter() {
                 @Override public void onStart() {
                     animCanvasSize = animRegion;

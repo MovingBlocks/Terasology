@@ -29,9 +29,6 @@ import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
-import org.terasology.rendering.animation.Animation;
-import org.terasology.rendering.animation.Frame;
-import org.terasology.rendering.animation.ColorInterpolator;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -61,7 +58,6 @@ public class UIButton extends CoreWidget {
     private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
     private boolean down;
-    private Color testColor;
 
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
@@ -71,16 +67,6 @@ public class UIButton extends CoreWidget {
         public boolean onMouseClick(NUIMouseClickEvent event) {
             if (enabled.get() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 down = true;
-                Animation testAnimation = new Animation();
-                Frame testFrame = new Frame();
-                testFrame.addComponent(new Color(255, 0, 0),
-                                       new Color(0, 0, 255),
-                                       new ColorInterpolator() {
-                        @Override public void setValue(Object value) {
-                            testColor = (Color) value;
-                        }});
-                testAnimation.addFrame(testFrame);
-                startAnimation(testAnimation);
                 return true;
             }
             return false;
@@ -110,7 +96,6 @@ public class UIButton extends CoreWidget {
     public UIButton(String id, String text) {
         super(id);
         this.text.set(text);
-        testColor = Color.WHITE;
     }
 
     public UIButton(String id, Binding<String> text) {
@@ -121,7 +106,7 @@ public class UIButton extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         if (image.get() != null) {
-            canvas.drawTexture(image.get(), testColor);
+            canvas.drawTexture(image.get());
         }
         canvas.drawText(text.get());
         canvas.addInteractionRegion(interactionListener);
