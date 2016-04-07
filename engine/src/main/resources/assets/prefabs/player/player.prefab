@@ -16,6 +16,9 @@
         "radius" : 0.3,
         "jumpSpeed" : 12
     },
+    "CharacterMovementModifier" : {
+        "unhinged" : 1.0
+    },
     "Mesh" : {
         "mesh" : "engine:testmonkey",
         "material" : "engine:monkeyHead9",

@@ -27,6 +27,7 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Quat4f;
@@ -591,7 +592,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
 
         if (input.isRunning() && movementComp.mode == MovementMode.UNHINGED) {
-            //maxSpeed *=  movementModifier;
+            maxSpeed *= entity.getComponent(CharacterMovementModifierComponent.class).unhinged;
         }
 
         // As we can't use it, remove the y component of desired movement while maintaining speed.

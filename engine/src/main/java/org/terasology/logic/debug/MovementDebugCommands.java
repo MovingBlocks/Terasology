@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.debug;
 
-import org.terasology.logic.characters.events.SetSpeedModifierEvent;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,6 +25,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
+import org.terasology.logic.characters.events.SetSpeedModifierEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
@@ -67,9 +67,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Turbo speed modifier", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String setSpeedModifier(@Sender EntityRef client, @CommandParam("amount") float amount) {
+    public String setSpeedModifier(@Sender EntityRef client, @CommandParam("amount") float amount, @CommandParam("MovementMode") String factorType) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        clientComp.character.send(new SetSpeedModifierEvent(amount));
+        clientComp.character.send(new SetSpeedModifierEvent(amount, factorType.toUpperCase()));
 
         return "Speed multiplier set to " + amount ;
     }

@@ -24,7 +24,7 @@ public enum MovementMode {
     SWIMMING(0.05f, 1.5f, true, false, true, 2f, true),
     DIVING(0f, 2f, true, false, true, 2f, true),
     GHOSTING(0f, 4f, false, false, false, 5f, true),
-    UNHINGED(0f, 5f, true, false, false, 5f, false),
+    UNHINGED(0f, 8f, false, false, false, 5f, false),
     FLYING(0f, 4f, true, false, false, 3f, true),
     NONE(0f, 0f, false, false, false, 0f, true);
 

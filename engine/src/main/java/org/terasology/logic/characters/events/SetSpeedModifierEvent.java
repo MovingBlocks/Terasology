@@ -16,6 +16,7 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.logic.characters.MovementMode;
 
 /**
  */
@@ -26,18 +27,29 @@ public class SetSpeedModifierEvent implements Event{
     private float UNHINGED_factor;
     public enum FactorType
     {
-        UNHINGED,
+        NONE,
+        UNHINGED
     }
 
-    public SetSpeedModifierEvent(float factor) {
+    public SetSpeedModifierEvent(float factor, String factorType) {
         this.UNHINGED_factor = factor;
     }
 
-    public float getFactor(FactorType type) {
+    public FactorType getFactor(String type) {
+        switch (type) {
+            case "UNHINGED":
+                return FactorType.UNHINGED;
+            default:
+                return FactorType.NONE;
+        }
+    }
+
+    public float getFactorValue(FactorType type) {
         switch (type) {
             case UNHINGED:
                 return UNHINGED_factor;
+            default:
+                return 1.0f;
         }
-        return 1.0f;
     }
 }

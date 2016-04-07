@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
+import org.terasology.logic.characters.events.SetSpeedModifierEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
@@ -111,6 +112,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(character, newState);
+    }
+
+    @ReceiveEvent
+    public void onSetSpeedModifierEvent(SetSpeedModifierEvent event, EntityRef character, CharacterMovementModifierComponent movementModifierComponent) {
+        movementModifierComponent.unhinged = event.getFactorValue(SetSpeedModifierEvent.FactorType.UNHINGED);
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
