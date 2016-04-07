@@ -45,6 +45,10 @@
                             "text": "${engine:menu#video-preset}"
                         },
                         {
+                            "type": "UILabel",
+                            "text": "${engine:menu#video-preset-message}"
+                        },
+                        {
                             "type": "ColumnLayout",
                             "columns": 1,
                             "verticalSpacing": 4,
