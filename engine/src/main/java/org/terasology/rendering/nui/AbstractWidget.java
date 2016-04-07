@@ -50,6 +50,9 @@ public abstract class AbstractWidget implements UIWidget {
 
     private boolean focused;
 
+    @LayoutConfig
+    private Binding<Boolean> enabled = new DefaultBinding<>(true);
+
     public AbstractWidget() {
         id = "";
     }
@@ -139,6 +142,14 @@ public abstract class AbstractWidget implements UIWidget {
 
     public void setVisible(boolean visible) {
         this.visible.set(visible);
+    }
+
+    public boolean isEnabled() {
+        return enabled.get();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
     }
 
     public void bindVisible(Binding<Boolean> bind) {

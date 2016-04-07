@@ -3,7 +3,15 @@
     "font" : "NotoSans-Regular",
     "elements" : {
         "UILabel" : {
-            "text-align-vertical" : "top"
+            "text-align-vertical" : "top",
+            "modes": {
+                "enabled": {
+                    "text-color": "FFFFFFFF"
+                },
+                "disabled": {
+                    "text-color": "888888FF"
+                }
+            }
         },
         "UITooltip" : {
             "background" : "engine:area",
@@ -312,6 +320,12 @@
                 },
                 "hover-active" : {
                     "background" : "engine:checkboxCheckedHover"
+                },
+                "disabled": {
+                    "background" : "engine:checkboxDisabled"
+                },
+                "disabled-active": {
+                    "background" : "engine:checkboxCheckedDisabled"
                 }
             }
         },

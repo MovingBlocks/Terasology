@@ -34,6 +34,7 @@ public interface UIWidget extends Iterable<UIWidget> {
     String FOCUSED_MODE = "focused";
     String ACTIVE_MODE = "active";
     String BASE_PART = "base";
+    String DISABLED_MODE = "disabled";
 
     String getId();
 
