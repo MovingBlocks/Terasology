@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.animation;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -26,7 +27,8 @@ public class Frame {
     private List<FrameComponentInterface> compInterfaces;
     private List<Interpolator> compInterpolators;
 
-    private int repeat;
+    private int repeatCount;
+    private RepeatMode repeatMode;
     private float startDelay;
     private float duration;
 
@@ -34,7 +36,7 @@ public class Frame {
     private Frame lastFrame;
 
     private float elapsedTime;
-    private int repeatCount;
+    private int currentRepeatCount;
 
     /**
      * Constructs a new linear-interpolated, 1 sec animation frame.
@@ -51,11 +53,12 @@ public class Frame {
         toComponents = new ArrayList<Object>();
         compInterfaces = new ArrayList<FrameComponentInterface>();
         compInterpolators = new ArrayList<Interpolator>();
-        repeat = 0;
+        currentRepeatCount = 0;
         repeatCount = 0;
         startDelay = 0;
         duration = 1;
         elapsedTime = 0;
+        repeatMode = RepeatMode.RUN_ONCE;
     }
 
     public Frame() {
@@ -66,7 +69,7 @@ public class Frame {
         elapsedTime += delta;
         float tval = (elapsedTime - startDelay) / duration;
         if (elapsedTime > startDelay + duration) {
-            repeatCount++;
+            currentRepeatCount++;
             tval = 1;
             elapsedTime = 0;
         }
@@ -92,6 +95,13 @@ public class Frame {
                 }
             }
         }
+    }
+
+    public void reverse() {
+        Collections.reverse(fromComponents);
+        Collections.reverse(toComponents);
+        Collections.reverse(compInterfaces);
+        Collections.reverse(compInterpolators);
     }
 
     /**
@@ -160,8 +170,15 @@ public class Frame {
      *
      * @param count the repeat count and type
      */
-    public void setRepeat(int count) {
-        repeat = count;
+    public void setRepeatCount(int count) {
+        if (!(count > 0)) {
+            throw new IllegalArgumentException("repeat must be positive");
+        }
+        this.repeatCount = count;
+    }
+
+    public void setRepeatMode(RepeatMode repeatMode) {
+        this.repeatMode = repeatMode;
     }
 
     /**
@@ -189,27 +206,17 @@ public class Frame {
         this.duration = duration;
     }
 
-    // /**
-    //  * Returns the duration this frame will take to complete.
-    //  *
-    //  * @return the duration this frame will take to complete
-    //  */
-    // public final float getDuration() {
-    //     return duration;
-    // }
-
     public final boolean isFinished() {
-        int repeatFinished = repeat;
-        if (repeat < 0) {
-            if (repeat == -1) {
-                return false;
-            } else {
-                repeatFinished = -(repeat + 1);
-            }
-        } else if (repeat == 0) {
+        switch (repeatMode) {
+        case RUN_ONCE:
+            return currentRepeatCount >= 1;
+        case REPEAT: case INVERSE:
+            return currentRepeatCount >= repeatCount;
+        case REPEAT_INFINITE: case INVERSE_INFINITE:
             return false;
+        default:
+            return true;
         }
-        return repeatCount >= repeatFinished;
     }
 
     public interface FrameComponentInterface {

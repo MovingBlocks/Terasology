@@ -15,17 +15,15 @@
  */
 package org.terasology.rendering.animation;
 
-/*
- * Deceleration interpolator, starts fast and ends slow.
- */
-public class DecelerateInterpolator extends BaseInterpolator {
-    private float factor;
+import org.terasology.rendering.nui.Color;
 
-    public DecelerateInterpolator() {
-        super();
+public abstract class SlowQualityColorInterpolator implements Frame.FrameComponentInterface {
+    private SlowQualityColorInterpolator() {
     }
-
-    public float getInterpolation(float v) {
-        return (float) (1 - (1 - v) * (1 - v)) * (end - start) + start;
+    @Override
+    public Object computeInterpolation(float v, Object theFrom, Object theTo) {
+        Color f = (Color) theFrom;
+        Color t = (Color) theTo;
+        throw new IllegalStateException("Slow quality color interpolator not yet supported");
     }
 }
