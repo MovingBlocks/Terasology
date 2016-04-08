@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -45,12 +44,13 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -169,11 +169,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     // TODO: one day the main light (sun/moon) should be just another light in the scene.
     private void initMainDirectionalLight() {
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
-        mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
-        mainDirectionalLight.lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
-        mainDirectionalLight.lightAmbientIntensity = 1.0f;
-        mainDirectionalLight.lightDiffuseIntensity = 2.0f;
-        mainDirectionalLight.lightSpecularIntensity = 0.0f;
+        mainDirectionalLight.lightAmbientIntensity = 0.75f;
+        mainDirectionalLight.lightDiffuseIntensity = 0.75f;
     }
 
     private void initRenderingSupport() {
@@ -576,7 +573,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         if (lightComponent.lightType == LightComponent.LightType.POINT) {
             if (!geometryOnly) {
-                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange * 0.975f, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
+                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
             }
 
             LightGeometryHelper.renderSphereGeometry();
