@@ -19,31 +19,7 @@ package org.terasology.rendering.animation;
  * Base linear interpolator, should typically be extended from.
  */
 public class BaseInterpolator implements Interpolator {
-    protected float start;
-    protected float end;
-
-    public BaseInterpolator() {
-        start = 0.f;
-        end = 1.f;
-    }
-
     public float getInterpolation(float v) {
-        return v * (end - start) + start;
-    }
-
-    public void setStart(float v) {
-        this.start = v;
-    }
-
-    public float getStart() {
-        return start;
-    }
-
-    public void setEnd(float v) {
-        this.end = v;
-    }
-
-    public float getEnd() {
-        return end;
+        return v;
     }
 }

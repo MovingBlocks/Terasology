@@ -19,13 +19,7 @@ package org.terasology.rendering.animation;
  * Deceleration interpolator, starts fast and ends slow.
  */
 public class DecelerateInterpolator extends BaseInterpolator {
-    private float factor;
-
-    public DecelerateInterpolator() {
-        super();
-    }
-
     public float getInterpolation(float v) {
-        return (float) (1 - (1 - v) * (1 - v)) * (end - start) + start;
+        return 1 - (1 - v) * (1 - v);
     }
 }

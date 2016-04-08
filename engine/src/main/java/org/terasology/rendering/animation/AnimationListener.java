@@ -16,17 +16,11 @@
 package org.terasology.rendering.animation;
 
 /*
- * Interface for interpolation equations.
  */
-public interface Interpolator {
-    /**
-     * Returns where an interpolated value should be based on
-     * where the position an animation is in.
-     *
-     * @param v position of the animation between the start and end [0:1]
-     * and also referenced as the intermediate interpolation <b>v</b>alue
-     *
-     * @return where the interpolated value should be, between [0:1]
-     */
-    float getInterpolation(float v);
+public interface AnimationListener {
+    default void onStart() { }
+    default void onFrameStart() { }
+    default void onStep(float v) { }
+    default void onFrameEnd() { }
+    default void onEnd() { }
 }
