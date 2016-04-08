@@ -21,6 +21,7 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.animation.Animation;
+import org.terasology.rendering.animation.AnimationListener;
 import org.terasology.rendering.animation.Frame;
 import org.terasology.rendering.animation.FloatInterpolator;
 import org.terasology.rendering.animation.AccelerateInterpolator;
@@ -37,9 +38,6 @@ import java.util.Iterator;
 /**
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
-
-    private Rect2i animRegion, animCanvasSize;
-    private Animation sizeAnim;
 
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
@@ -58,6 +56,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private NUIManager manager;
     private boolean initialised;
+
+    private Rect2i animRegion;
+    private Rect2i animCanvasSize;
+    private Animation sizeAnim;
 
     public CoreScreenLayer() {
         animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
@@ -230,12 +232,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         sizeAnim.addFrame(frm);
         sizeAnim.setRepeatCount(1);
         sizeAnim.setRepeatMode(RepeatMode.RUN_ONCE);
-        sizeAnim.addListener(new Animation.ListenerAdapter() {
+        sizeAnim.addListener(new AnimationListener() {
                 @Override public void onStart() {
                     animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
                     animCanvasSize = animRegion;
                 }
-                @Override public void onEnd(int ignore) {
+                @Override public void onEnd() {
                     sizeAnim = null;
                     animRegion = null;
                     animCanvasSize = null;
@@ -266,11 +268,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         sizeAnim.addFrame(frm);
         sizeAnim.setRepeatCount(1);
         sizeAnim.setRepeatMode(RepeatMode.RUN_ONCE);
-        sizeAnim.addListener(new Animation.ListenerAdapter() {
+        sizeAnim.addListener(new AnimationListener() {
                 @Override public void onStart() {
                     animCanvasSize = animRegion;
                 }
-                @Override public void onEnd(int ignore) {
+                @Override public void onEnd() {
                     sizeAnim = null;
                     animRegion = null;
                     animCanvasSize = null;

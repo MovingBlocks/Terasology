@@ -19,19 +19,7 @@ package org.terasology.rendering.animation;
  * Acceleration interpolator, starts slow and ends fast.
  */
 public class AccelerateInterpolator extends BaseInterpolator {
-    private float factor;
-
-    public AccelerateInterpolator() {
-        super();
-        factor = 2;
-    }
-
-    public AccelerateInterpolator(float factor) {
-        super();
-        this.factor = factor;
-    }
-
     public float getInterpolation(float v) {
-        return (float) factor * v * v * (end - start) + start;
+        return (float) v * v;
     }
 }

@@ -49,10 +49,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.animation.Animation;
-import org.terasology.rendering.animation.Frame;
-import org.terasology.rendering.animation.FloatInterpolator;
-import org.terasology.rendering.animation.AccelerateInterpolator;
-import org.terasology.rendering.animation.DecelerateInterpolator;
+import org.terasology.rendering.animation.AnimationListener;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
@@ -62,7 +59,6 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
-import org.terasology.rendering.nui.Color;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -193,8 +189,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private void closeScreen(UIScreenLayer screen, boolean sendEvents) {
         Animation closeAnim = screen.getCloseAnimation();
         if (closeAnim != null) {
-            closeAnim.addListener(new Animation.ListenerAdapter() {
-                    @Override public void onEnd(int ignore) {
+            closeAnim.addListener(new AnimationListener() {
+                    @Override public void onEnd() {
                         if (screens.remove(screen)) {
                             ResourceUrn screenUri = screenLookup.inverse().remove(screen);
                             onCloseScreen(screen, screenUri, sendEvents);
@@ -218,8 +214,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 localPlayer.getClientEntity().send(new ScreenLayerClosedEvent(screenUri));
             }
         }
-        if (!screens.isEmpty())
+        if (!screens.isEmpty()) {
             screens.peek().startAnimation(screens.peek().getOpenAnimation());
+        }
     }
 
     @Override
@@ -312,8 +309,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         } else if (doAnim && !screens.isEmpty()) {
             Animation closeAnim = screens.peek().getCloseAnimation();
             if (closeAnim != null) {
-                closeAnim.addListener(new Animation.ListenerAdapter() {
-                        @Override public void onEnd(int ignore) {
+                closeAnim.addListener(new AnimationListener() {
+                        @Override public void onEnd() {
                             pushScreen(screen, uri, false);
                         }
                     });

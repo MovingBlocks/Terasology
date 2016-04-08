@@ -33,6 +33,6 @@ public class CycleInterpolator extends BaseInterpolator {
     }
 
     public float getInterpolation(float v) {
-        return (float) Math.sin(2 * Math.PI * factor * v) * (end - start) + start;
+        return (float) Math.sin(2 * Math.PI * factor * v);
     }
 }
