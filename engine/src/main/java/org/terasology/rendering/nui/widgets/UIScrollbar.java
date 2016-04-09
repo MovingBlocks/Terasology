@@ -91,11 +91,11 @@ public class UIScrollbar extends CoreWidget {
                 if (vertical) {
                     updatePosition(pos.y - mouseOffset);
 
-                    setValue(TeraMath.clamp(pos.y - mouseOffset, 0, sliderSize) * getRange() / sliderSize);
+                    setValue((sliderSize > 0) ? TeraMath.clamp(pos.y - mouseOffset, 0, sliderSize) * getRange() / sliderSize : 0);
                 } else {
                     updatePosition(pos.x - mouseOffset);
 
-                    setValue(TeraMath.clamp(pos.x - mouseOffset, 0, sliderSize) * getRange() / sliderSize);
+                    setValue((sliderSize > 0) ? TeraMath.clamp(pos.x - mouseOffset, 0, sliderSize) * getRange() / sliderSize : 0);
                 }
                 dragging = true;
                 return true;
