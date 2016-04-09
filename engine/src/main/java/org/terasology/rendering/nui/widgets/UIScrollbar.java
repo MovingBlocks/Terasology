@@ -16,8 +16,8 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -88,15 +88,17 @@ public class UIScrollbar extends CoreWidget {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 Vector2i pos = event.getRelativeMousePosition();
                 mouseOffset = (sliderSize > handleSize) ? (handleSize / 2) : 0;
-                if (vertical) {
-                    updatePosition(pos.y - mouseOffset);
 
-                    setValue((sliderSize > 0) ? TeraMath.clamp(pos.y - mouseOffset, 0, sliderSize) * getRange() / sliderSize : 0);
+                int pixelPosition = vertical ? pos.y - mouseOffset : pos.x - mouseOffset;
+                updatePosition(pixelPosition);
+
+                if (sliderSize > 0) {
+                    int clamped = TeraMath.clamp(pixelPosition, 0, sliderSize);
+                    setValue(clamped * getRange() / sliderSize);
                 } else {
-                    updatePosition(pos.x - mouseOffset);
-
-                    setValue((sliderSize > 0) ? TeraMath.clamp(pos.x - mouseOffset, 0, sliderSize) * getRange() / sliderSize : 0);
+                    setValue(0);
                 }
+
                 dragging = true;
                 return true;
             }
