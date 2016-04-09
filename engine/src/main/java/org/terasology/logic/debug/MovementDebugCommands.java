@@ -15,15 +15,13 @@
  */
 package org.terasology.logic.debug;
 
+import org.terasology.logic.characters.*;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterTeleportEvent;
-import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.events.SetSpeedModifierEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -65,13 +63,30 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Unhinged mode toggled";
     }
 
+    @Command(shortDescription = "Steady height mode", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String hovercam(@Sender EntityRef client) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        //clientComp.character.g(CharacterMovementSystemUtility.class).
+        //clientComp.character.getComponent(CharacterMovementComponent.class).groundDistance = client.get
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.HOVERCAM));
+
+        return "Hovercam mode toggled";
+    }
+
     @Command(shortDescription = "Turbo speed modifier", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String setSpeedModifier(@Sender EntityRef client, @CommandParam("amount") float amount, @CommandParam("MovementMode") String factorType) {
+    public String setSpeedModifier(@Sender EntityRef client, @CommandParam("amount") float amount, @CommandParam(value = "MovementMode", required = false) String factorType) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
+
+        if (factorType == null)
+        {
+            factorType = clientComp.character.getComponent(CharacterMovementComponent.class).mode.toString();
+        }
+
         clientComp.character.send(new SetSpeedModifierEvent(amount, factorType.toUpperCase()));
 
-        return "Speed multiplier set to " + amount ;
+        return "Speed multiplier for " + factorType.toUpperCase() + " set to " + amount ;
     }
 
     @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true,

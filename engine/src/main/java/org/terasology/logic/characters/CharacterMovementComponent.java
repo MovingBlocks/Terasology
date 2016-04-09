@@ -71,6 +71,8 @@ public final class CharacterMovementComponent implements Component {
     // Distance since last footstep
     public float footstepDelta;
 
+    // Distance desired from ground
+    public float groundDistance;
 
     private Vector3f velocity = new Vector3f();
 

@@ -115,6 +115,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             }
         }
 
+        pickupItem.getComponent(ItemComponent.class).pickUpTime = 2000;
         pickupItem.send(new DropItemEvent(event.getNewPosition()));
         pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }

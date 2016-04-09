@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Component;
 /**
  * Created by rmincu on 5/4/2016.
  */
-public final class CharacterMovementModifierComponent implements Component {
+public final class CharacterSpeedModifierComponent implements Component {
     public float unhinged = 1.0f;
+    public float hovercam = 1.0f;
 }

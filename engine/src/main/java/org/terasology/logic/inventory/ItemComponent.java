@@ -80,6 +80,10 @@ public final class ItemComponent implements Component {
      */
     public int baseDamage = 1;
 
+    public boolean pickableUp = true;
+
+    public long pickUpTime = 0;
+
     //TODO: move this to a separate component alongside the health system
     public Prefab damageType;
 

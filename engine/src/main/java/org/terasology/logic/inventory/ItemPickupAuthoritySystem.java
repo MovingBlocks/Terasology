@@ -25,6 +25,8 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.delay.DelayManager;
+import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
@@ -43,8 +45,13 @@ import org.terasology.world.block.items.BlockItemComponent;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemPickupAuthoritySystem extends BaseComponentSystem {
+    static final String DELAYED_PICKUP_ACTION_ID = "Delayed Pickup";
+
     @In
     private EntitySystemLibrary library;
+
+    @In
+    private DelayManager delayManager;
 
     @ReceiveEvent
     public void onDropItemEvent(DropItemEvent event, EntityRef itemEntity, ItemComponent itemComponent) {
@@ -59,20 +66,32 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         if (!itemEntity.hasComponent(LocationComponent.class)) {
             itemEntity.addComponent(new LocationComponent(event.getPosition()));
         }
+
+        itemEntity.getComponent(ItemComponent.class).pickableUp = false;
+        long timeToPickUp = itemEntity.getComponent(ItemComponent.class).pickUpTime;
+        delayManager.addDelayedAction(itemEntity, DELAYED_PICKUP_ACTION_ID, timeToPickUp);
     }
 
+    @ReceiveEvent
+    public void onDelayedPickup(DelayedActionTriggeredEvent event, EntityRef entityRef) {
+        if (event.getActionId().equals(DELAYED_PICKUP_ACTION_ID)) {
+            entityRef.getComponent(ItemComponent.class).pickableUp = true;
+        }
+    }
 
     @ReceiveEvent
     public void onBumpGiveItemToEntity(CollideEvent event, EntityRef entity, PickupComponent pickupComponent) {
-        GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
-        entity.send(giveItemEvent);
+        if ( entity.getComponent(ItemComponent.class).pickableUp == true ) {
+            GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
+            entity.send(giveItemEvent);
 
-        if (giveItemEvent.isHandled()) {
-            // remove all the components added from the pickup prefab
-            ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
-            if (itemComponent != null) {
-                for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
-                    entity.removeComponent(component.getClass());
+            if (giveItemEvent.isHandled()) {
+                // remove all the components added from the pickup prefab
+                ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
+                if (itemComponent != null) {
+                    for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
+                        entity.removeComponent(component.getClass());
+                    }
                 }
             }
         }

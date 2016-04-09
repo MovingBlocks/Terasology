@@ -115,8 +115,19 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     }
 
     @ReceiveEvent
-    public void onSetSpeedModifierEvent(SetSpeedModifierEvent event, EntityRef character, CharacterMovementModifierComponent movementModifierComponent) {
-        movementModifierComponent.unhinged = event.getFactorValue(SetSpeedModifierEvent.FactorType.UNHINGED);
+    public void onSetSpeedModifierEvent(SetSpeedModifierEvent event, EntityRef character, CharacterSpeedModifierComponent movementModifierComponent) {
+        SetSpeedModifierEvent.FactorType factorType = event.getFactorType();
+        switch (factorType)
+        {
+            case UNHINGED:
+                movementModifierComponent.unhinged = event.getFactorValue();
+                break;
+            case HOVERCAM:
+                movementModifierComponent.hovercam = event.getFactorValue();
+                break;
+            default:
+                break;
+        }
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
