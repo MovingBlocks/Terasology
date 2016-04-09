@@ -16,35 +16,34 @@
 
 package org.terasology.core.world.viewer.layers;
 
-import java.util.Map;
-import java.util.function.Function;
-
+import com.google.common.collect.Maps;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.biomes.Biome;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * TODO Type description
  */
-public class CoreBiomeColors implements Function<CoreBiome, Color> {
+public class CoreBiomeColors implements Function<Biome, Color> {
 
-    private final Map<Biome, Color> biomeColors = Maps.newHashMap();
+    private final Map<String, Color> biomeColors = Maps.newHashMap();
 
     public CoreBiomeColors() {
-        biomeColors.put(CoreBiome.DESERT, new Color(0xb0a087ff));
-        biomeColors.put(CoreBiome.MOUNTAINS, new Color(0x899a47ff));
-        biomeColors.put(CoreBiome.PLAINS, new Color(0x80b068ff));
-        biomeColors.put(CoreBiome.SNOW, new Color(0x99ffffff));
-        biomeColors.put(CoreBiome.FOREST, new Color(0x439765ff));
-        biomeColors.put(CoreBiome.OCEAN, new Color(0x44447aff));
-        biomeColors.put(CoreBiome.BEACH, new Color(0xd0c087ff));
+        biomeColors.put(CoreBiome.DESERT.getName(), new Color(0xb0a087ff));
+        biomeColors.put(CoreBiome.MOUNTAINS.getName(), new Color(0x899a47ff));
+        biomeColors.put(CoreBiome.PLAINS.getName(), new Color(0x80b068ff));
+        biomeColors.put(CoreBiome.SNOW.getName(), new Color(0x99ffffff));
+        biomeColors.put(CoreBiome.FOREST.getName(), new Color(0x439765ff));
+        biomeColors.put(CoreBiome.OCEAN.getName(), new Color(0x44447aff));
+        biomeColors.put(CoreBiome.BEACH.getName(), new Color(0xd0c087ff));
     }
 
     @Override
-    public Color apply(CoreBiome biome) {
-        Color color = biomeColors.get(biome);
+    public Color apply(Biome biome) {
+        Color color = biomeColors.get(biome.getName());
         return color;
     }
 
@@ -53,6 +52,6 @@ public class CoreBiomeColors implements Function<CoreBiome, Color> {
      * @param color the new color
      */
     public void setBiomeColor(Biome biome, Color color) {
-        this.biomeColors.put(biome, color);
+        this.biomeColors.put(biome.getName(), color);
     }
 }
