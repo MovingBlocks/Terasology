@@ -66,6 +66,8 @@ public class UIText extends CoreWidget {
     private float blinkCounter;
 
     private TextureRegion cursorTexture;
+
+    @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
 
     @LayoutConfig
@@ -91,7 +93,7 @@ public class UIText extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 moveCursor(event.getRelativeMousePosition(), false, event.getKeyboard());
                 dragging = true;
                 return true;
@@ -101,14 +103,14 @@ public class UIText extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            if (dragging) {
+            if (isEnabled() && dragging) {
                 moveCursor(event.getRelativeMousePosition(), true, event.getKeyboard());
             }
         }
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 dragging = false;
             }
         }
@@ -238,7 +240,7 @@ public class UIText extends CoreWidget {
     public boolean onKeyEvent(NUIKeyEvent event) {
         correctCursor();
         boolean eventHandled = false;
-        if (event.isDown() && lastFont != null) {
+        if (isEnabled() && event.isDown() && lastFont != null) {
             String fullText = text.get();
 
             switch (event.getKey().getId()) {
@@ -481,6 +483,13 @@ public class UIText extends CoreWidget {
                     listener.onTextChange(prevText, val);
                 }
         }
+    }
+
+    @Override
+    public String getMode() {
+        if (!isEnabled())
+            return DISABLED_MODE;
+        return DEFAULT_MODE;
     }
 
     public boolean isMultiline() {

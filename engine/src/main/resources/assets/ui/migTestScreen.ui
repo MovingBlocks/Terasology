@@ -51,6 +51,47 @@
             {
                 "type": "UILabel",
                 "id": "",
+                "text": "UILabel",
+                "layoutInfo": {
+                    "cc": "newline"
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "label1",
+                "text": "label1",
+                "layoutInfo": {
+                    "cc": ""
+                },
+                "enabled": false
+            },
+            {
+                "type": "UILabel",
+                "id": "label2",
+                "text": "label2",
+                "layoutInfo": {
+                    "cc": "w min, h min"
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "label3",
+                "text": "label3",
+                "layoutInfo": {
+                    "cc": ""
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "label4",
+                "text": "label4",
+                "layoutInfo": {
+                    "cc": "grow"
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "",
                 "text": "UIButton",
                 "layoutInfo": {
                     "cc": "newline"
@@ -174,10 +215,12 @@
             {
                 "type": "UIText",
                 "id": "text1",
+                "text": "text1",
                 "layoutInfo": {
                     "cc": ""
                 },
-                "readOnly": true
+                "readOnly": true,
+                "enabled": false
             },
             {
                 "type": "UIText",
@@ -362,6 +405,38 @@
                 "layoutInfo": {
                     "cc": ""
                 },
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "family" : "option-grid",
+                    "columns" : 2,
+                    "column-widths" : [0.35, 0.65],
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 360,
+                        "height" : 192,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "offset" : 32,
+                            "widget" : "close"
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Example"
+                        },
+                        {
+                            "type" : "UISlider"
+                        }
+                    ]
+                },
                 "enabled": false
             },
             {
@@ -369,6 +444,38 @@
                 "id": "box2",
                 "layoutInfo": {
                     "cc": "w min, h min"
+                },
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "family" : "option-grid",
+                    "columns" : 2,
+                    "column-widths" : [0.35, 0.65],
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 360,
+                        "height" : 192,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "offset" : 32,
+                            "widget" : "close"
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Example"
+                        },
+                        {
+                            "type" : "UISlider"
+                        }
+                    ]
                 }
             },
             {
@@ -376,6 +483,38 @@
                 "id": "box3",
                 "layoutInfo": {
                     "cc": ""
+                },
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "family" : "option-grid",
+                    "columns" : 2,
+                    "column-widths" : [0.35, 0.65],
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 360,
+                        "height" : 192,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "offset" : 32,
+                            "widget" : "close"
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Example"
+                        },
+                        {
+                            "type" : "UISlider"
+                        }
+                    ]
                 }
             },
             {
@@ -383,6 +522,38 @@
                 "id": "box4",
                 "layoutInfo": {
                     "cc": "grow"
+                },
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "family" : "option-grid",
+                    "columns" : 2,
+                    "column-widths" : [0.35, 0.65],
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 360,
+                        "height" : 192,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "offset" : 32,
+                            "widget" : "close"
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Example"
+                        },
+                        {
+                            "type" : "UISlider"
+                        }
+                    ]
                 }
             },
             {

@@ -66,13 +66,19 @@ public class UIList<T> extends CoreWidget {
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             ItemInteractionListener listener = itemListeners.get(i);
-            if (Objects.equals(item, selection.get())) {
-                canvas.setMode(ACTIVE_MODE);
-            } else if (listener.isMouseOver()) {
-                canvas.setMode(HOVER_MODE);
-            } else {
-                canvas.setMode(DEFAULT_MODE);
+            if (this.isEnabled()) {
+                if (Objects.equals(item, selection.get())) {
+                    canvas.setMode(ACTIVE_MODE);
+                } else if (listener.isMouseOver()) {
+                    canvas.setMode(HOVER_MODE);
+                } else {
+                    canvas.setMode(DEFAULT_MODE);
+                }
             }
+            else {
+                canvas.setMode(DISABLED_MODE);
+            }
+
 
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
@@ -199,7 +205,7 @@ public class UIList<T> extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
                 select(index);
                 return true;
             }
@@ -208,7 +214,7 @@ public class UIList<T> extends CoreWidget {
 
         @Override
         public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
                 activate(index);
                 return true;
             }

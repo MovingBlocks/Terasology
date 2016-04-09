@@ -40,10 +40,6 @@ import java.util.List;
 public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
-    public static final String DISABLED_MODE = "disabled";
-
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
     private UIScrollbar verticalBar = new UIScrollbar(true);
     private int visibleOptionsNum = 5;
@@ -53,7 +49,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (enabled.get()) {
+            if (isEnabled()) {
                 opened = !opened;
                 optionListeners.clear();
                 if (opened) {
@@ -68,7 +64,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
-            if (enabled.get()) {
+            if (isEnabled()) {
                 int scrollMultiplier = 0 - verticalBar.getRange() / getOptions().size();
                 verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
                 return true;
@@ -244,14 +240,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
     public void setSelection(T value) {
         selection.set(value);
-    }
-
-    public boolean isEnabled() {
-        return enabled.get();
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled.set(enabled);
     }
 
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {

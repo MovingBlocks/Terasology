@@ -43,7 +43,7 @@ public class UISlider extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active = true;
                 offset.set(event.getRelativeMousePosition());
                 offset.x -= pixelOffsetFor(getValue(), sliderWidth);
@@ -59,7 +59,7 @@ public class UISlider extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            if (sliderWidth > 0) {
+            if (isEnabled() && sliderWidth > 0) {
                 Vector2i pos = event.getRelativeMousePosition();
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
@@ -160,6 +160,9 @@ public class UISlider extends CoreWidget {
 
     @Override
     public String getMode() {
+        if (!isEnabled())
+            return DISABLED_MODE;
+
         if (active) {
             return ACTIVE_MODE;
         } else if (tickerListener.isMouseOver()) {

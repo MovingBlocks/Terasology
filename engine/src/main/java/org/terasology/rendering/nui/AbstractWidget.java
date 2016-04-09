@@ -63,7 +63,9 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public String getMode() {
-        return DEFAULT_MODE;
+        if (this.isEnabled())
+            return DEFAULT_MODE;
+        return DISABLED_MODE;
     }
 
     @Override
@@ -150,6 +152,14 @@ public abstract class AbstractWidget implements UIWidget {
 
     public void setEnabled(boolean enabled) {
         this.enabled.set(enabled);
+
+        for (UIWidget child : this) {
+            if (child instanceof AbstractWidget) {
+                AbstractWidget widget = (AbstractWidget) child;
+                widget.setEnabled(this.isEnabled());
+            }
+        }
+
     }
 
     public void bindVisible(Binding<Boolean> bind) {

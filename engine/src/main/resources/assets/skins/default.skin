@@ -46,6 +46,12 @@
                 "bottom" : 4,
                 "left" : 4,
                 "right" : 4
+            },
+            "modes" : {
+                "disabled" : {
+                    "text-color": "888888FF",
+                    "background" : "engine:boxDisabled"
+                }
             }
         },
         "UIImage" : {
@@ -112,6 +118,10 @@
                         "active" : {
                             "background" : "buttonDown",
                             "text-color" : "FFFF00FF"
+                        },
+                        "disabled": {
+                            "background" : "button",
+                            "text-color" : "BBBBBBFF"
                         }
                     }
                 }
@@ -138,6 +148,10 @@
                     "modes" : {
                         "active" : {
                             "background" : "dropdownActive"
+                        },
+                        "disabled" : {
+                            "text-color" : "888888FF",
+                            "background" : "dropdownDisabled"
                         }
                     }
                 },
@@ -193,6 +207,10 @@
                     "modes" : {
                         "active" : {
                             "background" : "dropdownActive"
+                        },
+                        "disabled" : {
+                            "text-color" : "888888FF",
+                            "background" : "dropdownDisabled"
                         }
                     }
                 },
@@ -410,6 +428,10 @@
                     "modes" : {
                         "active" : {
                             "background" : "engine:boxActive"
+                        },
+                        "disabled": {
+                            "text-color": "888888FF",
+                            "background" : "engine:boxDisabled"
                         }
                     }
                 }
@@ -449,6 +471,10 @@
                     "modes" : {
                         "active" : {
                             "background" : "engine:boxActive"
+                        },
+                        "disabled": {
+                            "text-color" : "888888FF",
+                            "background" : "engine:boxDisabled"
                         }
                     }
                 },
@@ -470,6 +496,13 @@
                     "modes" : {
                         "active" : {
                             "background" : "engine:boxActive"
+                        },
+                         "enabled": {
+                             "text-color": "FFFFFFFF"
+                         },
+                         "disabled": {
+                            "text-color": "888888FF",
+                            "background" : "engine:boxDisabled"
                         }
                     }
                 }

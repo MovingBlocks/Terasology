@@ -40,17 +40,13 @@ import java.util.List;
 public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
-    public static final String DISABLED_MODE = "disabled";
-
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (enabled.get()) {
+            if (isEnabled()) {
                 opened = !opened;
                 optionListeners.clear();
                 if (opened) {
@@ -69,6 +65,7 @@ public class UIDropdown<T> extends CoreWidget {
     private boolean opened;
 
     public UIDropdown() {
+
     }
 
     public UIDropdown(String id) {
@@ -128,7 +125,7 @@ public class UIDropdown<T> extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (!enabled.get()) {
+        if (!isEnabled()) {
             return DISABLED_MODE;
         } else if (opened) {
             return ACTIVE_MODE;
@@ -164,14 +161,6 @@ public class UIDropdown<T> extends CoreWidget {
 
     public void setSelection(T value) {
         selection.set(value);
-    }
-
-    public boolean isEnabled() {
-        return enabled.get();
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled.set(enabled);
     }
 
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
