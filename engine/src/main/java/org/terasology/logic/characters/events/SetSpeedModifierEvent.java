@@ -32,7 +32,6 @@ public class SetSpeedModifierEvent implements Event{
     {
         NONE,
         UNHINGED,
-        HOVERCAM
     }
 
     public SetSpeedModifierEvent(float factor, String factorType) {
@@ -44,8 +43,6 @@ public class SetSpeedModifierEvent implements Event{
         switch (type) {
             case "UNHINGED":
                 return FactorType.UNHINGED;
-            case "HOVERCAM":
-                return FactorType.HOVERCAM;
             default:
                 return FactorType.NONE;
         }

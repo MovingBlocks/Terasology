@@ -594,10 +594,6 @@ public class KinematicCharacterMover implements CharacterMover {
             maxSpeed *= entity.getComponent(CharacterSpeedModifierComponent.class).unhinged;
         }
 
-        if (input.isRunning() && movementComp.mode == MovementMode.HOVERCAM) {
-            maxSpeed *= entity.getComponent(CharacterSpeedModifierComponent.class).hovercam;
-        }
-
         // As we can't use it, remove the y component of desired movement while maintaining speed.
         if (movementComp.grounded && desiredVelocity.y != 0) {
             float speed = desiredVelocity.length();

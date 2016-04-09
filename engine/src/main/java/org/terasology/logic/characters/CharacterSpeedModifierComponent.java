@@ -22,5 +22,4 @@ import org.terasology.entitySystem.Component;
  */
 public final class CharacterSpeedModifierComponent implements Component {
     public float unhinged = 1.0f;
-    public float hovercam = 1.0f;
 }

@@ -63,17 +63,6 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Unhinged mode toggled";
     }
 
-    @Command(shortDescription = "Steady height mode", runOnServer = true,
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String hovercam(@Sender EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        //clientComp.character.g(CharacterMovementSystemUtility.class).
-        //clientComp.character.getComponent(CharacterMovementComponent.class).groundDistance = client.get
-        clientComp.character.send(new SetMovementModeEvent(MovementMode.HOVERCAM));
-
-        return "Hovercam mode toggled";
-    }
-
     @Command(shortDescription = "Turbo speed modifier", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setSpeedModifier(@Sender EntityRef client, @CommandParam("amount") float amount, @CommandParam(value = "MovementMode", required = false) String factorType) {

@@ -122,9 +122,6 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             case UNHINGED:
                 movementModifierComponent.unhinged = event.getFactorValue();
                 break;
-            case HOVERCAM:
-                movementModifierComponent.hovercam = event.getFactorValue();
-                break;
             default:
                 break;
         }

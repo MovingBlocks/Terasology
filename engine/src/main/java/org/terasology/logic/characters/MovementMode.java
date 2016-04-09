@@ -25,7 +25,6 @@ public enum MovementMode {
     DIVING(0f, 2f, true, false, true, 2f, true),
     GHOSTING(0f, 4f, false, false, false, 5f, true),
     UNHINGED(0f, 8f, false, false, false, 5f, false),
-    HOVERCAM(0f, 3f, true, false, false, 5f, true),
     FLYING(0f, 4f, true, false, false, 3f, true),
     NONE(0f, 0f, false, false, false, 0f, true);
 
