@@ -67,6 +67,13 @@ public class UILabel extends CoreWidget {
         return text.get();
     }
 
+    @Override
+    public String getMode() {
+        if (isEnabled())
+            return DEFAULT_MODE;
+        return DISABLED_MODE;
+    }
+
     public void setText(String text) {
         this.text.set(text);
     }
