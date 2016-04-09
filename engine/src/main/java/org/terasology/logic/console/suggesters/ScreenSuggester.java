@@ -20,12 +20,12 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
+import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 
+import java.util.Optional;
 import java.util.Set;
 
-/**
- */
 public final class ScreenSuggester implements CommandParameterSuggester<String> {
     private final AssetManager assetManager;
 
@@ -38,7 +38,11 @@ public final class ScreenSuggester implements CommandParameterSuggester<String> 
         Set<String> suggestions = Sets.newHashSet();
 
         for (ResourceUrn resolvedParameter : assetManager.getAvailableAssets(UIElement.class)) {
-            suggestions.add(resolvedParameter.getResourceName().toString());
+            Optional<UIElement> element = assetManager.getAsset(resolvedParameter, UIElement.class);
+            if (element.isPresent() && element.get().getRootWidget() instanceof UIScreenLayer) {
+                suggestions.add(resolvedParameter.toString());
+            }
+
         }
 
         return suggestions;
