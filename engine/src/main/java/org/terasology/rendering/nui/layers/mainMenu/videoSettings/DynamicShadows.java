@@ -20,9 +20,9 @@ import org.terasology.config.RenderingConfig;
 /**
  */
 public enum DynamicShadows {
-    OFF("Off", false, false),
-    ON("On", true, false),
-    ON_PCF("On (PCF)", true, true);
+    OFF("shadows-off", false, false),
+    ON("shadows-on", true, false),
+    ON_PCF("shadows-pcr", true, true);
 
     private String displayName;
     private boolean shadow;
@@ -49,5 +49,9 @@ public enum DynamicShadows {
             return (pcf) ? ON_PCF : ON;
         }
         return OFF;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }
