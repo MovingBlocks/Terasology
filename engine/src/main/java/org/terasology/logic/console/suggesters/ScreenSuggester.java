@@ -23,6 +23,7 @@ import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,14 +36,30 @@ public final class ScreenSuggester implements CommandParameterSuggester<String> 
 
     @Override
     public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
+
+        HashMap<String, Set<ResourceUrn>> resourceMap = new HashMap<>();
         Set<String> suggestions = Sets.newHashSet();
 
         for (ResourceUrn resolvedParameter : assetManager.getAvailableAssets(UIElement.class)) {
             Optional<UIElement> element = assetManager.getAsset(resolvedParameter, UIElement.class);
             if (element.isPresent() && element.get().getRootWidget() instanceof UIScreenLayer) {
-                suggestions.add(resolvedParameter.toString());
-            }
+                String resourceName = resolvedParameter.getResourceName().toString();
+                if (!resourceMap.containsKey(resourceName))
+                    resourceMap.put(resourceName, Sets.newHashSet());
 
+                resourceMap.get(resourceName).add(resolvedParameter);
+            }
+        }
+
+        for (String key : resourceMap.keySet()) {
+            Set<ResourceUrn> set = resourceMap.get(key);
+            if (set.size() == 1) {
+                suggestions.add(set.iterator().next().getResourceName().toString());
+            } else {
+                for (ResourceUrn resourceUrn : set) {
+                    suggestions.add(resourceUrn.toString());
+                }
+            }
         }
 
         return suggestions;
