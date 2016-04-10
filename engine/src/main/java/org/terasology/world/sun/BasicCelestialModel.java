@@ -27,7 +27,7 @@ public class BasicCelestialModel implements CelestialModel {
     private static final long DAWN_TIME = DAY_LENGTH / 4;
     private static final long MIDDAY_TIME = DAY_LENGTH / 2;
     private static final long DUSK_TIME = 3 * DAY_LENGTH / 4;
-    private static final long MIDNIGHT_TIME = DAY_LENGTH;
+    private static final long MIDNIGHT_TIME = 0;
 
     @Override
     public float getSunPosAngle(float days) {
