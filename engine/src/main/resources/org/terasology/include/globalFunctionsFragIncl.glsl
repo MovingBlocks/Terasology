@@ -40,14 +40,8 @@ float calcLambLight(vec3 normal, vec3 lightVec) {
     return diffuse;
 }
 
-float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
-    vec3 halfWay = normalize(eyeVec+lightVec);
-    return pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
-}
-
 float calcSpecLightNormalized(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
-    vec3 halfWay = normalize(eyeVec+lightVec);
-    return ((exp + 8.0) / PI_TIMES_8) * pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
+    return pow(max(0.0, dot(-eyeVec, reflect(lightVec, normal))), exp);
 }
 
 vec4 linearToSrgb(vec4 color) {
