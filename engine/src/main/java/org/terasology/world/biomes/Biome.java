@@ -16,6 +16,7 @@
 package org.terasology.world.biomes;
 
 import org.terasology.module.sandbox.API;
+import org.terasology.rendering.nui.Color;
 
 @API
 public interface Biome {
@@ -36,5 +37,12 @@ public interface Biome {
     float getHumidity();
 
     float getTemperature();
+
+    /**
+     * @return The color as represented in the 2d preview.
+     */
+    default Color getColor() {
+        return Color.BLACK;
+    }
 
 }
