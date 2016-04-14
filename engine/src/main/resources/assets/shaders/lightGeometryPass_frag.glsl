@@ -126,7 +126,7 @@ void main() {
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     // ensure that the shadow does not make the surface completely black
-    shadowTerm = clamp(shadowTerm, 0.25, 1.0);
+    shadowTerm = clamp(shadowTerm, 0.5, 1.0);
 
     lambTerm *= shadowTerm;
     specTerm *= shadowTerm;

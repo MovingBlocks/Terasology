@@ -40,7 +40,7 @@ public final class LightComponent implements Component, ReplicationCheck {
     @Replicate
     public float lightDiffuseIntensity = 1.0f;
     @Replicate
-    public float lightSpecularIntensity = 0.1f;
+    public float lightSpecularIntensity = 0.03f;
     @Replicate
     public float lightAmbientIntensity = 1.0f;
 
@@ -48,7 +48,7 @@ public final class LightComponent implements Component, ReplicationCheck {
      * This helps control how focused the specular light is. A smaller number will make a wider cone of light. A larger number will make a narrower cone of light.
      */
     @Replicate
-    public float lightSpecularPower = 100.0f;
+    public float lightSpecularPower = 80.0f;
     /**
      * Light attenuation range used in the calculation of how light fades from the light source as it gets farther away.  It is use in the following calculation:
      * <p>

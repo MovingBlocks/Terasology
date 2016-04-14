@@ -171,6 +171,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
         mainDirectionalLight.lightAmbientIntensity = 0.75f;
         mainDirectionalLight.lightDiffuseIntensity = 0.75f;
+        mainDirectionalLight.lightSpecularIntensity = 0.02f;
+        mainDirectionalLight.lightSpecularPower = 100f;
     }
 
     private void initRenderingSupport() {
