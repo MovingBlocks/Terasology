@@ -46,6 +46,7 @@ public class MenuControlSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
+        nuiManager.getHUD().addHUDElement("dropItemRegion");  //Ensure the drop region is behind the toolbar
         nuiManager.getHUD().addHUDElement("toolbar");
     }
 

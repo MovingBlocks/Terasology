@@ -19,16 +19,20 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.input.MouseInput;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +50,17 @@ public class InventoryGrid extends CoreWidget {
 
     private List<InventoryCell> cells = Lists.newArrayList();
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
+
+    private InteractionListener interactionListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            MouseInput mouseButton = event.getMouseButton();
+            if (mouseButton == MouseInput.MOUSE_LEFT) {
+                return true;
+            }
+            return false;
+        }
+    };
 
     @Override
     public void update(float delta) {
@@ -83,6 +98,8 @@ public class InventoryGrid extends CoreWidget {
         if (cellSize.getX() == 0 || cellSize.getY() == 0) {
             return;
         }
+        canvas.addInteractionRegion(interactionListener);
+
         int horizontalCells = Math.max(1, Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX()));
         for (int i = 0; i < numSlots && i < cells.size(); ++i) {
             int horizPos = i % horizontalCells;
