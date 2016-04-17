@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,9 @@ public abstract class AbstractWidget implements UIWidget {
     private float tooltipDelay = 0.5f;
 
     private boolean focused;
+
+    @LayoutConfig
+    private Binding<Boolean> enabled = new DefaultBinding<>(true);
 
     private Animation currentAnimation;
 
@@ -142,6 +145,14 @@ public abstract class AbstractWidget implements UIWidget {
 
     public void setVisible(boolean visible) {
         this.visible.set(visible);
+    }
+
+    public boolean isEnabled() {
+        return enabled.get();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
     }
 
     public void bindVisible(Binding<Boolean> bind) {

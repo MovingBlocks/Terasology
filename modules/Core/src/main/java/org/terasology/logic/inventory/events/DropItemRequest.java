@@ -32,15 +32,22 @@ public class DropItemRequest implements Event {
     private EntityRef inventory = EntityRef.NULL;
     private Vector3f impulse;
     private Vector3f newPosition;
+    private int count;
 
     protected DropItemRequest() {
     }
 
-    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition) {
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition, int count) {
         this.item = usedItem;
         this.inventory = inventoryEntity;
         this.impulse = impulse;
         this.newPosition = newPosition;
+        this.count = count;
+    }
+
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition)
+    {
+        this(usedItem, inventoryEntity, impulse, newPosition, 1);
     }
 
     public EntityRef getItem() {
@@ -57,5 +64,9 @@ public class DropItemRequest implements Event {
 
     public Vector3f getImpulse() {
         return impulse;
+    }
+
+    public int getCount() {
+        return count;
     }
 }

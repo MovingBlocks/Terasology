@@ -105,11 +105,12 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             return;
         }
 
-        // remove a single item from the stack
+        int count = event.getCount();
+        // remove 'count' items from the stack
         EntityRef pickupItem = event.getItem();
         EntityRef owner = pickupItem.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
-            final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
+            final EntityRef removedItem = inventoryManager.removeItem(owner, EntityRef.NULL, pickupItem, false, count);
             if (removedItem != null) {
                 pickupItem = removedItem;
             }

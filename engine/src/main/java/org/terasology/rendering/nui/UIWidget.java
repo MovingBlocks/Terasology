@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public interface UIWidget extends Iterable<UIWidget> {
     String FOCUSED_MODE = "focused";
     String ACTIVE_MODE = "active";
     String BASE_PART = "base";
+    String DISABLED_MODE = "disabled";
 
     String getId();
 

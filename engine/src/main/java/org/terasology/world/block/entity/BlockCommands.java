@@ -218,13 +218,30 @@ public class BlockCommands extends BaseComponentSystem {
                 throw new IllegalArgumentException("No block found for '" + uri + "'");
             }
         } else if (matchingUris.isEmpty()) {
-            throw new IllegalArgumentException("No block found for '" + uri + "'");
+        	return suggestItemIfAvailable(uri);
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
             return builder.toString();
         }
+    }
+    
+    /**
+     * Tells players that their request matched no blocks, and directs them to giveItem if an item matches.
+     * 
+     * @param uri the URI to use to look for an item
+     */
+    private String suggestItemIfAvailable(String uri){
+    	Set<ResourceUrn> matchingItems = assetManager.resolve(uri, Prefab.class);
+    	StringBuilder result = new StringBuilder();
+    	result.append("No block found for "+uri);
+    	if(matchingItems.size() != 0){
+    		result.append(". ");
+    		result.append("Item matches found, use 'giveItem' to request one: ");
+    		Joiner.on(", ").appendTo(result, matchingItems);
+    	}
+    	return result.toString();
     }
 
     /**
