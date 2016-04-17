@@ -36,5 +36,6 @@
     },
     "entity": {
         "prefab": "Core:Torch"
-    }
+    },
+    "mass": 10
 }
