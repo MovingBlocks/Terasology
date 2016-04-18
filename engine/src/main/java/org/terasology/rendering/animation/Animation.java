@@ -15,12 +15,8 @@
  */
 package org.terasology.rendering.animation;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.terasology.engine.module.RemoteModuleExtension;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Single animation that traverses frames.
@@ -36,10 +32,10 @@ public class Animation {
     private TimeModifier timeModifier;
 
     private enum AnimState {
-        PRESTART, PAUSED, RUNNING, FINISHED
+        STOPPED, PAUSED, RUNNING
     }
 
-    private AnimState currentState = AnimState.PRESTART;
+    private AnimState currentState = AnimState.STOPPED;
 
     private final float duration;
 
@@ -80,8 +76,9 @@ public class Animation {
             currentFrame++;
 
             if (repeatMode == RepeatMode.RUN_ONCE) {
+                interpolator.apply(1f);
                 end();
-                break;
+                return;
             }
         }
 
@@ -93,7 +90,7 @@ public class Animation {
      * Notifies that this animation has been set up and is ready for use.
      */
     public void start() {
-        if (currentState == AnimState.PRESTART) {
+        if (currentState == AnimState.STOPPED) {
             currentState = AnimState.RUNNING;
             for (AnimationListener li : this.listeners) {
                 li.onStart();
@@ -106,7 +103,8 @@ public class Animation {
      */
     public void end() {
         if (currentState == AnimState.RUNNING) {
-            currentState = AnimState.FINISHED;
+            currentState = AnimState.STOPPED;
+            elapsedTime = 0;
             for (AnimationListener li : this.listeners) {
                 li.onEnd();
             }
@@ -149,14 +147,5 @@ public class Animation {
      */
     public void removeListener(AnimationListener li) {
         this.listeners.remove(li);
-    }
-
-    /**
-     * Returns if the animation has completed or has ended.
-     *
-     * @return if the animation has completed or has ended
-     */
-    public boolean isFinished() {
-        return currentState.equals(AnimState.FINISHED);
     }
 }

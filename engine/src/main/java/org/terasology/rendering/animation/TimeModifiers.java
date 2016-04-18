@@ -45,6 +45,14 @@ public final class TimeModifiers {
         return v -> (1 - v);
     }
 
+    public static TimeModifier mirror(float delta) {
+        return v -> (v < 0.5f) ? v * 2f : (1 - v) * 2;
+    }
+
+    public static TimeModifier rotate(float delta) {
+        return v -> (v + delta) % 1f;
+    }
+
     public static TimeModifier multiply(float times) {
         return v -> (v * times) % 1f;
     }
@@ -52,7 +60,7 @@ public final class TimeModifiers {
     /**
      * Smooth start, fast in the middle, smooth end. Almost identical to sin^2, but faster
      */
-    public static TimeModifier hermite() {
+    public static TimeModifier smooth() {
         return v -> TeraMath.fadeHermite(v);
     }
 }

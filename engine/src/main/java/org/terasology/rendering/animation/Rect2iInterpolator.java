@@ -22,7 +22,7 @@ import org.terasology.math.geom.Rect2i;
 /**
  * Interpolates rectangles
  */
-public class RectInterpolator implements Interpolator<Rect2i> {
+public class Rect2iInterpolator implements Interpolator<Rect2i> {
 
     private final Rect2i from;
     private final Rect2i to;
@@ -32,7 +32,7 @@ public class RectInterpolator implements Interpolator<Rect2i> {
      * @param from the left hand value to interpolate between
      * @param to the right hand value to interpolate between
      */
-    public RectInterpolator(Rect2i from, Rect2i to, Consumer<Rect2i> consumer) {
+    public Rect2iInterpolator(Rect2i from, Rect2i to, Consumer<Rect2i> consumer) {
         this.from = from;
         this.to = to;
         this.consumer = consumer;

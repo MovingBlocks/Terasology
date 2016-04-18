@@ -18,13 +18,7 @@ package org.terasology.rendering.nui;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.animation.Animation;
-import org.terasology.rendering.animation.AnimationListener;
-import org.terasology.rendering.animation.Interpolator;
-import org.terasology.rendering.animation.RectInterpolator;
-import org.terasology.rendering.animation.RepeatMode;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
@@ -55,27 +49,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private NUIManager manager;
     private boolean initialised;
 
-    private Rect2i animRegion;
-    private Animation animLeft;
-    private Animation animRight;
-
     public CoreScreenLayer() {
     }
 
     public CoreScreenLayer(String id) {
         super(id);
-
-        int width = 1152;
-        int height = 720;
-        Rect2i left = Rect2i.createFromMinAndSize(-width, 0, width, height);
-        Rect2i center = Rect2i.createFromMinAndSize(0, 0, width, height);
-        Rect2i right= Rect2i.createFromMinAndSize(width, 0, width, height);
-
-        Interpolator<?> ipolLeft = new RectInterpolator(left, center, rc -> animRegion = rc);
-        Interpolator<?> ipolRight = new RectInterpolator(center, right, rc -> animRegion = rc);
-
-        animLeft = new Animation(ipolLeft, 0.2f);
-        animRight = new Animation(ipolRight, 0.2f);
     }
 
     @Override
@@ -126,16 +104,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             canvas.addInteractionRegion(getScreenListener());
         }
         if (contents != null) {
-            canvas.drawWidget(contents, animRegion);
+            canvas.drawWidget(contents, canvas.getRegion());
         }
     }
 
     @Override
     public void update(float delta) {
-        animLeft.update(delta);
-        animRight.update(delta);
-
-        super.update(delta);
         if (contents != null) {
             contents.update(delta);
         }
