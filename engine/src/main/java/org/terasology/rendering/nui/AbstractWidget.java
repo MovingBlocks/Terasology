@@ -54,8 +54,6 @@ public abstract class AbstractWidget implements UIWidget {
     @LayoutConfig
     private Binding<Boolean> enabled = new DefaultBinding<>(true);
 
-    private Animation currentAnimation;
-
     public AbstractWidget() {
         id = "";
     }
@@ -184,12 +182,6 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public void update(float delta) {
-        if (currentAnimation != null) {
-            currentAnimation.update(delta);
-            if (currentAnimation.isFinished()) {
-                currentAnimation = null;
-            }
-        }
         for (UIWidget item : this) {
             item.update(delta);
         }
@@ -236,46 +228,6 @@ public abstract class AbstractWidget implements UIWidget {
 
     public final void setTooltipDelay(float value) {
         this.tooltipDelay = value;
-    }
-
-    @Override
-    public final void startAnimation(Animation anim) {
-        if (currentAnimation != null) {
-            currentAnimation.end();
-        }
-        currentAnimation = anim;
-        currentAnimation.start();
-    }
-
-    @Override
-    public final void endAnimation() {
-        if (currentAnimation != null) {
-            currentAnimation.end();
-            currentAnimation = null;
-        }
-    }
-
-    @Override
-    public final void pauseAnimation() {
-        if (currentAnimation != null) {
-            currentAnimation.pause();
-        }
-    }
-
-    @Override
-    public final void resumeAnimation() {
-        if (currentAnimation != null) {
-            currentAnimation.resume();
-        }
-    }
-
-    @Override
-    public final boolean isAnimating() {
-        boolean ret = currentAnimation != null;
-        for (UIWidget item : this) {
-            ret |= item.isAnimating();
-        }
-        return ret;
     }
 
     private static class TooltipLabelBinding extends ReadOnlyBinding<UIWidget> {

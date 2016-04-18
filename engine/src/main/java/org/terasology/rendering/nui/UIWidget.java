@@ -108,14 +108,4 @@ public interface UIWidget extends Iterable<UIWidget> {
     void setTooltip(String value);
 
     float getTooltipDelay();
-
-    void startAnimation(Animation anim);
-
-    void endAnimation();
-
-    void pauseAnimation();
-
-    void resumeAnimation();
-
-    boolean isAnimating();
 }

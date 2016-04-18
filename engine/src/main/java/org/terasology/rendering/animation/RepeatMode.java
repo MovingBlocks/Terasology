@@ -17,6 +17,5 @@ package org.terasology.rendering.animation;
 
 public enum RepeatMode {
     RUN_ONCE,
-    REPEAT, REPEAT_INFINITE,
-    INVERSE, INVERSE_INFINITE
+    REPEAT_INFINITE
 }

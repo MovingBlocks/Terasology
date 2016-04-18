@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.rendering.animation.Animation;
-
 /**
  */
 public interface UIScreenLayer extends ControlWidget {
@@ -32,7 +30,4 @@ public interface UIScreenLayer extends ControlWidget {
     NUIManager getManager();
 
     void setManager(NUIManager manager);
-
-    Animation getOpenAnimation();
-    Animation getCloseAnimation();
 }

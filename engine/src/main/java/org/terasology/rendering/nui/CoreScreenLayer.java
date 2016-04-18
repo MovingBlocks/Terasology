@@ -22,10 +22,8 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.animation.AnimationListener;
-import org.terasology.rendering.animation.Frame;
-import org.terasology.rendering.animation.FloatInterpolator;
-import org.terasology.rendering.animation.AccelerateInterpolator;
-import org.terasology.rendering.animation.DecelerateInterpolator;
+import org.terasology.rendering.animation.Interpolator;
+import org.terasology.rendering.animation.RectInterpolator;
 import org.terasology.rendering.animation.RepeatMode;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -58,18 +56,26 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private boolean initialised;
 
     private Rect2i animRegion;
-    private Rect2i animCanvasSize;
-    private Animation sizeAnim;
+    private Animation animLeft;
+    private Animation animRight;
 
     public CoreScreenLayer() {
-        animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
-        animCanvasSize = animRegion;
     }
 
     public CoreScreenLayer(String id) {
         super(id);
-        animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
-        animCanvasSize = animRegion;
+
+        int width = 1152;
+        int height = 720;
+        Rect2i left = Rect2i.createFromMinAndSize(-width, 0, width, height);
+        Rect2i center = Rect2i.createFromMinAndSize(0, 0, width, height);
+        Rect2i right= Rect2i.createFromMinAndSize(width, 0, width, height);
+
+        Interpolator<?> ipolLeft = new RectInterpolator(left, center, rc -> animRegion = rc);
+        Interpolator<?> ipolRight = new RectInterpolator(center, right, rc -> animRegion = rc);
+
+        animLeft = new Animation(ipolLeft, 0.2f);
+        animRight = new Animation(ipolRight, 0.2f);
     }
 
     @Override
@@ -116,12 +122,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (sizeAnim != null && !sizeAnim.isFinished()) {
-            animCanvasSize = canvas.getRegion();
-        } else if (animCanvasSize == null) {
-            animRegion = canvas.getRegion();
-        }
-
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener());
         }
@@ -132,6 +132,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void update(float delta) {
+        animLeft.update(delta);
+        animRight.update(delta);
+
         super.update(delta);
         if (contents != null) {
             contents.update(delta);
@@ -208,76 +211,5 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             return Collections.emptyIterator();
         }
         return Arrays.asList(contents).iterator();
-    }
-
-    @Override
-    public Animation getOpenAnimation() {
-        sizeAnim = new Animation();
-        Frame frm = new Frame();
-        // Move into view from left side (l to r)
-        frm.addComponent(new Float(0),
-                         new Float(1),
-                         new FloatInterpolator() {
-                public void setValue(Object value) {
-                    float v = ((Float) value).floatValue();
-                    animRegion = Rect2i.createFromMinAndMax(
-                        (int) (-animCanvasSize.maxX() * (1 - v)),
-                        animCanvasSize.minY(),
-                        (int) (animCanvasSize.maxX() * v),
-                        animCanvasSize.maxY());
-                }
-            }, new DecelerateInterpolator());
-        frm.setDuration(.75f);
-        frm.setRepeatCount(1);
-        sizeAnim.addFrame(frm);
-        sizeAnim.setRepeatCount(1);
-        sizeAnim.setRepeatMode(RepeatMode.RUN_ONCE);
-        sizeAnim.addListener(new AnimationListener() {
-                @Override public void onStart() {
-                    animRegion = Rect2i.createFromMinAndMax(-9000, 0, 1000, 1000);
-                    animCanvasSize = animRegion;
-                }
-                @Override public void onEnd() {
-                    sizeAnim = null;
-                    animRegion = null;
-                    animCanvasSize = null;
-                }
-            });
-        return sizeAnim;
-    }
-
-    @Override
-    public Animation getCloseAnimation() {
-        sizeAnim = new Animation();
-        Frame frm = new Frame();
-        // Move into view out of right side (r to inf)
-        frm.addComponent(new Float(0),
-                         new Float(1),
-                         new FloatInterpolator() {
-                public void setValue(Object value) {
-                    float v = ((Float) value).floatValue();
-                    animRegion = Rect2i.createFromMinAndMax(
-                        (int) (animCanvasSize.maxX() * v),
-                        animCanvasSize.minY(),
-                        (int) (animCanvasSize.maxX() * (v + 1)),
-                        animCanvasSize.maxY());
-                }
-            }, new AccelerateInterpolator());
-        frm.setDuration(.75f);
-        frm.setRepeatCount(1);
-        sizeAnim.addFrame(frm);
-        sizeAnim.setRepeatCount(1);
-        sizeAnim.setRepeatMode(RepeatMode.RUN_ONCE);
-        sizeAnim.addListener(new AnimationListener() {
-                @Override public void onStart() {
-                    animCanvasSize = animRegion;
-                }
-                @Override public void onEnd() {
-                    sizeAnim = null;
-                    animRegion = null;
-                    animCanvasSize = null;
-                }
-            });
-        return sizeAnim;
     }
 }

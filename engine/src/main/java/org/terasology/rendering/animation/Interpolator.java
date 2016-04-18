@@ -18,15 +18,13 @@ package org.terasology.rendering.animation;
 /*
  * Interface for interpolation equations.
  */
-public interface Interpolator {
+public interface Interpolator<T> {
     /**
      * Returns where an interpolated value should be based on
      * where the position an animation is in.
      *
-     * @param v position of the animation between the start and end [0:1]
-     * and also referenced as the intermediate interpolation <b>v</b>alue
-     *
-     * @return where the interpolated value should be, between [0:1]
+     * @param value position of the animation between the start and end [0:1]
+     * and also referenced as the intermediate interpolation <b>value</b>.
      */
-    float getInterpolation(float v);
+    void apply(float value);
 }

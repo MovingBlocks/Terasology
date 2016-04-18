@@ -17,6 +17,9 @@ package org.terasology.rendering.animation;
 
 import java.util.Collections;
 import java.util.List;
+
+import org.terasology.engine.module.RemoteModuleExtension;
+
 import java.util.ArrayList;
 
 /*
@@ -24,61 +27,41 @@ import java.util.ArrayList;
  */
 public class Animation {
     private final List<AnimationListener> listeners = new ArrayList<AnimationListener>();
-    private final List<Frame> frames = new ArrayList<Frame>();
-    private int repeatCount;
+
     private RepeatMode repeatMode;
 
     private float elapsedTime;
     private int currentFrame;
-    private int currentRepeatCount;
+
+    private TimeModifier timeModifier;
 
     private enum AnimState {
         PRESTART, PAUSED, RUNNING, FINISHED
     }
-    private AnimState currentState;
+
+    private AnimState currentState = AnimState.PRESTART;
+
+    private final float duration;
+
+    private Interpolator<?> interpolator;
 
     /**
-     * Constructs a new animation with default properties.
+     * Constructs a new animation that runs once with linear speed.
      */
-    public Animation() {
-        currentState = AnimState.PRESTART;
-        currentRepeatCount = 0;
-        repeatCount = 0;
-        elapsedTime = 0;
-        currentFrame = 0;
-        repeatMode = RepeatMode.REPEAT_INFINITE;
-    }
-
-    /**
-     * Adds a frame to the end.
-     *
-     * @param frame the frame to add.
-     */
-    public void addFrame(Frame frame) {
-        this.frames.add(frame);
-    }
-
-    /**
-     * Sets the number of times this animation must repeat.
-     *
-     * @param repeat number of times this animation must repeat, must be positive
-     *
-     * @throws IllegalArgumentException if repeat is not positive
-     */
-    public void setRepeatCount(int repeat) {
-        if (!(repeat > 0)) {
-            throw new IllegalArgumentException("repeat must be positive");
-        }
-        this.repeatCount = repeat;
+    public Animation(Interpolator<?> interpolator, float duration) {
+        this(interpolator, duration, RepeatMode.RUN_ONCE, TimeModifiers.linear());
     }
 
     /**
      * Sets how the animation should repeat once it completes all the frames.
      *
-     * @param repeat the repeat mode.
+     * @param repeatMode the repeat mode.
      */
-    public void setRepeatMode(RepeatMode repeat) {
-        this.repeatMode = repeat;
+    public Animation(Interpolator<?> interpolator, float duration, RepeatMode repeatMode, TimeModifier timeModifier) {
+        this.interpolator = interpolator;
+        this.duration = duration;
+        this.repeatMode = repeatMode;
+        this.timeModifier = timeModifier;
     }
 
     /**
@@ -87,62 +70,31 @@ public class Animation {
      * @param delta elapsed time since last update, in seconds.
      */
     public void update(float delta) {
-        switch (this.currentState) {
-        case RUNNING: {
-            frames.get(currentFrame).update(delta);
-            if (frames.get(currentFrame).isFinished()) {
-                currentFrame++;
-                if (currentFrame >= frames.size()) {
-                    currentRepeatCount++;
-                    switch (repeatMode) {
-                    case RUN_ONCE:
-                        end();
-                        break;
-                    case REPEAT: case INVERSE:
-                        if (currentRepeatCount >= repeatCount) {
-                            end();
-                            break;
-                        }
-                        if (repeatMode.equals(RepeatMode.INVERSE)) {
-                            flipFrames();
-                        }
-                        currentFrame = 0;
-                        elapsedTime = 0;
-                        break;
-                    case REPEAT_INFINITE: case INVERSE_INFINITE:
-                        if (repeatMode.equals(RepeatMode.INVERSE) || repeatMode.equals(RepeatMode.INVERSE_INFINITE)) {
-                            flipFrames();
-                        }
-                        currentFrame = 0;
-                        elapsedTime = 0;
-                        break;
-                    }
-                }
-            }
-            break;
+        if (currentState != AnimState.RUNNING) {
+            return;
         }
-        default: break;
-        }
-    }
 
-    /**
-     * Reverses the animation completely.
-     */
-    public void flipFrames() {
-        Collections.reverse(frames);
-        for (int i = 0; i < frames.size(); i++) {
-            frames.get(i).reverse();
+        elapsedTime += delta;
+        while (elapsedTime > duration) {
+            elapsedTime -= duration;
+            currentFrame++;
+
+            if (repeatMode == RepeatMode.RUN_ONCE) {
+                end();
+                break;
+            }
         }
+
+        float ipol = timeModifier.apply(elapsedTime / duration);
+        interpolator.apply(ipol);
     }
 
     /**
      * Notifies that this animation has been set up and is ready for use.
      */
     public void start() {
-        if (this.currentState.equals(AnimState.PRESTART)) {
-            elapsedTime = 0;
-            currentRepeatCount = 0;
-            this.currentState = AnimState.RUNNING;
+        if (currentState == AnimState.PRESTART) {
+            currentState = AnimState.RUNNING;
             for (AnimationListener li : this.listeners) {
                 li.onStart();
             }
@@ -153,8 +105,8 @@ public class Animation {
      * Notifies that this animation is finished or should end.
      */
     public void end() {
-        if (this.currentState.equals(AnimState.RUNNING)) {
-            this.currentState = AnimState.FINISHED;
+        if (currentState == AnimState.RUNNING) {
+            currentState = AnimState.FINISHED;
             for (AnimationListener li : this.listeners) {
                 li.onEnd();
             }
@@ -166,8 +118,8 @@ public class Animation {
      * maintains its current state.
      */
     public void pause() {
-        if (this.currentState.equals(AnimState.RUNNING)) {
-            this.currentState = AnimState.PAUSED;
+        if (currentState == AnimState.RUNNING) {
+            currentState = AnimState.PAUSED;
         }
     }
 
@@ -175,8 +127,8 @@ public class Animation {
      * Resumes a paused animation.
      */
     public void resume() {
-        if (this.currentState.equals(AnimState.PAUSED)) {
-            this.currentState = AnimState.RUNNING;
+        if (currentState == AnimState.PAUSED) {
+            currentState = AnimState.RUNNING;
         }
     }
 

@@ -16,11 +16,10 @@
 package org.terasology.rendering.animation;
 
 /*
+ * Notified on significant animation events.
+ * All methods are empty by default.
  */
 public interface AnimationListener {
     default void onStart() { }
-    default void onFrameStart() { }
-    default void onStep(float v) { }
-    default void onFrameEnd() { }
     default void onEnd() { }
 }
