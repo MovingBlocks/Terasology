@@ -42,14 +42,17 @@ public class DropItemRegion extends CoreHudWidget {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             MouseInput mouseButton = event.getMouseButton();
-            if (mouseButton == MouseInput.MOUSE_LEFT) {
+            if (mouseButton == MouseInput.MOUSE_LEFT || mouseButton == MouseInput.MOUSE_RIGHT) {
                 EntityRef playerEntity = localPlayer.getCharacterEntity();
                 EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
                 EntityRef item  = InventoryUtils.getItemAt(movingItem, 0);
                 if (!item.exists()) {
                     return true;
                 }
-                int count = InventoryUtils.getStackCount(item);
+                int count = 1;
+                if (mouseButton == MouseInput.MOUSE_LEFT) {
+                    count = InventoryUtils.getStackCount(item);     //Drop complete stack with left click
+                }
 
                 Vector3f position = localPlayer.getViewPosition();
                 Vector3f direction = localPlayer.getViewDirection();
