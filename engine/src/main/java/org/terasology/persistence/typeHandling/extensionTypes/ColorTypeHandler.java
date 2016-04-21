@@ -17,6 +17,7 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 
 import gnu.trove.list.TIntList;
 import org.terasology.persistence.typeHandling.DeserializationContext;
+import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -24,6 +25,8 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.rendering.nui.Color;
 
 /**
+ * Serializes {@link Color} instances to an int array <code>[r, g, b, a]</code>.
+ * De-serializing also supports hexadecimal strings such as <code>"AAAAAAFF"</code>.
  */
 public class ColorTypeHandler extends SimpleTypeHandler<Color> {
 
@@ -45,6 +48,10 @@ public class ColorTypeHandler extends SimpleTypeHandler<Color> {
                 return new Color(vals.get(0), vals.get(1), vals.get(2), vals.get(3));
             }
         }
-        return null;
+        if (data.isString()) {
+            String value = data.getAsString();
+            return new Color((int) Long.parseLong(value, 16));
+        }
+        throw new DeserializationException("Expecting integer array or hex-string, but found: " + String.valueOf(data));
     }
 }
