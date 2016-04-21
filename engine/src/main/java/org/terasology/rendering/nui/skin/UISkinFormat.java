@@ -31,6 +31,8 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.persistence.ModuleContext;
+import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.CoreRegistry;
@@ -41,7 +43,6 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.utilities.gson.ColorTypeAdapter;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -66,7 +67,7 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
                 .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(Font.class))
                 .registerTypeAdapter(UISkinData.class, new UISkinTypeAdapter())
                 .registerTypeAdapter(TextureRegion.class, new TextureRegionTypeAdapter())
-                .registerTypeAdapter(Color.class, new ColorTypeAdapter())
+                .registerTypeAdapter(Color.class, new JsonTypeHandlerAdapter<>(new ColorTypeHandler()))
                 .registerTypeAdapter(Optional.class, new OptionalTextureRegionTypeAdapter())
                 .create();
     }
