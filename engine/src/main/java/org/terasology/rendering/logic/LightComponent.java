@@ -40,8 +40,6 @@ public final class LightComponent implements Component, ReplicationCheck {
     @Replicate
     public float lightDiffuseIntensity = 1.0f;
     @Replicate
-    public float lightSpecularIntensity = 0.03f;
-    @Replicate
     public float lightAmbientIntensity = 1.0f;
 
     /**

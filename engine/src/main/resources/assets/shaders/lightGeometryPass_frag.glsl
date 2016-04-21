@@ -27,7 +27,6 @@ uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
 uniform vec4 lightProperties;
 #define lightDiffuseIntensity lightProperties.y
 #define lightAmbientIntensity lightProperties.x
-#define lightSpecularIntensity lightProperties.z
 #define lightSpecularPower lightProperties.w
 
 uniform vec4 lightExtendedProperties;
@@ -63,7 +62,10 @@ void main() {
 
     vec4 normalBuffer = texture2D(texSceneOpaqueNormals, projectedPos.xy).rgba;
     vec3 normal = normalize(normalBuffer.xyz * 2.0 - 1.0);
-    float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
+    float shininess = normalBuffer.a;
+    vec4 depthBuffer = texture2D(texSceneOpaqueDepth, projectedPos.xy).rgba;
+    float depth = depthBuffer.r * 2.0 - 1.0;
+    float sunlightIntensity = depthBuffer.a;
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     // TODO: Uhhh... Doing this twice here :/ Frustum ray would be better!
@@ -134,13 +136,13 @@ void main() {
     ambTerm *= shadowTerm;
 #endif
 
-    float specular = lightSpecularIntensity * specTerm;
+    float specular = shininess * specTerm;
 
 #if defined (FEATURE_LIGHT_POINT)
     vec3 color = ambTerm * lightColorAmbient;
     color *= lightColorDiffuse * lightDiffuseIntensity * lambTerm;
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
-    vec3 color = calcSunlightColorDeferred(normalBuffer.a, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
+    vec3 color = calcSunlightColorDeferred(sunlightIntensity, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
 #else
     vec3 color = vec3(1.0, 0.0, 1.0);
 #endif

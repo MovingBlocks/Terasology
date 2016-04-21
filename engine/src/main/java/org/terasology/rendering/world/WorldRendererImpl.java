@@ -171,7 +171,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
         mainDirectionalLight.lightAmbientIntensity = 0.75f;
         mainDirectionalLight.lightDiffuseIntensity = 0.75f;
-        mainDirectionalLight.lightSpecularIntensity = 0.02f;
         mainDirectionalLight.lightSpecularPower = 100f;
     }
 
@@ -570,7 +569,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
 
             program.setFloat4("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity,
-                    lightComponent.lightSpecularIntensity, lightComponent.lightSpecularPower, true);
+                    0.0f, lightComponent.lightSpecularPower, true);
         }
 
         if (lightComponent.lightType == LightComponent.LightType.POINT) {

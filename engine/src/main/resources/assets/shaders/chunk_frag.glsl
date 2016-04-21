@@ -94,9 +94,9 @@ void main() {
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
     vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
     vec3 normalOpaque = normal;
+    float shininess = 0.0;
 
 #if defined (NORMAL_MAPPING)
-#if defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
     vec3 dp1 = dFdx(vertexProjPos.xyz);
@@ -112,21 +112,17 @@ void main() {
     float invMax = inversesqrt(max(dot(tangent,tangent), dot(binormal,binormal)));
     mat3 tbn = mat3(tangent * invMax, binormal * invMax, normal);
 
+#if defined (PARALLAX_MAPPING)
     vec3 eyeTangentSpace = tbn * vertexViewPos.xyz;
 
     float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
 	texCoord += height * normalize(eyeTangentSpace).xy * TEXTURE_OFFSET;
 #endif
 
-    normalOpaque = (texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
+    normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
+    normalOpaque = normalize(tbn * normalOpaque);
 
-    // Simplified tangent basis - because we can! Voxels and blocks are great
-    normalOpaque.xyz = vec3(worldSpaceNormal.x, normalOpaque.x, normalOpaque.y) * abs(worldSpaceNormal.xxx)
-        + vec3(normalOpaque.y, worldSpaceNormal.y, normalOpaque.x) * abs(worldSpaceNormal.yyy)
-        + vec3(normalOpaque.x, normalOpaque.y, worldSpaceNormal.z) * abs(worldSpaceNormal.zzz);
-
-    // Costly, but necessary...
-    normalOpaque = normalMatrix * normalOpaque.xyz;
+    shininess = texture2D(textureAtlasNormal, texCoord).w;
 #endif
 
 #ifdef FEATURE_REFRACTIVE_PASS
@@ -206,11 +202,12 @@ void main() {
     // ...and finally the occlusion value
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
 
-    vec3 blocklightColorValue = calcBlocklightColor(blocklightValue
+    float blocklightColorBrightness = calcBlocklightColorBrightness(blocklightValue
 #if defined (FLICKERING_LIGHT)
         , flickeringLightOffset
 #endif
     );
+    vec3 blocklightColorValue = calcBlocklightColor(blocklightColorBrightness);
 
 #if defined (FEATURE_REFRACTIVE_PASS)
     vec3 daylightColorValue;
@@ -277,7 +274,7 @@ void main() {
     // Apply the final lighting mix
     color.xyz *= combinedLightValue * occlusionValue;
 #else
-    gl_FragData[2].rgba = vec4(blocklightColorValue.r, blocklightColorValue.g, blocklightColorValue.b, 0.0);
+    gl_FragData[2].rgba = vec4(blocklightColorBrightness, daylightValue, 0.0, 0.0);
 #endif
 
 #if defined (FEATURE_REFRACTIVE_PASS) || defined (FEATURE_USE_FORWARD_LIGHTING)
@@ -290,8 +287,8 @@ void main() {
     gl_FragData[0].rgb = color.rgb;
     // Encode occlusion value into the alpha channel
     gl_FragData[0].a = occlusionValue;
-    // Encode daylight value into the normal alpha channel
-    gl_FragData[1].a = daylightValue;
+    // Encode shininess value into the normal alpha channel
+    gl_FragData[1].a = shininess;
 #endif
 
 #if !defined (FEATURE_REFRACTIVE_PASS) && !defined (FEATURE_USE_FORWARD_LIGHTING)

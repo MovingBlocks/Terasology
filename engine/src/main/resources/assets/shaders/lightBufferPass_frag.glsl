@@ -24,10 +24,11 @@ void main() {
     float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r * 2.0 - 1.0;
     vec4 normalBuffer = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy).rgba;
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
+    vec3 blocklightColor = calcBlocklightColor(lightBufferOpaque.x);
 
     if (!epsilonEqualsOne(depthOpaque)) {
         // Diffuse
-        colorOpaque.rgb *= lightBufferOpaque.rgb;
+        colorOpaque.rgb *= blocklightColor.rgb;
 #if !defined (SSAO)
         // Occlusion
         colorOpaque.rgb *= colorOpaque.a;
@@ -38,7 +39,7 @@ void main() {
 
     gl_FragData[0].rgba = colorOpaque.rgba;
     gl_FragData[1].rgba = normalBuffer.rgba;
-    gl_FragData[2].rgba = lightBufferOpaque.rgba;
+    gl_FragData[2].rgb = blocklightColor.rgb;
 
     gl_FragDepth = depthOpaque * 0.5 + 0.5;
 }
