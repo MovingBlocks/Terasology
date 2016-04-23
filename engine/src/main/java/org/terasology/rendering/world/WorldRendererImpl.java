@@ -567,9 +567,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         if (!geometryOnly) {
             program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
             program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
-
-            program.setFloat4("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity,
-                    0.0f, lightComponent.lightSpecularPower, true);
+            program.setFloat3("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity, lightComponent.lightSpecularPower, true);
         }
 
         if (lightComponent.lightType == LightComponent.LightType.POINT) {

@@ -278,7 +278,7 @@ public class WorldAtlasImpl implements WorldAtlas {
             BufferedImage image = generateAtlas(i, tileImages, initialColor);
             if (alphaMaskTiles.size() > 0) {
                 BufferedImage alphaMask = generateAtlas(i, alphaMaskTiles, Color.BLACK);
-                applyGrayscaleMaskToAlpha(image, alphaMask);
+                storeGreyscaleMapIntoAlpha(image, alphaMask);
             }
 
             if (i == 0) {
@@ -304,12 +304,12 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     // Ref: http://stackoverflow.com/questions/221830/set-bufferedimage-alpha-mask-in-java/8058442#8058442
-    public void applyGrayscaleMaskToAlpha(BufferedImage image, BufferedImage mask) {
-        int width = image.getWidth();
-        int height = image.getHeight();
+    public void storeGreyscaleMapIntoAlpha(BufferedImage imageWithoutAlpha, BufferedImage greyscaleImage) {
+        int width = imageWithoutAlpha.getWidth();
+        int height = imageWithoutAlpha.getHeight();
 
-        int[] imagePixels = image.getRGB(0, 0, width, height, null, 0, width);
-        int[] maskPixels = mask.getRGB(0, 0, width, height, null, 0, width);
+        int[] imagePixels = imageWithoutAlpha.getRGB(0, 0, width, height, null, 0, width);
+        int[] maskPixels = greyscaleImage.getRGB(0, 0, width, height, null, 0, width);
 
         for (int i = 0; i < imagePixels.length; i++) {
             int color = imagePixels[i] & 0x00ffffff; // Mask preexisting alpha
@@ -317,7 +317,7 @@ public class WorldAtlasImpl implements WorldAtlas {
             imagePixels[i] = color | alpha;
         }
 
-        image.setRGB(0, 0, width, height, imagePixels, 0, width);
+        imageWithoutAlpha.setRGB(0, 0, width, height, imagePixels, 0, width);
     }
 
     // The atlas is configured using the following constraints...

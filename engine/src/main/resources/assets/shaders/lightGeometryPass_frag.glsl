@@ -24,10 +24,10 @@ uniform sampler2D texSceneOpaqueNormals;
 uniform vec3 lightColorDiffuse = vec3(1.0, 0.0, 0.0);
 uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
 
-uniform vec4 lightProperties;
-#define lightDiffuseIntensity lightProperties.y
+uniform vec3 lightProperties;
 #define lightAmbientIntensity lightProperties.x
-#define lightSpecularPower lightProperties.w
+#define lightDiffuseIntensity lightProperties.y
+#define lightSpecularPower lightProperties.z
 
 uniform vec4 lightExtendedProperties;
 #define lightAttenuationRange lightExtendedProperties.x
