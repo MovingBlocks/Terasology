@@ -36,7 +36,7 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     @In
     private GameEngine engine;
-    private Animation anim;
+    private Animation colorAnimation;
 
     @Override
     public void initialise() {
@@ -45,15 +45,15 @@ public class MainMenuScreen extends CoreScreenLayer {
         UILabel versionLabel = find("version", UILabel.class);
 
         Animator colorAnim = new ColorHueAnimator(color -> title.setTint(color));
-        Animator textAnim = v -> versionLabel.setText(String.format("Time: %.2f", v));
+        Animator textAnim = v -> versionLabel.setText(String.format("Color Hue: %.2f", v));
         Animator animGroup = new AnimatorGroup(colorAnim, textAnim);
 
-        TimeModifier timeMod = TimeModifiers
+        TimeModifier colorTimeMod = TimeModifiers
                 .mirror()
                 .andThen(TimeModifiers.smooth())
-                .andThen(TimeModifiers.sub(0.2f, 0.6f));
+                .andThen(TimeModifiers.sub(0.2f, 0.4f));
 
-        anim = Animation.infinite(animGroup, 5.0f, timeMod).start();
+        colorAnimation = Animation.infinite(animGroup, 3.0f, colorTimeMod).start();
 
         versionLabel.setText(TerasologyVersion.getInstance().getHumanVersion());
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
@@ -70,7 +70,7 @@ public class MainMenuScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        anim.update(delta);
+        colorAnimation.update(delta);
     }
 
     @Override

@@ -25,6 +25,10 @@ import com.google.api.client.util.Preconditions;
  */
 public final class TimeModifiers {
 
+    private TimeModifiers() {
+        // no instances
+    }
+
     /**
      * Always returns the same constant value
      * @param constant the constant value

@@ -17,9 +17,12 @@ package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import org.terasology.config.Config;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.layers.mainMenu.AnimatedGooey;
 import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
+import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
 
 /**
  */
@@ -27,9 +30,11 @@ public class SettingsMenuScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+    private AnimatedGooey anim;
 
     @Override
     public void initialise() {
+        anim = new AnimatedGooey((RelativeLayout) getContents());
         WidgetUtil.trySubscribe(this, "player", button -> getManager().pushScreen("engine:PlayerMenuScreen"));
         WidgetUtil.trySubscribe(this, "video", button -> getManager().pushScreen("engine:VideoMenuScreen"));
         WidgetUtil.trySubscribe(this, "audio", button -> getManager().pushScreen("engine:AudioMenuScreen"));
@@ -38,6 +43,24 @@ public class SettingsMenuScreen extends CoreScreenLayer {
             config.save();
             getManager().popScreen();
         });
+    }
+
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        anim.reset();
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        anim.update(delta);
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        anim.updateSize(canvas.getRegion());
     }
 
     @Override

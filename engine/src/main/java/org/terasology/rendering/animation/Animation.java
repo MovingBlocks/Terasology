@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 /*
  * Single animation that traverses frames.
  */
-public class Animation {
+public final class Animation {
     private final List<AnimationListener> listeners = new ArrayList<AnimationListener>();
 
     private RepeatMode repeatMode;
@@ -106,12 +106,15 @@ public class Animation {
             currentFrame++;
 
             if (repeatMode == RepeatMode.RUN_ONCE) {
-                animator.apply(1f);
-                end();
+                stop();
                 return;
             }
         }
 
+        updateAnimator();
+    }
+
+    private void updateAnimator() {
         float ipol = timeModifier.apply(elapsedTime / duration);
         animator.apply(ipol);
     }
@@ -123,9 +126,11 @@ public class Animation {
     public Animation start() {
         if (currentState == AnimState.STOPPED) {
             currentState = AnimState.RUNNING;
+            elapsedTime = 0;
             for (AnimationListener li : this.listeners) {
                 li.onStart();
             }
+            updateAnimator();
         }
         return this;
     }
@@ -134,10 +139,10 @@ public class Animation {
      * Notifies that this animation is finished or should end.
      * @return this
      */
-    public Animation end() {
+    public Animation stop() {
         if (currentState == AnimState.RUNNING) {
             currentState = AnimState.STOPPED;
-            elapsedTime = 0;
+            updateAnimator();
             for (AnimationListener li : this.listeners) {
                 li.onEnd();
             }
@@ -192,5 +197,9 @@ public class Animation {
      */
     public void removeListener(AnimationListener li) {
         this.listeners.remove(li);
+    }
+
+    public boolean isRunning() {
+        return currentState == AnimState.RUNNING;
     }
 }
