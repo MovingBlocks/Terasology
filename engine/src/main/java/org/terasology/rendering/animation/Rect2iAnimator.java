@@ -19,10 +19,12 @@ import java.util.function.Consumer;
 
 import org.terasology.math.geom.Rect2i;
 
+import com.google.api.client.util.Preconditions;
+
 /**
  * Interpolates rectangles
  */
-public class Rect2iInterpolator implements Interpolator {
+public class Rect2iAnimator implements Animator {
 
     private final Rect2i from;
     private final Rect2i to;
@@ -31,8 +33,12 @@ public class Rect2iInterpolator implements Interpolator {
     /**
      * @param from the left hand value to interpolate between
      * @param to the right hand value to interpolate between
+     * @param consumer the target of this animator
      */
-    public Rect2iInterpolator(Rect2i from, Rect2i to, Consumer<Rect2i> consumer) {
+    public Rect2iAnimator(Rect2i from, Rect2i to, Consumer<Rect2i> consumer) {
+        Preconditions.checkArgument(from != null);
+        Preconditions.checkArgument(to != null);
+        Preconditions.checkArgument(consumer != null);
         this.from = from;
         this.to = to;
         this.consumer = consumer;

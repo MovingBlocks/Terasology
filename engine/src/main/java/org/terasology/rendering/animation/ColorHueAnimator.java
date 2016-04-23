@@ -22,16 +22,17 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 
 /**
- * Interpolates rectangles
+ * Interpolates color hue based on the CIECam02 color model.
  */
-public class HueInterpolator implements Interpolator {
+public class ColorHueAnimator implements Animator {
 
     private Consumer<Color> consumer;
     private final List<Color> colors = CieCamColors.L65C65;
 
     /**
+     * @param consumer the target of this animator
      */
-    public HueInterpolator(Consumer<Color> consumer) {
+    public ColorHueAnimator(Consumer<Color> consumer) {
         this.consumer = consumer;
     }
 

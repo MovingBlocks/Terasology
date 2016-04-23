@@ -19,10 +19,9 @@ package org.terasology.rendering.nui;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.animation.AnimationListener;
-import org.terasology.rendering.animation.Interpolator;
-import org.terasology.rendering.animation.Rect2fInterpolator;
-import org.terasology.rendering.animation.Rect2iInterpolator;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.animation.Animator;
+import org.terasology.rendering.animation.Rect2fAnimator;
+import org.terasology.rendering.animation.TimeModifiers;
 
 /**
  * TODO Type description
@@ -41,12 +40,12 @@ public class MenuAnimationSystem {
         Rect2f center = Rect2f.createFromMinAndSize(0, 0, 1, 1);
         Rect2f right = Rect2f.createFromMinAndSize(1, 0, 1, 1);
 
-        Interpolator ipolLeft = new Rect2fInterpolator(left, center, rc -> animRegion = rc);
-        Interpolator ipolRight = new Rect2fInterpolator(center, right, rc -> animRegion = rc);
+        Animator ipolLeft = new Rect2fAnimator(left, center, rc -> animRegion = rc);
+        Animator ipolRight = new Rect2fAnimator(center, right, rc -> animRegion = rc);
 
         animRegion = center;
-        animLeft = new Animation(ipolLeft, 1.2f);
-        animRight = new Animation(ipolRight, 1.2f);
+        animLeft = Animation.once(ipolLeft, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
+        animRight = Animation.once(ipolRight, 1.2f, TimeModifiers.square());
     }
 
     public void triggerStart() {

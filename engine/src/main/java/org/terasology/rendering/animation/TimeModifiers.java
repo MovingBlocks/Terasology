@@ -25,11 +25,20 @@ import com.google.api.client.util.Preconditions;
  */
 public final class TimeModifiers {
 
+    /**
+     * Always returns the same constant value
+     * @param constant the constant value
+     * @return a mapping function
+     */
     public static TimeModifier constant(float constant) {
         Preconditions.checkArgument(constant >= 0 && constant <= 1);
         return v -> constant;
     }
 
+    /**
+     * Always returns the same constant value
+     * @return a mapping function
+     */
     public static TimeModifier linear() {
         return v -> v;
     }
@@ -51,9 +60,16 @@ public final class TimeModifiers {
     }
 
     public static TimeModifier multiply(float times) {
+        Preconditions.checkArgument(times > 0f);
         return v -> (v * times) % 1f;
     }
 
+    /**
+     * Maps to a sub-region of [0..1]
+     * @param min the lower bound
+     * @param max the upper bound
+     * @return a transformation from [0..1] to [min..max]
+     */
     public static TimeModifier sub(float min, float max) {
         Preconditions.checkArgument(min >= 0f);
         Preconditions.checkArgument(max > min);
@@ -65,6 +81,7 @@ public final class TimeModifiers {
 
     /**
      * Smooth start, fast in the middle, smooth end. Almost identical to sin^2, but faster
+     * @return a mapping function
      */
     public static TimeModifier smooth() {
         return v -> TeraMath.fadeHermite(v);

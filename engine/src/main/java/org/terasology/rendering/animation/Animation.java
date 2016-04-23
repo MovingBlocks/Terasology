@@ -18,6 +18,8 @@ package org.terasology.rendering.animation;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
+
 /*
  * Single animation that traverses frames.
  */
@@ -35,33 +37,61 @@ public class Animation {
         STOPPED, PAUSED, RUNNING
     }
 
+    private enum RepeatMode {
+        RUN_ONCE,
+        REPEAT_INFINITE
+    }
+
     private AnimState currentState = AnimState.STOPPED;
 
     private final float duration;
 
-    private Interpolator interpolator;
+    private Animator animator;
 
     /**
-     * Constructs a new animation that runs once with linear speed.
+     * @param animator the animator that is updated over time
+     * @param duration the duration in seconds (must be positive)
+     * @param repeatMode the repeat mode
+     * @param timeModifier the time modifier to apply
      */
-    public Animation(Interpolator interpolator, float duration) {
-        this(interpolator, duration, RepeatMode.RUN_ONCE, TimeModifiers.linear());
-    }
+    private Animation(Animator animator, float duration, RepeatMode repeatMode, TimeModifier timeModifier) {
+        Preconditions.checkArgument(animator != null);
+        Preconditions.checkArgument(repeatMode != null);
+        Preconditions.checkArgument(timeModifier != null);
+        Preconditions.checkArgument(duration > 0);
 
-    /**
-     * Sets how the animation should repeat once it completes all the frames.
-     *
-     * @param repeatMode the repeat mode.
-     */
-    public Animation(Interpolator interpolator, float duration, RepeatMode repeatMode, TimeModifier timeModifier) {
-        this.interpolator = interpolator;
+        this.animator = animator;
         this.duration = duration;
         this.repeatMode = repeatMode;
         this.timeModifier = timeModifier;
     }
 
     /**
-     * Updates the animation if start() has been called and is not finished.
+     * Constructs a new animation that runs once with linear speed.
+     * @param animator the animator that is updated over time
+     * @param duration the duration in seconds
+     * @param timeModifier the time modifier to apply
+     * @return the animation
+     */
+    public static Animation once(Animator animator, float duration, TimeModifier timeModifier) {
+        Animation anim = new Animation(animator, duration, RepeatMode.RUN_ONCE, timeModifier);
+        return anim;
+    }
+
+     /**
+      * Creates an animation that loops infinitely
+      * @param animator the animator that is updated over time
+      * @param duration the duration in seconds (must be positive)
+      * @param timeModifier the time modifier to apply
+      * @return the animation
+      */
+     public static Animation infinite(Animator animator, float duration, TimeModifier timeModifier) {
+         Animation anim = new Animation(animator, duration, RepeatMode.REPEAT_INFINITE, timeModifier);
+         return anim;
+     }
+
+    /**
+     * Updates the animation if {@link #start} has been called and is not finished.
      *
      * @param delta elapsed time since last update, in seconds.
      */
@@ -76,32 +106,35 @@ public class Animation {
             currentFrame++;
 
             if (repeatMode == RepeatMode.RUN_ONCE) {
-                interpolator.apply(1f);
+                animator.apply(1f);
                 end();
                 return;
             }
         }
 
         float ipol = timeModifier.apply(elapsedTime / duration);
-        interpolator.apply(ipol);
+        animator.apply(ipol);
     }
 
     /**
      * Notifies that this animation has been set up and is ready for use.
+     * @return this
      */
-    public void start() {
+    public Animation start() {
         if (currentState == AnimState.STOPPED) {
             currentState = AnimState.RUNNING;
             for (AnimationListener li : this.listeners) {
                 li.onStart();
             }
         }
+        return this;
     }
 
     /**
      * Notifies that this animation is finished or should end.
+     * @return this
      */
-    public void end() {
+    public Animation end() {
         if (currentState == AnimState.RUNNING) {
             currentState = AnimState.STOPPED;
             elapsedTime = 0;
@@ -109,25 +142,30 @@ public class Animation {
                 li.onEnd();
             }
         }
+        return this;
     }
 
     /**
      * Stops an animation without signaling that it is finished and
      * maintains its current state.
+     * @return this
      */
-    public void pause() {
+    public Animation pause() {
         if (currentState == AnimState.RUNNING) {
             currentState = AnimState.PAUSED;
         }
+        return this;
     }
 
     /**
      * Resumes a paused animation.
+     * @return this
      */
-    public void resume() {
+    public Animation resume() {
         if (currentState == AnimState.PAUSED) {
             currentState = AnimState.RUNNING;
         }
+        return this;
     }
 
     /**
