@@ -18,8 +18,15 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.registry.In;
+import org.terasology.rendering.animation.Animation;
+import org.terasology.rendering.animation.HueInterpolator;
+import org.terasology.rendering.animation.Interpolator;
+import org.terasology.rendering.animation.RepeatMode;
+import org.terasology.rendering.animation.TimeModifier;
+import org.terasology.rendering.animation.TimeModifiers;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
@@ -29,11 +36,30 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     @In
     private GameEngine engine;
+    private Animation anim;
+    private Animation anim2;
 
     @Override
     public void initialise() {
 
-        find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
+        UIImage title = find("title", UIImage.class);
+        UILabel versionLabel = find("version", UILabel.class);
+
+        Interpolator interpolator = new HueInterpolator(color -> title.setTint(color));
+        Interpolator textInterpolator = v -> versionLabel.setText(String.format("Time: %.2f", v));
+
+        TimeModifier timeMod = TimeModifiers
+                .mirror()
+                .andThen(TimeModifiers.smooth())
+                .andThen(TimeModifiers.sub(0.2f, 0.6f));
+
+        anim = new Animation(interpolator, 5.0f, RepeatMode.REPEAT_INFINITE, timeMod);
+        anim.start();
+
+        anim2 = new Animation(textInterpolator, 5.0f, RepeatMode.REPEAT_INFINITE, timeMod);
+        anim2.start();
+
+        versionLabel.setText(TerasologyVersion.getInstance().getHumanVersion());
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
             getManager().pushScreen("engine:selectGameScreen", SelectGameScreen.class).setLoadingAsServer(false);
         });
@@ -43,6 +69,13 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "join", button -> getManager().pushScreen("engine:joinGameScreen"));
         WidgetUtil.trySubscribe(this, "settings", button -> getManager().pushScreen("engine:settingsMenuScreen"));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        anim.update(delta);
+        anim2.update(delta);
     }
 
     @Override

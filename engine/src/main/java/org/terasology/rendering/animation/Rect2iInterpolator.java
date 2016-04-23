@@ -22,7 +22,7 @@ import org.terasology.math.geom.Rect2i;
 /**
  * Interpolates rectangles
  */
-public class Rect2iInterpolator implements Interpolator<Rect2i> {
+public class Rect2iInterpolator implements Interpolator {
 
     private final Rect2i from;
     private final Rect2i to;

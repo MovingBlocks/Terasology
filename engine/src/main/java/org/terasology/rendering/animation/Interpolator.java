@@ -18,7 +18,7 @@ package org.terasology.rendering.animation;
 /*
  * Interface for interpolation equations.
  */
-public interface Interpolator<T> {
+public interface Interpolator {
     /**
      * Returns where an interpolated value should be based on
      * where the position an animation is in.

@@ -41,8 +41,8 @@ public class MenuAnimationSystem {
         Rect2f center = Rect2f.createFromMinAndSize(0, 0, 1, 1);
         Rect2f right = Rect2f.createFromMinAndSize(1, 0, 1, 1);
 
-        Interpolator<?> ipolLeft = new Rect2fInterpolator(left, center, rc -> animRegion = rc);
-        Interpolator<?> ipolRight = new Rect2fInterpolator(center, right, rc -> animRegion = rc);
+        Interpolator ipolLeft = new Rect2fInterpolator(left, center, rc -> animRegion = rc);
+        Interpolator ipolRight = new Rect2fInterpolator(center, right, rc -> animRegion = rc);
 
         animRegion = center;
         animLeft = new Animation(ipolLeft, 1.2f);

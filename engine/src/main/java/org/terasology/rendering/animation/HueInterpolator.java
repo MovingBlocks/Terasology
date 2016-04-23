@@ -15,18 +15,31 @@
  */
 package org.terasology.rendering.animation;
 
-import org.terasology.rendering.nui.Color;
+import java.util.List;
+import java.util.function.Consumer;
 
-public abstract class QuickDirtyColorInterpolator implements Frame.FrameComponentInterface {
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
+
+/**
+ * Interpolates rectangles
+ */
+public class HueInterpolator implements Interpolator {
+
+    private Consumer<Color> consumer;
+    private final List<Color> colors = CieCamColors.L65C65;
+
+    /**
+     */
+    public HueInterpolator(Consumer<Color> consumer) {
+        this.consumer = consumer;
+    }
+
     @Override
-    public Object computeInterpolation(float v, Object theFrom, Object theTo) {
-        Color f = (Color) theFrom;
-        Color t = (Color) theTo;
-        return new Color(
-            v * (t.rf() - f.rf()) + f.rf(),
-            v * (t.gf() - f.gf()) + f.gf(),
-            v * (t.bf() - f.bf()) + f.bf(),
-            v * (t.af() - f.af()) + f.af()
-        );
+    public void apply(float v) {
+        int count = colors.size();
+        int index = (v == 1.0) ? count - 1 : (int) (v * count);
+        Color color = colors.get(index);
+        consumer.accept(color);
     }
 }

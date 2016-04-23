@@ -39,12 +39,12 @@ public class Animation {
 
     private final float duration;
 
-    private Interpolator<?> interpolator;
+    private Interpolator interpolator;
 
     /**
      * Constructs a new animation that runs once with linear speed.
      */
-    public Animation(Interpolator<?> interpolator, float duration) {
+    public Animation(Interpolator interpolator, float duration) {
         this(interpolator, duration, RepeatMode.RUN_ONCE, TimeModifiers.linear());
     }
 
@@ -53,7 +53,7 @@ public class Animation {
      *
      * @param repeatMode the repeat mode.
      */
-    public Animation(Interpolator<?> interpolator, float duration, RepeatMode repeatMode, TimeModifier timeModifier) {
+    public Animation(Interpolator interpolator, float duration, RepeatMode repeatMode, TimeModifier timeModifier) {
         this.interpolator = interpolator;
         this.duration = duration;
         this.repeatMode = repeatMode;
@@ -128,6 +128,13 @@ public class Animation {
         if (currentState == AnimState.PAUSED) {
             currentState = AnimState.RUNNING;
         }
+    }
+
+    /**
+     * @return the current frame, always non-negative
+     */
+    public int getCurrentFrame() {
+        return currentFrame;
     }
 
     /**

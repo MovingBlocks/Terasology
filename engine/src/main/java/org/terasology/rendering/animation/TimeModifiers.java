@@ -16,9 +16,6 @@
 
 package org.terasology.rendering.animation;
 
-import java.util.Objects;
-import java.util.function.Function;
-
 import org.terasology.math.TeraMath;
 
 import com.google.api.client.util.Preconditions;
@@ -45,7 +42,7 @@ public final class TimeModifiers {
         return v -> (1 - v);
     }
 
-    public static TimeModifier mirror(float delta) {
+    public static TimeModifier mirror() {
         return v -> (v < 0.5f) ? v * 2f : (1 - v) * 2;
     }
 
@@ -55,6 +52,15 @@ public final class TimeModifiers {
 
     public static TimeModifier multiply(float times) {
         return v -> (v * times) % 1f;
+    }
+
+    public static TimeModifier sub(float min, float max) {
+        Preconditions.checkArgument(min >= 0f);
+        Preconditions.checkArgument(max > min);
+        Preconditions.checkArgument(max <= 1f);
+
+        float range = max - min;
+        return v -> min + (v * range);
     }
 
     /**
