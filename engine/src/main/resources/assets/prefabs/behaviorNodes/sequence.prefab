@@ -4,8 +4,8 @@
         "name"      : "Sequence",
         "category"  : "logic",
         "shape"     : "diamond",
-        "color"     : [0.7, 0.7, 0.7],
+        "color"     : [180, 180, 180, 255],
         "description": "Composite\nEvaluates the children one by one.\nStarts next child, if previous child finishes with SUCCESS.\nSUCCESS: when all children finishes SUCCESS.\nFAILURE: as soon as a child finished with FAILURE.",
-        "textColor" : [  0,   0,   0]
+        "textColor" : [  0,   0,   0, 255]
     }
 }
