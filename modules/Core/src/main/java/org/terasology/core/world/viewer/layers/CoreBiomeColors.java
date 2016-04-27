@@ -16,19 +16,18 @@
 
 package org.terasology.core.world.viewer.layers;
 
-import java.util.Map;
-import java.util.function.Function;
-
+import com.google.common.collect.Maps;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.biomes.Biome;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
- * TODO Type description
+ * Maps the core biomes to colors
  */
-public class CoreBiomeColors implements Function<CoreBiome, Color> {
+public class CoreBiomeColors implements Function<Biome, Color> {
 
     private final Map<Biome, Color> biomeColors = Maps.newHashMap();
 
@@ -43,7 +42,7 @@ public class CoreBiomeColors implements Function<CoreBiome, Color> {
     }
 
     @Override
-    public Color apply(CoreBiome biome) {
+    public Color apply(Biome biome) {
         Color color = biomeColors.get(biome);
         return color;
     }
