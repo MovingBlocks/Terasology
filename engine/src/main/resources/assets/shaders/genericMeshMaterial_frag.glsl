@@ -39,6 +39,6 @@ void main(){
         gl_FragData[0].rgba = color;
     }
 
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, sunlight);
-    gl_FragData[2].rgba = vec4(blockLight, blockLight, blockLight, 0.0);
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0);
+    gl_FragData[2].rgba = vec4(blockLight, sunlight, 0.0, 0.0);
 }

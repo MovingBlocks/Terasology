@@ -25,6 +25,7 @@ void main() {
     vec4 normalBuffer = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy).rgba;
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
     vec3 blocklightColor = calcBlocklightColor(lightBufferOpaque.x);
+    float sunlightIntensity = lightBufferOpaque.y;
 
     if (!epsilonEqualsOne(depthOpaque)) {
         // Diffuse
@@ -40,6 +41,8 @@ void main() {
     gl_FragData[0].rgba = colorOpaque.rgba;
     gl_FragData[1].rgba = normalBuffer.rgba;
     gl_FragData[2].rgb = blocklightColor.rgb;
+    gl_FragData[2].a = sunlightIntensity;
+
 
     gl_FragDepth = depthOpaque * 0.5 + 0.5;
 }

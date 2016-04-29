@@ -20,6 +20,7 @@ uniform vec3 lightViewPos;
 
 uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D texSceneOpaqueNormals;
+uniform sampler2D texSceneOpaqueLightBuffer;
 
 uniform vec3 lightColorDiffuse = vec3(1.0, 0.0, 0.0);
 uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
@@ -65,7 +66,8 @@ void main() {
     float shininess = normalBuffer.a;
     vec4 depthBuffer = texture2D(texSceneOpaqueDepth, projectedPos.xy).rgba;
     float depth = depthBuffer.r * 2.0 - 1.0;
-    float sunlightIntensity = depthBuffer.a;
+    vec4 lightBuffer = texture2D(texSceneOpaqueLightBuffer, projectedPos.xy);
+    float sunlightIntensity = lightBuffer.y;
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     // TODO: Uhhh... Doing this twice here :/ Frustum ray would be better!
