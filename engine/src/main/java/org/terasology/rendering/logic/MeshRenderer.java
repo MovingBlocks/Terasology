@@ -232,7 +232,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
                         material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
-                        material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
+                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
 
                         lastMesh.doRender();
                     }

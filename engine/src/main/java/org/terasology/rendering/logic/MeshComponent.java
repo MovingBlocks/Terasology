@@ -36,6 +36,10 @@ public final class MeshComponent implements Component {
     @Replicate
     public boolean translucent;
 
+    // Use this for the mesh to light itself.  Useful for held lights where the point light is inside the mesh.
+    @Replicate
+    public float selfLuminance = 0f;
+
     public boolean hideFromOwner;
 
     // TODO: Some sort of Texture + Shader type?
