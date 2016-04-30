@@ -15,60 +15,33 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.layers.mainMenu.AnimatedGooey;
-import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
+import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.VideoSettingsScreen;
 
 /**
  */
 public class SettingsMenuScreen extends CoreScreenLayer {
 
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:settingsMenuScreen");
+
     @In
     private Config config;
-    private AnimatedGooey anim;
 
     @Override
     public void initialise() {
-        anim = new AnimatedGooey((RelativeLayout) getContents());
-        subscribeAnimatedForward("player", button -> getManager().pushScreen("engine:PlayerMenuScreen"));
-        subscribeAnimatedForward("video", button -> getManager().pushScreen("engine:VideoMenuScreen"));
-        subscribeAnimatedForward("audio", button -> getManager().pushScreen("engine:AudioMenuScreen"));
-        WidgetUtil.trySubscribe(this, "input", button -> {
-            anim.reverse();
-//            getManager().pushScreen(InputSettingsScreen.ASSET_URI);
-            });
-        subscribeAnimatedBack("close", button -> {
+        WidgetUtil.trySubscribe(this, "player", button -> triggerForwardAnimation(PlayerSettingsScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "video", button -> triggerForwardAnimation(VideoSettingsScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "audio", button -> triggerForwardAnimation(AudioSettingsScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "input", button -> triggerForwardAnimation(InputSettingsScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "close", button -> {
             config.save();
-            getManager().popScreen();
+            triggerBackAnimation();
         });
-    }
-
-    @Override
-    public void onOpened() {
-        super.onOpened();
-        anim.reset();
-    }
-
-    @Override
-    public void onShow() {
-        super.onShow();
-        anim.reset();
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-        anim.update(delta);
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        anim.updateSize(canvas.getRegion());
     }
 
     @Override

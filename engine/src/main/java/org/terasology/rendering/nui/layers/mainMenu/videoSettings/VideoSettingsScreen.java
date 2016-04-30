@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -41,6 +42,9 @@ import java.util.Arrays;
 /**
  */
 public class VideoSettingsScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:VideoMenuScreen");
+
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
 
     @In
@@ -248,13 +252,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             WidgetUtil.trySubscribe(this, "fovReset", widget -> fovSlider.setValue(100.0f));
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
-    }
-
-    @Override
-    public void onClosed() {
-        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
-        CoreRegistry.get(ShaderManager.class).recompileAllShaders();
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+            // TODO: add a dirty flag that checks if recompiling is needed
+            CoreRegistry.get(ShaderManager.class).recompileAllShaders();
+            triggerBackAnimation();
+        });
     }
 
     @Override

@@ -18,6 +18,8 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
@@ -59,6 +61,8 @@ import java.util.concurrent.Future;
 /**
  */
 public class JoinGameScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
     @In
     private Config config;
@@ -130,7 +134,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             config.save();
-            getManager().popScreen();
+            triggerBackAnimation();
         });
 
         activateOnline.onActivated(null);

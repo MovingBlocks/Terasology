@@ -49,6 +49,8 @@ import java.util.Locale;
  */
 public class PlayerSettingsScreen extends CoreScreenLayer {
 
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:PlayerMenuScreen");
+
     @In
     private Config config;
     @In
@@ -107,13 +109,13 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             language.setOptionRenderer(new LocaleRenderer(translationSystem));
         }
 
-        subscribeAnimatedBack("close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         UIButton okButton = find("ok", UIButton.class);
         if (okButton != null) {
             okButton.subscribe(button -> {
                 savePlayerSettings();
-                getManager().popScreen();
+                triggerBackAnimation();
             });
             okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                 @Override

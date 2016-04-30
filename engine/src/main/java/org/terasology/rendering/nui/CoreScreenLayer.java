@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -23,7 +24,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +51,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private NUIManager manager;
     private boolean initialised;
 
-    private MenuAnimationSystem switchAnimation = new MenuAnimationSystem();
+    private MenuAnimationSystem switchAnimation = new MenuAnimationSystem(0.3f);
 
     public CoreScreenLayer() {
     }
@@ -203,25 +203,13 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return Arrays.asList(contents).iterator();
     }
 
-    protected void subscribeAnimatedForward(String id, ActivateEventListener listener) {
-        WidgetUtil.trySubscribe(this, id, new ActivateEventListener() {
-
-            @Override
-            public void onActivated(UIWidget widget) {
-                switchAnimation.onEnd(() -> listener.onActivated(widget));
-                switchAnimation.triggerToNext();
-            }
-        });
+    protected void triggerForwardAnimation(ResourceUrn screenUri) {
+        switchAnimation.onEnd(() -> getManager().pushScreen(screenUri));
+        switchAnimation.triggerToNext();
     }
 
-    protected void subscribeAnimatedBack(String id, ActivateEventListener listener) {
-        WidgetUtil.trySubscribe(this, id, new ActivateEventListener() {
-
-            @Override
-            public void onActivated(UIWidget widget) {
-                switchAnimation.onEnd(() -> listener.onActivated(widget));
-                switchAnimation.triggerToPrev();
-            }
-        });
+    protected void triggerBackAnimation() {
+        switchAnimation.onEnd(getManager()::popScreen);
+        switchAnimation.triggerToPrev();
     }
 }

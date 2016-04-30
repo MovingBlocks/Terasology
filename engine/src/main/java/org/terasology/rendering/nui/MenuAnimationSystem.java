@@ -33,12 +33,14 @@ public class MenuAnimationSystem {
 
     /**
      * Creates default animations
+     * @param duration the duration of the animation in seconds
      */
-    public MenuAnimationSystem() {
-        flyIn = Animation.once(v -> scale = v, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
-        flyOut = Animation.once(v -> scale = -v, 1.2f, TimeModifiers.square());
-//        flyIn = Animation.once(v -> scale = -v, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
-//        flyOut = Animation.once(v -> scale = v, 1.2f, TimeModifiers.square());
+    public MenuAnimationSystem(float duration) {
+        // down from 1 (fast) to 0 (slow)
+        flyIn = Animation.once(v -> scale = v, duration, TimeModifiers.inverse().andThen(TimeModifiers.square()));
+
+        // down from 0 (slow) to -1 (fast)
+        flyOut = Animation.once(v -> scale = -v, duration, TimeModifiers.square());
     }
 
     /**
@@ -102,8 +104,15 @@ public class MenuAnimationSystem {
      * @param delta time difference in seconds
      */
     public void update(float delta) {
-        flyIn.update(delta);
-        flyOut.update(delta);
+        float animDelta = delta;
+
+        if (animDelta > 0.1f) {
+            // avoid skipping over fast animations on heavy load
+            animDelta = 0.1f;
+        }
+
+        flyIn.update(animDelta);
+        flyOut.update(animDelta);
     }
 
     public Rect2i animateRegion(Rect2i rc) {

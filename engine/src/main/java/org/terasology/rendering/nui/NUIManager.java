@@ -61,6 +61,12 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     UIScreenLayer pushScreen(UIElement element);
 
+    default <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType) {
+        return createScreen(new ResourceUrn(screenUri), expectedType);
+    }
+
+    <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType);
+
     <T extends CoreScreenLayer> T pushScreen(ResourceUrn screenUri, Class<T> expectedType);
 
     <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
@@ -102,5 +108,4 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setForceReleasingMouse(boolean value);
 
     void invalidate();
-
 }

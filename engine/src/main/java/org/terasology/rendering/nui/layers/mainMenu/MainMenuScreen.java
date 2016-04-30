@@ -18,15 +18,9 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.registry.In;
-import org.terasology.rendering.animation.Animation;
-import org.terasology.rendering.animation.Animator;
-import org.terasology.rendering.animation.AnimatorGroup;
-import org.terasology.rendering.animation.ColorHueAnimator;
-import org.terasology.rendering.animation.TimeModifier;
-import org.terasology.rendering.animation.TimeModifiers;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
@@ -36,41 +30,35 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     @In
     private GameEngine engine;
-    private Animation colorAnimation;
 
     @Override
     public void initialise() {
 
-        UIImage title = find("title", UIImage.class);
         UILabel versionLabel = find("version", UILabel.class);
-
-        Animator colorAnim = new ColorHueAnimator(color -> title.setTint(color));
-        Animator textAnim = v -> versionLabel.setText(String.format("Color Hue: %.2f", v));
-        Animator animGroup = new AnimatorGroup(colorAnim, textAnim);
-
-        TimeModifier colorTimeMod = TimeModifiers
-                .mirror()
-                .andThen(TimeModifiers.smooth())
-                .andThen(TimeModifiers.sub(0.2f, 0.4f));
-
-        colorAnimation = Animation.infinite(animGroup, 3.0f, colorTimeMod).start();
-
         versionLabel.setText(TerasologyVersion.getInstance().getHumanVersion());
-        subscribeAnimatedForward("singleplayer", button -> {
-            getManager().pushScreen("engine:selectGameScreen", SelectGameScreen.class).setLoadingAsServer(false);
+
+        WidgetUtil.trySubscribe(this, "singleplayer", button -> {
+            SelectGameScreen screen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
+            screen.setLoadingAsServer(false);
+            // in theory, the screen can be garbage collected now and the information will be lost
+            // TODO: pass the screen directly to NUIManger.push()
+            triggerForwardAnimation(SelectGameScreen.ASSET_URI);
         });
-        subscribeAnimatedForward("multiplayer", button -> {
-            getManager().pushScreen("engine:selectGameScreen", SelectGameScreen.class).setLoadingAsServer(true);
+        WidgetUtil.trySubscribe(this, "multiplayer", button -> {
+            SelectGameScreen screen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
+            screen.setLoadingAsServer(true);
+            // in theory, the screen can be garbage collected now and the information will be lost
+            // TODO: pass the screen directly to NUIManger.push()
+            triggerForwardAnimation(SelectGameScreen.ASSET_URI);
         });
-        subscribeAnimatedForward("join", button -> getManager().pushScreen("engine:joinGameScreen"));
-        subscribeAnimatedForward("settings", button -> getManager().pushScreen("engine:settingsMenuScreen"));
+        WidgetUtil.trySubscribe(this, "join", button -> triggerForwardAnimation(JoinGameScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "settings", button -> triggerForwardAnimation(SettingsMenuScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
-        colorAnimation.update(delta);
     }
 
     @Override

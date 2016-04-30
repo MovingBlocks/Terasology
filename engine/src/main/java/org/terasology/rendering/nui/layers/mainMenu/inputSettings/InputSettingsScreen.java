@@ -145,7 +145,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         area.setContent(mainLayout);
 
         WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
-        WidgetUtil.trySubscribe(this, "back", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
     }
 
     private void addInputSection(InputCategory category, ColumnLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {

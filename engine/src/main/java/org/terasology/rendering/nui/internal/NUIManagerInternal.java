@@ -240,6 +240,25 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
+    public <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType) {
+        Optional<UIElement> optElement = Assets.get(screenUri, UIElement.class);
+        if (optElement.isPresent()) {
+            UIElement element = optElement.get();
+            UIWidget root = element.getRootWidget();
+            if (expectedType.isInstance(root)) {
+                T screen = expectedType.cast(root);
+                InjectionHelper.inject(screen);
+                return screen;
+            } else {
+                logger.error("Screen '{}' is a '{}', not a '{}'", screenUri, root.getClass(), expectedType);
+            }
+        } else {
+            logger.error("Can't find screen '{}'", screenUri);
+        }
+        return null;
+    }
+
+    @Override
     public UIScreenLayer pushScreen(UIElement element) {
         if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
             CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
