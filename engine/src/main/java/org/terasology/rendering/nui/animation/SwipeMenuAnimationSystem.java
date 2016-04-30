@@ -29,8 +29,8 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
     public enum Direction {
         LEFT_TO_RIGHT(1, 0),
         RIGHT_TO_LEFT(-1, 0),
-        TOP_TO_BOTTOM(0, 1),
-        BOTTOM_TO_TOP(0, -1);
+        TOP_TO_BOTTOM(0, -1),
+        BOTTOM_TO_TOP(0, 1);
 
         private final float horzScale;
         private final float vertScale;
