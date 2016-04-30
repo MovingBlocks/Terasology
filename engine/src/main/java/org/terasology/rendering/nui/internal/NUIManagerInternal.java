@@ -36,7 +36,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
-import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.input.events.KeyEvent;
@@ -538,27 +537,26 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     //raw input events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void keyEvent(KeyEvent event, EntityRef entity) {
+    public void keyEvent(KeyEvent ev, EntityRef entity) {
+        NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getKeyCharacter(), ev.getState());
         if (focus != null) {
-            if (focus.onKeyEvent(new NUIKeyEvent(mouse, keyboard, event.getKey(), event.getKeyCharacter(), event.getState()))) {
-                event.consume();
+            if (focus.onKeyEvent(nuiEvent)) {
+                ev.consume();
             }
         }
-        if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
+
+        // send event to screen stack if not yet consumed
+        if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen.isEscapeToCloseAllowed()) {
-                    closeScreen(screen);
-                    event.consume();
-                    break;
-                } else if (screen.isModal()) {
+                if (screen != focus) {    // explicit identity check
+                    if (screen.onKeyEvent(nuiEvent)) {
+                        ev.consume();
+                        break;
+                    }
+                }
+                if (screen.isModal()) {
                     break;
                 }
-            }
-        }
-        for (UIScreenLayer screen : screens) {
-            if (screen.isModal()) {
-//                event.consume();
-                return;
             }
         }
     }

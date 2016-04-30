@@ -23,8 +23,6 @@ public interface UIScreenLayer extends ControlWidget {
 
     boolean isReleasingMouse();
 
-    boolean isEscapeToCloseAllowed();
-
     boolean isModal();
 
     NUIManager getManager();

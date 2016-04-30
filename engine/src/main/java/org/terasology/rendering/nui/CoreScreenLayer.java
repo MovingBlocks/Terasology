@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Keyboard;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
@@ -100,11 +101,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return true;
     }
 
-    @Override
-    public boolean isEscapeToCloseAllowed() {
-        return true;
-    }
-
     public UIWidget getContents() {
         return contents;
     }
@@ -169,7 +165,16 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
+        if (isEscapeToCloseAllowed() && event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            triggerBackAnimation();
+            return true;
+        }
+
         return false;
+    }
+
+    protected boolean isEscapeToCloseAllowed() {
+        return true;
     }
 
     @Override
