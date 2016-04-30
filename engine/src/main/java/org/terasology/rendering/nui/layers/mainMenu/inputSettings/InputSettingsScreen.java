@@ -41,6 +41,7 @@ import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
@@ -80,6 +81,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         ColumnLayout mainLayout = new ColumnLayout();
         mainLayout.setHorizontalSpacing(8);
         mainLayout.setVerticalSpacing(8);

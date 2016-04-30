@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui;
+package org.terasology.rendering.nui.animation;
 
 import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.animation.Animation;
@@ -24,10 +24,35 @@ import org.terasology.rendering.animation.TimeModifiers;
 /**
  * Controls animations to and from different screens
  */
-public class MenuAnimationSystem {
+public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
 
-    private Animation flyIn;
-    private Animation flyOut;
+    public enum Direction {
+        LEFT_TO_RIGHT(1, 0),
+        RIGHT_TO_LEFT(-1, 0),
+        TOP_TO_BOTTOM(0, 1),
+        BOTTOM_TO_TOP(0, -1);
+
+        private final float horzScale;
+        private final float vertScale;
+
+        Direction(float horzScale, float vertScale) {
+            this.horzScale = horzScale;
+            this.vertScale = vertScale;
+        }
+
+        public float getHorzScale() {
+            return horzScale;
+        }
+
+        public float getVertScale() {
+            return vertScale;
+        }
+    }
+
+    private final Direction direction;
+
+    private final Animation flyIn;
+    private final Animation flyOut;
 
     private float scale;
 
@@ -35,17 +60,29 @@ public class MenuAnimationSystem {
      * Creates default animations
      * @param duration the duration of the animation in seconds
      */
-    public MenuAnimationSystem(float duration) {
+    public SwipeMenuAnimationSystem(float duration) {
+        this(duration, Direction.LEFT_TO_RIGHT);
+    }
+
+    /**
+     * Creates default animations
+     * @param duration the duration of the animation in seconds
+     * @param direction the swipe direction
+     */
+    public SwipeMenuAnimationSystem(float duration, Direction direction) {
         // down from 1 (fast) to 0 (slow)
         flyIn = Animation.once(v -> scale = v, duration, TimeModifiers.inverse().andThen(TimeModifiers.square()));
 
         // down from 0 (slow) to -1 (fast)
         flyOut = Animation.once(v -> scale = -v, duration, TimeModifiers.square());
+
+        this.direction = direction;
     }
 
     /**
      * Trigger animation from previous screen to this one
      */
+    @Override
     public void triggerFromPrev() {
         flyIn.setForwardMode();
         flyIn.start();
@@ -54,6 +91,7 @@ public class MenuAnimationSystem {
     /**
      * Trigger animation from this one back to the previous screen
      */
+    @Override
     public void triggerToPrev() {
         flyIn.setReverseMode();
         flyIn.start();
@@ -62,6 +100,7 @@ public class MenuAnimationSystem {
     /**
      * Trigger animation from the next screen to this one
      */
+    @Override
     public void triggerFromNext() {
         flyOut.setReverseMode();
         flyOut.start();
@@ -70,6 +109,7 @@ public class MenuAnimationSystem {
     /**
      * Trigger animation from this one to the next screen
      */
+    @Override
     public void triggerToNext() {
         flyOut.setForwardMode();
         flyOut.start();
@@ -78,6 +118,7 @@ public class MenuAnimationSystem {
     /**
      * @param listener the listener to trigger when the animation has ended
      */
+    @Override
     public void onEnd(Runnable listener) {
         flyOut.removeAllListeners();
         flyOut.addListener(new AnimationListener() {
@@ -103,6 +144,7 @@ public class MenuAnimationSystem {
     /**
      * @param delta time difference in seconds
      */
+    @Override
     public void update(float delta) {
         float animDelta = delta;
 
@@ -115,14 +157,16 @@ public class MenuAnimationSystem {
         flyOut.update(animDelta);
     }
 
+    @Override
     public Rect2i animateRegion(Rect2i rc) {
         if (scale == 0.0) {
             // this should cover most of the cases
             return rc;
         }
 
-        int left = (int) (scale * rc.width());
-        return Rect2i.createFromMinAndSize(left, 0, rc.width(), rc.height());
+        int left = (int) (direction.getHorzScale() * scale * rc.width());
+        int top = (int) (direction.getVertScale() * scale * rc.height());
+        return Rect2i.createFromMinAndSize(left, top, rc.width(), rc.height());
     }
 
 }

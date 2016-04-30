@@ -20,6 +20,8 @@ import org.terasology.engine.GameEngine;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem;
 import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
@@ -33,6 +35,8 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         UILabel versionLabel = find("version", UILabel.class);
         versionLabel.setText(TerasologyVersion.getInstance().getHumanVersion());

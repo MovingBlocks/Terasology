@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.widgets.UISlider;
 
@@ -34,6 +35,7 @@ public class AudioSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         UISlider sound = find("sound", UISlider.class);
         if (sound != null) {
             sound.setIncrement(0.05f);

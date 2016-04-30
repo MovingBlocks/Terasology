@@ -39,6 +39,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -91,6 +92,7 @@ public class CreateGameScreen extends CoreScreenLayer {
     @SuppressWarnings("unchecked")
     public void initialise() {
 
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
         if (gameTypeTitle != null) {

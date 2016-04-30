@@ -37,6 +37,7 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -96,6 +97,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
 
         CardLayout cards = find("cards", CardLayout.class);

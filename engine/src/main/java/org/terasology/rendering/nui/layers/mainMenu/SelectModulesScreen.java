@@ -41,6 +41,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
@@ -109,6 +110,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
 
         resolver = new DependencyResolver(moduleManager.getRegistry());

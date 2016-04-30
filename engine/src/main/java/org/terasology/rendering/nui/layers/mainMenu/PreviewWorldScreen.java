@@ -41,6 +41,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
@@ -221,6 +222,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
             zoomSlider.setValue(2f);
