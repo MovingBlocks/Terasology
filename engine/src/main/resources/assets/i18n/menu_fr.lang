@@ -110,7 +110,7 @@
     "video-high-end-settings": "Paramètres haut de gamme / expérimentaux", 
     "video-preset": "Preset", 
     "video-preset-message" : "Does NOT change view distance or field of view",
-    "video-preset-custom": "Custom",
+    "video-preset-custom": "Personnalisé",
     "video-preset-minimal": "Minimal",
     "video-preset-low": "Low",
     "video-preset-medium": "Medium",
