@@ -22,7 +22,7 @@ import org.terasology.rendering.animation.AnimationListener;
 import org.terasology.rendering.animation.TimeModifiers;
 
 /**
- * TODO Type description
+ * Controls animations to and from different screens
  */
 public class MenuAnimationSystem {
 
@@ -32,47 +32,86 @@ public class MenuAnimationSystem {
     private float scale;
 
     /**
-     *
+     * Creates default animations
      */
     public MenuAnimationSystem() {
-
-        flyIn = Animation.once(v -> scale = -v, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
-        flyOut = Animation.once(v -> scale = v, 1.2f, TimeModifiers.square());
+        flyIn = Animation.once(v -> scale = v, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
+        flyOut = Animation.once(v -> scale = -v, 1.2f, TimeModifiers.square());
+//        flyIn = Animation.once(v -> scale = -v, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
+//        flyOut = Animation.once(v -> scale = v, 1.2f, TimeModifiers.square());
     }
 
-    public void triggerStart() {
+    /**
+     * Trigger animation from previous screen to this one
+     */
+    public void triggerFromPrev() {
+        flyIn.setForwardMode();
         flyIn.start();
     }
 
     /**
-     *
+     * Trigger animation from this one back to the previous screen
      */
-    public void triggerEnd() {
+    public void triggerToPrev() {
+        flyIn.setReverseMode();
+        flyIn.start();
+    }
+
+    /**
+     * Trigger animation from the next screen to this one
+     */
+    public void triggerFromNext() {
+        flyOut.setReverseMode();
         flyOut.start();
     }
 
     /**
-     * @param listener
+     * Trigger animation from this one to the next screen
+     */
+    public void triggerToNext() {
+        flyOut.setForwardMode();
+        flyOut.start();
+    }
+
+    /**
+     * @param listener the listener to trigger when the animation has ended
      */
     public void onEnd(Runnable listener) {
         flyOut.removeAllListeners();
         flyOut.addListener(new AnimationListener() {
             @Override
             public void onEnd() {
-                listener.run();
+                if (!flyOut.isReverse()) {
+                    listener.run();
+                }
+            }
+        });
+
+        flyIn.removeAllListeners();
+        flyIn.addListener(new AnimationListener() {
+            @Override
+            public void onEnd() {
+                if (flyIn.isReverse()) {
+                    listener.run();
+                }
             }
         });
     }
 
     /**
-     * @param delta
+     * @param delta time difference in seconds
      */
     public void update(float delta) {
         flyIn.update(delta);
         flyOut.update(delta);
     }
 
-    public Rect2i getRenderRegion(Rect2i rc) {
+    public Rect2i animateRegion(Rect2i rc) {
+        if (scale == 0.0) {
+            // this should cover most of the cases
+            return rc;
+        }
+
         int left = (int) (scale * rc.width());
         return Rect2i.createFromMinAndSize(left, 0, rc.width(), rc.height());
     }

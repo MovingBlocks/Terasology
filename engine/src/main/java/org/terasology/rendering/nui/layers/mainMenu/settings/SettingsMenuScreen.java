@@ -21,7 +21,6 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layers.mainMenu.AnimatedGooey;
-import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
 import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
 
 /**
@@ -35,11 +34,14 @@ public class SettingsMenuScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         anim = new AnimatedGooey((RelativeLayout) getContents());
-        WidgetUtil.trySubscribe(this, "player", button -> getManager().pushScreen("engine:PlayerMenuScreen"));
-        WidgetUtil.trySubscribe(this, "video", button -> getManager().pushScreen("engine:VideoMenuScreen"));
-        WidgetUtil.trySubscribe(this, "audio", button -> getManager().pushScreen("engine:AudioMenuScreen"));
-        WidgetUtil.trySubscribe(this, "input", button -> getManager().pushScreen(InputSettingsScreen.ASSET_URI));
-        WidgetUtil.trySubscribe(this, "close", button -> {
+        subscribeAnimatedForward("player", button -> getManager().pushScreen("engine:PlayerMenuScreen"));
+        subscribeAnimatedForward("video", button -> getManager().pushScreen("engine:VideoMenuScreen"));
+        subscribeAnimatedForward("audio", button -> getManager().pushScreen("engine:AudioMenuScreen"));
+        WidgetUtil.trySubscribe(this, "input", button -> {
+            anim.reverse();
+//            getManager().pushScreen(InputSettingsScreen.ASSET_URI);
+            });
+        subscribeAnimatedBack("close", button -> {
             config.save();
             getManager().popScreen();
         });
@@ -48,6 +50,12 @@ public class SettingsMenuScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
+        anim.reset();
+    }
+
+    @Override
+    public void onShow() {
+        super.onShow();
         anim.reset();
     }
 

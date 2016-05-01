@@ -86,7 +86,7 @@ public class AnimationTest {
 
     @Test
     public void startEndOnceReverse() {
-        Animation ani = once().playReverse();
+        Animation ani = once().setReverseMode();
         AnimationListener listener = Mockito.mock(AnimationListener.class);
         ani.addListener(listener);
         ani.start();
@@ -97,7 +97,7 @@ public class AnimationTest {
 
     @Test
     public void updatesReverse() {
-        Animation ani = once().playReverse();
+        Animation ani = once().setReverseMode();
         ani.update(2.5f);  // ignored
         Assert.assertEquals(0f, c.value, 0f);
         ani.start();

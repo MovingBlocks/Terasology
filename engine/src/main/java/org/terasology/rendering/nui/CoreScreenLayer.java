@@ -18,10 +18,12 @@ package org.terasology.rendering.nui;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +51,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private NUIManager manager;
     private boolean initialised;
 
+    private MenuAnimationSystem switchAnimation = new MenuAnimationSystem();
+
     public CoreScreenLayer() {
     }
 
@@ -75,6 +79,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             initialise();
             initialised = true;
         }
+        switchAnimation.triggerFromPrev();
     }
 
     protected abstract void initialise();
@@ -100,11 +105,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
+        Rect2i region = switchAnimation.animateRegion(canvas.getRegion());
         if (isModal()) {
-            canvas.addInteractionRegion(getScreenListener());
+            canvas.addInteractionRegion(getScreenListener(), region);
         }
-        if (contents != null) {
-            canvas.drawWidget(contents, canvas.getRegion());
+        if (getContents() != null) {
+            canvas.drawWidget(getContents(), region);
         }
     }
 
@@ -112,6 +118,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     public void update(float delta) {
         if (contents != null) {
             contents.update(delta);
+            switchAnimation.update(delta);
         }
     }
 
@@ -131,6 +138,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onShow() {
+        switchAnimation.triggerFromNext();
     }
 
     @Override
@@ -193,5 +201,27 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             return Collections.emptyIterator();
         }
         return Arrays.asList(contents).iterator();
+    }
+
+    protected void subscribeAnimatedForward(String id, ActivateEventListener listener) {
+        WidgetUtil.trySubscribe(this, id, new ActivateEventListener() {
+
+            @Override
+            public void onActivated(UIWidget widget) {
+                switchAnimation.onEnd(() -> listener.onActivated(widget));
+                switchAnimation.triggerToNext();
+            }
+        });
+    }
+
+    protected void subscribeAnimatedBack(String id, ActivateEventListener listener) {
+        WidgetUtil.trySubscribe(this, id, new ActivateEventListener() {
+
+            @Override
+            public void onActivated(UIWidget widget) {
+                switchAnimation.onEnd(() -> listener.onActivated(widget));
+                switchAnimation.triggerToPrev();
+            }
+        });
     }
 }

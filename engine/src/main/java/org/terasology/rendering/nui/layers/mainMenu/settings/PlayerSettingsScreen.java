@@ -107,7 +107,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             language.setOptionRenderer(new LocaleRenderer(translationSystem));
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        subscribeAnimatedBack("close", button -> getManager().popScreen());
 
         UIButton okButton = find("ok", UIButton.class);
         if (okButton != null) {
@@ -194,6 +194,11 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             config.getSystem().setLocale(language.getSelection());
             getManager().invalidate();
         }
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     /**

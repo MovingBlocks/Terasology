@@ -96,7 +96,7 @@ public final class Animation {
      * Plays the animation forwards. Can be set at any time.
      * @return this
      */
-    public Animation playForward() {
+    public Animation setForwardMode() {
         return setDirection(Direction.FORWARD);
     }
 
@@ -104,7 +104,7 @@ public final class Animation {
      * Plays the animation reverse. Can be set at any time.
      * @return this
      */
-    public Animation playReverse() {
+    public Animation setReverseMode() {
         return setDirection(Direction.REVERSE);
     }
 
