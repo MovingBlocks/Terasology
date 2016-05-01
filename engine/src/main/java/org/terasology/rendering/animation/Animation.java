@@ -24,13 +24,6 @@ import com.google.common.base.Preconditions;
  * Single animation that traverses frames.
  */
 public final class Animation {
-    private final List<AnimationListener> listeners = new ArrayList<AnimationListener>();
-
-    private RepeatMode repeatMode;
-
-    private float elapsedTime;
-
-    private TimeModifier timeModifier;
 
     private enum AnimState {
         STOPPED, PAUSED, RUNNING
@@ -41,11 +34,21 @@ public final class Animation {
         REPEAT_INFINITE
     }
 
-    private AnimState currentState = AnimState.STOPPED;
+    private enum Direction {
+        FORWARD,
+        REVERSE;
+    }
 
+    private final List<AnimationListener> listeners = new ArrayList<AnimationListener>();
+
+    private final RepeatMode repeatMode;
     private final float duration;
+    private final Animator animator;
+    private final TimeModifier timeModifier;
 
-    private Animator animator;
+    private Direction direction = Direction.FORWARD;
+    private AnimState currentState = AnimState.STOPPED;
+    private float elapsedTime;
 
     /**
      * @param animator the animator that is updated over time
@@ -77,17 +80,48 @@ public final class Animation {
         return anim;
     }
 
-     /**
-      * Creates an animation that loops infinitely
-      * @param animator the animator that is updated over time
-      * @param duration the duration in seconds (must be positive)
-      * @param timeModifier the time modifier to apply
-      * @return the animation
-      */
-     public static Animation infinite(Animator animator, float duration, TimeModifier timeModifier) {
-         Animation anim = new Animation(animator, duration, RepeatMode.REPEAT_INFINITE, timeModifier);
-         return anim;
-     }
+    /**
+     * Creates an animation that loops infinitely
+     * @param animator the animator that is updated over time
+     * @param duration the duration in seconds (must be positive)
+     * @param timeModifier the time modifier to apply
+     * @return the animation
+     */
+    public static Animation infinite(Animator animator, float duration, TimeModifier timeModifier) {
+        Animation anim = new Animation(animator, duration, RepeatMode.REPEAT_INFINITE, timeModifier);
+        return anim;
+    }
+
+    /**
+     * Plays the animation forwards. Can be set at any time.
+     * @return this
+     */
+    public Animation playForward() {
+        return setDirection(Direction.FORWARD);
+    }
+
+    /**
+     * Plays the animation reverse. Can be set at any time.
+     * @return this
+     */
+    public Animation playReverse() {
+        return setDirection(Direction.REVERSE);
+    }
+
+    /**
+     * @return true if in reverse mode, false otherwise
+     */
+    public boolean isReverse() {
+        return direction == Direction.REVERSE;
+    }
+
+    private Animation setDirection(Direction newDir) {
+        if (direction != newDir) {
+            direction = newDir;
+            elapsedTime = duration - elapsedTime;
+        }
+        return this;
+    }
 
     /**
      * Updates the animation if {@link #start} has been called and is not finished.
@@ -100,13 +134,13 @@ public final class Animation {
         }
 
         elapsedTime += delta;
-        while (elapsedTime > duration) {
+        if (elapsedTime > duration) {
             if (repeatMode == RepeatMode.RUN_ONCE) {
                 elapsedTime = duration;
                 stop();
                 return;
             } else {
-                elapsedTime -= duration;
+                elapsedTime %= duration;
             }
         }
 
@@ -114,7 +148,8 @@ public final class Animation {
     }
 
     private void updateAnimator() {
-        float ipol = timeModifier.apply(elapsedTime / duration);
+        float time = direction == Direction.FORWARD ? elapsedTime : duration - elapsedTime;
+        float ipol = timeModifier.apply(time / duration);
         animator.apply(ipol);
     }
 

@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * TODO Type description
+ * Tests the {@link Animation} class
  */
 public class AnimationTest {
 
@@ -57,6 +57,14 @@ public class AnimationTest {
     }
 
     @Test
+    public void overflowInfinite() {
+        Animation ani = infinite().start();
+        Assert.assertEquals(0.0f, c.value, 0.0f);
+        ani.update(112.5f);
+        Assert.assertEquals(.25f, c.value, EPS); // (112.5 % 2) / 2
+    }
+
+    @Test
     public void updates() {
         Animation ani = once();
         ani.update(2.5f);  // ignored
@@ -74,6 +82,37 @@ public class AnimationTest {
         Assert.assertEquals(1.00f, c.value, 0f);  // 2.5 / 2 -> capped
         ani.update(1.0f);  // ignored
         Assert.assertEquals(1.00f, c.value, 0f);  // same
+    }
+
+    @Test
+    public void startEndOnceReverse() {
+        Animation ani = once().playReverse();
+        AnimationListener listener = Mockito.mock(AnimationListener.class);
+        ani.addListener(listener);
+        ani.start();
+        ani.update(2.5f);
+        Mockito.verify(listener, Mockito.times(1)).onStart();
+        Mockito.verify(listener, Mockito.times(1)).onEnd();
+    }
+
+    @Test
+    public void updatesReverse() {
+        Animation ani = once().playReverse();
+        ani.update(2.5f);  // ignored
+        Assert.assertEquals(0f, c.value, 0f);
+        ani.start();
+        ani.update(0.5f);
+        Assert.assertEquals(0.75f, c.value, EPS); // 1 - 0.5 / 2
+        ani.pause();
+        ani.update(0.5f);  // ignored
+        Assert.assertEquals(0.75f, c.value, EPS); // same
+        ani.resume();
+        ani.update(1.0f);
+        Assert.assertEquals(0.25f, c.value, EPS); // 1 - 1.5 / 2
+        ani.update(1.0f);
+        Assert.assertEquals(0.00f, c.value, 0f);  // 1 - 2.5 / 2 -> capped
+        ani.update(1.0f);  // ignored
+        Assert.assertEquals(0.00f, c.value, 0f);  // same
     }
 
     private Animation once() {
