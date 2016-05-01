@@ -16,11 +16,9 @@
 
 package org.terasology.rendering.nui;
 
-import org.terasology.math.geom.Rect2f;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.animation.AnimationListener;
-import org.terasology.rendering.animation.Animator;
-import org.terasology.rendering.animation.Rect2fAnimator;
 import org.terasology.rendering.animation.TimeModifiers;
 
 /**
@@ -28,57 +26,55 @@ import org.terasology.rendering.animation.TimeModifiers;
  */
 public class MenuAnimationSystem {
 
-    private Rect2f animRegion;
-    private Animation animLeft;
-    private Animation animRight;
+    private Animation flyIn;
+    private Animation flyOut;
+
+    private float scale;
 
     /**
      *
      */
     public MenuAnimationSystem() {
-        Rect2f left = Rect2f.createFromMinAndSize(-1, 0, 1, 1);
-        Rect2f center = Rect2f.createFromMinAndSize(0, 0, 1, 1);
-        Rect2f right = Rect2f.createFromMinAndSize(1, 0, 1, 1);
 
-        Animator ipolLeft = new Rect2fAnimator(left, center, rc -> animRegion = rc);
-        Animator ipolRight = new Rect2fAnimator(center, right, rc -> animRegion = rc);
-
-        animRegion = center;
-        animLeft = Animation.once(ipolLeft, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
-        animRight = Animation.once(ipolRight, 1.2f, TimeModifiers.square());
+        flyIn = Animation.once(v -> scale = -v, 1.2f, TimeModifiers.inverse().andThen(TimeModifiers.square()));
+        flyOut = Animation.once(v -> scale = v, 1.2f, TimeModifiers.square());
     }
 
     public void triggerStart() {
-        animLeft.start();
+        flyIn.start();
     }
 
     /**
      *
      */
     public void triggerEnd() {
-        animRight.start();
+        flyOut.start();
     }
 
     /**
      * @param listener
      */
-    public void onEnd(AnimationListener listener) {
-        animRight.addListener(listener);
+    public void onEnd(Runnable listener) {
+        flyOut.removeAllListeners();
+        flyOut.addListener(new AnimationListener() {
+            @Override
+            public void onEnd() {
+                listener.run();
+            }
+        });
     }
 
     /**
      * @param delta
      */
     public void update(float delta) {
-        animLeft.update(delta);
-        animRight.update(delta);
+        flyIn.update(delta);
+        flyOut.update(delta);
     }
 
-    /**
-     * @return
-     */
-    public Rect2f getAnimRegion() {
-        return animRegion;
+    public Rect2i getRenderRegion(Rect2i rc) {
+        int left = (int) (scale * rc.width());
+        return Rect2i.createFromMinAndSize(left, 0, rc.width(), rc.height());
     }
 
 }

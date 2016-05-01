@@ -280,6 +280,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void pushScreen(CoreScreenLayer screen, ResourceUrn uri) {
+        if (!screen.isLowerLayerVisible()) {
+            UIScreenLayer current = screens.peek();
+            if (current != null) {
+                current.onHide();
+            }
+        }
         screen.setManager(this);
         prepare(screen);
         screens.push(screen);
@@ -294,6 +300,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             UIScreenLayer popped = screens.pop();
             screenLookup.inverse().remove(popped);
             popped.onClosed();
+            if (!popped.isLowerLayerVisible()) {
+                UIScreenLayer current = screens.peek();
+                if (current != null) {
+                    current.onShow();
+                }
+            }
         }
     }
 

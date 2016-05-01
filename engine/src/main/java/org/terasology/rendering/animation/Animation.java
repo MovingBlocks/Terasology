@@ -29,7 +29,6 @@ public final class Animation {
     private RepeatMode repeatMode;
 
     private float elapsedTime;
-    private int currentFrame;
 
     private TimeModifier timeModifier;
 
@@ -102,12 +101,12 @@ public final class Animation {
 
         elapsedTime += delta;
         while (elapsedTime > duration) {
-            elapsedTime -= duration;
-            currentFrame++;
-
             if (repeatMode == RepeatMode.RUN_ONCE) {
+                elapsedTime = duration;
                 stop();
                 return;
+            } else {
+                elapsedTime -= duration;
             }
         }
 
@@ -174,13 +173,6 @@ public final class Animation {
     }
 
     /**
-     * @return the current frame, always non-negative
-     */
-    public int getCurrentFrame() {
-        return currentFrame;
-    }
-
-    /**
      * Adds a listener for animation events.
      *
      * @param li the listener for animation events
@@ -199,7 +191,31 @@ public final class Animation {
         this.listeners.remove(li);
     }
 
+    /**
+     * Unsubscribes all listener from animation events.
+     */
+    public void removeAllListeners() {
+        this.listeners.clear();
+    }
+
+    /**
+     * @return true if stopped, false otherwise
+     */
+    public boolean isStopped() {
+        return currentState == AnimState.STOPPED;
+    }
+
+    /**
+     * @return true if running, false otherwise
+     */
     public boolean isRunning() {
         return currentState == AnimState.RUNNING;
+    }
+
+    /**
+     * @return true if paused, false otherwise
+     */
+    public boolean isPaused() {
+        return currentState == AnimState.PAUSED;
     }
 }
