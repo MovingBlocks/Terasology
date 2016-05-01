@@ -41,19 +41,15 @@ public class MainMenuScreen extends CoreScreenLayer {
         UILabel versionLabel = find("version", UILabel.class);
         versionLabel.setText(TerasologyVersion.getInstance().getHumanVersion());
 
+        SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
+
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
-            SelectGameScreen screen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
-            screen.setLoadingAsServer(false);
-            // in theory, the screen can be garbage collected now and the information will be lost
-            // TODO: pass the screen directly to NUIManger.push()
-            triggerForwardAnimation(SelectGameScreen.ASSET_URI);
+            selectScreen.setLoadingAsServer(false);
+            triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "multiplayer", button -> {
-            SelectGameScreen screen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
-            screen.setLoadingAsServer(true);
-            // in theory, the screen can be garbage collected now and the information will be lost
-            // TODO: pass the screen directly to NUIManger.push()
-            triggerForwardAnimation(SelectGameScreen.ASSET_URI);
+            selectScreen.setLoadingAsServer(true);
+            triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> triggerForwardAnimation(JoinGameScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "settings", button -> triggerForwardAnimation(SettingsMenuScreen.ASSET_URI));

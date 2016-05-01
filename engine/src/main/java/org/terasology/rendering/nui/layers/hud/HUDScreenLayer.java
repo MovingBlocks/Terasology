@@ -195,7 +195,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     @Override
-    protected void initialise() {
+    public void initialise() {
     }
 
     @Override

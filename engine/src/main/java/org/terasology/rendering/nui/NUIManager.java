@@ -55,23 +55,27 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void toggleScreen(UIElement element);
 
+    UIScreenLayer createScreen(String screenUri);
+
+    UIScreenLayer createScreen(ResourceUrn screenUri);
+
+    <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType);
+
+    <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType);
+
     UIScreenLayer pushScreen(ResourceUrn screenUri);
 
     UIScreenLayer pushScreen(String screenUri);
 
     UIScreenLayer pushScreen(UIElement element);
 
-    default <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType) {
-        return createScreen(new ResourceUrn(screenUri), expectedType);
-    }
-
-    <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType);
-
     <T extends CoreScreenLayer> T pushScreen(ResourceUrn screenUri, Class<T> expectedType);
 
     <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
 
     <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType);
+
+    void pushScreen(UIScreenLayer layer);
 
     void popScreen();
 

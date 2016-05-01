@@ -52,7 +52,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private UIWidget contents;
 
     private NUIManager manager;
-    private boolean initialised;
 
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
@@ -82,14 +81,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
-        if (!initialised) {
-            initialise();
-            initialised = true;
-        }
         animationSystem.triggerFromPrev();
     }
 
-    protected abstract void initialise();
+    public abstract void initialise();
 
     @Override
     public boolean isLowerLayerVisible() {
@@ -129,7 +124,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return manager;
     }
 
-    @Override
     public void setManager(NUIManager manager) {
         this.manager = manager;
     }
@@ -215,7 +209,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     protected void triggerForwardAnimation(ResourceUrn screenUri) {
-        animationSystem.onEnd(() -> getManager().pushScreen(screenUri));
+        // create and initialize now, open when the animation has finished
+        triggerForwardAnimation(getManager().createScreen(screenUri));
+    }
+
+    protected void triggerForwardAnimation(UIScreenLayer screen) {
+        animationSystem.onEnd(() -> getManager().pushScreen(screen));
         animationSystem.triggerToNext();
     }
 

@@ -219,95 +219,109 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIScreenLayer pushScreen(ResourceUrn screenUri) {
-        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
-        if (element.isPresent()) {
-            return pushScreen(element.get());
-        }
-        return null;
+    public UIScreenLayer createScreen(String screenUri) {
+        return createScreen(screenUri, CoreScreenLayer.class);
     }
 
     @Override
-    public UIScreenLayer pushScreen(String screenUri) {
-        Optional<UIElement> element = Assets.getUIElement(screenUri);
-        if (element.isPresent()) {
-            return pushScreen(element.get());
-        } else {
-            logger.error("Can't find screen " + screenUri);
-        }
-        return null;
+    public UIScreenLayer createScreen(ResourceUrn screenUri) {
+        return createScreen(screenUri, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType) {
+        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
+        return createScreen(element, expectedType, screenUri);
     }
 
     @Override
     public <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType) {
-        Optional<UIElement> optElement = Assets.get(screenUri, UIElement.class);
-        if (optElement.isPresent()) {
-            UIElement element = optElement.get();
+        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
+        return createScreen(element, expectedType, screenUri.toString());
+    }
+
+    private <T extends CoreScreenLayer> T createScreen(Optional<UIElement> opt, Class<T> expectedType, String id) {
+        if (!opt.isPresent()) {
+            logger.error("Can't find screen '{}'", id);
+        } else {
+            UIElement element = opt.get();
             UIWidget root = element.getRootWidget();
             if (expectedType.isInstance(root)) {
                 T screen = expectedType.cast(root);
-                InjectionHelper.inject(screen);
+                initialiseScreen(screen, element.getUrn());
                 return screen;
             } else {
-                logger.error("Screen '{}' is a '{}', not a '{}'", screenUri, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", id, root.getClass(), expectedType);
             }
-        } else {
-            logger.error("Can't find screen '{}'", screenUri);
         }
         return null;
     }
 
     @Override
-    public UIScreenLayer pushScreen(UIElement element) {
-        if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
-            CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
-            if (!screens.contains(result)) {
-                result.setId(element.getUrn().toString());
-                pushScreen(result, element.getUrn());
-            }
+    public CoreScreenLayer pushScreen(ResourceUrn screenUri) {
+        return pushScreen(screenUri, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T pushScreen(ResourceUrn screenUri, Class<T> expectedType) {
+        T layer = createScreen(screenUri, expectedType);
+        if (layer != null) {
+            pushScreen(layer);
+        }
+        return layer;
+    }
+
+    @Override
+    public CoreScreenLayer pushScreen(String screenUri) {
+        return pushScreen(screenUri, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
+        T screen = createScreen(screenUri, expectedType);
+        if (screen != null) {
+            pushScreen(screen);
+        }
+        return screen;
+    }
+
+    @Override
+    public CoreScreenLayer pushScreen(UIElement element) {
+        return pushScreen(element, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType) {
+        if (element != null && expectedType.isInstance(element.getRootWidget())) {
+            @SuppressWarnings("unchecked")
+            T result = (T) element.getRootWidget();
+            initialiseScreen(result, element.getUrn());
+            pushScreen(result);
             return result;
         }
         return null;
     }
 
-    @Override
-    public <T extends CoreScreenLayer> T pushScreen(ResourceUrn screenUri, Class<T> expectedType) {
-        UIScreenLayer result = pushScreen(screenUri);
-        if (expectedType.isInstance(result)) {
-            return expectedType.cast(result);
-        }
-        return null;
+    private void initialiseScreen(CoreScreenLayer screen, ResourceUrn uri) {
+        InjectionHelper.inject(screen);
+        screen.setId(uri.toString());
+        screen.setManager(this);
+        screen.initialise();
     }
 
     @Override
-    public <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
-        UIScreenLayer result = pushScreen(screenUri);
-        if (expectedType.isInstance(result)) {
-            return expectedType.cast(result);
-        }
-        return null;
-    }
-
-    @Override
-    public <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType) {
-        UIScreenLayer result = pushScreen(element);
-        if (expectedType.isInstance(result)) {
-            return expectedType.cast(result);
-        }
-        return null;
-    }
-
-    private void pushScreen(CoreScreenLayer screen, ResourceUrn uri) {
+    public void pushScreen(UIScreenLayer screen) {
         if (!screen.isLowerLayerVisible()) {
             UIScreenLayer current = screens.peek();
             if (current != null) {
                 current.onHide();
             }
         }
-        screen.setManager(this);
-        prepare(screen);
         screens.push(screen);
-        if (uri != null) {
+        screen.onOpened();
+        String id = screen.getId();
+        if (ResourceUrn.isValid(id)) {
+            ResourceUrn uri = new ResourceUrn(id);
             screenLookup.put(uri, screen);
         }
     }
@@ -356,7 +370,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        prepare(overlay);
+        InjectionHelper.inject(overlay);
+        overlay.onOpened();
         overlays.put(uri, overlay);
     }
 
@@ -611,12 +626,5 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             setHUDVisible(true);
         }
     }
-
-    private void prepare(ControlWidget screen) {
-        InjectionHelper.inject(screen);
-        screen.onOpened();
-    }
-
-
 
 }

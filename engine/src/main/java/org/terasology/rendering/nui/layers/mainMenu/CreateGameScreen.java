@@ -274,11 +274,9 @@ public class CreateGameScreen extends CoreScreenLayer {
             PreviewWorldScreen screen = getManager().createScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
             if (screen != null) {
                 screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
-                // the screen can be garbage collected while the animation is running
-                // TODO: pass the screen directly to NUIManager.pushScreen()
                 try {
                     screen.setEnvironment();
-                    triggerForwardAnimation(PreviewWorldScreen.ASSET_URI);
+                    triggerForwardAnimation(screen);
                 } catch (Exception e) {
                     String msg = "Unable to load world for a 2D preview:\n" + e.toString();
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", msg);

@@ -82,7 +82,7 @@ public class SelectGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "create", button -> {
             CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
             screen.setLoadingAsServer(loadingAsServer);
-            triggerForwardAnimation(CreateGameScreen.ASSET_URI);
+            triggerForwardAnimation(screen);
         });
 
         WidgetUtil.trySubscribe(this, "load", button -> {
