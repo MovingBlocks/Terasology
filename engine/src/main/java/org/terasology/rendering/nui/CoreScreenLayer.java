@@ -159,8 +159,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (isEscapeToCloseAllowed() && event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
-            triggerBackAnimation();
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            animationSystem.stop();
+            if (isEscapeToCloseAllowed()) {
+                triggerBackAnimation();
+            }
             return true;
         }
 

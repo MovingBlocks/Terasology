@@ -178,7 +178,7 @@ public class DebugOverlay extends CoreScreenLayer {
     }
 
     @Override
-    public boolean isEscapeToCloseAllowed() {
+    protected boolean isEscapeToCloseAllowed() {
         return false;
     }
 

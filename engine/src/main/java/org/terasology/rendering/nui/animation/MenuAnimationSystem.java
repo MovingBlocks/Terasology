@@ -60,4 +60,9 @@ public interface MenuAnimationSystem {
      * @return the transformed rectangle
      */
     Rect2i animateRegion(Rect2i rc);
+
+    /**
+     * Stops animation and plays the animation in reverse, if needed
+     */
+    void stop();
 }

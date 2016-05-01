@@ -84,8 +84,10 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
      */
     @Override
     public void triggerFromPrev() {
-        flyIn.setForwardMode();
-        flyIn.start();
+        if (flyOut.isStopped()) {
+            flyIn.setForwardMode();
+            flyIn.start();
+        }
     }
 
     /**
@@ -93,8 +95,10 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
      */
     @Override
     public void triggerToPrev() {
-        flyIn.setReverseMode();
-        flyIn.start();
+        if (flyOut.isStopped()) {
+            flyIn.setReverseMode();
+            flyIn.start();
+        }
     }
 
     /**
@@ -102,8 +106,10 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
      */
     @Override
     public void triggerFromNext() {
-        flyOut.setReverseMode();
-        flyOut.start();
+        if (flyIn.isStopped()) {
+            flyOut.setReverseMode();
+            flyOut.start();
+        }
     }
 
     /**
@@ -111,8 +117,20 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
      */
     @Override
     public void triggerToNext() {
-        flyOut.setForwardMode();
-        flyOut.start();
+        if (flyIn.isStopped()) {
+            flyOut.setForwardMode();
+            flyOut.start();
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (flyOut.isRunning()) {
+            flyOut.setReverseMode();
+        }
+        if (flyIn.isRunning()) {
+            flyIn.setForwardMode();
+        }
     }
 
     /**
