@@ -17,7 +17,6 @@ package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
 
-import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
