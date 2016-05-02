@@ -52,6 +52,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private UIWidget contents;
 
     private NUIManager manager;
+    private boolean initialised;
 
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
@@ -81,6 +82,14 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
+        // this is needed only for compatibility reasons
+        // some overlays are CoreScreenLayer and initialize themselves through this method
+        // TODO: create an interface for overlays with initialise() and call
+        // it from NUIManagerImpl just like for screens
+        if (!initialised) {
+            initialise();
+            initialised = true;
+        }
         animationSystem.triggerFromPrev();
     }
 
@@ -163,8 +172,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             animationSystem.stop();
             if (isEscapeToCloseAllowed()) {
                 triggerBackAnimation();
+                return true;
             }
-            return true;
         }
 
         return false;
