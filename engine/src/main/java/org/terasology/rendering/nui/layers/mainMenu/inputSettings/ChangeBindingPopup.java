@@ -15,14 +15,13 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
-import java.util.List;
-
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
@@ -31,6 +30,8 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
+
+import java.util.List;
 
 
 public class ChangeBindingPopup extends CoreScreenLayer {
@@ -45,6 +46,9 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @In
     private InputSystem inputSystem;
+
+    @In
+    private TranslationSystem translationSystem;
 
     @In
     private Context context;
@@ -67,12 +71,12 @@ public class ChangeBindingPopup extends CoreScreenLayer {
     }
 
     public void setBindingData(SimpleUri uri, RegisterBindButton bind, int index) {
-        find("title", UILabel.class).setText(bind.description());
+        find("title", UILabel.class).setText(translationSystem.translate(bind.description()));
         BindsConfig bindConfig = config.getInput().getBinds();
         bindButton.bindInput(new InputConfigBinding(bindConfig, uri, index));
         List<Input> defaults = defaultBinds.getBinds(uri);
         find("default-binding", UILabel.class).setText(
-                defaults.size() > index ? defaults.get(index).getDisplayName() : "<none>");
+                defaults.size() > index ? defaults.get(index).getDisplayName() : "<" + translationSystem.translate("${engine:menu#none}" + ">"));
         find("default", UIButton.class).subscribe(e -> bindButton.setNewInput(
                 defaults.size() > index ? defaults.get(index) : null));
     }

@@ -17,7 +17,7 @@
 
 @API
 @InputCategory(id = "interaction",
-        displayName = "Interaction",
+        displayName = "${engine:menu#category-interaction}",
         ordering = {
                 "engine:attack",
                 "engine:frob"

@@ -23,7 +23,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "hideHUD", description = "Hide HUD", category = "general")
+@RegisterBindButton(id = "hideHUD", description = "${engine:menu#binding-hide-hud}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.H)
 public class HideHUDButton extends BindButtonEvent {
 }

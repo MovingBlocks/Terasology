@@ -17,7 +17,7 @@
 
 @API
 @InputCategory(id = "movement",
-        displayName = "Movement",
+        displayName = "${engine:menu#category-movement}",
         ordering = {
                 "engine:forwards",
                 "engine:backwards",
