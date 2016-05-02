@@ -23,6 +23,7 @@
     "default-binding": "default-binding",
     "download-module": "download-module",
     "activate-module": "activate-module",
+    "menu-animations": "menu-animations",
     "module-dependencies-exist": "module-dependencies-exist",
     "module-dependencies-empty": "module-dependencies-empty",
     "module-status": "module-status",

@@ -16,6 +16,11 @@
 
 package org.terasology.rendering.nui.animation;
 
+import java.util.function.Supplier;
+
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem.Direction;
 
 /**
@@ -23,12 +28,15 @@ import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem.Direction
  */
 public final class MenuAnimationSystems {
 
-
     private MenuAnimationSystems() {
         // no instances
     }
 
     public static MenuAnimationSystem createDefaultSwipeAnimation() {
-        return new SwipeMenuAnimationSystem(0.3f, Direction.LEFT_TO_RIGHT);
+        RenderingConfig config = CoreRegistry.get(Config.class).getRendering();
+        MenuAnimationSystem swipe = new SwipeMenuAnimationSystem(0.25f, Direction.LEFT_TO_RIGHT);
+        MenuAnimationSystem instant = new MenuAnimationSystemStub();
+        Supplier<MenuAnimationSystem> provider = () -> config.isAnimatedMenu() ? swipe : instant;
+        return new DeferredMenuAnimationSystem(provider);
     }
 }

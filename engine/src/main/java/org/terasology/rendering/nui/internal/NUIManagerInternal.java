@@ -81,6 +81,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
+    private AssetManager assetManager;
 
     public NUIManagerInternal(CanvasRenderer renderer, Context context) {
         this.context = context;
@@ -89,6 +90,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.canvas = new CanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
+        this.assetManager = context.get(AssetManager.class);
         refreshWidgetsLibrary();
 
         TranslationSystem system = context.get(TranslationSystem.class);
@@ -230,32 +232,43 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType) {
-        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
-        return createScreen(element, expectedType, screenUri);
+        Set<ResourceUrn> urns = assetManager.resolve(screenUri, UIElement.class);
+        switch (urns.size()) {
+        case 0:
+            logger.warn("No asset found for screen '{}'", screenUri);
+            return null;
+        case 1:
+            ResourceUrn urn = urns.iterator().next();
+            return createScreen(urn, expectedType);
+        default:
+            logger.warn("Multiple matches for screen '{}': {}", screenUri, urns);
+            return null;
+        }
     }
 
     @Override
     public <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType) {
-        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
-        return createScreen(element, expectedType, screenUri.toString());
-    }
+        boolean existsAlready = assetManager.getLoadedAssetUrns(UIElement.class).contains(screenUri);
 
-    private <T extends CoreScreenLayer> T createScreen(Optional<UIElement> opt, Class<T> expectedType, String id) {
+        Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
         if (!opt.isPresent()) {
-            logger.error("Can't find screen '{}'", id);
+            logger.error("Can't find screen '{}'", screenUri);
         } else {
             UIElement element = opt.get();
             UIWidget root = element.getRootWidget();
             if (expectedType.isInstance(root)) {
                 T screen = expectedType.cast(root);
-                initialiseScreen(screen, element.getUrn());
+                if (!existsAlready) {
+                    initialiseScreen(screen, screenUri);
+                }
                 return screen;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", id, root.getClass(), expectedType);
+                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
             }
         }
         return null;
     }
+
 
     @Override
     public CoreScreenLayer pushScreen(ResourceUrn screenUri) {
