@@ -103,11 +103,12 @@ public class ItemCommonSystem extends BaseComponentSystem {
             meshComponent.material = Assets.getMaterial("engine:terrain").get();
             meshComponent.translucent = blockFamily.getArchetypeBlock().isTranslucent();
 
-            int luminance = blockFamily.getArchetypeBlock().getLuminance();
+            float luminance = blockFamily.getArchetypeBlock().getLuminance() / 15f;
+            meshComponent.selfLuminance = luminance;
             if (luminance > 0 && !entity.hasComponent(LightComponent.class)) {
                 LightComponent lightComponent = entity.addComponent(new LightComponent());
                 //scale the light back if it is a less bright block
-                lightComponent.lightAttenuationRange *= luminance / 15f;
+                lightComponent.lightAttenuationRange *= luminance;
             }
 
             entity.addOrSaveComponent(meshComponent);

@@ -29,7 +29,7 @@ public class PresetBinding implements Binding<Preset> {
 
     @Override
     public Preset get() {
-        if (config.isFlickeringLight() && config.isVignette() && config.isEyeAdaptation() && config.isFilmGrain()) {
+        if (config.isFlickeringLight() && config.isVignette() && config.isEyeAdaptation() && config.isFilmGrain() && config.isNormalMapping()) {
             if (config.isSsao()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts() && config.isCloudShadows()) {
                     return Preset.ULTRA;

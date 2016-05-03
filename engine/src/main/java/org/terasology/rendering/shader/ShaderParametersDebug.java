@@ -51,7 +51,6 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_NORMALS:
-            case OPAQUE_SUNLIGHT:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 buffersManager.bindFboNormalsTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
@@ -61,6 +60,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 buffersManager.bindFboDepthTexture("sceneOpaque");
                 program.setInt("texDebug", texId++, true);
                 break;
+            case OPAQUE_SUNLIGHT:
             case OPAQUE_LIGHT_BUFFER:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 buffersManager.bindFboLightBufferTexture("sceneOpaque");
