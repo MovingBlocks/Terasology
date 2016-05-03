@@ -121,6 +121,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
         for (RegionOutlineComponent regionOutline: entityToRegionOutlineMap.values()) {
+            material.setFloat3("colorOffset", regionOutline.color.rf(), regionOutline.color.gf(), regionOutline.color.bf(), true);
             drawRegionOutline(regionOutline);
         }
 
