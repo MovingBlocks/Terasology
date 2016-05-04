@@ -68,14 +68,14 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onBumpGiveItemToEntity(CollideEvent event, EntityRef entity, PickupComponent pickupComponent) {
-        ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
-        if (itemComponent != null) {
-            if (itemComponent.pickUpTime + itemComponent.timeToPickUp < time.getGameTimeInMs()) {
-                GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
-                entity.send(giveItemEvent);
+        if (pickupComponent.timeDropped + pickupComponent.timeToPickUp < time.getGameTimeInMs()) {
+            GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
+            entity.send(giveItemEvent);
 
-                if (giveItemEvent.isHandled()) {
-                    // remove all the components added from the pickup prefab
+            if (giveItemEvent.isHandled()) {
+                // remove all the components added from the pickup prefab
+                ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
+                if (itemComponent != null) {
                     for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
                         entity.removeComponent(component.getClass());
                     }
