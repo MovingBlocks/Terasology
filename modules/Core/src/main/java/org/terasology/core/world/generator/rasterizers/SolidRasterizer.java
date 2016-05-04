@@ -21,6 +21,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -69,7 +70,7 @@ public class SolidRasterizer implements WorldRasterizer {
         Vector2i pos2d = new Vector2i();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
             pos2d.set(pos.x, pos.z);
-            CoreBiome biome = biomeFacet.get(pos2d);
+            Biome biome = biomeFacet.get(pos2d);
             chunk.setBiome(pos.x, pos.y, pos.z, biome);
 
             int posY = pos.y + chunk.getChunkWorldOffsetY();
@@ -93,51 +94,53 @@ public class SolidRasterizer implements WorldRasterizer {
         }
     }
 
-    private Block getSurfaceBlock(int depth, int height, CoreBiome type, int seaLevel) {
-        switch (type) {
-            case FOREST:
-            case PLAINS:
-            case MOUNTAINS:
-                // Beach
-                if (depth == 0 && height > seaLevel && height < seaLevel + 96) {
-                    return grass;
-                } else if (depth == 0 && height >= seaLevel + 96) {
-                    return snow;
-                } else if (depth > 32) {
-                    return stone;
-                } else {
-                    return dirt;
-                }
-            case SNOW:
-                if (depth == 0 && height > seaLevel) {
-                    // Snow on top
-                    return snow;
-                } else if (depth > 32) {
-                    // Stone
-                    return stone;
-                } else {
-                    // Dirt
-                    return dirt;
-                }
-            case DESERT:
-                if (depth > 8) {
-                    // Stone
-                    return stone;
-                } else {
-                    return sand;
-                }
-            case OCEAN:
-                if (depth == 0) {
-                    return sand;
-                } else {
-                    return stone;
-                }
-            case BEACH:
-                if (depth < 3) {
-                    return sand;
-                } else {
-                    return stone;
-                }
+    private Block getSurfaceBlock(int depth, int height, Biome type, int seaLevel) {
+        if (type instanceof CoreBiome) {
+            switch ((CoreBiome) type) {
+                case FOREST:
+                case PLAINS:
+                case MOUNTAINS:
+                    // Beach
+                    if (depth == 0 && height > seaLevel && height < seaLevel + 96) {
+                        return grass;
+                    } else if (depth == 0 && height >= seaLevel + 96) {
+                        return snow;
+                    } else if (depth > 32) {
+                        return stone;
+                    } else {
+                        return dirt;
+                    }
+                case SNOW:
+                    if (depth == 0 && height > seaLevel) {
+                        // Snow on top
+                        return snow;
+                    } else if (depth > 32) {
+                        // Stone
+                        return stone;
+                    } else {
+                        // Dirt
+                        return dirt;
+                    }
+                case DESERT:
+                    if (depth > 8) {
+                        // Stone
+                        return stone;
+                    } else {
+                        return sand;
+                    }
+                case OCEAN:
+                    if (depth == 0) {
+                        return sand;
+                    } else {
+                        return stone;
+                    }
+                case BEACH:
+                    if (depth < 3) {
+                        return sand;
+                    } else {
+                        return stone;
+                    }
+            }
         }
         return dirt;
     }
