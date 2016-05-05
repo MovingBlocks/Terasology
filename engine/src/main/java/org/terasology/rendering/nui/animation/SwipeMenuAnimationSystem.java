@@ -124,6 +124,17 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
     }
 
     @Override
+    public void skip() {
+        // set the animation to the end point and trigger onEnd()
+        if (flyIn.isRunning()) {
+            flyIn.update(flyIn.getDuration());
+        }
+        if (flyOut.isRunning()) {
+            flyOut.update(flyOut.getDuration());
+        }
+    }
+
+    @Override
     public void stop() {
         if (flyOut.isRunning()) {
             flyOut.setReverseMode();

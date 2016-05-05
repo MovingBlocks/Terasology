@@ -62,10 +62,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         super(id);
     }
 
-    public void setAnimationSystem(MenuAnimationSystem animationSystem) {
-        this.animationSystem = animationSystem;
-    }
-
     @Override
     public void setId(String id) {
         super.setId(id);
@@ -209,6 +205,14 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             return Collections.emptyIterator();
         }
         return Arrays.asList(contents).iterator();
+    }
+
+    public MenuAnimationSystem getAnimationSystem() {
+        return animationSystem;
+    }
+
+    protected void setAnimationSystem(MenuAnimationSystem animationSystem) {
+        this.animationSystem = animationSystem;
     }
 
     protected void triggerForwardAnimation(ResourceUrn screenUri) {

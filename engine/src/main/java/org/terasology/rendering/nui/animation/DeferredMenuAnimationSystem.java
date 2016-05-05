@@ -62,6 +62,11 @@ public class DeferredMenuAnimationSystem implements MenuAnimationSystem {
     }
 
     @Override
+    public void skip() {
+        getSystem().skip();
+    }
+
+    @Override
     public void stop() {
         getSystem().stop();
     }

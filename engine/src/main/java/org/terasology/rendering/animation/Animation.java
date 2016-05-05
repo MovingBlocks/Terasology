@@ -134,7 +134,7 @@ public final class Animation {
         }
 
         elapsedTime += delta;
-        if (elapsedTime > duration) {
+        if (elapsedTime >= duration) {
             if (repeatMode == RepeatMode.RUN_ONCE) {
                 elapsedTime = duration;
                 stop();
@@ -252,5 +252,12 @@ public final class Animation {
      */
     public boolean isPaused() {
         return currentState == AnimState.PAUSED;
+    }
+
+    /**
+     * @return the duration of the animation in seconds
+     */
+    public float getDuration() {
+        return duration;
     }
 }

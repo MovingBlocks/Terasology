@@ -56,6 +56,12 @@ public class MainMenuScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void onOpened() {
+        super.onOpened();
+        getAnimationSystem().skip();
+    }
+
+    @Override
     public void update(float delta) {
         super.update(delta);
     }

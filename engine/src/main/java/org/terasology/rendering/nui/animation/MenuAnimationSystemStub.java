@@ -61,6 +61,11 @@ public class MenuAnimationSystemStub implements MenuAnimationSystem {
     }
 
     @Override
+    public void skip() {
+        // ignore
+    }
+
+    @Override
     public Rect2i animateRegion(Rect2i rc) {
         return rc;
     }

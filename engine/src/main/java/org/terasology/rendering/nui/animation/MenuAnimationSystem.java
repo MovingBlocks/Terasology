@@ -62,7 +62,12 @@ public interface MenuAnimationSystem {
     Rect2i animateRegion(Rect2i rc);
 
     /**
-     * Stops animation and plays the animation in reverse, if needed
+     * Stops the current animation by skipping straight to the end
+     */
+    void skip();
+
+    /**
+     * Stops the current animation and plays the animation in reverse, if needed
      */
     void stop();
 }
