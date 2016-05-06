@@ -33,6 +33,7 @@ public enum Preset {
             renderConfig.setSsao(false);
             renderConfig.setLightShafts(false);
             renderConfig.setCloudShadows(false);
+            renderConfig.setNormalMapping(false);
         }
     },
     LOW("Low") {
@@ -42,6 +43,7 @@ public enum Preset {
             renderConfig.setVignette(true);
             renderConfig.setEyeAdaptation(true);
             renderConfig.setFilmGrain(true);
+            renderConfig.setNormalMapping(true);
 
             renderConfig.setBloom(false);
             renderConfig.setMotionBlur(false);
@@ -58,6 +60,7 @@ public enum Preset {
             renderConfig.setEyeAdaptation(true);
             renderConfig.setFilmGrain(true);
             renderConfig.setBloom(true);
+            renderConfig.setNormalMapping(true);
 
             renderConfig.setSsao(false);
             renderConfig.setMotionBlur(false);
@@ -76,6 +79,7 @@ public enum Preset {
             renderConfig.setMotionBlur(true);
             renderConfig.setLightShafts(true);
             renderConfig.setCloudShadows(true);
+            renderConfig.setNormalMapping(true);
 
             renderConfig.setSsao(false);
         }
@@ -93,6 +97,7 @@ public enum Preset {
             renderConfig.setLightShafts(true);
             renderConfig.setCloudShadows(true);
             renderConfig.setAnimateGrass(true);
+            renderConfig.setNormalMapping(true);
 
         }
     },

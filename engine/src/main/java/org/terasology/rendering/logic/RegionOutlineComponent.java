@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.facets;
+package org.terasology.rendering.logic;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.rendering.nui.Color;
 
 /**
+ * Entities with this component will cause a outline be drawn about the specified region in block coordinates.
  */
-public class BiomeFacet extends BaseObjectFacet2D<Biome> {
-    public BiomeFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border, Biome.class);
-    }
+public class RegionOutlineComponent implements Component {
+    public Vector3i corner1;
+    public Vector3i corner2;
+    public Color color = Color.WHITE;
 }

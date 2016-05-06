@@ -101,6 +101,7 @@
     "not-bound": "not-bound",
     "oculus-rift-support": "oculus-rift-support",
     "outline": "outline",
+    "extra-Lighting": "extra-Lighting",
     "parallax-mapping": "parallax-mapping",
     "player-color": "player-color",
     "player-name": "player-name",
