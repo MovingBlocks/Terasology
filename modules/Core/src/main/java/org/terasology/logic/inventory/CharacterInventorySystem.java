@@ -119,7 +119,6 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         if (pickupItem.hasComponent(PickupComponent.class))
         {
             PickupComponent pickupComponent = pickupItem.getComponent(PickupComponent.class);
-            pickupComponent.timeToPickUp = 2000;
             pickupComponent.timeDropped = time.getGameTimeInMs();
             pickupItem.saveComponent(pickupComponent);
         }

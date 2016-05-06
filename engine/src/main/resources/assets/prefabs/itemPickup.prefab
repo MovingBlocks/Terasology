@@ -3,6 +3,8 @@
         "scale" : 0.3
     },
     "Pickup": {
+        "timeToPickUp": 2000,
+        "timeDropped": 0
     },
     "Lifespan": {
         "lifespan": 30
