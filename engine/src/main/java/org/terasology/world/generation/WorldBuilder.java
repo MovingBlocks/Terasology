@@ -112,17 +112,22 @@ public class WorldBuilder {
 
     private void ensureBorderCalculatedForFacet(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains,
                                                 Map<Class<? extends WorldFacet>, Border3D> borders) {
-        if (!borders.containsKey(facet)) {
-            Border3D border = new Border3D(0, 0, 0);
 
+        if (!borders.containsKey(facet)) {
+
+            Border3D border = new Border3D(0, 0, 0);
+            int maxSide = 0;
+            int maxTop = 0;
+            int maxBottom = 0;
             for (FacetProvider facetProvider : providerChains.values()) {
                 // Find all facets that require it
                 Requires requires = facetProvider.getClass().getAnnotation(Requires.class);
+                Produces produces = facetProvider.getClass().getAnnotation(Produces.class);
+                Updates updates = facetProvider.getClass().getAnnotation(Updates.class);
                 if (requires != null) {
                     for (Facet requiredFacet : requires.value()) {
                         if (requiredFacet.value() == facet) {
-                            Produces produces = facetProvider.getClass().getAnnotation(Produces.class);
-                            Updates updates = facetProvider.getClass().getAnnotation(Updates.class);
+
 
                             FacetBorder requiredBorder = requiredFacet.border();
 
@@ -151,10 +156,34 @@ public class WorldBuilder {
                         }
                     }
                 }
+//Get biggest border for facet?! Create an array of borders and search for maximum.
+// Check if there are update annotation for facet, if there are search for biggest border requested from providers and replace value
+                if(updates != null) {
+                    for (Facet producedFacetAnnotation : updates.value()) {
+                        if (producedFacetAnnotation.value() == facet) {
+
+                            FacetBorder borderForFacetAnnotation = producedFacetAnnotation.border();
+                            if (maxSide < borderForFacetAnnotation.sides()) {
+                                maxSide = borderForFacetAnnotation.sides();
+                            }
+                            if (maxTop < borderForFacetAnnotation.top()) {
+                                maxTop = borderForFacetAnnotation.top();
+                            }
+                            if (maxBottom < borderForFacetAnnotation.bottom()) {
+                                maxBottom = borderForFacetAnnotation.bottom();
+                            }
+
+                        }
+
+                    }
+
+                    border = border.maxWith(maxTop, maxBottom, maxSide);
+                }
             }
             borders.put(facet, border);
         }
     }
+
 
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains() {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
