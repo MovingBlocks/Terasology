@@ -90,6 +90,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             });
         }
         img = find("image", UIImage.class);
+        if (img != null) {
+            ResourceUrn uri = TextureUtil.getTextureUriForColor(Color.WHITE);
+            Texture tex = Assets.get(uri, Texture.class).get();
+            img.setImage(tex);
+        }
+
         slider = find("tone", UISlider.class);
         if (slider != null) {
             slider.setIncrement(0.01f);
@@ -168,10 +174,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private void updateImage() {
         Color color = getColor();
-        ResourceUrn uri = TextureUtil.getTextureUriForColor(color);
-        Texture tex = Assets.get(uri, Texture.class).get();
         if (img != null) {
-            img.setImage(tex);
+            img.setTint(color);
         }
     }
 
