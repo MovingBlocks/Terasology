@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -95,6 +96,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         TranslationSystem system = context.get(TranslationSystem.class);
         system.subscribe(proj -> invalidate());
+
+        // All UIElement instances are disposed so that they are not automatically reloaded
+        // by the AssetTypeManager. Reloading would not trigger the initialise() method
+        // and UI screens should be created on demand anyway.
+        context.get(ModuleAwareAssetTypeManager.class).disposeAll(UIElement.class);
     }
 
     public void refreshWidgetsLibrary() {
@@ -355,21 +361,48 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends ControlWidget> T addOverlay(String screenUri, Class<T> expectedType) {
-        Optional<UIElement> element = Assets.getUIElement(screenUri);
-        if (element.isPresent()) {
-            return addOverlay(element.get(), expectedType);
+    public <T extends ControlWidget> T addOverlay(String overlayUri, Class<T> expectedType) {
+        Set<ResourceUrn> urns = assetManager.resolve(overlayUri, UIElement.class);
+        switch (urns.size()) {
+        case 0:
+            logger.warn("No asset found for overlay '{}'", overlayUri);
+            return null;
+        case 1:
+            ResourceUrn urn = urns.iterator().next();
+            return addOverlay(urn, expectedType);
+        default:
+            logger.warn("Multiple matches for overlay '{}': {}", overlayUri, urns);
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends ControlWidget> T addOverlay(ResourceUrn overlayUri, Class<T> expectedType) {
+        boolean existsAlready = assetManager.getLoadedAssetUrns(UIElement.class).contains(overlayUri);
+
+        Optional<UIElement> opt = Assets.get(overlayUri, UIElement.class);
+        if (!opt.isPresent()) {
+            logger.error("Can't find overlay '{}'", overlayUri);
+        } else {
+            UIElement element = opt.get();
+            UIWidget root = element.getRootWidget();
+            if (expectedType.isInstance(root)) {
+                T overlay = expectedType.cast(root);
+                if (!existsAlready) {
+                    initialiseOverlay(overlay, overlayUri);
+                }
+                addOverlay(overlay, overlayUri);
+                return overlay;
+            } else {
+                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+            }
         }
         return null;
     }
 
-    @Override
-    public <T extends ControlWidget> T addOverlay(ResourceUrn screenUri, Class<T> expectedType) {
-        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
-        if (element.isPresent()) {
-            return addOverlay(element.get(), expectedType);
-        }
-        return null;
+    private <T extends ControlWidget> void initialiseOverlay(T overlay, ResourceUrn screenUri) {
+        InjectionHelper.inject(overlay);
+        overlay.initialise();
     }
 
     @Override
@@ -383,7 +416,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        InjectionHelper.inject(overlay);
         overlay.onOpened();
         overlays.put(uri, overlay);
     }

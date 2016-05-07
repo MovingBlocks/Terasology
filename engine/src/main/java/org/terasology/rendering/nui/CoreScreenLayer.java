@@ -80,8 +80,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         animationSystem.triggerFromPrev();
     }
 
-    public abstract void initialise();
-
     @Override
     public boolean isLowerLayerVisible() {
         return true;

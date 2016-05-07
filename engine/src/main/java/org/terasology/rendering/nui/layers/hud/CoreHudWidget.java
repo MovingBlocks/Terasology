@@ -50,8 +50,6 @@ public abstract class CoreHudWidget extends CoreWidget implements ControlWidget 
         }
     }
 
-    protected abstract void initialise();
-
     @Override
     public void onClosed() {
     }
