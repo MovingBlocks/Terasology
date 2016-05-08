@@ -23,7 +23,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "useItem", description = "Use Held Item", repeating = true, category = "interaction")
+@RegisterBindButton(id = "useItem", description = "${engine:menu#binding-use-item}", repeating = true, category = "interaction")
 @DefaultBinding(type = InputType.MOUSE_BUTTON, id = 1)
 public class UseItemButton extends BindButtonEvent {
 }
