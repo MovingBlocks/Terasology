@@ -254,7 +254,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType) {
-        boolean existsAlready = assetManager.getLoadedAssetUrns(UIElement.class).contains(screenUri);
+        boolean existsAlready = assetManager.isLoaded(screenUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
         if (!opt.isPresent()) {
@@ -378,7 +378,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public <T extends ControlWidget> T addOverlay(ResourceUrn overlayUri, Class<T> expectedType) {
-        boolean existsAlready = assetManager.getLoadedAssetUrns(UIElement.class).contains(overlayUri);
+        boolean existsAlready = assetManager.isLoaded(overlayUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(overlayUri, UIElement.class);
         if (!opt.isPresent()) {
@@ -647,7 +647,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void invalidate() {
-        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.getLoadedAssets(UIElement.class).forEach(UIElement::dispose);
 
         boolean hudVisible = isHUDVisible();
