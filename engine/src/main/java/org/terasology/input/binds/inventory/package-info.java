@@ -15,6 +15,9 @@
  */
 
 @API
-package org.terasology.input.binds.inventory;
+@InputCategory(id = "inventory",
+        displayName = "${engine:menu#category-inventory}"
+) package org.terasology.input.binds.inventory;
 
+import org.terasology.input.InputCategory;
 import org.terasology.module.sandbox.API;

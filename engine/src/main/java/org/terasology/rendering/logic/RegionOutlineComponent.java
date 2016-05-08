@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.logic;
 
-package org.terasology.input.binds.movement;
-
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.Keyboard;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.rendering.nui.Color;
 
 /**
+ * Entities with this component will cause a outline be drawn about the specified region in block coordinates.
  */
-@RegisterBindButton(id = "left", description = "${engine:menu#binding-left}")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.A)
-public class LeftStrafeButton extends BindButtonEvent {
+public class RegionOutlineComponent implements Component {
+    public Vector3i corner1;
+    public Vector3i corner2;
+    public Color color = Color.WHITE;
 }

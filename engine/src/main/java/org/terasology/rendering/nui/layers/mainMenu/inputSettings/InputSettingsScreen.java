@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
@@ -26,6 +25,7 @@ import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
@@ -77,6 +77,9 @@ public class InputSettingsScreen extends CoreScreenLayer {
     private InputSystem inputSystem;
 
     @In
+    private TranslationSystem translationSystem;
+
+    @In
     private Context context;
 
     @Override
@@ -95,11 +98,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
         mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
 
-        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", "Mouse"));
-        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity)
+        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
+        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), mouseInverted)
+        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-mouse}") + ":"), mouseInverted)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -154,7 +157,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         if (category != null) {
             layout.addWidget(new UISpace(new Vector2i(0, 16)));
 
-            UILabel categoryHeader = new UILabel(category.displayName());
+            UILabel categoryHeader = new UILabel(translationSystem.translate(category.displayName()));
             categoryHeader.setFamily("subheading");
             layout.addWidget(categoryHeader);
 
@@ -194,19 +197,19 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         UICheckbox invertX = new UICheckbox();
         invertX.bindChecked(BindHelper.bindBeanProperty("invertX", info, Boolean.TYPE));
-        layout.addWidget(new RowLayout(new UILabel("Invert X Axis"), invertX)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-x}")), invertX)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
         UICheckbox invertY = new UICheckbox();
         invertY.bindChecked(BindHelper.bindBeanProperty("invertY", info, Boolean.TYPE));
-        layout.addWidget(new RowLayout(new UILabel("Invert Y Axis"), invertY)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-y}")), invertY)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
         UICheckbox invertZ = new UICheckbox();
         invertZ.bindChecked(BindHelper.bindBeanProperty("invertZ", info, Boolean.TYPE));
-        layout.addWidget(new RowLayout(new UILabel("Invert Z Axis"), invertZ)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-z}")), invertZ)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -216,9 +219,9 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mvmtDeadZone.setRange(1);
         mvmtDeadZone.setPrecision(2);
         mvmtDeadZone.bindValue(BindHelper.bindBeanProperty("movementDeadZone", info, Float.TYPE));
-        layout.addWidget(new RowLayout(new UILabel("Movement Axis Dead Zone"), mvmtDeadZone)
-            .setColumnRatios(columnRatio)
-            .setHorizontalSpacing(horizontalSpacing));
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#movement-dead-zone}")), mvmtDeadZone)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
 
         UISlider rotDeadZone = new UISlider();
         rotDeadZone.setIncrement(0.01f);
@@ -227,7 +230,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         rotDeadZone.setPrecision(2);
         rotDeadZone.bindValue(BindHelper.bindBeanProperty("rotationDeadZone", info, Float.TYPE));
 
-        layout.addWidget(new RowLayout(new UILabel("Rotation Axis Dead Zone"), rotDeadZone)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#rotation-dead-zone}")), rotDeadZone)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -250,7 +253,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
             ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
             popup.setBindingData(uri, bind, 1);
         });
-        layout.addWidget(new RowLayout(new UILabel(bind.description()), primaryInputBind, secondaryInputBind)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind, secondaryInputBind)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
     }
@@ -283,7 +286,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
                     return input.getDisplayName();
                 }
             }
-            return "<not bound>";
+            return "<" + translationSystem.translate("${engine:menu#not-bound}") + ">";
         }
     }
 

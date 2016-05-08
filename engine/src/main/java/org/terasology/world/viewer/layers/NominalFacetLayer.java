@@ -16,17 +16,17 @@
 
 package org.terasology.world.viewer.layers;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBufferInt;
-import java.util.function.Function;
-
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.base.ObjectFacet2D;
 import org.terasology.world.viewer.color.ColorBlender;
 import org.terasology.world.viewer.color.ColorBlenders;
 import org.terasology.world.viewer.color.ColorModels;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBufferInt;
+import java.util.function.Function;
 
 /**
  * Provides info about an {@link ObjectFacet2D}.
@@ -56,8 +56,10 @@ public abstract class NominalFacetLayer<E> extends AbstractFacetLayer {
         for (int z = 0; z < height; z++) {
             for (int x = 0; x < width; x++) {
                 Color src = getColor(facet, x, z);
-                int blend = blender.get(src.rgba());
-                dataBuffer.setElem(z * width + x, blend);
+                if (src != null) {
+                    int blend = blender.get(src.rgba());
+                    dataBuffer.setElem(z * width + x, blend);
+                }
             }
         }
     }

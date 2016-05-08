@@ -173,6 +173,14 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#extra-Lighting}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "extraLighting"
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#parallax-mapping}: "
                                 },
                                 {

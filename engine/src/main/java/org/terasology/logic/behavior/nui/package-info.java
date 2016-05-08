@@ -17,7 +17,7 @@
 
 @API
 @InputCategory(id = "behavior",
-        displayName = "Behavior"
+        displayName = "${engine:menu#category-behavior}"
         ) package org.terasology.logic.behavior.nui;
 
 import org.terasology.module.sandbox.API;

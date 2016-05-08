@@ -1,5 +1,4 @@
 {
-  "engine:item#axe#name": "item-axe-shortname",
-  "engine:biome#beach#name": "biome-beach-name"
+    "engine:biome#beach#name": "biome-beach-name",
+    "engine:item#axe#name": "item-axe-shortname"
 }
-

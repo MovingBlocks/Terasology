@@ -24,7 +24,6 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
@@ -38,6 +37,7 @@ import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
+import org.terasology.utilities.Assets;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -73,6 +73,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     private List<BlockTile> tiles = Lists.newArrayList();
     private List<BlockTile> tilesNormal = Lists.newArrayList();
     private List<BlockTile> tilesHeight = Lists.newArrayList();
+    private List<BlockTile> tilesGloss = Lists.newArrayList();
 
     private BlockingQueue<BlockTile> reloadQueue = Queues.newLinkedBlockingQueue();
 
@@ -168,6 +169,7 @@ public class WorldAtlasImpl implements WorldAtlas {
                 tiles.add(tile.get());
                 addNormal(uri);
                 addHeightMap(uri);
+                addGlossMap(uri);
                 tileIndexes.put(uri, index);
                 tile.get().subscribe(tileReloadListener);
                 return index;
@@ -189,6 +191,9 @@ public class WorldAtlasImpl implements WorldAtlas {
         Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
         if (tile.isPresent()) {
             tilesNormal.add(tile.get());
+        } else {
+            // intentionally pad this list with null so that the indexes match the main atlas
+            tilesNormal.add(null);
         }
     }
 
@@ -197,6 +202,20 @@ public class WorldAtlasImpl implements WorldAtlas {
         Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
         if (tile.isPresent()) {
             tilesHeight.add(tile.get());
+        } else {
+            // intentionally pad this list with null so that the indexes match the main atlas
+            tilesHeight.add(null);
+        }
+    }
+
+    private void addGlossMap(ResourceUrn uri) {
+        String name = uri.toString() + "Gloss";
+        Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
+        if (tile.isPresent()) {
+            tilesGloss.add(tile.get());
+        } else {
+            // intentionally pad this list with null so that the indexes match the main atlas
+            tilesGloss.add(null);
         }
     }
 
@@ -205,7 +224,7 @@ public class WorldAtlasImpl implements WorldAtlas {
 
         int numMipMaps = getNumMipmaps();
         ByteBuffer[] data = createAtlasMipmaps(numMipMaps, TRANSPARENT_COLOR, tiles, "tiles.png");
-        ByteBuffer[] dataNormal = createAtlasMipmaps(numMipMaps, UNIT_Z_COLOR, tilesNormal, "tilesNormal.png");
+        ByteBuffer[] dataNormal = createAtlasMipmaps(numMipMaps, UNIT_Z_COLOR, tilesNormal, "tilesNormal.png", tilesGloss);
         ByteBuffer[] dataHeight = createAtlasMipmaps(numMipMaps, BLACK_COLOR, tilesHeight, "tilesHeight.png");
 
         TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
@@ -250,9 +269,18 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<BlockTile> tileImages, String screenshotName) {
+        return createAtlasMipmaps(numMipMaps, initialColor, tileImages, screenshotName, Lists.newArrayList());
+    }
+
+    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<BlockTile> tileImages, String screenshotName, List<BlockTile> alphaMaskTiles) {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i, tileImages, initialColor);
+            if (alphaMaskTiles.size() > 0) {
+                BufferedImage alphaMask = generateAtlas(i, alphaMaskTiles, Color.BLACK);
+                storeGreyscaleMapIntoAlpha(image, alphaMask);
+            }
+
             if (i == 0) {
                 try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
                     ImageIO.write(image, "png", stream);
@@ -273,6 +301,23 @@ public class WorldAtlasImpl implements WorldAtlas {
             }
         }
         return data;
+    }
+
+    // Ref: http://stackoverflow.com/questions/221830/set-bufferedimage-alpha-mask-in-java/8058442#8058442
+    public void storeGreyscaleMapIntoAlpha(BufferedImage imageWithoutAlpha, BufferedImage greyscaleImage) {
+        int width = imageWithoutAlpha.getWidth();
+        int height = imageWithoutAlpha.getHeight();
+
+        int[] imagePixels = imageWithoutAlpha.getRGB(0, 0, width, height, null, 0, width);
+        int[] maskPixels = greyscaleImage.getRGB(0, 0, width, height, null, 0, width);
+
+        for (int i = 0; i < imagePixels.length; i++) {
+            int color = imagePixels[i] & 0x00ffffff; // Mask preexisting alpha
+            int alpha = maskPixels[i] << 24; // Shift blue to alpha
+            imagePixels[i] = color | alpha;
+        }
+
+        imageWithoutAlpha.setRGB(0, 0, width, height, imagePixels, 0, width);
     }
 
     // The atlas is configured using the following constraints...
@@ -310,13 +355,14 @@ public class WorldAtlasImpl implements WorldAtlas {
         Graphics g = result.getGraphics();
 
         g.setColor(clearColor);
-        g.fillRect(0, 0, size, size);
         for (int index = 0; index < tileImages.size(); ++index) {
             int posX = (index) % tilesPerDim;
             int posY = (index) / tilesPerDim;
             BlockTile tile = tileImages.get(index);
             if (tile != null) {
                 g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+            } else {
+                g.fillRect(posX * textureSize, posY * textureSize, textureSize, textureSize);
             }
         }
 
