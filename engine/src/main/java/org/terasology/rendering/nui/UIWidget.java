@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -108,4 +109,13 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     float getTooltipDelay();
 
+    void startAnimation(Animation anim);
+
+    void endAnimation();
+
+    void pauseAnimation();
+
+    void resumeAnimation();
+
+    boolean isAnimating();
 }

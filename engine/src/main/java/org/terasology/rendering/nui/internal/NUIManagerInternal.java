@@ -48,6 +48,8 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.registry.InjectionHelper;
+import org.terasology.rendering.animation.Animation;
+import org.terasology.rendering.animation.AnimationListener;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
@@ -165,10 +167,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void closeScreen(ResourceUrn screenUri, boolean sendEvents) {
-        UIScreenLayer screen = screenLookup.remove(screenUri);
+        UIScreenLayer screen = getScreen(screenUri);
         if (screen != null) {
-            screens.remove(screen);
-            onCloseScreen(screen, screenUri, sendEvents);
+            closeScreen(screen, sendEvents);
+            // screenLookup.remove(screenUri);
+            // screens.remove(screen);
+            // onCloseScreen(screen, screenUri, sendEvents);
         }
     }
 
@@ -179,9 +183,26 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void closeScreen(UIScreenLayer screen) {
-        if (screens.remove(screen)) {
-            ResourceUrn screenUri = screenLookup.inverse().remove(screen);
-            onCloseScreen(screen, screenUri, true);
+        closeScreen(screen, true);
+    }
+
+    private void closeScreen(UIScreenLayer screen, boolean sendEvents) {
+        Animation closeAnim = screen.getCloseAnimation();
+        if (closeAnim != null) {
+            closeAnim.addListener(new AnimationListener() {
+                    @Override public void onEnd() {
+                        if (screens.remove(screen)) {
+                            ResourceUrn screenUri = screenLookup.inverse().remove(screen);
+                            onCloseScreen(screen, screenUri, sendEvents);
+                        }
+                    }
+                });
+            screen.startAnimation(closeAnim);
+        } else {
+            if (screens.remove(screen)) {
+                ResourceUrn screenUri = screenLookup.inverse().remove(screen);
+                onCloseScreen(screen, screenUri, sendEvents);
+            }
         }
     }
 
@@ -192,6 +213,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (localPlayer != null) {
                 localPlayer.getClientEntity().send(new ScreenLayerClosedEvent(screenUri));
             }
+        }
+        if (!screens.isEmpty()) {
+            screens.peek().startAnimation(screens.peek().getOpenAnimation());
         }
     }
 
@@ -279,21 +303,40 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return null;
     }
 
-    private void pushScreen(CoreScreenLayer screen, ResourceUrn uri) {
-        screen.setManager(this);
-        prepare(screen);
-        screens.push(screen);
-        if (uri != null) {
-            screenLookup.put(uri, screen);
+    private void pushScreen(CoreScreenLayer screen, ResourceUrn uri, boolean doAnim) {
+        if (screens == null) {
+            pushScreen(screen, uri, false);
+        } else if (doAnim && !screens.isEmpty()) {
+            Animation closeAnim = screens.peek().getCloseAnimation();
+            if (closeAnim != null) {
+                closeAnim.addListener(new AnimationListener() {
+                        @Override public void onEnd() {
+                            pushScreen(screen, uri, false);
+                        }
+                    });
+                screens.peek().startAnimation(closeAnim);
+            } else {
+                pushScreen(screen, uri, false);
+            }
+        } else {
+            screen.setManager(NUIManagerInternal.this);
+            prepare(screen);
+            screens.push(screen);
+            if (uri != null) {
+                screenLookup.put(uri, screen);
+            }
+            screen.startAnimation(screen.getOpenAnimation());
         }
+    }
+
+    private void pushScreen(CoreScreenLayer screen, ResourceUrn uri) {
+        pushScreen(screen, uri, true);
     }
 
     @Override
     public void popScreen() {
         if (!screens.isEmpty()) {
-            UIScreenLayer popped = screens.pop();
-            screenLookup.inverse().remove(popped);
-            popped.onClosed();
+            closeScreen(screens.peek());
         }
     }
 
@@ -366,13 +409,15 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void render() {
         canvas.preRender();
+
         Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
         for (UIScreenLayer layer : screens) {
             screensToRender.push(layer);
-            if (!layer.isLowerLayerVisible()) {
+            if (!layer.isLowerLayerVisible() && !layer.isAnimating()) {
                 break;
             }
         }
+
         for (UIScreenLayer screen : screensToRender) {
             canvas.drawWidget(screen, canvas.getRegion());
         }
@@ -397,7 +442,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
         InputSystem inputSystem = context.get(InputSystem.class);
         inputSystem.getMouseDevice().setGrabbed(inputSystem.isCapturingMouse() && !(this.isReleasingMouse()));
-
     }
 
     @Override
@@ -587,7 +631,4 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         InjectionHelper.inject(screen);
         screen.onOpened();
     }
-
-
-
 }
