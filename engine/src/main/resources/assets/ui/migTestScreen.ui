@@ -559,18 +559,36 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIScrollbar",
+                "text": "ScrollableArea",
                 "layoutInfo": {
                     "cc": "newline"
                 }
             },
             {
-                "type": "UIScrollbar",
+                "type": "ScrollableArea",
                 "id": "scrollbar1",
                 "layoutInfo": {
-                    "cc": ""
+                    "width": 70,
+                    "cc": "",
+                    "position-horizontal-center": {}
                 },
-                "enabled": false
+                "enabled": false,
+                "content": {
+                    "type": "RelativeLayout",
+                    "contents": [
+                            {
+                                "type": "UILabel",
+                                "id": "message",
+                                "text": "Lorem ipsum, Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum",
+                                "layoutInfo": {
+                                    "position-left": {},
+                                    "position-right": {},
+                                    "use-content-height": true,
+                                    "position-bottom": {}
+                                }
+                            }
+                    ]
+                }
             },
             {
                 "type": "UIScrollbar",
