@@ -117,6 +117,14 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         }
 
         pickupItem.send(new DropItemEvent(event.getNewPosition()));
+
+        if (pickupItem.hasComponent(PickupComponent.class))
+        {
+            PickupComponent pickupComponent = pickupItem.getComponent(PickupComponent.class);
+            pickupComponent.timeDropped = time.getGameTimeInMs();
+            pickupItem.saveComponent(pickupComponent);
+        }
+
         pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }
 
