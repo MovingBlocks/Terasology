@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
-import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
@@ -33,11 +32,11 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.utilities.collection.ListOrderedSet;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -65,9 +64,7 @@ public class DebugOverlay extends CoreScreenLayer {
     @In
     private WorldProvider worldProvider;
 
-    private List<MetricsMode> metricsModes = Lists.newArrayList(new NullMetricsMode(), new RunningMeansMode(), new SpikesMode(),
-            new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode(), new NetworkStatsMode(),
-            new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
+    private ListOrderedSet<MetricsMode> metricsModes;
     private int currentMode;
     private UILabel metricsLabel;
 
@@ -78,6 +75,9 @@ public class DebugOverlay extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        metricsModes = ListOrderedSet.create();
+        MetricsMode.setDefaultMetrics(this);
+
         bindVisible(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
@@ -168,6 +168,11 @@ public class DebugOverlay extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         if (metricsLabel != null) {
+            if (metricsModes.isEmpty()) {
+                metricsLabel.setText("No metric modes are available!");
+                return;
+            }
+
             metricsLabel.setText(metricsModes.get(currentMode).getMetrics());
         }
     }
@@ -183,10 +188,24 @@ public class DebugOverlay extends CoreScreenLayer {
     }
 
     public void toggleMetricsMode() {
-        currentMode = (currentMode + 1) % metricsModes.size();
-        while (!metricsModes.get(currentMode).isAvailable()) {
+        if (!metricsModes.isEmpty()) {
             currentMode = (currentMode + 1) % metricsModes.size();
+            while (!metricsModes.get(currentMode).isAvailable()) {
+                currentMode = (currentMode + 1) % metricsModes.size();
+            }
+            PerformanceMonitor.setEnabled(metricsModes.get(currentMode).isPerformanceManagerMode());
         }
-        PerformanceMonitor.setEnabled(metricsModes.get(currentMode).isPerformanceManagerMode());
+    }
+
+    public void register(MetricsMode mode) {
+        metricsModes.add(mode);
+    }
+
+    public void unregister(MetricsMode mode) {
+        metricsModes.remove(mode);
+    }
+
+    public void unregisterAll() {
+        metricsModes.clear();
     }
 }

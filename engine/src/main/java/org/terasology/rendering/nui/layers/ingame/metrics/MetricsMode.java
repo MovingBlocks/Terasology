@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,16 @@ public abstract class MetricsMode {
 
     public MetricsMode(String name) {
         this.name = name;
+    }
+
+    static void setDefaultMetrics(DebugOverlay debugOverlay) {
+        debugOverlay.register(new RunningMeansMode());
+        debugOverlay.register(new SpikesMode());
+        debugOverlay.register(new AllocationsMode());
+        debugOverlay.register(new RunningThreadsMode());
+        debugOverlay.register(new WorldRendererMode());
+        debugOverlay.register(new NetworkStatsMode());
+        debugOverlay.register(new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
     }
 
     public abstract String getMetrics();
