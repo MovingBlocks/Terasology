@@ -100,7 +100,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         // All UIElement instances are disposed so that they are not automatically reloaded
         // by the AssetTypeManager. Reloading would not trigger the initialise() method
         // and UI screens should be created on demand anyway.
-        context.get(ModuleAwareAssetTypeManager.class).disposeAll(UIElement.class);
+        ModuleAwareAssetTypeManager maaTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        maaTypeManager.getAssetType(UIElement.class).ifPresent(type -> type.disposeAll());
     }
 
     public void refreshWidgetsLibrary() {
