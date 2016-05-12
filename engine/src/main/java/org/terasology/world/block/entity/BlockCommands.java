@@ -18,6 +18,16 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.sun.prism.impl.Disposer;
+import com.sun.security.ntlm.Client;
+import javafx.geometry.HorizontalDirection;
+import org.lwjgl.util.vector.Vector3f;
+import org.terasology.input.cameraTarget.TargetSystem;
+import org.terasology.logic.location.Location;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.Direction;
+import org.terasology.math.Rotation;
+import org.terasology.physics.Physics;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -38,14 +48,15 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockExplorer;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.*;
+import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.internal.WorldProviderCoreImpl;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -58,7 +69,7 @@ import java.util.Set;
 @RegisterSystem
 @Share(BlockCommands.class)
 public class BlockCommands extends BaseComponentSystem {
-
+    private TargetSystem targetSystem;
     // TODO: Remove once camera is handled better
     @In
     private WorldRenderer renderer;
@@ -81,6 +92,18 @@ public class BlockCommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
+    @In
+    private LocalPlayer player;
+
+    @In
+    private Physics physics;
+
+    @In
+    private BlockEntityRegistry blockRegistry;
+
+    @In
+    private WorldProviderCoreImpl worldImpl;
+
     private BlockItemFactory blockItemFactory;
     private BlockExplorer blockExplorer;
 
@@ -88,6 +111,7 @@ public class BlockCommands extends BaseComponentSystem {
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
         blockExplorer = new BlockExplorer(assetManager);
+        targetSystem = new TargetSystem(blockRegistry, physics);
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)",
@@ -174,6 +198,41 @@ public class BlockCommands extends BaseComponentSystem {
         }
 
         return stringBuilder.toString();
+    }
+
+    @Command(shortDescription = "Creates a block in front of user",
+            helpText = "Creates a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public void createBlock(
+            @Sender EntityRef sender,
+            @CommandParam("blockName") String uri,
+            @CommandParam(value = "maxDistance", required = false) Integer maxDistanceParam) {
+        int maxDistance = maxDistanceParam != null ? maxDistanceParam : 10;
+        EntityRef playerEntity = sender.getComponent(ClientComponent.class).character;
+        LocationComponent location = playerEntity.getComponent(LocationComponent.class);
+        Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
+        org.terasology.math.geom.Vector3f direction = location.getWorldDirection();
+        targetSystem.updateTarget(location.getWorldPosition(), location.getWorldDirection(), maxDistance);
+        EntityRef target = targetSystem.getTarget();
+        BlockComponent targetLocation = target.getComponent(BlockComponent.class);
+
+        if (matchingUris.size() >= 1) {
+            Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
+            if(def.isPresent()) {
+                BlockFamily blockFamily = blockManager.getBlockFamily(uri);
+                Block block = blockManager.getBlock(new BlockUri(def.get().getUrn()));
+                Block test = blockManager.getBlock(blockFamily.getURI());
+                System.out.println(test);
+                System.out.println(targetLocation.getPosition());
+                System.out.print("Making it inside if");
+                worldImpl.setBlock(targetLocation.getPosition(), test);
+               // return createBlock(playerEntity, uri, maxDistanceParam);
+            }
+            //System.out.print("Found" + def);
+            System.out.print("Location" + location.getWorldPosition());
+            System.out.print("Target" + target);
+
+        }
+
     }
 
     @Command(shortDescription = "Adds a block to your inventory",
