@@ -218,14 +218,14 @@ public class BlockCommands extends BaseComponentSystem {
         if (matchingUris.size() >= 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if(def.isPresent()) {
-                BlockFamily blockFamily = blockManager.getBlockFamily(uri);
-                Block block = blockManager.getBlock(new BlockUri(def.get().getUrn()));
-                Block test = blockManager.getBlock(blockFamily.getURI());
-                System.out.println(test);
-                System.out.println(targetLocation.getPosition());
-                System.out.print("Making it inside if");
-                worldImpl.setBlock(targetLocation.getPosition(), test);
-               // return createBlock(playerEntity, uri, maxDistanceParam);
+                    BlockFamily blockFamily = blockManager.getBlockFamily(uri);
+                    Block block = blockManager.getBlock(blockFamily.getURI());
+                    System.out.println(block);
+                    System.out.println(targetLocation.getPosition());
+                    System.out.print("Making it inside if");
+                    //targetLocation.getPosition().y = targetLocation.getPosition().y + 1;
+                    world.setBlock(targetLocation.getPosition(), block);
+                    // return createBlock(playerEntity, uri, maxDistanceParam)
             }
             //System.out.print("Found" + def);
             System.out.print("Location" + location.getWorldPosition());
