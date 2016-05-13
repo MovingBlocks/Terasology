@@ -23,11 +23,13 @@ import com.sun.security.ntlm.Client;
 import javafx.geometry.HorizontalDirection;
 import org.lwjgl.util.vector.Vector3f;
 import org.terasology.input.cameraTarget.TargetSystem;
+import org.terasology.logic.characters.GazeAuthoritySystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.Rotation;
 import org.terasology.physics.Physics;
+import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -208,14 +210,17 @@ public class BlockCommands extends BaseComponentSystem {
             @CommandParam(value = "maxDistance", required = false) Integer maxDistanceParam) {
         int maxDistance = maxDistanceParam != null ? maxDistanceParam : 10;
         EntityRef playerEntity = sender.getComponent(ClientComponent.class).character;
+        EntityRef gazeEntity = sender.getComponent(ClientComponent.class).character;
+        LocationComponent gazeController;
+        gazeEntity = playerEntity.getComponent(GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity));
         LocationComponent location = playerEntity.getComponent(LocationComponent.class);
+        LocationComponent looking = playerEntity.getComponent(GazeAuthoritySystem.getGazeEntityForCharacter());
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        org.terasology.math.geom.Vector3f direction = location.getWorldDirection();
         targetSystem.updateTarget(location.getWorldPosition(), location.getWorldDirection(), maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
 
-        if (matchingUris.size() >= 1) {
+        if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if(def.isPresent()) {
                     BlockFamily blockFamily = blockManager.getBlockFamily(uri);
@@ -226,6 +231,16 @@ public class BlockCommands extends BaseComponentSystem {
                     //targetLocation.getPosition().y = targetLocation.getPosition().y + 1;
                     world.setBlock(targetLocation.getPosition(), block);
                     // return createBlock(playerEntity, uri, maxDistanceParam)
+            } else if (matchingUris.size() > 1) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("Non-unique shape name, possible matches: ");
+                Iterator<ResourceUrn> shapeUris = sortItems(matchingUris).iterator();
+                while (shapeUris.hasNext()) {
+                    builder.append(shapeUris.next().toString());
+                    if (shapeUris.hasNext()) {
+                        builder.append(", ");
+                    }
+                }
             }
             //System.out.print("Found" + def);
             System.out.print("Location" + location.getWorldPosition());
