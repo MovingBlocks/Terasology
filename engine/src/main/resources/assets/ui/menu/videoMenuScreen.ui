@@ -66,6 +66,10 @@
                             "size": [1, 12]
                         },
                         {
+                            "type": "UISpace",
+                            "size": [1, 12]
+                        },
+                        {
                             "type": "UILabel",
                             "family": "subheading",
                             "text": "${engine:menu#video-graphic-settings}"
@@ -108,6 +112,14 @@
                                 {
                                     "type": "UICheckbox",
                                     "id": "vsync"
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "text" : "${engine:menu#menu-animations}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id" : "menu-animations"
                                 }
                             ]
                         },

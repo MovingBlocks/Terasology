@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.GameEngine;
@@ -38,6 +39,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -64,6 +66,8 @@ import java.util.stream.Collectors;
  */
 public class CreateGameScreen extends CoreScreenLayer {
 
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:createGameScreen");
+
     private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
 
@@ -88,6 +92,7 @@ public class CreateGameScreen extends CoreScreenLayer {
     @SuppressWarnings("unchecked")
     public void initialise() {
 
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
         if (gameTypeTitle != null) {
@@ -222,7 +227,7 @@ public class CreateGameScreen extends CoreScreenLayer {
         }
 
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (worldGenerator.getSelection() == null) {
@@ -266,13 +271,21 @@ public class CreateGameScreen extends CoreScreenLayer {
         };
         previewSeed.bindEnabled(worldGeneratorSelected);
         WidgetUtil.trySubscribe(this, "previewSeed", button -> {
-            PreviewWorldScreen screen = getManager().pushScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
+            PreviewWorldScreen screen = getManager().createScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
             if (screen != null) {
                 screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
+                try {
+                    screen.setEnvironment();
+                    triggerForwardAnimation(screen);
+                } catch (Exception e) {
+                    String msg = "Unable to load world for a 2D preview:\n" + e.toString();
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", msg);
+                    logger.error("Unable to load world for a 2D preview", e);
+                }
             }
         });
 
-        WidgetUtil.trySubscribe(this, "mods", button -> getManager().pushScreen("engine:selectModsScreen"));
+        WidgetUtil.trySubscribe(this, "mods", w -> triggerForwardAnimation(SelectModulesScreen.ASSET_URI));
     }
 
     @Override

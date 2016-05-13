@@ -24,6 +24,9 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem;
+import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem.Direction;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -57,6 +60,9 @@ public class ConsoleScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
+        setAnimationSystem(new SwipeMenuAnimationSystem(0.2f, Direction.TOP_TO_BOTTOM));
+
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 

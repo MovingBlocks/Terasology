@@ -23,12 +23,17 @@ public interface UIScreenLayer extends ControlWidget {
 
     boolean isReleasingMouse();
 
-    boolean isEscapeToCloseAllowed();
-
     boolean isModal();
 
     NUIManager getManager();
 
-    void setManager(NUIManager manager);
+    /**
+     * Called when the layer becomes visible again (all layers on top have been closed)
+     */
+    void onShow();
 
+    /**
+     * Called when the layer becomes invisible (at least one other layer is on top)
+     */
+    void onHide();
 }

@@ -18,6 +18,8 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
@@ -35,6 +37,7 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -59,6 +62,8 @@ import java.util.concurrent.Future;
 /**
  */
 public class JoinGameScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
     @In
     private Config config;
@@ -92,6 +97,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         downloader = new ServerListDownloader(config.getNetwork().getMasterServer());
 
         CardLayout cards = find("cards", CardLayout.class);
@@ -130,7 +136,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             config.save();
-            getManager().popScreen();
+            triggerBackAnimation();
         });
 
         activateOnline.onActivated(null);

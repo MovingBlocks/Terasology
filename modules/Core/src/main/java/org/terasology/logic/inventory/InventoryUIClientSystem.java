@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.inventory;
 
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -30,7 +29,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.asset.UIElement;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class InventoryUIClientSystem extends BaseComponentSystem {
@@ -41,8 +39,7 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("inventoryHud");
-        UIElement cursorElement = Assets.getUIElement("core:transferItemCursor").get();
-        nuiManager.addOverlay(cursorElement, ControlWidget.class);
+        nuiManager.addOverlay("core:transferItemCursor", ControlWidget.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class)

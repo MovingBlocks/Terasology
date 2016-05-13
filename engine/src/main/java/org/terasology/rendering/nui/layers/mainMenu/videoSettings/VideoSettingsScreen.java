@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -28,6 +29,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
@@ -41,6 +43,9 @@ import java.util.Arrays;
 /**
  */
 public class VideoSettingsScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:VideoMenuScreen");
+
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
 
     @In
@@ -64,6 +69,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
             videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.LOW, Preset.MEDIUM, Preset.HIGH, Preset.ULTRA));
@@ -222,7 +228,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }
 
-
+        WidgetUtil.tryBindCheckbox(this, "menu-animations", BindHelper.bindBeanProperty("animatedMenu", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("oculusVrSupport", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateGrass", BindHelper.bindBeanProperty("animateGrass", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateWater", BindHelper.bindBeanProperty("animateWater", config.getRendering(), Boolean.TYPE));
@@ -249,13 +255,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             WidgetUtil.trySubscribe(this, "fovReset", widget -> fovSlider.setValue(100.0f));
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
-    }
-
-    @Override
-    public void onClosed() {
-        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
-        CoreRegistry.get(ShaderManager.class).recompileAllShaders();
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+            // TODO: add a dirty flag that checks if recompiling is needed
+            CoreRegistry.get(ShaderManager.class).recompileAllShaders();
+            triggerBackAnimation();
+        });
     }
 
     @Override
