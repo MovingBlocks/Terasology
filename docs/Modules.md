@@ -78,6 +78,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Throughout the Ages gameplay
 * [PolyWorld](https://github.com/Terasology/PolyWorld) - creates very neat island worlds based on the [map generating algorithm by Amit Patel of Red Blob Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock portal`
+* [PotentialEnergyDevices](https://github.com/Terasology/PotentialEnergyDevices) - A library for creating entities that build up potential energy
 * [QuestExamples](https://github.com/Terasology/QuestExamples) - samples for developers to help create quests
 * ~~[Rails](https://github.com/Terasology/Rails) - railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts~~ (broken, waiting for author's return)
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
