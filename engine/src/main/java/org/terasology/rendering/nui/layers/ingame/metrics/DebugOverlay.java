@@ -32,7 +32,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.utilities.collection.ListOrderedSet;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
@@ -64,10 +63,10 @@ public class DebugOverlay extends CoreScreenLayer {
     @In
     private WorldProvider worldProvider;
 
-    private ListOrderedSet<MetricsMode> metricsModes;
-    private int currentMode;
-    private UILabel metricsLabel;
+    @In
+    private DebugRenderingSystem debugRendering;
 
+    private UILabel metricsLabel;
 
     @In
     private StorageManager storageManager;
@@ -75,9 +74,6 @@ public class DebugOverlay extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        metricsModes = ListOrderedSet.create();
-        MetricsMode.setDefaultMetrics(this);
-
         bindVisible(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
@@ -167,13 +163,10 @@ public class DebugOverlay extends CoreScreenLayer {
 
     @Override
     public void update(float delta) {
-        if (metricsLabel != null) {
-            if (metricsModes.isEmpty()) {
-                metricsLabel.setText("No metric modes are available!");
-                return;
-            }
-
-            metricsLabel.setText(metricsModes.get(currentMode).getMetrics());
+        if (debugRendering.isMetricModesAvailable()) {
+            metricsLabel.setText(debugRendering.getCurrentMode().getMetrics());
+        } else {
+            metricsLabel.setText("No metric modes are available!");
         }
     }
 
@@ -188,24 +181,11 @@ public class DebugOverlay extends CoreScreenLayer {
     }
 
     public void toggleMetricsMode() {
-        if (!metricsModes.isEmpty()) {
-            currentMode = (currentMode + 1) % metricsModes.size();
-            while (!metricsModes.get(currentMode).isAvailable()) {
-                currentMode = (currentMode + 1) % metricsModes.size();
-            }
-            PerformanceMonitor.setEnabled(metricsModes.get(currentMode).isPerformanceManagerMode());
+        if (debugRendering.isMetricModesAvailable()) {
+            debugRendering.toggle();
+            PerformanceMonitor.setEnabled(debugRendering.getCurrentMode().isPerformanceManagerMode());
         }
     }
 
-    public void register(MetricsMode mode) {
-        metricsModes.add(mode);
-    }
 
-    public void unregister(MetricsMode mode) {
-        metricsModes.remove(mode);
-    }
-
-    public void unregisterAll() {
-        metricsModes.clear();
-    }
 }

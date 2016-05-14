@@ -25,16 +25,6 @@ public abstract class MetricsMode {
         this.name = name;
     }
 
-    static void setDefaultMetrics(DebugOverlay debugOverlay) {
-        debugOverlay.register(new RunningMeansMode());
-        debugOverlay.register(new SpikesMode());
-        debugOverlay.register(new AllocationsMode());
-        debugOverlay.register(new RunningThreadsMode());
-        debugOverlay.register(new WorldRendererMode());
-        debugOverlay.register(new NetworkStatsMode());
-        debugOverlay.register(new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
-    }
-
     public abstract String getMetrics();
 
     public abstract boolean isAvailable();
