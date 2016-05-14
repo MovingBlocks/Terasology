@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- */
+
 @RegisterSystem
 @Share(BlockCommands.class)
 public class BlockCommands extends BaseComponentSystem {
@@ -197,6 +196,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
+
     @Command(shortDescription = "Replaces a block in front of user",
             helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void replaceBlock(
@@ -214,9 +214,9 @@ public class BlockCommands extends BaseComponentSystem {
         if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if (def.isPresent()) {
-                    BlockFamily blockFamily = blockManager.getBlockFamily(uri);
-                    Block block = blockManager.getBlock(blockFamily.getURI());
-                    world.setBlock(targetLocation.getPosition(), block);
+                BlockFamily blockFamily = blockManager.getBlockFamily(uri);
+                Block block = blockManager.getBlock(blockFamily.getURI());
+                world.setBlock(targetLocation.getPosition(), block);
             } else if (matchingUris.size() > 1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Non-unique shape name, possible matches: ");
@@ -294,9 +294,9 @@ public class BlockCommands extends BaseComponentSystem {
         StringBuilder result = new StringBuilder();
         result.append("No block found for " + uri);
         if (matchingItems.size() != 0) {
-    		result.append(". ");
-    		result.append("Item matches found, use 'giveItem' to request one: ");
-    		Joiner.on(", ").appendTo(result, matchingItems);
+            result.append(". ");
+            result.append("Item matches found, use 'giveItem' to request one: ");
+            Joiner.on(", ").appendTo(result, matchingItems);
         }
         return result.toString();
     }
