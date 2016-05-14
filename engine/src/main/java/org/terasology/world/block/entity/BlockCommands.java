@@ -18,11 +18,6 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import org.terasology.input.cameraTarget.TargetSystem;
-import org.terasology.logic.characters.GazeAuthoritySystem;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.physics.Physics;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -31,20 +26,29 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.cameraTarget.TargetSystem;
+import org.terasology.logic.characters.GazeAuthoritySystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.inventory.events.GiveItemEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.*;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockExplorer;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -202,13 +206,11 @@ public class BlockCommands extends BaseComponentSystem {
         int maxDistance = maxDistanceParam != null ? maxDistanceParam : 12;
         EntityRef playerEntity = sender.getComponent(ClientComponent.class).character;
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
-        LocationComponent gazeLocation;
+        LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         targetSystem.updateTarget(gazeLocation.getWorldPosition(), gazeLocation.getWorldDirection(), maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
-
         if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if (def.isPresent()) {
