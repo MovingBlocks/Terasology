@@ -28,6 +28,7 @@ import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.Rotation;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.Physics;
 import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.Assets;
@@ -204,33 +205,38 @@ public class BlockCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Creates a block in front of user",
             helpText = "Creates a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public void createBlock(
+    public void replaceBlock(
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,
             @CommandParam(value = "maxDistance", required = false) Integer maxDistanceParam) {
         int maxDistance = maxDistanceParam != null ? maxDistanceParam : 10;
         EntityRef playerEntity = sender.getComponent(ClientComponent.class).character;
-        EntityRef gazeEntity = sender.getComponent(ClientComponent.class).character;
-        LocationComponent gazeController;
-        gazeEntity = playerEntity.getComponent(GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity));
+        EntityRef gazeEntity;
+        LocationComponent gazeLocation;
+        gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
         LocationComponent location = playerEntity.getComponent(LocationComponent.class);
-        LocationComponent looking = playerEntity.getComponent(GazeAuthoritySystem.getGazeEntityForCharacter());
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        targetSystem.updateTarget(location.getWorldPosition(), location.getWorldDirection(), maxDistance);
+        gazeLocation = gazeEntity.getComponent(LocationComponent.class);
+        targetSystem.updateTarget(gazeLocation.getWorldPosition(), gazeLocation.getWorldDirection(), maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
 
         if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if(def.isPresent()) {
+                if (target != null) {
                     BlockFamily blockFamily = blockManager.getBlockFamily(uri);
                     Block block = blockManager.getBlock(blockFamily.getURI());
                     System.out.println(block);
                     System.out.println(targetLocation.getPosition());
                     System.out.print("Making it inside if");
-                    //targetLocation.getPosition().y = targetLocation.getPosition().y + 1;
                     world.setBlock(targetLocation.getPosition(), block);
-                    // return createBlock(playerEntity, uri, maxDistanceParam)
+                } else  {
+                    org.terasology.math.geom.Vector3i playerLocation = new Vector3i(location.getWorldPosition());
+                    BlockFamily blockFamily = blockManager.getBlockFamily(uri);
+                    Block block = blockManager.getBlock(blockFamily.getURI());
+                    world.setBlock(playerLocation, block);
+                }
             } else if (matchingUris.size() > 1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Non-unique shape name, possible matches: ");
@@ -242,7 +248,6 @@ public class BlockCommands extends BaseComponentSystem {
                     }
                 }
             }
-            //System.out.print("Found" + def);
             System.out.print("Location" + location.getWorldPosition());
             System.out.print("Target" + target);
 
@@ -307,15 +312,15 @@ public class BlockCommands extends BaseComponentSystem {
      * @param uri the URI to use to look for an item
      */
     private String suggestItemIfAvailable(String uri){
-    	Set<ResourceUrn> matchingItems = assetManager.resolve(uri, Prefab.class);
-    	StringBuilder result = new StringBuilder();
-    	result.append("No block found for "+uri);
-    	if(matchingItems.size() != 0){
+        Set<ResourceUrn> matchingItems = assetManager.resolve(uri, Prefab.class);
+        StringBuilder result = new StringBuilder();
+        result.append("No block found for "+uri);
+        if(matchingItems.size() != 0){
     		result.append(". ");
     		result.append("Item matches found, use 'giveItem' to request one: ");
     		Joiner.on(", ").appendTo(result, matchingItems);
-    	}
-    	return result.toString();
+        }
+        return result.toString();
     }
 
     /**
