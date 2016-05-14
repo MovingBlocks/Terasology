@@ -18,19 +18,10 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.sun.prism.impl.Disposer;
-import com.sun.security.ntlm.Client;
-import javafx.geometry.HorizontalDirection;
-import org.lwjgl.util.vector.Vector3f;
 import org.terasology.input.cameraTarget.TargetSystem;
 import org.terasology.logic.characters.GazeAuthoritySystem;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Direction;
-import org.terasology.math.Rotation;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.Physics;
-import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -54,7 +45,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.*;
-import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -209,12 +199,10 @@ public class BlockCommands extends BaseComponentSystem {
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,
             @CommandParam(value = "maxDistance", required = false) Integer maxDistanceParam) {
-        int maxDistance = maxDistanceParam != null ? maxDistanceParam : 10;
+        int maxDistance = maxDistanceParam != null ? maxDistanceParam : 12;
         EntityRef playerEntity = sender.getComponent(ClientComponent.class).character;
-        EntityRef gazeEntity;
+        EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
         LocationComponent gazeLocation;
-        gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
-        LocationComponent location = playerEntity.getComponent(LocationComponent.class);
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
         gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         targetSystem.updateTarget(gazeLocation.getWorldPosition(), gazeLocation.getWorldDirection(), maxDistance);
@@ -223,20 +211,10 @@ public class BlockCommands extends BaseComponentSystem {
 
         if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
-            if(def.isPresent()) {
-                if (target != null) {
+            if (def.isPresent()) {
                     BlockFamily blockFamily = blockManager.getBlockFamily(uri);
                     Block block = blockManager.getBlock(blockFamily.getURI());
-                    System.out.println(block);
-                    System.out.println(targetLocation.getPosition());
-                    System.out.print("Making it inside if");
                     world.setBlock(targetLocation.getPosition(), block);
-                } else  {
-                    org.terasology.math.geom.Vector3i playerLocation = new Vector3i(location.getWorldPosition());
-                    BlockFamily blockFamily = blockManager.getBlockFamily(uri);
-                    Block block = blockManager.getBlock(blockFamily.getURI());
-                    world.setBlock(playerLocation, block);
-                }
             } else if (matchingUris.size() > 1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Non-unique shape name, possible matches: ");
@@ -248,8 +226,6 @@ public class BlockCommands extends BaseComponentSystem {
                     }
                 }
             }
-            System.out.print("Location" + location.getWorldPosition());
-            System.out.print("Target" + target);
 
         }
 
@@ -311,11 +287,11 @@ public class BlockCommands extends BaseComponentSystem {
      * 
      * @param uri the URI to use to look for an item
      */
-    private String suggestItemIfAvailable(String uri){
+    private String suggestItemIfAvailable(String uri) {
         Set<ResourceUrn> matchingItems = assetManager.resolve(uri, Prefab.class);
         StringBuilder result = new StringBuilder();
-        result.append("No block found for "+uri);
-        if(matchingItems.size() != 0){
+        result.append("No block found for " + uri);
+        if (matchingItems.size() != 0) {
     		result.append(". ");
     		result.append("Item matches found, use 'giveItem' to request one: ");
     		Joiner.on(", ").appendTo(result, matchingItems);
