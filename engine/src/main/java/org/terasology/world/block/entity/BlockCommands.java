@@ -193,8 +193,8 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Creates a block in front of user",
-            helpText = "Creates a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "Replaces a block in front of user",
+            helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void replaceBlock(
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,
