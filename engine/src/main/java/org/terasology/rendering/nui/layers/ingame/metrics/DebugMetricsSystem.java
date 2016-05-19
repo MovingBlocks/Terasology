@@ -25,9 +25,13 @@ import org.terasology.registry.Share;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+/**
+ * Provides MetricsMode objects to DebugOverlay. Default metrics nodes can be modified via register
+ * unregister and unregisterAll functions.
+ */
 @RegisterSystem
-@Share(DebugRenderingSystem.class)
-public class DebugRenderingSystem extends BaseComponentSystem {
+@Share(DebugMetricsSystem.class)
+public class DebugMetricsSystem extends BaseComponentSystem {
 
     private LinkedHashSet<MetricsMode> metricsModes;
     private Iterator<MetricsMode> modeIterator;
@@ -43,36 +47,58 @@ public class DebugRenderingSystem extends BaseComponentSystem {
         register(new AllocationsMode());
         register(new RunningThreadsMode());
         register(new WorldRendererMode());
-        register(new NetworkStatsMode());
         register(new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
     }
 
+    /**
+     * Registers a metrics mode, can be viewed via toggling {@link DebugMetricsSystem#toggle()}
+     *
+     * @param mode
+     * @return
+     */
     public MetricsMode register(MetricsMode mode) {
         metricsModes.add(mode);
         return mode;
     }
 
+    /***
+     * Returns current mode, initializes a default {@link NullMetricsMode}, if currentMode is null
+     * @return current mode
+     */
     public MetricsMode getCurrentMode() {
+        if (currentMode == null) {
+            currentMode = register(new NullMetricsMode());
+        }
         return currentMode;
     }
 
-    public void toggle() {
+    /**
+     * Toggles to next mode
+     *
+     * @return
+     */
+    public MetricsMode toggle() {
         do {
             currentMode = modeIterator.next();
         } while (!getCurrentMode().isAvailable());
+        return this.getCurrentMode();
     }
 
-    public boolean isMetricModesAvailable() {
-        return !metricsModes.isEmpty();
-    }
-
+    /**
+     * Removes given metric mode, makes sure currentMode is updated
+     * @param mode
+     */
     public void unregister(MetricsMode mode) {
+        if (currentMode == mode)
+            currentMode = toggle();
+
         metricsModes.remove(mode);
     }
 
+    /**
+     * Removes all registered metrics modes
+     */
     public void unregisterAll() {
         metricsModes.clear();
     }
-
-
 }

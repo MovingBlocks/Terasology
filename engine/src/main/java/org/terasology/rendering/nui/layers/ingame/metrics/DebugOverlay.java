@@ -39,6 +39,9 @@ import org.terasology.world.biomes.BiomeManager;
 import java.util.Locale;
 
 /**
+ * Displays and changes metrics modes, according to incoming actions from DebugControlSystem.
+ *
+ * DebugMetricsSystem provides available metrics modes to DebugOverlay.
  */
 public class DebugOverlay extends CoreScreenLayer {
 
@@ -64,7 +67,7 @@ public class DebugOverlay extends CoreScreenLayer {
     private WorldProvider worldProvider;
 
     @In
-    private DebugRenderingSystem debugRendering;
+    private DebugMetricsSystem debugMetricsSystem;
 
     private UILabel metricsLabel;
 
@@ -163,11 +166,7 @@ public class DebugOverlay extends CoreScreenLayer {
 
     @Override
     public void update(float delta) {
-        if (debugRendering.isMetricModesAvailable()) {
-            metricsLabel.setText(debugRendering.getCurrentMode().getMetrics());
-        } else {
-            metricsLabel.setText("No metric modes are available!");
-        }
+        metricsLabel.setText(debugMetricsSystem.getCurrentMode().getMetrics());
     }
 
     @Override
@@ -181,10 +180,8 @@ public class DebugOverlay extends CoreScreenLayer {
     }
 
     public void toggleMetricsMode() {
-        if (debugRendering.isMetricModesAvailable()) {
-            debugRendering.toggle();
-            PerformanceMonitor.setEnabled(debugRendering.getCurrentMode().isPerformanceManagerMode());
-        }
+        MetricsMode mode = debugMetricsSystem.toggle();
+        PerformanceMonitor.setEnabled(mode.isPerformanceManagerMode());
     }
 
 
