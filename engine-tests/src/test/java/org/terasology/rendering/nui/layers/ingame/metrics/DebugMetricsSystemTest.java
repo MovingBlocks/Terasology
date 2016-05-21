@@ -125,6 +125,13 @@ public class DebugMetricsSystemTest {
         assertEquals(modes.get(1), system.getCurrentMode());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemovingDefaultMetric() {
+        DebugMetricsSystem system = getEmptySystem();
+        MetricsMode defaultMode = system.getCurrentMode();
+        system.unregister(defaultMode);
+    }
+
     @Test
     public void testUnregisterWithToggleRemovingNext() {
         DebugMetricsSystem system = getEmptySystem();

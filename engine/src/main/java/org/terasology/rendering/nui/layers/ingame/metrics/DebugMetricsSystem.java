@@ -95,7 +95,11 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      * @return True if the MetricsMode instance was in the set. False otherwise.
      */
     public boolean unregister(MetricsMode mode) {
-        if (currentMode == mode) {
+        if (mode == defaultMode) {
+            throw new IllegalArgumentException("Removing defaultMode is not allowed!");
+        }
+
+        if (mode == currentMode) {
             toggle();
         }
 
@@ -103,7 +107,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
     }
 
     /**
-     * Removes all registered metrics modes
+     * Removes all registered metrics modes except an instance of NullMetricsMode, which is guaranteed to be always available.
      */
     public void unregisterAll() {
         modes.clear();
