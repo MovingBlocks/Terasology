@@ -16,89 +16,105 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.Share;
+import org.terasology.utilities.collection.CircularToggleSet;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 
 /**
- * Provides MetricsMode objects to DebugOverlay. Default metrics nodes can be modified via register
+ * Manages an ordered set of MetricsMode instances.
+ *
+ *
+ * A number of default metrics modes is instantiated in the initialize() method and becomes immediately available by
+ * iterating through the set repeatedly invoking the toggle() method. The getCurrentMode() method can also be used to
+ * obtain the mode currently pointed at. Further modes can be added to the set via the register method, while registered
+ * modes can be removed via the unregister method. A convenience method unregisterAll() removes all registered modes at
+ * once. MetricsModes are currently used by the DebugOverlay instance, displaying runtime statistics on screen.
  * unregister and unregisterAll functions.
  */
 @RegisterSystem
 @Share(DebugMetricsSystem.class)
 public class DebugMetricsSystem extends BaseComponentSystem {
 
-    private LinkedHashSet<MetricsMode> metricsModes;
-    private Iterator<MetricsMode> modeIterator;
+    private final MetricsMode defaultMode = new NullMetricsMode();
+    private CircularToggleSet<MetricsMode> modes;
     private MetricsMode currentMode;
 
     @Override
     public void initialise() {
-        metricsModes = Sets.newLinkedHashSet();
-        modeIterator = Iterators.cycle(metricsModes);
-        currentMode = register(new NullMetricsMode());
+        modes = new CircularToggleSet<>();
+
+        register(defaultMode);
         register(new RunningMeansMode());
         register(new SpikesMode());
         register(new AllocationsMode());
         register(new RunningThreadsMode());
         register(new WorldRendererMode());
         register(new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
+        toggle();
+    }
+
+
+    /**
+     * Adds a MetricsMode instance to the set. Use the toggle() and getCurrentMode() methods to iterate over the set and
+     * obtain the MetricsMode instances.
+     * @param mode a MetricsMode instance
+     */
+    public boolean register(MetricsMode mode) {
+        return modes.add(mode);
     }
 
     /**
-     * Registers a metrics mode, can be viewed via toggling {@link DebugMetricsSystem#toggle()}
-     *
-     * @param mode
-     * @return
-     */
-    public MetricsMode register(MetricsMode mode) {
-        metricsModes.add(mode);
-        return mode;
-    }
-
-    /***
      * Returns current mode, initializes a default {@link NullMetricsMode}, if currentMode is null
      * @return current mode
      */
     public MetricsMode getCurrentMode() {
-        if (currentMode == null) {
-            currentMode = register(new NullMetricsMode());
-        }
         return currentMode;
     }
 
     /**
-     * Toggles to next mode
-     *
-     * @return
+     * Iterates through the set of registered MetricsMode and returns the first instance whose method isAvailable()
+     * returns true. Notice that this could be the MetricsMode that was current at the time this method was invoked.
+     * @returns a MetricsMode instance
      */
     public MetricsMode toggle() {
         do {
-            currentMode = modeIterator.next();
-        } while (!getCurrentMode().isAvailable());
-        return this.getCurrentMode();
+            currentMode = modes.toggle();
+        } while (!currentMode.isAvailable());
+
+        return currentMode;
     }
 
-    /**
-     * Removes given metric mode, makes sure currentMode is updated
-     * @param mode
-     */
-    public void unregister(MetricsMode mode) {
-        if (currentMode == mode)
-            currentMode = toggle();
 
-        metricsModes.remove(mode);
+    /**
+     * Removes from the set the MetricsMode instance provided as input.
+     *
+     * If the MetricsMode instance is the mode currently pointed at by the iterator, toggles the iterator forward.
+     *
+     * @return True if the MetricsMode instance was in the set. False otherwise.
+     */
+    public boolean unregister(MetricsMode mode) {
+        if (currentMode == mode) {
+            toggle();
+        }
+
+        return modes.remove(mode);
     }
 
     /**
      * Removes all registered metrics modes
      */
     public void unregisterAll() {
-        metricsModes.clear();
+        modes.clear();
+        register(defaultMode);
+        toggle();
+    }
+
+    /**
+     * Returns number of registered metrics modes
+     */
+    public int getNumberOfModes() {
+        return modes.size();
     }
 }
