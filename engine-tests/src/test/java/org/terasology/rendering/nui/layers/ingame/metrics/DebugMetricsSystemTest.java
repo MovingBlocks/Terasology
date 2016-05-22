@@ -132,6 +132,18 @@ public class DebugMetricsSystemTest {
         system.unregister(defaultMode);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testRegisterNull() {
+        DebugMetricsSystem system = getEmptySystem();
+        system.register(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testUnregisterNull() {
+        DebugMetricsSystem system = getEmptySystem();
+        system.unregister(null);
+    }
+
     @Test
     public void testUnregisterWithToggleRemovingNext() {
         DebugMetricsSystem system = getEmptySystem();

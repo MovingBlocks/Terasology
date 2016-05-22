@@ -16,10 +16,12 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.Share;
-import org.terasology.utilities.collection.CircularToggleSet;
+
+import java.util.ArrayList;
 
 
 /**
@@ -52,7 +54,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
         register(new RunningThreadsMode());
         register(new WorldRendererMode());
         register(new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
-        toggle();
+        currentMode = defaultMode;
     }
 
 
@@ -62,6 +64,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      * @param mode a MetricsMode instance
      */
     public boolean register(MetricsMode mode) {
+        Preconditions.checkNotNull(mode, "Illegal argument passed, mode is null.");
         return modes.add(mode);
     }
 
@@ -95,8 +98,9 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      * @return True if the MetricsMode instance was in the set. False otherwise.
      */
     public boolean unregister(MetricsMode mode) {
+        Preconditions.checkNotNull(mode, "Illegal argument passed, mode is null.");
         if (mode == defaultMode) {
-            throw new IllegalArgumentException("Removing defaultMode is not allowed!");
+            throw new IllegalArgumentException("Removing defaultMode is not allowed.");
         }
 
         if (mode == currentMode) {
@@ -112,7 +116,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
     public void unregisterAll() {
         modes.clear();
         register(defaultMode);
-        toggle();
+        currentMode = defaultMode;
     }
 
     /**
@@ -120,5 +124,36 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      */
     public int getNumberOfModes() {
         return modes.size();
+    }
+
+
+    private class CircularToggleSet<T> {
+        ArrayList<T> container = new ArrayList<>();
+        int cursor;
+
+        public int size() {
+            return container.size();
+        }
+
+        public void clear() {
+            cursor = 0;
+            container.clear();
+        }
+
+        public boolean remove(T mode) {
+            return container.remove(mode);
+        }
+
+        public T toggle() {
+            cursor = (cursor + 1) % size();
+            return container.get(cursor);
+        }
+
+        public boolean add(T mode) {
+            if (!container.contains(mode)) {
+                return container.add(mode);
+            }
+            return false;
+        }
     }
 }
