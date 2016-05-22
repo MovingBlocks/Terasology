@@ -1,30 +1,25 @@
 /*
-* Copyright 2014 MovingBlocks
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*  http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2016 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -37,7 +32,19 @@ public class UIDoubleSlider extends CoreWidget {
     public static final String SLIDER_PART = "slider";
     public static final String TICKER_LEFT_PART = "tickerLeft";
     public static final String TICKER_RIGHT_PART = "tickerRight";
-
+    @LayoutConfig
+    private Binding<Float> minimum = new DefaultBinding<>(0.0f);
+    @LayoutConfig
+    private Binding<Float> range = new DefaultBinding<>(1.0f);
+    @LayoutConfig
+    private Binding<Float> increment = new DefaultBinding<>(0.1f);
+    @LayoutConfig
+    private int precision = 1;
+    private Binding<Float> valueLeft = new DefaultBinding<>(0.3f);
+    private Binding<Float> valueRight = new DefaultBinding<>(0.7f);
+    private int sliderWidth;
+    private String formatString = "0.0";
+    private boolean active;
     private InteractionListener tickerListenerLeft = new BaseInteractionListener() {
         private Vector2i offset = new Vector2i();
 
@@ -70,7 +77,6 @@ public class UIDoubleSlider extends CoreWidget {
             }
         }
     };
-
     private InteractionListener tickerListenerRight = new BaseInteractionListener() {
         private Vector2i offset = new Vector2i();
 
@@ -103,25 +109,6 @@ public class UIDoubleSlider extends CoreWidget {
             }
         }
     };
-
-    @LayoutConfig
-    private Binding<Float> minimum = new DefaultBinding<>(0.0f);
-
-    @LayoutConfig
-    private Binding<Float> range = new DefaultBinding<>(1.0f);
-
-    @LayoutConfig
-    private Binding<Float> increment = new DefaultBinding<>(0.1f);
-
-    @LayoutConfig
-    private int precision = 1;
-
-    private Binding<Float> valueLeft = new DefaultBinding<>(0.3f);
-    private Binding<Float> valueRight = new DefaultBinding<>(0.7f);
-
-    private int sliderWidth;
-    private String formatString = "0.0";
-    private boolean active;
 
     public UIDoubleSlider() {
     }
@@ -203,8 +190,9 @@ public class UIDoubleSlider extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (!isEnabled())
+        if (!isEnabled()) {
             return DISABLED_MODE;
+        }
 
         if (active) {
             return ACTIVE_MODE;
@@ -264,16 +252,16 @@ public class UIDoubleSlider extends CoreWidget {
         return valueLeft.get();
     }
 
-    public float getValueRight() {
-        return valueRight.get();
-    }
-
     public void setValueLeft(float val) {
         valueLeft.set(val);
 
         if (val > valueRight.get()) {
             valueRight.set(val);
         }
+    }
+
+    public float getValueRight() {
+        return valueRight.get();
     }
 
     public void setValueRight(float val) {

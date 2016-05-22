@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,12 +20,7 @@ import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -43,6 +38,9 @@ public class UIDropdown<T> extends CoreWidget {
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
+    private List<InteractionListener> optionListeners = Lists.newArrayList();
+    private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
+    private boolean opened;
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
@@ -59,10 +57,6 @@ public class UIDropdown<T> extends CoreWidget {
             return false;
         }
     };
-    private List<InteractionListener> optionListeners = Lists.newArrayList();
-    private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
-
-    private boolean opened;
 
     public UIDropdown() {
 
@@ -170,7 +164,7 @@ public class UIDropdown<T> extends CoreWidget {
     private class ItemListener extends BaseInteractionListener {
         private int index;
 
-        public ItemListener(int index) {
+        ItemListener(int index) {
             this.index = index;
         }
 

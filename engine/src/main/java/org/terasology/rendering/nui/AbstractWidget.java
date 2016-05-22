@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -63,8 +62,9 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public String getMode() {
-        if (this.isEnabled())
+        if (this.isEnabled()) {
             return DEFAULT_MODE;
+        }
         return DISABLED_MODE;
     }
 
@@ -212,6 +212,15 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
+    public void setTooltip(String value) {
+        if (value != null && !value.isEmpty()) {
+            setTooltip(new UILabel(value));
+        } else {
+            tooltip = new DefaultBinding<>(null);
+        }
+    }
+
+    @Override
     public void setTooltip(UIWidget val) {
         tooltip.set(val);
     }
@@ -219,15 +228,6 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void bindTooltipString(Binding<String> bind) {
         bindTooltip(new TooltipLabelBinding(bind));
-    }
-
-    @Override
-    public void setTooltip(String value) {
-        if (value != null && !value.isEmpty()) {
-            setTooltip(new UILabel(value));
-        } else {
-            tooltip = new DefaultBinding<>(null);
-        }
     }
 
     @Override
@@ -243,7 +243,7 @@ public abstract class AbstractWidget implements UIWidget {
 
         private UILabel tooltipLabel = new UILabel();
 
-        public TooltipLabelBinding(Binding<String> stringBind) {
+        TooltipLabelBinding(Binding<String> stringBind) {
             tooltipLabel.bindText(stringBind);
         }
 

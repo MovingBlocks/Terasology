@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,32 +19,27 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.FontUnderline;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.utilities.Assets;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -487,13 +482,18 @@ public class UIText extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (!isEnabled())
+        if (!isEnabled()) {
             return DISABLED_MODE;
+        }
         return DEFAULT_MODE;
     }
 
     public boolean isMultiline() {
         return multiline;
+    }
+
+    public void setMultiline(boolean multiline) {
+        this.multiline = multiline;
     }
 
     public boolean isReadOnly() {
@@ -502,10 +502,6 @@ public class UIText extends CoreWidget {
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
-    }
-
-    public void setMultiline(boolean multiline) {
-        this.multiline = multiline;
     }
 
     public void subscribe(ActivateEventListener listener) {
@@ -572,6 +568,10 @@ public class UIText extends CoreWidget {
         return cursorPosition;
     }
 
+    public void setCursorPosition(int position) {
+        setCursorPosition(position, true, true);
+    }
+
     public void setCursorPosition(int position, boolean moveSelectionStart, boolean callEvent) {
         int previousPosition = cursorPosition;
         cursorPosition = position;
@@ -591,10 +591,6 @@ public class UIText extends CoreWidget {
 
     public void setCursorPosition(int position, boolean moveSelectionStart) {
         setCursorPosition(position, moveSelectionStart, true);
-    }
-
-    public void setCursorPosition(int position) {
-        setCursorPosition(position, true, true);
     }
 
     private void correctCursor() {

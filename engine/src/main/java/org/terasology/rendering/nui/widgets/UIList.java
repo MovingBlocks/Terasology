@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,15 +38,13 @@ import java.util.Objects;
  */
 public class UIList<T> extends CoreWidget {
 
-    private Binding<Boolean> selectable = new DefaultBinding<>(true);
-    private Binding<T> selection = new DefaultBinding<>();
-    private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
-
-    private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
-
     private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
+    private Binding<Boolean> selectable = new DefaultBinding<>(true);
+    private Binding<T> selection = new DefaultBinding<>();
+    private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
+    private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 
 
     public UIList() {
@@ -74,8 +72,7 @@ public class UIList<T> extends CoreWidget {
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
-            }
-            else {
+            } else {
                 canvas.setMode(DISABLED_MODE);
             }
 
@@ -116,12 +113,12 @@ public class UIList<T> extends CoreWidget {
         this.list = binding;
     }
 
-    public void setList(List<T> list) {
-        this.list.set(list);
-    }
-
     public List<T> getList() {
         return list.get();
+    }
+
+    public void setList(List<T> list) {
+        this.list.set(list);
     }
 
     public void bindSelectable(Binding<Boolean> binding) {
@@ -199,7 +196,7 @@ public class UIList<T> extends CoreWidget {
     private class ItemInteractionListener extends BaseInteractionListener {
         private int index;
 
-        public ItemInteractionListener(int index) {
+        ItemInteractionListener(int index) {
             this.index = index;
         }
 
