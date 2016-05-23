@@ -40,12 +40,13 @@ import java.util.ArrayList;
 public class DebugMetricsSystem extends BaseComponentSystem {
 
     private final MetricsMode defaultMode = new NullMetricsMode();
-    private CircularToggleSet<MetricsMode> modes;
+    private ArrayList<MetricsMode> modes;
     private MetricsMode currentMode;
+    private int cursor;
 
     @Override
     public void initialise() {
-        modes = new CircularToggleSet<>();
+        modes = new ArrayList<>();
 
         register(defaultMode);
         register(new RunningMeansMode());
@@ -65,12 +66,17 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      */
     public boolean register(MetricsMode mode) {
         Preconditions.checkNotNull(mode, "Illegal argument passed, mode is null.");
-        return modes.add(mode);
+
+        if (!modes.contains(mode)) {
+            return modes.add(mode);
+        } else {
+            return false;
+        }
     }
 
     /**
      * Returns current mode, initializes a default {@link NullMetricsMode}, if currentMode is null
-     * @return current mode
+     * @return the current MetricsMode instance
      */
     public MetricsMode getCurrentMode() {
         return currentMode;
@@ -83,7 +89,8 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      */
     public MetricsMode toggle() {
         do {
-            currentMode = modes.toggle();
+            cursor = (cursor + 1) % modes.size();
+            currentMode = modes.get(cursor);
         } while (!currentMode.isAvailable());
 
         return currentMode;
@@ -93,7 +100,8 @@ public class DebugMetricsSystem extends BaseComponentSystem {
     /**
      * Removes from the set the MetricsMode instance provided as input.
      *
-     * If the MetricsMode instance is the mode currently pointed at by the iterator, toggles the iterator forward.
+     * If the MetricsMode instance is the mode currently pointed at by the iterator, toggles the iterator forward. Unregistering
+     * defaultMode is not allowed, therefore throws {@link IllegalArgumentException}.
      *
      * @return True if the MetricsMode instance was in the set. False otherwise.
      */
@@ -115,45 +123,15 @@ public class DebugMetricsSystem extends BaseComponentSystem {
      */
     public void unregisterAll() {
         modes.clear();
+        cursor = 0;
         register(defaultMode);
         currentMode = defaultMode;
     }
 
     /**
-     * Returns number of registered metrics modes
+     * @return the number of registered modes including defaultMode
      */
     public int getNumberOfModes() {
         return modes.size();
-    }
-
-
-    private class CircularToggleSet<T> {
-        ArrayList<T> container = new ArrayList<>();
-        int cursor;
-
-        public int size() {
-            return container.size();
-        }
-
-        public void clear() {
-            cursor = 0;
-            container.clear();
-        }
-
-        public boolean remove(T mode) {
-            return container.remove(mode);
-        }
-
-        public T toggle() {
-            cursor = (cursor + 1) % size();
-            return container.get(cursor);
-        }
-
-        public boolean add(T mode) {
-            if (!container.contains(mode)) {
-                return container.add(mode);
-            }
-            return false;
-        }
     }
 }
