@@ -31,43 +31,43 @@ import java.util.stream.Collectors;
 
 public class DirectedAcyclicGraph<T> {
 
-    private Map<T, Vertex> objectVertexMap;
-    private Set<Vertex> vertices;
+    private Map<T, Node> objectNodeMap;
+    private Set<Node> nodes;
 
     public DirectedAcyclicGraph() {
-        vertices = new LinkedHashSet<>();
-        objectVertexMap = Maps.newHashMap();
+        nodes = new LinkedHashSet<>();
+        objectNodeMap = Maps.newHashMap();
     }
 
-    public boolean addVertex(T o) {
+    public boolean addNode(T o) {
         Preconditions.checkNotNull(o);
-        if (objectVertexMap.containsKey(o)) {
+        if (objectNodeMap.containsKey(o)) {
             return false;
         }
 
-        Vertex v = new Vertex(o);
-        objectVertexMap.put(o, v);
-        vertices.add(v);
+        Node v = new Node(o);
+        objectNodeMap.put(o, v);
+        nodes.add(v);
 
         return true;
     }
 
     public boolean addEdge(T sourceObject, T targetObject) {
-        assertVertexExists(sourceObject);
-        assertVertexExists(targetObject);
+        assertNodeExists(sourceObject);
+        assertNodeExists(targetObject);
 
-        Vertex sourceVertex = objectVertexMap.get(sourceObject);
-        Vertex targetVertex = objectVertexMap.get(targetObject);
+        Node sourceNode = objectNodeMap.get(sourceObject);
+        Node targetNode = objectNodeMap.get(targetObject);
 
-        if (sourceVertex.hasPrecessor(targetVertex)) {
-            throw new IllegalArgumentException("Vertex " + targetVertex.toString() +
-                    " is already precessor of " + sourceVertex.toString());
+        if (sourceNode.hasPrecessor(targetNode)) {
+            throw new IllegalArgumentException("Node " + targetNode.toString() +
+                    " is already precessor of " + sourceNode.toString());
         }
 
-        sourceVertex.addPrecessor(targetVertex);
+        sourceNode.addPrecessor(targetNode);
 
         if (getTopologicalOrder() == null) {
-            sourceVertex.removePrecessor(targetVertex);
+            sourceNode.removePrecessor(targetNode);
             return false;
         } else {
             return true;
@@ -88,11 +88,11 @@ public class DirectedAcyclicGraph<T> {
     }
 
 
-    private boolean assertVertexExists(T o) {
+    private boolean assertNodeExists(T o) {
         Preconditions.checkNotNull(o);
-        Vertex v = objectVertexMap.get(o);
+        Node v = objectNodeMap.get(o);
 
-        if (v != null && vertices.contains(v)) {
+        if (v != null && nodes.contains(v)) {
             return true;
         } else {
             throw new IllegalArgumentException("No such vertex in graph: " + o.toString());
@@ -102,24 +102,24 @@ public class DirectedAcyclicGraph<T> {
     public static class CycleFoundException extends Exception {
     }
 
-    private final class Vertex {
-        Set<Vertex> precessors;
+    private final class Node {
+        Set<Node> precessors;
         private T object;
 
-        private Vertex(T object) {
+        private Node(T object) {
             this.object = object;
             precessors = new LinkedHashSet<>();
         }
 
-        private boolean hasPrecessor(Vertex precessor) {
+        private boolean hasPrecessor(Node precessor) {
             return precessors.contains(precessor);
         }
 
-        private boolean addPrecessor(Vertex precessor) {
+        private boolean addPrecessor(Node precessor) {
             return precessors.add(precessor);
         }
 
-        private boolean removePrecessor(Vertex precessor) {
+        private boolean removePrecessor(Node precessor) {
             return precessors.remove(precessor);
         }
 
@@ -131,19 +131,19 @@ public class DirectedAcyclicGraph<T> {
 
     private final class TopologicalSorter {
 
-        private Set<Vertex> unexploredSet;
-        private LinkedList<Vertex> sorted;
-        private Set<Vertex> temporarilyVisited;
+        private Set<Node> unexploredSet;
+        private LinkedList<Node> sorted;
+        private Set<Node> temporarilyVisited;
 
         private TopologicalSorter() {
             unexploredSet = Sets.newHashSet();
             temporarilyVisited = Sets.newHashSet();
-            unexploredSet.addAll(vertices);
+            unexploredSet.addAll(nodes);
             sorted = new LinkedList<>();
         }
 
-        private LinkedList<Vertex> sort() throws CycleFoundException {
-            for (Vertex v : vertices) {
+        private LinkedList<Node> sort() throws CycleFoundException {
+            for (Node v : nodes) {
                 if (unexploredSet.contains(v)) {
                     depthFirstSearch(v);
                 }
@@ -151,14 +151,14 @@ public class DirectedAcyclicGraph<T> {
             return sorted;
         }
 
-        private void depthFirstSearch(Vertex v) throws CycleFoundException {
+        private void depthFirstSearch(Node v) throws CycleFoundException {
             if (temporarilyVisited.contains(v)) {
                 throw new CycleFoundException();
             } else {
 
                 temporarilyVisited.add(v);
 
-                for (Vertex p : v.precessors) {
+                for (Node p : v.precessors) {
                     if (unexploredSet.contains(p)) {
                         depthFirstSearch(p);
                     }
