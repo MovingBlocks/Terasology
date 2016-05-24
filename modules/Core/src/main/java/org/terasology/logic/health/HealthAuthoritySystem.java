@@ -171,7 +171,7 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, EntityRef directCause) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
-        bool ghost = false;
+        boolean ghost = false;
         if (characterMovementComponent != null) {
             ghost = (characterMovementComponent.mode == MovementMode.GHOSTING);
         }
