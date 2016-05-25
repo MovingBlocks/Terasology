@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets.models;
 
 import com.google.common.collect.Lists;
-import org.terasology.input.MouseInput;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
@@ -50,23 +49,11 @@ public class TreeViewModel<T> {
     private class TreeItemInteractionListener extends BaseInteractionListener {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                rootNode.setExpanded(!rootNode.isExpanded());
-                return true;
-            }
-            if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                // TODO: open the context menu
-                return true;
-            }
             return false;
         }
 
         @Override
         public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                // TODO: activate the items?
-                return true;
-            }
             return false;
         }
     }

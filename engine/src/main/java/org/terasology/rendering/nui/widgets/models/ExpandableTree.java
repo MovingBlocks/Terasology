@@ -17,7 +17,13 @@ package org.terasology.rendering.nui.widgets.models;
 
 import com.google.common.collect.Lists;
 
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 
 /**
  * A general-purpose tree data structure.
@@ -29,7 +35,7 @@ import java.util.List;
 public class ExpandableTree<T> {
     private static final String NULL_NODE_ARGUMENT = "node argument is null";
     private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
-    
+
     private T value;
     private ExpandableTree<T> parent;
     private List<ExpandableTree<T>> children = Lists.newArrayList();
@@ -40,18 +46,10 @@ public class ExpandableTree<T> {
     }
 
     /**
-     * @param childIndex The index of the child to return.
-     * @return The element at the specified index in this tree.
+     * @return This node's children.
      */
-    public ExpandableTree<T> getChildAt(int childIndex) {
-        return this.children.get(childIndex);
-    }
-
-    /**
-     * @return The amount of this node's children.
-     */
-    public int getChildCount() {
-        return this.children.size();
+    public List<ExpandableTree<T>> getChildren() {
+        return this.children;
     }
 
     /**
@@ -85,6 +83,20 @@ public class ExpandableTree<T> {
      */
     public boolean isRoot() {
         return this.parent == null;
+    }
+
+    /**
+     * Adds a child to this tree.
+     *
+     * @param child The child to be added.
+     */
+    public void addChild(ExpandableTree<T> child) {
+        if (child == null) {
+            throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
+        }
+
+        this.children.add(child);
+        child.setParent(this);
     }
 
     /**
@@ -136,7 +148,6 @@ public class ExpandableTree<T> {
      * @param parent The {@code Tree} the parent of this tree will be set to.
      */
     public void setParent(ExpandableTree<T> parent) {
-        this.parent.removeChild(this);
         this.parent = parent;
     }
 
@@ -166,5 +177,56 @@ public class ExpandableTree<T> {
      */
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
+    }
+
+    /**
+     * @param enumerateExpandedOnly Whether the children of non-expanded elements are excluded from the enumeration.
+     * @return The iterator of this tree in breadth-first order.
+     */
+    public Iterator getBreadthFirstIterator(boolean enumerateExpandedOnly) {
+        return new BreadthFirstIterator(this, enumerateExpandedOnly);
+    }
+
+    public Iterator getBreadthFirstIterator() {
+        return this.getBreadthFirstIterator(false);
+    }
+
+    /**
+     * An iterator of an {@code ExpandableTree} in breadth-first order.
+     */
+    private class BreadthFirstIterator implements Iterator {
+        /**
+         * If true, the children of non-expanded elements will be excluded from iteration.
+         */
+        private boolean enumerateExpandedOnly;
+        private Queue<ExpandableTree> queue = new LinkedList<>();
+
+        public BreadthFirstIterator(ExpandableTree root, boolean enumerateExpandedOnly) {
+            this.queue.add(root);
+            this.enumerateExpandedOnly = enumerateExpandedOnly;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !this.queue.isEmpty();
+        }
+
+        @Override
+        public Object next() {
+            if (!this.hasNext()) {
+                throw new NoSuchElementException("No elements left in the queue (try validating with hasMoreElements?)");
+            }
+            ExpandableTree nextElement = this.queue.remove();
+
+            if (!this.enumerateExpandedOnly || nextElement.isExpanded()) {
+                Enumeration childEnumeration = Collections.enumeration(nextElement.getChildren());
+
+                while (childEnumeration.hasMoreElements()) {
+                    this.queue.add((ExpandableTree) childEnumeration.nextElement());
+                }
+            }
+
+            return nextElement;
+        }
     }
 }
