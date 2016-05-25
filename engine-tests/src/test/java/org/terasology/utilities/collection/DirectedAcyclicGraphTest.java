@@ -15,14 +15,16 @@
  */
 package org.terasology.utilities.collection;
 
-
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class DirectedAcyclicGraphTest {
 
@@ -30,18 +32,18 @@ public class DirectedAcyclicGraphTest {
     public void addTest() {
         DirectedAcyclicGraph<String> dag = new DirectedAcyclicGraph<>();
 
-        dag.addVertex("A");
-        dag.addVertex("B");
-        dag.addVertex("C");
+        dag.addNode("A");
+        dag.addNode("B");
+        dag.addNode("C");
     }
 
     @Test
     public void addPrecessorTest() {
         DirectedAcyclicGraph<String> dag = new DirectedAcyclicGraph<>();
 
-        assertTrue(dag.addVertex("A"));
-        assertTrue(dag.addVertex("B"));
-        assertTrue(dag.addVertex("C"));
+        assertTrue(dag.addNode("A"));
+        assertTrue(dag.addNode("B"));
+        assertTrue(dag.addNode("C"));
 
         dag.addEdge("B", "A");
         dag.addEdge("C", "A");
@@ -51,9 +53,9 @@ public class DirectedAcyclicGraphTest {
     public void addPrecessorTest2() {
         DirectedAcyclicGraph<String> dag = new DirectedAcyclicGraph<>();
 
-        assertTrue(dag.addVertex("A"));
-        assertTrue(dag.addVertex("B"));
-        assertTrue(dag.addVertex("C"));
+        assertTrue(dag.addNode("A"));
+        assertTrue(dag.addNode("B"));
+        assertTrue(dag.addNode("C"));
 
         dag.addEdge("A", "B");
         dag.addEdge("A", "C");
@@ -66,13 +68,12 @@ public class DirectedAcyclicGraphTest {
         dag.addEdge("C", "A");
     }
 
-
     @Test
     public void cyclicCheckTest() {
         DirectedAcyclicGraph<String> dag = new DirectedAcyclicGraph<>();
 
-        dag.addVertex("A");
-        dag.addVertex("B");
+        dag.addNode("A");
+        dag.addNode("B");
 
         assertTrue(dag.addEdge("A", "B"));
         assertFalse(dag.addEdge("B", "A"));
@@ -83,7 +84,7 @@ public class DirectedAcyclicGraphTest {
         DirectedAcyclicGraph<Integer> dag = new DirectedAcyclicGraph<>();
         List<Integer> list = Lists.newArrayList(1, 2, 3, 4);
         for (Integer i : list) {
-            assertTrue(dag.addVertex(i));
+            assertTrue(dag.addNode(i));
         }
 
         assertTrue(dag.addEdge(1, 2));
@@ -102,7 +103,7 @@ public class DirectedAcyclicGraphTest {
         DirectedAcyclicGraph<Integer> dag = new DirectedAcyclicGraph<>();
         List<Integer> list = Lists.newArrayList(1, 2, 3, 4);
         for (Integer i : list) {
-            assertTrue(dag.addVertex(i));
+            assertTrue(dag.addNode(i));
         }
 
         assertTrue(dag.addEdge(1, 2));
