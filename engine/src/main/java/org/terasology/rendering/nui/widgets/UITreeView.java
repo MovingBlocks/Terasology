@@ -19,20 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
-import org.terasology.rendering.nui.widgets.models.TreeViewModel;
-
-import java.util.List;
+import org.terasology.rendering.nui.widgets.models.Tree;
+import org.terasology.rendering.nui.widgets.models.TreeModel;
 
 /**
  *
@@ -41,24 +35,11 @@ public class UITreeView<T> extends CoreWidget {
     private static final Logger logger = LoggerFactory.getLogger(UITreeView.class);
     private static final String TREE = "tree";
 
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
-
-    private Binding<TreeViewModel<T>> model = new DefaultBinding<>(new TreeViewModel<T>());
-    private Binding<T> selection = new DefaultBinding<>();
-
+    private Binding<Integer> indentation = new DefaultBinding<>(25);
+    private Binding<TreeModel> model = new DefaultBinding<>(new TreeModel<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 
-    private InteractionListener mainListener = new BaseInteractionListener() {
-        @Override
-        public boolean onMouseClick(NUIMouseClickEvent event) {
-            logger.info("mainListener");
-            return false;
-        }
-    };
-
     public UITreeView() {
-
     }
 
     public UITreeView(String id) {
@@ -68,18 +49,23 @@ public class UITreeView<T> extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         canvas.setPart(TREE);
-        List<T> items = model.get().getItems(true);
 
         int yOffset = 0;
-        for (int i = 0; i < items.size(); i++) {
-            T item = items.get(i);
+        for (int i = 0; i < model.get().getElementCount(); i++) {
+            Tree<T> item = model.get().getElement(i);
+            TreeModel.TreeInteractionListener listener = model.get().getListener(i);
+            if (listener.isMouseOver()) {
+                canvas.setMode(HOVER_MODE);
+            } else {
+                canvas.setMode(DEFAULT_MODE);
+            }
 
-            Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
+            Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item.getValue(), canvas));
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(indentation.get() * item.getDepth(), yOffset, canvas.size().x, preferredSize.y);
             canvas.drawBackground(itemRegion);
 
-            itemRenderer.draw(item, canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
-            canvas.addInteractionRegion(new ItemInteractionListener(), itemRenderer.getTooltip(item), itemRegion);
+            itemRenderer.draw(item.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
+            canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item.getValue()), itemRegion);
 
             yOffset += preferredSize.getY();
         }
@@ -88,32 +74,25 @@ public class UITreeView<T> extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         canvas.setPart(TREE);
-        List<T> items = model.get().getItems(false);
 
         Vector2i result = new Vector2i();
-        for (T item : items) {
-            Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
+        model.get().setEnumerateExpandedOnly(false);
+        for (int i = 0; i < model.get().getElementCount(); i++) {
+            Tree<T> item = model.get().getElement(i);
+
+            Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item.getValue(), canvas));
             result.x = Math.max(result.x, preferredSize.x);
             result.y += preferredSize.y;
         }
+        model.get().setEnumerateExpandedOnly(true);
         return result;
     }
 
-    public void setModel(TreeViewModel<T> model) {
-        this.model.set(model);
+    public void setModel(Tree<T> root) {
+        this.setModel(new TreeModel<T>(root));
     }
 
-    private class ItemInteractionListener extends BaseInteractionListener {
-        @Override
-        public boolean onMouseClick(NUIMouseClickEvent event) {
-            logger.info("itemListener mouseClick");
-            return false;
-        }
-
-        @Override
-        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
-            logger.info("itemListener mouseDoubleClick");
-            return false;
-        }
+    public void setModel(TreeModel<T> model) {
+        this.model.set(model);
     }
 }

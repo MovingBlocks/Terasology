@@ -17,13 +17,13 @@ package org.terasology.rendering.nui.widgets.models;
 
 import com.google.common.collect.Lists;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Queue;
 
 /**
  * A general-purpose tree data structure.
@@ -32,34 +32,35 @@ import java.util.Queue;
  *
  * @param <T> Type of objects stored in the tree.
  */
-public class ExpandableTree<T> {
+public class Tree<T> {
     private static final String NULL_NODE_ARGUMENT = "node argument is null";
     private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
+    private static final String ITERATOR_NO_ELEMENTS = "no elements left (try validating with hasNext?)";
 
     private T value;
-    private ExpandableTree<T> parent;
-    private List<ExpandableTree<T>> children = Lists.newArrayList();
+    private Tree<T> parent;
+    private List<Tree<T>> children = Lists.newArrayList();
     private boolean expanded;
 
-    public ExpandableTree() {
+    public Tree() {
         this(null);
     }
 
-    public ExpandableTree(T value) {
+    public Tree(T value) {
         this.value = value;
     }
 
     /**
      * @return This node's children.
      */
-    public List<ExpandableTree<T>> getChildren() {
+    public List<Tree<T>> getChildren() {
         return this.children;
     }
 
     /**
      * @return This node's parent, or null if the node is a root.
      */
-    public ExpandableTree<T> getParent() {
+    public Tree<T> getParent() {
         return this.parent;
     }
 
@@ -67,7 +68,7 @@ public class ExpandableTree<T> {
      * @param node The node the index of which is to be returned.
      * @return The index of the specified node.
      */
-    public int getIndex(ExpandableTree<T> node) {
+    public int getIndex(Tree<T> node) {
         if (node == null) {
             throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
         }
@@ -90,11 +91,37 @@ public class ExpandableTree<T> {
     }
 
     /**
+     * @return The root of the tree this tree is a member of.
+     */
+    public Tree<T> getRoot() {
+        if (this.isRoot()) {
+            return this;
+        }
+
+        return this.parent.getRoot();
+    }
+
+    /**
+     * @return The depth of this node relative to the root node of its' tree.
+     */
+    public int getDepth() {
+        return this.getRecursiveDepth(0);
+    }
+
+    private int getRecursiveDepth(int currentDepth) {
+        if (this.isRoot()) {
+            return currentDepth;
+        }
+
+        return this.parent.getRecursiveDepth(currentDepth + 1);
+    }
+
+    /**
      * Adds a child to this tree.
      *
      * @param child The child to be added.
      */
-    public void addChild(ExpandableTree<T> child) {
+    public void addChild(Tree<T> child) {
         if (child == null) {
             throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
         }
@@ -109,7 +136,7 @@ public class ExpandableTree<T> {
      * @param childIndex The index of the child to be added.
      * @param child      The child to be added.
      */
-    public void addChild(int childIndex, ExpandableTree<T> child) {
+    public void addChild(int childIndex, Tree<T> child) {
         if (child == null) {
             throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
         }
@@ -124,7 +151,7 @@ public class ExpandableTree<T> {
      * @param childIndex The index of the child to be removed.
      */
     public void removeChild(int childIndex) {
-        ExpandableTree<T> child = this.children.remove(childIndex);
+        Tree<T> child = this.children.remove(childIndex);
         child.setParent(null);
     }
 
@@ -134,7 +161,7 @@ public class ExpandableTree<T> {
      *
      * @param child The child to be removed.
      */
-    public void removeChild(ExpandableTree<T> child) {
+    public void removeChild(Tree<T> child) {
         if (child == null) {
             throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
         }
@@ -151,7 +178,7 @@ public class ExpandableTree<T> {
      *
      * @param parent The {@code Tree} the parent of this tree will be set to.
      */
-    public void setParent(ExpandableTree<T> parent) {
+    public void setParent(Tree<T> parent) {
         this.parent = parent;
     }
 
@@ -185,52 +212,77 @@ public class ExpandableTree<T> {
 
     /**
      * @param enumerateExpandedOnly Whether the children of non-expanded elements are excluded from the enumeration.
-     * @return The iterator of this tree in breadth-first order.
+     * @return The iterator of this tree in depth-first, pre-ordered order.
      */
-    public Iterator getBreadthFirstIterator(boolean enumerateExpandedOnly) {
-        return new BreadthFirstIterator(this, enumerateExpandedOnly);
-    }
-
-    public Iterator getBreadthFirstIterator() {
-        return this.getBreadthFirstIterator(false);
+    public Iterator getDepthFirstIterator(boolean enumerateExpandedOnly) {
+        return new DepthFirstIterator(this, enumerateExpandedOnly);
     }
 
     /**
-     * An iterator of an {@code ExpandableTree} in breadth-first order.
+     * An iterator of an {@code ExpandableTree} in depth-first, pre-ordered order.
      */
-    private class BreadthFirstIterator implements Iterator {
+    private class DepthFirstIterator implements Iterator {
         /**
          * If true, the children of non-expanded elements will be excluded from iteration.
          */
         private boolean enumerateExpandedOnly;
-        private Queue<ExpandableTree> queue = new LinkedList<>();
+        private Tree<T> next;
+        private Deque<Enumeration> stack = new ArrayDeque<>();
 
-        public BreadthFirstIterator(ExpandableTree root, boolean enumerateExpandedOnly) {
-            this.queue.add(root);
+        public DepthFirstIterator(Tree root, boolean enumerateExpandedOnly) {
             this.enumerateExpandedOnly = enumerateExpandedOnly;
+            this.next = root;
+
+            if (!enumerateExpandedOnly || root.isExpanded()) {
+                this.stack.push(Collections.enumeration(root.getChildren()));
+            }
         }
 
         @Override
         public boolean hasNext() {
-            return !this.queue.isEmpty();
+            return this.next != null;
         }
 
         @Override
         public Object next() {
             if (!this.hasNext()) {
-                throw new NoSuchElementException("No elements left in the queue (try validating with hasMoreElements?)");
+                throw new NoSuchElementException(ITERATOR_NO_ELEMENTS);
             }
-            ExpandableTree nextElement = this.queue.remove();
 
-            if (!this.enumerateExpandedOnly || nextElement.isExpanded()) {
-                Enumeration childEnumeration = Collections.enumeration(nextElement.getChildren());
+            Tree<T> current = next;
 
-                while (childEnumeration.hasMoreElements()) {
-                    this.queue.add((ExpandableTree) childEnumeration.nextElement());
+            Enumeration childEnumeration = stack.peek();
+
+            // Retrieve the next element.
+            next = traverse(childEnumeration);
+
+            return current;
+        }
+
+        private Tree<T> traverse(Enumeration childEnumeration) {
+            // Handle the root object being non-expanded
+            if (childEnumeration == null) {
+                return null;
+            }
+
+            if (childEnumeration.hasMoreElements()) {
+                Tree<T> child = (Tree<T>) childEnumeration.nextElement();
+
+                // If the child is expanded, iterate through its' children as well
+                if (!enumerateExpandedOnly || child.isExpanded()) {
+                    stack.push(Collections.enumeration(child.getChildren()));
                 }
+
+                return child;
             }
 
-            return nextElement;
+            // If a higher level is available, return to it
+            stack.pop();
+            if (stack.isEmpty()) {
+                return null;
+            } else {
+                return traverse(stack.peek());
+            }
         }
     }
 }

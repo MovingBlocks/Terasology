@@ -4,7 +4,7 @@
     "contents": {
         "type": "migLayout",
         "layoutConstraints": "",
-        "colConstraints": "[min][pref][min][pref][grow]",
+        "colConstraints": "[min][pref]",
         "rowConstraints": "[min]",
         "debug": true,
         "contents": [
@@ -12,22 +12,6 @@
                 "type": "UILabel",
                 "id": "",
                 "text": "",
-                "layoutInfo": {
-                    "cc": ""
-                }
-            },
-            {
-                "type": "UILabel",
-                "id": "",
-                "text": "disabled",
-                "layoutInfo": {
-                    "cc": ""
-                }
-            },
-            {
-                "type": "UILabel",
-                "id": "",
-                "text": "min",
                 "layoutInfo": {
                     "cc": ""
                 }
@@ -43,14 +27,6 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "grow",
-                "layoutInfo": {
-                    "cc": "grow"
-                }
-            },
-            {
-                "type": "UILabel",
-                "id": "",
                 "text": "UITreeView",
                 "layoutInfo": {
                     "cc": "newline"
@@ -58,31 +34,9 @@
             },
             {
                 "type": "UITreeView",
-                "id": "treeView1",
+                "id": "treeView",
                 "layoutInfo": {
                     "cc": ""
-                },
-                "enabled": false
-            },
-            {
-                "type": "UITreeView",
-                "id": "treeView2",
-                "layoutInfo": {
-                    "cc": "w min, h min"
-                }
-            },
-            {
-                "type": "UITreeView",
-                "id": "treeView3",
-                "layoutInfo": {
-                    "cc": ""
-                }
-            },
-            {
-                "type": "UITreeView",
-                "id": "treeView4",
-                "layoutInfo": {
-                    "cc": "grow"
                 }
             }
         ]

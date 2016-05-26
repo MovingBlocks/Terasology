@@ -26,13 +26,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class ExpandableTreeTest {
-    private List<ExpandableTree<Integer>> nodes = Lists.newArrayList();
+public class TreeTest {
+    private List<Tree<Integer>> nodes = Lists.newArrayList();
 
     @Before
     public void setup() {
         for (int i = 0; i <= 10; i++) {
-            nodes.add(new ExpandableTree<>(i));
+            nodes.add(new Tree<>(i));
         }
 
         /**
@@ -60,6 +60,10 @@ public class ExpandableTreeTest {
         nodes.get(5).addChild(nodes.get(6));
         nodes.get(5).addChild(nodes.get(9));
         nodes.get(9).addChild(nodes.get(10));
+
+        nodes.get(0).setExpanded(true);
+        nodes.get(1).setExpanded(true);
+        nodes.get(5).setExpanded(true);
     }
 
     @Test
@@ -76,38 +80,34 @@ public class ExpandableTreeTest {
     }
 
     @Test
-    public void getBreadthFirstEnumeration() {
-        List<ExpandableTree<Integer>> expected = Arrays.asList(nodes.get(0),
-                nodes.get(1), nodes.get(4), nodes.get(5),
-                nodes.get(2), nodes.get(8), nodes.get(6), nodes.get(9),
-                nodes.get(3), nodes.get(7), nodes.get(10)
-        );
+    public void getDepthFirstIterator() {
+        List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3), nodes.get(7), nodes.get(4), nodes.get(8), nodes.get(5), nodes.get(6), nodes.get(9), nodes.get(10));
 
-        List<ExpandableTree<Integer>> actual = Lists.newArrayList();
-        Iterator i = nodes.get(0).getBreadthFirstIterator();
+        List<Tree<Integer>> actual = Lists.newArrayList();
+        Iterator i = nodes.get(0).getDepthFirstIterator(false);
         while (i.hasNext()) {
-            actual.add((ExpandableTree<Integer>) i.next());
+            actual.add((Tree<Integer>) i.next());
         }
         assertEquals(expected, actual);
     }
 
     @Test
-    public void getBreadthFirstEnumerationExpanded() {
-        List<ExpandableTree<Integer>> expandedNodes = this.nodes;
-        expandedNodes.get(0).setExpanded(true);
-        expandedNodes.get(1).setExpanded(true);
-        expandedNodes.get(5).setExpanded(true);
+    public void getDepthFirstIteratorExpanded() {
+        List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(4), nodes.get(5), nodes.get(6), nodes.get(9));
 
-        List<ExpandableTree<Integer>> expected = Arrays.asList(expandedNodes.get(0),
-                expandedNodes.get(1), expandedNodes.get(4), expandedNodes.get(5),
-                expandedNodes.get(2), expandedNodes.get(6), expandedNodes.get(9)
-        );
-
-        List<ExpandableTree<Integer>> actual = Lists.newArrayList();
-        Iterator i = expandedNodes.get(0).getBreadthFirstIterator(true);
+        List<Tree<Integer>> actual = Lists.newArrayList();
+        Iterator i = nodes.get(0).getDepthFirstIterator(true);
         while (i.hasNext()) {
-            actual.add((ExpandableTree<Integer>) i.next());
+            actual.add((Tree<Integer>) i.next());
         }
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void getDepth() {
+        assertEquals(0, nodes.get(0).getDepth());
+        assertEquals(1, nodes.get(1).getDepth());
+        assertEquals(2, nodes.get(8).getDepth());
+        assertEquals(3, nodes.get(10).getDepth());
     }
 }

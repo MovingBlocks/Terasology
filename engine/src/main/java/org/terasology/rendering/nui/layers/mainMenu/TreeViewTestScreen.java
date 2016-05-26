@@ -18,17 +18,16 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.collect.Lists;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UITreeView;
-import org.terasology.rendering.nui.widgets.models.ExpandableTree;
-import org.terasology.rendering.nui.widgets.models.TreeViewModel;
+import org.terasology.rendering.nui.widgets.models.Tree;
 
 import java.util.List;
 
 public class TreeViewTestScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
-        List<ExpandableTree<Integer>> nodes = Lists.newArrayList();
+        List<Tree<String>> nodes = Lists.newArrayList();
         for (int i = 0; i <= 10; i++) {
-            nodes.add(new ExpandableTree<>(i));
+            nodes.add(new Tree<>("Item " + i));
         }
 
         /**
@@ -57,11 +56,11 @@ public class TreeViewTestScreen extends CoreScreenLayer {
         nodes.get(5).addChild(nodes.get(9));
         nodes.get(9).addChild(nodes.get(10));
 
-        TreeViewModel<Integer> model = new TreeViewModel(nodes.get(0));
+        nodes.get(0).setExpanded(true);
+        nodes.get(1).setExpanded(true);
+        nodes.get(5).setExpanded(true);
 
-        for (String id : new String[]{"treeView1", "treeView2", "treeView3", "treeView4"}) {
-            find(id, UITreeView.class).setModel(model);
-        }
+        find("treeView", UITreeView.class).setModel(nodes.get(0));
     }
 
     @Override
