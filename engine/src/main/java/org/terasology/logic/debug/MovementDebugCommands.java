@@ -31,6 +31,11 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.logic.location.Location;
+import org.terasology.logic.location.LocationComponent;
 
 import java.util.Optional;
 
@@ -55,6 +60,25 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Flight mode toggled";
     }
 
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+        ClientComponent clientComp = sender.getComponent(ClientComponent.class);
+        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
+
+        if (location != null) {
+            // deactivate the character to reset the CharacterPredictionSystem,
+            // which would overwrite the character location
+            clientComp.character.send(BeforeDeactivateComponent.newInstance());
+
+            location.setWorldPosition(new Vector3f(x, y, z));
+            clientComp.character.saveComponent(location);
+
+            // re-active the character
+            clientComp.character.send(OnActivatedComponent.newInstance());
+        }
+        return "Teleported to " + x + " " + y + " " + z;
+    }
 
     @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)

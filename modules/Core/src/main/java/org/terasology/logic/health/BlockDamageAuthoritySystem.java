@@ -148,14 +148,14 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onAttackHealthlessBlock(AttackEvent event, EntityRef targetEntity, BlockComponent blockComponent) {
         if (!targetEntity.hasComponent(HealthComponent.class)) {
-            HealthAuthoritySystem.damageEntity(event, targetEntity);
+            HealthClientSystem.damageEntity(event, targetEntity);
         }
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onAttackHealthlessActAsBlock(AttackEvent event, EntityRef targetEntity, ActAsBlockComponent actAsBlockComponent) {
         if (!targetEntity.hasComponent(HealthComponent.class)) {
-            HealthAuthoritySystem.damageEntity(event, targetEntity);
+            HealthClientSystem.damageEntity(event, targetEntity);
         }
     }
 
