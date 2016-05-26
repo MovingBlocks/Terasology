@@ -41,6 +41,10 @@ public class ExpandableTree<T> {
     private List<ExpandableTree<T>> children = Lists.newArrayList();
     private boolean expanded;
 
+    public ExpandableTree() {
+        this(null);
+    }
+
     public ExpandableTree(T value) {
         this.value = value;
     }

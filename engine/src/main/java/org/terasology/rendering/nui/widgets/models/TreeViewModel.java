@@ -15,16 +15,17 @@
  */
 package org.terasology.rendering.nui.widgets.models;
 
-import com.google.common.collect.Lists;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
+import com.google.api.client.util.Lists;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class TreeViewModel<T> {
     private ExpandableTree<T> rootNode;
-    private final List<TreeItemInteractionListener> treeItemListeners = Lists.newArrayList();
+
+    public TreeViewModel() {
+        this(new ExpandableTree<T>());
+    }
 
     public TreeViewModel(ExpandableTree<T> rootNode) {
         this.rootNode = rootNode;
@@ -38,23 +39,14 @@ public class TreeViewModel<T> {
         this.rootNode = rootNode;
     }
 
-    public void subscribe(TreeItemInteractionListener eventListener) {
-        this.treeItemListeners.add(eventListener);
-    }
+    public List<T> getItems(boolean enumerateExpandedOnly) {
+        Iterator it = rootNode.getBreadthFirstIterator(enumerateExpandedOnly);
+        List<T> elements = Lists.newArrayList();
 
-    public void unsubscribe(TreeItemInteractionListener eventListener) {
-        this.treeItemListeners.remove(eventListener);
-    }
-
-    private class TreeItemInteractionListener extends BaseInteractionListener {
-        @Override
-        public boolean onMouseClick(NUIMouseClickEvent event) {
-            return false;
+        while (it.hasNext()) {
+            elements.add(((ExpandableTree<T>) it.next()).getValue());
         }
 
-        @Override
-        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
-            return false;
-        }
+        return elements;
     }
 }
