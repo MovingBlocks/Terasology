@@ -16,10 +16,9 @@
 
 package org.terasology.persistence;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Tests the {@link TemplateEngineImpl} class.
@@ -27,7 +26,7 @@ import com.google.common.collect.ImmutableMap;
 public class TemplateEngineTest {
 
     @Test
-    public void simpleTest() {
+    public void testSimple() {
         TemplateEngineImpl engine = new TemplateEngineImpl(text -> "bla");
 
         Assert.assertEquals("I like bla!", engine.transform("I like ${text}!"));

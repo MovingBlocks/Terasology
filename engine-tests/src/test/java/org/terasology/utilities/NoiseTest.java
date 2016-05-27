@@ -16,9 +16,6 @@
 
 package org.terasology.utilities;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +30,11 @@ import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 /**
  * A few tests for different {@link Noise} implementations.
- *
  */
 @RunWith(Parameterized.class)
 public class NoiseTest {
@@ -51,11 +50,11 @@ public class NoiseTest {
     @Parameters(name = "{0}")
     public static Collection<Noise[]> data() {
         return Arrays.asList(new Noise[][]{
-                {new WhiteNoise(0xCAFE) },
-                {new DiscreteWhiteNoise(0xCAFE) },
-                {new SimplexNoise(0xCAFE) },
-                {new PerlinNoise(0xCAFE) },
-                {new BrownianNoise(new WhiteNoise(0xCAFE), 3) }
+                {new WhiteNoise(0xCAFE)},
+                {new DiscreteWhiteNoise(0xCAFE)},
+                {new SimplexNoise(0xCAFE)},
+                {new PerlinNoise(0xCAFE)},
+                {new BrownianNoise(new WhiteNoise(0xCAFE), 3)}
         });
     }
 
@@ -81,14 +80,14 @@ public class NoiseTest {
         }
 
         Assert.assertTrue(min >= -1);
-        Assert.assertTrue(max <=  1);
+        Assert.assertTrue(max <= 1);
 
         Assert.assertEquals(-1, min, 0.05);
         Assert.assertEquals(1, max, 0.05);
     }
 
     @Test
-    public void resolutionTest() {
+    public void testResolution() {
 
         for (int i = 0; i < 1000000; i++) {
             float posX = rng.nextFloat() * 100f;

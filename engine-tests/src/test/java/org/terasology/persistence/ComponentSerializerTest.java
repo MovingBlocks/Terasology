@@ -57,6 +57,7 @@ public class ComponentSerializerTest {
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
     private Context context;
+
     @BeforeClass
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();

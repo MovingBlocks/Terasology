@@ -83,7 +83,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void unblockedSunlightRegenPropagation() {
+    public void testUnblockedSunlightRegenPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
@@ -94,7 +94,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void blockedSunlightRegenPropagationResets() {
+    public void testBlockedSunlightRegenPropagationResets() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 60, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
@@ -115,7 +115,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void blockedAtTopSunlightRegenPropagationResets() {
+    public void testBlockedAtTopSunlightRegenPropagationResets() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 63, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
@@ -129,7 +129,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void unblockedSunlightPropagationAfterHittingMaxRegen() {
+    public void testUnblockedSunlightPropagationAfterHittingMaxRegen() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
@@ -146,7 +146,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void blockedSunlightPropagation() {
+    public void testBlockedSunlightPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
@@ -160,7 +160,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void unblockedSunlightPropagation() {
+    public void testUnblockedSunlightPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
@@ -171,7 +171,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void horizontalSunlightPropagation() {
+    public void testHorizontalSunlightPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
@@ -192,7 +192,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void lightPropagation() {
+    public void testLightPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, biomeManager);
         chunk.setBlock(16, 32, 16, fullLight);
 

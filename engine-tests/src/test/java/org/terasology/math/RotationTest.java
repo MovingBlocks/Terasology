@@ -15,11 +15,10 @@
  */
 package org.terasology.math;
 
+import com.google.common.collect.Iterables;
 import org.junit.Test;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-
-import com.google.common.collect.Iterables;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,12 +27,12 @@ import static org.junit.Assert.assertEquals;
 public class RotationTest {
 
     @Test
-    public void rotateSideNone() {
+    public void testRotateSideNone() {
         assertEquals(Side.LEFT, Rotation.none().rotate(Side.LEFT));
     }
 
     @Test
-    public void rotateSideYaw() {
+    public void testRotateSideYaw() {
         Rotation rotation = Rotation.rotate(Yaw.CLOCKWISE_90);
         Quat4f rot = rotation.getQuat4f();
         Vector3f dir = rot.rotate(Side.FRONT.toDirection().getVector3f(), new Vector3f());
@@ -44,7 +43,7 @@ public class RotationTest {
     }
 
     @Test
-    public void rotateSidePitch() {
+    public void testRotateSidePitch() {
         Rotation rotation = Rotation.rotate(Pitch.CLOCKWISE_90);
         Quat4f rot = rotation.getQuat4f();
         Vector3f dir = rot.rotate(Side.FRONT.toDirection().getVector3f(), new Vector3f());
@@ -55,7 +54,7 @@ public class RotationTest {
     }
 
     @Test
-    public void rotateSideRoll() {
+    public void testRotateSideRoll() {
         Rotation rotation = Rotation.rotate(Roll.CLOCKWISE_90);
         Quat4f rot = rotation.getQuat4f();
         Vector3f dir = rot.rotate(Side.TOP.toDirection().getVector3f(), new Vector3f());
@@ -66,7 +65,7 @@ public class RotationTest {
     }
 
     @Test
-    public void rotateMixed() {
+    public void testRotateMixed() {
         Rotation rotation = Rotation.rotate(Yaw.CLOCKWISE_180, Pitch.CLOCKWISE_90, Roll.CLOCKWISE_90);
         Quat4f rot = rotation.getQuat4f();
         Vector3f dir = rot.rotate(Side.FRONT.toDirection().getVector3f(), new Vector3f());
@@ -74,13 +73,13 @@ public class RotationTest {
     }
 
     @Test
-    public void allRotations() {
+    public void testAllRotations() {
         assertEquals(24, Iterables.size(Rotation.values()));
         assertEquals(64, Iterables.size(Rotation.allValues()));
     }
 
     @Test
-    public void reverseRotation() {
+    public void testReverseRotation() {
         for (Rotation rotation : Rotation.allValues()) {
             Rotation reverseRotation = Rotation.findReverse(rotation);
             for (Side side : Side.values()) {

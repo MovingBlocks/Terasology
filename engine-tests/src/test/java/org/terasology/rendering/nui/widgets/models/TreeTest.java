@@ -67,20 +67,20 @@ public class TreeTest {
     }
 
     @Test
-    public void getParent() {
+    public void testGetParent() {
         assertNull(nodes.get(0).getParent());
         assertEquals(nodes.get(0), nodes.get(4).getParent());
         assertEquals(nodes.get(9), nodes.get(10).getParent());
     }
 
     @Test
-    public void getChildren() {
+    public void testGetChildren() {
         assertEquals(Lists.newArrayList(), nodes.get(10).getChildren());
         assertEquals(Arrays.asList(nodes.get(6), nodes.get(9)), nodes.get(5).getChildren());
     }
 
     @Test
-    public void getDepthFirstIterator() {
+    public void testDepthFirstIterator() {
         List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3), nodes.get(7), nodes.get(4), nodes.get(8), nodes.get(5), nodes.get(6), nodes.get(9), nodes.get(10));
 
         List<Tree<Integer>> actual = Lists.newArrayList();
@@ -92,7 +92,7 @@ public class TreeTest {
     }
 
     @Test
-    public void getDepthFirstIteratorExpanded() {
+    public void testDepthFirstIteratorIterateExpandedOnly() {
         List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(4), nodes.get(5), nodes.get(6), nodes.get(9));
 
         List<Tree<Integer>> actual = Lists.newArrayList();
@@ -104,7 +104,7 @@ public class TreeTest {
     }
 
     @Test
-    public void getDepth() {
+    public void testNodeDepth() {
         assertEquals(0, nodes.get(0).getDepth());
         assertEquals(1, nodes.get(1).getDepth());
         assertEquals(2, nodes.get(8).getDepth());

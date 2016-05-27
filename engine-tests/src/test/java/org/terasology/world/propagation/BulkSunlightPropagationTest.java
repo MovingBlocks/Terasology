@@ -89,7 +89,7 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void allowSunlightVertical() {
+    public void testAllowSunlightVertical() {
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
             regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
             lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
@@ -115,7 +115,7 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void stopSunlightVertical() {
+    public void testStopSunlightVertical() {
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
             regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
             lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);

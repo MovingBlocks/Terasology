@@ -26,13 +26,13 @@ import static org.junit.Assert.assertEquals;
 public class ChunkMathTest {
 
     @Test
-    public void getEdgeRegion() {
+    public void testGetEdgeRegion() {
         Region3i region = Region3i.createFromMinAndSize(new Vector3i(16, 0, 16), new Vector3i(16, 128, 16));
         assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), ChunkMath.getEdgeRegion(region, Side.LEFT));
     }
 
     @Test
-    public void regionPositions() {
+    public void testRegionPositions() {
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, new Config());
 

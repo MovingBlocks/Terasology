@@ -332,7 +332,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void allComponentsNotMarkedAsRetainedRemovedOnBlockChange() {
+    public void testAllComponentsNotMarkedAsRetainedRemovedOnBlockChange() {
         worldStub.setBlock(Vector3i.zero(), blockWithString);
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new ForceBlockActiveComponent());
@@ -345,7 +345,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void retainedComponentsNotAltered() {
+    public void testRetainedComponentsNotAltered() {
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
@@ -355,7 +355,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void networkComponentAddedWhenChangedToNonTemporary() {
+    public void testMetworkComponentAddedWhenChangedToNonTemporary() {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
@@ -366,7 +366,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void networkComponentRemovedWhenTemporaryCleanedUp() {
+    public void testNetworkComponentRemovedWhenTemporaryCleanedUp() {
         EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
@@ -380,7 +380,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void componentsNotAlteredIfBlockInSameFamily() {
+    public void testComponentsNotAlteredIfBlockInSameFamily() {
         worldProvider.setBlock(Vector3i.zero(), blockInFamilyOne);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         entity.addComponent(new IntegerComponent());
@@ -389,7 +389,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void componentsAlteredIfBlockInSameFamilyWhenForced() {
+    public void testComponentsAlteredIfBlockInSameFamilyWhenForced() {
         worldProvider.setBlock(Vector3i.zero(), blockInFamilyOne);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         entity.addComponent(new IntegerComponent());
@@ -398,7 +398,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void componentUntouchedIfRetainRequested() {
+    public void testComponentUntouchedIfRetainRequested() {
         worldProvider.setBlock(Vector3i.zero(), blockInFamilyOne);
         EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
         entity.addComponent(new IntegerComponent());

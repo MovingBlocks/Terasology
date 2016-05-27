@@ -152,7 +152,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void getUnstoredPlayerReturnsNewStor() {
+    public void testGetUnstoredPlayerReturnsNewStor() {
         PlayerStore store = esm.loadPlayerStore(PLAYER_ID);
         assertNotNull(store);
         assertEquals(new Vector3f(), store.getRelevanceLocation());
@@ -161,7 +161,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void storeAndRestoreOfPlayerWithoutCharacter() {
+    public void testStoreAndRestoreOfPlayerWithoutCharacter() {
         // remove character from player:
         character.destroy();
 
@@ -175,7 +175,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void playerRelevanceLocationSurvivesStorage() {
+    public void testPlayerRelevanceLocationSurvivesStorage() {
         Vector3f loc = new Vector3f(1, 2, 3);
         character.addComponent(new LocationComponent(loc));
 
@@ -187,7 +187,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void characterSurvivesStorage() {
+    public void testCharacterSurvivesStorage() {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
@@ -198,7 +198,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void globalEntitiesStoredAndRestored() throws Exception {
+    public void testGlobalEntitiesStoredAndRestored() throws Exception {
         EntityRef entity = entityManager.create(new StringComponent("Test"));
         long entityId = entity.getId();
 
@@ -220,7 +220,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void referenceRemainsValidOverStorageRestoral() throws Exception {
+    public void testReferenceRemainsValidOverStorageRestoral() throws Exception {
         EntityRef someEntity = entityManager.create();
         character.addComponent(new EntityRefComponent(someEntity));
 
@@ -230,7 +230,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,  blockManager,
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
                 biomeManager, false);
         newSM.loadGlobalStore();
 
@@ -240,12 +240,12 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void getUnstoredChunkReturnsNothing() {
+    public void testGetUnstoredChunkReturnsNothing() {
         esm.loadChunkStore(CHUNK_POS);
     }
 
     @Test
-    public void storeAndRestoreChunkStore() {
+    public void testStoreAndRestoreChunkStore() {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, biomeManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
@@ -264,7 +264,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void chunkSurvivesStorageSaveAndRestore() throws Exception {
+    public void testChunkSurvivesStorageSaveAndRestore() throws Exception {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, biomeManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
@@ -295,7 +295,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void entitySurvivesStorageInChunkStore() throws Exception {
+    public void testEntitySurvivesStorageInChunkStore() throws Exception {
         Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, biomeManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
@@ -317,7 +317,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
-        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager,  blockManager,
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
                 biomeManager, false);
         newSM.loadGlobalStore();
 
@@ -330,7 +330,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void canSavePlayerWithoutUnloading() throws Exception {
+    public void testCanSavePlayerWithoutUnloading() throws Exception {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 

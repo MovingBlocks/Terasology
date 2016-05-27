@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Tests {@link MersenneRandom}.
- *
  */
 public class MersenneRandomTest {
     private static final Logger logger = LoggerFactory.getLogger(MersenneRandomTest.class);
@@ -124,7 +123,7 @@ public class MersenneRandomTest {
      * http://www.math.keio.ac.jp/matumoto/CODES/MT2002/mt19937ar.out
      */
     @Test
-    public void correctnessTest() {
+    public void testCorrectness() {
         MersenneRandom r = new MersenneRandom(new int[]{0x123, 0x234, 0x345, 0x456});
         logger.debug("Compare MersenneTwisterFast with new (2002/1/26) seeding mechanism with original result data..");
 
@@ -145,7 +144,7 @@ public class MersenneRandomTest {
      * Perform some speed tests and write results to logger
      */
     @Test
-    public void speedTest() {
+    public void testSpeed() {
 
         final long seed = 4357;
 

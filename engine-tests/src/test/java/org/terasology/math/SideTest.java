@@ -24,14 +24,14 @@ import static org.junit.Assert.assertEquals;
 public class SideTest {
 
     @Test
-    public void sideInDirection() {
+    public void testSideInDirection() {
         for (Side side : Side.values()) {
             assertEquals(side, Side.inDirection(side.getVector3i().x, side.getVector3i().y, side.getVector3i().z));
         }
     }
 
     @Test
-    public void relativeSides() {
+    public void testRelativeSides() {
         Side side = Side.FRONT;
         assertEquals(Side.LEFT, side.getRelativeSide(Direction.LEFT));
         assertEquals(Side.RIGHT, side.getRelativeSide(Direction.RIGHT));
