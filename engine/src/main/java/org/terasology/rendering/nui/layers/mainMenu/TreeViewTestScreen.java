@@ -60,7 +60,9 @@ public class TreeViewTestScreen extends CoreScreenLayer {
         nodes.get(1).setExpanded(true);
         nodes.get(5).setExpanded(true);
 
-        find("treeView", UITreeView.class).setModel(nodes.get(0));
+        for (String id : new String[]{"treeView1", "treeView2", "treeView3", "treeView4"}) {
+            find(id, UITreeView.class).setModel(nodes.get(0));
+        }
     }
 
     @Override

@@ -16,9 +16,6 @@
 package org.terasology.rendering.nui.widgets.models;
 
 import com.google.api.client.util.Lists;
-import org.terasology.input.MouseInput;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +25,6 @@ import java.util.List;
  */
 public class TreeModel<T> {
     private List<Tree<T>> elements = Lists.newArrayList();
-    private List<TreeInteractionListener> listeners = Lists.newArrayList();
     private boolean enumerateExpandedOnly = true;
 
     public TreeModel() {
@@ -39,26 +35,18 @@ public class TreeModel<T> {
         this.resetElements(root);
     }
 
-    private void resetElements(Tree<T> root) {
+    public void resetElements(Tree<T> root) {
         this.elements = Lists.newArrayList();
-        this.listeners = Lists.newArrayList();
 
         Iterator it = root.getDepthFirstIterator(enumerateExpandedOnly);
 
-        int i = 0;
         while (it.hasNext()) {
             this.elements.add((Tree<T>) it.next());
-            this.listeners.add(new TreeInteractionListener(i));
-            i++;
         }
     }
 
     public Tree<T> getElement(int index) {
         return this.elements.get(index);
-    }
-
-    public TreeInteractionListener getListener(int index) {
-        return this.listeners.get(index);
     }
 
     public int getElementCount() {
@@ -68,23 +56,5 @@ public class TreeModel<T> {
     public void setEnumerateExpandedOnly(boolean enumerateExpandedOnly) {
         this.enumerateExpandedOnly = enumerateExpandedOnly;
         this.resetElements(this.elements.get(0).getRoot());
-    }
-
-    public class TreeInteractionListener extends BaseInteractionListener {
-        private int index;
-
-        public TreeInteractionListener(int index) {
-            this.index = index;
-        }
-
-        @Override
-        public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                elements.get(index).setExpanded(!elements.get(index).isExpanded());
-                resetElements(elements.get(index).getRoot());
-                return true;
-            }
-            return false;
-        }
     }
 }
