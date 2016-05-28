@@ -501,6 +501,14 @@
                         "active": {
                             "background": "buttonDown",
                             "text-color": "FFFF00FF"
+                        },
+                        "disabled": {
+                            "background": "button",
+                            "text-color": "888888FF"
+                        },
+                        "hover-disabled": {
+                            "background": "buttonOver",
+                            "text-color": "888888FF"
                         }
                     }
                 }

@@ -24,7 +24,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -42,13 +41,11 @@ import java.util.Objects;
 public class UITreeView<T> extends CoreWidget {
     private static final Logger logger = LoggerFactory.getLogger(UITreeView.class);
     private static final String TREE_ITEM = "tree-item";
+    private static final String HOVER_DISABLED_MODE = "hover-disabled";
+
     private Binding<TreeModel<T>> model = new DefaultBinding<>(new TreeModel<>());
     private Binding<Tree<T>> selection = new DefaultBinding<>();
-
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
-
-    private Binding<Integer> itemIndent = new DefaultBinding<>(15);
+    private Binding<Integer> itemIndent = new DefaultBinding<>(25);
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 
     private final List<TreeInteractionListener> itemListeners = Lists.newArrayList();
@@ -72,7 +69,9 @@ public class UITreeView<T> extends CoreWidget {
             if (Objects.equals(item, selection.get())) {
                 canvas.setMode(ACTIVE_MODE);
             } else if (listener.isMouseOver()) {
-                canvas.setMode(HOVER_MODE);
+                canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
+            } else if (!isEnabled()) {
+                canvas.setMode(DISABLED_MODE);
             } else {
                 canvas.setMode(DEFAULT_MODE);
             }
@@ -130,7 +129,7 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isEnabled()) {
                 model.get().getElement(index).setExpanded(!model.get().getElement(index).isExpanded());
                 model.get().resetElements(model.get().getElement(index).getRoot());
                 return true;
