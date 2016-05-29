@@ -255,7 +255,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType) {
-        boolean existsAlready = assetManager.isLoaded(screenUri, UIElement.class);
+        boolean existsAlready = !screenUri.isInstance() && assetManager.isLoaded(screenUri, UIElement.class);
 
         Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
         if (!opt.isPresent()) {
