@@ -19,6 +19,8 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
@@ -168,7 +170,12 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
 
     private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, EntityRef directCause) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
-        if (health != null) {
+        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        boolean ghost = false;
+        if (characterMovementComponent != null) {
+            ghost = (characterMovementComponent.mode == MovementMode.GHOSTING);
+        }
+        if ((health != null) && !ghost) {
             int damagedAmount = health.currentHealth - Math.max(health.currentHealth - damageAmount, 0);
             health.currentHealth -= damagedAmount;
             health.nextRegenTick = time.getGameTimeInMs() + TeraMath.floorToInt(health.waitBeforeRegen * 1000);
