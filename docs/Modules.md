@@ -90,6 +90,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
+* [StructureTemplates](https://github.com/Terasology/StructureTemplates) - a system for placing structures as per some template
 * [SubstanceMatters](https://github.com/Terasology/SubstanceMatters) - library for the definition and usage of materials in various contexts, such as tools with dynamic looks based on material
 * [Tasks](https://github.com/Terasology/Tasks) - allows for the definition of tasks/quests
 * [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
