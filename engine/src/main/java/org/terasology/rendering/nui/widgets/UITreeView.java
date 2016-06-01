@@ -16,17 +16,20 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.input.MouseInput;
+import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.models.Tree;
@@ -39,14 +42,31 @@ import java.util.Objects;
  *
  */
 public class UITreeView<T> extends CoreWidget {
-    private static final Logger logger = LoggerFactory.getLogger(UITreeView.class);
     private static final String TREE_ITEM = "tree-item";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
 
+    @LayoutConfig
+    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
+
+    private UIScrollbar verticalBar = new UIScrollbar(true);
+    private Binding<Integer> maxDisplayedElements = new DefaultBinding<>(5);
+    private Binding<Integer> itemIndent = new DefaultBinding<>(25);
+
     private Binding<TreeModel<T>> model = new DefaultBinding<>(new TreeModel<>());
     private Binding<Tree<T>> selection = new DefaultBinding<>();
-    private Binding<Integer> itemIndent = new DefaultBinding<>(25);
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
+
+    private InteractionListener mainListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseWheel(NUIMouseWheelEvent event) {
+            if (enabled.get()) {
+                int scrollMultiplier = 0 - verticalBar.getRange() / model.get().getElementCount();
+                verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
+                return true;
+            }
+            return false;
+        }
+    };
 
     private final List<TreeInteractionListener> itemListeners = Lists.newArrayList();
 
@@ -62,30 +82,80 @@ public class UITreeView<T> extends CoreWidget {
         updateItemListeners();
 
         canvas.setPart(TREE_ITEM);
-        int yOffset = 0;
+
+        int itemHeight = canvas.getCurrentStyle().getMargin().getTotalHeight() + canvas.getCurrentStyle().getFont().getLineHeight();
+        int totalHeight = itemHeight * model.get().getElementCount() + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+        int listenerHeight = itemHeight * Math.min(maxDisplayedElements.get(), model.get().getElementCount()) + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
+        canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + listenerHeight));
+
+        if (model.get().getElementCount() > maxDisplayedElements.get()) {
+            drawScrollbarItems(canvas, itemHeight, totalHeight);
+        } else {
+            drawNonScrollItems(canvas, itemHeight);
+        }
+    }
+
+    private void drawScrollbarItems(Canvas canvas, int itemHeight, int totalHeight) {
+        Border itemMargin = canvas.getCurrentStyle().getMargin();
+
+        // Scrollbar Measurement
+        int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
+        int scrollbarHeight = canvas.size().y - itemMargin.getTop();
+        int availableWidth = canvas.size().x - scrollbarWidth;
+        int scrollbarXPos = availableWidth - itemMargin.getRight();
+        int scrollbarYPos = itemMargin.getTotalHeight();
+
+        Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y);
+
+        // Draw Scrollbar
+        Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
+        canvas.drawWidget(verticalBar, scrollbarRegion);
+
+        // Set the range of Scrollbar
+        float maxVertBarDesired = itemHeight * (model.get().getElementCount() - maxDisplayedElements.get() - 0.5f) + itemMargin.getBottom();
+        verticalBar.setRange((int) maxVertBarDesired);
+
         for (int i = 0; i < model.get().getElementCount(); i++) {
             Tree<T> item = model.get().getElement(i);
             TreeInteractionListener listener = itemListeners.get(i);
-            if (Objects.equals(item, selection.get())) {
-                canvas.setMode(ACTIVE_MODE);
-            } else if (listener.isMouseOver()) {
-                canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
-            } else if (!isEnabled()) {
-                canvas.setMode(DISABLED_MODE);
-            } else {
-                canvas.setMode(DEFAULT_MODE);
+
+            handleListeners(canvas, item, listener);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(), i * itemHeight - verticalBar.getValue(), availableWidth - item.getDepth() * itemIndent.get(), itemHeight);
+            try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
+                drawItem(canvas, itemRegion, item, listener);
             }
-
-            Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item.getValue(), canvas));
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(), yOffset, canvas.size().x - item.getDepth() * itemIndent.get(), preferredSize.y);
-            canvas.drawBackground(itemRegion);
-
-            itemRenderer.draw(item.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
-            canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item.getValue()), itemRegion);
-
-            yOffset += preferredSize.getY();
         }
     }
+
+    private void drawNonScrollItems(Canvas canvas, int itemHeight) {
+        for (int i = 0; i < model.get().getElementCount(); i++) {
+            Tree<T> item = model.get().getElement(i);
+            TreeInteractionListener listener = itemListeners.get(i);
+
+            handleListeners(canvas, item, listener);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(), i * itemHeight, canvas.size().x - item.getDepth() * itemIndent.get(), itemHeight);
+            drawItem(canvas, itemRegion, item, listener);
+        }
+    }
+
+    private void handleListeners(Canvas canvas, Tree<T> item, TreeInteractionListener listener) {
+        if (Objects.equals(item, selection.get())) {
+            canvas.setMode(ACTIVE_MODE);
+        } else if (listener.isMouseOver()) {
+            canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
+        } else if (!isEnabled()) {
+            canvas.setMode(DISABLED_MODE);
+        } else {
+            canvas.setMode(DEFAULT_MODE);
+        }
+    }
+
+    private void drawItem(Canvas canvas, Rect2i itemRegion, Tree<T> item, TreeInteractionListener listener) {
+        canvas.drawBackground(itemRegion);
+        itemRenderer.draw(item.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
+        canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item.getValue()), itemRegion);
+    }
+
 
     private void updateItemListeners() {
         while (itemListeners.size() > model.get().getElementCount()) {
@@ -99,6 +169,7 @@ public class UITreeView<T> extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         canvas.setPart(TREE_ITEM);
+
         model.get().setEnumerateExpandedOnly(false);
         Vector2i result = new Vector2i();
         for (int i = 0; i < model.get().getElementCount(); i++) {
@@ -106,9 +177,17 @@ public class UITreeView<T> extends CoreWidget {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
                     .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y;
+
+            if (i < maxDisplayedElements.get()) {
+                result.y += preferredSize.y;
+            }
         }
         model.get().setEnumerateExpandedOnly(true);
+
+        // Also add scrollbar width if scrollbar is displayed
+        if (model.get().getElementCount() > maxDisplayedElements.get()) {
+            result.addX(canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x);
+        }
         return result;
     }
 
@@ -129,10 +208,21 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isEnabled()) {
-                model.get().getElement(index).setExpanded(!model.get().getElement(index).isExpanded());
-                model.get().resetElements(model.get().getElement(index).getRoot());
-                return true;
+            if (isEnabled()) {
+                if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                    // Expand or contract and item on LMB
+                    model.get().getElement(index).setExpanded(!model.get().getElement(index).isExpanded());
+                    model.get().resetElements(model.get().getElement(index).getRoot());
+                    return true;
+                } else if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
+                    // Select the item on RMB - if it's already selected, deselect
+                    if (selection.get() == model.get().getElement(index)) {
+                        selection.set(null);
+                    } else {
+                        selection.set(model.get().getElement(index));
+                    }
+                    return true;
+                }
             }
             return false;
         }
