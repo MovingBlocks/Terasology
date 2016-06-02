@@ -48,10 +48,10 @@ public class UITreeView<T> extends CoreWidget {
     @LayoutConfig
     private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
-    private UIScrollbar verticalBar = new UIScrollbar(true);
     private Binding<Integer> maxDisplayedElements = new DefaultBinding<>(5);
     private Binding<Integer> itemIndent = new DefaultBinding<>(25);
 
+    private UIScrollbar verticalBar = new UIScrollbar(true);
     private Binding<TreeModel<T>> model = new DefaultBinding<>(new TreeModel<>());
     private Binding<Tree<T>> selection = new DefaultBinding<>();
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
@@ -59,6 +59,7 @@ public class UITreeView<T> extends CoreWidget {
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
+            // Change the UIScrollbar value on mousewheel
             if (enabled.get()) {
                 int scrollMultiplier = 0 - verticalBar.getRange() / model.get().getElementCount();
                 verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
@@ -84,43 +85,46 @@ public class UITreeView<T> extends CoreWidget {
         canvas.setPart(TREE_ITEM);
 
         int itemHeight = canvas.getCurrentStyle().getMargin().getTotalHeight() + canvas.getCurrentStyle().getFont().getLineHeight();
-        int totalHeight = itemHeight * model.get().getElementCount() + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
-        int listenerHeight = itemHeight * Math.min(maxDisplayedElements.get(), model.get().getElementCount()) + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight();
-        canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + listenerHeight));
+        canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y));
 
         if (model.get().getElementCount() > maxDisplayedElements.get()) {
-            drawScrollbarItems(canvas, itemHeight, totalHeight);
+            drawScrollbarItems(canvas, itemHeight);
         } else {
             drawNonScrollItems(canvas, itemHeight);
         }
     }
 
-    private void drawScrollbarItems(Canvas canvas, int itemHeight, int totalHeight) {
+    private void drawScrollbarItems(Canvas canvas, int itemHeight) {
         Border itemMargin = canvas.getCurrentStyle().getMargin();
 
-        // Scrollbar Measurement
+        // Calculate scrollbar dimensions
         int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
-        int scrollbarHeight = canvas.size().y - itemMargin.getTop();
+        int scrollbarHeight = canvas.size().y - itemMargin.getTotalHeight();
         int availableWidth = canvas.size().x - scrollbarWidth;
-        int scrollbarXPos = availableWidth - itemMargin.getRight();
-        int scrollbarYPos = itemMargin.getTotalHeight();
+        int scrollbarXPosition = canvas.size().x - scrollbarWidth - itemMargin.getRight();
+        int scrollbarYPosition = itemMargin.getTop();
 
         Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y);
 
-        // Draw Scrollbar
-        Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPos, scrollbarYPos, scrollbarWidth, scrollbarHeight);
+        // Draw the scrollbar
+        Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPosition, scrollbarYPosition, scrollbarWidth, scrollbarHeight);
         canvas.drawWidget(verticalBar, scrollbarRegion);
 
-        // Set the range of Scrollbar
-        float maxVertBarDesired = itemHeight * (model.get().getElementCount() - maxDisplayedElements.get() - 0.5f) + itemMargin.getBottom();
-        verticalBar.setRange((int) maxVertBarDesired);
+        // Set the scrollbar range
+        int maxScrollbarRange = itemHeight * (model.get().getElementCount() - maxDisplayedElements.get()) + itemMargin.getBottom();
+        verticalBar.setRange(maxScrollbarRange);
 
         for (int i = 0; i < model.get().getElementCount(); i++) {
             Tree<T> item = model.get().getElement(i);
             TreeInteractionListener listener = itemListeners.get(i);
 
             handleListeners(canvas, item, listener);
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(), i * itemHeight - verticalBar.getValue(), availableWidth - item.getDepth() * itemIndent.get(), itemHeight);
+
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+                    i * itemHeight - verticalBar.getValue(),
+                    availableWidth - item.getDepth() * itemIndent.get(),
+                    itemHeight);
+
             try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
                 drawItem(canvas, itemRegion, item, listener);
             }
@@ -133,7 +137,12 @@ public class UITreeView<T> extends CoreWidget {
             TreeInteractionListener listener = itemListeners.get(i);
 
             handleListeners(canvas, item, listener);
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(), i * itemHeight, canvas.size().x - item.getDepth() * itemIndent.get(), itemHeight);
+
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+                    i * itemHeight,
+                    canvas.size().x - item.getDepth() * itemIndent.get(),
+                    itemHeight);
+
             drawItem(canvas, itemRegion, item, listener);
         }
     }
@@ -184,10 +193,9 @@ public class UITreeView<T> extends CoreWidget {
         }
         model.get().setEnumerateExpandedOnly(true);
 
-        // Also add scrollbar width if scrollbar is displayed
-        if (model.get().getElementCount() > maxDisplayedElements.get()) {
-            result.addX(canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x);
-        }
+        // Account for the width of the vertical scrollbar
+        result.addX(canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x);
+
         return result;
     }
 
@@ -211,11 +219,13 @@ public class UITreeView<T> extends CoreWidget {
             if (isEnabled()) {
                 if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                     // Expand or contract and item on LMB
+
                     model.get().getElement(index).setExpanded(!model.get().getElement(index).isExpanded());
                     model.get().resetElements(model.get().getElement(index).getRoot());
                     return true;
                 } else if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
                     // Select the item on RMB - if it's already selected, deselect
+
                     if (selection.get() == model.get().getElement(index)) {
                         selection.set(null);
                     } else {
