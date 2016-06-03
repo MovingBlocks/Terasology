@@ -37,9 +37,21 @@ public class Tree<T> {
     private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
     private static final String ITERATOR_NO_ELEMENTS = "no elements left (try validating with hasNext?)";
 
+    /**
+     * The object stored in this tree.
+     */
     private T value;
+    /**
+     * The parent node for this tree.
+     */
     private Tree<T> parent;
+    /**
+     * The list of children for this tree.
+     */
     private List<Tree<T>> children = Lists.newArrayList();
+    /**
+     * Whether the tree is expanded in the interface.
+     */
     private boolean expanded;
 
     public Tree() {
@@ -51,10 +63,10 @@ public class Tree<T> {
     }
 
     /**
-     * @return A shallow copy of this node.
+     * @return A shallow copy of this tree.
      */
     public Tree<T> copy() {
-        Tree<T> copy = new Tree<T>(this.value);
+        Tree<T> copy = new Tree<>(this.value);
         copy.setExpanded(this.expanded);
 
         for (Tree<T> child : this.children) {
@@ -64,22 +76,30 @@ public class Tree<T> {
     }
 
     /**
-     * @return This node's children.
-     */
-    public List<Tree<T>> getChildren() {
-        return this.children;
-    }
-
-    /**
-     * @return This node's parent, or null if the node is a root.
+     * @return This tree's parent.
      */
     public Tree<T> getParent() {
         return this.parent;
     }
 
     /**
-     * @param node The node the index of which is to be returned.
-     * @return The index of the specified node.
+     * @return Whether the tree is a root (has no parent node).
+     */
+    public boolean isRoot() {
+        return this.parent == null;
+    }
+
+    /**
+     * @return The list of children for this tree.
+     */
+    public List<Tree<T>> getChildren() {
+        return this.children;
+    }
+
+
+    /**
+     * @param node The {@code Tree}the index of which is to be returned.
+     * @return The index of the specified {@code Tree}.
      */
     public int getIndex(Tree<T> node) {
         if (node == null) {
@@ -89,33 +109,19 @@ public class Tree<T> {
         return this.children.indexOf(node);
     }
 
-    /**
-     * @return Whether the node is a leaf (a node with no children).
-     */
-    public boolean isLeaf() {
-        return this.children.isEmpty();
-    }
 
     /**
-     * @return Whether the node is a root (a node with no parent).
-     */
-    public boolean isRoot() {
-        return this.parent == null;
-    }
-
-    /**
-     * @return The root of the tree this tree is a member of.
+     * @return The root of the tree this subtree is a member of.
      */
     public Tree<T> getRoot() {
         if (this.isRoot()) {
             return this;
         }
-
         return this.parent.getRoot();
     }
 
     /**
-     * @return The depth of this node relative to the root node of its' tree.
+     * @return The depth of the tree this tree is a subtree of.
      */
     public int getDepth() {
         return this.getRecursiveDepth(0);
@@ -159,8 +165,8 @@ public class Tree<T> {
     }
 
     /**
-     * @param child A specified node.
-     * @return Whether the specified node is a child of this tree.
+     * @param child A specified tree.
+     * @return Whether the specified tree is a (direct) child of this tree.
      */
     public boolean containsChild(Tree<T> child) {
         return this.children.contains(child);
@@ -175,7 +181,6 @@ public class Tree<T> {
         Tree<T> child = this.children.remove(childIndex);
         child.setParent(null);
     }
-
 
     /**
      * Removes a specified child in this tree.
@@ -195,7 +200,8 @@ public class Tree<T> {
     }
 
     /**
-     * Sets the parent of the tree to a specific {@code Tree}.
+     * Sets the parent of this tree to a specific {@code Tree}.
+     * Should NOT be used externally (use a combination of removeChild()/addChild() instead)
      *
      * @param parent The {@code Tree} the parent of this tree will be set to.
      */
@@ -240,7 +246,7 @@ public class Tree<T> {
     }
 
     /**
-     * An iterator of an {@code ExpandableTree} in depth-first, pre-ordered order.
+     * An iterator of a {@code Tree} in depth-first, pre-ordered order.
      */
     private class DepthFirstIterator implements Iterator {
         /**
@@ -281,7 +287,7 @@ public class Tree<T> {
         }
 
         private Tree<T> traverse(Enumeration childEnumeration) {
-            // Handle the root object being non-expanded
+            // Handle the root object being non-expanded.
             if (childEnumeration == null) {
                 return null;
             }
@@ -289,7 +295,7 @@ public class Tree<T> {
             if (childEnumeration.hasMoreElements()) {
                 Tree<T> child = (Tree<T>) childEnumeration.nextElement();
 
-                // If the child is expanded, iterate through its' children as well
+                // If the child is expanded, iterate through its' children as well.
                 if (!enumerateExpandedOnly || child.isExpanded()) {
                     stack.push(Collections.enumeration(child.getChildren()));
                 }
@@ -297,7 +303,7 @@ public class Tree<T> {
                 return child;
             }
 
-            // If a higher level is available, return to it
+            // If a higher level is available, return to it.
             stack.pop();
             if (stack.isEmpty()) {
                 return null;

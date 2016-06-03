@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
@@ -57,7 +58,9 @@ public class UITreeView<T> extends CoreWidget {
 
     private UIScrollbar verticalBar = new UIScrollbar(true);
     private Binding<TreeModel<T>> model = new DefaultBinding<>(new TreeModel<>());
-    private Binding<Tree<T>> selection = new DefaultBinding<>();
+    private Binding<Integer> selectedIndex = new DefaultBinding<>();
+    private Binding<Integer> mouseOverIndex = new DefaultBinding<>();
+
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 
     private InteractionListener mainListener = new BaseInteractionListener() {
@@ -152,7 +155,7 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void handleListeners(Canvas canvas, Tree<T> item, TreeInteractionListener listener) {
-        if (Objects.equals(item, selection.get())) {
+        if (selectedIndex.get() != null && Objects.equals(item, model.get().getElement(selectedIndex.get()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listener.isMouseOver()) {
             canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
@@ -228,7 +231,7 @@ public class UITreeView<T> extends CoreWidget {
             } else if (isEnabled()) {
                 if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                     // Select the item on LMB
-                    selection.set(model.get().getElement(index));
+                    selectedIndex.set(index);
                     return true;
                 } else if (event.getMouseButton() == MouseInput.MOUSE_3) {
                     // Remove the item on MMB
@@ -241,8 +244,27 @@ public class UITreeView<T> extends CoreWidget {
         }
 
         @Override
+        public void onMouseOver(NUIMouseOverEvent event) {
+            super.onMouseOver(event);
+            mouseOverIndex.set(index);
+        }
+
+        @Override
+        public void onMouseLeave() {
+            super.onMouseLeave();
+            mouseOverIndex.set(null);
+        }
+
+        @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            selection.set(null);
+            if (mouseOverIndex.get() != null && selectedIndex.get() != null
+                    && !mouseOverIndex.get().equals(selectedIndex.get())) {
+                // Stub implementation. TODO: finish this
+                logger.info("Dragging " + model.get().getElement(selectedIndex.get()).getValue()
+                        + " onto " + model.get().getElement(mouseOverIndex.get()).getValue() + "...");
+            }
+            mouseOverIndex.set(null);
+            selectedIndex.set(null);
         }
     }
 }
