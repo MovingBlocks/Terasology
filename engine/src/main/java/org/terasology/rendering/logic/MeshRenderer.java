@@ -181,9 +181,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
             if (material.isRenderable()) {
                 OpenGLMesh lastMesh = null;
                 material.enable();
-                material.setFloat("sunlight", 1.0f);
-                material.setFloat("blockLight", 1.0f);
-                material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                material.setFloat("sunlight", 1.0f, true);
+                material.setFloat("blockLight", 1.0f, true);
+                material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                 material.bindTextures();
 
                 Set<EntityRef> entities = meshByMaterial.get(material);
@@ -226,7 +226,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
                         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
 
-                        material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+                        material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 

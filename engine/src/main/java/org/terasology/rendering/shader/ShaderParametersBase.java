@@ -41,7 +41,7 @@ public class ShaderParametersBase implements ShaderParameters {
     @Override
     public void applyParameters(Material program) {
 
-        program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f);
+        program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f, true);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
@@ -68,7 +68,7 @@ public class ShaderParametersBase implements ShaderParameters {
 
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
-            program.setFloat("time", worldProvider.getTime().getDays());
+            program.setFloat("time", worldProvider.getTime().getDays(), true);
         }
     }
 }
