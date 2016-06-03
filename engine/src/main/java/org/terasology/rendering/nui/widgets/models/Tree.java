@@ -51,6 +51,19 @@ public class Tree<T> {
     }
 
     /**
+     * @return A shallow copy of this node.
+     */
+    public Tree<T> copy() {
+        Tree<T> copy = new Tree<T>(this.value);
+        copy.setExpanded(this.expanded);
+
+        for (Tree<T> child : this.children) {
+            copy.addChild(child.copy());
+        }
+        return copy;
+    }
+
+    /**
      * @return This node's children.
      */
     public List<Tree<T>> getChildren() {
@@ -143,6 +156,14 @@ public class Tree<T> {
 
         this.children.add(childIndex, child);
         child.setParent(this);
+    }
+
+    /**
+     * @param child A specified node.
+     * @return Whether the specified node is a child of this tree.
+     */
+    public boolean containsChild(Tree<T> child) {
+        return this.children.contains(child);
     }
 
     /**

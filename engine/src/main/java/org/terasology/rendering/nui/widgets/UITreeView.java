@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
@@ -29,6 +31,7 @@ import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
@@ -42,6 +45,7 @@ import java.util.Objects;
  *
  */
 public class UITreeView<T> extends CoreWidget {
+    private static Logger logger = LoggerFactory.getLogger(UITreeView.class);
     private static final String TREE_ITEM = "tree-item";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
 
@@ -216,25 +220,29 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled()) {
+            if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
+                // Expand or contract and item on RMB - works even if the tree is disabled
+                model.get().getElement(index).setExpanded(!model.get().getElement(index).isExpanded());
+                model.get().resetElements(model.get().getElement(index).getRoot());
+                return true;
+            } else if (isEnabled()) {
                 if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                    // Expand or contract and item on LMB
-
-                    model.get().getElement(index).setExpanded(!model.get().getElement(index).isExpanded());
-                    model.get().resetElements(model.get().getElement(index).getRoot());
+                    // Select the item on LMB
+                    selection.set(model.get().getElement(index));
                     return true;
-                } else if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                    // Select the item on RMB - if it's already selected, deselect
-
-                    if (selection.get() == model.get().getElement(index)) {
-                        selection.set(null);
-                    } else {
-                        selection.set(model.get().getElement(index));
-                    }
+                } else if (event.getMouseButton() == MouseInput.MOUSE_3) {
+                    // Remove the item on MMB
+                    model.get().removeElement(index);
                     return true;
                 }
+
             }
             return false;
+        }
+
+        @Override
+        public void onMouseRelease(NUIMouseReleaseEvent event) {
+            selection.set(null);
         }
     }
 }

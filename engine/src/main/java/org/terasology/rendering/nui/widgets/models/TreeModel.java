@@ -49,6 +49,26 @@ public class TreeModel<T> {
         return this.elements.get(index);
     }
 
+    public void removeElement(int index) {
+        Tree<T> element = this.getElement(index);
+
+        // Never remove the root node
+        if (element.isRoot()) {
+            return;
+        }
+
+        Iterator it = this.elements.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
+
+        while (it.hasNext()) {
+            Tree<T> next = (Tree<T>) it.next();
+            if (next.containsChild(element)) {
+                next.removeChild(element);
+                break;
+            }
+        }
+        this.resetElements(this.elements.get(0).getRoot());
+    }
+
     public int getElementCount() {
         return this.elements.size();
     }
