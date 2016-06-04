@@ -28,6 +28,7 @@ public class TreeViewTestScreen extends CoreScreenLayer {
         List<Tree<String>> nodes = Lists.newArrayList();
         for (int i = 0; i <= 10; i++) {
             nodes.add(new Tree<>("Item " + i));
+            nodes.get(i).setExpanded(true);
         }
 
         /**
@@ -56,12 +57,9 @@ public class TreeViewTestScreen extends CoreScreenLayer {
         nodes.get(5).addChild(nodes.get(9));
         nodes.get(9).addChild(nodes.get(10));
 
-        nodes.get(0).setExpanded(true);
-        nodes.get(1).setExpanded(true);
-        nodes.get(5).setExpanded(true);
-
         for (String id : new String[]{"treeView1", "treeView2", "treeView3", "treeView4"}) {
             find(id, UITreeView.class).setModel(nodes.get(0).copy());
+            find(id, UITreeView.class).setDefaultValue("New Item");
         }
     }
 

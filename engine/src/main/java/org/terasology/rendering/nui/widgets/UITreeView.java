@@ -16,8 +16,6 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
@@ -47,7 +45,6 @@ import java.util.Objects;
  *
  */
 public class UITreeView<T> extends CoreWidget {
-    private static Logger logger = LoggerFactory.getLogger(UITreeView.class);
     private static final String TREE_ITEM = "tree-item";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
 
@@ -61,6 +58,8 @@ public class UITreeView<T> extends CoreWidget {
     private Binding<TreeModel<T>> model = new DefaultBinding<>(new TreeModel<>());
     private Binding<Integer> selectedIndex = new DefaultBinding<>();
     private Binding<Integer> mouseOverIndex = new DefaultBinding<>();
+    private Binding<Tree<T>> clipboard = new DefaultBinding<>();
+    private Binding<T> defaultValue = new DefaultBinding<>();
 
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
 
@@ -214,11 +213,23 @@ public class UITreeView<T> extends CoreWidget {
 
             if (id == Keyboard.KeyId.UP || id == Keyboard.KeyId.DOWN) {
                 // Move the element up/down the list of its' parent's children on UP/DOWN.
-                moveSelectedElement(id);
+                moveSelected(id);
                 return true;
             } else if (id == Keyboard.KeyId.DELETE) {
                 // Remove the element on DELETE.
-                removeSelectedElement();
+                removeSelected();
+                return true;
+            } else if (id == Keyboard.KeyId.A) {
+                // Add a new child on A. TODO: Should be Shift+A.
+                addToSelected();
+                return true;
+            } else if (id == Keyboard.KeyId.C) {
+                // Copy the selected element on C. TODO: Should be Ctrl+C.
+                copySelected();
+                return true;
+            } else if (id == Keyboard.KeyId.V) {
+                // Paste the element in the clipboard as a child of a selected element on V. TODO: Should be Ctrl+V.
+                pasteSelected();
                 return true;
             } else {
                 return false;
@@ -228,7 +239,7 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
-    private void moveSelectedElement(int keyId) {
+    private void moveSelected(int keyId) {
         if (selectedIndex.get() != null) {
             Tree<T> selectedElement = model.get().getElement(selectedIndex.get());
             Tree<T> parent = selectedElement.getParent();
@@ -256,17 +267,36 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    private void removeSelectedElement() {
+    private void removeSelected() {
         model.get().removeElement(selectedIndex.get());
         selectedIndex.set(null);
     }
 
-    public void setModel(Tree<T> root) {
-        this.setModel(new TreeModel<T>(root));
+    private void addToSelected() {
+        model.get().getElement(selectedIndex.get()).addChild(new Tree<T>(defaultValue.get()));
     }
 
-    public void setModel(TreeModel<T> model) {
-        this.model.set(model);
+    private void copySelected() {
+        clipboard.set(model.get().getElement(selectedIndex.get()).copy());
+    }
+
+    private void pasteSelected() {
+        if (clipboard.get() != null) {
+            model.get().getElement(selectedIndex.get()).addChild(clipboard.get());
+            clipboard.set(null);
+        }
+    }
+
+    public void setModel(Tree<T> root) {
+        setModel(new TreeModel<T>(root));
+    }
+
+    public void setModel(TreeModel<T> newModel) {
+        model.set(newModel);
+    }
+
+    public void setDefaultValue(T value) {
+        defaultValue.set(value);
     }
 
     private class TreeInteractionListener extends BaseInteractionListener {
