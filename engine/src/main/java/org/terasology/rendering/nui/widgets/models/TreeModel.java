@@ -49,6 +49,10 @@ public class TreeModel<T> {
         return this.elements.get(index);
     }
 
+    public int indexOf(Tree<T> element) {
+        return elements.indexOf(element);
+    }
+
     public void removeElement(int index) {
         Tree<T> element = this.getElement(index);
 

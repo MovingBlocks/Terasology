@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
@@ -30,9 +31,9 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
-import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
@@ -206,6 +207,60 @@ public class UITreeView<T> extends CoreWidget {
         return result;
     }
 
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown()) {
+            int id = event.getKey().getId();
+
+            if (id == Keyboard.KeyId.UP || id == Keyboard.KeyId.DOWN) {
+                // Move the element up/down the list of its' parent's children on UP/DOWN.
+                moveSelectedElement(id);
+                return true;
+            } else if (id == Keyboard.KeyId.DELETE) {
+                // Remove the element on DELETE.
+                removeSelectedElement();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    private void moveSelectedElement(int keyId) {
+        if (selectedIndex.get() != null) {
+            Tree<T> selectedElement = model.get().getElement(selectedIndex.get());
+            Tree<T> parent = selectedElement.getParent();
+            if (!selectedElement.isRoot()) {
+                int indexOfElement = parent.getIndex(selectedElement);
+
+                if (keyId == Keyboard.KeyId.UP && indexOfElement > 0) {
+                    // Move the element up, unless it is the first element.
+                    parent.removeChild(selectedElement);
+                    parent.addChild(indexOfElement - 1, selectedElement);
+                    model.get().resetElements(selectedElement.getRoot());
+
+                    // Re-select the moved element.
+                    selectedIndex.set(model.get().indexOf(selectedElement));
+                } else if (keyId == Keyboard.KeyId.DOWN && indexOfElement < parent.getChildren().size() - 1) {
+                    // Move the element down, unless it is the last element.
+                    parent.removeChild(selectedElement);
+                    parent.addChild(indexOfElement + 1, selectedElement);
+                    model.get().resetElements(selectedElement.getRoot());
+
+                    // Re-select the moved element.
+                    selectedIndex.set(model.get().indexOf(selectedElement));
+                }
+            }
+        }
+    }
+
+    private void removeSelectedElement() {
+        model.get().removeElement(selectedIndex.get());
+        selectedIndex.set(null);
+    }
+
     public void setModel(Tree<T> root) {
         this.setModel(new TreeModel<T>(root));
     }
@@ -214,10 +269,10 @@ public class UITreeView<T> extends CoreWidget {
         this.model.set(model);
     }
 
-    public class TreeInteractionListener extends BaseInteractionListener {
+    private class TreeInteractionListener extends BaseInteractionListener {
         private int index;
 
-        public TreeInteractionListener(int index) {
+        TreeInteractionListener(int index) {
             this.index = index;
         }
 
@@ -230,15 +285,14 @@ public class UITreeView<T> extends CoreWidget {
                 return true;
             } else if (isEnabled()) {
                 if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                    // Select the item on LMB
-                    selectedIndex.set(index);
-                    return true;
-                } else if (event.getMouseButton() == MouseInput.MOUSE_3) {
-                    // Remove the item on MMB
-                    model.get().removeElement(index);
+                    // Select the item on LMB - deselect when selected again
+                    if (selectedIndex.get() != null && selectedIndex.get().equals(index)) {
+                        selectedIndex.set(null);
+                    } else {
+                        selectedIndex.set(index);
+                    }
                     return true;
                 }
-
             }
             return false;
         }
@@ -253,18 +307,6 @@ public class UITreeView<T> extends CoreWidget {
         public void onMouseLeave() {
             super.onMouseLeave();
             mouseOverIndex.set(null);
-        }
-
-        @Override
-        public void onMouseRelease(NUIMouseReleaseEvent event) {
-            if (mouseOverIndex.get() != null && selectedIndex.get() != null
-                    && !mouseOverIndex.get().equals(selectedIndex.get())) {
-                // Stub implementation. TODO: finish this
-                logger.info("Dragging " + model.get().getElement(selectedIndex.get()).getValue()
-                        + " onto " + model.get().getElement(mouseOverIndex.get()).getValue() + "...");
-            }
-            mouseOverIndex.set(null);
-            selectedIndex.set(null);
         }
     }
 }
