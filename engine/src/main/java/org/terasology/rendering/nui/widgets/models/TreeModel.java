@@ -24,7 +24,13 @@ import java.util.List;
  * @param <T> Type of objects stored in the underlying tree.
  */
 public class TreeModel<T> {
-    private List<Tree<T>> elements = Lists.newArrayList();
+    /**
+     * A list of items, fetched from a {@code Tree} iterator.
+     */
+    private List<Tree<T>> items = Lists.newArrayList();
+    /**
+     * Whether the children of non-expanded items are excluded from the enumeration.
+     */
     private boolean enumerateExpandedOnly = true;
 
     public TreeModel() {
@@ -32,53 +38,82 @@ public class TreeModel<T> {
     }
 
     public TreeModel(Tree<T> root) {
-        this.resetElements(root);
+        this.resetItems(root);
     }
 
-    public void resetElements(Tree<T> root) {
-        this.elements = Lists.newArrayList();
+    /**
+     * Reset the items in the tree.
+     */
+    public void resetItems() {
+        this.resetItems(this.items.get(0).getRoot());
+    }
+
+    /**
+     * @param root The tree the list of items is to be fetched from.
+     */
+    private void resetItems(Tree<T> root) {
+        this.items = Lists.newArrayList();
 
         Iterator it = root.getDepthFirstIterator(enumerateExpandedOnly);
 
         while (it.hasNext()) {
-            this.elements.add((Tree<T>) it.next());
+            this.items.add((Tree<T>) it.next());
         }
     }
 
-    public Tree<T> getElement(int index) {
-        return this.elements.get(index);
+    /**
+     * @param index The index.
+     * @return The item located at a given index.
+     */
+    public Tree<T> getItem(int index) {
+        return this.items.get(index);
     }
 
-    public int indexOf(Tree<T> element) {
-        return elements.indexOf(element);
+    /**
+     * @param item The item.
+     * @return The index of the given item.
+     */
+    public int indexOf(Tree<T> item) {
+        return items.indexOf(item);
     }
 
-    public void removeElement(int index) {
-        Tree<T> element = this.getElement(index);
+    /**
+     * Removes the item located at a given index.
+     *
+     * @param index The index.
+     */
+    public void removeItem(int index) {
+        Tree<T> item = this.getItem(index);
 
-        // Never remove the root node
-        if (element.isRoot()) {
+        // Never remove the root node.
+        if (item.isRoot()) {
             return;
         }
 
-        Iterator it = this.elements.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
+        Iterator it = this.items.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
 
         while (it.hasNext()) {
             Tree<T> next = (Tree<T>) it.next();
-            if (next.containsChild(element)) {
-                next.removeChild(element);
+            if (next.containsChild(item)) {
+                next.removeChild(item);
                 break;
             }
         }
-        this.resetElements(this.elements.get(0).getRoot());
+        this.resetItems(this.items.get(0).getRoot());
     }
 
-    public int getElementCount() {
-        return this.elements.size();
+    /**
+     * @return The amount of items in the tree.
+     */
+    public int getItemCount() {
+        return this.items.size();
     }
 
+    /**
+     * @param enumerateExpandedOnly Whether the children of non-expanded items are excluded from the enumeration.
+     */
     public void setEnumerateExpandedOnly(boolean enumerateExpandedOnly) {
         this.enumerateExpandedOnly = enumerateExpandedOnly;
-        this.resetElements(this.elements.get(0).getRoot());
+        this.resetItems();
     }
 }

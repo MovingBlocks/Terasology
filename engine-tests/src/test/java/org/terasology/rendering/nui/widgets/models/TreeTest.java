@@ -24,7 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TreeTest {
     private List<Tree<Integer>> nodes = Lists.newArrayList();
@@ -80,6 +82,14 @@ public class TreeTest {
     }
 
     @Test
+    public void testContainsChild() {
+        assertTrue(nodes.get(0).containsChild(nodes.get(1)));
+        assertTrue(nodes.get(0).containsChild(nodes.get(4)));
+        assertTrue(nodes.get(9).containsChild(nodes.get(10)));
+        assertFalse(nodes.get(7).containsChild(nodes.get(3)));
+    }
+
+    @Test
     public void testDepthFirstIterator() {
         List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3), nodes.get(7), nodes.get(4), nodes.get(8), nodes.get(5), nodes.get(6), nodes.get(9), nodes.get(10));
 
@@ -109,5 +119,12 @@ public class TreeTest {
         assertEquals(1, nodes.get(1).getDepth());
         assertEquals(2, nodes.get(8).getDepth());
         assertEquals(3, nodes.get(10).getDepth());
+    }
+
+    @Test
+    public void testGetRoot() {
+        for (Tree<Integer> node : nodes) {
+            assertEquals(nodes.get(0), node.getRoot());
+        }
     }
 }

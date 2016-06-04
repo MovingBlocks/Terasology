@@ -25,10 +25,10 @@ import java.util.List;
 public class TreeViewTestScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
-        List<Tree<String>> nodes = Lists.newArrayList();
+        List<Tree<String>> treeList = Lists.newArrayList();
         for (int i = 0; i <= 10; i++) {
-            nodes.add(new Tree<>("Item " + i));
-            nodes.get(i).setExpanded(true);
+            treeList.add(new Tree<>("Item " + i));
+            treeList.get(i).setExpanded(true);
         }
 
         /**
@@ -46,19 +46,19 @@ public class TreeViewTestScreen extends CoreScreenLayer {
          * 3  7     10
          */
 
-        nodes.get(0).addChild(nodes.get(1));
-        nodes.get(0).addChild(nodes.get(4));
-        nodes.get(0).addChild(nodes.get(5));
-        nodes.get(1).addChild(nodes.get(2));
-        nodes.get(2).addChild(nodes.get(3));
-        nodes.get(2).addChild(nodes.get(7));
-        nodes.get(4).addChild(nodes.get(8));
-        nodes.get(5).addChild(nodes.get(6));
-        nodes.get(5).addChild(nodes.get(9));
-        nodes.get(9).addChild(nodes.get(10));
+        treeList.get(0).addChild(treeList.get(1));
+        treeList.get(0).addChild(treeList.get(4));
+        treeList.get(0).addChild(treeList.get(5));
+        treeList.get(1).addChild(treeList.get(2));
+        treeList.get(2).addChild(treeList.get(3));
+        treeList.get(2).addChild(treeList.get(7));
+        treeList.get(4).addChild(treeList.get(8));
+        treeList.get(5).addChild(treeList.get(6));
+        treeList.get(5).addChild(treeList.get(9));
+        treeList.get(9).addChild(treeList.get(10));
 
         for (String id : new String[]{"treeView1", "treeView2", "treeView3", "treeView4"}) {
-            find(id, UITreeView.class).setModel(nodes.get(0).copy());
+            find(id, UITreeView.class).setModel(treeList.get(0).copy());
             find(id, UITreeView.class).setDefaultValue("New Item");
         }
     }

@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
 public class Tree<T> {
     private static final String NULL_NODE_ARGUMENT = "node argument is null";
     private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
-    private static final String ITERATOR_NO_ELEMENTS = "no elements left (try validating with hasNext?)";
+    private static final String ITERATOR_NO_ITEMS = "no elements left (try validating with hasNext?)";
 
     /**
      * The object stored in this tree.
@@ -238,7 +238,7 @@ public class Tree<T> {
     }
 
     /**
-     * @param enumerateExpandedOnly Whether the children of non-expanded elements are excluded from the enumeration.
+     * @param enumerateExpandedOnly Whether the children of non-expanded items are excluded from the enumeration.
      * @return The iterator of this tree in depth-first, pre-ordered order.
      */
     public Iterator getDepthFirstIterator(boolean enumerateExpandedOnly) {
@@ -250,13 +250,13 @@ public class Tree<T> {
      */
     private class DepthFirstIterator implements Iterator {
         /**
-         * If true, the children of non-expanded elements will be excluded from iteration.
+         * If true, the children of non-expanded items will be excluded from iteration.
          */
         private boolean enumerateExpandedOnly;
         private Tree<T> next;
         private Deque<Enumeration> stack = new ArrayDeque<>();
 
-        public DepthFirstIterator(Tree root, boolean enumerateExpandedOnly) {
+        DepthFirstIterator(Tree<T> root, boolean enumerateExpandedOnly) {
             this.enumerateExpandedOnly = enumerateExpandedOnly;
             this.next = root;
 
@@ -273,14 +273,14 @@ public class Tree<T> {
         @Override
         public Object next() {
             if (!this.hasNext()) {
-                throw new NoSuchElementException(ITERATOR_NO_ELEMENTS);
+                throw new NoSuchElementException(ITERATOR_NO_ITEMS);
             }
 
             Tree<T> current = next;
 
             Enumeration childEnumeration = stack.peek();
 
-            // Retrieve the next element.
+            // Retrieve the next item.
             next = traverse(childEnumeration);
 
             return current;
