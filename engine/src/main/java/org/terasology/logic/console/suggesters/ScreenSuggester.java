@@ -21,13 +21,15 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Suggest screen names. When only one screen resource exists for the entire set of loaded modules,
+ * the name alone suffices. Otherwise, the module name must be prepended.
+ */
 public final class ScreenSuggester implements CommandParameterSuggester<String> {
     private final AssetManager assetManager;
 
@@ -41,18 +43,12 @@ public final class ScreenSuggester implements CommandParameterSuggester<String> 
         Set<String> suggestions = Sets.newHashSet();
 
         for (ResourceUrn resolvedParameter : assetManager.getAvailableAssets(UIElement.class)) {
-            Optional<UIElement> element = assetManager.getAsset(resolvedParameter, UIElement.class);
-            if (element.isPresent() && element.get().getRootWidget() instanceof UIScreenLayer) {
-                String resourceName = resolvedParameter.getResourceName().toString();
-                if (!resourceMap.containsKey(resourceName)) {
-                    resourceMap.put(resourceName, Sets.newHashSet());
-                }
+            String resourceName = resolvedParameter.getResourceName().toString();
+            if (!resourceMap.containsKey(resourceName)) {
+                resourceMap.put(resourceName, Sets.newHashSet());
+            }
 
-                resourceMap.get(resourceName).add(resolvedParameter);
-            }
-            if (element.isPresent()) {
-                element.get().dispose();
-            }
+            resourceMap.get(resourceName).add(resolvedParameter);
         }
 
         for (String key : resourceMap.keySet()) {
