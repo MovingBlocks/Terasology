@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.suggesters;
 
+import com.google.api.client.util.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -23,7 +24,7 @@ import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,18 +37,21 @@ public final class ScreenSuggester implements CommandParameterSuggester<String> 
 
     @Override
     public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
-
-        HashMap<String, Set<ResourceUrn>> resourceMap = new HashMap<>();
+        Map<String, Set<ResourceUrn>> resourceMap = Maps.newHashMap();
         Set<String> suggestions = Sets.newHashSet();
 
         for (ResourceUrn resolvedParameter : assetManager.getAvailableAssets(UIElement.class)) {
             Optional<UIElement> element = assetManager.getAsset(resolvedParameter, UIElement.class);
             if (element.isPresent() && element.get().getRootWidget() instanceof UIScreenLayer) {
                 String resourceName = resolvedParameter.getResourceName().toString();
-                if (!resourceMap.containsKey(resourceName))
+                if (!resourceMap.containsKey(resourceName)) {
                     resourceMap.put(resourceName, Sets.newHashSet());
+                }
 
                 resourceMap.get(resourceName).add(resolvedParameter);
+            }
+            if (element.isPresent()) {
+                element.get().dispose();
             }
         }
 
