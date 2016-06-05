@@ -79,7 +79,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void entityNetworkIdChangedOnServerStart() throws HostingFailedException {
+    public void testEntityNetworkIdChangedOnServerStart() throws HostingFailedException {
         EngineEntityManager entityManager = getEntityManager();
         NetworkComponent netComp = new NetworkComponent();
         netComp.setNetworkId(122);

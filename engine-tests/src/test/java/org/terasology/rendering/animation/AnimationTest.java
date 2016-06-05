@@ -30,7 +30,7 @@ public class AnimationTest {
     private Container c = new Container();
 
     @Test
-    public void startEndOnce() {
+    public void testStartEndOnce() {
         Animation ani = once();
         AnimationListener listener = Mockito.mock(AnimationListener.class);
         ani.addListener(listener);
@@ -41,7 +41,7 @@ public class AnimationTest {
     }
 
     @Test
-    public void startEndValuesOnce() {
+    public void testStartEndValuesOnce() {
         Animation ani = once().start();
         Assert.assertEquals(0.0f, c.value, 0.0f);
         ani.update(2.5f);
@@ -49,7 +49,7 @@ public class AnimationTest {
     }
 
     @Test
-    public void startEndValuesInfinite() {
+    public void testStartEndValuesInfinite() {
         Animation ani = infinite().start();
         Assert.assertEquals(0.0f, c.value, 0.0f);
         ani.update(2.5f);
@@ -57,7 +57,7 @@ public class AnimationTest {
     }
 
     @Test
-    public void overflowInfinite() {
+    public void testOverflowInfinite() {
         Animation ani = infinite().start();
         Assert.assertEquals(0.0f, c.value, 0.0f);
         ani.update(112.5f);
@@ -65,7 +65,7 @@ public class AnimationTest {
     }
 
     @Test
-    public void updates() {
+    public void testUpdates() {
         Animation ani = once();
         ani.update(2.5f);  // ignored
         Assert.assertEquals(0f, c.value, 0f);
@@ -85,7 +85,7 @@ public class AnimationTest {
     }
 
     @Test
-    public void startEndOnceReverse() {
+    public void testStartEndOnceReverse() {
         Animation ani = once().setReverseMode();
         AnimationListener listener = Mockito.mock(AnimationListener.class);
         ani.addListener(listener);
@@ -96,7 +96,7 @@ public class AnimationTest {
     }
 
     @Test
-    public void updatesReverse() {
+    public void testUpdatesReverse() {
         Animation ani = once().setReverseMode();
         ani.update(2.5f);  // ignored
         Assert.assertEquals(0f, c.value, 0f);

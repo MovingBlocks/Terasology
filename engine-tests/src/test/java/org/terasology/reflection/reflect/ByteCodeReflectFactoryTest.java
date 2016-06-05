@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 public class ByteCodeReflectFactoryTest {
 
     @Test
-    public void createConstructorObjectWithPublicConstructor() throws NoSuchMethodException {
+    public void testCreateConstructorObjectWithPublicConstructor() throws NoSuchMethodException {
         ReflectFactory reflectFactory = new ByteCodeReflectFactory();
         ObjectConstructor<LocationComponent> constructor = reflectFactory.createConstructor(LocationComponent.class);
         LocationComponent locationComponent = constructor.construct();
@@ -40,7 +40,7 @@ public class ByteCodeReflectFactoryTest {
     }
 
     @Test
-    public void createConstructorObjectWithProtectedConstructor() throws Exception {
+    public void testCreateConstructorObjectWithProtectedConstructor() throws Exception {
         ReflectFactory reflectFactory = new ByteCodeReflectFactory();
         ObjectConstructor<AttackRequest> constructor = reflectFactory.createConstructor(AttackRequest.class);
         AttackRequest result = constructor.construct();
@@ -48,7 +48,7 @@ public class ByteCodeReflectFactoryTest {
     }
 
     @Test
-    public void createFieldAccessorWithGetterSetter() throws Exception {
+    public void testCreateFieldAccessorWithGetterSetter() throws Exception {
         ReflectFactory reflectFactory = new ByteCodeReflectFactory();
         FieldAccessor<GetterSetterComponent, Vector3f> fieldAccessor
                 = reflectFactory.createFieldAccessor(GetterSetterComponent.class, GetterSetterComponent.class.getDeclaredField("value"), Vector3f.class);
@@ -62,7 +62,7 @@ public class ByteCodeReflectFactoryTest {
     }
 
     @Test
-    public void createFieldAccessorDirectToField() throws Exception {
+    public void testCreateFieldAccessorDirectToField() throws Exception {
         ReflectFactory reflectFactory = new ByteCodeReflectFactory();
         FieldAccessor<StringComponent, String> fieldAccessor
                 = reflectFactory.createFieldAccessor(StringComponent.class, StringComponent.class.getDeclaredField("value"), String.class);
@@ -72,7 +72,7 @@ public class ByteCodeReflectFactoryTest {
     }
 
     @Test
-    public void accessIntegerField() throws Exception {
+    public void testAccessIntegerField() throws Exception {
         ReflectFactory reflectFactory = new ByteCodeReflectFactory();
         FieldAccessor fieldAccessor
                 = reflectFactory.createFieldAccessor(IntegerComponent.class, IntegerComponent.class.getDeclaredField("value"));

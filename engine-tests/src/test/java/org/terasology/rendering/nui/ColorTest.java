@@ -24,12 +24,12 @@ import static org.junit.Assert.assertEquals;
 public class ColorTest {
 
     @Test
-    public void colorToHash() {
+    public void testColorToHash() {
         assertEquals("010A3CFF", new Color(1, 10, 60, 255).toHex());
     }
 
     @Test
-    public void getSetRed() {
+    public void testGetSetRed() {
         Color color = new Color(1, 10, 60, 255);
         assertEquals(1, color.r());
         color = color.alterRed(72);
@@ -37,7 +37,7 @@ public class ColorTest {
     }
 
     @Test
-    public void getSetGreen() {
+    public void testGetSetGreen() {
         Color color = new Color(1, 10, 60, 255);
         assertEquals(10, color.g());
         color = color.alterGreen(72);
@@ -45,7 +45,7 @@ public class ColorTest {
     }
 
     @Test
-    public void getSetBlue() {
+    public void testGetSetBlue() {
         Color color = new Color(1, 10, 60, 255);
         assertEquals(60, color.b());
         color = color.alterBlue(72);
@@ -53,7 +53,7 @@ public class ColorTest {
     }
 
     @Test
-    public void getSetAlpha() {
+    public void testGetSetAlpha() {
         Color color = new Color(1, 10, 60, 255);
         assertEquals(255, color.a());
         color = color.alterAlpha(72);

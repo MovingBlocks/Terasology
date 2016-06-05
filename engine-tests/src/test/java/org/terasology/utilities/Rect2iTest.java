@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 public class Rect2iTest {
 
     @Test
-    public void overlap() {
+    public void testOverlap() {
         assertTrue(Rect2i.createFromMinAndSize(5, 5, 472, 17).overlaps(Rect2i.createFromMinAndSize(5, 5, 1, 16)));
     }
 

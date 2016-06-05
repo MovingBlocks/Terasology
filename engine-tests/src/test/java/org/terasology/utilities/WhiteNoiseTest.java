@@ -23,12 +23,11 @@ import org.terasology.utilities.random.FastRandom;
 
 /**
  * A simple validity test for {@link org.terasology.utilities.procedural.WhiteNoise}
- *
  */
 public class WhiteNoiseTest {
 
     @Test
-    public void distributionTest() {
+    public void testDistribution() {
         FastRandom rng = new FastRandom(0xBEEF);
         WhiteNoise noiseGen = new WhiteNoise(0xDEADC0DE);
 

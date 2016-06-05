@@ -31,18 +31,18 @@ public class HTMLParserTest {
     private HTMLParser htmlParser = new HTMLParser((name, bold, italic) -> null);
 
     @Test
-    public void parseEmptyDocument() throws IOException, SAXException, ParserConfigurationException {
+    public void testParseEmptyDocument() throws IOException, SAXException, ParserConfigurationException {
         DocumentData documentData = htmlParser.parseHTMLDocument("<body></body>");
         assertEquals(0, documentData.getParagraphs().size());
     }
 
     @Test(expected = HTMLParseException.class)
-    public void parseUnfinishedBody() throws IOException, SAXException, ParserConfigurationException {
+    public void testParseUnfinishedBody() throws IOException, SAXException, ParserConfigurationException {
         DocumentData documentData = htmlParser.parseHTMLDocument("<body>");
     }
 
     @Test
-    public void parseSimpleParagraph() throws IOException, SAXException, ParserConfigurationException {
+    public void testParseSimpleParagraph() throws IOException, SAXException, ParserConfigurationException {
         DocumentData documentData = htmlParser.parseHTMLDocument("<body><p>Text</p></body>");
         assertEquals(1, documentData.getParagraphs().size());
         ParagraphData paragraph = documentData.getParagraphs().iterator().next();
@@ -50,18 +50,18 @@ public class HTMLParserTest {
     }
 
     @Test
-    public void parseTwoParagraphs() throws IOException, SAXException, ParserConfigurationException {
+    public void testParseTwoParagraphs() throws IOException, SAXException, ParserConfigurationException {
         DocumentData documentData = htmlParser.parseHTMLDocument("<body><p>Text</p><p>Second</p></body>");
         assertEquals(2, documentData.getParagraphs().size());
     }
 
     @Test(expected = HTMLParseException.class)
-    public void parseUnfinishedParagraph() throws IOException, SAXException, ParserConfigurationException {
+    public void testParseUnfinishedParagraph() throws IOException, SAXException, ParserConfigurationException {
         DocumentData documentData = htmlParser.parseHTMLDocument("<body><p>Text</body>");
     }
 
     @Test(expected = HTMLParseException.class)
-    public void parseTextOutsideParagraph() throws IOException, SAXException, ParserConfigurationException {
+    public void testParseTextOutsideParagraph() throws IOException, SAXException, ParserConfigurationException {
         DocumentData documentData = htmlParser.parseHTMLDocument("<body>Text</body>");
     }
 }

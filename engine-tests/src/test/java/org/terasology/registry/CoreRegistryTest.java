@@ -20,7 +20,9 @@ import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.context.Context;
+
 import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -40,7 +42,7 @@ public class CoreRegistryTest {
      * Check if the context is changed with setContext method.
      */
     @Test
-    public void contextChange() {
+    public void testContextChange() {
         CoreRegistry.setContext(new ContextImplementation());
         assertNotEquals(CoreRegistry.get(Context.class), context);
     }
@@ -49,7 +51,7 @@ public class CoreRegistryTest {
      * Check if CoreRegistry returns null on its methods when the context is not defined.
      */
     @Test
-    public void nullReturnOnMissingContext() {
+    public void testNullReturnOnMissingContext() {
         CoreRegistry.setContext(null);
 
         assertEquals(CoreRegistry.put(Integer.class, 10), null);
@@ -61,7 +63,7 @@ public class CoreRegistryTest {
      * independently of the Context implementation.
      */
     @Test
-    public void contextGetIndependenceFromContextInterfaceImplementation() {
+    public void testContextGetIndependenceFromContextInterfaceImplementation() {
         assertEquals(CoreRegistry.get(Context.class), context);
 
         assertEquals(context.get(Context.class), null);
@@ -71,7 +73,7 @@ public class CoreRegistryTest {
      * Check if the CoreRegistry is calling the methods of its Context
      */
     @Test
-    public void contextMethodsCalled() {
+    public void testContextMethodsCalled() {
         // Load value in context
         Integer value = 10;
         CoreRegistry.put(Integer.class, value);
@@ -102,7 +104,7 @@ public class CoreRegistryTest {
         }
 
         @Override
-        public <T, U extends T> void put(Class<T> type, U object)  {
+        public <T, U extends T> void put(Class<T> type, U object) {
             map.put(type, object);
         }
     }

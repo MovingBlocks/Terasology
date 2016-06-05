@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class Region3iTest {
 
     @Test
-    public void emptyConstructor() {
+    public void testEmptyConstructor() {
         Region3i region = Region3i.EMPTY;
         assertEquals(new Vector3i(), region.size());
         assertTrue(region.isEmpty());

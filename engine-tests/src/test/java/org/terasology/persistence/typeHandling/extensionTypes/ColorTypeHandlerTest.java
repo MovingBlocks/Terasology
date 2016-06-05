@@ -16,6 +16,8 @@
 
 package org.terasology.persistence.typeHandling.extensionTypes;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -25,9 +27,6 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.rendering.nui.Color;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 
 /**
  * Tests the {@link ColorTypeHandler} class.
