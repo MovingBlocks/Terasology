@@ -341,7 +341,16 @@ public class UITreeView<T> extends CoreWidget {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
                 // Expand or contract and item on RMB - works even if the tree is disabled.
                 model.get().getItem(index).setExpanded(!model.get().getItem(index).isExpanded());
+
+                Tree<T> selectedItem = model.get().getItem(selectedIndex.get());
                 model.get().resetItems();
+
+                int newIndex = model.get().indexOf(selectedItem);
+                if (newIndex == -1) {
+                    selectedIndex.set(null);
+                } else {
+                    selectedIndex.set(newIndex);
+                }
                 return true;
             } else if (isEnabled()) {
                 if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
