@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.models;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayDeque;
@@ -23,7 +24,6 @@ import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * A general-purpose tree data structure.
@@ -102,9 +102,7 @@ public class Tree<T> {
      * @return The index of the specified {@code Tree}.
      */
     public int getIndex(Tree<T> node) {
-        if (node == null) {
-            throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
-        }
+        Preconditions.checkNotNull(node, NULL_NODE_ARGUMENT);
 
         return this.children.indexOf(node);
     }
@@ -141,9 +139,7 @@ public class Tree<T> {
      * @param child The child to be added.
      */
     public void addChild(Tree<T> child) {
-        if (child == null) {
-            throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
-        }
+        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
 
         this.children.add(child);
         child.setParent(this);
@@ -156,9 +152,7 @@ public class Tree<T> {
      * @param child      The child to be added.
      */
     public void addChild(int childIndex, Tree<T> child) {
-        if (child == null) {
-            throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
-        }
+        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
 
         this.children.add(childIndex, child);
         child.setParent(this);
@@ -188,12 +182,8 @@ public class Tree<T> {
      * @param child The child to be removed.
      */
     public void removeChild(Tree<T> child) {
-        if (child == null) {
-            throw new IllegalArgumentException(NULL_NODE_ARGUMENT);
-        }
-        if (child.getParent() != this) {
-            throw new IllegalArgumentException(NODE_ARGUMENT_INVALID_PARENT);
-        }
+        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
+        Preconditions.checkState(child.getParent() == this, NODE_ARGUMENT_INVALID_PARENT);
 
         this.children.remove(child);
         child.setParent(null);
@@ -272,12 +262,9 @@ public class Tree<T> {
 
         @Override
         public Object next() {
-            if (!this.hasNext()) {
-                throw new NoSuchElementException(ITERATOR_NO_ITEMS);
-            }
+            Preconditions.checkState(this.hasNext(), ITERATOR_NO_ITEMS);
 
             Tree<T> current = next;
-
             Enumeration childEnumeration = stack.peek();
 
             // Retrieve the next item.
