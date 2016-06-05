@@ -16,6 +16,8 @@
 package org.terasology.entitySystem.prefab.internal;
 
 import com.google.common.base.Charsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
@@ -34,6 +36,7 @@ import java.util.List;
 /**
  */
 public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
+    private static final Logger logger = LoggerFactory.getLogger(PrefabFormat.class);
 
     private ComponentLibrary componentLibrary;
     private TypeSerializationLibrary typeSerializationLibrary;
@@ -49,6 +52,7 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
             if (prefabData != null) {
+                logger.debug("Attempting to deserialize prefab {} with inputs {}", resourceUrn, inputs);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
                 return serializer.deserialize(prefabData);
             } else {
