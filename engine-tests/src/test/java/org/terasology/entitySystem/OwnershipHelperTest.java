@@ -58,7 +58,7 @@ public class OwnershipHelperTest {
     }
 
     @Test
-    public void listsOwnedEntities() {
+    public void testListsOwnedEntities() {
         EntityRef ownedEntity = entityManager.create();
         OwnerComponent ownerComp = new OwnerComponent();
         ownerComp.child = ownedEntity;

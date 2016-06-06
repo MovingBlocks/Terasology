@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 public class CircularBufferTest {
 
     @Test
-    public void addItems() {
+    public void testAddItems() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(4);
         for (int i = 0; i < 100; ++i) {
             buffer.add(i);
@@ -39,7 +39,7 @@ public class CircularBufferTest {
     }
 
     @Test
-    public void removeItems() {
+    public void testRemoveItems() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(4);
         buffer.add(1);
         buffer.add(2);
@@ -91,7 +91,7 @@ public class CircularBufferTest {
     }
 
     @Test
-    public void insert() {
+    public void testInsert() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(4);
         buffer.addAll(ImmutableList.of(1, 2, 5, 7));
 
@@ -112,7 +112,7 @@ public class CircularBufferTest {
     }
 
     @Test
-    public void iterator1() {
+    public void testIterator1() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
         buffer.addAll(ImmutableList.of(1, 2));
         Iterator<Integer> iterator = buffer.iterator();
@@ -121,7 +121,7 @@ public class CircularBufferTest {
     }
 
     @Test
-    public void iterator2() {
+    public void testIterator2() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
         buffer.addAll(ImmutableList.of(1, 2));
         Iterator<Integer> iterator = buffer.iterator();
@@ -134,7 +134,7 @@ public class CircularBufferTest {
 
 
     @Test(expected = IllegalStateException.class)
-    public void iteratorRemoveTwice() {
+    public void testIteratorRemoveTwice() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
         buffer.addAll(ImmutableList.of(1, 2));
         Iterator<Integer> iterator = buffer.iterator();
@@ -144,14 +144,14 @@ public class CircularBufferTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void iteratorRemoveWithoutNext() {
+    public void testIteratorRemoveWithoutNext() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
         buffer.addAll(ImmutableList.of(1, 2));
         buffer.iterator().remove();
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void iteratorAfterEnd() {
+    public void testIteratorAfterEnd() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(1);
         buffer.add(1);
         Iterator<Integer> it = buffer.iterator();

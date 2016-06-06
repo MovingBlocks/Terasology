@@ -41,13 +41,13 @@ public class MetadataBuilderTest {
     }
 
     @Test
-    public void detectLackOfDefaultConstructor() throws Exception {
+    public void testDetectsLackOfDefaultConstructor() throws Exception {
         DefaultClassMetadata<NoDefaultConstructor> metadata = new DefaultClassMetadata<>(new SimpleUri(), NoDefaultConstructor.class, factory, copyStrategyLibrary);
         assertFalse(metadata.isConstructable());
     }
 
     @Test
-    public void trivialMetadata() throws Exception {
+    public void testTrivialMetadata() throws Exception {
         DefaultClassMetadata<Trivial> metadata = new DefaultClassMetadata<>(new SimpleUri(), Trivial.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(0, metadata.getFieldCount());

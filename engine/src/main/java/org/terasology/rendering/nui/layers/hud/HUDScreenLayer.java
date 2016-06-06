@@ -137,7 +137,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     @Override
-    public boolean isEscapeToCloseAllowed() {
+    protected boolean isEscapeToCloseAllowed() {
         return false;
     }
 
@@ -195,7 +195,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     @Override
-    protected void initialise() {
+    public void initialise() {
     }
 
     @Override

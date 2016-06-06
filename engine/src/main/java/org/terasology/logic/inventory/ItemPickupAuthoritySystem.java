@@ -17,6 +17,7 @@
 package org.terasology.logic.inventory;
 
 import com.bulletphysics.collision.shapes.BoxShape;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
@@ -46,6 +47,9 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
     @In
     private EntitySystemLibrary library;
 
+    @In
+    private Time time;
+
     @ReceiveEvent
     public void onDropItemEvent(DropItemEvent event, EntityRef itemEntity, ItemComponent itemComponent) {
         for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
@@ -64,15 +68,17 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onBumpGiveItemToEntity(CollideEvent event, EntityRef entity, PickupComponent pickupComponent) {
-        GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
-        entity.send(giveItemEvent);
+        if (pickupComponent.timeDropped + pickupComponent.timeToPickUp < time.getGameTimeInMs()) {
+            GiveItemEvent giveItemEvent = new GiveItemEvent(event.getOtherEntity());
+            entity.send(giveItemEvent);
 
-        if (giveItemEvent.isHandled()) {
-            // remove all the components added from the pickup prefab
-            ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
-            if (itemComponent != null) {
-                for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
-                    entity.removeComponent(component.getClass());
+            if (giveItemEvent.isHandled()) {
+                // remove all the components added from the pickup prefab
+                ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
+                if (itemComponent != null) {
+                    for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
+                        entity.removeComponent(component.getClass());
+                    }
                 }
             }
         }

@@ -1,9 +1,9 @@
 {
-    "text-shadowed" : true,
-    "font" : "NotoSans-Regular",
-    "elements" : {
-        "UILabel" : {
-            "text-align-vertical" : "top",
+    "text-shadowed": true,
+    "font": "NotoSans-Regular",
+    "elements": {
+        "UILabel": {
+            "text-align-vertical": "top",
             "modes": {
                 "enabled": {
                     "text-color": "FFFFFFFF"
@@ -13,496 +13,535 @@
                 }
             }
         },
-        "UITooltip" : {
-            "background" : "engine:area",
-            "background-border" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+        "UITooltip": {
+            "background": "engine:area",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "margin" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+            "margin": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "align-horizontal" : "left",
-            "align-vertical" : "bottom",
-            "text-align-horizontal" : "left"
+            "align-horizontal": "left",
+            "align-vertical": "bottom",
+            "text-align-horizontal": "left"
         },
-        "UIText" : {
-            "text-align-horizontal" : "left",
-            "text-align-vertical" : "top",
-            "background" : "engine:box",
-            "background-border" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+        "UIText": {
+            "text-align-horizontal": "left",
+            "text-align-vertical": "top",
+            "background": "engine:box",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "margin" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+            "margin": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "modes" : {
-                "disabled" : {
+            "modes": {
+                "disabled": {
                     "text-color": "888888FF",
-                    "background" : "engine:boxDisabled"
+                    "background": "engine:boxDisabled"
                 }
             }
         },
-        "UIImage" : {
-            "texture-scale-mode" : "scale fit"
+        "UIImage": {
+            "texture-scale-mode": "scale fit"
         },
-        "RowLayout" : {
+        "RowLayout": {
         },
-        "UIBox" : {
-            "background" : "engine:area",
-            "background-border" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+        "UIBox": {
+            "background": "engine:area",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "margin" : {
-                "top" : 12,
-                "bottom" : 12,
-                "left" : 12,
-                "right" : 12
+            "margin": {
+                "top": 12,
+                "bottom": 12,
+                "left": 12,
+                "right": 12
             }
         },
-        "UILoadBar" : {
-            "background" : "engine:area",
-            "background-border" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+        "UILoadBar": {
+            "background": "engine:area",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "margin" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+            "margin": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
             },
-            "min-width" : 256,
-            "max-width" : 512,
-            "fixed-height" : 20
+            "min-width": 256,
+            "max-width": 512,
+            "fixed-height": 20
         },
-        "UIList" : {
-            "parts" : {
-                "item" : {
-                    "text-align-horizontal" : "center",
-                    "text-align-vertical" : "middle",
-                    "background" : "button",
-                    "background-border" : {
-                        "top" : 2,
-                        "bottom" : 2,
-                        "left" : 2,
-                        "right" : 2
+        "UIList": {
+            "parts": {
+                "item": {
+                    "text-align-horizontal": "center",
+                    "text-align-vertical": "middle",
+                    "background": "button",
+                    "background-border": {
+                        "top": 2,
+                        "bottom": 2,
+                        "left": 2,
+                        "right": 2
                     },
-                    "margin" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 2,
-                        "right" : 2
+                    "margin": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 2,
+                        "right": 2
                     },
-                    "texture-scale-mode" : "scale fit",
-                    "modes" : {
-                        "hover" : {
-                            "background" : "buttonOver"
+                    "texture-scale-mode": "scale fit",
+                    "modes": {
+                        "hover": {
+                            "background": "buttonOver"
                         },
-                        "active" : {
-                            "background" : "buttonDown",
-                            "text-color" : "FFFF00FF"
+                        "active": {
+                            "background": "buttonDown",
+                            "text-color": "FFFF00FF"
                         },
                         "disabled": {
-                            "background" : "button",
-                            "text-color" : "BBBBBBFF"
+                            "background": "button",
+                            "text-color": "BBBBBBFF"
                         }
                     }
                 }
             }
         },
-        "UIDropdown" : {
-            "text-align-horizontal" : "left",
-            "fixed-height" : 32,
-            "parts" : {
-                "base" : {
-                    "background" : "dropdown",
-                    "background-border" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 3,
-                        "right" : 29
+        "UIDropdown": {
+            "text-align-horizontal": "left",
+            "fixed-height": 32,
+            "parts": {
+                "base": {
+                    "background": "dropdown",
+                    "background-border": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 3,
+                        "right": 29
                     },
-                    "margin" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 5,
-                        "right" : 31
+                    "margin": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 5,
+                        "right": 31
                     },
-                    "modes" : {
-                        "active" : {
-                            "background" : "dropdownActive"
-                        },
-                        "disabled" : {
-                            "text-color" : "888888FF",
-                            "background" : "dropdownDisabled"
-                        }
-                    }
-                },
-                "list" : {
-                    "background" : "dropdownList",
-                    "background-border" : {
-                        "top" : 0,
-                        "bottom" : 3,
-                        "left" : 3,
-                        "right" : 3
-                    },
-                    "margin" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 5,
-                        "right" : 5
-                    }
-                },
-                "list-item" : {
-                    "margin" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 5,
-                        "right" : 5
-                    },
-                    "modes" : {
-                        "hover" : {
-                            "text-color" : "FFFF00FF",
-                            "background" : "dropdownListItemActive"
-                        }
-                    }
-                }
-            }
-        },
-        "UIDropdownScrollable" : {
-            "text-align-horizontal" : "left",
-            "fixed-height" : 32,
-            "parts" : {
-                "base" : {
-                    "background" : "dropdown",
-                    "background-border" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 3,
-                        "right" : 29
-                    },
-                    "margin" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 5,
-                        "right" : 31
-                    },
-                    "modes" : {
-                        "active" : {
-                            "background" : "dropdownActive"
-                        },
-                        "disabled" : {
-                            "text-color" : "888888FF",
-                            "background" : "dropdownDisabled"
-                        }
-                    }
-                },
-                "list" : {
-                    "background" : "dropdownList",
-                    "background-border" : {
-                        "top" : 0,
-                        "bottom" : 3,
-                        "left" : 3,
-                        "right" : 3
-                    },
-                    "margin" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 5,
-                        "right" : 5
-                    }
-                },
-                "list-item" : {
-                    "margin" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 5,
-                        "right" : 5
-                    },
-                    "modes" : {
-                        "hover" : {
-                            "text-color" : "FFFF00FF",
-                            "background" : "dropdownListItemActive"
-                        }
-                    }
-                }
-            }
-        },
-        "UIButton" : {
-            "text-align-horizontal" : "center",
-            "text-align-vertical" : "middle",
-            "background" : "button",
-            "background-border" : {
-                "top" : 2,
-                "bottom" : 2,
-                "left" : 2,
-                "right" : 2
-            },
-            "margin" : {
-                "top" : 2,
-                "bottom" : 2,
-                "left" : 10,
-                "right" : 10
-            },
-            "texture-scale-mode" : "scale fit",
-            "modes" : {
-                "hover" : {
-                    "background" : "buttonOver"
-                },
-                "down" : {
-                    "background" : "buttonDown",
-                    "text-color" : "FFFF00FF"
-                },
-                "disabled" : {
-                    "background" : "button",
-                    "text-color" : "BBBBBBFF"
-                }
-            }
-        },
-        "UIInputBind" : {
-            "text-align-horizontal" : "center",
-            "text-align-vertical" : "middle",
-            "background" : "button",
-            "background-border" : {
-                "top" : 2,
-                "bottom" : 2,
-                "left" : 2,
-                "right" : 2
-            },
-            "texture-scale-mode" : "scale fit",
-            "modes" : {
-                "hover" : {
-                    "background" : "buttonOver"
-                },
-                "active" : {
-                    "background" : "buttonDown",
-                    "text-color" : "FFFF00FF"
-                }
-            }
-        },
-        "UIInputBindButton" : {
-            "text-align-horizontal" : "center",
-            "text-align-vertical" : "middle",
-            "background" : "button",
-            "background-border" : {
-                "top" : 2,
-                "bottom" : 2,
-                "left" : 2,
-                "right" : 2
-            },
-            "margin" : {
-                "top" : 6,
-                "bottom" : 6,
-                "left" : 4,
-                "right" : 4
-            },
-            "texture-scale-mode" : "scale fit",
-            "modes" : {
-                "hover" : {
-                    "background" : "buttonOver"
-                },
-                "active" : {
-                    "background" : "buttonDown",
-                    "text-color" : "FFFF00FF"
-                }
-            }
-        },
-        "UICheckbox" : {
-            "background" : "engine:checkbox",
-            "fixed-width" : 24,
-            "fixed-height" : 24,
-            "align-horizontal" : "left",
-            "modes" : {
-                "hover" : {
-                    "background" : "engine:checkboxHover"
-                },
-                "active" : {
-                    "background" : "engine:checkboxChecked"
-                },
-                "hover-active" : {
-                    "background" : "engine:checkboxCheckedHover"
-                },
-                "disabled": {
-                    "background" : "engine:checkboxDisabled"
-                },
-                "disabled-active": {
-                    "background" : "engine:checkboxCheckedDisabled"
-                }
-            }
-        },
-        "ScrollableArea" : {
-            "background" : "engine:box",
-            "background-border" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
-            },
-            "margin" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
-            }
-        },
-        "ColumnLayout" : {
-            "align-vertical" : "TOP"
-        },
-        "UIScrollbar" : {
-            "parts" : {
-                "sliderVertical" : {
-                    "background" : "engine:sliderTrack",
-                    "fixed-width" : 8,
-                    "background-border" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 0,
-                        "right" : 0
-                    }
-                },
-                "sliderHorizontal" : {
-                    "background" : "engine:sliderTrack",
-                    "fixed-height" : 8,
-                    "background-border" : {
-                        "top" : 0,
-                        "bottom" : 0,
-                        "left" : 3,
-                        "right" : 3
-                    }
-                },
-                "handle" : {
-                    "background" : "engine:handle",
-                    "fixed-width" : 16,
-                    "fixed-height" : 16
-                }
-            }
-        },
-        "UISlider" : {
-            "text-align-horizontal" : "center",
-            "text-align-vertical" : "middle",
-            "fixed-height" : 32,
-            "parts" : {
-                "slider" : {
-                    "background" : "engine:sliderTrack",
-                    "fixed-height" : 8,
-                    "min-width" : 8,
-                    "background-border" : {
-                        "top" : 0,
-                        "bottom" : 0,
-                        "left" : 3,
-                        "right" : 3
-                    }
-                },
-                "ticker" : {
-                    "background" : "engine:box",
-                    "fixed-height" : 32,
-                    "background-border" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 4,
-                        "right" : 4
-                    },
-                    "margin" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 5,
-                        "right" : 5
-                    },
-                    "modes" : {
-                        "active" : {
-                            "background" : "engine:boxActive"
+                    "modes": {
+                        "active": {
+                            "background": "dropdownActive"
                         },
                         "disabled": {
                             "text-color": "888888FF",
-                            "background" : "engine:boxDisabled"
+                            "background": "dropdownDisabled"
+                        }
+                    }
+                },
+                "list": {
+                    "background": "dropdownList",
+                    "background-border": {
+                        "top": 0,
+                        "bottom": 3,
+                        "left": 3,
+                        "right": 3
+                    },
+                    "margin": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 5,
+                        "right": 5
+                    }
+                },
+                "list-item": {
+                    "margin": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 5,
+                        "right": 5
+                    },
+                    "modes": {
+                        "hover": {
+                            "text-color": "FFFF00FF",
+                            "background": "dropdownListItemActive"
                         }
                     }
                 }
             }
         },
-        "UIDoubleSlider" : {
-            "text-align-horizontal" : "center",
-            "text-align-vertical" : "middle",
-            "fixed-height" : 32,
-            "parts" : {
-                "slider" : {
-                    "background" : "engine:sliderTrack",
-                    "fixed-height" : 8,
-                    "min-width" : 8,
-                    "background-border" : {
-                        "top" : 0,
-                        "bottom" : 0,
-                        "left" : 3,
-                        "right" : 3
-                    }
-                },
-                "tickerLeft" : {
-                    "background" : "engine:box",
-                    "fixed-height" : 32,
-                    "background-border" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 4,
-                        "right" : 4
+        "UIDropdownScrollable": {
+            "text-align-horizontal": "left",
+            "fixed-height": 32,
+            "parts": {
+                "base": {
+                    "background": "dropdown",
+                    "background-border": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 3,
+                        "right": 29
                     },
-                    "margin" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 5,
-                        "right" : 5
+                    "margin": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 5,
+                        "right": 31
                     },
-                    "modes" : {
-                        "active" : {
-                            "background" : "engine:boxActive"
+                    "modes": {
+                        "active": {
+                            "background": "dropdownActive"
                         },
                         "disabled": {
-                            "text-color" : "888888FF",
-                            "background" : "engine:boxDisabled"
+                            "text-color": "888888FF",
+                            "background": "dropdownDisabled"
                         }
                     }
                 },
-                "tickerRight" : {
-                    "background" : "engine:box",
-                    "fixed-height" : 32,
-                    "background-border" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 4,
-                        "right" : 4
+                "list": {
+                    "background": "dropdownList",
+                    "background-border": {
+                        "top": 0,
+                        "bottom": 3,
+                        "left": 3,
+                        "right": 3
                     },
-                    "margin" : {
-                        "top" : 4,
-                        "bottom" : 4,
-                        "left" : 5,
-                        "right" : 5
+                    "margin": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 5,
+                        "right": 5
+                    }
+                },
+                "list-item": {
+                    "margin": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 5,
+                        "right": 5
                     },
-                    "modes" : {
-                        "active" : {
-                            "background" : "engine:boxActive"
+                    "modes": {
+                        "hover": {
+                            "text-color": "FFFF00FF",
+                            "background": "dropdownListItemActive"
+                        }
+                    }
+                }
+            }
+        },
+        "UIButton": {
+            "text-align-horizontal": "center",
+            "text-align-vertical": "middle",
+            "background": "button",
+            "background-border": {
+                "top": 2,
+                "bottom": 2,
+                "left": 2,
+                "right": 2
+            },
+            "margin": {
+                "top": 2,
+                "bottom": 2,
+                "left": 10,
+                "right": 10
+            },
+            "texture-scale-mode": "scale fit",
+            "modes": {
+                "hover": {
+                    "background": "buttonOver"
+                },
+                "down": {
+                    "background": "buttonDown",
+                    "text-color": "FFFF00FF"
+                },
+                "disabled": {
+                    "background": "button",
+                    "text-color": "BBBBBBFF"
+                }
+            }
+        },
+        "UIInputBind": {
+            "text-align-horizontal": "center",
+            "text-align-vertical": "middle",
+            "background": "button",
+            "background-border": {
+                "top": 2,
+                "bottom": 2,
+                "left": 2,
+                "right": 2
+            },
+            "texture-scale-mode": "scale fit",
+            "modes": {
+                "hover": {
+                    "background": "buttonOver"
+                },
+                "active": {
+                    "background": "buttonDown",
+                    "text-color": "FFFF00FF"
+                }
+            }
+        },
+        "UIInputBindButton": {
+            "text-align-horizontal": "center",
+            "text-align-vertical": "middle",
+            "background": "button",
+            "background-border": {
+                "top": 2,
+                "bottom": 2,
+                "left": 2,
+                "right": 2
+            },
+            "margin": {
+                "top": 6,
+                "bottom": 6,
+                "left": 4,
+                "right": 4
+            },
+            "texture-scale-mode": "scale fit",
+            "modes": {
+                "hover": {
+                    "background": "buttonOver"
+                },
+                "active": {
+                    "background": "buttonDown",
+                    "text-color": "FFFF00FF"
+                }
+            }
+        },
+        "UICheckbox": {
+            "background": "engine:checkbox",
+            "fixed-width": 24,
+            "fixed-height": 24,
+            "align-horizontal": "left",
+            "modes": {
+                "hover": {
+                    "background": "engine:checkboxHover"
+                },
+                "active": {
+                    "background": "engine:checkboxChecked"
+                },
+                "hover-active": {
+                    "background": "engine:checkboxCheckedHover"
+                },
+                "disabled": {
+                    "background": "engine:checkboxDisabled"
+                },
+                "disabled-active": {
+                    "background": "engine:checkboxCheckedDisabled"
+                }
+            }
+        },
+        "ScrollableArea": {
+            "background": "engine:box",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
+            },
+            "margin": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
+            }
+        },
+        "ColumnLayout": {
+            "align-vertical": "TOP"
+        },
+        "UIScrollbar": {
+            "parts": {
+                "sliderVertical": {
+                    "background": "engine:sliderTrack",
+                    "fixed-width": 8,
+                    "background-border": {
+                        "top": 3,
+                        "bottom": 3,
+                        "left": 0,
+                        "right": 0
+                    }
+                },
+                "sliderHorizontal": {
+                    "background": "engine:sliderTrack",
+                    "fixed-height": 8,
+                    "background-border": {
+                        "top": 0,
+                        "bottom": 0,
+                        "left": 3,
+                        "right": 3
+                    }
+                },
+                "handle": {
+                    "background": "engine:handle",
+                    "fixed-width": 16,
+                    "fixed-height": 16
+                }
+            }
+        },
+        "UISlider": {
+            "text-align-horizontal": "center",
+            "text-align-vertical": "middle",
+            "fixed-height": 32,
+            "parts": {
+                "slider": {
+                    "background": "engine:sliderTrack",
+                    "fixed-height": 8,
+                    "min-width": 8,
+                    "background-border": {
+                        "top": 0,
+                        "bottom": 0,
+                        "left": 3,
+                        "right": 3
+                    }
+                },
+                "ticker": {
+                    "background": "engine:box",
+                    "fixed-height": 32,
+                    "background-border": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 4,
+                        "right": 4
+                    },
+                    "margin": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 5,
+                        "right": 5
+                    },
+                    "modes": {
+                        "active": {
+                            "background": "engine:boxActive"
+                        },
+                        "disabled": {
+                            "text-color": "888888FF",
+                            "background": "engine:boxDisabled"
+                        }
+                    }
+                }
+            }
+        },
+        "UIDoubleSlider": {
+            "text-align-horizontal": "center",
+            "text-align-vertical": "middle",
+            "fixed-height": 32,
+            "parts": {
+                "slider": {
+                    "background": "engine:sliderTrack",
+                    "fixed-height": 8,
+                    "min-width": 8,
+                    "background-border": {
+                        "top": 0,
+                        "bottom": 0,
+                        "left": 3,
+                        "right": 3
+                    }
+                },
+                "tickerLeft": {
+                    "background": "engine:box",
+                    "fixed-height": 32,
+                    "background-border": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 4,
+                        "right": 4
+                    },
+                    "margin": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 5,
+                        "right": 5
+                    },
+                    "modes": {
+                        "active": {
+                            "background": "engine:boxActive"
+                        },
+                        "disabled": {
+                            "text-color": "888888FF",
+                            "background": "engine:boxDisabled"
+                        }
+                    }
+                },
+                "tickerRight": {
+                    "background": "engine:box",
+                    "fixed-height": 32,
+                    "background-border": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 4,
+                        "right": 4
+                    },
+                    "margin": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 5,
+                        "right": 5
+                    },
+                    "modes": {
+                        "active": {
+                            "background": "engine:boxActive"
                         },
                          "enabled": {
                              "text-color": "FFFFFFFF"
                          },
                          "disabled": {
                             "text-color": "888888FF",
-                            "background" : "engine:boxDisabled"
+                            "background": "engine:boxDisabled"
+                        }
+                    }
+                }
+            }
+        },
+        "UITreeView": {
+            "parts": {
+                "tree-item": {
+                    "text-align-horizontal": "left",
+                    "text-align-vertical": "middle",
+                    "background": "button",
+                    "background-border": {
+                        "top": 2,
+                        "bottom": 2,
+                        "left": 2,
+                        "right": 2
+                    },
+                    "margin": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 2,
+                        "right": 2
+                    },
+                    "texture-scale-mode": "scale fit",
+                    "modes": {
+                        "hover": {
+                            "background": "buttonOver"
+                        },
+                        "active": {
+                            "background": "buttonDown",
+                            "text-color": "FFFF00FF"
+                        },
+                        "disabled": {
+                            "background": "button",
+                            "text-color": "888888FF"
+                        },
+                        "hover-disabled": {
+                            "background": "buttonOver",
+                            "text-color": "888888FF"
                         }
                     }
                 }

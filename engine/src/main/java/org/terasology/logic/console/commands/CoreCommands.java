@@ -15,7 +15,9 @@
  */
 package org.terasology.logic.console.commands;
 
+import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.utilities.Assets;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
@@ -73,6 +75,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -206,25 +209,26 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Shows a ui screen", helpText = "Can be used for debugging/testing, example: \"showScreen migTestScreen\"")
-    public String showScreen(@CommandParam("uri") String uri) {
+    public String showScreen(@CommandParam(value="uri", suggester = ScreenSuggester.class) String uri) {
         return nuiManager.pushScreen(uri) != null ? "Success" : "Not found";
     }
 
     @Command(shortDescription = "Reloads a ui screen")
     public String reloadScreen(@CommandParam("ui") String ui) {
-        Optional<UIElement> uiData = assetManager.getAsset(ui, UIElement.class);
-        if (uiData.isPresent()) {
-            boolean wasOpen = nuiManager.isOpen(uiData.get().getUrn());
+        Set<ResourceUrn> urns = assetManager.resolve(ui, UIElement.class);
+        if (urns.size() == 1) {
+            ResourceUrn urn = urns.iterator().next();
+            boolean wasOpen = nuiManager.isOpen(urn);
             if (wasOpen) {
-                nuiManager.closeScreen(uiData.get().getUrn());
+                nuiManager.closeScreen(urn);
             }
 
             if (wasOpen) {
-                nuiManager.pushScreen(uiData.get());
+                nuiManager.pushScreen(urn);
             }
             return "Success";
         } else {
-            return "Unable to resolve ui '" + ui + "'";
+            return "No unique resource found";
         }
     }
 

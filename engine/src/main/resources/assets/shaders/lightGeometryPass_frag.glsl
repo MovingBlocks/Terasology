@@ -20,15 +20,15 @@ uniform vec3 lightViewPos;
 
 uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D texSceneOpaqueNormals;
+uniform sampler2D texSceneOpaqueLightBuffer;
 
 uniform vec3 lightColorDiffuse = vec3(1.0, 0.0, 0.0);
 uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
 
-uniform vec4 lightProperties;
-#define lightDiffuseIntensity lightProperties.y
+uniform vec3 lightProperties;
 #define lightAmbientIntensity lightProperties.x
-#define lightSpecularIntensity lightProperties.z
-#define lightSpecularPower lightProperties.w
+#define lightDiffuseIntensity lightProperties.y
+#define lightSpecularPower lightProperties.z
 
 uniform vec4 lightExtendedProperties;
 #define lightAttenuationRange lightExtendedProperties.x
@@ -63,7 +63,11 @@ void main() {
 
     vec4 normalBuffer = texture2D(texSceneOpaqueNormals, projectedPos.xy).rgba;
     vec3 normal = normalize(normalBuffer.xyz * 2.0 - 1.0);
-    float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
+    float shininess = normalBuffer.a;
+    vec4 depthBuffer = texture2D(texSceneOpaqueDepth, projectedPos.xy).rgba;
+    float depth = depthBuffer.r * 2.0 - 1.0;
+    vec4 lightBuffer = texture2D(texSceneOpaqueLightBuffer, projectedPos.xy);
+    float sunlightIntensity = lightBuffer.y;
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     // TODO: Uhhh... Doing this twice here :/ Frustum ray would be better!
@@ -89,8 +93,11 @@ void main() {
 
 #if defined (CLOUD_SHADOWS) && !defined (VOLUMETRIC_LIGHTING)
         // TODO: Add shader parameters for this...
-        float cloudOcclusion = clamp(texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.004)).r * 4,0,.4);
+        // Get the preconfigured value from the randomized texture, sampling a value from it to determine how much cloud shadow there will be.
+        // Clamp the value so that clouds do not turn the surface black.
+        float cloudOcclusion = clamp(texture2D(texSceneClouds, (worldPosition.xz + cameraPosition.xz) * 0.005 + timeToTick(time, 0.002)).r * 10,0.6,1);
 
+        // Combine the cloud shadow with the dynamic shadows
         shadowTerm *= rescaleRange(cloudOcclusion,0,1,0,shadowTerm);
 #endif
    }
@@ -122,7 +129,8 @@ void main() {
     float specTerm  = calcSpecLightNormalized(normal, lightDirNorm, eyeVec, lightSpecularPower);
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
-    shadowTerm = clamp(shadowTerm, 0.25, 1.0);
+    // ensure that the shadow does not make the surface completely black
+    shadowTerm = clamp(shadowTerm, 0.5, 1.0);
 
     lambTerm *= shadowTerm;
     specTerm *= shadowTerm;
@@ -130,34 +138,32 @@ void main() {
     ambTerm *= shadowTerm;
 #endif
 
-    float specular = lightSpecularIntensity * specTerm;
+    float specular = shininess * specTerm;
 
 #if defined (FEATURE_LIGHT_POINT)
     vec3 color = ambTerm * lightColorAmbient;
     color *= lightColorDiffuse * lightDiffuseIntensity * lambTerm;
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
-    vec3 color = calcSunlightColorDeferred(normalBuffer.a, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
+    vec3 color = calcSunlightColorDeferred(sunlightIntensity, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
 #else
     vec3 color = vec3(1.0, 0.0, 1.0);
 #endif
 
 #if defined (FEATURE_LIGHT_POINT)
 
-
-    //ref: https://imdoingitwrong.wordpress.com/2011/01/31/light-attenuation/
-    // TODO: Make cutoff a shader parameter
-    const float cutoff= 0.005;
-    const float radius = 3.0;
     // calculate basic attenuation
-    float denom = lightDist/radius + 1;
+    // realistic attenuation ref: https://imdoingitwrong.wordpress.com/2011/01/31/light-attenuation/
+    float denom = lightDist/lightAttenuationRange + 1;
     float attenuation = 1.0/(denom*denom);
-    //float attenuation = clamp (1.0 - ((lightDist * lightDist) / (lightAttenuationRange * lightAttenuationRange)), 0.0, 1.0);
-    //float attenuation = 1.0 - (pow (lightDist, lightAttenuationFalloff) / lightAttenuationRange);
 
-    attenuation = (attenuation - cutoff)/(1.0-cutoff);
+    // Force the light to gradually come to a complete stop at the attenuation range + falloff distance.
+    float lightDistPastRange = max(lightDist - lightAttenuationRange, 0.0);
+    float falloffTerm = 1.0 - min(lightDistPastRange / lightAttenuationFalloff, 1.0);
+    attenuation *= falloffTerm;
+
     attenuation = max(attenuation,0);
 
-    specular *= attenuation  * max(dot(lightDir/ lightDist, normal), 0);
+    specular *= attenuation * max(dot(lightDir/ lightDist, normal), 0);
     color *= attenuation * max(dot(lightDir/ lightDist, normal), 0);
 #endif
 

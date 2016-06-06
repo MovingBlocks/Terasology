@@ -16,7 +16,6 @@
 
 package org.terasology.logic.inventory;
 
-import org.terasology.utilities.Assets;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -24,10 +23,10 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.iconmesh.IconMeshFactory;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
@@ -104,12 +103,12 @@ public class ItemCommonSystem extends BaseComponentSystem {
             meshComponent.material = Assets.getMaterial("engine:terrain").get();
             meshComponent.translucent = blockFamily.getArchetypeBlock().isTranslucent();
 
-            if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !entity.hasComponent(LightComponent.class)) {
+            float luminance = blockFamily.getArchetypeBlock().getLuminance() / 15f;
+            meshComponent.selfLuminance = luminance;
+            if (luminance > 0 && !entity.hasComponent(LightComponent.class)) {
                 LightComponent lightComponent = entity.addComponent(new LightComponent());
-
-                Vector3f randColor = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
-                lightComponent.lightColorDiffuse.set(randColor);
-                lightComponent.lightColorAmbient.set(randColor);
+                //scale the light back if it is a less bright block
+                lightComponent.lightAttenuationRange *= luminance;
             }
 
             entity.addOrSaveComponent(meshComponent);

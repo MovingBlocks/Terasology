@@ -19,6 +19,6 @@ package org.terasology.rendering.nui.layers.hud;
  */
 public class HudToolbar extends CoreHudWidget {
     @Override
-    protected void initialise() {
+    public void initialise() {
     }
 }

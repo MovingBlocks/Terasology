@@ -42,6 +42,36 @@
                         {
                             "type": "UILabel",
                             "family": "subheading",
+                            "text": "${engine:menu#video-preset}"
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#video-preset-message}"
+                        },
+                        {
+                            "type": "ColumnLayout",
+                            "columns": 1,
+                            "verticalSpacing": 4,
+                            "horizontalSpacing": 4,
+                            "family": "option-grid",
+                            "contents": [
+                                {
+                                    "type": "UIDropdown",
+                                    "id": "graphicsPreset"
+                                },
+                            ]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 12]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 12]
+                        },
+                        {
+                            "type": "UILabel",
+                            "family": "subheading",
                             "text": "${engine:menu#video-graphic-settings}"
                         },
                         {
@@ -52,28 +82,12 @@
                             "family": "option-grid",
                             "contents": [
                                 {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#video-preset}: "
-                                },
-                                {
-                                    "type": "UIDropdown",
-                                    "id": "graphicsPreset"
-                                },
-                                {
                                     "type" : "UILabel",
                                     "text" : "${engine:menu#screenshot-size}: "
                                 },
                                 {
                                     "type": "UIDropdown",
                                     "id" : "screenshotSize"
-                                },
-                                {
-                                    "type": "UILabel",
-                                    "text": "${engine:menu#video-fullscreen}: "
-                                },
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "fullscreen"
                                 },
                                 {
                                     "type" : "UILabel",
@@ -85,11 +99,27 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#video-fullscreen}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "fullscreen"
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#video-vsync}: "
                                 },
                                 {
                                     "type": "UICheckbox",
                                     "id": "vsync"
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "text" : "${engine:menu#menu-animations}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id" : "menu-animations"
                                 }
                             ]
                         },
@@ -140,6 +170,14 @@
                                 {
                                     "type": "UICheckbox",
                                     "id": "cloudShadow"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#extra-Lighting}: "
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "extraLighting"
                                 },
                                 {
                                     "type": "UILabel",
@@ -290,11 +328,13 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#oculus-rift-support}: "
+                                    "text": "${engine:menu#oculus-rift-support}: ",
+                                    "enabled": false
                                 },
                                 {
                                     "type": "UICheckbox",
-                                    "id": "oculusVrSupport"
+                                    "id": "oculusVrSupport",
+                                    "enabled": false
                                 },
                                 {
                                     "type": "UILabel",

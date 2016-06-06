@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
-import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
@@ -37,10 +36,12 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 
-import java.util.List;
 import java.util.Locale;
 
 /**
+ * Displays the content of the MetricsMode instances provided by the {@link DebugMetricsSystem}.
+ *
+ * See the {@link #toggleMetricsMode()} method to iterate through the MetricsMode instances available for display.
  */
 public class DebugOverlay extends CoreScreenLayer {
 
@@ -65,12 +66,10 @@ public class DebugOverlay extends CoreScreenLayer {
     @In
     private WorldProvider worldProvider;
 
-    private List<MetricsMode> metricsModes = Lists.newArrayList(new NullMetricsMode(), new RunningMeansMode(), new SpikesMode(),
-            new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode(), new NetworkStatsMode(),
-            new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
-    private int currentMode;
-    private UILabel metricsLabel;
+    @In
+    private DebugMetricsSystem debugMetricsSystem;
 
+    private UILabel metricsLabel;
 
     @In
     private StorageManager storageManager;
@@ -167,9 +166,7 @@ public class DebugOverlay extends CoreScreenLayer {
 
     @Override
     public void update(float delta) {
-        if (metricsLabel != null) {
-            metricsLabel.setText(metricsModes.get(currentMode).getMetrics());
-        }
+        metricsLabel.setText(debugMetricsSystem.getCurrentMode().getMetrics());
     }
 
     @Override
@@ -178,15 +175,17 @@ public class DebugOverlay extends CoreScreenLayer {
     }
 
     @Override
-    public boolean isEscapeToCloseAllowed() {
+    protected boolean isEscapeToCloseAllowed() {
         return false;
     }
 
+    /**
+     * Moves forward through the MetricsMode instances and displays the content of the next available one.
+     */
     public void toggleMetricsMode() {
-        currentMode = (currentMode + 1) % metricsModes.size();
-        while (!metricsModes.get(currentMode).isAvailable()) {
-            currentMode = (currentMode + 1) % metricsModes.size();
-        }
-        PerformanceMonitor.setEnabled(metricsModes.get(currentMode).isPerformanceManagerMode());
+        MetricsMode mode = debugMetricsSystem.toggle();
+        PerformanceMonitor.setEnabled(mode.isPerformanceManagerMode());
     }
+
+
 }

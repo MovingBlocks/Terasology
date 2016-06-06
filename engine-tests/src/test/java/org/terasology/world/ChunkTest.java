@@ -74,7 +74,7 @@ public class ChunkTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void getAABB() {
+    public void testGetAabb() {
         assertEquals(new Vector3f(0, 0, 0), chunk.getAABB().getMin());
         assertEquals(new Vector3f(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), chunk.getAABB().getMax());
     }

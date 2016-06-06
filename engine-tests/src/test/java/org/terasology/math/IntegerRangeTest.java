@@ -37,21 +37,21 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void simpleRange() {
+    public void testSimpleRange() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 3);
         validateRange(range, 1, 2, 3);
     }
 
     @Test
-    public void oneNumberRange() {
+    public void testOneNumberRange() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 1);
         validateRange(range, 1);
     }
 
     @Test
-    public void twoRanges() {
+    public void testTwoRanges() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 3);
         range.addNumbers(5, 6);
@@ -59,7 +59,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void twoRangesAddedInReverseOrder() {
+    public void testTwoRangesAddedInReverseOrder() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(5, 6);
         range.addNumbers(1, 3);
@@ -67,7 +67,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void twoRangesOneWithinAnother() {
+    public void testTwoRangesOneWithinAnother() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 6);
         range.addNumbers(3, 5);
@@ -75,7 +75,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void twoRangesOverlapping() {
+    public void testTwoRangesOverlapping() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 4);
         range.addNumbers(3, 6);
@@ -83,7 +83,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void twoRangesAtTheMaxInt() {
+    public void testTwoRangesAtTheMaxInt() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(Integer.MAX_VALUE - 3, Integer.MAX_VALUE);
         range.addNumbers(Integer.MAX_VALUE - 1, Integer.MAX_VALUE);

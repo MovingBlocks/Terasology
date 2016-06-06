@@ -32,6 +32,7 @@ import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -48,6 +49,8 @@ import java.util.Locale;
 /**
  */
 public class PlayerSettingsScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:PlayerMenuScreen");
 
     @In
     private Config config;
@@ -79,6 +82,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         nametext = find("playername", UIText.class);
         if (nametext != null) {
             nametext.setTooltipDelay(0);
@@ -90,6 +94,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             });
         }
         img = find("image", UIImage.class);
+        if (img != null) {
+            ResourceUrn uri = TextureUtil.getTextureUriForColor(Color.WHITE);
+            Texture tex = Assets.get(uri, Texture.class).get();
+            img.setImage(tex);
+        }
+
         slider = find("tone", UISlider.class);
         if (slider != null) {
             slider.setIncrement(0.01f);
@@ -107,13 +117,13 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             language.setOptionRenderer(new LocaleRenderer(translationSystem));
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         UIButton okButton = find("ok", UIButton.class);
         if (okButton != null) {
             okButton.subscribe(button -> {
                 savePlayerSettings();
-                getManager().popScreen();
+                triggerBackAnimation();
             });
             okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                 @Override
@@ -168,10 +178,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private void updateImage() {
         Color color = getColor();
-        ResourceUrn uri = TextureUtil.getTextureUriForColor(color);
-        Texture tex = Assets.get(uri, Texture.class).get();
         if (img != null) {
-            img.setImage(tex);
+            img.setTint(color);
         }
     }
 
@@ -194,6 +202,11 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             config.getSystem().setLocale(language.getSelection());
             getManager().invalidate();
         }
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     /**

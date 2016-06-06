@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
@@ -28,6 +29,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -40,6 +42,8 @@ import java.nio.file.Path;
 /**
  */
 public class SelectGameScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
@@ -54,6 +58,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
         if (gameTypeTitle != null) {
@@ -75,8 +80,9 @@ public class SelectGameScreen extends CoreScreenLayer {
         gameList.subscribe((widget, item) -> loadGame(item));
 
         WidgetUtil.trySubscribe(this, "create", button -> {
-            CreateGameScreen createGameScreen = getManager().pushScreen("engine:createGameScreen", CreateGameScreen.class);
-            createGameScreen.setLoadingAsServer(loadingAsServer);
+            CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
+            screen.setLoadingAsServer(loadingAsServer);
+            triggerForwardAnimation(screen);
         });
 
         WidgetUtil.trySubscribe(this, "load", button -> {
@@ -101,7 +107,7 @@ public class SelectGameScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
     @Override

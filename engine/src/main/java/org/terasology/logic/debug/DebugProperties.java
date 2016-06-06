@@ -31,7 +31,7 @@ public class DebugProperties extends CoreHudWidget {
     private PropertyLayout propertyLayout;
 
     @Override
-    protected void initialise() {
+    public void initialise() {
         container = find("container", ColumnLayout.class);
         propertyLayout = find("properties", PropertyLayout.class);
     }

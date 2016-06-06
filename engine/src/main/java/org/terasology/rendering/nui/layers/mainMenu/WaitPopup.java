@@ -52,7 +52,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
     private UIButton cancelButton;
 
     @Override
-    protected void initialise() {
+    public void initialise() {
         titleLabel = find("title", UILabel.class);
         Preconditions.checkNotNull(titleLabel, "UILabel 'title' not found");
 

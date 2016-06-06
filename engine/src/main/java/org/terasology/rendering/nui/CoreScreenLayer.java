@@ -15,10 +15,15 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Keyboard;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.nui.animation.MenuAnimationSystem;
+import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
@@ -47,7 +52,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private UIWidget contents;
 
     private NUIManager manager;
-    private boolean initialised;
+
+    private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
     public CoreScreenLayer() {
     }
@@ -71,13 +77,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
-        if (!initialised) {
-            initialise();
-            initialised = true;
-        }
+        animationSystem.triggerFromPrev();
     }
-
-    protected abstract void initialise();
 
     @Override
     public boolean isLowerLayerVisible() {
@@ -89,22 +90,18 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return true;
     }
 
-    @Override
-    public boolean isEscapeToCloseAllowed() {
-        return true;
-    }
-
     public UIWidget getContents() {
         return contents;
     }
 
     @Override
     public void onDraw(Canvas canvas) {
+        Rect2i region = animationSystem.animateRegion(canvas.getRegion());
         if (isModal()) {
-            canvas.addInteractionRegion(getScreenListener());
+            canvas.addInteractionRegion(getScreenListener(), region);
         }
-        if (contents != null) {
-            canvas.drawWidget(contents, canvas.getRegion());
+        if (getContents() != null) {
+            canvas.drawWidget(getContents(), region);
         }
     }
 
@@ -112,6 +109,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     public void update(float delta) {
         if (contents != null) {
             contents.update(delta);
+            animationSystem.update(delta);
         }
     }
 
@@ -120,13 +118,21 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return manager;
     }
 
-    @Override
     public void setManager(NUIManager manager) {
         this.manager = manager;
     }
 
     @Override
     public void onClosed() {
+    }
+
+    @Override
+    public void onShow() {
+        animationSystem.triggerFromNext();
+    }
+
+    @Override
+    public void onHide() {
     }
 
     @Override
@@ -147,7 +153,19 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            animationSystem.stop();
+            if (isEscapeToCloseAllowed()) {
+                triggerBackAnimation();
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    protected boolean isEscapeToCloseAllowed() {
+        return true;
     }
 
     @Override
@@ -185,5 +203,28 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             return Collections.emptyIterator();
         }
         return Arrays.asList(contents).iterator();
+    }
+
+    public MenuAnimationSystem getAnimationSystem() {
+        return animationSystem;
+    }
+
+    protected void setAnimationSystem(MenuAnimationSystem animationSystem) {
+        this.animationSystem = animationSystem;
+    }
+
+    protected void triggerForwardAnimation(ResourceUrn screenUri) {
+        // create and initialize now, open when the animation has finished
+        triggerForwardAnimation(getManager().createScreen(screenUri));
+    }
+
+    protected void triggerForwardAnimation(UIScreenLayer screen) {
+        animationSystem.onEnd(() -> getManager().pushScreen(screen));
+        animationSystem.triggerToNext();
+    }
+
+    protected void triggerBackAnimation() {
+        animationSystem.onEnd(getManager()::popScreen);
+        animationSystem.triggerToPrev();
     }
 }

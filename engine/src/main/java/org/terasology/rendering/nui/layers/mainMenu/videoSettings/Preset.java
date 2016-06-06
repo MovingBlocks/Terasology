@@ -33,15 +33,17 @@ public enum Preset {
             renderConfig.setSsao(false);
             renderConfig.setLightShafts(false);
             renderConfig.setCloudShadows(false);
+            renderConfig.setNormalMapping(false);
         }
     },
-    NICE("Nice") {
+    LOW("Low") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
             renderConfig.setVignette(true);
             renderConfig.setEyeAdaptation(true);
             renderConfig.setFilmGrain(true);
+            renderConfig.setNormalMapping(true);
 
             renderConfig.setBloom(false);
             renderConfig.setMotionBlur(false);
@@ -50,7 +52,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    EPIC("Epic") {
+    MEDIUM("Medium") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -58,6 +60,7 @@ public enum Preset {
             renderConfig.setEyeAdaptation(true);
             renderConfig.setFilmGrain(true);
             renderConfig.setBloom(true);
+            renderConfig.setNormalMapping(true);
 
             renderConfig.setSsao(false);
             renderConfig.setMotionBlur(false);
@@ -65,7 +68,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    INSANE("Insane") {
+    HIGH("High") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -76,11 +79,12 @@ public enum Preset {
             renderConfig.setMotionBlur(true);
             renderConfig.setLightShafts(true);
             renderConfig.setCloudShadows(true);
+            renderConfig.setNormalMapping(true);
 
             renderConfig.setSsao(false);
         }
     },
-    UBER("Uber") {
+    ULTRA("Ultra") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -93,6 +97,7 @@ public enum Preset {
             renderConfig.setLightShafts(true);
             renderConfig.setCloudShadows(true);
             renderConfig.setAnimateGrass(true);
+            renderConfig.setNormalMapping(true);
 
         }
     },

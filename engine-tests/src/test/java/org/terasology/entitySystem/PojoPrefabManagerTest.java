@@ -17,12 +17,11 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.utilities.Assets;
-import org.terasology.context.internal.ContextImpl;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -41,6 +40,7 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.utilities.Assets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -79,12 +79,12 @@ public class PojoPrefabManagerTest {
     }
 
     @Test
-    public void retrieveNonExistentPrefab() {
+    public void testRetrieveNonExistentPrefab() {
         assertNull(prefabManager.getPrefab(PREFAB_NAME));
     }
 
     @Test
-    public void retrievePrefab() {
+    public void testRetrievePrefab() {
         PrefabData data = new PrefabData();
         data.addComponent(new StringComponent("Test"));
         Prefab prefab = Assets.generateAsset(new ResourceUrn(PREFAB_NAME), data, Prefab.class);

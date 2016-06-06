@@ -15,9 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -28,6 +30,9 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 public class UIImage extends CoreWidget {
     @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
+
+    @LayoutConfig
+    private Binding<Color> tint = new DefaultBinding<>(Color.WHITE);
 
     public UIImage() {
     }
@@ -48,7 +53,7 @@ public class UIImage extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         if (image.get() != null) {
-            canvas.drawTexture(image.get());
+            canvas.drawTexture(image.get(), tint.get());
         }
     }
 
@@ -70,6 +75,18 @@ public class UIImage extends CoreWidget {
 
     public void bindTexture(Binding<TextureRegion> binding) {
         this.image = binding;
+    }
+
+    public Color getTint() {
+        return tint.get();
+    }
+
+    public void setTint(Color color) {
+        this.tint.set(color);
+    }
+
+    public void bindTint(Binding<Color> binding) {
+        this.tint = binding;
     }
 
 }

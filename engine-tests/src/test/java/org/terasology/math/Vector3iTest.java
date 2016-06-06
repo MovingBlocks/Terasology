@@ -62,7 +62,7 @@ public class Vector3iTest {
     }
 
     @Test
-    public void emptyConstructor() {
+    public void testEmptyConstructor() {
         Vector3i v = new Vector3i();
         assertEquals(0, v.x);
         assertEquals(0, v.y);
@@ -70,7 +70,7 @@ public class Vector3iTest {
     }
 
     @Test
-    public void tripleConstructor() {
+    public void testTripleConstructor() {
         Vector3i v = new Vector3i(1, 2, 3);
         assertEquals(1, v.x);
         assertEquals(2, v.y);
@@ -78,21 +78,21 @@ public class Vector3iTest {
     }
 
     @Test
-    public void offsetConstructor() {
+    public void testOffsetConstructor() {
         Vector3f vOrig = new Vector3f(0.1f, 0.6f, 7.2f);
         Vector3i v = new Vector3i(vOrig, 0.5f);
         assertEquals(new Vector3i(0, 1, 7), v);
     }
 
     @Test
-    public void offsetConstructorWithNegatives() {
+    public void testOffsetConstructorWithNegatives() {
         Vector3f vOrig = new Vector3f(-0.1f, -0.6f, -1.4f);
         Vector3i v = new Vector3i(vOrig, 0.5f);
         assertEquals(new Vector3i(0, -1, -1), v);
     }
 
     @Test
-    public void copyConstructor() {
+    public void testCopyConstructor() {
         Vector3i copy = new Vector3i(v1);
         assertEquals(v1.x, copy.x);
         assertEquals(v1.y, copy.y);

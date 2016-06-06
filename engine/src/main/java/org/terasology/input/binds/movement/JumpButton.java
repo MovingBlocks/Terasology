@@ -25,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "jump", description = "Jump / Ascend", repeating = false)
+@RegisterBindButton(id = "jump", description = "${engine:menu#binding-jump}", repeating = false)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.SPACE)
 @DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.TWO)
 public class JumpButton extends BindButtonEvent {

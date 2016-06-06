@@ -32,6 +32,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
+import org.terasology.module.exceptions.UnresolvedDependencyException;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -40,6 +41,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
@@ -109,36 +111,28 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     public PreviewWorldScreen() {
     }
 
-    @Override
-    public void onOpened() {
-        super.onOpened();
+    public void setEnvironment() throws Exception {
 
+        // TODO: pass world gen and module list directly rather than using the config
         SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
 
-        try {
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            if (result.isSuccess()) {
-                subContext = new ContextImpl(context);
-                CoreRegistry.setContext(subContext);
-                environment = moduleManager.loadEnvironment(result.getModules(), false);
-                subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
-                EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-                environmentSwitchHandler.handleSwitchToPreviewEnvironment(subContext, environment);
-                genTexture();
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+        if (result.isSuccess()) {
+            subContext = new ContextImpl(context);
+            CoreRegistry.setContext(subContext);
+            environment = moduleManager.loadEnvironment(result.getModules(), false);
+            subContext.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, subContext));
+            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
+            environmentSwitchHandler.handleSwitchToPreviewEnvironment(subContext, environment);
+            genTexture();
 
-                worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
-                worldGenerator.setWorldSeed(seed.getText());
-                previewGen = new FacetLayerPreview(environment, worldGenerator);
-                configureProperties();
-            } else {
-                logger.error("Could not resolve modules for: {}", worldGenUri);
-            }
-
-        } catch (Exception e) {
-            // if errors happen, don't enable this feature
-            worldGenerator = null;
-            logger.error("Unable to load world generator: " + worldGenUri + " for a 2d preview", e);
+            worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
+            worldGenerator.setWorldSeed(seed.getText());
+            previewGen = new FacetLayerPreview(environment, worldGenerator);
+            configureProperties();
+        } else {
+            throw new UnresolvedDependencyException("Unable to resolve depencencies for " + worldGenUri);
         }
     }
 
@@ -205,8 +199,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
-    @Override
-    public void onClosed() {
+    private void resetEnvironment() {
 
         CoreRegistry.setContext(context);
 
@@ -225,12 +218,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (params != null) {
             config.setModuleConfigs(worldGenerator.getUri(), params);
         }
-
-        super.onClosed();
     }
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
             zoomSlider.setValue(2f);
@@ -243,7 +236,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             applyButton.subscribe(widget -> updatePreview());
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().popScreen());
+        WidgetUtil.trySubscribe(this, "close", w -> {
+            resetEnvironment();
+            triggerBackAnimation();
+        });
     }
 
     @Override
@@ -252,9 +248,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     public void bindSeed(Binding<String> binding) {
-        if (seed != null) {
-            seed.bindText(binding);
+        if (seed == null) {
+            // TODO: call initialize through NUIManager instead of onOpened()
+            seed = find("seed", UIText.class);
         }
+        seed.bindText(binding);
     }
 
     private void updatePreview() {

@@ -21,7 +21,6 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -35,6 +34,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
+import org.terasology.utilities.Assets;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -47,7 +47,26 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTexCoord2d;
+import static org.lwjgl.opengl.GL11.glVertex3i;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -320,15 +339,15 @@ public class PostProcessor {
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindTexture();
-        materials.lightBufferPass.setInt("texSceneOpaque", texId++);
+        materials.lightBufferPass.setInt("texSceneOpaque", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindDepthTexture();
-        materials.lightBufferPass.setInt("texSceneOpaqueDepth", texId++);
+        materials.lightBufferPass.setInt("texSceneOpaqueDepth", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindNormalsTexture();
-        materials.lightBufferPass.setInt("texSceneOpaqueNormals", texId++);
+        materials.lightBufferPass.setInt("texSceneOpaqueNormals", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffers.sceneOpaque.bindLightBufferTexture();

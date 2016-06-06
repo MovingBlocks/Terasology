@@ -202,9 +202,9 @@ public abstract class BaseMaterial extends Material {
 
     @Override
     public void setCamera(Camera camera) {
-        setMatrix4("viewMatrix", camera.getViewMatrix());
-        setMatrix4("projMatrix", camera.getProjectionMatrix());
-        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix());
-        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
+        setMatrix4("viewMatrix", camera.getViewMatrix(), true);
+        setMatrix4("projMatrix", camera.getProjectionMatrix(), true);
+        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix(), true);
+        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix(), true);
     }
 }

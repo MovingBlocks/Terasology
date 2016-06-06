@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 public class LiquidTypeTest {
 
     @Test
-    public void byteToLiquidType() {
+    public void testByteToLiquidType() {
         for (int i = 0; i < 8; i++) {
             assertEquals(LiquidType.WATER, LiquidType.getTypeForByte((byte) i));
         }
@@ -35,7 +35,7 @@ public class LiquidTypeTest {
     }
 
     @Test
-    public void convertToByte() {
+    public void testConvertToByte() {
         assertEquals(0, LiquidType.WATER.convertToByte((byte) 0));
         assertEquals(4, LiquidType.WATER.convertToByte((byte) 4));
         assertEquals(7, LiquidType.WATER.convertToByte((byte) 7));

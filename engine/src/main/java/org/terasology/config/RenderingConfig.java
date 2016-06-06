@@ -36,6 +36,7 @@ public class RenderingConfig {
     private int windowWidth;
     private int windowHeight;
     private boolean fullscreen;
+    private boolean animatedMenu;
     private ViewDistance viewDistance;
     private boolean flickeringLight;
     private boolean animateGrass;
@@ -136,6 +137,14 @@ public class RenderingConfig {
 
     public void setFullscreen(boolean fullscreen) {
         this.fullscreen = fullscreen;
+    }
+
+    public boolean isAnimatedMenu() {
+        return animatedMenu;
+    }
+
+    public void setAnimatedMenu(boolean animatedMenu) {
+        this.animatedMenu = animatedMenu;
     }
 
     public ViewDistance getViewDistance() {

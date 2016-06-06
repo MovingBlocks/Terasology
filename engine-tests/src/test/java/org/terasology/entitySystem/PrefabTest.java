@@ -89,20 +89,20 @@ public class PrefabTest {
     }
 
     @Test
-    public void getSimplePrefab() {
+    public void testGetSimplePrefab() {
         Prefab prefab = prefabManager.getPrefab("unittest:simple");
         assertNotNull(prefab);
         assertEquals("unittest:simple", prefab.getName());
     }
 
     @Test
-    public void prefabHasDefinedComponents() {
+    public void testPrefabHasDefinedComponents() {
         Prefab prefab = prefabManager.getPrefab("unittest:withComponent");
         assertTrue(prefab.hasComponent(StringComponent.class));
     }
 
     @Test
-    public void prefabHasDefinedComponentsWithOrderedMap() {
+    public void testPrefabHasDefinedComponentsWithOrderedMap() {
         Prefab prefab = prefabManager.getPrefab("unittest:withComponentContainingOrderedMap");
         assertTrue(prefab.hasComponent(OrderedMapTestComponent.class));
         OrderedMapTestComponent component = prefab.getComponent(OrderedMapTestComponent.class);
@@ -122,19 +122,19 @@ public class PrefabTest {
     }
 
     @Test
-    public void prefabInheritsFromParent() {
+    public void testPrefabInheritsFromParent() {
         Prefab prefab = prefabManager.getPrefab("unittest:inheritsComponent");
         assertTrue(prefab.hasComponent(StringComponent.class));
     }
 
     @Test
-    public void prefabTransitiveInheritance() {
+    public void testPrefabTransitiveInheritance() {
         Prefab prefab = prefabManager.getPrefab("unittest:multilevelInheritance");
         assertTrue(prefab.hasComponent(StringComponent.class));
     }
 
     @Test
-    public void prefabWithCollectionOfMappedContainers() {
+    public void testPrefabWithCollectionOfMappedContainers() {
         Prefab prefab = prefabManager.getPrefab("unittest:withCollectionOfMappedContainers");
         MappedContainerComponent mappedContainer = prefab.getComponent(MappedContainerComponent.class);
         assertNotNull(mappedContainer);
@@ -144,8 +144,9 @@ public class PrefabTest {
         assertNotNull(cont);
         assertEquals("a", cont.value);
     }
+
     @Test
-    public void prefabWithListOfMappedContainers() {
+    public void testPrefabWithListOfMappedContainers() {
         Prefab prefab = prefabManager.getPrefab("unittest:withListContainer");
         ListOfObjectComponent mappedContainer = prefab.getComponent(ListOfObjectComponent.class);
         assertEquals(2, mappedContainer.elements.size());

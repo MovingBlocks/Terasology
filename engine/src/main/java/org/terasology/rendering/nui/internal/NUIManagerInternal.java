@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -36,7 +37,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
-import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.input.events.KeyEvent;
@@ -82,6 +82,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
+    private AssetManager assetManager;
 
     public NUIManagerInternal(CanvasRenderer renderer, Context context) {
         this.context = context;
@@ -90,10 +91,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.canvas = new CanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
+        this.assetManager = context.get(AssetManager.class);
         refreshWidgetsLibrary();
 
         TranslationSystem system = context.get(TranslationSystem.class);
         system.subscribe(proj -> invalidate());
+
+        // All UIElement instances are disposed so that they are not automatically reloaded
+        // by the AssetTypeManager. Reloading would not trigger the initialise() method
+        // and UI screens should be created on demand anyway.
+        ModuleAwareAssetTypeManager maaTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        maaTypeManager.getAssetType(UIElement.class).ifPresent(type -> type.disposeAll());
     }
 
     public void refreshWidgetsLibrary() {
@@ -220,70 +228,120 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIScreenLayer pushScreen(ResourceUrn screenUri) {
-        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
-        if (element.isPresent()) {
-            return pushScreen(element.get());
-        }
-        return null;
+    public UIScreenLayer createScreen(String screenUri) {
+        return createScreen(screenUri, CoreScreenLayer.class);
     }
 
     @Override
-    public UIScreenLayer pushScreen(String screenUri) {
-        Optional<UIElement> element = Assets.getUIElement(screenUri);
-        if (element.isPresent()) {
-            return pushScreen(element.get());
+    public UIScreenLayer createScreen(ResourceUrn screenUri) {
+        return createScreen(screenUri, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType) {
+        Set<ResourceUrn> urns = assetManager.resolve(screenUri, UIElement.class);
+        switch (urns.size()) {
+        case 0:
+            logger.warn("No asset found for screen '{}'", screenUri);
+            return null;
+        case 1:
+            ResourceUrn urn = urns.iterator().next();
+            return createScreen(urn, expectedType);
+        default:
+            logger.warn("Multiple matches for screen '{}': {}", screenUri, urns);
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T createScreen(ResourceUrn screenUri, Class<T> expectedType) {
+        boolean existsAlready = !screenUri.isInstance() && assetManager.isLoaded(screenUri, UIElement.class);
+
+        Optional<UIElement> opt = Assets.get(screenUri, UIElement.class);
+        if (!opt.isPresent()) {
+            logger.error("Can't find screen '{}'", screenUri);
         } else {
-            logger.error("Can't find screen " + screenUri);
+            UIElement element = opt.get();
+            UIWidget root = element.getRootWidget();
+            if (expectedType.isInstance(root)) {
+                T screen = expectedType.cast(root);
+                if (!existsAlready) {
+                    initialiseScreen(screen, screenUri);
+                }
+                return screen;
+            } else {
+                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
+            }
         }
         return null;
     }
 
+
     @Override
-    public UIScreenLayer pushScreen(UIElement element) {
-        if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
-            CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
-            if (!screens.contains(result)) {
-                result.setId(element.getUrn().toString());
-                pushScreen(result, element.getUrn());
-            }
+    public CoreScreenLayer pushScreen(ResourceUrn screenUri) {
+        return pushScreen(screenUri, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T pushScreen(ResourceUrn screenUri, Class<T> expectedType) {
+        T layer = createScreen(screenUri, expectedType);
+        if (layer != null) {
+            pushScreen(layer);
+        }
+        return layer;
+    }
+
+    @Override
+    public CoreScreenLayer pushScreen(String screenUri) {
+        return pushScreen(screenUri, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
+        T screen = createScreen(screenUri, expectedType);
+        if (screen != null) {
+            pushScreen(screen);
+        }
+        return screen;
+    }
+
+    @Override
+    public CoreScreenLayer pushScreen(UIElement element) {
+        return pushScreen(element, CoreScreenLayer.class);
+    }
+
+    @Override
+    public <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType) {
+        if (element != null && expectedType.isInstance(element.getRootWidget())) {
+            @SuppressWarnings("unchecked")
+            T result = (T) element.getRootWidget();
+            initialiseScreen(result, element.getUrn());
+            pushScreen(result);
             return result;
         }
         return null;
     }
 
-    @Override
-    public <T extends CoreScreenLayer> T pushScreen(ResourceUrn screenUri, Class<T> expectedType) {
-        UIScreenLayer result = pushScreen(screenUri);
-        if (expectedType.isInstance(result)) {
-            return expectedType.cast(result);
-        }
-        return null;
-    }
-
-    @Override
-    public <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
-        UIScreenLayer result = pushScreen(screenUri);
-        if (expectedType.isInstance(result)) {
-            return expectedType.cast(result);
-        }
-        return null;
-    }
-
-    @Override
-    public <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType) {
-        UIScreenLayer result = pushScreen(element);
-        if (expectedType.isInstance(result)) {
-            return expectedType.cast(result);
-        }
-        return null;
-    }
-
-    private void pushScreen(CoreScreenLayer screen, ResourceUrn uri) {
+    private void initialiseScreen(CoreScreenLayer screen, ResourceUrn uri) {
+        InjectionHelper.inject(screen);
+        screen.setId(uri.toString());
         screen.setManager(this);
-        prepare(screen);
+        screen.initialise();
+    }
+
+    @Override
+    public void pushScreen(UIScreenLayer screen) {
+        if (!screen.isLowerLayerVisible()) {
+            UIScreenLayer current = screens.peek();
+            if (current != null) {
+                current.onHide();
+            }
+        }
         screens.push(screen);
-        if (uri != null) {
+        screen.onOpened();
+        String id = screen.getId();
+        if (ResourceUrn.isValid(id)) {
+            ResourceUrn uri = new ResourceUrn(id);
             screenLookup.put(uri, screen);
         }
     }
@@ -294,25 +352,58 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             UIScreenLayer popped = screens.pop();
             screenLookup.inverse().remove(popped);
             popped.onClosed();
+            if (!popped.isLowerLayerVisible()) {
+                UIScreenLayer current = screens.peek();
+                if (current != null) {
+                    current.onShow();
+                }
+            }
         }
     }
 
     @Override
-    public <T extends ControlWidget> T addOverlay(String screenUri, Class<T> expectedType) {
-        Optional<UIElement> element = Assets.getUIElement(screenUri);
-        if (element.isPresent()) {
-            return addOverlay(element.get(), expectedType);
+    public <T extends ControlWidget> T addOverlay(String overlayUri, Class<T> expectedType) {
+        Set<ResourceUrn> urns = assetManager.resolve(overlayUri, UIElement.class);
+        switch (urns.size()) {
+        case 0:
+            logger.warn("No asset found for overlay '{}'", overlayUri);
+            return null;
+        case 1:
+            ResourceUrn urn = urns.iterator().next();
+            return addOverlay(urn, expectedType);
+        default:
+            logger.warn("Multiple matches for overlay '{}': {}", overlayUri, urns);
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends ControlWidget> T addOverlay(ResourceUrn overlayUri, Class<T> expectedType) {
+        boolean existsAlready = assetManager.isLoaded(overlayUri, UIElement.class);
+
+        Optional<UIElement> opt = Assets.get(overlayUri, UIElement.class);
+        if (!opt.isPresent()) {
+            logger.error("Can't find overlay '{}'", overlayUri);
+        } else {
+            UIElement element = opt.get();
+            UIWidget root = element.getRootWidget();
+            if (expectedType.isInstance(root)) {
+                T overlay = expectedType.cast(root);
+                if (!existsAlready) {
+                    initialiseOverlay(overlay, overlayUri);
+                }
+                addOverlay(overlay, overlayUri);
+                return overlay;
+            } else {
+                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+            }
         }
         return null;
     }
 
-    @Override
-    public <T extends ControlWidget> T addOverlay(ResourceUrn screenUri, Class<T> expectedType) {
-        Optional<UIElement> element = Assets.get(screenUri, UIElement.class);
-        if (element.isPresent()) {
-            return addOverlay(element.get(), expectedType);
-        }
-        return null;
+    private <T extends ControlWidget> void initialiseOverlay(T overlay, ResourceUrn screenUri) {
+        InjectionHelper.inject(overlay);
+        overlay.initialise();
     }
 
     @Override
@@ -326,7 +417,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        prepare(overlay);
+        overlay.onOpened();
         overlays.put(uri, overlay);
     }
 
@@ -507,27 +598,26 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     //raw input events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void keyEvent(KeyEvent event, EntityRef entity) {
+    public void keyEvent(KeyEvent ev, EntityRef entity) {
+        NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getKeyCharacter(), ev.getState());
         if (focus != null) {
-            if (focus.onKeyEvent(new NUIKeyEvent(mouse, keyboard, event.getKey(), event.getKeyCharacter(), event.getState()))) {
-                event.consume();
+            if (focus.onKeyEvent(nuiEvent)) {
+                ev.consume();
             }
         }
-        if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
+
+        // send event to screen stack if not yet consumed
+        if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen.isEscapeToCloseAllowed()) {
-                    closeScreen(screen);
-                    event.consume();
-                    break;
-                } else if (screen.isModal()) {
+                if (screen != focus) {    // explicit identity check
+                    if (screen.onKeyEvent(nuiEvent)) {
+                        ev.consume();
+                        break;
+                    }
+                }
+                if (screen.isModal()) {
                     break;
                 }
-            }
-        }
-        for (UIScreenLayer screen : screens) {
-            if (screen.isModal()) {
-//                event.consume();
-                return;
             }
         }
     }
@@ -558,7 +648,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void invalidate() {
-        AssetManager assetManager = context.get(AssetManager.class);
         assetManager.getLoadedAssets(UIElement.class).forEach(UIElement::dispose);
 
         boolean hudVisible = isHUDVisible();
@@ -582,12 +671,5 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             setHUDVisible(true);
         }
     }
-
-    private void prepare(ControlWidget screen) {
-        InjectionHelper.inject(screen);
-        screen.onOpened();
-    }
-
-
 
 }

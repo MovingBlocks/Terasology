@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -45,16 +44,19 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
+
+import java.util.PriorityQueue;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -80,6 +82,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
+    private final ShaderManager shaderManager;
+    private final EntityManager entityManager;
 
     private final Camera playerCamera;
     private final Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
@@ -145,6 +149,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.systemManager = context.get(ComponentSystemManager.class);
+        this.shaderManager = context.get(ShaderManager.class);
+        this.entityManager = context.get(EntityManager.class);
 
         if (renderingConfig.isOculusVrSupport()) {
             playerCamera = new OculusStereoCamera();
@@ -169,11 +175,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     // TODO: one day the main light (sun/moon) should be just another light in the scene.
     private void initMainDirectionalLight() {
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
-        mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
-        mainDirectionalLight.lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
-        mainDirectionalLight.lightAmbientIntensity = 1.0f;
-        mainDirectionalLight.lightDiffuseIntensity = 2.0f;
-        mainDirectionalLight.lightSpecularIntensity = 0.0f;
+        mainDirectionalLight.lightAmbientIntensity = 0.75f;
+        mainDirectionalLight.lightDiffuseIntensity = 0.75f;
+        mainDirectionalLight.lightSpecularPower = 100f;
     }
 
     private void initRenderingSupport() {
@@ -188,7 +192,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         buffersManager.setPostProcessor(postProcessor);
         buffersManager.initialize();
 
-        context.get(ShaderManager.class).initShaders();
+        shaderManager.initShaders();
         postProcessor.initializeMaterials();
         initMaterials();
     }
@@ -374,9 +378,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             graphicState.preRenderSetupSceneShadowMap();
             shadowMapCamera.lookThrough();
 
-            while (renderQueues.chunksOpaqueShadow.size() > 0) {
-                renderChunk(renderQueues.chunksOpaqueShadow.poll(), ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, ChunkRenderMode.SHADOW_MAP);
-            }
+            renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, ChunkRenderMode.SHADOW_MAP);
 
             for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
                 renderer.renderShadows();
@@ -401,11 +403,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         if (renderingConfig.isReflectiveWater()) {
             chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-
-            while (renderQueues.chunksOpaqueReflection.size() > 0) {
-                renderChunk(renderQueues.chunksOpaqueReflection.poll(), ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.REFLECTION);
-            }
-
+            renderChunks(renderQueues.chunksOpaqueReflection, ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.REFLECTION);
             chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
         }
 
@@ -440,18 +438,14 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void renderChunksOpaque() {
         PerformanceMonitor.startActivity("Render Chunks (Opaque)");
-        while (renderQueues.chunksOpaque.size() > 0) {
-            renderChunk(renderQueues.chunksOpaque.poll(), ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.DEFAULT);
-        }
+        renderChunks(renderQueues.chunksOpaque, ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.DEFAULT);
         PerformanceMonitor.endActivity();
     }
 
     // Alpha reject is used for semi-transparent billboards, which in turn are used for ground plants.
     private void renderChunksAlphaReject() {
         PerformanceMonitor.startActivity("Render Chunks (Alpha Reject)");
-        while (renderQueues.chunksAlphaReject.size() > 0) {
-            renderChunk(renderQueues.chunksAlphaReject.poll(), ChunkMesh.RenderPhase.ALPHA_REJECT, playerCamera, ChunkRenderMode.DEFAULT);
-        }
+        renderChunks(renderQueues.chunksAlphaReject, ChunkMesh.RenderPhase.ALPHA_REJECT, playerCamera, ChunkRenderMode.DEFAULT);
         PerformanceMonitor.endActivity();
     }
 
@@ -504,7 +498,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         */
 
         graphicState.preRenderSetupLightGeometry();
-        EntityManager entityManager = context.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -569,14 +562,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         if (!geometryOnly) {
             program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
             program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
-
-            program.setFloat4("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity,
-                    lightComponent.lightSpecularIntensity, lightComponent.lightSpecularPower, true);
+            program.setFloat3("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity, lightComponent.lightSpecularPower, true);
         }
 
         if (lightComponent.lightType == LightComponent.LightType.POINT) {
             if (!geometryOnly) {
-                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange * 0.975f, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
+                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
             }
 
             LightGeometryHelper.renderSphereGeometry();
@@ -602,9 +593,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         boolean isHeadUnderWater = isHeadUnderWater();
         graphicState.preRenderSetupSceneReflectiveRefractive(isHeadUnderWater);
 
-        while (renderQueues.chunksAlphaBlend.size() > 0) {
-            renderChunk(renderQueues.chunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
-        }
+        renderChunks(renderQueues.chunksAlphaBlend, ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
 
         graphicState.postRenderCleanupSceneReflectiveRefractive(isHeadUnderWater);
         PerformanceMonitor.endActivity();
@@ -622,45 +611,51 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunk(RenderableChunk chunk, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
-        if (chunk.hasMesh()) {
-            final Vector3f cameraPosition = camera.getPosition();
-            final Vector3f chunkPosition = chunk.getPosition().toVector3f();
-            final Vector3f chunkPositionRelativeToCamera =
-                    new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                            chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                            chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
-
-            if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                    chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-                } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                    chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-                }
-
-                chunkShader.setFloat3("chunkPositionWorld", chunkPosition.x * ChunkConstants.SIZE_X,
-                        chunkPosition.y * ChunkConstants.SIZE_Y,
-                        chunkPosition.z * ChunkConstants.SIZE_Z);
-                chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f);
-
-                if (mode == ChunkRenderMode.REFLECTION) {
-                    chunkShader.setFloat("clip", camera.getClipHeight());
-                } else {
-                    chunkShader.setFloat("clip", 0.0f);
-                }
-
-                chunkShader.enable();
-
-            } else if (mode == ChunkRenderMode.SHADOW_MAP) {
-                shadowMapShader.enable();
-
-            } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
-                context.get(ShaderManager.class).disableShader();
+    private void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
+        final Vector3f cameraPosition = camera.getPosition();
+        if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
+            if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
+                chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+            } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
+                chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
             }
 
-            graphicState.preRenderSetupChunk(chunkPositionRelativeToCamera);
+            if (mode == ChunkRenderMode.REFLECTION) {
+                chunkShader.setFloat("clip", camera.getClipHeight(), true);
+            } else {
+                chunkShader.setFloat("clip", 0.0f, true);
+            }
 
+            chunkShader.enable();
+
+        } else if (mode == ChunkRenderMode.SHADOW_MAP) {
+            shadowMapShader.enable();
+
+        } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
+            shaderManager.disableShader();
+        }
+
+        // render all the chunks in the queue
+        while (chunks.size() > 0) {
+            RenderableChunk chunk = chunks.poll();
             if (chunk.hasMesh()) {
+                final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+                final Vector3f chunkPositionRelativeToCamera =
+                        new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
+                                chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
+                                chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
+
+                if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
+                    chunkShader.setFloat3("chunkPositionWorld",
+                            chunkPosition.x * ChunkConstants.SIZE_X,
+                            chunkPosition.y * ChunkConstants.SIZE_Y,
+                            chunkPosition.z * ChunkConstants.SIZE_Z,
+                            true);
+                    chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
+                }
+
+                graphicState.preRenderSetupChunk(chunkPositionRelativeToCamera);
+
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
                     AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
                     aabbRenderer.renderLocally(1f);
@@ -669,20 +664,20 @@ public final class WorldRendererImpl implements WorldRenderer {
 
                 chunk.getMesh().render(phase);
                 statRenderedTriangles += chunk.getMesh().triangleCount();
-            }
 
-            graphicState.postRenderCleanupChunk();
+                graphicState.postRenderCleanupChunk();
 
-            // TODO: review - moving the deactivateFeature commands to the analog codeblock above doesn't work. Why?
-            if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                    chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-                } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                    chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-                }
+            } else {
+                statChunkNotReady++;
             }
-        } else {
-            statChunkNotReady++;
+        }
+
+        if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
+            if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
+                chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+            } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
+                chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+            }
         }
     }
 

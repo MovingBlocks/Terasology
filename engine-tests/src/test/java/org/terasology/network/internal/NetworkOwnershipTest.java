@@ -82,7 +82,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientSentNetInitialForNewNetworkEntity() {
+    public void testClientSentNetInitialForNewNetworkEntity() {
         connectClient();
         EntityRef entity = entityManager.create(new NetworkComponent());
         networkSystem.registerNetworkEntity(entity);
@@ -91,7 +91,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientSentNetInitialForExistingNetworkEntityOnConnect() {
+    public void testClientSentNetInitialForExistingNetworkEntityOnConnect() {
         EntityRef entity = entityManager.create(new NetworkComponent());
         networkSystem.registerNetworkEntity(entity);
         connectClient();
@@ -100,7 +100,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientNoInitialEntityIfNotOwnedAndReplicateToOwner() {
+    public void testClientNoInitialEntityIfNotOwnedAndReplicateToOwner() {
         connectClient();
         NetworkComponent netComp = new NetworkComponent();
         netComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;
@@ -114,7 +114,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientSentInitialIfOwnedEntityRegistered() {
+    public void testClientSentInitialIfOwnedEntityRegistered() {
         connectClient();
         EntityBuilder builder = entityManager.newBuilder();
         NetworkComponent netComp = builder.addComponent(new NetworkComponent());
@@ -129,7 +129,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientSentInitialOnlyOnce() {
+    public void testClientSentInitialOnlyOnce() {
         EntityBuilder builder = entityManager.newBuilder();
         NetworkComponent netComp = builder.addComponent(new NetworkComponent());
         netComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;
@@ -144,7 +144,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientSentInitialForOwnershipChain() {
+    public void testClientSentInitialForOwnershipChain() {
         NetworkComponent netCompA = new NetworkComponent();
         netCompA.replicateMode = NetworkComponent.ReplicateMode.OWNER;
         EntityRef entityA = entityManager.create(netCompA);
@@ -168,7 +168,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void clientSendInitialForRelevantOwnedItems() {
+    public void testClientSendInitialForRelevantOwnedItems() {
         EntityBuilder builder = entityManager.newBuilder();
         NetworkComponent netCompA = builder.addComponent(new NetworkComponent());
         netCompA.replicateMode = NetworkComponent.ReplicateMode.RELEVANT;

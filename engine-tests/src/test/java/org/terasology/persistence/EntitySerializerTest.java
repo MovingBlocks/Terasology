@@ -16,11 +16,9 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -46,6 +44,7 @@ import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.utilities.Assets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

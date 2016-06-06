@@ -73,7 +73,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void simpleWorldView() {
+    public void testSimpleWorldView() {
         Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
@@ -82,7 +82,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void offsetWorldView() {
+    public void testOffsetWorldView() {
         Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
@@ -96,7 +96,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void offsetWorldViewBeforeMainChunk() {
+    public void testOffsetWorldViewBeforeMainChunk() {
         Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(ChunkConstants.SIZE_X - 1, 0, ChunkConstants.SIZE_Z - 1), solidBlock);
 
@@ -110,7 +110,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void offsetWorldViewAfterMainChunk() {
+    public void testOffsetWorldViewAfterMainChunk() {
         Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
@@ -124,7 +124,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void offsetChunksWorldView() {
+    public void testOffsetChunksWorldView() {
         Chunk chunk = createChunk(1, 0, 1);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
@@ -138,7 +138,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void localToWorld() {
+    public void testLocalToWorld() {
         Chunk chunk = createChunk(1, 0, 1);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 

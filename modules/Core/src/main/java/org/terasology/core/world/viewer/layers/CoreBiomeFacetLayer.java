@@ -18,6 +18,7 @@ package org.terasology.core.world.viewer.layers;
 
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.viewer.layers.NominalFacetLayer;
 import org.terasology.world.viewer.layers.Renders;
 import org.terasology.world.viewer.layers.ZOrder;
@@ -26,7 +27,7 @@ import org.terasology.world.viewer.layers.ZOrder;
  * Maps {@link CoreBiome} facet to corresponding colors.
  */
 @Renders(value = BiomeFacet.class, order = ZOrder.BIOME)
-public class CoreBiomeFacetLayer extends NominalFacetLayer<CoreBiome> {
+public class CoreBiomeFacetLayer extends NominalFacetLayer<Biome> {
 
     public CoreBiomeFacetLayer() {
         super(BiomeFacet.class, new CoreBiomeColors());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+# * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeSerialization.typeHandlers.math;
+package org.terasology.persistence.typeHandling.mathTypes;
 
 import org.junit.Test;
 import org.terasology.math.IntegerRange;
-import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 
 import java.util.Iterator;
 
@@ -29,7 +28,7 @@ public class IntegerRangeHandlerTest {
     private IntegerRangeHandler handler = new IntegerRangeHandler();
 
     @Test
-    public void emptyRange() {
+    public void testEmptyRange() {
         IntegerRange range = new IntegerRange();
         String rangeStr = handler.getAsString(range);
         assertEquals("", rangeStr);
@@ -37,7 +36,7 @@ public class IntegerRangeHandlerTest {
     }
 
     @Test
-    public void simpleRange() {
+    public void testSimpleRange() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 3);
         String rangeStr = handler.getAsString(range);
@@ -46,7 +45,7 @@ public class IntegerRangeHandlerTest {
     }
 
     @Test
-    public void singleRange() {
+    public void testSingleRange() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 1);
         String rangeStr = handler.getAsString(range);
@@ -55,7 +54,7 @@ public class IntegerRangeHandlerTest {
     }
 
     @Test
-    public void twoRanges() {
+    public void testTwoRanges() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 3);
         range.addNumbers(5, 6);
@@ -65,7 +64,7 @@ public class IntegerRangeHandlerTest {
     }
 
     @Test
-    public void twoRangesMerged() {
+    public void testTwoRangesMerged() {
         IntegerRange range = new IntegerRange();
         range.addNumbers(1, 5);
         range.addNumbers(3, 6);
@@ -74,7 +73,7 @@ public class IntegerRangeHandlerTest {
         validateRange(handler.getFromString(rangeStr), 1, 2, 3, 4, 5, 6);
     }
 
-    private void validateRange(IntegerRange range, Integer...numbers) {
+    private void validateRange(IntegerRange range, Integer... numbers) {
         Iterator<Integer> iterator = range.iterator();
         for (Integer number : numbers) {
             assertTrue(iterator.hasNext());

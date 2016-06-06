@@ -15,13 +15,14 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 /**
+ * Add this component to an entity for it to transmit light from its location.  By default the component is configured to act similarly to a placed torch block.
  */
 // TODO: Split into multiple components? Point, Directional?
 public final class LightComponent implements Component, ReplicationCheck {
@@ -39,18 +40,31 @@ public final class LightComponent implements Component, ReplicationCheck {
     @Replicate
     public float lightDiffuseIntensity = 1.0f;
     @Replicate
-    public float lightSpecularIntensity = 0.1f;
-    @Replicate
     public float lightAmbientIntensity = 1.0f;
 
+    /**
+     * This helps control how focused the specular light is. A smaller number will make a wider cone of light. A larger number will make a narrower cone of light.
+     */
     @Replicate
-    public float lightSpecularPower = 1.0f;
+    public float lightSpecularPower = 80.0f;
+    /**
+     * Light attenuation range used in the calculation of how light fades from the light source as it gets farther away.  It is use in the following calculation:
+     * <p>
+     * attenuation = 1 / (lightDist/lightAttenuationRange + 1)^2
+     * <p>
+     * Where lightDist is how far the point in the world is from the light source.
+     */
     @Replicate
-    public float lightAttenuationRange = 16.0f;
+    public float lightAttenuationRange = 10.0f;
+    /**
+     * After light travels the lightAttenuationRange, linearly fade to 0 light over this falloff distance.
+     */
     @Replicate
     public float lightAttenuationFalloff = 1.25f;
 
-    // The rendering distance for light components (0.0f == Always render the light)
+    /**
+     * The rendering distance for light components (0.0f == Always render the light)
+     */
     @Replicate
     public float lightRenderingDistance;
 

@@ -32,7 +32,7 @@ public class WorldBuilderTest {
     private Context context = new ContextImpl();
 
     @Test
-    public void borderCalculation() {
+    public void testBorderCalculation() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
@@ -50,7 +50,7 @@ public class WorldBuilderTest {
     }
 
     @Test
-    public void cumulativeBorderCalculation() {
+    public void testCumulativeBorderCalculation() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
@@ -72,7 +72,7 @@ public class WorldBuilderTest {
     }
 
     @Test
-    public void multiplePathsBorderCalculation() {
+    public void testMultiplePathsBorderCalculation() {
         WorldBuilder worldBuilder = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class));
         worldBuilder.setSeed(12);
         worldBuilder.addProvider(new Facet1Provider());
@@ -124,6 +124,7 @@ public class WorldBuilderTest {
 
     public static class Facet1 extends BaseFacet3D {
         public boolean updated;
+
         public Facet1(Region3i targetRegion, Border3D border) {
             super(targetRegion, border);
         }
@@ -143,6 +144,7 @@ public class WorldBuilderTest {
 
     public static class Facet4 extends BaseFacet3D {
         public boolean updated;
+
         public Facet4(Region3i targetRegion, Border3D border) {
             super(targetRegion, border);
 

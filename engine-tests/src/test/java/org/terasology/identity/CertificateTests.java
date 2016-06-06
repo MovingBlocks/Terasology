@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 public class CertificateTests {
 
     @Test
-    public void checkGeneratedSelfSignedCertificateValid() {
+    public void testGeneratedSelfSignedCertificateValid() {
         CertificateGenerator gen = new CertificateGenerator();
         CertificatePair pair = gen.generateSelfSigned();
         assertTrue(pair.getPublicCert().verifySelfSigned());

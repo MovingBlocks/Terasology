@@ -102,7 +102,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
 
     @Test
-    public void betweenChunksSimple() {
+    public void testBetweenChunksSimple() {
         Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
         Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
 
@@ -124,7 +124,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void betweenChunksSimpleSunlightRegenOnly() {
+    public void testBetweenChunksSimpleSunlightRegenOnly() {
         Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
         Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
 
@@ -144,7 +144,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void betweenChunksWithOverhang() {
+    public void testBetweenChunksWithOverhang() {
         Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
         Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
 
@@ -172,7 +172,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    public void propagateSunlightAppearingMidChunk() {
+    public void testPropagateSunlightAppearingMidChunk() {
         Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
         Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
 
