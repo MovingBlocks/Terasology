@@ -15,18 +15,21 @@
  */
 package org.terasology.logic.console.suggesters;
 
+import com.google.api.client.util.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 
+/**
+ * Suggest screen names. When only one screen resource exists for the entire set of loaded modules,
+ * the name alone suffices. Otherwise, the module name must be prepended.
+ */
 public final class ScreenSuggester implements CommandParameterSuggester<String> {
     private final AssetManager assetManager;
 
@@ -36,19 +39,16 @@ public final class ScreenSuggester implements CommandParameterSuggester<String> 
 
     @Override
     public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
-
-        HashMap<String, Set<ResourceUrn>> resourceMap = new HashMap<>();
+        Map<String, Set<ResourceUrn>> resourceMap = Maps.newHashMap();
         Set<String> suggestions = Sets.newHashSet();
 
         for (ResourceUrn resolvedParameter : assetManager.getAvailableAssets(UIElement.class)) {
-            Optional<UIElement> element = assetManager.getAsset(resolvedParameter, UIElement.class);
-            if (element.isPresent() && element.get().getRootWidget() instanceof UIScreenLayer) {
-                String resourceName = resolvedParameter.getResourceName().toString();
-                if (!resourceMap.containsKey(resourceName))
-                    resourceMap.put(resourceName, Sets.newHashSet());
-
-                resourceMap.get(resourceName).add(resolvedParameter);
+            String resourceName = resolvedParameter.getResourceName().toString();
+            if (!resourceMap.containsKey(resourceName)) {
+                resourceMap.put(resourceName, Sets.newHashSet());
             }
+
+            resourceMap.get(resourceName).add(resolvedParameter);
         }
 
         for (String key : resourceMap.keySet()) {
