@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
@@ -55,9 +54,8 @@ public class UIBox extends CoreWidget {
 
     public void setContent(UIWidget content) {
         this.content = content;
-        if (content instanceof AbstractWidget) {
-            ((AbstractWidget) content).setEnabled(isEnabled());
-        }
+        content.setEnabled(isEnabled());
+
     }
 
     @Override
