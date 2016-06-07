@@ -46,7 +46,6 @@
   </root>
 
   <logger name="org.terasology" level="${logOverrideLevel:-info}" />
-  <logger name="org.terasology.entitySystem.prefab.internal.PrefabFormat" level="${logOverrideLevel:-debug}" />
   <logger name="org.reflections.Reflections" level="${logOverrideLevel:-error}" />
 
 </configuration>

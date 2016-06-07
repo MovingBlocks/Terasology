@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-/**
- */
 public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
     private static final Logger logger = LoggerFactory.getLogger(PrefabFormat.class);
 
@@ -52,7 +50,7 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
             if (prefabData != null) {
-                logger.debug("Attempting to deserialize prefab {} with inputs {}", resourceUrn, inputs);
+                logger.info("Attempting to deserialize prefab {} with inputs {}", resourceUrn, inputs);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
                 return serializer.deserialize(prefabData);
             } else {
