@@ -43,7 +43,7 @@ public class UISlider extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active = true;
                 offset.set(event.getRelativeMousePosition());
                 offset.x -= pixelOffsetFor(getValue(), sliderWidth);
@@ -59,7 +59,7 @@ public class UISlider extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            if (isEnabled() && sliderWidth > 0) {
+            if (sliderWidth > 0) {
                 Vector2i pos = event.getRelativeMousePosition();
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
@@ -124,7 +124,9 @@ public class UISlider extends CoreWidget {
         try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
             canvas.drawBackground();
             canvas.drawText(display);
-            canvas.addInteractionRegion(tickerListener);
+            if (isEnabled()) {
+                canvas.addInteractionRegion(tickerListener);
+            }
         }
     }
 

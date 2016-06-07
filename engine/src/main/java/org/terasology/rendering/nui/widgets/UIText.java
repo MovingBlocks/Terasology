@@ -30,9 +30,14 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.FontUnderline;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -41,7 +46,7 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.utilities.Assets;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -88,7 +93,7 @@ public class UIText extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 moveCursor(event.getRelativeMousePosition(), false, event.getKeyboard());
                 dragging = true;
                 return true;
@@ -98,14 +103,14 @@ public class UIText extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            if (isEnabled() && dragging) {
+            if (dragging) {
                 moveCursor(event.getRelativeMousePosition(), true, event.getKeyboard());
             }
         }
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 dragging = false;
             }
         }
@@ -127,7 +132,9 @@ public class UIText extends CoreWidget {
         }
         lastFont = canvas.getCurrentStyle().getFont();
         lastWidth = canvas.size().x;
-        canvas.addInteractionRegion(interactionListener, canvas.getRegion());
+        if (isEnabled()) {
+            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
+        }
         correctCursor();
 
         int widthForDraw = (multiline) ? canvas.size().x : lastFont.getWidth(getText());

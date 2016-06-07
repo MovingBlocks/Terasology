@@ -19,7 +19,12 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -50,7 +55,7 @@ public class UIDoubleSlider extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active = true;
                 offset.set(event.getRelativeMousePosition());
                 offset.x -= pixelOffsetFor(getValueLeft(), sliderWidth);
@@ -66,7 +71,7 @@ public class UIDoubleSlider extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            if (isEnabled() && sliderWidth > 0) {
+            if (sliderWidth > 0) {
                 Vector2i pos = event.getRelativeMousePosition();
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
@@ -82,7 +87,7 @@ public class UIDoubleSlider extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active = true;
                 offset.set(event.getRelativeMousePosition());
                 offset.x -= pixelOffsetFor(getValueRight(), sliderWidth);
@@ -98,7 +103,7 @@ public class UIDoubleSlider extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            if (isEnabled() && sliderWidth > 0) {
+            if (sliderWidth > 0) {
                 Vector2i pos = event.getRelativeMousePosition();
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
@@ -141,7 +146,9 @@ public class UIDoubleSlider extends CoreWidget {
         try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
             canvas.drawBackground();
             canvas.drawText(display);
-            canvas.addInteractionRegion(tickerListener);
+            if (isEnabled()) {
+                canvas.addInteractionRegion(tickerListener);
+            }
         }
     }
 

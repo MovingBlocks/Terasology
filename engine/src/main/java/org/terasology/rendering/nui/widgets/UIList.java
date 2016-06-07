@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
+import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -34,7 +35,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * A list widget.
+ * @param <T> the list element type
  */
 public class UIList<T> extends CoreWidget {
 
@@ -59,12 +61,17 @@ public class UIList<T> extends CoreWidget {
     public void onDraw(Canvas canvas) {
         updateItemListeners();
 
+        boolean enabled = isEnabled();
+        Border margin = canvas.getCurrentStyle().getMargin();
+
         canvas.setPart("item");
         int yOffset = 0;
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
+            Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
             ItemInteractionListener listener = itemListeners.get(i);
-            if (this.isEnabled()) {
+            if (enabled) {
                 if (Objects.equals(item, selection.get())) {
                     canvas.setMode(ACTIVE_MODE);
                 } else if (listener.isMouseOver()) {
@@ -72,17 +79,13 @@ public class UIList<T> extends CoreWidget {
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
+                canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item), itemRegion);
             } else {
                 canvas.setMode(DISABLED_MODE);
             }
 
-
-            Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
             canvas.drawBackground(itemRegion);
-
-            itemRenderer.draw(item, canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
-            canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item), itemRegion);
+            itemRenderer.draw(item, canvas, margin.shrink(itemRegion));
 
             yOffset += preferredSize.getY();
         }
@@ -202,7 +205,7 @@ public class UIList<T> extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
                 select(index);
                 return true;
             }
@@ -211,7 +214,7 @@ public class UIList<T> extends CoreWidget {
 
         @Override
         public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT && isSelectable()) {
                 activate(index);
                 return true;
             }

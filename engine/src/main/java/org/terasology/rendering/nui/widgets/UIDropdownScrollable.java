@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A scrollable dropdown widget.
+ * @param <T> the list element type
  */
 public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private static final String LIST = "list";
@@ -51,27 +53,21 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled()) {
-                opened = !opened;
-                optionListeners.clear();
-                if (opened) {
-                    for (int i = 0; i < getOptions().size(); ++i) {
-                        optionListeners.add(new ItemListener(i));
-                    }
+            opened = !opened;
+            optionListeners.clear();
+            if (opened) {
+                for (int i = 0; i < getOptions().size(); ++i) {
+                    optionListeners.add(new ItemListener(i));
                 }
-                return true;
             }
-            return false;
+            return true;
         }
 
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
-            if (isEnabled()) {
-                int scrollMultiplier = 0 - verticalBar.getRange() / getOptions().size();
-                verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
-                return true;
-            }
-            return false;
+            int scrollMultiplier = 0 - verticalBar.getRange() / getOptions().size();
+            verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
+            return true;
         }
     };
 
@@ -96,7 +92,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             }
         }
 
-        if (opened) {
+        if (!isEnabled()) {
+            // do not open and do not add an interaction region
+        } else if (opened) {
             canvas.setPart(LIST);
             canvas.setDrawOnTop(true);
             Font font = canvas.getCurrentStyle().getFont();

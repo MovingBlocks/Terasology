@@ -20,7 +20,11 @@ import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -31,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A dropdown widget.
+ * @param <T> the list element type
  */
 public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
@@ -44,17 +50,14 @@ public class UIDropdown<T> extends CoreWidget {
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled()) {
-                opened = !opened;
-                optionListeners.clear();
-                if (opened) {
-                    for (int i = 0; i < getOptions().size(); ++i) {
-                        optionListeners.add(new ItemListener(i));
-                    }
+            opened = !opened;
+            optionListeners.clear();
+            if (opened) {
+                for (int i = 0; i < getOptions().size(); ++i) {
+                    optionListeners.add(new ItemListener(i));
                 }
-                return true;
             }
-            return false;
+            return true;
         }
     };
 
@@ -80,7 +83,9 @@ public class UIDropdown<T> extends CoreWidget {
             }
         }
 
-        if (opened) {
+        if (!isEnabled()) {
+            // do not open and do not add an interaction region
+        } else if (opened) {
             canvas.setPart(LIST);
             canvas.setDrawOnTop(true);
             Font font = canvas.getCurrentStyle().getFont();
