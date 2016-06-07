@@ -162,6 +162,17 @@ public abstract class AbstractWidget implements UIWidget {
 
     }
 
+    public void bindEnabled(Binding<Boolean> binding) {
+        enabled = binding;
+
+        for (UIWidget child : this) {
+            if (child instanceof AbstractWidget) {
+                AbstractWidget widget = (AbstractWidget) child;
+                widget.bindEnabled(binding);
+            }
+        }
+    }
+
     public void bindVisible(Binding<Boolean> bind) {
         this.visible = bind;
     }
