@@ -342,14 +342,16 @@ public class UITreeView<T> extends CoreWidget {
                 // Expand or contract and item on RMB - works even if the tree is disabled.
                 model.get().getItem(index).setExpanded(!model.get().getItem(index).isExpanded());
 
-                Tree<T> selectedItem = model.get().getItem(selectedIndex.get());
+                Tree<T> selectedItem = selectedIndex.get() != null ? model.get().getItem(selectedIndex.get()) : null;
                 model.get().resetItems();
 
-                int newIndex = model.get().indexOf(selectedItem);
-                if (newIndex == -1) {
-                    selectedIndex.set(null);
-                } else {
-                    selectedIndex.set(newIndex);
+                if (selectedItem != null) {
+                    int newIndex = model.get().indexOf(selectedItem);
+                    if (newIndex == -1) {
+                        selectedIndex.set(null);
+                    } else {
+                        selectedIndex.set(newIndex);
+                    }
                 }
                 return true;
             } else if (isEnabled()) {
