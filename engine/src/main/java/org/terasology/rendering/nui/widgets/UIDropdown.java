@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -36,39 +35,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A dropdown widget.
+ * @param <T> the list element type
  */
 public class UIDropdown<T> extends CoreWidget {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
-    public static final String DISABLED_MODE = "disabled";
-
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
     private Binding<T> selection = new DefaultBinding<>();
+    private List<InteractionListener> optionListeners = Lists.newArrayList();
+    private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
+    private boolean opened;
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (enabled.get()) {
-                opened = !opened;
-                optionListeners.clear();
-                if (opened) {
-                    for (int i = 0; i < getOptions().size(); ++i) {
-                        optionListeners.add(new ItemListener(i));
-                    }
+            opened = !opened;
+            optionListeners.clear();
+            if (opened) {
+                for (int i = 0; i < getOptions().size(); ++i) {
+                    optionListeners.add(new ItemListener(i));
                 }
-                return true;
             }
-            return false;
+            return true;
         }
     };
-    private List<InteractionListener> optionListeners = Lists.newArrayList();
-    private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
-
-    private boolean opened;
 
     public UIDropdown() {
+
     }
 
     public UIDropdown(String id) {
@@ -89,7 +83,9 @@ public class UIDropdown<T> extends CoreWidget {
             }
         }
 
-        if (opened) {
+        if (!isEnabled()) {
+            // do not open and do not add an interaction region
+        } else if (opened) {
             canvas.setPart(LIST);
             canvas.setDrawOnTop(true);
             Font font = canvas.getCurrentStyle().getFont();
@@ -128,7 +124,7 @@ public class UIDropdown<T> extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (!enabled.get()) {
+        if (!isEnabled()) {
             return DISABLED_MODE;
         } else if (opened) {
             return ACTIVE_MODE;
@@ -166,14 +162,6 @@ public class UIDropdown<T> extends CoreWidget {
         selection.set(value);
     }
 
-    public boolean isEnabled() {
-        return enabled.get();
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled.set(enabled);
-    }
-
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
         optionRenderer = itemRenderer;
     }
@@ -181,7 +169,7 @@ public class UIDropdown<T> extends CoreWidget {
     private class ItemListener extends BaseInteractionListener {
         private int index;
 
-        public ItemListener(int index) {
+        ItemListener(int index) {
             this.index = index;
         }
 

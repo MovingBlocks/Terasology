@@ -124,7 +124,9 @@ public class UISlider extends CoreWidget {
         try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
             canvas.drawBackground();
             canvas.drawText(display);
-            canvas.addInteractionRegion(tickerListener);
+            if (isEnabled()) {
+                canvas.addInteractionRegion(tickerListener);
+            }
         }
     }
 
@@ -160,6 +162,9 @@ public class UISlider extends CoreWidget {
 
     @Override
     public String getMode() {
+        if (!isEnabled())
+            return DISABLED_MODE;
+
         if (active) {
             return ACTIVE_MODE;
         } else if (tickerListener.isMouseOver()) {

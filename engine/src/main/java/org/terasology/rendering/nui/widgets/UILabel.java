@@ -27,6 +27,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import java.util.List;
 
 /**
+ * A (multi-line) label widget.
  */
 public class UILabel extends CoreWidget {
 
@@ -69,8 +70,9 @@ public class UILabel extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (isEnabled())
+        if (isEnabled()) {
             return DEFAULT_MODE;
+        }
         return DISABLED_MODE;
     }
 

@@ -39,7 +39,6 @@ import java.util.List;
  */
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
-    public static final String DISABLED_MODE = "disabled";
 
     @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
@@ -53,9 +52,6 @@ public class UIButton extends CoreWidget {
     @LayoutConfig
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
 
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
-
     private boolean down;
 
     private List<ActivateEventListener> listeners = Lists.newArrayList();
@@ -64,7 +60,7 @@ public class UIButton extends CoreWidget {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (enabled.get() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 down = true;
                 return true;
             }
@@ -73,7 +69,7 @@ public class UIButton extends CoreWidget {
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            if (enabled.get() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (isMouseOver()) {
                     if (getClickSound() != null) {
                         getClickSound().play(getClickVolume());
@@ -108,7 +104,9 @@ public class UIButton extends CoreWidget {
             canvas.drawTexture(image.get());
         }
         canvas.drawText(text.get());
-        canvas.addInteractionRegion(interactionListener);
+        if (isEnabled()) {
+            canvas.addInteractionRegion(interactionListener);
+        }
     }
 
     @Override
@@ -120,7 +118,7 @@ public class UIButton extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (!enabled.get()) {
+        if (!isEnabled()) {
             return DISABLED_MODE;
         } else if (down) {
             return DOWN_MODE;
@@ -182,18 +180,6 @@ public class UIButton extends CoreWidget {
 
     public void setClickVolume(float val) {
         clickVolume.set(val);
-    }
-
-    public void bindEnabled(Binding<Boolean> binding) {
-        enabled = binding;
-    }
-
-    public boolean isEnabled() {
-        return enabled.get();
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled.set(enabled);
     }
 
     public void subscribe(ActivateEventListener listener) {

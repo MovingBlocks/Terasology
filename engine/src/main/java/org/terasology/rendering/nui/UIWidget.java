@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -55,6 +54,10 @@ public interface UIWidget extends Iterable<UIWidget> {
      * @return Whether the widget is currently visible and should be rendered
      */
     boolean isVisible();
+
+    boolean isEnabled();
+
+    void setEnabled(boolean enabled);
 
     /**
      * Finds a widget with the given id and type, within the current widget and its contents.
