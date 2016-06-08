@@ -15,16 +15,38 @@
  */
 package org.terasology.rendering.world.dag;
 
-public interface RenderNode {
+
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.opengl.FBO;
+
+public class ShadowMapNode implements RenderNode {
+
+    private Material shader;
+    private FBO fbo;
 
 
-    void initialise();
+    public ShadowMapNode(Material shader, Camera camera, Camera playerCamera) {
 
-    void render();
+    }
 
-    void dispose();
+    @Override
+    public void initialise() {
 
-    void inserted();
+    }
 
+    @Override
+    public void render() {
 
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    @Override
+    public void inserted() {
+
+    }
 }
