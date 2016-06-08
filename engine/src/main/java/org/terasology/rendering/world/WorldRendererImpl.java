@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
-import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -49,8 +48,11 @@ import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
+import org.terasology.rendering.world.dag.RenderNode;
+import org.terasology.rendering.world.dag.ShadowMapNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
+import org.terasology.utilities.collection.DirectedAcyclicClassGraph;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -74,7 +76,8 @@ import java.util.PriorityQueue;
  */
 public final class WorldRendererImpl implements WorldRenderer {
 
-    private static final int SHADOW_FRUSTUM_BOUNDS = 500;
+    // TODO: to be private
+    public final RenderQueuesHelper renderQueues;
 
     private final Context context;
 
@@ -86,20 +89,18 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final EntityManager entityManager;
 
     private final Camera playerCamera;
-    private final Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
     private float timeSmoothedMainLightIntensity;
 
-    private final RenderQueuesHelper renderQueues;
+
     private RenderingStage currentRenderingStage;
     private boolean isFirstRenderingStageForCurrentFrame;
 
     private Material chunkShader;
     private Material lightGeometryShader;
     // private Material simpleShader; // in use by the currently commented out light stencil pass
-    private Material shadowMapShader;
 
     private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
@@ -125,6 +126,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     private GraphicState graphicState;
     private PostProcessor postProcessor;
 
+
+    private ShadowMapNode shadowMap;
+    private DirectedAcyclicClassGraph<RenderNode> dag = new DirectedAcyclicClassGraph<>();
     /**
      * Instantiates a WorldRenderer implementation.
      *
@@ -165,7 +169,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera, shadowMapCamera);
+        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera, dag);
         renderQueues = renderableWorld.getRenderQueues();
 
         initMainDirectionalLight();
@@ -195,13 +199,21 @@ public final class WorldRendererImpl implements WorldRenderer {
         shaderManager.initShaders();
         postProcessor.initializeMaterials();
         initMaterials();
+
+        shadowMap = new ShadowMapNode(getMaterial("engine:prog.shadowMap"),
+                playerCamera,
+                this,
+                backdropProvider,
+                renderingConfig,
+                graphicState);
+
+        dag.add(shadowMap);
     }
 
     private void initMaterials() {
         chunkShader = getMaterial("engine:prog.chunk");
         lightGeometryShader = getMaterial("engine:prog.lightGeometryPass");
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
-        shadowMapShader = getMaterial("engine:prog.shadowMap");
     }
 
     private Material getMaterial(String assetId) {
@@ -229,37 +241,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         secondsSinceLastFrame += deltaInSeconds;
     }
 
-    private void positionShadowMapCamera() {
-        // Shadows are rendered around the player so...
-        Vector3f lightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z);
-
-        // Project the shadowMapCamera position to light space and make sure it is only moved in texel steps (avoids flickering when moving the shadowMapCamera)
-        float texelSize = 1.0f / renderingConfig.getShadowMapResolution();
-        texelSize *= 2.0f;
-
-        shadowMapCamera.getViewProjectionMatrix().transformPoint(lightPosition);
-        lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
-        shadowMapCamera.getInverseViewProjectionMatrix().transformPoint(lightPosition);
-
-        // ... we position our new shadowMapCamera at the position of the player and move it
-        // quite a bit into the direction of the sun (our main light).
-
-        // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
-        float stepSize = 50f;
-        Vector3f sunDirection = backdropProvider.getQuantizedSunDirection(stepSize);
-
-        Vector3f sunPosition = new Vector3f(sunDirection);
-        sunPosition.scale(256.0f + 64.0f);
-        lightPosition.add(sunPosition);
-
-        shadowMapCamera.getPosition().set(lightPosition);
-
-        // and adjust it to look from the sun direction into the direction of our player
-        Vector3f negSunDirection = new Vector3f(sunDirection);
-        negSunDirection.scale(-1.0f);
-
-        shadowMapCamera.getViewingDirection().set(negSunDirection);
-    }
 
     private void resetStats() {
         statChunkMeshEmpty = 0;
@@ -271,11 +252,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         resetStats();
 
         currentRenderingStage = renderingStage;
-        if (currentRenderingStage == RenderingStage.MONO || currentRenderingStage == RenderingStage.LEFT_EYE) {
-            isFirstRenderingStageForCurrentFrame = true;
-        } else {
-            isFirstRenderingStageForCurrentFrame = false;
-        }
+        isFirstRenderingStageForCurrentFrame = currentRenderingStage == RenderingStage.MONO || currentRenderingStage == RenderingStage.LEFT_EYE;
 
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
@@ -283,8 +260,8 @@ public final class WorldRendererImpl implements WorldRenderer {
             timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
-            positionShadowMapCamera();
-            shadowMapCamera.update(secondsSinceLastFrame);
+
+            shadowMap.preRender(secondsSinceLastFrame);
 
             renderableWorld.update();
             renderableWorld.generateVBOs();
@@ -374,19 +351,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void renderShadowMap() {
         if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
             PerformanceMonitor.startActivity("Render World (Shadow Map)");
-
-            graphicState.preRenderSetupSceneShadowMap();
-            shadowMapCamera.lookThrough();
-
-            renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, ChunkRenderMode.SHADOW_MAP);
-
-            for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-                renderer.renderShadows();
-            }
-
-            playerCamera.lookThrough(); // not strictly needed: just defensive programming here.
-            graphicState.postRenderCleanupSceneShadowMap();
-
+            shadowMap.render();
             PerformanceMonitor.endActivity();
         }
     }
@@ -611,7 +576,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
+    public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         final Vector3f cameraPosition = camera.getPosition();
         if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
             if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
@@ -627,9 +592,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             }
 
             chunkShader.enable();
-
-        } else if (mode == ChunkRenderMode.SHADOW_MAP) {
-            shadowMapShader.enable();
 
         } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
             shaderManager.disableShader();
@@ -777,7 +739,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public Camera getLightCamera() {
-        return shadowMapCamera;
+        //FIXME: remove this method
+        return shadowMap.getCamera();
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,9 +81,12 @@ public class GraphicState {
     // eventually decided for GraphicState as it resides in the rendering.opengl
     // package anyway and rendering.opengl.OpenGLState felt cumbersome. --emanuele3d
 
+    // FIXME: for making nodes work without breaking anything
+    public Buffers buffers = new Buffers();
+
     private FrameBuffersManager buffersManager;
     private Dimensions fullScale;
-    private Buffers buffers  = new Buffers();
+
 
     /**
      * Graphic State constructor.
@@ -544,7 +547,7 @@ public class GraphicState {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
-    private class Buffers {
+    public class Buffers {
         public FBO sceneOpaque;
         public FBO sceneReflectiveRefractive;
         public FBO sceneReflected;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,10 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.world.dag.RenderNode;
+import org.terasology.rendering.world.dag.ShadowMapNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.utilities.collection.DirectedAcyclicClassGraph;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
@@ -62,11 +65,11 @@ public class RenderableWorldImpl implements RenderableWorld {
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<RenderableChunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private Region3i renderableRegion = Region3i.EMPTY;
-    private ViewDistance currentViewDistance = null;
+    private ViewDistance currentViewDistance;
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
-    private Camera shadowMapCamera;
+    private DirectedAcyclicClassGraph<RenderNode> dag;
 
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
@@ -75,14 +78,19 @@ public class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
-    public RenderableWorldImpl(WorldProvider worldProvider, ChunkProvider chunkProvider, GLBufferPool bufferPool, Camera playerCamera, Camera shadowMapCamera) {
+    public RenderableWorldImpl(WorldProvider worldProvider,
+                               ChunkProvider chunkProvider,
+                               GLBufferPool bufferPool,
+                               Camera playerCamera,
+                               DirectedAcyclicClassGraph<RenderNode> dag) {
+
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
         chunkTessellator = new ChunkTessellator(bufferPool);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
-        this.shadowMapCamera = shadowMapCamera;
+        this.dag = dag;
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -217,12 +225,13 @@ public class RenderableWorldImpl implements RenderableWorld {
             renderableRegion = newRenderableRegion;
             return true;
         }
+
         return false;
     }
 
     @Override
     public boolean updateChunksInProximity(ViewDistance newViewDistance) {
-        if(newViewDistance != currentViewDistance) {
+        if (newViewDistance != currentViewDistance) {
             logger.info("New Viewing Distance: {}", newViewDistance);
             currentViewDistance = newViewDistance;
             return updateChunksInProximity(calculateRenderableRegion(newViewDistance));
@@ -372,7 +381,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     public boolean isChunkVisibleLight(RenderableChunk chunk) {
-        return isChunkVisible(shadowMapCamera, chunk);
+        return isChunkVisible(dag.get(ShadowMapNode.class).getCamera(), chunk); //TODO: find an elegant way
     }
 
     public boolean isChunkVisible(RenderableChunk chunk) {

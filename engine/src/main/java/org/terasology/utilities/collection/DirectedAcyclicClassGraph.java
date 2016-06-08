@@ -30,6 +30,10 @@ public class DirectedAcyclicClassGraph<T> extends DirectedAcyclicGraph<T> {
 
     public <G> G get(Class<G> c) {
         return (G) classObjectMap.get(c);
+    } // FIXME: is there a better way to do this?
+
+    public boolean add(T o) {
+        return this.addNode(o);
     }
 
     @Override
