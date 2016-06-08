@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.world.dag;
 
-public abstract class RenderableNode {
+public abstract class RenderNode {
 
     public DAGRendererSystem renderer;
 
