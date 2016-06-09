@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.characters;
 
-import java.math.RoundingMode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -38,6 +36,8 @@ import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+
+import java.math.RoundingMode;
 
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
@@ -648,7 +648,9 @@ public class KinematicCharacterMover implements CharacterMover {
             // Jumping is only possible, if the entity is standing on ground
             if (input.isJumpRequested()) {
                 state.setGrounded(false);
-                endVelocity.y += movementComp.jumpSpeed;
+                AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
+                entity.send(affectJumpForceEvent);
+                endVelocity.y += affectJumpForceEvent.getResultValue();
                 if (input.isFirstRun()) {
                     entity.send(new JumpEvent());
                 }
