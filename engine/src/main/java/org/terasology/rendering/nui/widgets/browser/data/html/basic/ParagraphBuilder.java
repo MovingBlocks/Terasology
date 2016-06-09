@@ -40,7 +40,6 @@ public class ParagraphBuilder implements HTMLBlockBuilder {
     private String hyperlink;
     private String fontName;
     private boolean bold;
-    private boolean italic;
     private Color color;
 
     public ParagraphBuilder(HTMLFontResolver htmlFontResolver, Attributes attributes) {
@@ -56,9 +55,6 @@ public class ParagraphBuilder implements HTMLBlockBuilder {
     public boolean startTag(String tag, Attributes attributes) {
         if (tag.equalsIgnoreCase("b")) {
             bold = true;
-            return true;
-        } else if (tag.equalsIgnoreCase("i")) {
-            italic = true;
             return true;
         } else if (tag.equalsIgnoreCase("font")) {
             String name = HTMLUtils.findAttribute(attributes, "name");
@@ -80,7 +76,7 @@ public class ParagraphBuilder implements HTMLBlockBuilder {
 
         for (Map.Entry<String, FlowRenderableFactory> flowRenderableFactoryEntry : flowRenderableFactoryMap.entrySet()) {
             if (flowRenderableFactoryEntry.getKey().equalsIgnoreCase(tag)) {
-                paragraphData.append(flowRenderableFactoryEntry.getValue().create(attributes, htmlFontResolver.getFont(fontName, bold, italic), color, hyperlink));
+                paragraphData.append(flowRenderableFactoryEntry.getValue().create(attributes, htmlFontResolver.getFont(fontName, bold), color, hyperlink));
                 return true;
             }
         }
@@ -90,7 +86,7 @@ public class ParagraphBuilder implements HTMLBlockBuilder {
 
     @Override
     public void text(String text) {
-        StaticTextRenderStyle renderStyle = new StaticTextRenderStyle(htmlFontResolver.getFont(fontName, bold, italic), color);
+        StaticTextRenderStyle renderStyle = new StaticTextRenderStyle(htmlFontResolver.getFont(fontName, bold), color);
         paragraphData.append(new TextFlowRenderable(text, renderStyle, hyperlink));
     }
 
@@ -98,8 +94,6 @@ public class ParagraphBuilder implements HTMLBlockBuilder {
     public void endTag(String tag) {
         if (tag.equalsIgnoreCase("b")) {
             bold = false;
-        } else if (tag.equalsIgnoreCase("i")) {
-            italic = false;
         } else if (tag.equalsIgnoreCase("font")) {
             fontName = null;
             color = null;

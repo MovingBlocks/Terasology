@@ -19,5 +19,5 @@ import org.terasology.rendering.assets.font.Font;
 
 @FunctionalInterface
 public interface HTMLFontResolver {
-    Font getFont(String name, boolean bold, boolean italic);
+    Font getFont(String name, boolean bold);
 }

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class HTMLParserTest {
-    private HTMLParser htmlParser = new HTMLParser((name, bold, italic) -> null);
+    private HTMLParser htmlParser = new HTMLParser((name, bold) -> null);
 
     @Test
     public void testParseEmptyDocument() throws IOException, SAXException, ParserConfigurationException {
