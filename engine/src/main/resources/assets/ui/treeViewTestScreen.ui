@@ -67,7 +67,6 @@
             {
                 "type": "UITreeView",
                 "id": "treeView2",
-                "text": "treeView2",
                 "layoutInfo": {
                     "cc": "w min, h min"
                 }

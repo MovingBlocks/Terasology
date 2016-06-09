@@ -497,10 +497,10 @@
                         "active": {
                             "background": "engine:boxActive"
                         },
-                         "enabled": {
-                             "text-color": "FFFFFFFF"
-                         },
-                         "disabled": {
+                        "enabled": {
+                            "text-color": "FFFFFFFF"
+                        },
+                        "disabled": {
                             "text-color": "888888FF",
                             "background": "engine:boxDisabled"
                         }
@@ -510,6 +510,30 @@
         },
         "UITreeView": {
             "parts": {
+                "expand-button": {
+                    "background": "button",
+                    "background-border": {
+                        "top": 2,
+                        "bottom": 2,
+                        "left": 2,
+                        "right": 2
+                    },
+                    "texture-scale-mode": "scale fit",
+                    "modes": {
+                        "contract": {
+                            "background": "contract"
+                        },
+                        "contract-hover": {
+                            "background": "contractOver"
+                        },
+                        "expand": {
+                            "background": "expand"
+                        },
+                        "expand-hover": {
+                            "background": "expandOver"
+                        }
+                    }
+                },
                 "tree-item": {
                     "text-align-horizontal": "left",
                     "text-align-vertical": "middle",
