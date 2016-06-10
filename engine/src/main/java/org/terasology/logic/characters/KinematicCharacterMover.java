@@ -89,6 +89,9 @@ public class KinematicCharacterMover implements CharacterMover {
     private WorldProvider worldProvider;
     private PhysicsEngine physics;
 
+    // Store the number of jumps left.
+    private int numberOfJumpsLeft;
+
     public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
         physics = physicsEngine;
@@ -633,6 +636,11 @@ public class KinematicCharacterMover implements CharacterMover {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
 
+        // Upon hitting solid ground, reset the number of jumps back to the maximum value.
+        if (state.isGrounded()) {
+            numberOfJumpsLeft = movementComp.numberOfJumpsMax;
+        }
+
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded() && movementComp.mode.canBeGrounded) {
                 if (input.isFirstRun()) {
@@ -642,23 +650,56 @@ public class KinematicCharacterMover implements CharacterMover {
                     entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
                 }
                 state.setGrounded(true);
+                numberOfJumpsLeft = movementComp.numberOfJumpsMax;
             }
             endVelocity.y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
             if (input.isJumpRequested()) {
+
                 state.setGrounded(false);
+
+                // Send event to allow for other systems to modify the jump force.
                 AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
                 entity.send(affectJumpForceEvent);
                 endVelocity.y += affectJumpForceEvent.getResultValue();
                 if (input.isFirstRun()) {
                     entity.send(new JumpEvent());
                 }
+
+                // Send event to allow for other systems to modify the max number of jumps.
+                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.numberOfJumpsMax);
+                entity.send(affectMultiJumpEvent);
+                movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
+
+                numberOfJumpsLeft--;
             }
-        } else {
+        }
+        else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
                 endVelocity.y = -0.5f * endVelocity.y;
             }
+
+            // Jump again in mid-air only if a jump was requested and there are jumps remaining.
+            if (input.isJumpRequested() && numberOfJumpsLeft > 0) {
+                state.setGrounded(false);
+
+                // Send event to allow for other systems to modify the jump force.
+                AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
+                entity.send(affectJumpForceEvent);
+                endVelocity.y += affectJumpForceEvent.getResultValue();
+                if (input.isFirstRun()) {
+                    entity.send(new JumpEvent());
+                }
+
+                // Send event to allow for other systems to modify the max number of jumps.
+                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.numberOfJumpsMax);
+                entity.send(affectMultiJumpEvent);
+                movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
+
+                numberOfJumpsLeft--;
+            }
+
             state.setGrounded(false);
         }
         state.getVelocity().set(endVelocity);
