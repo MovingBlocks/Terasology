@@ -45,6 +45,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Collections;
 
 /**
  */
@@ -112,6 +113,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             SimpleUri menuUri = new SimpleUri("engine:menu");
             TranslationProject menuProject = translationSystem.getProject(menuUri);
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
+            Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
             language.setOptions(Lists.newArrayList(locales));
             language.setVisibleOptions(5); // Set maximum number of options visible for scrolling
             language.setOptionRenderer(new LocaleRenderer(translationSystem));
