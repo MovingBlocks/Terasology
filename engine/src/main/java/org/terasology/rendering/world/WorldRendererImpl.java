@@ -200,7 +200,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.initializeMaterials();
         initMaterials();
 
-        shadowMapNode = new ShadowMapNode(getMaterial("engine:prog.shadowMapNode"),
+        shadowMapNode = new ShadowMapNode(getMaterial("engine:prog.shadowMap"),
                 playerCamera,
                 this,
                 backdropProvider,
