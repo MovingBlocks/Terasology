@@ -64,7 +64,7 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * The maximum amount of items displayed before a scrollbar is created.
      */
-    private Binding<Integer> maxItems = new DefaultBinding<>(5);
+    private Binding<Integer> maxItems = new DefaultBinding<>(10);
     /**
      * The indentation of one level in the tree.
      */

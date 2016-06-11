@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.widgets.models;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 

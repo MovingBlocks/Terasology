@@ -4,7 +4,7 @@
     "contents": {
         "type": "migLayout",
         "layoutConstraints": "",
-        "colConstraints": "[min][pref][min][pref][grow]",
+        "colConstraints": "[min][pref][pref]",
         "rowConstraints": "[min]",
         "debug": true,
         "contents": [
@@ -27,25 +27,9 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "min",
+                "text": "enabled",
                 "layoutInfo": {
                     "cc": ""
-                }
-            },
-            {
-                "type": "UILabel",
-                "id": "",
-                "text": "pref",
-                "layoutInfo": {
-                    "cc": ""
-                }
-            },
-            {
-                "type": "UILabel",
-                "id": "",
-                "text": "grow",
-                "layoutInfo": {
-                    "cc": "grow"
                 }
             },
             {
@@ -58,7 +42,7 @@
             },
             {
                 "type": "UITreeView",
-                "id": "treeView1",
+                "id": "treeViewDisabled",
                 "layoutInfo": {
                     "cc": ""
                 },
@@ -66,23 +50,9 @@
             },
             {
                 "type": "UITreeView",
-                "id": "treeView2",
-                "layoutInfo": {
-                    "cc": "w min, h min"
-                }
-            },
-            {
-                "type": "UITreeView",
-                "id": "treeView3",
+                "id": "treeViewEnabled",
                 "layoutInfo": {
                     "cc": ""
-                }
-            },
-            {
-                "type": "UITreeView",
-                "id": "treeView4",
-                "layoutInfo": {
-                    "cc": "grow"
                 }
             }
         ]

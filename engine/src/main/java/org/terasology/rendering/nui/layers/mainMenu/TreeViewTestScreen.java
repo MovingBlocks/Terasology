@@ -15,50 +15,39 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.google.gson.JsonParser;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UITreeView;
+import org.terasology.rendering.nui.widgets.models.JsonTreeAdapter;
 import org.terasology.rendering.nui.widgets.models.Tree;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
 
 public class TreeViewTestScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
-        List<Tree<String>> treeList = Lists.newArrayList();
-        for (int i = 0; i <= 10; i++) {
-            treeList.add(new Tree<>("Item " + i));
-            treeList.get(i).setExpanded(true);
+        // Load our own asset file for the demo.
+        File file = new File(getClass().getClassLoader().getResource("assets/ui/treeViewTestScreen.ui").getFile());
+        String content = null;
+        try {
+            content = Files.toString(file, Charsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        /**
-         * 0
-         * | \
-         * |  \
-         * |\  \
-         * | \  \
-         * 1  4  5
-         * |  |  |\
-         * |  |  | \
-         * 2  8  6  9
-         * |\       |
-         * | \      |
-         * 3  7     10
-         */
+        // Deserialize the file, then expand every node.
+        Tree<JsonTreeAdapter.JsonNode> tree = JsonTreeAdapter.serialize(new JsonParser().parse(content));
+        Iterator it = tree.getDepthFirstIterator(false);
+        while (it.hasNext()) {
+            ((Tree<JsonTreeAdapter.JsonNode>) it.next()).setExpanded(true);
+        }
 
-        treeList.get(0).addChild(treeList.get(1));
-        treeList.get(0).addChild(treeList.get(4));
-        treeList.get(0).addChild(treeList.get(5));
-        treeList.get(1).addChild(treeList.get(2));
-        treeList.get(2).addChild(treeList.get(3));
-        treeList.get(2).addChild(treeList.get(7));
-        treeList.get(4).addChild(treeList.get(8));
-        treeList.get(5).addChild(treeList.get(6));
-        treeList.get(5).addChild(treeList.get(9));
-        treeList.get(9).addChild(treeList.get(10));
-
-        for (String id : new String[]{"treeView1", "treeView2", "treeView3", "treeView4"}) {
-            find(id, UITreeView.class).setModel(treeList.get(0).copy());
+        for (String id : new String[]{"treeViewDisabled", "treeViewEnabled"}) {
+            find(id, UITreeView.class).setModel(tree.copy());
             find(id, UITreeView.class).setDefaultValue("New Item");
         }
     }
