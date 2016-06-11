@@ -31,7 +31,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.world.dag.RenderNode;
+import org.terasology.rendering.world.dag.Node;
 import org.terasology.rendering.world.dag.ShadowMapNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.collection.DirectedAcyclicClassGraph;
@@ -69,7 +69,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
-    private DirectedAcyclicClassGraph<RenderNode> dag;
+    private DirectedAcyclicClassGraph<Node> renderingPipeline;
 
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
@@ -82,7 +82,7 @@ public class RenderableWorldImpl implements RenderableWorld {
                                ChunkProvider chunkProvider,
                                GLBufferPool bufferPool,
                                Camera playerCamera,
-                               DirectedAcyclicClassGraph<RenderNode> dag) {
+                               DirectedAcyclicClassGraph<Node> renderingPipeline) {
 
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
@@ -90,7 +90,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
-        this.dag = dag;
+        this.renderingPipeline = renderingPipeline;
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -381,7 +381,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     public boolean isChunkVisibleLight(RenderableChunk chunk) {
-        return isChunkVisible(dag.get(ShadowMapNode.class).getCamera(), chunk); //TODO: find an elegant way
+        return isChunkVisible(renderingPipeline.get(ShadowMapNode.class).getCamera(), chunk); //TODO: find an elegant way
     }
 
     public boolean isChunkVisible(RenderableChunk chunk) {

@@ -17,21 +17,23 @@ package org.terasology.rendering.world.dag;
 
 import org.terasology.rendering.cameras.Camera;
 
-public interface RenderNode {
+public interface Node { // since it's inside dag package
 
     void initialise();
 
-    void preRender(float update);
+    void update(float deltaInSeconds);
 
-    void render();
+    void execute();
 
     void postRender();
 
-    void dispose();
+    void onDeletion();
 
-    void insert();
+    void onRemoval();
 
-    // FIXME: might be deleted in the future, some of the RenderNode's may not need a camera
+    void onInsert();
+
+    // FIXME: might be deleted in the future, some of the Node's may not need a camera
     Camera getCamera();
 
 }

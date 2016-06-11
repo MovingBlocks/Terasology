@@ -20,12 +20,14 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.GraphicState;
+import org.terasology.rendering.opengl.OpenGLUtil;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRendererImpl;
 
@@ -36,13 +38,14 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Diagram of this node can be viewed from:
+ * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
-public class ShadowMapNode implements RenderNode {
+public class ShadowMapNode implements Node {
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
     private Material shader;
-    private FBO fbo;
+    private FBO shadowMap;
     private Camera camera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     // TODO: every node proposes its modifiable configuration?
@@ -75,12 +78,12 @@ public class ShadowMapNode implements RenderNode {
 
     @Override
     public void initialise() {
-        // TODO: shader and fbo shall be initialised here
+        // TODO: shader and fbo initialization here
         // TODO: using ShaderParametersShadowMap here, instead of storing in ShaderManagerLwjgl
     }
 
     @Override
-    public void preRender(float update) {
+    public void update(float deltaInSeconds) {
         // positionShadowMapCamera()
 
         // Shadows are rendered around the player so...
@@ -113,19 +116,21 @@ public class ShadowMapNode implements RenderNode {
 
         camera.getViewingDirection().set(negSunDirection);
 
-        camera.update(update);
+        camera.update(deltaInSeconds);
 
     }
 
 
     @Override
-    public void render() {
+    public void execute() {
+        PerformanceMonitor.startActivity("Render World (Shadow Map)");
         // TODO: removing this assignment
-        fbo = state.buffers.sceneShadowMap; // added here since graphic settings can be modified and a new fbo can be generated.
+        shadowMap = state.buffers.sceneShadowMap; // added here since graphic settings can be modified and a new fbo can be generated.
 
         // preRenderSetupSceneShadowMap
-        fbo.bind();
-        glViewport(0, 0, fbo.width(), fbo.height());
+        shadowMap.bind();
+        OpenGLUtil.setViewportToSizeOf(shadowMap); // TODO: how about shadowMap.setAsViewport() ?
+        // TODO: verify the need to clear color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glDisable(GL_CULL_FACE);
 
@@ -142,6 +147,8 @@ public class ShadowMapNode implements RenderNode {
         GL11.glEnable(GL_CULL_FACE);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); // bindDisplay()
 
+
+        PerformanceMonitor.endActivity();
     }
 
     @Override
@@ -150,14 +157,19 @@ public class ShadowMapNode implements RenderNode {
     }
 
     @Override
-    public void dispose() {
-        // TODO: disposing shader and fbo whenever node is removed from DAG
+    public void onDeletion() {
+
+    }
+
+    @Override
+    public void onRemoval() {
+        // TODO: removing shader and fbo, whenever node is removed from DAG
 
     }
 
 
     @Override
-    public void insert() {
+    public void onInsert() {
         // TODO: required initialization whenever node is inserted to DAG
 
     }

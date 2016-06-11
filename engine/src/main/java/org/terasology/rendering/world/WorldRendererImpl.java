@@ -48,7 +48,7 @@ import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
-import org.terasology.rendering.world.dag.RenderNode;
+import org.terasology.rendering.world.dag.Node;
 import org.terasology.rendering.world.dag.ShadowMapNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
@@ -127,8 +127,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     private PostProcessor postProcessor;
 
 
-    private ShadowMapNode shadowMap;
-    private DirectedAcyclicClassGraph<RenderNode> dag = new DirectedAcyclicClassGraph<>();
+    private ShadowMapNode shadowMapNode;
+    private DirectedAcyclicClassGraph<Node> renderingPipeline = new DirectedAcyclicClassGraph<>();
     /**
      * Instantiates a WorldRenderer implementation.
      *
@@ -169,7 +169,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera, dag);
+        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera, renderingPipeline);
         renderQueues = renderableWorld.getRenderQueues();
 
         initMainDirectionalLight();
@@ -200,14 +200,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.initializeMaterials();
         initMaterials();
 
-        shadowMap = new ShadowMapNode(getMaterial("engine:prog.shadowMap"),
+        shadowMapNode = new ShadowMapNode(getMaterial("engine:prog.shadowMapNode"),
                 playerCamera,
                 this,
                 backdropProvider,
                 renderingConfig,
                 graphicState);
 
-        dag.add(shadowMap);
+        renderingPipeline.add(shadowMapNode);
     }
 
     private void initMaterials() {
@@ -261,7 +261,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
             playerCamera.update(secondsSinceLastFrame);
 
-            shadowMap.preRender(secondsSinceLastFrame);
+            shadowMapNode.update(secondsSinceLastFrame);
 
             renderableWorld.update();
             renderableWorld.generateVBOs();
@@ -297,7 +297,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        renderShadowMap();          // into shadowMap buffer
+        if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
+            shadowMapNode.execute(); // into shadowMap buffer
+        }
+
         renderWorldReflection();    // into sceneReflect buffer
 
         graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
@@ -346,14 +349,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
 
         playerCamera.updatePrevViewProjectionMatrix();
-    }
-
-    private void renderShadowMap() {
-        if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
-            PerformanceMonitor.startActivity("Render World (Shadow Map)");
-            shadowMap.render();
-            PerformanceMonitor.endActivity();
-        }
     }
 
     private void renderWorldReflection() {
@@ -740,7 +735,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public Camera getLightCamera() {
         //FIXME: remove this method
-        return shadowMap.getCamera();
+        return shadowMapNode.getCamera();
     }
 
     @Override
