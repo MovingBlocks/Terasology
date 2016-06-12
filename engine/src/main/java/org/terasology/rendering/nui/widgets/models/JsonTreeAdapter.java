@@ -167,11 +167,11 @@ public class JsonTreeAdapter {
                 }
                 return property == null ? value.toString() : property;
             } else if (type == ElementType.ARRAY) {
-                return ARRAY_STRING;
+                return property != null ? property : ARRAY_STRING;
             } else if (type == ElementType.OBJECT) {
-                return OBJECT_STRING;
+                return property != null ? property : OBJECT_STRING;
             } else {
-                return NULL_STRING;
+                return property != null ? property : NULL_STRING;
             }
         }
     }
