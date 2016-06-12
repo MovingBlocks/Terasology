@@ -98,8 +98,8 @@ public class Tree<T> {
 
 
     /**
-     * @param node The {@code Tree}the index of which is to be returned.
-     * @return The index of the specified {@code Tree}.
+     * @param node The tree the index of which is to be returned.
+     * @return The index of the specified tree.
      */
     public int getIndex(Tree<T> node) {
         Preconditions.checkNotNull(node, NULL_NODE_ARGUMENT);
@@ -190,12 +190,11 @@ public class Tree<T> {
     }
 
     /**
-     * Sets the parent of this tree to a specific {@code Tree}.
-     * Should NOT be used externally (use a combination of removeChild()/addChild() instead)
+     * Sets the parent of this tree to a specific tree.
      *
-     * @param parent The {@code Tree} the parent of this tree will be set to.
+     * @param parent The tree the parent of this tree will be set to.
      */
-    public void setParent(Tree<T> parent) {
+    private void setParent(Tree<T> parent) {
         this.parent = parent;
     }
 
@@ -236,7 +235,7 @@ public class Tree<T> {
     }
 
     /**
-     * An iterator of a {@code Tree} in depth-first, pre-ordered order.
+     * An iterator of a {@link Tree} in depth-first, pre-ordered order.
      */
     private class DepthFirstIterator implements Iterator {
         /**

@@ -47,7 +47,13 @@ import java.util.Objects;
  * @param <T> Type of objects stored in the underlying tree.
  */
 public class UITreeView<T> extends CoreWidget {
+    private static final String EXPAND_BUTTON = "expand-button";
     private static final String TREE_ITEM = "tree-item";
+
+    private static final String CONTRACT_MODE = "contract";
+    private static final String CONTRACT_HOVER_MODE = "contract-hover";
+    private static final String EXPAND_MODE = "expand";
+    private static final String EXPAND_HOVER_MODE = "expand-hover";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
 
     /**
@@ -58,7 +64,7 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * The maximum amount of items displayed before a scrollbar is created.
      */
-    private Binding<Integer> maxItems = new DefaultBinding<>(5);
+    private Binding<Integer> maxItems = new DefaultBinding<>(10);
     /**
      * The indentation of one level in the tree.
      */
@@ -104,7 +110,11 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * The individual item listeners.
      */
-    private final List<TreeInteractionListener> itemListeners = Lists.newArrayList();
+    private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
+    /**
+     * The individual expand/contract button listeners.
+     */
+    private final List<ExpandButtonInteractionListener> expandListeners = Lists.newArrayList();
 
     public UITreeView() {
     }
@@ -198,7 +208,7 @@ public class UITreeView<T> extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        updateItemListeners();
+        updateListeners();
 
         canvas.setPart(TREE_ITEM);
 
@@ -234,17 +244,29 @@ public class UITreeView<T> extends CoreWidget {
 
         for (int i = 0; i < model.get().getItemCount(); i++) {
             Tree<T> item = model.get().getItem(i);
-            TreeInteractionListener listener = itemListeners.get(i);
+            ItemInteractionListener itemListener = itemListeners.get(i);
+            ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
-            handleListeners(canvas, item, listener);
+            if (!item.getChildren().isEmpty()) {
+                canvas.setPart(EXPAND_BUTTON);
+                setButtonMode(canvas, item, buttonListener);
+                Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+                        i * itemHeight - verticalBar.getValue(),
+                        itemIndent.get(),
+                        itemHeight);
+                try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
+                    drawButton(canvas, buttonRegion, buttonListener);
+                }
+            }
 
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+            canvas.setPart(TREE_ITEM);
+            setItemMode(canvas, item, itemListener);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
                     i * itemHeight - verticalBar.getValue(),
-                    availableWidth - item.getDepth() * itemIndent.get(),
+                    availableWidth - (item.getDepth() + 1) * itemIndent.get(),
                     itemHeight);
-
             try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
-                drawItem(canvas, itemRegion, item, listener);
+                drawItem(canvas, itemRegion, item, itemListener);
             }
         }
     }
@@ -252,20 +274,38 @@ public class UITreeView<T> extends CoreWidget {
     private void drawNonScrollItems(Canvas canvas, int itemHeight) {
         for (int i = 0; i < model.get().getItemCount(); i++) {
             Tree<T> item = model.get().getItem(i);
-            TreeInteractionListener listener = itemListeners.get(i);
+            ItemInteractionListener itemListener = itemListeners.get(i);
+            ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
-            handleListeners(canvas, item, listener);
+            if (!item.getChildren().isEmpty()) {
+                canvas.setPart(EXPAND_BUTTON);
+                setButtonMode(canvas, item, buttonListener);
+                Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+                        i * itemHeight,
+                        itemIndent.get(),
+                        itemHeight);
+                drawButton(canvas, buttonRegion, buttonListener);
+            }
 
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+            canvas.setPart(TREE_ITEM);
+            setItemMode(canvas, item, itemListener);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
                     i * itemHeight,
-                    canvas.size().x - item.getDepth() * itemIndent.get(),
+                    canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
                     itemHeight);
-
-            drawItem(canvas, itemRegion, item, listener);
+            drawItem(canvas, itemRegion, item, itemListener);
         }
     }
 
-    private void handleListeners(Canvas canvas, Tree<T> item, TreeInteractionListener listener) {
+    private void setButtonMode(Canvas canvas, Tree<T> item, ExpandButtonInteractionListener listener) {
+        if (listener.isMouseOver()) {
+            canvas.setMode(item.isExpanded() ? CONTRACT_HOVER_MODE : EXPAND_HOVER_MODE);
+        } else {
+            canvas.setMode(item.isExpanded() ? CONTRACT_MODE : EXPAND_MODE);
+        }
+    }
+
+    private void setItemMode(Canvas canvas, Tree<T> item, ItemInteractionListener listener) {
         if (selectedIndex.get() != null && Objects.equals(item, model.get().getItem(selectedIndex.get()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listener.isMouseOver()) {
@@ -277,19 +317,25 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    private void drawItem(Canvas canvas, Rect2i itemRegion, Tree<T> item, TreeInteractionListener listener) {
+    private void drawButton(Canvas canvas, Rect2i buttonRegion, ExpandButtonInteractionListener listener) {
+        canvas.drawBackground(buttonRegion);
+        canvas.addInteractionRegion(listener, buttonRegion);
+    }
+
+    private void drawItem(Canvas canvas, Rect2i itemRegion, Tree<T> item, ItemInteractionListener listener) {
         canvas.drawBackground(itemRegion);
         itemRenderer.draw(item.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
         canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item.getValue()), itemRegion);
     }
 
-
-    private void updateItemListeners() {
+    private void updateListeners() {
         while (itemListeners.size() > model.get().getItemCount()) {
             itemListeners.remove(itemListeners.size() - 1);
+            expandListeners.remove(expandListeners.size() - 1);
         }
         while (itemListeners.size() < model.get().getItemCount()) {
-            itemListeners.add(new TreeInteractionListener(itemListeners.size()));
+            itemListeners.add(new ItemInteractionListener(itemListeners.size()));
+            expandListeners.add(new ExpandButtonInteractionListener(expandListeners.size()));
         }
     }
 
@@ -314,6 +360,9 @@ public class UITreeView<T> extends CoreWidget {
         // Account for the width of the vertical scrollbar.
         result.addX(canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x);
 
+        // Account for the expand/contract button.
+        result.addX(itemIndent.get());
+
         return result;
     }
 
@@ -329,22 +378,23 @@ public class UITreeView<T> extends CoreWidget {
         defaultValue.set(value);
     }
 
-    private class TreeInteractionListener extends BaseInteractionListener {
+    private class ExpandButtonInteractionListener extends BaseInteractionListener {
         private int index;
 
-        TreeInteractionListener(int index) {
+        ExpandButtonInteractionListener(int index) {
             this.index = index;
         }
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                // Expand or contract and item on RMB - works even if the tree is disabled.
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                // Expand or contract and item on LMB - works even if the tree is disabled.
                 model.get().getItem(index).setExpanded(!model.get().getItem(index).isExpanded());
 
                 Tree<T> selectedItem = selectedIndex.get() != null ? model.get().getItem(selectedIndex.get()) : null;
                 model.get().resetItems();
 
+                // Update the index of the selected item.
                 if (selectedItem != null) {
                     int newIndex = model.get().indexOf(selectedItem);
                     if (newIndex == -1) {
@@ -354,16 +404,28 @@ public class UITreeView<T> extends CoreWidget {
                     }
                 }
                 return true;
-            } else if (isEnabled()) {
-                if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                    // Select the item on LMB - deselect when selected again.
-                    if (selectedIndex.get() != null && selectedIndex.get().equals(index)) {
-                        selectedIndex.set(null);
-                    } else {
-                        selectedIndex.set(index);
-                    }
-                    return true;
+            }
+            return false;
+        }
+    }
+
+    private class ItemInteractionListener extends BaseInteractionListener {
+        private int index;
+
+        ItemInteractionListener(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                // Select the item on LMB - deselect when selected again.
+                if (selectedIndex.get() != null && selectedIndex.get().equals(index)) {
+                    selectedIndex.set(null);
+                } else {
+                    selectedIndex.set(index);
                 }
+                return true;
             }
             return false;
         }
