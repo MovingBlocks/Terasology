@@ -213,30 +213,6 @@ public class GraphicState {
     }
 
     /**
-     * Sets the state for the rendering of the Shadow Map.
-     *
-     * Currently a single shadow map is produced around the player. The shadows are cast
-     * by the main directional light, which at this stage is either the sun or the moon.
-     */
-    public void preRenderSetupSceneShadowMap() {
-        buffers.sceneShadowMap.bind();
-
-        setViewportToSizeOf(buffers.sceneShadowMap);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glDisable(GL_CULL_FACE);
-    }
-
-    /**
-     * Resets the state after the rendering of the Shadow Map.
-     * See preRenderSetupSceneShadowMap() for some more information.
-     */
-    public void postRenderCleanupSceneShadowMap() {
-        GL11.glEnable(GL_CULL_FACE);
-        bindDisplay();
-        setViewportToWholeDisplay();
-    }
-
-    /**
      * Sets the state for the rendering of the Reflected Scene.
      *
      * This is effectively an inverted rendering of the backdrop and
