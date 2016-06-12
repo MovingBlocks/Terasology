@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -26,19 +27,6 @@ import java.util.Map;
  * A utility class that converts a {@link JsonElement} to a {@link Tree} and vice versa.
  */
 public class JsonTreeAdapter {
-    /**
-     * The default name for a JSON object node.
-     */
-    private static final String JSON_OBJECT = "{}";
-    /**
-     * The default name for a JSON array node.
-     */
-    private static final String JSON_ARRAY = "[]";
-    /**
-     * The default name for a null JSON node.
-     */
-    private static final String JSON_NULL = "null";
-
     private JsonTreeAdapter() {
     }
 
@@ -61,39 +49,85 @@ public class JsonTreeAdapter {
             if (primitive.isBoolean()) {
                 return new Tree<>(new JsonNode(name, json.getAsBoolean(), ElementType.PRIMITIVE));
             } else if (primitive.isNumber()) {
-                return new Tree<>(new JsonNode(name, json.getAsBigDecimal(), ElementType.PRIMITIVE));
+                return new Tree<>(new JsonNode(name, json.getAsNumber(), ElementType.PRIMITIVE));
             } else if (primitive.isString()) {
                 return new Tree<>(new JsonNode(name, json.getAsString(), ElementType.PRIMITIVE));
             } else {
                 return new Tree<>(new JsonNode(name, null, ElementType.PRIMITIVE));
             }
         } else if (json.isJsonArray()) {
-            Tree<JsonNode> tree = new Tree<>(new JsonNode(name == null ? JSON_ARRAY : name, null, ElementType.ARRAY));
+            Tree<JsonNode> tree = new Tree<>(new JsonNode(name, null, ElementType.ARRAY));
             JsonArray array = json.getAsJsonArray();
             for (int i = 0; i < array.size(); i++) {
                 tree.addChild(serialize(array.get(i)));
             }
             return tree;
         } else if (json.isJsonObject()) {
-            Tree<JsonNode> tree = new Tree<>(new JsonNode(name == null ? JSON_OBJECT : name, null, ElementType.OBJECT));
+            Tree<JsonNode> tree = new Tree<>(new JsonNode(name, null, ElementType.OBJECT));
             JsonObject object = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 tree.addChild(serialize(entry.getKey(), entry.getValue()));
             }
             return tree;
         } else {
-            return new Tree<>(new JsonNode(JSON_NULL, null, ElementType.NULL));
+            return new Tree<>(new JsonNode(name, null, ElementType.NULL));
         }
     }
 
-    public enum ElementType {
-        PRIMITIVE, OBJECT, ARRAY, NULL
+    /**
+     * @param tree A tree hierarchy based on a {@link JsonElement}, created by the serialize() method.
+     * @return The initial {@link JsonElement} reconstructed from the tree.
+     */
+    public static JsonElement deserialize(Tree<JsonNode> tree) {
+        JsonNode node = tree.getValue();
+        if (node.type == ElementType.PRIMITIVE) {
+            Object value = node.value;
+            if (value instanceof Boolean) {
+                return new JsonPrimitive((Boolean) value);
+            } else if (value instanceof Number) {
+                return new JsonPrimitive((Number) value);
+            } else if (value instanceof String) {
+                return new JsonPrimitive((String) value);
+            } else {
+                return JsonNull.INSTANCE;
+            }
+        } else if (node.type == ElementType.ARRAY) {
+            JsonArray array = new JsonArray();
+            for (Tree<JsonNode> child : tree.getChildren()) {
+                array.add(deserialize(child));
+            }
+            return array;
+        } else if (node.type == ElementType.OBJECT) {
+            JsonObject object = new JsonObject();
+            for (Tree<JsonNode> child : tree.getChildren()) {
+                object.add(child.getValue().getProperty(), deserialize(child));
+            }
+            return object;
+        } else {
+            return JsonNull.INSTANCE;
+        }
+    }
+
+    private enum ElementType {
+        PRIMITIVE, ARRAY, OBJECT, NULL
     }
 
     /**
      * The value type for the tree representation of a {@link JsonElement}.
      */
     public static class JsonNode {
+        /**
+         * The default name for a JSON object node.
+         */
+        private static final String OBJECT_STRING = "{}";
+        /**
+         * The default name for a JSON array node.
+         */
+        private static final String ARRAY_STRING = "[]";
+        /**
+         * The default name for a null JSON node.
+         */
+        private static final String NULL_STRING = "null";
         /**
          * The name of the node.
          */
@@ -107,30 +141,38 @@ public class JsonTreeAdapter {
          */
         private ElementType type;
 
-        public JsonNode(String property, Object value, ElementType type) {
+        private JsonNode(String property, Object value, ElementType type) {
             this.property = property;
             this.value = value;
             this.type = type;
         }
 
         public String getProperty() {
-            return this.property;
+            return property;
         }
 
         public Object getValue() {
-            return this.value;
+            return value;
         }
 
         public ElementType getType() {
-            return this.type;
+            return type;
         }
 
         @Override
         public String toString() {
-            if (property != null && value != null) {
-                return property + ": " + value;
+            if (type == ElementType.PRIMITIVE) {
+                if (property != null && value != null) {
+                    return property + ": " + value;
+                }
+                return property == null ? value.toString() : property;
+            } else if (type == ElementType.ARRAY) {
+                return ARRAY_STRING;
+            } else if (type == ElementType.OBJECT) {
+                return OBJECT_STRING;
+            } else {
+                return NULL_STRING;
             }
-            return property == null ? value.toString() : property;
         }
     }
 }
