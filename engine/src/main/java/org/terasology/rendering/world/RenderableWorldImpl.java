@@ -31,10 +31,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.world.dag.Node;
-import org.terasology.rendering.world.dag.ShadowMapNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.utilities.collection.DirectedAcyclicClassGraph;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
@@ -69,7 +66,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
-    private DirectedAcyclicClassGraph<Node> renderingPipeline;
+    private Camera shadowMapCamera;
 
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
@@ -78,11 +75,11 @@ public class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
+
     public RenderableWorldImpl(WorldProvider worldProvider,
                                ChunkProvider chunkProvider,
                                GLBufferPool bufferPool,
-                               Camera playerCamera,
-                               DirectedAcyclicClassGraph<Node> renderingPipeline) {
+                               Camera playerCamera) {
 
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
@@ -90,7 +87,6 @@ public class RenderableWorldImpl implements RenderableWorld {
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
-        this.renderingPipeline = renderingPipeline;
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -307,7 +303,7 @@ public class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleLight(chunk)) {
+                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleFromMainLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {
@@ -380,8 +376,8 @@ public class RenderableWorldImpl implements RenderableWorld {
         return chunk.isReady() && chunk.areAdjacentChunksReady();
     }
 
-    public boolean isChunkVisibleLight(RenderableChunk chunk) {
-        return isChunkVisible(renderingPipeline.get(ShadowMapNode.class).getCamera(), chunk); //TODO: find an elegant way
+    public boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
+        return isChunkVisible(shadowMapCamera, chunk); //TODO: find an elegant way
     }
 
     public boolean isChunkVisible(RenderableChunk chunk) {
@@ -404,6 +400,11 @@ public class RenderableWorldImpl implements RenderableWorld {
     @Override
     public ChunkProvider getChunkProvider() {
         return chunkProvider;
+    }
+
+    @Override
+    public void setShadowMapCamera(Camera camera) {
+        this.shadowMapCamera = camera;
     }
 
     @Override

@@ -15,9 +15,6 @@
  */
 package org.terasology.rendering.world.dag;
 
-
-import org.terasology.rendering.cameras.Camera;
-
 public class WorldReflectionNode implements Node {
 
     @Override
@@ -55,8 +52,4 @@ public class WorldReflectionNode implements Node {
 
     }
 
-    @Override
-    public Camera getCamera() {
-        return null;
-    }
 }

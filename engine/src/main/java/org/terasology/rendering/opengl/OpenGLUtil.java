@@ -21,6 +21,8 @@ import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
@@ -63,5 +65,9 @@ public final class OpenGLUtil {
      */
     public static void setViewportToSizeOf(FBO fbo) {
         glViewport(0, 0, fbo.width(), fbo.height());
+    }
+
+    public static void bindDisplay() {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 }

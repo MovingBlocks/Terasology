@@ -15,9 +15,10 @@
  */
 package org.terasology.rendering.world.dag;
 
-
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -26,14 +27,11 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.GraphicState;
-import org.terasology.rendering.opengl.OpenGLUtil;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRendererImpl;
-
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.*;
+import static org.terasology.rendering.opengl.OpenGLUtil.*;
 
 
 /**
@@ -44,13 +42,15 @@ import static org.lwjgl.opengl.GL11.*;
 public class ShadowMapNode implements Node {
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
-    private Material shader;
+
+    public Camera camera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
+
+    private Context context;
+    private Material shadowMapShader;
     private FBO shadowMap;
-    private Camera camera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     // TODO: every node proposes its modifiable configuration?
     private RenderingConfig renderingConfig;
-    private GraphicState state;
 
     private Camera playerCamera;
     // FIXME: remove reference to WorldRendererImpl
@@ -59,20 +59,16 @@ public class ShadowMapNode implements Node {
 
 
     // FIXME: unnecessary arguments must be eliminated
-    public ShadowMapNode(Material shader,
+    public ShadowMapNode(Context context, Material shadowMapShader,
                          Camera playerCamera,
-                         WorldRendererImpl worldRenderer,
-                         BackdropProvider backdropProvider,
-                         RenderingConfig renderingConfig,
-                         GraphicState state) {
-
-        this.shader = shader;
+                         WorldRendererImpl worldRenderer) {
+        this.context = context;
+        this.shadowMapShader = shadowMapShader;
         this.playerCamera = playerCamera;
         this.worldRenderer = worldRenderer;
-        this.backdropProvider = backdropProvider;
-        this.renderingConfig = renderingConfig;
-        this.state = state;
-
+        this.backdropProvider = context.get(BackdropProvider.class);
+        this.renderingConfig = context.get(Config.class).getRendering();
+        this.shadowMap = context.get(FrameBuffersManager.class).getFBO("sceneShadowMap");
     }
 
 
@@ -84,6 +80,8 @@ public class ShadowMapNode implements Node {
 
     @Override
     public void update(float deltaInSeconds) {
+        this.shadowMap = context.get(FrameBuffersManager.class).getFBO("sceneShadowMap");
+
         // positionShadowMapCamera()
 
         // Shadows are rendered around the player so...
@@ -124,12 +122,10 @@ public class ShadowMapNode implements Node {
     @Override
     public void execute() {
         PerformanceMonitor.startActivity("Render World (Shadow Map)");
-        // TODO: removing this assignment
-        shadowMap = state.buffers.sceneShadowMap; // added here since graphic settings can be modified and a new fbo can be generated.
 
         // preRenderSetupSceneShadowMap
         shadowMap.bind();
-        OpenGLUtil.setViewportToSizeOf(shadowMap); // TODO: how about shadowMap.setAsViewport() ?
+        setViewportToSizeOf(shadowMap); // TODO: how about shadowMap.setAsViewport() ?
         // TODO: verify the need to clear color buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glDisable(GL_CULL_FACE);
@@ -137,7 +133,7 @@ public class ShadowMapNode implements Node {
         // render
         camera.lookThrough();
 
-        shader.enable();
+        shadowMapShader.enable();
         // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
         worldRenderer.renderChunks(worldRenderer.renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, camera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
         playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
@@ -145,7 +141,7 @@ public class ShadowMapNode implements Node {
 
         // postRenderCleanupSceneShadowMap
         GL11.glEnable(GL_CULL_FACE);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); // bindDisplay()
+        bindDisplay(); // bindDisplay()
 
 
         PerformanceMonitor.endActivity();
@@ -173,11 +169,5 @@ public class ShadowMapNode implements Node {
         // TODO: required initialization whenever node is inserted to DAG
 
     }
-
-    @Override
-    public Camera getCamera() {
-        return camera;
-    }
-
 
 }

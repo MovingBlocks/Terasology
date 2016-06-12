@@ -547,7 +547,7 @@ public class GraphicState {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
-    public class Buffers {
+    private class Buffers {
         public FBO sceneOpaque;
         public FBO sceneReflectiveRefractive;
         public FBO sceneReflected;

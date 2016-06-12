@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world.dag;
 
-import org.terasology.rendering.cameras.Camera;
 
 public interface Node { // since it's inside dag package
 
@@ -32,8 +31,4 @@ public interface Node { // since it's inside dag package
     void onRemoval();
 
     void onInsert();
-
-    // FIXME: might be deleted in the future, some of the Node's may not need a camera
-    Camera getCamera();
-
 }

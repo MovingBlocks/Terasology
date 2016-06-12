@@ -169,7 +169,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera, renderingPipeline);
+        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
+
         renderQueues = renderableWorld.getRenderQueues();
 
         initMainDirectionalLight();
@@ -200,14 +201,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.initializeMaterials();
         initMaterials();
 
-        shadowMapNode = new ShadowMapNode(getMaterial("engine:prog.shadowMap"),
-                playerCamera,
-                this,
-                backdropProvider,
-                renderingConfig,
-                graphicState);
+        shadowMapNode = new ShadowMapNode(context, getMaterial("engine:prog.shadowMap"), playerCamera, this);
 
         renderingPipeline.add(shadowMapNode);
+        renderableWorld.setShadowMapCamera(shadowMapNode.camera); //TODO: verify this assignment at this stage does not cause any problems
     }
 
     private void initMaterials() {
@@ -252,7 +249,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         resetStats();
 
         currentRenderingStage = renderingStage;
-        isFirstRenderingStageForCurrentFrame = currentRenderingStage == RenderingStage.MONO || currentRenderingStage == RenderingStage.LEFT_EYE;
+        isFirstRenderingStageForCurrentFrame = (currentRenderingStage == RenderingStage.MONO) || (currentRenderingStage == RenderingStage.LEFT_EYE);
 
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
@@ -735,7 +732,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public Camera getLightCamera() {
         //FIXME: remove this method
-        return shadowMapNode.getCamera();
+        return shadowMapNode.camera;
     }
 
     @Override
