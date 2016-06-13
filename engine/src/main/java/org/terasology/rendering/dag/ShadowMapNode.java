@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.world.dag;
+package org.terasology.rendering.dag;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
@@ -33,7 +33,7 @@ import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
 import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.OpenGLUtil.*;
+import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 
 /**
@@ -70,13 +70,6 @@ public class ShadowMapNode implements Node {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shadowMap = context.get(FrameBuffersManager.class).getFBO("sceneShadowMap");
         this.renderQueues = context.get(RenderQueuesHelper.class);
-    }
-
-
-    @Override
-    public void initialise() {
-        // TODO: shader and fbo initialization here
-        // TODO: using ShaderParametersShadowMap here, instead of storing in ShaderManagerLwjgl
     }
 
     @Override
@@ -148,26 +141,6 @@ public class ShadowMapNode implements Node {
         PerformanceMonitor.endActivity();
     }
 
-    @Override
-    public void postRender() {
 
-    }
-
-    @Override
-    public void onDisposal() { // opposite of initialise
-        // TODO: removing shader and fbo, whenever node is removed from DAG
-    }
-
-    @Override
-    public void onRemoval() { // for explicit listeners
-
-    }
-
-
-    @Override
-    public void onInsert() {
-        // TODO: required initialization whenever node is inserted to DAG
-
-    }
 
 }

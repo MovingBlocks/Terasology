@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
-import org.terasology.rendering.opengl.OpenGLUtil;
+import org.terasology.rendering.opengl.OpenGLUtils;
 import org.terasology.world.WorldProvider;
 
 import java.util.Arrays;
@@ -119,7 +119,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
             float scale = METER_PER_PIXEL * floatingText.scale;
 
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-            OpenGLUtil.applyBillboardOrientation();
+            OpenGLUtils.applyBillboardOrientation();
             glScaled(scale, -scale, scale);
             glTranslated(-textWidth / 2.0, 0.0, 0.0);
             for (Map.Entry<Material, Mesh> meshMapEntry : meshMap.entrySet()) {

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.world;
 
+import com.google.api.client.util.Lists;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -48,17 +49,17 @@ import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
-import org.terasology.rendering.world.dag.Node;
-import org.terasology.rendering.world.dag.ShadowMapNode;
-import org.terasology.rendering.world.dag.WorldReflectionNode;
+import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.ShadowMapNode;
+import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
-import org.terasology.utilities.collection.DirectedAcyclicClassGraph;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -127,9 +128,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     private PostProcessor postProcessor;
 
 
+    private List<Node> renderingPipeline; // TODO: will be replaced by a DirectedAcyclicGraph data structure
     private ShadowMapNode shadowMapNode;
     private WorldReflectionNode worldReflectionNode;
-    private DirectedAcyclicClassGraph<Node> renderingPipeline = new DirectedAcyclicClassGraph<>();
+
+
     /**
      * Instantiates a WorldRenderer implementation.
      *
@@ -207,8 +210,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // FIXME: playerCamera to context?
         shadowMapNode = new ShadowMapNode(context, getMaterial("engine:prog.shadowMap"), playerCamera);
-        worldReflectionNode = new WorldReflectionNode(context, playerCamera);
+        worldReflectionNode = new WorldReflectionNode(context, playerCamera, chunkShader);
 
+        renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
         renderingPipeline.add(worldReflectionNode);
 
@@ -266,7 +270,10 @@ public final class WorldRendererImpl implements WorldRenderer {
 
             playerCamera.update(secondsSinceLastFrame);
 
-            shadowMapNode.update(secondsSinceLastFrame);
+            for (Node node : renderingPipeline) {
+                node.update(secondsSinceLastFrame);
+            }
+            
 
             renderableWorld.update();
             renderableWorld.generateVBOs();
@@ -306,7 +313,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             shadowMapNode.process(); // into shadowMap buffer
         }
 
-        renderWorldReflection();    // into sceneReflect buffer
+        worldReflectionNode.process(); // into sceneReflect buffer
 
         graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
         graphicState.initialClearing();
@@ -354,28 +361,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
 
         playerCamera.updatePrevViewProjectionMatrix();
-    }
-
-    private void renderWorldReflection() {
-        PerformanceMonitor.startActivity("Render World (Reflection)");
-
-        graphicState.preRenderSetupReflectedScene();
-        playerCamera.setReflected(true);
-
-        playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
-        backdropRenderer.render(playerCamera);
-        playerCamera.lookThrough();
-
-        if (renderingConfig.isReflectiveWater()) {
-            chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-            renderChunks(renderQueues.chunksOpaqueReflection, ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.REFLECTION);
-            chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        }
-
-        playerCamera.setReflected(false);
-        graphicState.postRenderCleanupReflectedScene();
-
-        PerformanceMonitor.endActivity();
     }
 
     private void renderBackdrop() {

@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.world.dag;
+package org.terasology.rendering.dag;
 
 
 public interface Node { // since it's inside dag package
 
-    void initialise();
-
     void update(float deltaInSeconds);
 
     void process();
-
-    void postRender();
-
-    void onDisposal();
-
-    void onRemoval();
-
-    void onInsert();
 }

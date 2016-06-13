@@ -28,9 +28,9 @@ import static org.lwjgl.opengl.GL11.glViewport;
 /**
 
  */
-public final class OpenGLUtil {
+public final class OpenGLUtils {
 
-    private OpenGLUtil() {
+    private OpenGLUtils() {
         // Utility class, no instance required
     }
 

@@ -55,7 +55,6 @@ import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 
 /**
@@ -212,29 +211,6 @@ public class GraphicState {
         }
     }
 
-    /**
-     * Sets the state for the rendering of the Reflected Scene.
-     *
-     * This is effectively an inverted rendering of the backdrop and
-     * the opaque chunks of the landscape, to be used in water reflections.
-     */
-    public void preRenderSetupReflectedScene() {
-        buffers.sceneReflected.bind();
-
-        setViewportToSizeOf(buffers.sceneReflected);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glCullFace(GL11.GL_FRONT);
-    }
-
-    /**
-     * Resets the state after the rendering of the Reflected Scene.
-     * See preRenderSetupReflectedScene() for some more information.
-     */
-    public void postRenderCleanupReflectedScene() {
-        GL11.glCullFace(GL11.GL_BACK);
-        bindDisplay();
-        setViewportToWholeDisplay();
-    }
 
     /**
      * Sets the state to render the Backdrop. At this stage the backdrop is the SkySphere
@@ -491,28 +467,6 @@ public class GraphicState {
         bufferIds.flip();
 
         GL20.glDrawBuffers(bufferIds);
-    }
-
-    /**
-     * Sets the viewport of the currently bound FBO to the size of the Display.
-     * 
-     * Which might mean the full screen, the full size of the window or the
-     * currently set screenshot size if a screenshot is being taken.
-     */
-    // TODO: verify if this can become part of the bindDisplay() method.
-    public void setViewportToWholeDisplay() {
-        glViewport(0, 0, fullScale.width(), fullScale.height());
-    }
-
-    /**
-     * Sets the viewport of the currently bound FBO to the dimensions of the FBO
-     * given as parameter.
-     *
-     * @param fbo The FBO whose dimensions will be matched by the viewport of the currently bound FBO.
-     */
-    // TODO: verify if this can become part of the FBO.bind() method.
-    public void setViewportToSizeOf(FBO fbo) {
-        glViewport(0, 0, fbo.width(), fbo.height());
     }
 
     /**
