@@ -29,6 +29,8 @@ import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.rendering.world.RenderQueuesHelper;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
 import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.OpenGLUtil.*;
@@ -44,7 +46,7 @@ public class ShadowMapNode implements Node {
 
 
     public Camera camera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
-
+    private RenderQueuesHelper renderQueues;
     private Context context;
     private Material shadowMapShader;
     private FBO shadowMap;
@@ -54,21 +56,20 @@ public class ShadowMapNode implements Node {
 
     private Camera playerCamera;
     // FIXME: remove reference to WorldRendererImpl
-    private WorldRendererImpl worldRenderer;
+    private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
 
 
     // FIXME: unnecessary arguments must be eliminated
-    public ShadowMapNode(Context context, Material shadowMapShader,
-                         Camera playerCamera,
-                         WorldRendererImpl worldRenderer) {
+    public ShadowMapNode(Context context, Material shadowMapShader, Camera playerCamera) {
         this.context = context;
         this.shadowMapShader = shadowMapShader;
         this.playerCamera = playerCamera;
-        this.worldRenderer = worldRenderer;
+        this.worldRenderer = context.get(WorldRenderer.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shadowMap = context.get(FrameBuffersManager.class).getFBO("sceneShadowMap");
+        this.renderQueues = context.get(RenderQueuesHelper.class);
     }
 
 
@@ -120,7 +121,7 @@ public class ShadowMapNode implements Node {
 
 
     @Override
-    public void execute() {
+    public void process() {
         PerformanceMonitor.startActivity("Render World (Shadow Map)");
 
         // preRenderSetupSceneShadowMap
@@ -135,7 +136,7 @@ public class ShadowMapNode implements Node {
 
         shadowMapShader.enable();
         // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
-        worldRenderer.renderChunks(worldRenderer.renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, camera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
+        worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, camera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
         playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
 
 
@@ -153,13 +154,12 @@ public class ShadowMapNode implements Node {
     }
 
     @Override
-    public void onDeletion() {
-
+    public void onDisposal() { // opposite of initialise
+        // TODO: removing shader and fbo, whenever node is removed from DAG
     }
 
     @Override
-    public void onRemoval() {
-        // TODO: removing shader and fbo, whenever node is removed from DAG
+    public void onRemoval() { // for explicit listeners
 
     }
 

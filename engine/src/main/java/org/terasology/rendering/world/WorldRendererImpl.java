@@ -50,6 +50,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.dag.Node;
 import org.terasology.rendering.world.dag.ShadowMapNode;
+import org.terasology.rendering.world.dag.WorldReflectionNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.collection.DirectedAcyclicClassGraph;
@@ -76,8 +77,7 @@ import java.util.PriorityQueue;
  */
 public final class WorldRendererImpl implements WorldRenderer {
 
-    // TODO: to be private
-    public final RenderQueuesHelper renderQueues;
+    private final RenderQueuesHelper renderQueues;
 
     private final Context context;
 
@@ -128,6 +128,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
 
     private ShadowMapNode shadowMapNode;
+    private WorldReflectionNode worldReflectionNode;
     private DirectedAcyclicClassGraph<Node> renderingPipeline = new DirectedAcyclicClassGraph<>();
     /**
      * Instantiates a WorldRenderer implementation.
@@ -201,9 +202,16 @@ public final class WorldRendererImpl implements WorldRenderer {
         postProcessor.initializeMaterials();
         initMaterials();
 
-        shadowMapNode = new ShadowMapNode(context, getMaterial("engine:prog.shadowMap"), playerCamera, this);
+        context.put(WorldRenderer.class, this);
+        context.put(RenderQueuesHelper.class, renderQueues);
+
+        // FIXME: playerCamera to context?
+        shadowMapNode = new ShadowMapNode(context, getMaterial("engine:prog.shadowMap"), playerCamera);
+        worldReflectionNode = new WorldReflectionNode(context, playerCamera);
 
         renderingPipeline.add(shadowMapNode);
+        renderingPipeline.add(worldReflectionNode);
+
         renderableWorld.setShadowMapCamera(shadowMapNode.camera); //TODO: verify this assignment at this stage does not cause any problems
     }
 
@@ -295,7 +303,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         preRenderUpdate(renderingStage);
 
         if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
-            shadowMapNode.execute(); // into shadowMap buffer
+            shadowMapNode.process(); // into shadowMap buffer
         }
 
         renderWorldReflection();    // into sceneReflect buffer
@@ -568,6 +576,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
     }
 
+    @Override
     public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         final Vector3f cameraPosition = camera.getPosition();
         if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {

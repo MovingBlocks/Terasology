@@ -22,11 +22,11 @@ public interface Node { // since it's inside dag package
 
     void update(float deltaInSeconds);
 
-    void execute();
+    void process();
 
     void postRender();
 
-    void onDeletion();
+    void onDisposal();
 
     void onRemoval();
 
