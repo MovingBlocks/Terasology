@@ -28,13 +28,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class TreeTest {
-    private List<Tree<Integer>> nodes = Lists.newArrayList();
+public class GenericTreeTest {
+    private List<GenericTree<Integer>> nodes = Lists.newArrayList();
 
     @Before
     public void setup() {
         for (int i = 0; i <= 10; i++) {
-            nodes.add(new Tree<>(i));
+            nodes.add(new GenericTree<>(i));
         }
 
         /**
@@ -91,24 +91,24 @@ public class TreeTest {
 
     @Test
     public void testDepthFirstIterator() {
-        List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3), nodes.get(7), nodes.get(4), nodes.get(8), nodes.get(5), nodes.get(6), nodes.get(9), nodes.get(10));
+        List<GenericTree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3), nodes.get(7), nodes.get(4), nodes.get(8), nodes.get(5), nodes.get(6), nodes.get(9), nodes.get(10));
 
-        List<Tree<Integer>> actual = Lists.newArrayList();
+        List<GenericTree<Integer>> actual = Lists.newArrayList();
         Iterator i = nodes.get(0).getDepthFirstIterator(false);
         while (i.hasNext()) {
-            actual.add((Tree<Integer>) i.next());
+            actual.add((GenericTree<Integer>) i.next());
         }
         assertEquals(expected, actual);
     }
 
     @Test
     public void testDepthFirstIteratorIterateExpandedOnly() {
-        List<Tree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(4), nodes.get(5), nodes.get(6), nodes.get(9));
+        List<GenericTree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(4), nodes.get(5), nodes.get(6), nodes.get(9));
 
-        List<Tree<Integer>> actual = Lists.newArrayList();
+        List<GenericTree<Integer>> actual = Lists.newArrayList();
         Iterator i = nodes.get(0).getDepthFirstIterator(true);
         while (i.hasNext()) {
-            actual.add((Tree<Integer>) i.next());
+            actual.add((GenericTree<Integer>) i.next());
         }
         assertEquals(expected, actual);
     }
@@ -123,7 +123,7 @@ public class TreeTest {
 
     @Test
     public void testGetRoot() {
-        for (Tree<Integer> node : nodes) {
+        for (GenericTree<Integer> node : nodes) {
             assertEquals(nodes.get(0), node.getRoot());
         }
     }

@@ -20,7 +20,9 @@ import com.google.common.io.Files;
 import com.google.gson.JsonParser;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UITreeView;
-import org.terasology.rendering.nui.widgets.models.JsonTreeAdapter;
+import org.terasology.rendering.nui.widgets.models.JsonTree;
+import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
+import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
 import org.terasology.rendering.nui.widgets.models.Tree;
 
 import java.io.File;
@@ -40,10 +42,10 @@ public class TreeViewTestScreen extends CoreScreenLayer {
         }
 
         // Deserialize the file, then expand every node.
-        Tree<JsonTreeAdapter.JsonNode> tree = JsonTreeAdapter.serialize(new JsonParser().parse(content));
+        JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
         Iterator it = tree.getDepthFirstIterator(false);
         while (it.hasNext()) {
-            ((Tree<JsonTreeAdapter.JsonNode>) it.next()).setExpanded(true);
+            ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
         }
 
         for (String id : new String[]{"treeViewDisabled", "treeViewEnabled"}) {

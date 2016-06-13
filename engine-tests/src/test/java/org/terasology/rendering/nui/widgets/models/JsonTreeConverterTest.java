@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class JsonTreeAdapterTest {
+public class JsonTreeConverterTest {
     @Test
     public void testTreeAdapter() {
         File file = new File(getClass().getClassLoader().getResource("example.json").getFile());
@@ -37,6 +37,6 @@ public class JsonTreeAdapterTest {
             e.printStackTrace();
         }
         JsonElement element = new JsonParser().parse(content);
-        assertEquals(element, JsonTreeAdapter.deserialize(JsonTreeAdapter.serialize(element)));
+        assertEquals(element, JsonTreeConverter.deserialize(JsonTreeConverter.serialize(element)));
     }
 }

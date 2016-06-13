@@ -193,7 +193,7 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void addToSelected() {
-        model.get().getItem(selectedIndex.get()).addChild(new Tree<>(defaultValue.get()));
+        model.get().getItem(selectedIndex.get()).addChild(defaultValue.get());
     }
 
     private void copySelected() {

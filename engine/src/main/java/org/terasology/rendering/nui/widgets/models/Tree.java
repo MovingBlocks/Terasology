@@ -15,98 +15,72 @@
  */
 package org.terasology.rendering.nui.widgets.models;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * A general-purpose tree data structure.
- * <p>
- * Stores a single object. May have a single parent and an arbitrary amount of children.
  *
  * @param <T> Type of objects stored in the tree.
  */
-public class Tree<T> {
-    private static final String NULL_NODE_ARGUMENT = "node argument is null";
-    private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
-    private static final String ITERATOR_NO_ITEMS = "no elements left (try validating with hasNext?)";
+public abstract class Tree<T> {
+    /**
+     * @return The object stored in this tree.
+     */
+    public abstract T getValue();
 
     /**
-     * The object stored in this tree.
+     * @param value The new value of the object stored in this tree.
      */
-    private T value;
-    /**
-     * The parent node for this tree.
-     */
-    private Tree<T> parent;
-    /**
-     * The list of children for this tree.
-     */
-    private List<Tree<T>> children = Lists.newArrayList();
-    /**
-     * Whether the tree is expanded in the interface.
-     */
-    private boolean expanded;
-
-    public Tree() {
-        this(null);
-    }
-
-    public Tree(T value) {
-        this.value = value;
-    }
+    public abstract void setValue(T value);
 
     /**
-     * @return A shallow copy of this tree.
+     * @return Whether this tree is expanded.
      */
-    public Tree<T> copy() {
-        Tree<T> copy = new Tree<>(this.value);
-        copy.setExpanded(this.expanded);
+    public abstract boolean isExpanded();
 
-        for (Tree<T> child : this.children) {
-            copy.addChild(child.copy());
-        }
-        return copy;
+    /**
+     * @param expanded The new expanded state of this tree.
+     */
+    public abstract void setExpanded(boolean expanded);
+
+    /**
+     * @return Whether the tree is a root (has no parent node).
+     */
+    public abstract boolean isRoot();
+
+    /**
+     * @return Whether the tree is a leaf (has no child nodes).
+     */
+    public boolean isLeaf() {
+        return this.getChildren().isEmpty();
     }
 
     /**
      * @return This tree's parent.
      */
-    public Tree<T> getParent() {
-        return this.parent;
-    }
+    public abstract Tree<T> getParent();
 
     /**
-     * @return Whether the tree is a root (has no parent node).
+     * @param tree The tree that the parent of this tree is to be set to.
      */
-    public boolean isRoot() {
-        return this.parent == null;
-    }
+    public abstract void setParent(Tree<T> tree);
 
     /**
      * @return The list of children for this tree.
      */
-    public List<Tree<T>> getChildren() {
-        return this.children;
-    }
-
+    public abstract Collection<Tree<T>> getChildren();
 
     /**
-     * @param node The tree the index of which is to be returned.
+     * @param tree The tree the index of which is to be returned.
      * @return The index of the specified tree.
      */
-    public int getIndex(Tree<T> node) {
-        Preconditions.checkNotNull(node, NULL_NODE_ARGUMENT);
-
-        return this.children.indexOf(node);
-    }
-
+    public abstract int getIndex(Tree<T> tree);
 
     /**
      * @return The root of the tree this subtree is a member of.
@@ -115,7 +89,7 @@ public class Tree<T> {
         if (this.isRoot()) {
             return this;
         }
-        return this.parent.getRoot();
+        return this.getParent().getRoot();
     }
 
     /**
@@ -130,101 +104,56 @@ public class Tree<T> {
             return currentDepth;
         }
 
-        return this.parent.getRecursiveDepth(currentDepth + 1);
-    }
-
-    /**
-     * Adds a child to this tree.
-     *
-     * @param child The child to be added.
-     */
-    public void addChild(Tree<T> child) {
-        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
-
-        this.children.add(child);
-        child.setParent(this);
-    }
-
-    /**
-     * Adds a child at the specified index in this tree.
-     *
-     * @param childIndex The index of the child to be added.
-     * @param child      The child to be added.
-     */
-    public void addChild(int childIndex, Tree<T> child) {
-        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
-
-        this.children.add(childIndex, child);
-        child.setParent(this);
+        return this.getParent().getRecursiveDepth(currentDepth + 1);
     }
 
     /**
      * @param child A specified tree.
      * @return Whether the specified tree is a (direct) child of this tree.
      */
-    public boolean containsChild(Tree<T> child) {
-        return this.children.contains(child);
-    }
+    public abstract boolean containsChild(Tree<T> child);
+
+    /**
+     * Instantiates and adds a child with a specified value to this tree.
+     *
+     * @param childValue The value of the child to be added.
+     */
+    public abstract void addChild(T childValue);
+
+    /**
+     * Adds a child to this tree.
+     *
+     * @param child The child to be added.
+     */
+    public abstract void addChild(Tree<T> child);
+
+    /**
+     * Adds a child to this tree at a specified index.
+     *
+     * @param index The index of the child to be added.
+     * @param child The child to be added.
+     */
+    public abstract void addChild(int index, Tree<T> child);
 
     /**
      * Removes a child at the specified index in this tree.
      *
      * @param childIndex The index of the child to be removed.
      */
-    public void removeChild(int childIndex) {
-        Tree<T> child = this.children.remove(childIndex);
-        child.setParent(null);
-    }
+    public abstract void removeChild(int childIndex);
 
     /**
      * Removes a specified child in this tree.
      *
      * @param child The child to be removed.
      */
-    public void removeChild(Tree<T> child) {
-        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
-        Preconditions.checkState(child.getParent() == this, NODE_ARGUMENT_INVALID_PARENT);
-
-        this.children.remove(child);
-        child.setParent(null);
-    }
+    public abstract void removeChild(Tree<T> child);
 
     /**
-     * Sets the parent of this tree to a specific tree.
-     *
-     * @param parent The tree the parent of this tree will be set to.
+     * @return A shallow copy of this tree.
      */
-    private void setParent(Tree<T> parent) {
-        this.parent = parent;
-    }
+    public abstract Tree<T> copy();
 
-    /**
-     * @return The object stored in this tree.
-     */
-    public T getValue() {
-        return this.value;
-    }
-
-    /**
-     * @param value The new value of the object stored in this tree.
-     */
-    public void setValue(T value) {
-        this.value = value;
-    }
-
-    /**
-     * @return Whether this tree is expanded.
-     */
-    public boolean isExpanded() {
-        return this.expanded;
-    }
-
-    /**
-     * @param expanded The new expanded state of this tree.
-     */
-    public void setExpanded(boolean expanded) {
-        this.expanded = expanded;
-    }
 
     /**
      * @param enumerateExpandedOnly Whether the children of non-expanded items are excluded from the enumeration.
@@ -235,9 +164,11 @@ public class Tree<T> {
     }
 
     /**
-     * An iterator of a {@link Tree} in depth-first, pre-ordered order.
+     * An iterator in depth-first, pre-ordered order.
      */
     private class DepthFirstIterator implements Iterator {
+        private static final String ITERATOR_NO_ITEMS = "no elements left (try validating with hasNext?)";
+
         /**
          * If true, the children of non-expanded items will be excluded from iteration.
          */
@@ -261,7 +192,9 @@ public class Tree<T> {
 
         @Override
         public Object next() {
-            Preconditions.checkState(this.hasNext(), ITERATOR_NO_ITEMS);
+            if (!this.hasNext()) {
+                throw new NoSuchElementException(ITERATOR_NO_ITEMS);
+            }
 
             Tree<T> current = next;
             Enumeration childEnumeration = stack.peek();
