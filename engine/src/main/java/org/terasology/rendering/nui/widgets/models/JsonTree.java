@@ -25,7 +25,6 @@ import java.util.List;
  * A tree representation of a JSON hierarchy, constructed from a {@link com.google.gson.JsonElement}.
  */
 public class JsonTree extends Tree<JsonTreeNode> {
-    private static final String INVALID_NODE_TYPE = "JSON node does not accept children";
     private static final String NULL_NODE_ARGUMENT = "node argument is null";
     private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
 
@@ -100,6 +99,24 @@ public class JsonTree extends Tree<JsonTreeNode> {
         return this.children.contains(child);
     }
 
+    private boolean acceptsChild(Tree<JsonTreeNode> child) {
+        // null children are not accepted
+        if (child == null) {
+            return false;
+        }
+        // PRIMITIVE or NULL nodes cannot have children
+        if (getValue().getType() == JsonTreeNode.ElementType.PRIMITIVE
+                || getValue().getType() == JsonTreeNode.ElementType.NULL) {
+            return false;
+        }
+        // ARRAY nodes cannot have PRIMITIVE children
+        if (getValue().getType() == JsonTreeNode.ElementType.ARRAY
+                && child.getValue().getType() == JsonTreeNode.ElementType.PRIMITIVE) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void addChild(JsonTreeNode childValue) {
         this.addChild(new JsonTree(childValue));
@@ -107,22 +124,18 @@ public class JsonTree extends Tree<JsonTreeNode> {
 
     @Override
     public void addChild(Tree<JsonTreeNode> child) {
-        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
-        Preconditions.checkArgument((getValue().getType() != JsonTreeNode.ElementType.PRIMITIVE)
-                && (getValue().getType() != JsonTreeNode.ElementType.NULL), INVALID_NODE_TYPE);
-
-        this.children.add(child);
-        child.setParent(this);
+        if (this.acceptsChild(child)) {
+            this.children.add(child);
+            child.setParent(this);
+        }
     }
 
     @Override
     public void addChild(int index, Tree<JsonTreeNode> child) {
-        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
-        Preconditions.checkArgument((getValue().getType() != JsonTreeNode.ElementType.PRIMITIVE)
-                && (getValue().getType() != JsonTreeNode.ElementType.NULL), INVALID_NODE_TYPE);
-
-        this.children.add(index, child);
-        child.setParent(this);
+        if (this.acceptsChild(child)) {
+            this.children.add(index, child);
+            child.setParent(this);
+        }
     }
 
     @Override
