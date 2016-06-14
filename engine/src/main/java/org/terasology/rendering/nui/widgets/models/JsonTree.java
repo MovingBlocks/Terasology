@@ -110,10 +110,10 @@ public class JsonTree extends Tree<JsonTreeNode> {
             return false;
         }
         // ARRAY nodes cannot have PRIMITIVE children
-        if (getValue().getType() == JsonTreeNode.ElementType.ARRAY
+        /*if (getValue().getType() == JsonTreeNode.ElementType.ARRAY
                 && child.getValue().getType() == JsonTreeNode.ElementType.PRIMITIVE) {
             return false;
-        }
+        }*/
         return true;
     }
 
