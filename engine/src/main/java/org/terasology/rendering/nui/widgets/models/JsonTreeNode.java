@@ -25,15 +25,25 @@ public class JsonTreeNode {
      * The type of the JSON node.
      */
     public enum ElementType {
-        // Primitive data type (string, boolean, array).
+        /**
+         * Primitive data type (string, boolean, array).
+         */
         VALUE,
-        // A primitive data type paired with a key string.
+        /**
+         * A primitive data type paired with a key string.
+         */
         KEY_VALUE_PAIR,
-        // An ordered list of zero or more values.
+        /**
+         * An ordered list of zero or more values.
+         */
         ARRAY,
-        // An unordered list of name/value pairs.
+        /**
+         * An unordered list of name/value pairs.
+         */
         OBJECT,
-        // An empty value.
+        /**
+         * An empty value.
+         */
         NULL
     }
 
