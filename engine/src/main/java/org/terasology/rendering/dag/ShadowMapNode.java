@@ -18,10 +18,10 @@ package org.terasology.rendering.dag;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
@@ -30,6 +30,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
+import org.terasology.rendering.world.RenderableWorld;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
 import static org.lwjgl.opengl.GL11.*;
@@ -43,41 +44,76 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
  */
 public class ShadowMapNode implements Node {
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
+    public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
+    @In
+    private RenderableWorld renderableWorld;
 
-    public Camera camera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
+    @In
     private RenderQueuesHelper renderQueues;
-    private Context context;
-    private Material shadowMapShader;
-    private FBO shadowMap;
 
-    // TODO: every node proposes its modifiable configuration?
-    private RenderingConfig renderingConfig;
+    @In
+    private Config config;
 
-    private Camera playerCamera;
-    // FIXME: remove reference to WorldRendererImpl
+    @In
+    private FrameBuffersManager frameBuffersManager;
+
+    @In
     private WorldRenderer worldRenderer;
+
+    @In
     private BackdropProvider backdropProvider;
 
+    private Material shadowMapShader;
+    private FBO shadowMap;
+    private RenderingConfig renderingConfig;
+    private Camera playerCamera;
 
-    // FIXME: unnecessary arguments must be eliminated
-    public ShadowMapNode(Context context, Material shadowMapShader, Camera playerCamera) {
-        this.context = context;
-        this.shadowMapShader = shadowMapShader;
-        this.playerCamera = playerCamera;
-        this.worldRenderer = context.get(WorldRenderer.class);
-        this.backdropProvider = context.get(BackdropProvider.class);
-        this.renderingConfig = context.get(Config.class).getRendering();
-        this.shadowMap = context.get(FrameBuffersManager.class).getFBO("sceneShadowMap");
-        this.renderQueues = context.get(RenderQueuesHelper.class);
+
+    @Override
+    public void initialise() {
+        this.playerCamera = worldRenderer.getActiveCamera();
+        this.shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
+        this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
+        this.renderingConfig = config.getRendering();
+        renderableWorld.setShadowMapCamera(shadowMapCamera);
     }
 
     @Override
-    public void update(float deltaInSeconds) {
-        this.shadowMap = context.get(FrameBuffersManager.class).getFBO("sceneShadowMap");
+    public void process() {
+        this.shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
+        positionShadowMapCamera();
 
-        // positionShadowMapCamera()
+        // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame
+        boolean processCondition = renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame();
+        if (!processCondition) {
+            return;
+        }
 
+        PerformanceMonitor.startActivity("Render World (Shadow Map)");
+        // preRenderSetupSceneShadowMap
+        shadowMap.bind();
+        setViewportToSizeOf(shadowMap);
+        // TODO: verify the need to clear color buffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GL11.glDisable(GL_CULL_FACE);
+
+        // render
+        shadowMapCamera.lookThrough();
+
+        shadowMapShader.enable();
+        // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
+        worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
+        playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
+
+        // postRenderCleanupSceneShadowMap
+        GL11.glEnable(GL_CULL_FACE);
+        bindDisplay();
+
+        PerformanceMonitor.endActivity();
+    }
+
+    private void positionShadowMapCamera() {
         // Shadows are rendered around the player so...
         Vector3f lightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z);
 
@@ -85,9 +121,9 @@ public class ShadowMapNode implements Node {
         float texelSize = 1.0f / renderingConfig.getShadowMapResolution();
         texelSize *= 2.0f;
 
-        camera.getViewProjectionMatrix().transformPoint(lightPosition);
+        shadowMapCamera.getViewProjectionMatrix().transformPoint(lightPosition);
         lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
-        camera.getInverseViewProjectionMatrix().transformPoint(lightPosition);
+        shadowMapCamera.getInverseViewProjectionMatrix().transformPoint(lightPosition);
 
         // ... we position our new shadowMapCamera at the position of the player and move it
         // quite a bit into the direction of the sun (our main light).
@@ -99,48 +135,14 @@ public class ShadowMapNode implements Node {
         Vector3f sunPosition = new Vector3f(sunDirection);
         sunPosition.scale(256.0f + 64.0f);
         lightPosition.add(sunPosition);
-
-        camera.getPosition().set(lightPosition);
+        shadowMapCamera.getPosition().set(lightPosition);
 
         // and adjust it to look from the sun direction into the direction of our player
         Vector3f negSunDirection = new Vector3f(sunDirection);
         negSunDirection.scale(-1.0f);
 
-        camera.getViewingDirection().set(negSunDirection);
-
-        camera.update(deltaInSeconds);
-
+        shadowMapCamera.getViewingDirection().set(negSunDirection);
+        shadowMapCamera.update(worldRenderer.getSecondsSinceLastFrame());
     }
-
-
-    @Override
-    public void process() {
-        PerformanceMonitor.startActivity("Render World (Shadow Map)");
-
-        // preRenderSetupSceneShadowMap
-        shadowMap.bind();
-        setViewportToSizeOf(shadowMap); // TODO: how about shadowMap.setAsViewport() ?
-        // TODO: verify the need to clear color buffer
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glDisable(GL_CULL_FACE);
-
-        // render
-        camera.lookThrough();
-
-        shadowMapShader.enable();
-        // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
-        worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, camera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
-        playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
-
-
-        // postRenderCleanupSceneShadowMap
-        GL11.glEnable(GL_CULL_FACE);
-        bindDisplay(); // bindDisplay()
-
-
-        PerformanceMonitor.endActivity();
-    }
-
-
 
 }

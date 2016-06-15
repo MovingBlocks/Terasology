@@ -18,12 +18,12 @@ package org.terasology.engine.subsystem.headless.renderer;
 import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRendererImpl;
@@ -62,6 +62,21 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(noCamera);
         config = context.get(Config.class);
+    }
+
+    @Override
+    public float getSecondsSinceLastFrame() {
+        return 0;
+    }
+
+    @Override
+    public Material getMaterial(String assetId) {
+        return null;
+    }
+
+    @Override
+    public boolean isFirstRenderingStageForCurrentFrame() {
+        return false;
     }
 
     @Override

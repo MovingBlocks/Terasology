@@ -16,9 +16,9 @@
 package org.terasology.rendering.dag;
 
 
-public interface Node { // since it's inside dag package
+public interface Node {
 
-    void update(float deltaInSeconds);
+    void initialise();
 
     void process();
 }

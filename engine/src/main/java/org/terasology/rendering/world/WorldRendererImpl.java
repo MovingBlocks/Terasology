@@ -43,6 +43,7 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.NodeCreator;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.GraphicState;
@@ -77,35 +78,27 @@ import java.util.PriorityQueue;
  *
  */
 public final class WorldRendererImpl implements WorldRenderer {
-
+    private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
-
     private final Context context;
-
     private final BackdropRenderer backdropRenderer;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
     private final EntityManager entityManager;
-
     private final Camera playerCamera;
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
     private float timeSmoothedMainLightIntensity;
-
-
     private RenderingStage currentRenderingStage;
-    private boolean isFirstRenderingStageForCurrentFrame;
-
     private Material chunkShader;
     private Material lightGeometryShader;
     // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
-
     private int statChunkMeshEmpty;
     private int statChunkNotReady;
     private int statRenderedTriangles;
@@ -119,19 +112,13 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private ComponentSystemManager systemManager;
-
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
-
     private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
-
-
     private List<Node> renderingPipeline; // TODO: will be replaced by a DirectedAcyclicGraph data structure
     private ShadowMapNode shadowMapNode;
-    private WorldReflectionNode worldReflectionNode;
-
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -174,7 +161,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         localPlayerSystem.setPlayerCamera(playerCamera);
 
         renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
-
         renderQueues = renderableWorld.getRenderQueues();
 
         initMainDirectionalLight();
@@ -207,16 +193,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         context.put(WorldRenderer.class, this);
         context.put(RenderQueuesHelper.class, renderQueues);
-
-        // FIXME: playerCamera to context?
-        shadowMapNode = new ShadowMapNode(context, getMaterial("engine:prog.shadowMap"), playerCamera);
-        worldReflectionNode = new WorldReflectionNode(context, playerCamera, chunkShader);
-
-        renderingPipeline = Lists.newArrayList();
-        renderingPipeline.add(shadowMapNode);
-        renderingPipeline.add(worldReflectionNode);
-
-        renderableWorld.setShadowMapCamera(shadowMapNode.camera); //TODO: verify this assignment at this stage does not cause any problems
+        context.put(RenderableWorld.class, renderableWorld);
+        initPipeline();
     }
 
     private void initMaterials() {
@@ -225,7 +203,24 @@ public final class WorldRendererImpl implements WorldRenderer {
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
-    private Material getMaterial(String assetId) {
+    private void initPipeline() {
+        // FIXME: init pipeline without specifying them as a field in this class
+        shadowMapNode = NodeCreator.create(ShadowMapNode.class, context);
+        Node worldReflectionNode = NodeCreator.create(WorldReflectionNode.class, context);
+
+        renderingPipeline = Lists.newArrayList();
+        renderingPipeline.add(shadowMapNode);
+        renderingPipeline.add(worldReflectionNode);
+    }
+
+
+    @Override
+    public float getSecondsSinceLastFrame() {
+        return secondsSinceLastFrame;
+    }
+
+    @Override
+    public Material getMaterial(String assetId) {
         return Assets.getMaterial(assetId).orElseThrow(() ->
                 new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));
     }
@@ -269,10 +264,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
-
-            for (Node node : renderingPipeline) {
-                node.update(secondsSinceLastFrame);
-            }
             
 
             renderableWorld.update();
@@ -309,11 +300,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        if (renderingConfig.isDynamicShadows() && isFirstRenderingStageForCurrentFrame) {
-            shadowMapNode.process(); // into shadowMap buffer
-        }
-
-        worldReflectionNode.process(); // into sceneReflect buffer
+        renderingPipeline.forEach(Node::process);
 
         graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
         graphicState.initialClearing();
@@ -562,6 +549,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
+    public boolean isFirstRenderingStageForCurrentFrame() {
+        return isFirstRenderingStageForCurrentFrame;
+    }
+
+    @Override
     public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         final Vector3f cameraPosition = camera.getPosition();
         if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
@@ -726,7 +718,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public Camera getLightCamera() {
         //FIXME: remove this method
-        return shadowMapNode.camera;
+        return shadowMapNode.shadowMapCamera;
     }
 
     @Override

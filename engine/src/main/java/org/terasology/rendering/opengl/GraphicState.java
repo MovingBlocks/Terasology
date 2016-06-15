@@ -19,13 +19,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.opengl.FBO.Dimensions;
 
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -56,6 +53,7 @@ import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
  * The GraphicState class aggregates a number of methods setting the OpenGL state
@@ -79,13 +77,8 @@ public class GraphicState {
     // that it might be better called OpenGLState or something along that line. I
     // eventually decided for GraphicState as it resides in the rendering.opengl
     // package anyway and rendering.opengl.OpenGLState felt cumbersome. --emanuele3d
-
-    // FIXME: for making nodes work without breaking anything
-    public Buffers buffers = new Buffers();
-
     private FrameBuffersManager buffersManager;
-    private Dimensions fullScale;
-
+    private Buffers buffers = new Buffers();
 
     /**
      * Graphic State constructor.
@@ -115,7 +108,6 @@ public class GraphicState {
      */
     public void dispose() {
         buffersManager = null;
-        fullScale = null;
         buffers = null;
     }
 
@@ -133,7 +125,6 @@ public class GraphicState {
         buffers.sceneOpaque               = buffersManager.getFBO("sceneOpaque");
         buffers.sceneReflectiveRefractive = buffersManager.getFBO("sceneReflectiveRefractive");
         buffers.sceneReflected            = buffersManager.getFBO("sceneReflected");
-        fullScale = buffers.sceneOpaque.dimensions();
     }
 
     public void setSceneOpaqueFBO(FBO newSceneOpaque) {
@@ -467,14 +458,6 @@ public class GraphicState {
         bufferIds.flip();
 
         GL20.glDrawBuffers(bufferIds);
-    }
-
-    /**
-     * Unbinds any currently bound FBO and binds the default Frame Buffer,
-     * which is usually the Display (be it the full screen or a window).
-     */
-    public void bindDisplay() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
     private class Buffers {

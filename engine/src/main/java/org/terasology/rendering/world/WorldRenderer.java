@@ -15,14 +15,12 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.PriorityQueue;
@@ -43,6 +41,13 @@ public interface WorldRenderer {
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
+
+    // TODO: appropriate javadocs
+    float getSecondsSinceLastFrame();
+
+    Material getMaterial(String assetId);
+
+    boolean isFirstRenderingStageForCurrentFrame();
 
     void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, WorldRendererImpl.ChunkRenderMode mode);
     /**

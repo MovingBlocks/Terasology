@@ -67,6 +67,10 @@ public final class OpenGLUtils {
         glViewport(0, 0, fbo.width(), fbo.height());
     }
 
+    /**
+     * Unbinds any currently bound FBO and binds the default Frame Buffer,
+     * which is usually the Display (be it the full screen or a window).
+     */
     public static void bindDisplay() {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
