@@ -247,7 +247,7 @@ public class UITreeView<T> extends CoreWidget {
             ItemInteractionListener itemListener = itemListeners.get(i);
             ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
-            if (!item.getChildren().isEmpty()) {
+            if (!item.isLeaf()) {
                 canvas.setPart(EXPAND_BUTTON);
                 setButtonMode(canvas, item, buttonListener);
                 Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
@@ -277,7 +277,7 @@ public class UITreeView<T> extends CoreWidget {
             ItemInteractionListener itemListener = itemListeners.get(i);
             ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
-            if (!item.getChildren().isEmpty()) {
+            if (!item.isLeaf()) {
                 canvas.setPart(EXPAND_BUTTON);
                 setButtonMode(canvas, item, buttonListener);
                 Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),

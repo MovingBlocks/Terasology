@@ -15,12 +15,16 @@
  */
 package org.terasology.rendering.nui.widgets.models;
 
+import com.google.api.client.util.Lists;
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -29,30 +33,60 @@ import java.util.NoSuchElementException;
  * @param <T> Type of objects stored in the tree.
  */
 public abstract class Tree<T> {
+    private static final String NULL_NODE_ARGUMENT = "node argument is null";
+    private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
+
+    /**
+     * The object stored in this tree.
+     */
+    protected T value;
+    /**
+     * Whether the tree is expanded.
+     */
+    protected boolean expanded;
+    /**
+     * The parent of this tree.
+     */
+    protected Tree<T> parent;
+    /**
+     * The children of this tree.
+     */
+    protected List<Tree<T>> children = Lists.newArrayList();
+
     /**
      * @return The object stored in this tree.
      */
-    public abstract T getValue();
+    public T getValue() {
+        return this.value;
+    }
 
     /**
      * @param value The new value of the object stored in this tree.
      */
-    public abstract void setValue(T value);
+    public void setValue(T value) {
+        this.value = value;
+    }
 
     /**
      * @return Whether this tree is expanded.
      */
-    public abstract boolean isExpanded();
+    public boolean isExpanded() {
+        return this.expanded;
+    }
 
     /**
      * @param expanded The new expanded state of this tree.
      */
-    public abstract void setExpanded(boolean expanded);
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
+    }
 
     /**
      * @return Whether the tree is a root (has no parent node).
      */
-    public abstract boolean isRoot();
+    public boolean isRoot() {
+        return this.parent == null;
+    }
 
     /**
      * @return Whether the tree is a leaf (has no child nodes).
@@ -64,23 +98,32 @@ public abstract class Tree<T> {
     /**
      * @return This tree's parent.
      */
-    public abstract Tree<T> getParent();
+    public Tree<T> getParent() {
+        return this.parent;
+    }
 
     /**
      * @param tree The tree that the parent of this tree is to be set to.
      */
-    public abstract void setParent(Tree<T> tree);
+    public void setParent(Tree<T> tree) {
+        this.parent = tree;
+    }
 
     /**
      * @return The list of children for this tree.
      */
-    public abstract Collection<Tree<T>> getChildren();
+    public Collection<Tree<T>> getChildren() {
+        return this.children;
+    }
 
     /**
      * @param tree The tree the index of which is to be returned.
      * @return The index of the specified tree.
      */
-    public abstract int getIndex(Tree<T> tree);
+    public int getIndex(Tree<T> tree) {
+        Preconditions.checkNotNull(tree, NULL_NODE_ARGUMENT);
+        return this.children.indexOf(tree);
+    }
 
     /**
      * @return The root of the tree this subtree is a member of.
@@ -111,10 +154,19 @@ public abstract class Tree<T> {
      * @param child A specified tree.
      * @return Whether the specified tree is a (direct) child of this tree.
      */
-    public abstract boolean containsChild(Tree<T> child);
+    public boolean containsChild(Tree<T> child) {
+        return this.children.contains(child);
+    }
+
+    /**
+     * @param child The child to be added.
+     * @return Whether the specified child can be added to the tree.
+     */
+    public abstract boolean acceptsChild(Tree<T> child);
 
     /**
      * Instantiates and adds a child with a specified value to this tree.
+     * A child should not be added if the tree does not accept it.
      *
      * @param childValue The value of the child to be added.
      */
@@ -122,38 +174,58 @@ public abstract class Tree<T> {
 
     /**
      * Adds a child to this tree.
+     * A child should not be added if the tree does not accept it.
      *
      * @param child The child to be added.
      */
-    public abstract void addChild(Tree<T> child);
+    public void addChild(Tree<T> child) {
+        if (this.acceptsChild(child)) {
+            this.children.add(child);
+            child.setParent(this);
+        }
+    }
 
     /**
      * Adds a child to this tree at a specified index.
+     * A child should not be added if the tree does not accept it.
      *
      * @param index The index of the child to be added.
      * @param child The child to be added.
      */
-    public abstract void addChild(int index, Tree<T> child);
+    public void addChild(int index, Tree<T> child) {
+        if (this.acceptsChild(child)) {
+            this.children.add(index, child);
+            child.setParent(this);
+        }
+    }
 
     /**
      * Removes a child at the specified index in this tree.
      *
      * @param childIndex The index of the child to be removed.
      */
-    public abstract void removeChild(int childIndex);
+    public void removeChild(int childIndex) {
+        Tree<T> child = this.children.remove(childIndex);
+        child.setParent(null);
+    }
 
     /**
      * Removes a specified child in this tree.
      *
      * @param child The child to be removed.
      */
-    public abstract void removeChild(Tree<T> child);
+    public void removeChild(Tree<T> child) {
+        Preconditions.checkNotNull(child, NULL_NODE_ARGUMENT);
+        Preconditions.checkState(child.getParent() == this, NODE_ARGUMENT_INVALID_PARENT);
+
+        this.children.remove(child);
+        child.setParent(null);
+    }
 
     /**
      * @return A shallow copy of this tree.
      */
     public abstract Tree<T> copy();
-
 
     /**
      * @param enumerateExpandedOnly Whether the children of non-expanded items are excluded from the enumeration.

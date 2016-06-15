@@ -21,8 +21,20 @@ import com.google.gson.JsonElement;
  * The value type for the tree representation of a {@link JsonElement}.
  */
 public class JsonTreeNode {
+    /**
+     * The type of the JSON node.
+     */
     public enum ElementType {
-        PRIMITIVE, ARRAY, OBJECT, NULL
+        // Primitive data type (string, boolean, array).
+        VALUE,
+        // A primitive data type paired with a key string.
+        KEY_VALUE_PAIR,
+        // An ordered list of zero or more values.
+        ARRAY,
+        // An unordered list of name/value pairs.
+        OBJECT,
+        // An empty value.
+        NULL
     }
 
     /**
@@ -40,7 +52,7 @@ public class JsonTreeNode {
     /**
      * The name of the node.
      */
-    private String property;
+    private String key;
     /**
      * The value stored within the node.
      */
@@ -50,14 +62,14 @@ public class JsonTreeNode {
      */
     private ElementType type;
 
-    public JsonTreeNode(String property, Object value, ElementType type) {
-        this.property = property;
+    public JsonTreeNode(String key, Object value, ElementType type) {
+        this.key = key;
         this.value = value;
         this.type = type;
     }
 
-    public String getProperty() {
-        return this.property;
+    public String getKey() {
+        return this.key;
     }
 
     public Object getValue() {
@@ -70,17 +82,19 @@ public class JsonTreeNode {
 
     @Override
     public String toString() {
-        if (type == ElementType.PRIMITIVE) {
-            if (property != null && value != null) {
-                return property + ": " + value;
+        if (type == ElementType.KEY_VALUE_PAIR) {
+            if (key != null && value != null) {
+                return key + ": " + value;
             }
-            return property == null ? value.toString() : property;
+            return key == null ? value.toString() : key;
+        } else if (type == ElementType.VALUE) {
+            return value.toString();
         } else if (type == ElementType.ARRAY) {
-            return property != null ? property : ARRAY_STRING;
+            return key != null ? key : ARRAY_STRING;
         } else if (type == ElementType.OBJECT) {
-            return property != null ? property : OBJECT_STRING;
+            return key != null ? key : OBJECT_STRING;
         } else {
-            return property != null ? property : NULL_STRING;
+            return key != null ? key : NULL_STRING;
         }
     }
 }

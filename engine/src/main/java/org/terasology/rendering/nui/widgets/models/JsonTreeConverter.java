@@ -47,13 +47,16 @@ public final class JsonTreeConverter {
         if (json.isJsonPrimitive()) {
             JsonPrimitive primitive = json.getAsJsonPrimitive();
             if (primitive.isBoolean()) {
-                return new JsonTree(new JsonTreeNode(name, json.getAsBoolean(), JsonTreeNode.ElementType.PRIMITIVE));
+                return new JsonTree(new JsonTreeNode(name, json.getAsBoolean(),
+                        name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
             } else if (primitive.isNumber()) {
-                return new JsonTree(new JsonTreeNode(name, json.getAsNumber(), JsonTreeNode.ElementType.PRIMITIVE));
+                return new JsonTree(new JsonTreeNode(name, json.getAsNumber(),
+                        name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
             } else if (primitive.isString()) {
-                return new JsonTree(new JsonTreeNode(name, json.getAsString(), JsonTreeNode.ElementType.PRIMITIVE));
+                return new JsonTree(new JsonTreeNode(name, json.getAsString(),
+                        name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
             } else {
-                return new JsonTree(new JsonTreeNode(name, null, JsonTreeNode.ElementType.PRIMITIVE));
+                return new JsonTree(new JsonTreeNode(name, null, name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
             }
         } else if (json.isJsonArray()) {
             JsonTree tree = new JsonTree(new JsonTreeNode(name, null, JsonTreeNode.ElementType.ARRAY));
@@ -80,7 +83,7 @@ public final class JsonTreeConverter {
      */
     public static JsonElement deserialize(Tree<JsonTreeNode> tree) {
         JsonTreeNode node = tree.getValue();
-        if (node.getType() == JsonTreeNode.ElementType.PRIMITIVE) {
+        if (node.getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR || node.getType() == JsonTreeNode.ElementType.VALUE) {
             Object value = node.getValue();
             if (value instanceof Boolean) {
                 return new JsonPrimitive((Boolean) value);
@@ -100,7 +103,7 @@ public final class JsonTreeConverter {
         } else if (node.getType() == JsonTreeNode.ElementType.OBJECT) {
             JsonObject object = new JsonObject();
             for (Tree<JsonTreeNode> child : tree.getChildren()) {
-                object.add(child.getValue().getProperty(), deserialize(child));
+                object.add(child.getValue().getKey(), deserialize(child));
             }
             return object;
         } else {
