@@ -33,6 +33,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
@@ -43,7 +44,6 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.dag.NodeCreator;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.GraphicState;
@@ -205,14 +205,22 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initPipeline() {
         // FIXME: init pipeline without specifying them as a field in this class
-        shadowMapNode = NodeCreator.create(ShadowMapNode.class, context);
-        Node worldReflectionNode = NodeCreator.create(WorldReflectionNode.class, context);
+        shadowMapNode = createInstance(ShadowMapNode.class, context);
+        Node worldReflectionNode = createInstance(WorldReflectionNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
         renderingPipeline.add(worldReflectionNode);
     }
 
+    private static <T extends Node> T createInstance(Class<T> type, Context context) {
+        // Attempt constructor-based injection first
+        T node = InjectionHelper.createWithConstructorInjection(type, context);
+        // Then fill @In fields
+        InjectionHelper.inject(node, context);
+        node.initialise();
+        return type.cast(node);
+    }
 
     @Override
     public float getSecondsSinceLastFrame() {
@@ -268,7 +276,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
-            
+
 
             renderableWorld.update();
             renderableWorld.generateVBOs();
