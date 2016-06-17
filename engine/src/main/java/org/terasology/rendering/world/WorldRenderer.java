@@ -19,6 +19,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.chunks.RenderableChunk;
@@ -43,6 +44,8 @@ public interface WorldRenderer {
 
 
     // TODO: appropriate javadocs
+    boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly);
+
     float getSecondsSinceLastFrame();
 
     Material getMaterial(String assetId);

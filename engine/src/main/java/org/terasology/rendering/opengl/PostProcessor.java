@@ -57,7 +57,9 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.terasology.rendering.opengl.OpenGLUtils.*;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderQuad;
+import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -820,26 +822,6 @@ public class PostProcessor {
 
         materials.ocDistortion.setFloat2("ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
         materials.ocDistortion.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
-    }
-
-    /**
-     * Renders a quad filling the whole currently set viewport.
-     */
-    public void renderFullscreenQuad() {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-
-        renderQuad();
-
-        glPopMatrix();
-
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
     }
 
     /**

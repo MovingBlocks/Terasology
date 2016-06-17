@@ -23,15 +23,12 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.AABBRenderer;
@@ -44,7 +41,18 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.BackdropNode;
+import org.terasology.rendering.dag.ChunksAlphaRejectNode;
+import org.terasology.rendering.dag.ChunksOpaqueNode;
+import org.terasology.rendering.dag.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.DirectionalLightsNode;
+import org.terasology.rendering.dag.FirstPersonViewNode;
+import org.terasology.rendering.dag.LightGeometryNode;
+import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.ObjectsOpaqueNode;
+import org.terasology.rendering.dag.OverlaysNode;
+import org.terasology.rendering.dag.ShadowMapNode;
 import org.terasology.rendering.dag.SkyBandsNode;
+import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.GraphicState;
@@ -63,8 +71,6 @@ import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.List;
 import java.util.PriorityQueue;
-
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -91,8 +97,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final EntityManager entityManager;
     private final Camera playerCamera;
 
-    // TODO: Review this? (What are we doing with a component not attached to an entity?)
-    private LightComponent mainDirectionalLight = new LightComponent();
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
     private Material chunkShader;
@@ -164,16 +168,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
-        initMainDirectionalLight();
         initRenderingSupport();
-    }
-
-    // TODO: one day the main light (sun/moon) should be just another light in the scene.
-    private void initMainDirectionalLight() {
-        mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
-        mainDirectionalLight.lightAmbientIntensity = 0.75f;
-        mainDirectionalLight.lightDiffuseIntensity = 0.75f;
-        mainDirectionalLight.lightSpecularPower = 100f;
     }
 
     private void initRenderingSupport() {
@@ -210,12 +205,28 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node worldReflectionNode = createInstance(WorldReflectionNode.class, context);
         Node backdropNode = createInstance(BackdropNode.class, context);
         Node skybandsNode = createInstance(SkyBandsNode.class, context);
+        Node objectOpaqueNode = createInstance(ObjectsOpaqueNode.class, context);
+        Node chunksOpaqueNode = createInstance(ChunksOpaqueNode.class, context);
+        Node chunksAlphaRejectNode = createInstance(ChunksAlphaRejectNode.class, context);
+        Node overlaysNode = createInstance(OverlaysNode.class, context);
+        Node firstPersonViewNode = createInstance(FirstPersonViewNode.class, context);
+        Node lightGeometryNode = createInstance(LightGeometryNode.class, context);
+        Node directionalLightsNode = createInstance(DirectionalLightsNode.class, context);
+        Node chunksRefractiveReflectiveNode = createInstance(ChunksRefractiveReflectiveNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
         renderingPipeline.add(worldReflectionNode);
         renderingPipeline.add(backdropNode);
         renderingPipeline.add(skybandsNode);
+        renderingPipeline.add(objectOpaqueNode);
+        renderingPipeline.add(chunksOpaqueNode);
+        renderingPipeline.add(chunksAlphaRejectNode);
+        renderingPipeline.add(overlaysNode);
+        renderingPipeline.add(firstPersonViewNode);
+        renderingPipeline.add(lightGeometryNode);
+        renderingPipeline.add(directionalLightsNode);
+        renderingPipeline.add(chunksRefractiveReflectiveNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -319,20 +330,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
-            renderObjectsOpaque();      //
-            renderChunksOpaque();       //
-            renderChunksAlphaReject();  //  all into sceneOpaque buffer
-            renderOverlays();           //
-            renderFirstPersonView();    //
-
-            graphicState.postRenderCleanupSceneOpaque();
-
-            renderLightGeometry();              // into sceneOpaque buffer
-            renderChunksRefractiveReflective(); // into sceneReflectiveRefractive buffer
-        }
-
-        disableWireframeIf(renderingDebugConfig.isWireframe());
+        graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
         postProcessor.generateOutline();                    // into outline buffer
@@ -361,101 +359,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         playerCamera.updatePrevViewProjectionMatrix();
     }
 
-
-    private void renderObjectsOpaque() {
-        PerformanceMonitor.startActivity("Render Objects (Opaque)");
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderOpaque();
-        }
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderChunksOpaque() {
-        PerformanceMonitor.startActivity("Render Chunks (Opaque)");
-        renderChunks(renderQueues.chunksOpaque, ChunkMesh.RenderPhase.OPAQUE, playerCamera, ChunkRenderMode.DEFAULT);
-        PerformanceMonitor.endActivity();
-    }
-
-    // Alpha reject is used for semi-transparent billboards, which in turn are used for ground plants.
-    private void renderChunksAlphaReject() {
-        PerformanceMonitor.startActivity("Render Chunks (Alpha Reject)");
-        renderChunks(renderQueues.chunksAlphaReject, ChunkMesh.RenderPhase.ALPHA_REJECT, playerCamera, ChunkRenderMode.DEFAULT);
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderOverlays() {
-        PerformanceMonitor.startActivity("Render Overlays");
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderOverlay();
-        }
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderFirstPersonView() {
-        if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
-            PerformanceMonitor.startActivity("Render First Person");
-            graphicState.preRenderSetupFirstPerson();
-
-            playerCamera.updateMatrices(90f);
-            playerCamera.loadProjectionMatrix();
-
-            for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-                renderer.renderFirstPerson();
-            }
-
-            playerCamera.updateMatrices();
-            playerCamera.loadProjectionMatrix();
-
-            graphicState.postRenderClenaupFirstPerson();
-            PerformanceMonitor.endActivity();
-        }
-    }
-
-    private void renderLightGeometry() {
-        PerformanceMonitor.startActivity("Render Light Geometry");
-        // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
-        /*
-        graphicState.preRenderSetupLightGeometryStencil();
-
-        simple.enable();
-        simple.setCamera(playerCamera);
-        EntityManager entityManager = context.get(EntityManager.class);
-        for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
-            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-            LightComponent lightComponent = entity.getComponent(LightComponent.class);
-
-            final Vector3f worldPosition = locationComponent.getWorldPosition();
-            renderLightComponent(lightComponent, worldPosition, simple, true);
-        }
-
-        graphicState.postRenderCleanupLightGeometryStencil();
-        */
-
-        graphicState.preRenderSetupLightGeometry();
-        for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
-            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-            LightComponent lightComponent = entity.getComponent(LightComponent.class);
-
-            final Vector3f worldPosition = locationComponent.getWorldPosition();
-            renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
-        }
-        graphicState.postRenderCleanupLightGeometry();
-
-        // Sunlight
-        graphicState.preRenderSetupDirectionalLights();
-
-        Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
-        sunlightWorldPosition.scale(50000f);
-        sunlightWorldPosition.add(playerCamera.getPosition());
-        renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
-
-        graphicState.postRenderCleanupDirectionalLights();
-
-        postProcessor.applyLightBufferPass();
-        PerformanceMonitor.endActivity();
-    }
-
-    private boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly) {
+    @Override
+    public boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly) {
         Vector3f positionViewSpace = new Vector3f();
         positionViewSpace.sub(lightWorldPosition, playerCamera.getPosition());
 
@@ -507,7 +412,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             LightGeometryHelper.renderSphereGeometry();
         } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
             // Directional lights cover all pixels on the screen
-            postProcessor.renderFullscreenQuad();
+            renderFullscreenQuad();
         }
 
         if (!geometryOnly) {
@@ -521,17 +426,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         return true;
     }
 
-    private void renderChunksRefractiveReflective() {
-        PerformanceMonitor.startActivity("Render Chunks (Refractive/Reflective)");
-
-        boolean isHeadUnderWater = isHeadUnderWater();
-        graphicState.preRenderSetupSceneReflectiveRefractive(isHeadUnderWater);
-
-        renderChunks(renderQueues.chunksAlphaBlend, ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, ChunkRenderMode.DEFAULT);
-
-        graphicState.postRenderCleanupSceneReflectiveRefractive(isHeadUnderWater);
-        PerformanceMonitor.endActivity();
-    }
 
     private void renderSimpleBlendMaterials() {
         PerformanceMonitor.startActivity("Render Objects (Transparent)");
