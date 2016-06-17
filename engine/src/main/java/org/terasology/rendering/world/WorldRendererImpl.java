@@ -44,13 +44,12 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.BackdropNode;
 import org.terasology.rendering.dag.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.ChunksOpaqueNode;
-import org.terasology.rendering.dag.ChunksRefractiveReflective;
+import org.terasology.rendering.dag.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.DirectionalLightsNode;
 import org.terasology.rendering.dag.FirstPersonViewNode;
 import org.terasology.rendering.dag.LightGeometryNode;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.ObjectsOpaqueNode;
-import org.terasology.rendering.dag.OutlineNode;
 import org.terasology.rendering.dag.OverlaysNode;
 import org.terasology.rendering.dag.ShadowMapNode;
 import org.terasology.rendering.dag.SkyBandsNode;
@@ -215,8 +214,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node firstPersonViewNode = createInstance(FirstPersonViewNode.class, context);
         Node lightGeometryNode = createInstance(LightGeometryNode.class, context);
         Node directionalLightsNode = createInstance(DirectionalLightsNode.class, context);
-        Node chunksRefractiveReflective = createInstance(ChunksRefractiveReflective.class, context);
-        Node outlineNode = createInstance(OutlineNode.class, context);
+        Node chunksRefractiveReflectiveNode = createInstance(ChunksRefractiveReflectiveNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -230,8 +228,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(firstPersonViewNode);
         renderingPipeline.add(lightGeometryNode);
         renderingPipeline.add(directionalLightsNode);
-        renderingPipeline.add(chunksRefractiveReflective);
-        renderingPipeline.add(outlineNode);
+        renderingPipeline.add(chunksRefractiveReflectiveNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -335,6 +332,10 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
+        graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
+
+        PerformanceMonitor.startActivity("Pre-post composite");
+        postProcessor.generateOutline();                    // into outline buffer
         postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
         postProcessor.generatePrePostComposite();           // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
         PerformanceMonitor.endActivity();

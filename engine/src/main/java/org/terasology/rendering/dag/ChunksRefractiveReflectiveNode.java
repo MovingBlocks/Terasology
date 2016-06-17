@@ -31,7 +31,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 /**
  * TODO: Diagram of this node
  */
-public class ChunksRefractiveReflective implements Node {
+public class ChunksRefractiveReflectiveNode implements Node {
 
     @In
     private RenderQueuesHelper renderQueues;
