@@ -41,6 +41,7 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.BackdropNode;
 import org.terasology.rendering.dag.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.ChunksOpaqueNode;
@@ -217,6 +218,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node directionalLightsNode = createInstance(DirectionalLightsNode.class, context);
         Node chunksRefractiveReflectiveNode = createInstance(ChunksRefractiveReflectiveNode.class, context);
         Node outlineNode = createInstance(OutlineNode.class, context);
+        Node ambientOcclusionPassesNode = createInstance(AmbientOcclusionPassesNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -232,6 +234,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(directionalLightsNode);
         renderingPipeline.add(chunksRefractiveReflectiveNode);
         renderingPipeline.add(outlineNode);
+        renderingPipeline.add(ambientOcclusionPassesNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -335,7 +338,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
         postProcessor.generatePrePostComposite();           // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
         PerformanceMonitor.endActivity();
 

@@ -349,53 +349,6 @@ public class PostProcessor {
         buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
-    /**
-     * If Ambient Occlusion is enabled in the render settings, this method generates and
-     * stores the necessary images into their own FBOs. The stored images are eventually
-     * combined with others.
-     *
-     * For further information on Ambient Occlusion see: http://en.wikipedia.org/wiki/Ambient_occlusion
-     */
-    public void generateAmbientOcclusionPasses() {
-        if (renderingConfig.isSsao()) {
-            generateSSAO();
-            generateBlurredSSAO();
-        }
-    }
-
-    private void generateSSAO() {
-        materials.ssao.enable();
-        materials.ssao.setFloat2("texelSize", 1.0f / buffers.ssao.width(), 1.0f / buffers.ssao.height(), true);
-        materials.ssao.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
-
-        // TODO: verify if some textures should be bound here
-        buffers.ssao.bind();
-
-        setViewportToSizeOf(buffers.ssao.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-        renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToWholeDisplay();    // TODO: verify this is necessary
-    }
-
-    private void generateBlurredSSAO() {
-        materials.ssaoBlurred.enable();
-        materials.ssaoBlurred.setFloat2("texelSize", 1.0f / buffers.ssaoBlurred.width(), 1.0f / buffers.ssaoBlurred.height(), true);
-
-        buffers.ssao.bindTexture(); // TODO: verify this is the only input
-
-        buffers.ssaoBlurred.bind();
-
-        setViewportToSizeOf(buffers.ssaoBlurred.dimensions());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-        renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToWholeDisplay();    // TODO: verify this is necessary
-    }
 
     /**
      * Adds outlines and ambient occlusion to the rendering obtained so far stored in the primary FBO.
