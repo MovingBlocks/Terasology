@@ -17,38 +17,6 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.geom.Vector3f;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DECR;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_INCR;
-import static org.lwjgl.opengl.GL11.GL_KEEP;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * The GraphicState class aggregates a number of methods setting the OpenGL state
@@ -137,57 +105,6 @@ public class GraphicState {
      */
     public void setSceneShadowMap(FBO newShadowMap) {
         buffers.sceneShadowMap = newShadowMap;
-    }
-
-    /**
-     * Disables wireframe rendering. Used together with enableWireFrameIf().
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
-     */
-    public void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-    }
-
-    /**
-     * Sets the state for the rendering of objects or portions of objects having some degree of transparency.
-     *
-     * Generally speaking objects drawn with this state will have their color blended with the background
-     * color, depending on their opacity. I.e. a 25% opaque foreground object will provide 25% of its
-     * color while the background will provide the remaining 75%. The sum of the two RGBA vectors gets
-     * written onto the output buffer.
-     *
-     * Important note: this method disables writing to the Depth Buffer. This is why filters relying on
-     * depth information (i.e. DoF) have problems with transparent objects: the depth of their pixels is
-     * found to be that of the background. This is an unresolved (unresolv-able?) issue that would only
-     * be reversed, not eliminated, by re-enabling writing to the Depth Buffer.
-     */
-    public void preRenderSetupSimpleBlendMaterials() {
-        buffers.sceneOpaque.bind();
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-
-        GL11.glEnable(GL_BLEND);
-        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
-        GL11.glDepthMask(false);
-
-        // (*) In this context SRC is Foreground. This effectively says:
-        // Resulting RGB = ForegroundRGB * ForegroundAlpha + BackgroundRGB * (1 - ForegroundAlpha)
-        // Which might still look complicated, but it's actually the most typical alpha-driven composite.
-        // A neat tool to play with this settings can be found here: http://www.andersriggelsen.dk/glblendfunc.php
-    }
-
-    /**
-     * Resets the state after the rendering of semi-opaque/semi-transparent objects.
-     *
-     * See preRenderSetupSimpleBlendMaterials() for additional information.
-     */
-    public void postRenderCleanupSimpleBlendMaterials() {
-        GL11.glDisable(GL_BLEND);
-        GL11.glDepthMask(true);
-
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true); // TODO: review - this might be redundant.
-        bindDisplay();
     }
 
     /**
