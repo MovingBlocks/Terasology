@@ -44,6 +44,8 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.BackdropNode;
+import org.terasology.rendering.dag.SkyBandsNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.GraphicState;
@@ -207,10 +209,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         // FIXME: init pipeline without specifying them as a field in this class
         shadowMapNode = createInstance(ShadowMapNode.class, context);
         Node worldReflectionNode = createInstance(WorldReflectionNode.class, context);
+        Node backdropNode = createInstance(BackdropNode.class, context);
+        Node skybandsNode = createInstance(SkyBandsNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
         renderingPipeline.add(worldReflectionNode);
+        renderingPipeline.add(backdropNode);
+        renderingPipeline.add(skybandsNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -314,12 +320,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
-        graphicState.initialClearing();
-
-        graphicState.preRenderSetupSceneOpaque();
-        renderBackdrop();   // into sceneOpaque and skyBands[0-1] buffers
-
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
             renderObjectsOpaque();      //
             renderChunksOpaque();       //
@@ -360,21 +360,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         PerformanceMonitor.endActivity();
 
         playerCamera.updatePrevViewProjectionMatrix();
-    }
-
-    private void renderBackdrop() {
-        PerformanceMonitor.startActivity("Render Sky");
-        playerCamera.lookThroughNormalized();
-        graphicState.preRenderSetupBackdrop();
-
-        backdropRenderer.render(playerCamera);
-        graphicState.midRenderChangesBackdrop();
-        postProcessor.generateSkyBands();
-
-        graphicState.postRenderCleanupBackdrop();
-
-        playerCamera.lookThrough();
-        PerformanceMonitor.endActivity();
     }
 
     private void renderObjectsOpaque() {

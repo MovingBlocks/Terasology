@@ -18,17 +18,23 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
 
 /**
 
  */
 public final class OpenGLUtils {
+    private static int displayListQuad = -1;
 
     private OpenGLUtils() {
         // Utility class, no instance required
@@ -73,5 +79,110 @@ public final class OpenGLUtils {
      */
     public static void bindDisplay() {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    }
+
+    /**
+     * Sets the state to render in wireframe.
+     *
+     * @param wireframeIsEnabledInRenderingDebugConfig If True enables wireframe rendering. False, does nothing.
+     */
+    public static void enableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
+        if (wireframeIsEnabledInRenderingDebugConfig) {
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+    }
+
+    /**
+     * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
+     * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
+     * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
+     *
+     * @param fbo         The FBO holding the attachments to be set or unset for drawing.
+     * @param color       If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param normal      If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param lightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     */
+    // TODO: verify if this can become part of the FBO.bind() method.
+    public static void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
+        if (fbo == null) {
+            return;
+        }
+
+        int attachmentId = 0;
+
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
+
+        if (fbo.colorBufferTextureId != 0) {
+            if (color) {
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+            attachmentId++;
+        }
+        if (fbo.normalsBufferTextureId != 0) {
+            if (normal) {
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+            attachmentId++;
+        }
+        if (fbo.lightBufferTextureId != 0) {
+            if (lightBuffer) {
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+        }
+
+        bufferIds.flip();
+
+        GL20.glDrawBuffers(bufferIds);
+    }
+
+    /**
+     * Renders a quad filling the whole currently set viewport.
+     */
+    public static void renderFullscreenQuad() {
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+
+        renderQuad();
+
+        glPopMatrix();
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+    }
+
+
+    // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
+    public static void renderQuad() {
+        if (displayListQuad == -1) {
+            displayListQuad = glGenLists(1);
+
+            glNewList(displayListQuad, GL11.GL_COMPILE);
+
+            glBegin(GL_QUADS);
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+            glTexCoord2d(0.0, 0.0);
+            glVertex3i(-1, -1, -1);
+
+            glTexCoord2d(1.0, 0.0);
+            glVertex3i(1, -1, -1);
+
+            glTexCoord2d(1.0, 1.0);
+            glVertex3i(1, 1, -1);
+
+            glTexCoord2d(0.0, 1.0);
+            glVertex3i(-1, 1, -1);
+
+            glEnd();
+
+            glEndList();
+        }
+
+        glCallList(displayListQuad);
     }
 }

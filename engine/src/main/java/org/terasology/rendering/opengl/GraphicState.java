@@ -15,14 +15,8 @@
  */
 package org.terasology.rendering.opengl;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.math.geom.Vector3f;
-
-import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -54,6 +48,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * The GraphicState class aggregates a number of methods setting the OpenGL state
@@ -202,36 +197,6 @@ public class GraphicState {
         }
     }
 
-
-    /**
-     * Sets the state to render the Backdrop. At this stage the backdrop is the SkySphere
-     * plus the SkyBands passes.
-     *
-     * The backdrop is the only rendering that has three state-changing methods.
-     * This is due to the SkySphere requiring a state and the SkyBands requiring a slightly
-     * different one.
-     */
-    public void preRenderSetupBackdrop() {
-        setRenderBufferMask(buffers.sceneOpaque, true, false, false);
-    }
-
-    /**
-     * Sets the state to generate the SkyBands.
-     *
-     * See preRenderSetupBackdrop() for some more information.
-     */
-    public void midRenderChangesBackdrop() {
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-    }
-
-    /**
-     * Resets the state after the rendering of the Backdrop.
-     *
-     * See preRenderSetupBackdrop() for some more information.
-     */
-    public void postRenderCleanupBackdrop() {
-        buffers.sceneOpaque.bind();
-    }
 
     /**
      * Sets the state to render the First Person View.
@@ -417,48 +382,7 @@ public class GraphicState {
         GL11.glPopMatrix();
     }
 
-    /**
-     * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
-     * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
-     * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
-     *
-     * @param fbo The FBO holding the attachments to be set or unset for drawing.
-     * @param color If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param normal If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param lightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     */
-    // TODO: verify if this can become part of the FBO.bind() method.
-    public void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
-        if (fbo == null) {
-            return;
-        }
 
-        int attachmentId = 0;
-
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-
-        if (fbo.colorBufferTextureId != 0) {
-            if (color) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-            attachmentId++;
-        }
-        if (fbo.normalsBufferTextureId != 0) {
-            if (normal) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-            attachmentId++;
-        }
-        if (fbo.lightBufferTextureId != 0) {
-            if (lightBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-        }
-
-        bufferIds.flip();
-
-        GL20.glDrawBuffers(bufferIds);
-    }
 
     private class Buffers {
         public FBO sceneOpaque;

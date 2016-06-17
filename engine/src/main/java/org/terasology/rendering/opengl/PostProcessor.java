@@ -51,23 +51,15 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glNewList;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTexCoord2d;
-import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderQuad;
+import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -133,7 +125,6 @@ public class PostProcessor {
     private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
 
-    private int displayListQuad = -1;
     private FBO.Dimensions fullScale;
 
     private FrameBuffersManager buffersManager;
@@ -317,9 +308,9 @@ public class PostProcessor {
         }
 
         skyBand.bind();
-        graphicState.setRenderBufferMask(skyBand, true, false, false);
+        setRenderBufferMask(skyBand, true, false, false);
 
-        setViewportTo(skyBand.dimensions());
+        setViewportToSizeOf(skyBand.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -355,9 +346,9 @@ public class PostProcessor {
         materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
         buffers.sceneOpaquePingPong.bind();
-        graphicState.setRenderBufferMask(buffers.sceneOpaquePingPong, true, true, true);
+        setRenderBufferMask(buffers.sceneOpaquePingPong, true, true, true);
 
-        setViewportTo(buffers.sceneOpaquePingPong.dimensions());
+        setViewportToSizeOf(buffers.sceneOpaquePingPong.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -387,7 +378,7 @@ public class PostProcessor {
             // TODO: verify inputs: shouldn't there be a texture binding here?
             buffers.outline.bind();
 
-            setViewportTo(buffers.outline.dimensions());
+            setViewportToSizeOf(buffers.outline.dimensions());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
             renderFullscreenQuad();
@@ -419,7 +410,7 @@ public class PostProcessor {
         // TODO: verify if some textures should be bound here
         buffers.ssao.bind();
 
-        setViewportTo(buffers.ssao.dimensions());
+        setViewportToSizeOf(buffers.ssao.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -436,7 +427,7 @@ public class PostProcessor {
 
         buffers.ssaoBlurred.bind();
 
-        setViewportTo(buffers.ssaoBlurred.dimensions());
+        setViewportToSizeOf(buffers.ssaoBlurred.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -455,7 +446,7 @@ public class PostProcessor {
         // TODO: verify if there should be bound textures here.
         buffers.sceneOpaquePingPong.bind();
 
-        setViewportTo(buffers.sceneOpaquePingPong.dimensions());
+        setViewportToSizeOf(buffers.sceneOpaquePingPong.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -478,7 +469,7 @@ public class PostProcessor {
             // TODO: verify what the inputs are
             buffers.lightShafts.bind();
 
-            setViewportTo(buffers.lightShafts.dimensions());
+            setViewportToSizeOf(buffers.lightShafts.dimensions());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
             renderFullscreenQuad();
@@ -501,7 +492,7 @@ public class PostProcessor {
         // TODO: verify what the inputs are
         buffers.scenePrePost.bind(); // TODO: see if we could write this straight into sceneOpaque
 
-        setViewportTo(buffers.scenePrePost.dimensions());
+        setViewportToSizeOf(buffers.scenePrePost.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -525,7 +516,7 @@ public class PostProcessor {
 
             downSampledFBO.bind();
 
-            setViewportTo(downSampledFBO.dimensions());
+            setViewportToSizeOf(downSampledFBO.dimensions());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // TODO: move this block above, for consistency
@@ -614,7 +605,7 @@ public class PostProcessor {
 
         buffers.sceneToneMapped.bind();
 
-        setViewportTo(buffers.sceneToneMapped.dimensions());
+        setViewportToSizeOf(buffers.sceneToneMapped.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -660,7 +651,7 @@ public class PostProcessor {
 
         buffers.sceneHighPass.bind();
 
-        setViewportTo(buffers.sceneHighPass.dimensions());
+        setViewportToSizeOf(buffers.sceneHighPass.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -684,7 +675,7 @@ public class PostProcessor {
 
         sceneBloom.bind();
 
-        setViewportTo(sceneBloom.dimensions());
+        setViewportToSizeOf(sceneBloom.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -722,7 +713,7 @@ public class PostProcessor {
 
         sceneBlur.bind();
 
-        setViewportTo(sceneBlur.dimensions());
+        setViewportToSizeOf(sceneBlur.dimensions());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullscreenQuad();
@@ -908,41 +899,12 @@ public class PostProcessor {
         renderFullscreenQuad();
     }
 
-    // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
-    private void renderQuad() {
-        if (displayListQuad == -1) {
-            displayListQuad = glGenLists(1);
-
-            glNewList(displayListQuad, GL11.GL_COMPILE);
-
-            glBegin(GL_QUADS);
-            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-            glTexCoord2d(0.0, 0.0);
-            glVertex3i(-1, -1, -1);
-
-            glTexCoord2d(1.0, 0.0);
-            glVertex3i(1, -1, -1);
-
-            glTexCoord2d(1.0, 1.0);
-            glVertex3i(1, 1, -1);
-
-            glTexCoord2d(0.0, 1.0);
-            glVertex3i(-1, 1, -1);
-
-            glEnd();
-
-            glEndList();
-        }
-
-        glCallList(displayListQuad);
-    }
 
     private void setViewportToWholeDisplay() {
         glViewport(0, 0, fullScale.width(), fullScale.height());
     }
 
-    private void setViewportTo(FBO.Dimensions dimensions) {
+    private void setViewportToSizeOf(FBO.Dimensions dimensions) {
         glViewport(0, 0, dimensions.width(), dimensions.height());
     }
 
