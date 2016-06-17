@@ -53,6 +53,7 @@ import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.ObjectsOpaqueNode;
 import org.terasology.rendering.dag.OutlineNode;
 import org.terasology.rendering.dag.OverlaysNode;
+import org.terasology.rendering.dag.PrePostCompositeNode;
 import org.terasology.rendering.dag.ShadowMapNode;
 import org.terasology.rendering.dag.SkyBandsNode;
 import org.terasology.rendering.dag.WorldReflectionNode;
@@ -219,6 +220,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node chunksRefractiveReflectiveNode = createInstance(ChunksRefractiveReflectiveNode.class, context);
         Node outlineNode = createInstance(OutlineNode.class, context);
         Node ambientOcclusionPassesNode = createInstance(AmbientOcclusionPassesNode.class, context);
+        Node prePostCompositeNode = createInstance(PrePostCompositeNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -235,6 +237,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(chunksRefractiveReflectiveNode);
         renderingPipeline.add(outlineNode);
         renderingPipeline.add(ambientOcclusionPassesNode);
+        renderingPipeline.add(prePostCompositeNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -337,9 +340,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         preRenderUpdate(renderingStage);
 
         renderingPipeline.forEach(Node::process);
-
-        postProcessor.generatePrePostComposite();           // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
-        PerformanceMonitor.endActivity();
 
         renderSimpleBlendMaterials();                       // into sceneOpaque buffer
 
