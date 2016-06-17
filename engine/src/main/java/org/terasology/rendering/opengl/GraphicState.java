@@ -17,36 +17,8 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.geom.Vector3f;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DECR;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_INCR;
-import static org.lwjgl.opengl.GL11.GL_KEEP;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
+
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
@@ -140,53 +112,6 @@ public class GraphicState {
     }
 
     /**
-     * Initial clearing of a couple of important Frame Buffers. Then binds back the Display.
-     */
-    // It's unclear why these buffers need to be cleared while all the others don't...
-    public void initialClearing() {
-        buffers.sceneOpaque.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        buffers.sceneReflectiveRefractive.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bindDisplay();
-    }
-
-    /**
-     * Readies the state to render the Opaque scene.
-     *
-     * The opaque scene includes a number of successive passes including the backdrop (i.e. the skysphere),
-     * the landscape (chunks/blocks), additional objects associated with the landscape (i.e. other players/fauna),
-     * overlays (i.e. the cursor-cube) and the geometry associated with the first person view, i.e. the objects
-     * held in hand.
-     */
-    public void preRenderSetupSceneOpaque() {
-        buffers.sceneOpaque.bind();
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-    }
-
-    /**
-     * Resets the state after the rendering of the Opaque scene.
-     *
-     * See preRenderSetupSceneOpaque() for more details about
-     * the Opaque scene rendering.
-     */
-    public void postRenderCleanupSceneOpaque() {
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true); // TODO: probably redundant - verify
-        bindDisplay();
-    }
-
-    /**
-     * Sets the state to render in wireframe.
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True enables wireframe rendering. False, does nothing.
-     */
-    public void enableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-    }
-
-    /**
      * Disables wireframe rendering. Used together with enableWireFrameIf().
      *
      * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
@@ -195,130 +120,6 @@ public class GraphicState {
         if (wireframeIsEnabledInRenderingDebugConfig) {
             GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-    }
-
-
-    /**
-     * Sets the state to render the First Person View.
-     *
-     * This generally comprises the objects held in hand, i.e. a pick, an axe, a torch and so on.
-     */
-    public void preRenderSetupFirstPerson() {
-        GL11.glPushMatrix();
-        GL11.glLoadIdentity();
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
-    }
-
-    /**
-     * Resets the state after the render of the First Person View.
-     *
-     * See preRenderSetupFirstPerson() for some more information.
-     */
-    public void postRenderClenaupFirstPerson() {
-        GL11.glDepthFunc(GL_LEQUAL);
-        GL11.glPopMatrix();
-    }
-
-    // TODO: figure how lighting works and what this does
-    public void preRenderSetupLightGeometryStencil() {
-        buffers.sceneOpaque.bind();
-        setRenderBufferMask(buffers.sceneOpaque, false, false, false);
-        glDepthMask(false);
-
-        glClear(GL_STENCIL_BUFFER_BIT);
-
-        glCullFace(GL_FRONT);
-        glDisable(GL_CULL_FACE);
-
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_ALWAYS, 0, 0);
-
-        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR, GL_KEEP);
-        glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR, GL_KEEP);
-    }
-
-    // TODO: figure how lighting works and what this does
-    public void postRenderCleanupLightGeometryStencil() {
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-        bindDisplay();
-    }
-
-    // TODO: figure how lighting works and what this does
-    public void preRenderSetupLightGeometry() {
-        buffers.sceneOpaque.bind();
-
-        // Only write to the light buffer
-        setRenderBufferMask(buffers.sceneOpaque, false, false, true);
-
-        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-        glDepthMask(true);
-        glDisable(GL_DEPTH_TEST);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-    }
-
-    // TODO: figure how lighting works and what this does
-    public void postRenderCleanupLightGeometry() {
-        glDisable(GL_STENCIL_TEST);
-        glCullFace(GL_BACK);
-
-        bindDisplay();
-    }
-
-    // TODO: figure how lighting works and what this does
-    public void preRenderSetupDirectionalLights() {
-        buffers.sceneOpaque.bind();
-    }
-
-    // TODO: figure how lighting works and what this does
-    public void postRenderCleanupDirectionalLights() {
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glEnable(GL_DEPTH_TEST);
-
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-        bindDisplay();
-    }
-
-    /**
-     * Sets the state for the rendering of the reflective/refractive features of the scene.
-     *
-     * At this stage this is the surface of water bodies, reflecting the sky and (if enabled)
-     * the surrounding landscape, and refracting the underwater scenery.
-     *
-     * If the isHeadUnderWater argument is set to True, the state is further modified to
-     * accommodate the rendering of the water surface from an underwater point of view.
-     *
-     * @param isHeadUnderWater Set to True if the point of view is underwater, to render the water surface correctly.
-     */
-    public void preRenderSetupSceneReflectiveRefractive(boolean isHeadUnderWater) {
-        buffers.sceneReflectiveRefractive.bind();
-
-        // Make sure the water surface is rendered if the player is underwater.
-        if (isHeadUnderWater) {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-        }
-    }
-
-    /**
-     * Resets the state after the rendering of the reflective/refractive features of the scene.
-     *
-     * See preRenderSetupSceneReflectiveRefractive() for additional information.
-     *
-     * @param isHeadUnderWater Set to True if the point of view is underwater, for some additional resetting.
-     */
-    public void postRenderCleanupSceneReflectiveRefractive(boolean isHeadUnderWater) {
-        if (isHeadUnderWater) {
-            GL11.glEnable(GL11.GL_CULL_FACE);
-        }
-
-        bindDisplay();
     }
 
     /**
@@ -381,8 +182,6 @@ public class GraphicState {
     public void postRenderCleanupChunk() {
         GL11.glPopMatrix();
     }
-
-
 
     private class Buffers {
         public FBO sceneOpaque;

@@ -47,19 +47,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
+import static org.lwjgl.opengl.GL11.*;
+import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -763,13 +752,13 @@ public class PostProcessor {
 
         if (isNotTakingScreenshot()) {
             bindDisplay();
-            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+            renderFullscreenQuadWithDimensions(0, 0, Display.getWidth(), Display.getHeight());
 
         } else {
             buffers.sceneFinal.bind();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
+            renderFullscreenQuadWithDimensions(0, 0, fullScale.width(), fullScale.height());
 
             saveScreenshot();
             // when saving a screenshot we do not send the image to screen,
@@ -793,13 +782,13 @@ public class PostProcessor {
         switch (renderingStage) {
             case LEFT_EYE:
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                renderFullscreenQuad(0, 0, fullScale.width() / 2, fullScale.height());
+                renderFullscreenQuadWithDimensions(0, 0, fullScale.width() / 2, fullScale.height());
 
                 break;
 
             case RIGHT_EYE:
                 // no glClear() here: the rendering for the second eye is being added besides the first eye's rendering
-                renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
+                renderFullscreenQuadWithDimensions(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
 
                 if (isNotTakingScreenshot()) {
                     bindDisplay();
@@ -829,16 +818,16 @@ public class PostProcessor {
 
         if (isNotTakingScreenshot()) {
             updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.LEFT_EYE);
-            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+            renderFullscreenQuadWithDimensions(0, 0, Display.getWidth(), Display.getHeight());
             updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.RIGHT_EYE);
-            renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
+            renderFullscreenQuadWithDimensions(0, 0, Display.getWidth(), Display.getHeight());
 
         } else {
             // what follows -should- work also when there is no screenshot being taken, but somehow it doesn't, hence the block above
             updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.LEFT_EYE);
-            renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
+            renderFullscreenQuadWithDimensions(0, 0, fullScale.width(), fullScale.height());
             updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.RIGHT_EYE);
-            renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
+            renderFullscreenQuadWithDimensions(0, 0, fullScale.width(), fullScale.height());
         }
     }
 
@@ -866,26 +855,6 @@ public class PostProcessor {
     }
 
     /**
-     * Renders a quad filling the whole currently set viewport.
-     */
-    public void renderFullscreenQuad() {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-
-        renderQuad();
-
-        glPopMatrix();
-
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-    }
-
-    /**
      * First sets a viewport and then renders a quad filling it.
      *
      * @param x an integer representing the x coordinate (in pixels) of the origin of the viewport.
@@ -894,7 +863,7 @@ public class PostProcessor {
      * @param viewportHeight an integer representing the height (in pixels) the viewport.
      */
     // TODO: perhaps remove this method and make sure the viewport is set explicitely.
-    public void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
+    public void renderFullscreenQuadWithDimensions(int x, int y, int viewportWidth, int viewportHeight) {
         glViewport(x, y, viewportWidth, viewportHeight);
         renderFullscreenQuad();
     }
