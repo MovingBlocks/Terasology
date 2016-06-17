@@ -353,6 +353,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 disableAll.subscribe(button -> sortedModules.stream()
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
+
+            UIButton ensableAll = find("enableAll", UIButton.class);
+            if (ensableAll != null) {
+                ensableAll.subscribe(button -> moduleList.getList().stream()
+                        .filter(info -> info.isPresent() || info.isValidToSelect()).forEach(this::select));
+            }
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());

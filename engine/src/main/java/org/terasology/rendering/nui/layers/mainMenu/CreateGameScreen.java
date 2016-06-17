@@ -71,6 +71,8 @@ public class CreateGameScreen extends CoreScreenLayer {
     private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
 
+    private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
+
     @In
     private WorldGeneratorManager worldGeneratorManager;
 
@@ -294,15 +296,27 @@ public class CreateGameScreen extends CoreScreenLayer {
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
 
-        // get the default gameplay module from the config.  This is likely to have a user triggered selection.
-        Name defaultGameplayModuleName = new Name(config.getDefaultModSelection().getDefaultGameplayModuleName());
+        String configDefaultModuleName = config.getDefaultModSelection().getDefaultGameplayModuleName();
+        String useThisModuleName = "";
+
+        // Get the default gameplay module from the config if it exists. This is likely to have a user triggered selection.
+        // Otherwise, default to DEFAULT_GAME_TEMPLATE_NAME.
+        if (DEFAULT_GAME_TEMPLATE_NAME.equalsIgnoreCase(configDefaultModuleName)) {
+            useThisModuleName = DEFAULT_GAME_TEMPLATE_NAME;
+        }
+        else {
+            useThisModuleName = configDefaultModuleName;
+        }
+
+        Name defaultGameplayModuleName = new Name(configDefaultModuleName);
         Module defaultGameplayModule = moduleManager.getRegistry().getLatestModuleVersion(defaultGameplayModuleName);
+
         if (defaultGameplayModule != null) {
             gameplay.setSelection(defaultGameplayModule);
         } else {
-            // find the first gameplay module that is available
+            // Find the first gameplay module that is available.
             for (Module module : moduleManager.getRegistry()) {
-                // module is null if it is no longer present
+                // Module is null if it is no longer present.
                 if (module != null && StandardModuleExtension.isGameplayModule(module)) {
                     gameplay.setSelection(module);
                 }
