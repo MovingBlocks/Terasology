@@ -112,17 +112,6 @@ public class GraphicState {
     }
 
     /**
-     * Disables wireframe rendering. Used together with enableWireFrameIf().
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
-     */
-    public void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-    }
-
-    /**
      * Sets the state for the rendering of objects or portions of objects having some degree of transparency.
      *
      * Generally speaking objects drawn with this state will have their color blended with the background

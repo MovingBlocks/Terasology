@@ -350,34 +350,6 @@ public class PostProcessor {
     }
 
     /**
-     * Enabled by the "outline" option in the render settings, this method generates
-     * landscape/objects outlines and stores them into a buffer in its own FBO. The
-     * stored image is eventually combined with others.
-     *
-     * The outlines visually separate a given object (including the landscape) or parts of it
-     * from sufficiently distant objects it overlaps. It is effectively a depth-based edge
-     * detection technique and internally uses a Sobel operator.
-     *
-     * For further information see: http://en.wikipedia.org/wiki/Sobel_operator
-     */
-    public void generateOutline() {
-        if (renderingConfig.isOutline()) {
-            materials.outline.enable();
-
-            // TODO: verify inputs: shouldn't there be a texture binding here?
-            buffers.outline.bind();
-
-            setViewportToSizeOf(buffers.outline.dimensions());
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-            renderFullscreenQuad();
-
-            bindDisplay();  // TODO: verify this is necessary
-            setViewportToWholeDisplay(); // TODO: verify this is necessary
-        }
-    }
-
-    /**
      * If Ambient Occlusion is enabled in the render settings, this method generates and
      * stores the necessary images into their own FBOs. The stored images are eventually
      * combined with others.
