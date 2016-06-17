@@ -23,7 +23,6 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -55,6 +54,7 @@ import org.terasology.rendering.dag.OutlineNode;
 import org.terasology.rendering.dag.OverlaysNode;
 import org.terasology.rendering.dag.PrePostCompositeNode;
 import org.terasology.rendering.dag.ShadowMapNode;
+import org.terasology.rendering.dag.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.SkyBandsNode;
 import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
@@ -221,6 +221,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node outlineNode = createInstance(OutlineNode.class, context);
         Node ambientOcclusionPassesNode = createInstance(AmbientOcclusionPassesNode.class, context);
         Node prePostCompositeNode = createInstance(PrePostCompositeNode.class, context);
+        Node simpleBlendMaterialsNode = createInstance(SimpleBlendMaterialsNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -238,6 +239,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(outlineNode);
         renderingPipeline.add(ambientOcclusionPassesNode);
         renderingPipeline.add(prePostCompositeNode);
+        renderingPipeline.add(simpleBlendMaterialsNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -341,8 +343,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        renderSimpleBlendMaterials();                       // into sceneOpaque buffer
-
         PerformanceMonitor.startActivity("Post-Processing");
         postProcessor.generateLightShafts();                // into lightShafts buffer
 
@@ -427,19 +427,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
 
         return true;
-    }
-
-
-    private void renderSimpleBlendMaterials() {
-        PerformanceMonitor.startActivity("Render Objects (Transparent)");
-        graphicState.preRenderSetupSimpleBlendMaterials();
-
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderAlphaBlend();
-        }
-
-        graphicState.postRenderCleanupSimpleBlendMaterials();
-        PerformanceMonitor.endActivity();
     }
 
     @Override

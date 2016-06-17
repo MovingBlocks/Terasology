@@ -26,7 +26,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 
 /**
  * TODO: Diagram of this node
@@ -55,7 +55,7 @@ public class FirstPersonViewNode implements Node {
     public void process() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("Render First Person");
-            enableWireframeIf(renderingDebugConfig.isWireframe());
+            disableWireframeIf(renderingDebugConfig.isWireframe());
 
 
             /**

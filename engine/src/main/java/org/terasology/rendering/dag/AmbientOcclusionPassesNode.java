@@ -17,6 +17,7 @@ package org.terasology.rendering.dag;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.FBO;
@@ -26,9 +27,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
  * TODO: Add diagram of this node
@@ -45,6 +44,7 @@ public class AmbientOcclusionPassesNode implements Node {
     private Config config;
 
     private RenderingConfig renderingConfig;
+    private RenderingDebugConfig renderingDebugConfig;
     private FBO sceneOpaque;
     private FBO ssaoBlurredFBO;
     private FBO ssaoFBO;
@@ -54,6 +54,7 @@ public class AmbientOcclusionPassesNode implements Node {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
+        renderingDebugConfig = renderingConfig.getDebug();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
     }
@@ -69,6 +70,7 @@ public class AmbientOcclusionPassesNode implements Node {
     public void process() {
         if (renderingConfig.isSsao()) {
             // TODO: consider moving these into initialise without breaking existing implementation
+            disableWireframeIf(renderingDebugConfig.isWireframe());
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
             ssaoBlurredFBO = frameBuffersManager.getFBO("ssaoBlurred");
             ssaoFBO = frameBuffersManager.getFBO("ssao");

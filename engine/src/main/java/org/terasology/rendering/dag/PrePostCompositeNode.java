@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.dag;
 
+import org.terasology.config.Config;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -25,9 +27,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
  * TODO: Add diagram of this node
@@ -40,11 +40,16 @@ public class PrePostCompositeNode implements Node {
     @In
     private WorldRenderer worldRenderer;
 
+    @In
+    private Config config;
+
     private Material prePostComposite;
+    private RenderingDebugConfig renderingDebugConfig;
 
     @Override
     public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
+        renderingDebugConfig = config.getRendering().getDebug();
     }
 
     /**
@@ -53,6 +58,7 @@ public class PrePostCompositeNode implements Node {
      */
     @Override
     public void process() {
+        disableWireframeIf(renderingDebugConfig.isWireframe());
         prePostComposite.enable();
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         FBO sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");

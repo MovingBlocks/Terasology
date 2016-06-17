@@ -18,10 +18,6 @@ package org.terasology.rendering.opengl;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.geom.Vector3f;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
-
 /**
  * The GraphicState class aggregates a number of methods setting the OpenGL state
  * before and after rendering passes.
@@ -109,46 +105,6 @@ public class GraphicState {
      */
     public void setSceneShadowMap(FBO newShadowMap) {
         buffers.sceneShadowMap = newShadowMap;
-    }
-
-    /**
-     * Sets the state for the rendering of objects or portions of objects having some degree of transparency.
-     *
-     * Generally speaking objects drawn with this state will have their color blended with the background
-     * color, depending on their opacity. I.e. a 25% opaque foreground object will provide 25% of its
-     * color while the background will provide the remaining 75%. The sum of the two RGBA vectors gets
-     * written onto the output buffer.
-     *
-     * Important note: this method disables writing to the Depth Buffer. This is why filters relying on
-     * depth information (i.e. DoF) have problems with transparent objects: the depth of their pixels is
-     * found to be that of the background. This is an unresolved (unresolv-able?) issue that would only
-     * be reversed, not eliminated, by re-enabling writing to the Depth Buffer.
-     */
-    public void preRenderSetupSimpleBlendMaterials() {
-        buffers.sceneOpaque.bind();
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-
-        GL11.glEnable(GL_BLEND);
-        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
-        GL11.glDepthMask(false);
-
-        // (*) In this context SRC is Foreground. This effectively says:
-        // Resulting RGB = ForegroundRGB * ForegroundAlpha + BackgroundRGB * (1 - ForegroundAlpha)
-        // Which might still look complicated, but it's actually the most typical alpha-driven composite.
-        // A neat tool to play with this settings can be found here: http://www.andersriggelsen.dk/glblendfunc.php
-    }
-
-    /**
-     * Resets the state after the rendering of semi-opaque/semi-transparent objects.
-     *
-     * See preRenderSetupSimpleBlendMaterials() for additional information.
-     */
-    public void postRenderCleanupSimpleBlendMaterials() {
-        GL11.glDisable(GL_BLEND);
-        GL11.glDepthMask(true);
-
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true); // TODO: review - this might be redundant.
-        bindDisplay();
     }
 
     /**
