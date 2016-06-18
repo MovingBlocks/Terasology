@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.opengl.FBO.Dimensions;
 
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -55,8 +52,8 @@ import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
  * The GraphicState class aggregates a number of methods setting the OpenGL state
@@ -80,10 +77,8 @@ public class GraphicState {
     // that it might be better called OpenGLState or something along that line. I
     // eventually decided for GraphicState as it resides in the rendering.opengl
     // package anyway and rendering.opengl.OpenGLState felt cumbersome. --emanuele3d
-
     private FrameBuffersManager buffersManager;
-    private Dimensions fullScale;
-    private Buffers buffers  = new Buffers();
+    private Buffers buffers = new Buffers();
 
     /**
      * Graphic State constructor.
@@ -113,7 +108,6 @@ public class GraphicState {
      */
     public void dispose() {
         buffersManager = null;
-        fullScale = null;
         buffers = null;
     }
 
@@ -131,7 +125,6 @@ public class GraphicState {
         buffers.sceneOpaque               = buffersManager.getFBO("sceneOpaque");
         buffers.sceneReflectiveRefractive = buffersManager.getFBO("sceneReflectiveRefractive");
         buffers.sceneReflected            = buffersManager.getFBO("sceneReflected");
-        fullScale = buffers.sceneOpaque.dimensions();
     }
 
     public void setSceneOpaqueFBO(FBO newSceneOpaque) {
@@ -209,53 +202,6 @@ public class GraphicState {
         }
     }
 
-    /**
-     * Sets the state for the rendering of the Shadow Map.
-     *
-     * Currently a single shadow map is produced around the player. The shadows are cast
-     * by the main directional light, which at this stage is either the sun or the moon.
-     */
-    public void preRenderSetupSceneShadowMap() {
-        buffers.sceneShadowMap.bind();
-
-        setViewportToSizeOf(buffers.sceneShadowMap);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glDisable(GL_CULL_FACE);
-    }
-
-    /**
-     * Resets the state after the rendering of the Shadow Map.
-     * See preRenderSetupSceneShadowMap() for some more information.
-     */
-    public void postRenderCleanupSceneShadowMap() {
-        GL11.glEnable(GL_CULL_FACE);
-        bindDisplay();
-        setViewportToWholeDisplay();
-    }
-
-    /**
-     * Sets the state for the rendering of the Reflected Scene.
-     *
-     * This is effectively an inverted rendering of the backdrop and
-     * the opaque chunks of the landscape, to be used in water reflections.
-     */
-    public void preRenderSetupReflectedScene() {
-        buffers.sceneReflected.bind();
-
-        setViewportToSizeOf(buffers.sceneReflected);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glCullFace(GL11.GL_FRONT);
-    }
-
-    /**
-     * Resets the state after the rendering of the Reflected Scene.
-     * See preRenderSetupReflectedScene() for some more information.
-     */
-    public void postRenderCleanupReflectedScene() {
-        GL11.glCullFace(GL11.GL_BACK);
-        bindDisplay();
-        setViewportToWholeDisplay();
-    }
 
     /**
      * Sets the state to render the Backdrop. At this stage the backdrop is the SkySphere
@@ -512,36 +458,6 @@ public class GraphicState {
         bufferIds.flip();
 
         GL20.glDrawBuffers(bufferIds);
-    }
-
-    /**
-     * Sets the viewport of the currently bound FBO to the size of the Display.
-     * 
-     * Which might mean the full screen, the full size of the window or the
-     * currently set screenshot size if a screenshot is being taken.
-     */
-    // TODO: verify if this can become part of the bindDisplay() method.
-    public void setViewportToWholeDisplay() {
-        glViewport(0, 0, fullScale.width(), fullScale.height());
-    }
-
-    /**
-     * Sets the viewport of the currently bound FBO to the dimensions of the FBO
-     * given as parameter.
-     *
-     * @param fbo The FBO whose dimensions will be matched by the viewport of the currently bound FBO.
-     */
-    // TODO: verify if this can become part of the FBO.bind() method.
-    public void setViewportToSizeOf(FBO fbo) {
-        glViewport(0, 0, fbo.width(), fbo.height());
-    }
-
-    /**
-     * Unbinds any currently bound FBO and binds the default Frame Buffer,
-     * which is usually the Display (be it the full screen or a window).
-     */
-    public void bindDisplay() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
     private class Buffers {

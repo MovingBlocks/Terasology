@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,16 @@ import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import static org.lwjgl.opengl.GL11.glViewport;
+
 /**
 
  */
-public final class OpenGLUtil {
+public final class OpenGLUtils {
 
-    private OpenGLUtil() {
+    private OpenGLUtils() {
         // Utility class, no instance required
     }
 
@@ -51,5 +55,23 @@ public final class OpenGLUtil {
         }
 
         GL11.glLoadMatrix(model);
+    }
+
+    /**
+     * Sets the viewport of the currently bound FBO to the dimensions of the FBO
+     * given as parameter.
+     *
+     * @param fbo The FBO whose dimensions will be matched by the viewport of the currently bound FBO.
+     */
+    public static void setViewportToSizeOf(FBO fbo) {
+        glViewport(0, 0, fbo.width(), fbo.height());
+    }
+
+    /**
+     * Unbinds any currently bound FBO and binds the default Frame Buffer,
+     * which is usually the Display (be it the full screen or a window).
+     */
+    public static void bindDisplay() {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 }

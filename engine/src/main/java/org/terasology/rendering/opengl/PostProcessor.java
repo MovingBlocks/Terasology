@@ -67,6 +67,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTexCoord2d;
 import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -323,7 +324,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
@@ -361,7 +362,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         buffersManager.swapSceneOpaqueFBOs();
@@ -391,7 +392,7 @@ public class PostProcessor {
 
             renderFullscreenQuad();
 
-            graphicState.bindDisplay();  // TODO: verify this is necessary
+            bindDisplay();  // TODO: verify this is necessary
             setViewportToWholeDisplay(); // TODO: verify this is necessary
         }
     }
@@ -423,7 +424,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
@@ -440,7 +441,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
@@ -459,7 +460,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         buffersManager.swapSceneOpaqueFBOs();
@@ -482,7 +483,7 @@ public class PostProcessor {
 
             renderFullscreenQuad();
 
-            graphicState.bindDisplay();     // TODO: verify this is necessary
+            bindDisplay();     // TODO: verify this is necessary
             setViewportToWholeDisplay();    // TODO: verify this is necessary
 
             PerformanceMonitor.endActivity();
@@ -505,7 +506,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
@@ -536,7 +537,7 @@ public class PostProcessor {
 
             renderFullscreenQuad();
 
-            graphicState.bindDisplay(); // TODO: probably can be removed or moved out of the loop
+            bindDisplay(); // TODO: probably can be removed or moved out of the loop
         }
 
         setViewportToWholeDisplay();    // TODO: verify this is necessary
@@ -618,7 +619,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
@@ -664,7 +665,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
+        bindDisplay();
         setViewportToWholeDisplay();
     }
 
@@ -688,7 +689,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();     // TODO: verify this is necessary
+        bindDisplay();     // TODO: verify this is necessary
         setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
@@ -726,7 +727,7 @@ public class PostProcessor {
 
         renderFullscreenQuad();
 
-        graphicState.bindDisplay();
+        bindDisplay();
         setViewportToWholeDisplay();
     }
 
@@ -770,7 +771,7 @@ public class PostProcessor {
     private void renderFinalMonoImage() {
 
         if (isNotTakingScreenshot()) {
-            graphicState.bindDisplay();
+            bindDisplay();
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
         } else {
@@ -810,7 +811,7 @@ public class PostProcessor {
                 renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
 
                 if (isNotTakingScreenshot()) {
-                    graphicState.bindDisplay();
+                    bindDisplay();
                     applyOculusDistortion(buffers.sceneFinal);
 
                 } else {

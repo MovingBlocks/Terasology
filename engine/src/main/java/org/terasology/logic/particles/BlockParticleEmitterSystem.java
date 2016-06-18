@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.logic.NearestSortingList;
-import org.terasology.rendering.opengl.OpenGLUtil;
+import org.terasology.rendering.opengl.OpenGLUtils;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -296,7 +296,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         for (Particle particle : particleEffect.particles) {
             glPushMatrix();
             glTranslatef(particle.position.x, particle.position.y, particle.position.z);
-            OpenGLUtil.applyBillboardOrientation();
+            OpenGLUtils.applyBillboardOrientation();
             glScalef(particle.size, particle.size, particle.size);
 
             float light = worldRenderer.getRenderingLightIntensityAt(new Vector3f(worldPos.x + particle.position.x,
@@ -314,7 +314,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         for (Particle particle : particleEffect.particles) {
             glPushMatrix();
             glTranslatef(particle.position.x, particle.position.y, particle.position.z);
-            OpenGLUtil.applyBillboardOrientation();
+            OpenGLUtils.applyBillboardOrientation();
             glScalef(particle.size, particle.size, particle.size);
 
             float light = worldRenderer.getRenderingLightIntensityAt(new Vector3f(worldPos.x + particle.position.x,

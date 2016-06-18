@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
             buffersManager.bindFboDepthTexture("sceneShadowMap");
             program.setInt("texSceneShadowMap", texId++, true);
 
-            Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();
+            Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera(); // TODO: shadowMapNode.camera here
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
             if (lightCamera != null && activeCamera != null) {

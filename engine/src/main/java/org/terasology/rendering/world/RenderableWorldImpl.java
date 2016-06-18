@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<RenderableChunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private Region3i renderableRegion = Region3i.EMPTY;
-    private ViewDistance currentViewDistance = null;
+    private ViewDistance currentViewDistance;
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
@@ -75,14 +75,18 @@ public class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
-    public RenderableWorldImpl(WorldProvider worldProvider, ChunkProvider chunkProvider, GLBufferPool bufferPool, Camera playerCamera, Camera shadowMapCamera) {
+
+    public RenderableWorldImpl(WorldProvider worldProvider,
+                               ChunkProvider chunkProvider,
+                               GLBufferPool bufferPool,
+                               Camera playerCamera) {
+
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
         chunkTessellator = new ChunkTessellator(bufferPool);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
-        this.shadowMapCamera = shadowMapCamera;
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -217,12 +221,13 @@ public class RenderableWorldImpl implements RenderableWorld {
             renderableRegion = newRenderableRegion;
             return true;
         }
+
         return false;
     }
 
     @Override
     public boolean updateChunksInProximity(ViewDistance newViewDistance) {
-        if(newViewDistance != currentViewDistance) {
+        if (newViewDistance != currentViewDistance) {
             logger.info("New Viewing Distance: {}", newViewDistance);
             currentViewDistance = newViewDistance;
             return updateChunksInProximity(calculateRenderableRegion(newViewDistance));
@@ -298,7 +303,7 @@ public class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleLight(chunk)) {
+                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleFromMainLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {
@@ -371,8 +376,8 @@ public class RenderableWorldImpl implements RenderableWorld {
         return chunk.isReady() && chunk.areAdjacentChunksReady();
     }
 
-    public boolean isChunkVisibleLight(RenderableChunk chunk) {
-        return isChunkVisible(shadowMapCamera, chunk);
+    public boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
+        return isChunkVisible(shadowMapCamera, chunk); //TODO: find an elegant way
     }
 
     public boolean isChunkVisible(RenderableChunk chunk) {
@@ -395,6 +400,11 @@ public class RenderableWorldImpl implements RenderableWorld {
     @Override
     public ChunkProvider getChunkProvider() {
         return chunkProvider;
+    }
+
+    @Override
+    public void setShadowMapCamera(Camera camera) {
+        this.shadowMapCamera = camera;
     }
 
     @Override

@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,13 +18,15 @@ package org.terasology.engine.subsystem.headless.renderer;
 import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -36,6 +38,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
@@ -59,6 +62,26 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(noCamera);
         config = context.get(Config.class);
+    }
+
+    @Override
+    public float getSecondsSinceLastFrame() {
+        return 0;
+    }
+
+    @Override
+    public Material getMaterial(String assetId) {
+        return null;
+    }
+
+    @Override
+    public boolean isFirstRenderingStageForCurrentFrame() {
+        return false;
+    }
+
+    @Override
+    public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, WorldRendererImpl.ChunkRenderMode mode) {
+
     }
 
     @Override

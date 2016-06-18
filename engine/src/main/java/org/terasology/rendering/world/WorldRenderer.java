@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,15 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.RenderableChunk;
+
+import java.util.PriorityQueue;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -39,6 +41,15 @@ public interface WorldRenderer {
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
+
+    // TODO: appropriate javadocs
+    float getSecondsSinceLastFrame();
+
+    Material getMaterial(String assetId);
+
+    boolean isFirstRenderingStageForCurrentFrame();
+
+    void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, WorldRendererImpl.ChunkRenderMode mode);
     /**
      * This method is triggered when a chunk has been loaded.
      *
