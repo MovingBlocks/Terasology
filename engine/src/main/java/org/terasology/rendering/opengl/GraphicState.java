@@ -17,35 +17,8 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.geom.Vector3f;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DECR;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_INCR;
-import static org.lwjgl.opengl.GL11.GL_KEEP;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
+
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
@@ -139,30 +112,6 @@ public class GraphicState {
         buffers.sceneShadowMap = newShadowMap;
     }
 
-    /**
-     * Initial clearing of a couple of important Frame Buffers. Then binds back the Display.
-     */
-    // It's unclear why these buffers need to be cleared while all the others don't...
-    public void initialClearing() {
-        buffers.sceneOpaque.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        buffers.sceneReflectiveRefractive.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bindDisplay();
-    }
-
-    /**
-     * Readies the state to render the Opaque scene.
-     *
-     * The opaque scene includes a number of successive passes including the backdrop (i.e. the skysphere),
-     * the landscape (chunks/blocks), additional objects associated with the landscape (i.e. other players/fauna),
-     * overlays (i.e. the cursor-cube) and the geometry associated with the first person view, i.e. the objects
-     * held in hand.
-     */
-    public void preRenderSetupSceneOpaque() {
-        buffers.sceneOpaque.bind();
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-    }
 
     /**
      * Resets the state after the rendering of the Opaque scene.
@@ -175,16 +124,6 @@ public class GraphicState {
         bindDisplay();
     }
 
-    /**
-     * Sets the state to render in wireframe.
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True enables wireframe rendering. False, does nothing.
-     */
-    public void enableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-    }
 
     /**
      * Disables wireframe rendering. Used together with enableWireFrameIf().
