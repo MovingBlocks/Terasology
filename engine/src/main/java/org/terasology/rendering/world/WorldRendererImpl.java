@@ -46,8 +46,11 @@ import org.terasology.rendering.dag.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.ChunksOpaqueNode;
 import org.terasology.rendering.dag.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.DirectionalLightsNode;
+import org.terasology.rendering.dag.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.FirstPersonViewNode;
+import org.terasology.rendering.dag.InitialPostProcessingNode;
 import org.terasology.rendering.dag.LightGeometryNode;
+import org.terasology.rendering.dag.LightShaftsNode;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.ObjectsOpaqueNode;
 import org.terasology.rendering.dag.OutlineNode;
@@ -56,6 +59,7 @@ import org.terasology.rendering.dag.PrePostCompositeNode;
 import org.terasology.rendering.dag.ShadowMapNode;
 import org.terasology.rendering.dag.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.SkyBandsNode;
+import org.terasology.rendering.dag.ToneMappedSceneNode;
 import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -222,6 +226,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node ambientOcclusionPassesNode = createInstance(AmbientOcclusionPassesNode.class, context);
         Node prePostCompositeNode = createInstance(PrePostCompositeNode.class, context);
         Node simpleBlendMaterialsNode = createInstance(SimpleBlendMaterialsNode.class, context);
+        Node lightShaftsNode = createInstance(LightShaftsNode.class, context);
+        Node initialPostProcessingNode = createInstance(InitialPostProcessingNode.class, context);
+        Node downSampleSceneAndUpdateExposure = createInstance(DownSampleSceneAndUpdateExposureNode.class, context);
+        Node toneMappedSceneNode = createInstance(ToneMappedSceneNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -240,6 +248,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(ambientOcclusionPassesNode);
         renderingPipeline.add(prePostCompositeNode);
         renderingPipeline.add(simpleBlendMaterialsNode);
+        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
+        renderingPipeline.add(lightShaftsNode);
+        renderingPipeline.add(initialPostProcessingNode);
+        renderingPipeline.add(downSampleSceneAndUpdateExposure);
+        renderingPipeline.add(toneMappedSceneNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -325,6 +338,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     /**
+     * TODO: update javadocs
      * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
      * or to a file, when grabbing a screenshot.
      *
@@ -343,21 +357,15 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        PerformanceMonitor.startActivity("Post-Processing");
-        postProcessor.generateLightShafts();                // into lightShafts buffer
 
-        // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        postProcessor.initialPostProcessing();              // into scenePrePost buffer
-
-        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
-        postProcessor.downsampleSceneAndUpdateExposure();   // downSampledScene buffer used only to update exposure value
-        postProcessor.generateToneMappedScene();            // into sceneToneMapped buffer
         postProcessor.generateBloomPasses();                // into sceneHighPass and sceneBloom[0-2]
         postProcessor.generateBlurPasses();                 // into sceneBlur[0-1]
+
 
         // Final Post-Processing: depth-of-field blur, motion blur, film grain, grading, OculusVR distortion
         postProcessor.finalPostProcessing(renderingStage);  // to screen normally, to a buffer if a screenshot is being taken
         PerformanceMonitor.endActivity();
+
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
