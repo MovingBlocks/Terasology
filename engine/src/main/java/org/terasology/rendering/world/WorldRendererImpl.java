@@ -40,7 +40,6 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
@@ -83,7 +82,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
-    private final BackdropRenderer backdropRenderer;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
@@ -142,7 +140,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
-        this.backdropRenderer = context.get(BackdropRenderer.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.systemManager = context.get(ComponentSystemManager.class);
@@ -182,7 +179,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(FrameBuffersManager.class, buffersManager);
 
         graphicState = new GraphicState(buffersManager);
-        postProcessor = new PostProcessor(buffersManager, graphicState);
+        postProcessor = new PostProcessor(buffersManager);
         context.put(PostProcessor.class, postProcessor);
 
         buffersManager.setGraphicState(graphicState);

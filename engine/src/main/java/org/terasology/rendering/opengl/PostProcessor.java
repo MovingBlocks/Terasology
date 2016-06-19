@@ -126,7 +126,6 @@ public class PostProcessor {
     private FBO.Dimensions fullScale;
 
     private FrameBuffersManager buffersManager;
-    private GraphicState graphicState;
     private Materials materials = new Materials();
     private Buffers buffers = new Buffers();
 
@@ -147,11 +146,9 @@ public class PostProcessor {
      * Method refreshDynamicFBOs() must be called at least once to initialize all other FBOs references.
      *
      * @param buffersManager An FrameBuffersManager instance, required to obtain FBO references.
-     * @param graphicState A GraphicState instance, providing opengl state-changing methods.
      */
-    public PostProcessor(FrameBuffersManager buffersManager, GraphicState graphicState) {
+    public PostProcessor(FrameBuffersManager buffersManager) {
         this.buffersManager = buffersManager;
-        this.graphicState = graphicState;
     }
 
     /**
@@ -276,45 +273,7 @@ public class PostProcessor {
     // instance's lifecycle.
     public void dispose() {
         buffersManager = null;
-        graphicState = null;
         fullScale = null;
-    }
-
-    /**
-     * Generates SkyBands and stores them into their specific FBOs
-     * if inscattering is enabled in the rendering config.
-     *
-     * SkyBands visually fade the far landscape and its entities into the color of
-     * the sky, effectively constituting a form of depth cue.
-     */
-    public void generateSkyBands() {
-        if (renderingConfig.isInscattering()) {
-            generateSkyBand(buffers.sceneSkyBand0);
-            generateSkyBand(buffers.sceneSkyBand1);
-        }
-    }
-
-    private void generateSkyBand(FBO skyBand) {
-        materials.blur.enable();
-        materials.blur.setFloat("radius", 8.0f, true);
-        materials.blur.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
-
-        if (skyBand == buffers.sceneSkyBand0) {
-            buffers.sceneOpaque.bindTexture();
-        } else {
-            buffers.sceneSkyBand0.bindTexture();
-        }
-
-        skyBand.bind();
-        setRenderBufferMask(skyBand, true, false, false);
-
-        setViewportToSizeOf(skyBand);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-        renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToWholeDisplay();    // TODO: verify this is necessary
     }
 
     /**
