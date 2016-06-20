@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package org.terasology.rendering.nui.asset;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.format.AssetDataFile;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  */
@@ -31,6 +32,8 @@ import org.terasology.rendering.nui.UIWidget;
 public class UIElement extends Asset<UIData> {
 
     private UIWidget rootWidget;
+
+    private transient AssetDataFile source;
 
     private final List<Consumer<UIElement>> reloadListeners = new CopyOnWriteArrayList<>();
 
@@ -41,6 +44,7 @@ public class UIElement extends Asset<UIData> {
 
     /**
      * Subscribe to reload events.
+     *
      * @param reloadListener the listener to add
      */
     public void subscribe(Consumer<UIElement> reloadListener) {
@@ -49,6 +53,7 @@ public class UIElement extends Asset<UIData> {
 
     /**
      * Unsubscribe from reload events.
+     *
      * @param reloadListener the listener to remove. Non-existing entries will be ignored.
      */
     public void unsubscribe(Consumer<UIElement> reloadListener) {
@@ -58,6 +63,7 @@ public class UIElement extends Asset<UIData> {
     @Override
     protected void doReload(UIData data) {
         rootWidget = data.getRootWidget();
+        source = data.getSource();
         for (Consumer<UIElement> listener : reloadListeners) {
             listener.accept(this);
         }
@@ -65,5 +71,9 @@ public class UIElement extends Asset<UIData> {
 
     public UIWidget getRootWidget() {
         return rootWidget;
+    }
+
+    public AssetDataFile getSource() {
+        return source;
     }
 }

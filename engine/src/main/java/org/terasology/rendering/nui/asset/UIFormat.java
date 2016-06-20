@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ import java.util.Set;
 
 /**
  * The UILoader handles loading UI widgets from json format files.
- *
  */
 @RegisterAssetFileFormat
 public class UIFormat extends AbstractAssetFileFormat<UIData> {
@@ -100,7 +99,9 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
         try (JsonReader reader = new JsonReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             reader.setLenient(true);
-            return gson.fromJson(reader, UIData.class);
+            UIData data = gson.fromJson(reader, UIData.class);
+            data.setSource(inputs.get(0));
+            return data;
         }
     }
 
@@ -182,9 +183,9 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 String name = entry.getKey();
                 if (!ID_FIELD.equals(name)
-                    && !CONTENTS_FIELD.equals(name)
-                    && !TYPE_FIELD.equals(name)
-                    && !LAYOUT_INFO_FIELD.equals(name)) {
+                        && !CONTENTS_FIELD.equals(name)
+                        && !TYPE_FIELD.equals(name)
+                        && !LAYOUT_INFO_FIELD.equals(name)) {
                     unknownFields.add(name);
                 }
             }

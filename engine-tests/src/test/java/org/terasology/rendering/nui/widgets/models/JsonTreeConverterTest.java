@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class JsonTreeConverterTest {
     @Test
@@ -34,7 +35,7 @@ public class JsonTreeConverterTest {
         try {
             content = Files.toString(file, Charsets.UTF_8);
         } catch (IOException e) {
-            e.printStackTrace();
+            fail("Could not load sample file");
         }
         JsonElement element = new JsonParser().parse(content);
         assertEquals(element, JsonTreeConverter.deserialize(JsonTreeConverter.serialize(element)));

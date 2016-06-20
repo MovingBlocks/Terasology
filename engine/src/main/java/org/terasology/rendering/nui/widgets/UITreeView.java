@@ -343,6 +343,10 @@ public class UITreeView<T> extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         canvas.setPart(TREE_ITEM);
 
+        if (model.get().getItemCount() == 0) {
+            return new Vector2i();
+        }
+
         model.get().setEnumerateExpandedOnly(false);
         Vector2i result = new Vector2i();
         for (int i = 0; i < model.get().getItemCount(); i++) {
@@ -366,12 +370,17 @@ public class UITreeView<T> extends CoreWidget {
         return result;
     }
 
+    public TreeModel<T> getModel() {
+        return model.get();
+    }
+
     public void setModel(Tree<T> root) {
         setModel(new TreeModel<>(root));
     }
 
     public void setModel(TreeModel<T> newModel) {
         model.set(newModel);
+        selectedIndex.set(null);
     }
 
     public void setDefaultValue(T value) {

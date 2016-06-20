@@ -1,0 +1,51 @@
+{
+    "type": "engine:nuiEditorScreen",
+    "skin": "engine:nuiEditorScreen",
+    "contents": {
+        "type": "migLayout",
+        "layoutConstraints": "",
+        "colConstraints": "[min][grow, fill]",
+        "rowConstraints": "[min][grow, fill]",
+        "debug": true,
+        "contents": [
+            {
+                "type": "UISpace",
+                "layoutInfo": {
+                    "cc": "cell 1 0, spany 2"
+                }
+            },
+            {
+                "type": "UITreeView",
+                "id": "treeView",
+                "layoutInfo": {
+                    "cc": "cell 0 1, w 500!"
+                }
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 0"
+                },
+                "contents": [
+                    {
+                        "type": "UIDropdownScrollable",
+                        "id": "availableAssets",
+                        "layoutInfo": {
+                            "cc": "w 300!"
+                        }
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "copy",
+                        "text": "Copy"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "paste",
+                        "text": "Paste"
+                    }
+                ]
+            }
+        ]
+    }
+}

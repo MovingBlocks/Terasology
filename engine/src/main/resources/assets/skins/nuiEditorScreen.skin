@@ -1,0 +1,9 @@
+{
+    "inherit": "engine:mainmenu",
+    "elements": {
+        "UILabel": {
+            "text-align-horizontal": "left",
+            "text-shadowed": false
+        }
+    }
+}
