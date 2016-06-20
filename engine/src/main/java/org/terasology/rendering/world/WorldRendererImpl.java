@@ -64,6 +64,8 @@ import org.terasology.world.chunks.RenderableChunk;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
+
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
  *
@@ -330,7 +332,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderChunksRefractiveReflective(); // into sceneReflectiveRefractive buffer
         }
 
-        graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
+        disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
         postProcessor.generateOutline();                    // into outline buffer
@@ -358,6 +360,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
+
 
     private void renderObjectsOpaque() {
         PerformanceMonitor.startActivity("Render Objects (Opaque)");

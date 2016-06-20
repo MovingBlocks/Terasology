@@ -90,7 +90,7 @@ public class ShadowMapNode implements Node {
             return;
         }
 
-        PerformanceMonitor.startActivity("Render World (Shadow Map)");
+        PerformanceMonitor.startActivity("rendering/shadowmap");
         // preRenderSetupSceneShadowMap
         shadowMap.bind();
         setViewportToSizeOf(shadowMap);

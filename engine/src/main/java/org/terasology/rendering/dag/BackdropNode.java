@@ -26,9 +26,7 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
+import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
  * TODO: Diagram of this node
@@ -59,10 +57,11 @@ public class BackdropNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Sky");
+        PerformanceMonitor.startActivity("rendering/backdrop");
+        enableWireframeIf(renderingDebugConfig.isWireframe());
+
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
-        enableWireframeIf(renderingDebugConfig.isWireframe());
         initialClearing();
 
         sceneOpaque.bind();
@@ -79,6 +78,9 @@ public class BackdropNode implements Node {
          */
         setRenderBufferMask(sceneOpaque, true, false, false);
         backdropRenderer.render(playerCamera);
+
+        disableWireframeIf(renderingDebugConfig.isWireframe());
+        PerformanceMonitor.endActivity();
     }
 
     /**

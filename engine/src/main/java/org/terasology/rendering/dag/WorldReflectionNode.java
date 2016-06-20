@@ -71,7 +71,7 @@ public class WorldReflectionNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render World (Reflection)");
+        PerformanceMonitor.startActivity("rendering/worldreflection");
         FBO sceneReflected = frameBuffersManager.getFBO("sceneReflected");
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
