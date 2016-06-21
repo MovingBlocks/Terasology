@@ -42,6 +42,7 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.BackdropNode;
+import org.terasology.rendering.dag.BloomPassesNode;
 import org.terasology.rendering.dag.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.ChunksOpaqueNode;
 import org.terasology.rendering.dag.ChunksRefractiveReflectiveNode;
@@ -230,6 +231,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node initialPostProcessingNode = createInstance(InitialPostProcessingNode.class, context);
         Node downSampleSceneAndUpdateExposure = createInstance(DownSampleSceneAndUpdateExposureNode.class, context);
         Node toneMappedSceneNode = createInstance(ToneMappedSceneNode.class, context);
+        Node bloomPassesNode = createInstance(BloomPassesNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -253,6 +255,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(initialPostProcessingNode);
         renderingPipeline.add(downSampleSceneAndUpdateExposure);
         renderingPipeline.add(toneMappedSceneNode);
+        renderingPipeline.add(bloomPassesNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -358,7 +361,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.forEach(Node::process);
 
 
-        postProcessor.generateBloomPasses();                // into sceneHighPass and sceneBloom[0-2]
         postProcessor.generateBlurPasses();                 // into sceneBlur[0-1]
 
 

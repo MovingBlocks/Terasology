@@ -67,6 +67,15 @@ public class BloomPassesNode implements Node {
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass
     }
 
+    /**
+     * If bloom is enabled via the rendering settings, this method generates the images needed
+     * for the bloom shader effect and stores them in their own frame buffers.
+     * <p>
+     * This effects renders adds fringes (or "feathers") of light to areas of intense brightness.
+     * This in turn give the impression of those areas partially overwhelming the camera or the eye.
+     * <p>
+     * For more information see: http://en.wikipedia.org/wiki/Bloom_(shader_effect)
+     */
     @Override
     public void process() {
         if (renderingConfig.isBloom()) {
