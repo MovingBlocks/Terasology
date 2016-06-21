@@ -20,9 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -35,7 +33,6 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
@@ -99,18 +96,15 @@ public final class WorldRendererImpl implements WorldRenderer {
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
-    private final BackdropRenderer backdropRenderer;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final EntityManager entityManager;
     private final Camera playerCamera;
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
     private Material chunkShader;
-    private Material lightGeometryShader;
     // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
@@ -127,7 +121,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Z_PRE_PASS
     }
 
-    private ComponentSystemManager systemManager;
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
     private FrameBuffersManager buffersManager;
@@ -156,12 +149,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
-        this.backdropRenderer = context.get(BackdropRenderer.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
-        this.systemManager = context.get(ComponentSystemManager.class);
         this.shaderManager = context.get(ShaderManager.class);
-        this.entityManager = context.get(EntityManager.class);
 
         if (renderingConfig.isOculusVrSupport()) {
             playerCamera = new OculusStereoCamera();
@@ -206,7 +196,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initMaterials() {
         chunkShader = getMaterial("engine:prog.chunk");
-        lightGeometryShader = getMaterial("engine:prog.lightGeometryPass");
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
