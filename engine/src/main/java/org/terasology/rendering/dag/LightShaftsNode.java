@@ -17,7 +17,6 @@ package org.terasology.rendering.dag;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -43,21 +42,19 @@ public class LightShaftsNode implements Node {
 
 
     private RenderingConfig renderingConfig;
-    private RenderingDebugConfig renderingDebugConfig;
     private Material lightShaftsShader;
 
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        renderingDebugConfig = renderingConfig.getDebug();
         lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
     }
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Post-Processing");
+        PerformanceMonitor.startActivity("Post-Processing"); // TODO: Remove
         if (renderingConfig.isLightShafts()) {
-            PerformanceMonitor.startActivity("Rendering light shafts");
+            PerformanceMonitor.startActivity("rendering/lightshafts");
             FBO lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
             FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
