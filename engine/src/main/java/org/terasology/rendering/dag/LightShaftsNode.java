@@ -52,7 +52,6 @@ public class LightShaftsNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Post-Processing"); // TODO: Remove
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightshafts");
             FBO lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");

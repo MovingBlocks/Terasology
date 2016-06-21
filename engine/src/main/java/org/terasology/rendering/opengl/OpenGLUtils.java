@@ -155,6 +155,19 @@ public final class OpenGLUtils {
         glPopMatrix();
     }
 
+    /**
+     * First sets a viewport and then renders a quad filling it.
+     *
+     * @param x              an integer representing the x coordinate (in pixels) of the origin of the viewport.
+     * @param y              an integer representing the y coordinate (in pixels) of the origin of the viewport.
+     * @param viewportWidth  an integer representing the width (in pixels) the viewport.
+     * @param viewportHeight an integer representing the height (in pixels) the viewport.
+     */
+    // TODO: perhaps remove this method and make sure the viewport is set explicitly.
+    public static void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
+        glViewport(x, y, viewportWidth, viewportHeight);
+        renderFullscreenQuad();
+    }
 
     // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
     public static void renderQuad() {

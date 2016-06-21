@@ -30,6 +30,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.ByteBuffer;
@@ -56,7 +57,6 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     @Range(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
-    private float currentExposure = 2.0f;
     private float currentSceneLuminance = 1.0f;
 
     @In
@@ -70,6 +70,9 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
 
     @In
     private BackdropProvider backdropProvider;
+
+    @In
+    private PostProcessor postProcessor;
 
     private RenderingConfig renderingConfig;
     private RenderingDebugConfig renderingDebugConfig;
@@ -133,13 +136,13 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
                 targetExposure = hdrMinExposure;
             }
 
-            currentExposure = TeraMath.lerp(currentExposure, targetExposure, hdrExposureAdjustmentSpeed);
+            postProcessor.setExposure(TeraMath.lerp(postProcessor.getExposure(), targetExposure, hdrExposureAdjustmentSpeed));
 
         } else {
             if (backdropProvider.getDaylight() == 0.0) {
-                currentExposure = hdrMaxExposureNight;
+                postProcessor.setExposure(hdrMaxExposureNight);
             } else {
-                currentExposure = hdrExposureDefault;
+                postProcessor.setExposure(hdrExposureDefault);
             }
         }
         PerformanceMonitor.endActivity();

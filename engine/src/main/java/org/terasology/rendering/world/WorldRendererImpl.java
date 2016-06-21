@@ -28,7 +28,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
@@ -43,11 +42,13 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.BackdropNode;
 import org.terasology.rendering.dag.BloomPassesNode;
+import org.terasology.rendering.dag.BlurPassesNode;
 import org.terasology.rendering.dag.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.ChunksOpaqueNode;
 import org.terasology.rendering.dag.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.DirectionalLightsNode;
 import org.terasology.rendering.dag.DownSampleSceneAndUpdateExposureNode;
+import org.terasology.rendering.dag.FinalPostProcessingNode;
 import org.terasology.rendering.dag.FirstPersonViewNode;
 import org.terasology.rendering.dag.InitialPostProcessingNode;
 import org.terasology.rendering.dag.LightGeometryNode;
@@ -232,6 +233,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node downSampleSceneAndUpdateExposure = createInstance(DownSampleSceneAndUpdateExposureNode.class, context);
         Node toneMappedSceneNode = createInstance(ToneMappedSceneNode.class, context);
         Node bloomPassesNode = createInstance(BloomPassesNode.class, context);
+        Node blurPassesNode = createInstance(BlurPassesNode.class, context);
+        Node finalPostProcessingNode = createInstance(FinalPostProcessingNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -256,6 +259,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(downSampleSceneAndUpdateExposure);
         renderingPipeline.add(toneMappedSceneNode);
         renderingPipeline.add(bloomPassesNode);
+        renderingPipeline.add(blurPassesNode);
+        renderingPipeline.add(finalPostProcessingNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -359,15 +364,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         preRenderUpdate(renderingStage);
 
         renderingPipeline.forEach(Node::process);
-
-
-        postProcessor.generateBlurPasses();                 // into sceneBlur[0-1]
-
-
-        // Final Post-Processing: depth-of-field blur, motion blur, film grain, grading, OculusVR distortion
-        postProcessor.finalPostProcessing(renderingStage);  // to screen normally, to a buffer if a screenshot is being taken
-        PerformanceMonitor.endActivity();
-
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
