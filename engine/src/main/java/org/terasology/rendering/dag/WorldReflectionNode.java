@@ -61,6 +61,8 @@ public class WorldReflectionNode implements Node {
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
+    private FBO sceneReflected;
+    private FBO sceneOpaque;
 
     @Override
     public void initialise() {
@@ -72,8 +74,8 @@ public class WorldReflectionNode implements Node {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/worldreflection");
-        FBO sceneReflected = frameBuffersManager.getFBO("sceneReflected");
-        FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneReflected = frameBuffersManager.getFBO("sceneReflected");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
         sceneReflected.bind();
         setViewportToSizeOf(sceneReflected);

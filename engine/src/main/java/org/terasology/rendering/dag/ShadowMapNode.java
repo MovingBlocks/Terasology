@@ -69,7 +69,6 @@ public class ShadowMapNode implements Node {
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
 
-
     @Override
     public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
@@ -81,7 +80,7 @@ public class ShadowMapNode implements Node {
 
     @Override
     public void process() {
-        this.shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
+        shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
         positionShadowMapCamera();
 
         // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame
