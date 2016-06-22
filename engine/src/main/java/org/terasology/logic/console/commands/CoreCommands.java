@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.console.commands;
 
-import org.terasology.logic.console.suggesters.ScreenSuggester;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -44,6 +42,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
+import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
@@ -61,9 +60,11 @@ import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.editor.NUIEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
@@ -71,11 +72,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -114,6 +111,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private NUIEditorSystem nuiEditorSystem;
 
     @In
     private AssetManager assetManager;
@@ -209,7 +209,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Shows a ui screen", helpText = "Can be used for debugging/testing, example: \"showScreen migTestScreen\"")
-    public String showScreen(@CommandParam(value="uri", suggester = ScreenSuggester.class) String uri) {
+    public String showScreen(@CommandParam(value = "uri", suggester = ScreenSuggester.class) String uri) {
         return nuiManager.pushScreen(uri) != null ? "Success" : "Not found";
     }
 
@@ -230,6 +230,17 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "No unique resource found";
         }
+    }
+
+    @Command(shortDescription = "Opens the NUI editor for a ui screen", requiredPermission = PermissionManager.NO_PERMISSION)
+    public String editScreen(@CommandParam(value = "uri", suggester = ScreenSuggester.class) String uri) {
+        // Close the console screen to avoid popScreen() bugs.
+        nuiManager.closeScreen("engine:console");
+
+        if (!nuiEditorSystem.isEditorActive()) {
+            nuiEditorSystem.toggleEditor();
+        }
+        return nuiEditorSystem.selectScreen(uri) != null ? "Success" : "Not found";
     }
 
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -270,13 +281,13 @@ public class CoreCommands extends BaseComponentSystem {
         final WaitPopup<JoinStatus> popup = nuiManager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
         popup.onSuccess(result -> {
-                if (result.getStatus() != JoinStatus.Status.FAILED) {
-                    gameEngine.changeState(new StateLoading(result));
-                } else {
-                    MessagePopup screen = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
-                }
-            });
+            if (result.getStatus() != JoinStatus.Status.FAILED) {
+                gameEngine.changeState(new StateLoading(result));
+            } else {
+                MessagePopup screen = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
+            }
+        });
         popup.startOperation(operation, true);
     }
 

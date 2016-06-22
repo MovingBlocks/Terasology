@@ -93,7 +93,10 @@ public class StateMainMenu implements GameState {
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
-        componentSystemManager.register(new NUIEditorSystem(), "engine:NUIEditorSystem");
+
+        NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
+        context.put(NUIEditorSystem.class, nuiEditorSystem);
+        componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
 
         inputSystem = context.get(InputSystem.class);
 

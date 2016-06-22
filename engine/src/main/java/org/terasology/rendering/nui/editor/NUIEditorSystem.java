@@ -24,18 +24,79 @@ import org.terasology.input.ButtonState;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.UIScreenLayer;
 
 @RegisterSystem
 public class NUIEditorSystem extends BaseComponentSystem {
+    private static final String NUI_EDITOR_URN = "engine:nuiEditorScreen";
+
     @In
     private NUIManager nuiManager;
+
+    /**
+     * Whether the editor is currently active.
+     */
+    private boolean editorActive;
+    /**
+     * Whether a UI screen to edit has been selected.
+     */
+    private boolean screenSelected;
+    /**
+     * The Urn of the screen selected to edit.
+     */
+    private String selectedScreen;
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void showEditor(NUIEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            nuiManager.toggleScreen("engine:nuiEditorScreen");
-
+            toggleEditor();
             event.consume();
         }
+    }
+
+    public void toggleEditor() {
+        if (editorActive) {
+            // Hide the editor (and the screen being edited).
+            if (screenSelected) {
+                nuiManager.popScreen();
+            }
+            nuiManager.popScreen();
+        } else {
+            // Show the editor (and the screen being edited).
+            if (screenSelected) {
+                pushSelectedScreen();
+            }
+            nuiManager.pushScreen(NUI_EDITOR_URN);
+        }
+        editorActive = !editorActive;
+    }
+
+    public UIScreenLayer selectScreen(String urn) {
+        // Hide the editor, then the screen being edited.
+        nuiManager.popScreen();
+        if (screenSelected) {
+            nuiManager.popScreen();
+        }
+
+        selectedScreen = urn;
+        screenSelected = true;
+
+        // Push the screen being edited, then the editor.
+        UIScreenLayer screen = this.pushSelectedScreen();
+        nuiManager.pushScreen(NUI_EDITOR_URN);
+        return screen;
+    }
+
+    public UIScreenLayer pushSelectedScreen() {
+        // TODO: push the screen layout WITHOUT initialising the screen.
+        return nuiManager.pushScreen(selectedScreen);
+    }
+
+    public boolean isEditorActive() {
+        return editorActive;
+    }
+
+    public String getSelectedScreen() {
+        return selectedScreen;
     }
 }

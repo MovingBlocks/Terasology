@@ -18,11 +18,12 @@
                 "type": "UITreeView",
                 "id": "treeView",
                 "layoutInfo": {
-                    "cc": "cell 0 1, w 500!"
+                    "cc": "cell 0 1"
                 }
             },
             {
                 "type": "migLayout",
+                "debug": true,
                 "layoutInfo": {
                     "cc": "cell 0 0"
                 },

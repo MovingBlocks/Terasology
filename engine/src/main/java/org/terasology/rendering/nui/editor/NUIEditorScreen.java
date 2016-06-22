@@ -59,10 +59,13 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private NUIManager nuiManager;
 
     @In
+    private NUIEditorSystem nuiEditorSystem;
+
+    @In
     private AssetManager assetManager;
 
     private List<ResourceUrn> uiUrns = Lists.newArrayList();
-    private UIDropdownScrollable availableAssetDropdown;
+    private UIDropdownScrollable availableAssets;
     private ResourceUrn selectedUrn;
     private UITreeView treeView;
 
@@ -76,9 +79,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
         uiUrns.sort(Comparator.comparing(ResourceUrn::toString));
 
         // Populate the asset dropdown with the asset list.
-        availableAssetDropdown = find("availableAssets", UIDropdownScrollable.class);
-        availableAssetDropdown.setOptions(uiUrns);
-        availableAssetDropdown.bindSelection(new Binding<ResourceUrn>() {
+        availableAssets = find("availableAssets", UIDropdownScrollable.class);
+        availableAssets.setOptions(uiUrns);
+        availableAssets.bindSelection(new Binding<ResourceUrn>() {
             @Override
             public ResourceUrn get() {
                 return selectedUrn;
@@ -87,9 +90,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
             @Override
             public void set(ResourceUrn value) {
                 if (selectedUrn != value) {
-                    setActiveFile(value);
+                    selectFile(value);
                 }
-                // TODO: load the screen being edited; display the editor above it
+                nuiEditorSystem.selectScreen(value.toString());
                 selectedUrn = value;
             }
         });
@@ -148,10 +151,15 @@ public class NUIEditorScreen extends CoreScreenLayer {
         });
     }
 
+    @Override
+    public boolean isEscapeToCloseAllowed() {
+        return false;
+    }
+    
     /**
      * @param urn The Urn of the file to be edited.
      */
-    private void setActiveFile(ResourceUrn urn) {
+    private void selectFile(ResourceUrn urn) {
         // Fetch the file from the asset Urn.
         AssetDataFile source = assetManager.getAsset(urn, UIElement.class).get().getSource();
 
