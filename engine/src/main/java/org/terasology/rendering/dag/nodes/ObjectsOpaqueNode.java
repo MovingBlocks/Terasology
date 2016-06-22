@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
@@ -21,13 +21,14 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
+import org.terasology.rendering.dag.Node;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /*
  * TODO: Diagram of this node
  */
-public class ObjectsOpaqueNode implements Node {
+public class ObjectsOpaqueNode extends Node {
     @In
     private Config config;
 
@@ -37,7 +38,8 @@ public class ObjectsOpaqueNode implements Node {
     private RenderingDebugConfig renderingDebugConfig;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
         renderingDebugConfig = config.getRendering().getDebug();
     }
 

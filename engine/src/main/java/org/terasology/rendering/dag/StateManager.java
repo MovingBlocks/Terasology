@@ -15,18 +15,8 @@
  */
 package org.terasology.rendering.dag;
 
-
-public abstract class Node {
-
-    private String identifier;
-
-    public void initialise(String id) {
-        this.identifier = id;
-    }
-
-    public abstract void process();
-
-    public String getIdentifier() {
-        return identifier;
-    }
+/**
+ * TODO: add javadocs
+ */
+public class StateManager {
 }

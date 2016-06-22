@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -32,7 +33,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add diagram of this node
  */
-public class ToneMappedSceneNode implements Node {
+public class PrePostCompositeNode extends Node {
 
     @In
     private FrameBuffersManager frameBuffersManager;
@@ -43,41 +44,41 @@ public class ToneMappedSceneNode implements Node {
     @In
     private Config config;
 
+    private Material prePostComposite;
     private RenderingDebugConfig renderingDebugConfig;
-    private Material toneMapping;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
+        prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
         renderingDebugConfig = config.getRendering().getDebug();
-        toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 
     /**
-     * // TODO: write javadoc
+     * Adds outlines and ambient occlusion to the rendering obtained so far stored in the primary FBO.
+     * Stores the resulting output back into the primary buffer.
      */
-    // TODO: Tone mapping usually maps colors from HDR to a more limited range,
-    // TODO: i.e. the 24 bit a monitor can display. This method however maps from an HDR buffer
-    // TODO: to another HDR buffer and this puzzles me. Will need to dig deep in the shader to
-    // TODO: see what it does.
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Tone mapping");
         disableWireframeIf(renderingDebugConfig.isWireframe());
-        FBO sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
+        prePostComposite.enable();
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        FBO sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
+        FBO sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
 
-        toneMapping.enable();
+        // TODO: verify if there should be bound textures here.
+        sceneOpaquePingPong.bind();
 
-        sceneToneMapped.bind();
-        setViewportToSizeOf(sceneToneMapped);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // TODO: verify this is necessary
+        setViewportToSizeOf(sceneOpaquePingPong);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        PerformanceMonitor.endActivity();
+        frameBuffersManager.swapSceneOpaqueFBOs();
+        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
+        PerformanceMonitor.endActivity(); // End of activity "Pre-post composite"
     }
-
 }

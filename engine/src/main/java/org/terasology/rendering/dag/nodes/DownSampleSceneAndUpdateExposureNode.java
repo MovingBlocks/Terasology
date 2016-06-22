@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -27,6 +27,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -41,7 +42,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add node of this diagram
  */
-public class DownSampleSceneAndUpdateExposureNode implements Node {
+public class DownSampleSceneAndUpdateExposureNode extends Node {
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
 
     @Range(min = 0.0f, max = 10.0f)
@@ -82,7 +83,8 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     private Material downSampler;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
         renderingConfig = config.getRendering();
         renderingDebugConfig = renderingConfig.getDebug();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler

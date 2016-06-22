@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -30,7 +31,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add diagram of this node
  */
-public class InitialPostProcessingNode implements Node {
+public class InitialPostProcessingNode extends Node {
 
     @In
     private Config config;
@@ -45,7 +46,8 @@ public class InitialPostProcessingNode implements Node {
     private Material initialPost;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
         renderingDebugConfig = config.getRendering().getDebug();
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
     }

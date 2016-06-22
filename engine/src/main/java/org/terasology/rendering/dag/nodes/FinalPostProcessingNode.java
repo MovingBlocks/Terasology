@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL13;
@@ -23,6 +23,7 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -41,7 +42,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  * TODO: Break into two different nodes
  */
-public class FinalPostProcessingNode implements Node {
+public class FinalPostProcessingNode extends Node {
 
     @In
     private WorldRenderer worldRenderer;
@@ -69,7 +70,8 @@ public class FinalPostProcessingNode implements Node {
     private FBO sceneOpaque;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
         renderingConfig = config.getRendering();
         renderingDebugConfig = renderingConfig.getDebug();
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -22,6 +22,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -36,7 +37,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
  * TODO: Diagram of this node
  * TODO: Separate this node into multiple SkyBandNode's
  */
-public class SkyBandsNode implements Node {
+public class SkyBandsNode extends Node {
 
     @In
     private Config config;
@@ -55,7 +56,8 @@ public class SkyBandsNode implements Node {
     private Camera playerCamera;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
         renderingConfig = config.getRendering();
         renderingDebugConfig = renderingConfig.getDebug();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");

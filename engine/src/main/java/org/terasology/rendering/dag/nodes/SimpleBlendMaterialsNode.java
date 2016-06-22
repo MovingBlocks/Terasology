@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
@@ -22,6 +22,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 
@@ -35,7 +36,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 /**
  * TODO: Add diagram of this node
  */
-public class SimpleBlendMaterialsNode implements Node {
+public class SimpleBlendMaterialsNode extends Node {
 
     @In
     private ComponentSystemManager componentSystemManager;
@@ -50,7 +51,8 @@ public class SimpleBlendMaterialsNode implements Node {
     private RenderingDebugConfig renderingDebugConfig;
 
     @Override
-    public void initialise() {
+    public void initialise(String id) {
+        super.initialise(id);
         renderingDebugConfig = config.getRendering().getDebug();
     }
 
