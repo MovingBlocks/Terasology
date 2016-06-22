@@ -23,10 +23,12 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 
 @RegisterSystem
+@Share(NUIEditorSystem.class)
 public class NUIEditorSystem extends BaseComponentSystem {
     private static final String NUI_EDITOR_URN = "engine:nuiEditorScreen";
 

@@ -155,7 +155,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     public boolean isEscapeToCloseAllowed() {
         return false;
     }
-    
+
     /**
      * @param urn The Urn of the file to be edited.
      */
