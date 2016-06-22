@@ -245,12 +245,14 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                     ContextAttribs ctxAttribs = new ContextAttribs().withDebug(true);
                     Display.create(config.getPixelFormat(), ctxAttribs);
 
-                    GL43.glDebugMessageCallback(new KHRDebugCallback(new DebugCallback()));
-                } catch (LWJGLException | IllegalStateException e) {
-                    logger.warn("Unable to create an OpenGL debug context. Maybe your graphics card does not support it.", e);
-                    if (e.getClass().equals(IllegalStateException.class)) {
-                        Display.destroy();
+                    try {
+                        GL43.glDebugMessageCallback(new KHRDebugCallback(new DebugCallback()));
+                    } catch (IllegalStateException e) {
+                        logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
                     }
+
+                } catch (LWJGLException e) {
+                    logger.warn("Unable to create an OpenGL debug context. Maybe your graphics card does not support it.", e);
                     Display.create(config.getPixelFormat()); // Create a normal context instead
                 }
 
