@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.dag;
 
-import org.lwjgl.opengl.GL11;
+
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
@@ -33,8 +33,13 @@ import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.OpenGLUtils.*;
+import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 
 /**
@@ -69,7 +74,6 @@ public class ShadowMapNode implements Node {
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
 
-
     @Override
     public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
@@ -81,7 +85,7 @@ public class ShadowMapNode implements Node {
 
     @Override
     public void process() {
-        this.shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
+        shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
         positionShadowMapCamera();
 
         // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame
@@ -90,7 +94,7 @@ public class ShadowMapNode implements Node {
             return;
         }
 
-        PerformanceMonitor.startActivity("Render World (Shadow Map)");
+        PerformanceMonitor.startActivity("rendering/shadowmap");
         // preRenderSetupSceneShadowMap
         shadowMap.bind();
         setViewportToSizeOf(shadowMap);

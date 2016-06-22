@@ -15,45 +15,13 @@
  */
 package org.terasology.rendering.opengl;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.math.geom.Vector3f;
 
-import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DECR;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_INCR;
-import static org.lwjgl.opengl.GL11.GL_KEEP;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * The GraphicState class aggregates a number of methods setting the OpenGL state
@@ -144,30 +112,6 @@ public class GraphicState {
         buffers.sceneShadowMap = newShadowMap;
     }
 
-    /**
-     * Initial clearing of a couple of important Frame Buffers. Then binds back the Display.
-     */
-    // It's unclear why these buffers need to be cleared while all the others don't...
-    public void initialClearing() {
-        buffers.sceneOpaque.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        buffers.sceneReflectiveRefractive.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bindDisplay();
-    }
-
-    /**
-     * Readies the state to render the Opaque scene.
-     *
-     * The opaque scene includes a number of successive passes including the backdrop (i.e. the skysphere),
-     * the landscape (chunks/blocks), additional objects associated with the landscape (i.e. other players/fauna),
-     * overlays (i.e. the cursor-cube) and the geometry associated with the first person view, i.e. the objects
-     * held in hand.
-     */
-    public void preRenderSetupSceneOpaque() {
-        buffers.sceneOpaque.bind();
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-    }
 
     /**
      * Resets the state after the rendering of the Opaque scene.
@@ -178,59 +122,6 @@ public class GraphicState {
     public void postRenderCleanupSceneOpaque() {
         setRenderBufferMask(buffers.sceneOpaque, true, true, true); // TODO: probably redundant - verify
         bindDisplay();
-    }
-
-    /**
-     * Sets the state to render in wireframe.
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True enables wireframe rendering. False, does nothing.
-     */
-    public void enableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-    }
-
-    /**
-     * Disables wireframe rendering. Used together with enableWireFrameIf().
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
-     */
-    public void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-    }
-
-
-    /**
-     * Sets the state to render the Backdrop. At this stage the backdrop is the SkySphere
-     * plus the SkyBands passes.
-     *
-     * The backdrop is the only rendering that has three state-changing methods.
-     * This is due to the SkySphere requiring a state and the SkyBands requiring a slightly
-     * different one.
-     */
-    public void preRenderSetupBackdrop() {
-        setRenderBufferMask(buffers.sceneOpaque, true, false, false);
-    }
-
-    /**
-     * Sets the state to generate the SkyBands.
-     *
-     * See preRenderSetupBackdrop() for some more information.
-     */
-    public void midRenderChangesBackdrop() {
-        setRenderBufferMask(buffers.sceneOpaque, true, true, true);
-    }
-
-    /**
-     * Resets the state after the rendering of the Backdrop.
-     *
-     * See preRenderSetupBackdrop() for some more information.
-     */
-    public void postRenderCleanupBackdrop() {
-        buffers.sceneOpaque.bind();
     }
 
     /**
@@ -417,48 +308,7 @@ public class GraphicState {
         GL11.glPopMatrix();
     }
 
-    /**
-     * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
-     * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
-     * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
-     *
-     * @param fbo The FBO holding the attachments to be set or unset for drawing.
-     * @param color If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param normal If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param lightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     */
-    // TODO: verify if this can become part of the FBO.bind() method.
-    public void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
-        if (fbo == null) {
-            return;
-        }
 
-        int attachmentId = 0;
-
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-
-        if (fbo.colorBufferTextureId != 0) {
-            if (color) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-            attachmentId++;
-        }
-        if (fbo.normalsBufferTextureId != 0) {
-            if (normal) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-            attachmentId++;
-        }
-        if (fbo.lightBufferTextureId != 0) {
-            if (lightBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-        }
-
-        bufferIds.flip();
-
-        GL20.glDrawBuffers(bufferIds);
-    }
 
     private class Buffers {
         public FBO sceneOpaque;

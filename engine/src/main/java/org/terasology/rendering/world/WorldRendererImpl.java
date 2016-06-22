@@ -40,10 +40,11 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.BackdropNode;
+import org.terasology.rendering.dag.SkyBandsNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.GraphicState;
@@ -63,6 +64,8 @@ import org.terasology.world.chunks.RenderableChunk;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
+
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
  *
@@ -81,7 +84,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
-    private final BackdropRenderer backdropRenderer;
     private final BackdropProvider backdropProvider;
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
@@ -140,7 +142,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
-        this.backdropRenderer = context.get(BackdropRenderer.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.systemManager = context.get(ComponentSystemManager.class);
@@ -180,7 +181,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(FrameBuffersManager.class, buffersManager);
 
         graphicState = new GraphicState(buffersManager);
-        postProcessor = new PostProcessor(buffersManager, graphicState);
+        postProcessor = new PostProcessor(buffersManager);
         context.put(PostProcessor.class, postProcessor);
 
         buffersManager.setGraphicState(graphicState);
@@ -207,10 +208,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         // FIXME: init pipeline without specifying them as a field in this class
         shadowMapNode = createInstance(ShadowMapNode.class, context);
         Node worldReflectionNode = createInstance(WorldReflectionNode.class, context);
+        Node backdropNode = createInstance(BackdropNode.class, context);
+        Node skybandsNode = createInstance(SkyBandsNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
         renderingPipeline.add(worldReflectionNode);
+        renderingPipeline.add(backdropNode);
+        renderingPipeline.add(skybandsNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -314,12 +319,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        graphicState.enableWireframeIf(renderingDebugConfig.isWireframe());
-        graphicState.initialClearing();
-
-        graphicState.preRenderSetupSceneOpaque();
-        renderBackdrop();   // into sceneOpaque and skyBands[0-1] buffers
-
         try (Activity ignored = PerformanceMonitor.startActivity("Render World")) {
             renderObjectsOpaque();      //
             renderChunksOpaque();       //
@@ -333,7 +332,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderChunksRefractiveReflective(); // into sceneReflectiveRefractive buffer
         }
 
-        graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
+        disableWireframeIf(renderingDebugConfig.isWireframe());
 
         PerformanceMonitor.startActivity("Pre-post composite");
         postProcessor.generateOutline();                    // into outline buffer
@@ -362,20 +361,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         playerCamera.updatePrevViewProjectionMatrix();
     }
 
-    private void renderBackdrop() {
-        PerformanceMonitor.startActivity("Render Sky");
-        playerCamera.lookThroughNormalized();
-        graphicState.preRenderSetupBackdrop();
-
-        backdropRenderer.render(playerCamera);
-        graphicState.midRenderChangesBackdrop();
-        postProcessor.generateSkyBands();
-
-        graphicState.postRenderCleanupBackdrop();
-
-        playerCamera.lookThrough();
-        PerformanceMonitor.endActivity();
-    }
 
     private void renderObjectsOpaque() {
         PerformanceMonitor.startActivity("Render Objects (Opaque)");

@@ -34,7 +34,8 @@ import org.terasology.rendering.world.WorldRendererImpl;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.*;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 /**
  * Diagram of this node can be viewed from:
@@ -61,6 +62,8 @@ public class WorldReflectionNode implements Node {
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
+    private FBO sceneReflected;
+    private FBO sceneOpaque;
 
     @Override
     public void initialise() {
@@ -71,9 +74,9 @@ public class WorldReflectionNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render World (Reflection)");
-        FBO sceneReflected = frameBuffersManager.getFBO("sceneReflected");
-        FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        PerformanceMonitor.startActivity("rendering/worldreflection");
+        sceneReflected = frameBuffersManager.getFBO("sceneReflected");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
         sceneReflected.bind();
         setViewportToSizeOf(sceneReflected);
