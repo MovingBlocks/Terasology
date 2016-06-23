@@ -27,12 +27,14 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.input.Keyboard;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
@@ -153,6 +155,16 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     @Override
     public boolean isEscapeToCloseAllowed() {
+        return false;
+    }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            getAnimationSystem().stop();
+            nuiEditorSystem.toggleEditor();
+            return true;
+        }
         return false;
     }
 
