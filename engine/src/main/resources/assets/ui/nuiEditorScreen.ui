@@ -9,14 +9,15 @@
         "debug": true,
         "contents": [
             {
-                "type": "UISpace",
+                "type": "ColumnLayout",
+                "id": "selectedScreen",
                 "layoutInfo": {
                     "cc": "cell 1 0, spany 2"
                 }
             },
             {
                 "type": "UITreeView",
-                "id": "treeView",
+                "id": "editor",
                 "layoutInfo": {
                     "cc": "cell 0 1"
                 }

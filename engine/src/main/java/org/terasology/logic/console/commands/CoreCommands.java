@@ -234,13 +234,20 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Opens the NUI editor for a ui screen", requiredPermission = PermissionManager.NO_PERMISSION)
     public String editScreen(@CommandParam(value = "uri", suggester = ScreenSuggester.class) String uri) {
-        // Close the console screen to avoid popScreen() bugs.
-        nuiManager.closeScreen("engine:console");
-
         if (!nuiEditorSystem.isEditorActive()) {
             nuiEditorSystem.toggleEditor();
         }
-        return nuiEditorSystem.selectScreen(uri) != null ? "Success" : "Not found";
+        Set<ResourceUrn> urns = assetManager.resolve(uri, UIElement.class);
+        switch (urns.size()) {
+            case 0:
+                return String.format("No asset found for screen '%s'", uri);
+            case 1:
+                ResourceUrn urn = urns.iterator().next();
+                nuiEditorSystem.setSelectedUrn(urn);
+                return "Success";
+            default:
+                return String.format("Multiple matches for screen '%s': {%s}", uri, Arrays.toString(urns.toArray()));
+        }
     }
 
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)

@@ -29,12 +29,11 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.input.Keyboard;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
+import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
@@ -57,6 +56,8 @@ import java.util.stream.Collectors;
 public class NUIEditorScreen extends CoreScreenLayer {
     private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
+    private static final ResourceUrn NUI_EDITOR_URN = new ResourceUrn("engine:nuiEditorScreen");
+
     @In
     private NUIManager nuiManager;
 
@@ -66,24 +67,45 @@ public class NUIEditorScreen extends CoreScreenLayer {
     @In
     private AssetManager assetManager;
 
-    private List<ResourceUrn> uiUrns = Lists.newArrayList();
-    private UIDropdownScrollable availableAssets;
+    /**
+     * The list of loaded {@link UIElement} asset {@link ResourceUrn}s.
+     */
+    private List<ResourceUrn> availableAssetList = Lists.newArrayList();
+    /**
+     * The dropdown containing a list of available asset {@link ResourceUrn}s.
+     */
+    private UIDropdownScrollable availableAssetDropdown;
+    /**
+     * The Urn of the currently selected UIElement.
+     */
     private ResourceUrn selectedUrn;
-    private UITreeView treeView;
+    /**
+     * The tree view containing a {@link JsonTree} representation of the asset being edited.
+     */
+    private UITreeView editorTreeView;
+    /**
+     * The layout containing the screen being edited.
+     */
+    private CoreLayout selectedScreenLayout;
 
     @Override
     public void initialise() {
-        // Get the list of available UIElement assets.
-        uiUrns.addAll(assetManager
+        availableAssetDropdown = find("availableAssets", UIDropdownScrollable.class);
+        editorTreeView = find("editor", UITreeView.class);
+        selectedScreenLayout = find("selectedScreen", ColumnLayout.class);
+
+        // Populate the asset dropdown with the asset list.
+        availableAssetList.addAll(assetManager
                 .getAvailableAssets(UIElement.class)
                 .stream()
                 .collect(Collectors.toList()));
-        uiUrns.sort(Comparator.comparing(ResourceUrn::toString));
 
-        // Populate the asset dropdown with the asset list.
-        availableAssets = find("availableAssets", UIDropdownScrollable.class);
-        availableAssets.setOptions(uiUrns);
-        availableAssets.bindSelection(new Binding<ResourceUrn>() {
+        // Exclude the NUI editor itself, then sort the list..
+        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(NUI_EDITOR_URN));
+        availableAssetList.sort(Comparator.comparing(ResourceUrn::toString));
+
+        availableAssetDropdown.setOptions(availableAssetList);
+        availableAssetDropdown.bindSelection(new Binding<ResourceUrn>() {
             @Override
             public ResourceUrn get() {
                 return selectedUrn;
@@ -94,17 +116,14 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 if (selectedUrn != value) {
                     selectFile(value);
                 }
-                nuiEditorSystem.selectScreen(value.toString());
-                selectedUrn = value;
             }
         });
 
-        treeView = find("treeView", UITreeView.class);
-
+        // Set the handler for the Copy button.
         WidgetUtil.trySubscribe(this, "copy", button -> {
             if (selectedUrn != null) {
                 // Deserialize the tree view's internal JsonTree into the original JSON string.
-                JsonElement json = JsonTreeConverter.deserialize(treeView.getModel().getItem(0).getRoot());
+                JsonElement json = JsonTreeConverter.deserialize(editorTreeView.getModel().getItem(0).getRoot());
                 String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
 
                 // Set the clipboard contents to the JSON string.
@@ -118,6 +137,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
         });
 
+        // Set the handler for the Paste button.
         WidgetUtil.trySubscribe(this, "paste", button -> {
             // Fetch the clipboard contents.
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -145,7 +165,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     }
 
                     // Set the tree view's internal model to the tree.
-                    treeView.setModel(tree);
+                    editorTreeView.setModel(tree);
                 } catch (JsonSyntaxException | NullPointerException e) {
                     logger.warn("Could not construct a valid tree from clipboard contents.", e);
                 }
@@ -168,31 +188,55 @@ public class NUIEditorScreen extends CoreScreenLayer {
         return false;
     }
 
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        ResourceUrn systemUrn = nuiEditorSystem.getSelectedUrn();
+        if (systemUrn != null && systemUrn != selectedUrn) {
+            selectFile(systemUrn);
+            nuiEditorSystem.setSelectedUrn(null);
+        }
+    }
+
     /**
      * @param urn The Urn of the file to be edited.
      */
     private void selectFile(ResourceUrn urn) {
-        // Fetch the file from the asset Urn.
-        AssetDataFile source = assetManager.getAsset(urn, UIElement.class).get().getSource();
+        if (assetManager.getAsset(urn, UIElement.class).isPresent()) {
+            UIElement element = assetManager.getAsset(urn, UIElement.class).get();
 
-        String content = null;
-        try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
-            reader.setLenient(true);
-            content = new JsonParser().parse(reader).toString();
-        } catch (IOException e) {
-            logger.error(String.format("Could not load asset source file for %s", urn.toString()), e);
-        }
+            // Fetch the file from the asset Urn.
+            AssetDataFile source = element.getSource();
 
-        if (content != null) {
-            // Serialize the JSON string into a JsonTree and expand its' nodes.
-            JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
-            Iterator it = tree.getDepthFirstIterator(false);
-            while (it.hasNext()) {
-                ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
+            String content = null;
+            try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
+                reader.setLenient(true);
+                content = new JsonParser().parse(reader).toString();
+            } catch (IOException e) {
+                logger.error(String.format("Could not load asset source file for %s", urn.toString()), e);
             }
 
-            // Set the tree view's internal model to the resulting tree.
-            treeView.setModel(tree.copy());
+            if (content != null) {
+                // Serialize the JSON string into a JsonTree and expand its' nodes.
+                JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
+                Iterator it = tree.getDepthFirstIterator(false);
+                while (it.hasNext()) {
+                    ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
+                }
+
+                // Set the tree view's internal model to the resulting tree.
+                editorTreeView.setModel(tree.copy());
+            }
+
+            // Add the selected screen as a child of the layout.
+            while (selectedScreenLayout.iterator().hasNext()) {
+                selectedScreenLayout.removeWidget((UIWidget) selectedScreenLayout.iterator().next());
+            }
+            UIWidget rootWidget = element.getRootWidget();
+            selectedScreenLayout.addWidget(rootWidget, null);
+
+            selectedUrn = urn;
         }
     }
 }

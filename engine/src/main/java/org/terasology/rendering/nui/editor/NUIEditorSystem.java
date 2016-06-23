@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.editor;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -25,7 +26,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.asset.UIElement;
 
 @RegisterSystem
 @Share(NUIEditorSystem.class)
@@ -40,13 +41,11 @@ public class NUIEditorSystem extends BaseComponentSystem {
      */
     private boolean editorActive;
     /**
-     * Whether a UI screen to edit has been selected.
+     * The Urn of the currently selected {@link UIElement}.
+     * <p>
+     * Used when selecting a UIElement by means other than the editor dropdown, e.g. console command.
      */
-    private boolean screenSelected;
-    /**
-     * The Urn of the screen selected to edit.
-     */
-    private String selectedScreen;
+    private ResourceUrn selectedUrn;
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void showEditor(NUIEditorButton event, EntityRef entity) {
@@ -57,48 +56,19 @@ public class NUIEditorSystem extends BaseComponentSystem {
     }
 
     public void toggleEditor() {
-        if (editorActive) {
-            // Hide the editor (and the screen being edited).
-            if (screenSelected) {
-                nuiManager.popScreen();
-            }
-            nuiManager.popScreen();
-        } else {
-            // Show the editor (and the screen being edited).
-            if (screenSelected) {
-                pushSelectedScreen();
-            }
-            nuiManager.pushScreen(NUI_EDITOR_URN);
-        }
+        nuiManager.toggleScreen(NUI_EDITOR_URN);
         editorActive = !editorActive;
-    }
-
-    public UIScreenLayer selectScreen(String urn) {
-        // Hide the editor, then the screen being edited.
-        nuiManager.popScreen();
-        if (screenSelected) {
-            nuiManager.popScreen();
-        }
-
-        selectedScreen = urn;
-        screenSelected = true;
-
-        // Push the screen being edited, then the editor.
-        UIScreenLayer screen = this.pushSelectedScreen();
-        nuiManager.pushScreen(NUI_EDITOR_URN);
-        return screen;
-    }
-
-    public UIScreenLayer pushSelectedScreen() {
-        // TODO: push the screen layout WITHOUT initialising the screen.
-        return nuiManager.pushScreen(selectedScreen);
     }
 
     public boolean isEditorActive() {
         return editorActive;
     }
 
-    public String getSelectedScreen() {
-        return selectedScreen;
+    public ResourceUrn getSelectedUrn() {
+        return selectedUrn;
+    }
+
+    public void setSelectedUrn(ResourceUrn urn) {
+        selectedUrn = urn;
     }
 }
