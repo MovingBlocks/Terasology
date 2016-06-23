@@ -25,9 +25,8 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
-
 
 /**
  * TODO: Diagram of this node
@@ -58,12 +57,14 @@ public class ChunksAlphaRejectNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Chunks (Alpha Reject)");
+        PerformanceMonitor.startActivity("rendering/chunksalphareject");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         worldRenderer.renderChunks(renderQueues.chunksAlphaReject,
                 ChunkMesh.RenderPhase.ALPHA_REJECT, playerCamera,
                 WorldRendererImpl.ChunkRenderMode.DEFAULT);
+
+        disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();
     }
 }

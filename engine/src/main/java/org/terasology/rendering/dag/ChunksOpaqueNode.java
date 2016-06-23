@@ -24,7 +24,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
@@ -52,12 +52,15 @@ public class ChunksOpaqueNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Chunks (Opaque)");
+        PerformanceMonitor.startActivity("rendering/chunksopaque");
         enableWireframeIf(renderingDebugConfig.isWireframe());
+
         worldRenderer.renderChunks(renderQueues.chunksOpaque,
                 ChunkMesh.RenderPhase.OPAQUE,
                 playerCamera,
                 WorldRendererImpl.ChunkRenderMode.DEFAULT);
+
+        disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();
     }
 }

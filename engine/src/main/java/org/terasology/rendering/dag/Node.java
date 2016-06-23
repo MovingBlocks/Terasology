@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag;
 
-
 public interface Node {
 
     void initialise();

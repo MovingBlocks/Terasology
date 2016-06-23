@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag;
 
-
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;

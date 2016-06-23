@@ -24,8 +24,8 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
@@ -54,7 +54,7 @@ public class FirstPersonViewNode implements Node {
     @Override
     public void process() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
-            PerformanceMonitor.startActivity("Render First Person");
+            PerformanceMonitor.startActivity("rendering/firstpersonview");
             enableWireframeIf(renderingDebugConfig.isWireframe());
 
 
@@ -84,6 +84,7 @@ public class FirstPersonViewNode implements Node {
             GL11.glDepthFunc(GL_LEQUAL);
             GL11.glPopMatrix();
 
+            disableWireframeIf(renderingDebugConfig.isWireframe());
             PerformanceMonitor.endActivity();
         }
     }

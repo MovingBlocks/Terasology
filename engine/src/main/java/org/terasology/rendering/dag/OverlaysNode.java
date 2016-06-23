@@ -21,7 +21,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
@@ -44,12 +44,14 @@ public class OverlaysNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Overlays");
+        PerformanceMonitor.startActivity("rendering/overlays");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }
+
+        disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();
     }
 }

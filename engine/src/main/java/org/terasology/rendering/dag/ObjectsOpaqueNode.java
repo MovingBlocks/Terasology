@@ -21,7 +21,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-
+import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /*
@@ -43,13 +43,14 @@ public class ObjectsOpaqueNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render World");
+        PerformanceMonitor.startActivity("rendering/objectsopaque");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
-        PerformanceMonitor.startActivity("Render Objects (Opaque)");
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
+
+        disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();
     }
 }

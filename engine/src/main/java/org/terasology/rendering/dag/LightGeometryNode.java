@@ -22,13 +22,25 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
-
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
@@ -48,17 +60,15 @@ public class LightGeometryNode implements Node {
 
     private Material lightGeometryShader;
     private FBO sceneOpaque;
-    private Camera playerCamera;
 
     @Override
     public void initialise() {
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
-        playerCamera = worldRenderer.getActiveCamera();
     }
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Light Geometry");
+        PerformanceMonitor.startActivity("rendering/lightgeometry");
         // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
         /*
         graphicState.preRenderSetupLightGeometryStencil();
@@ -91,7 +101,7 @@ public class LightGeometryNode implements Node {
             worldRenderer.renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
         postRenderCleanupLightGeometry();
-
+        PerformanceMonitor.endActivity();
 
     }
 
