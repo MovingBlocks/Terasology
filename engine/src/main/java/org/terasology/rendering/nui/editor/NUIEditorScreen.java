@@ -29,7 +29,10 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.input.Keyboard;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -56,10 +59,7 @@ import java.util.stream.Collectors;
 public class NUIEditorScreen extends CoreScreenLayer {
     private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
-    private static final ResourceUrn NUI_EDITOR_URN = new ResourceUrn("engine:nuiEditorScreen");
-
-    @In
-    private NUIManager nuiManager;
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
 
     @In
     private NUIEditorSystem nuiEditorSystem;
@@ -101,7 +101,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 .collect(Collectors.toList()));
 
         // Exclude the NUI editor itself, then sort the list..
-        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(NUI_EDITOR_URN));
+        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ASSET_URI));
         availableAssetList.sort(Comparator.comparing(ResourceUrn::toString));
 
         availableAssetDropdown.setOptions(availableAssetList);
@@ -170,6 +170,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     logger.warn("Could not construct a valid tree from clipboard contents.", e);
                 }
             }
+        });
+
+        // Set the handler for the Settings button.
+        WidgetUtil.trySubscribe(this, "settings", button -> {
+            getManager().pushScreen(NUIEditorSettingsPopup.ASSET_URI, NUIEditorSettingsPopup.class);
         });
     }
 
