@@ -33,7 +33,7 @@ import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
+import org.terasology.rendering.nui.layouts.SingleElementLayout;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
@@ -92,7 +92,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     public void initialise() {
         availableAssetDropdown = find("availableAssets", UIDropdownScrollable.class);
         editorTreeView = find("editor", UITreeView.class);
-        selectedScreenLayout = find("selectedScreen", ColumnLayout.class);
+        selectedScreenLayout = find("selectedScreen", SingleElementLayout.class);
 
         // Populate the asset dropdown with the asset list.
         availableAssetList.addAll(assetManager

@@ -5,15 +5,34 @@
         "type": "migLayout",
         "layoutConstraints": "",
         "colConstraints": "[min][grow, fill]",
-        "rowConstraints": "[min][grow, fill]",
+        "rowConstraints": "[min][grow, fill][min]",
         "debug": true,
         "contents": [
             {
-                "type": "ColumnLayout",
+                "type": "SingleElementLayout",
                 "id": "selectedScreen",
+                "updateContent": false,
                 "layoutInfo": {
-                    "cc": "cell 1 0, spany 2"
+                    "cc": "cell 1 0, spany 3"
                 }
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 2"
+                },
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "id": "copy",
+                        "text": "Copy"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "paste",
+                        "text": "Paste"
+                    }
+                ]
             },
             {
                 "type": "UITreeView",
@@ -24,7 +43,6 @@
             },
             {
                 "type": "migLayout",
-                "debug": true,
                 "layoutInfo": {
                     "cc": "cell 0 0"
                 },
@@ -35,16 +53,6 @@
                         "layoutInfo": {
                             "cc": "w 300!"
                         }
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "copy",
-                        "text": "Copy"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "paste",
-                        "text": "Paste"
                     }
                 ]
             }
