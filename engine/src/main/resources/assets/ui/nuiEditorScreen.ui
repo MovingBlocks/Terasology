@@ -13,24 +13,34 @@
                 "id": "selectedScreen",
                 "updateContent": false,
                 "layoutInfo": {
-                    "cc": "cell 1 0, spany 3"
+                    "cc": "cell 1 0, spany 2"
                 }
             },
             {
                 "type": "migLayout",
                 "layoutInfo": {
-                    "cc": "cell 0 2"
+                    "cc": "cell 0 2, spanx 3"
                 },
                 "contents": [
                     {
                         "type": "UIButton",
                         "id": "copy",
-                        "text": "Copy"
+                        "text": "Copy Tree"
                     },
                     {
                         "type": "UIButton",
                         "id": "paste",
-                        "text": "Paste"
+                        "text": "Paste Tree"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "undo",
+                        "text": "Undo"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "redo",
+                        "text": "Redo"
                     },
                     {
                         "type": "UIButton",
