@@ -301,10 +301,9 @@ public class CreateGameScreen extends CoreScreenLayer {
 
         // Get the default gameplay module from the config if it exists. This is likely to have a user triggered selection.
         // Otherwise, default to DEFAULT_GAME_TEMPLATE_NAME.
-        if (DEFAULT_GAME_TEMPLATE_NAME.equalsIgnoreCase(configDefaultModuleName)) {
+        if ("".equalsIgnoreCase(configDefaultModuleName) || DEFAULT_GAME_TEMPLATE_NAME.equalsIgnoreCase(configDefaultModuleName)) {
             useThisModuleName = DEFAULT_GAME_TEMPLATE_NAME;
-        }
-        else {
+        } else {
             useThisModuleName = configDefaultModuleName;
         }
 
