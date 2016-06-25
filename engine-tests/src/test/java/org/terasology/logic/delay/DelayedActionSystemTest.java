@@ -40,7 +40,6 @@ public class DelayedActionSystemTest extends TerasologyTestingEnvironment {
     private DelayedActionSystem delayedActionSystem;
     private List<Integer> vals; // Use this for ordering the expected values.
 
-    @In
     private Time time;
 
     long nextFakeEntityId = 1;
@@ -74,11 +73,8 @@ public class DelayedActionSystemTest extends TerasologyTestingEnvironment {
 
         vals = new ArrayList<Integer>(Arrays.asList(3));
 
-        long currentTime = time.getGameTimeInMs();
-
-
         delayedActionSystem.addDelayedAction(createFakeEntityWith(a1),
-                "Blah Blah", ((currentTime + 1000) - currentTime));
+                "Blah Blah", ((time.getGameTimeInMs() + 1000) - time.getGameTimeInMs()));
         nextFakeEntityId++;
     }
 

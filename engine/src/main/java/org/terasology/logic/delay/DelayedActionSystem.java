@@ -47,7 +47,7 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
     private SortedSetMultimap<Long, EntityRef> periodicOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
     // ONLY use this for testing. DO NOT use this during regular usage.
-    public void setTime(Time t)
+    void setTime(Time t)
     {
         time = t;
     }
@@ -83,7 +83,7 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             }
 
             for (String actionId : actionIds) {
-                 delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
+                delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
             }
         });
     }
