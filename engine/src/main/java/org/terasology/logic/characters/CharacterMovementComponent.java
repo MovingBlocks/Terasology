@@ -60,6 +60,9 @@ public final class CharacterMovementComponent implements Component {
 
     // Acrobatics settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public int baseNumberOfJumpsMax = 1; // Base maximum number of jumps allowed starting from solid ground.
+
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public int numberOfJumpsMax = 1; // Maximum number of jumps allowed starting from solid ground.
 
     public float distanceBetweenFootsteps = 1f;

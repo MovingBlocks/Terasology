@@ -668,7 +668,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 }
 
                 // Send event to allow for other systems to modify the max number of jumps.
-                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.numberOfJumpsMax);
+                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.baseNumberOfJumpsMax);
                 entity.send(affectMultiJumpEvent);
                 movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
 
@@ -693,7 +693,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 }
 
                 // Send event to allow for other systems to modify the max number of jumps.
-                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.numberOfJumpsMax);
+                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.baseNumberOfJumpsMax);
                 entity.send(affectMultiJumpEvent);
                 movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
 
