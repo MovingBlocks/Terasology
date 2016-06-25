@@ -46,6 +46,12 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
     private SortedSetMultimap<Long, EntityRef> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
     private SortedSetMultimap<Long, EntityRef> periodicOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
+    // ONLY use this for testing. DO NOT use this during regular usage.
+    public void setTime(Time t)
+    {
+        time = t;
+    }
+
     @Override
     public void update(float delta) {
         final long currentWorldTime = time.getGameTimeInMs();
