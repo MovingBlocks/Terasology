@@ -307,7 +307,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             useThisModuleName = configDefaultModuleName;
         }
 
-        Name defaultGameplayModuleName = new Name(configDefaultModuleName);
+        Name defaultGameplayModuleName = new Name(useThisModuleName);
         Module defaultGameplayModule = moduleManager.getRegistry().getLatestModuleVersion(defaultGameplayModuleName);
 
         if (defaultGameplayModule != null) {
@@ -322,6 +322,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                 // Module is null if it is no longer present.
                 if (module != null && StandardModuleExtension.isGameplayModule(module)) {
                     gameplay.setSelection(module);
+                    break;
                 }
             }
         }
