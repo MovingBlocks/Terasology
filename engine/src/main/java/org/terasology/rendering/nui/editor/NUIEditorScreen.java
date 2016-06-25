@@ -15,28 +15,32 @@
  */
 package org.terasology.rendering.nui.editor;
 
-import com.google.api.client.util.Lists;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.input.Keyboard;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
 import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
@@ -86,9 +90,18 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * The {@link UIBox} containing the screen being edited.
      */
     private UIBox selectedScreenContainer;
+    /**
+     *
+     */
+    private List<JsonTree> editorHistory = Lists.newArrayList();
+    /**
+     *
+     */
+    private int editorHistoryPosition;
 
     @Override
     public void initialise() {
+        // Fetch the interface widgets.
         availableAssetDropdown = find("availableAssets", UIDropdownScrollable.class);
         editorTreeView = find("editor", UITreeView.class);
         selectedScreenContainer = find("selectedScreen", UIBox.class);
@@ -99,7 +112,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 .stream()
                 .collect(Collectors.toList()));
 
-        // Exclude the NUI editor itself, then sort the list..
+        // Exclude the NUI editor itself, then sort the list.
         availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ASSET_URI));
         availableAssetList.sort(Comparator.comparing(ResourceUrn::toString));
 
@@ -116,6 +129,18 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     selectFile(value);
                 }
             }
+        });
+
+        // When the tree view is updated, update the widget accordingly.
+        editorTreeView.subscribe(() -> {
+            JsonTree tree = (JsonTree) (editorTreeView.getModel().getItem(0).getRoot());
+            if (editorHistoryPosition < editorHistory.size() - 1) {
+                editorHistory = editorHistory.subList(0, editorHistoryPosition + 1);
+            }
+            editorHistory.add(tree);
+            editorHistoryPosition++;
+
+            updateWidget(tree);
         });
 
         // Set the handler for the Copy button.
@@ -177,6 +202,28 @@ public class NUIEditorScreen extends CoreScreenLayer {
         });
     }
 
+    private void updateTree(JsonTree tree) {
+        Iterator it = tree.getDepthFirstIterator(false);
+        while (it.hasNext()) {
+            ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
+        }
+
+        // Set the tree view's internal model to the resulting tree.
+        editorTreeView.setModel(tree.copy());
+    }
+
+    private void updateWidget(JsonTree tree) {
+        // Update the widget.
+        UIWidget widget;
+        try {
+            JsonElement element = JsonTreeConverter.deserialize(tree);
+            widget = new UIFormat().load(element).getRootWidget();
+        } catch (Exception e) {
+            widget = new UILabel(ExceptionUtils.getStackTrace(e));
+        }
+        selectedScreenContainer.setContent(widget);
+    }
+
     @Override
     public boolean isEscapeToCloseAllowed() {
         return false;
@@ -184,11 +231,36 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
-            getAnimationSystem().stop();
-            nuiEditorSystem.toggleEditor();
-            return true;
+        if (event.isDown()) {
+            int id = event.getKey().getId();
+            KeyboardDevice keyboard = event.getKeyboard();
+            boolean ctrlDown = keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL);
+
+            if (id == Keyboard.KeyId.ESCAPE) {
+                getAnimationSystem().stop();
+                nuiEditorSystem.toggleEditor();
+                return true;
+            } else if (ctrlDown && id == Keyboard.KeyId.Z) {
+                if (editorHistoryPosition > 0) {
+                    editorHistoryPosition--;
+                    JsonTree tree = editorHistory.get(editorHistoryPosition);
+                    updateTree(tree);
+                    updateWidget(tree);
+                }
+                return true;
+            } else if (ctrlDown && id == Keyboard.KeyId.Y) {
+                if (editorHistoryPosition < editorHistory.size() - 1) {
+                    editorHistoryPosition++;
+                    JsonTree tree = editorHistory.get(editorHistoryPosition);
+                    updateTree(tree);
+                    updateWidget(tree);
+                }
+                return true;
+            } else {
+                return false;
+            }
         }
+
         return false;
     }
 
@@ -213,20 +285,16 @@ public class NUIEditorScreen extends CoreScreenLayer {
             if (content != null) {
                 // Serialize the JSON string into a JsonTree and expand its' nodes.
                 JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
-                Iterator it = tree.getDepthFirstIterator(false);
-                while (it.hasNext()) {
-                    ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
-                }
-
-                // Set the tree view's internal model to the resulting tree.
-                editorTreeView.setModel(tree.copy());
+                updateTree(tree);
+                editorHistory.clear();
+                editorHistory.add(tree);
+                editorHistoryPosition = 0;
             }
 
-            // Set the selected screen as the content of the container.
-            UIWidget rootWidget = element.getRootWidget();
-            selectedScreenContainer.setContent(rootWidget);
-
             selectedUrn = urn;
+
+            // Set the selected screen as the content of the container.
+            selectedScreenContainer.setContent(element.getRootWidget());
         }
     }
 }
