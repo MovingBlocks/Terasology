@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.editor;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -26,7 +25,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.asset.UIElement;
 
 @RegisterSystem
 @Share(NUIEditorSystem.class)
@@ -40,12 +38,6 @@ public class NUIEditorSystem extends BaseComponentSystem {
      * Whether the editor is currently active.
      */
     private boolean editorActive;
-    /**
-     * The Urn of the currently selected {@link UIElement}.
-     * <p>
-     * Used when selecting a UIElement by means other than the editor dropdown, e.g. console command.
-     */
-    private ResourceUrn selectedUrn;
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void showEditor(NUIEditorButton event, EntityRef entity) {
@@ -62,13 +54,5 @@ public class NUIEditorSystem extends BaseComponentSystem {
 
     public boolean isEditorActive() {
         return editorActive;
-    }
-
-    public ResourceUrn getSelectedUrn() {
-        return selectedUrn;
-    }
-
-    public void setSelectedUrn(ResourceUrn urn) {
-        selectedUrn = urn;
     }
 }

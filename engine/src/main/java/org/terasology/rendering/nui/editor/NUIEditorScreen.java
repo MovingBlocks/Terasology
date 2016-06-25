@@ -29,14 +29,13 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.input.Keyboard;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.layouts.SingleElementLayout;
+import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
@@ -84,15 +83,15 @@ public class NUIEditorScreen extends CoreScreenLayer {
      */
     private UITreeView editorTreeView;
     /**
-     * The layout containing the screen being edited.
+     * The {@link UIBox} containing the screen being edited.
      */
-    private CoreLayout selectedScreenLayout;
+    private UIBox selectedScreenContainer;
 
     @Override
     public void initialise() {
         availableAssetDropdown = find("availableAssets", UIDropdownScrollable.class);
         editorTreeView = find("editor", UITreeView.class);
-        selectedScreenLayout = find("selectedScreen", SingleElementLayout.class);
+        selectedScreenContainer = find("selectedScreen", UIBox.class);
 
         // Populate the asset dropdown with the asset list.
         availableAssetList.addAll(assetManager
@@ -193,21 +192,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
         return false;
     }
 
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-
-        ResourceUrn systemUrn = nuiEditorSystem.getSelectedUrn();
-        if (systemUrn != null && systemUrn != selectedUrn) {
-            selectFile(systemUrn);
-            nuiEditorSystem.setSelectedUrn(null);
-        }
-    }
-
     /**
      * @param urn The Urn of the file to be edited.
      */
-    private void selectFile(ResourceUrn urn) {
+    public void selectFile(ResourceUrn urn) {
         if (assetManager.getAsset(urn, UIElement.class).isPresent()) {
             UIElement element = assetManager.getAsset(urn, UIElement.class).get();
 
@@ -234,12 +222,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 editorTreeView.setModel(tree.copy());
             }
 
-            // Add the selected screen as a child of the layout.
-            while (selectedScreenLayout.iterator().hasNext()) {
-                selectedScreenLayout.removeWidget((UIWidget) selectedScreenLayout.iterator().next());
-            }
+            // Set the selected screen as the content of the container.
             UIWidget rootWidget = element.getRootWidget();
-            selectedScreenLayout.addWidget(rootWidget, null);
+            selectedScreenContainer.setContent(rootWidget);
 
             selectedUrn = urn;
         }

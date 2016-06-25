@@ -9,7 +9,7 @@
         "debug": true,
         "contents": [
             {
-                "type": "SingleElementLayout",
+                "type": "UIBox",
                 "id": "selectedScreen",
                 "updateContent": false,
                 "layoutInfo": {

@@ -60,6 +60,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.editor.NUIEditorScreen;
 import org.terasology.rendering.nui.editor.NUIEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
@@ -243,7 +244,7 @@ public class CoreCommands extends BaseComponentSystem {
                 return String.format("No asset found for screen '%s'", uri);
             case 1:
                 ResourceUrn urn = urns.iterator().next();
-                nuiEditorSystem.setSelectedUrn(urn);
+                ((NUIEditorScreen) nuiManager.getScreen(NUIEditorScreen.ASSET_URI)).selectFile(urn);
                 return "Success";
             default:
                 return String.format("Multiple matches for screen '%s': {%s}", uri, Arrays.toString(urns.toArray()));
