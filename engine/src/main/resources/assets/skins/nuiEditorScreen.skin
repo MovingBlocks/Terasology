@@ -1,0 +1,10 @@
+{
+    "inherit": "engine:mainMenu",
+    "elements": {
+        "UIBox": {
+            "background": "",
+            "background-border": {},
+            "margin": {}
+        }
+    }
+}

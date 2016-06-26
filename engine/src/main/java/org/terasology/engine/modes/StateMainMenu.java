@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.modes;
 
-import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -36,9 +35,11 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.editor.NUIEditorSystem;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.utilities.Assets;
 
 /**
  * The class implements the main game menu.
@@ -92,6 +93,10 @@ public class StateMainMenu implements GameState {
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
+
+        NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
+        context.put(NUIEditorSystem.class, nuiEditorSystem);
+        componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
 
         inputSystem = context.get(InputSystem.class);
 

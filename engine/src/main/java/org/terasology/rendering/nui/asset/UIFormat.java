@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,7 @@ package org.terasology.rendering.nui.asset;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 
 import org.slf4j.Logger;
@@ -63,7 +56,6 @@ import java.util.Set;
 
 /**
  * The UILoader handles loading UI widgets from json format files.
- *
  */
 @RegisterAssetFileFormat
 public class UIFormat extends AbstractAssetFileFormat<UIData> {
@@ -81,6 +73,15 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
     @Override
     public UIData load(ResourceUrn resourceUrn, List<AssetDataFile> inputs) throws IOException {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
+            reader.setLenient(true);
+            UIData data = load(new JsonParser().parse(reader));
+            data.setSource(inputs.get(0));
+            return data;
+        }
+    }
+
+    public UIData load(JsonElement element) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
@@ -94,14 +95,11 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         for (Class<?> handledType : library.getCoreTypes()) {
             gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
         }
+
         // override the String TypeAdapter from the serialization library
         gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem));
         Gson gson = gsonBuilder.create();
-
-        try (JsonReader reader = new JsonReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
-            reader.setLenient(true);
-            return gson.fromJson(reader, UIData.class);
-        }
+        return gson.fromJson(element, UIData.class);
     }
 
     private static final class I18nStringTypeAdapter implements JsonDeserializer<String> {
@@ -182,9 +180,9 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 String name = entry.getKey();
                 if (!ID_FIELD.equals(name)
-                    && !CONTENTS_FIELD.equals(name)
-                    && !TYPE_FIELD.equals(name)
-                    && !LAYOUT_INFO_FIELD.equals(name)) {
+                        && !CONTENTS_FIELD.equals(name)
+                        && !TYPE_FIELD.equals(name)
+                        && !LAYOUT_INFO_FIELD.equals(name)) {
                     unknownFields.add(name);
                 }
             }

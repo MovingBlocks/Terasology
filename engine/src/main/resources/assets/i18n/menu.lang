@@ -17,6 +17,7 @@
     "binding-increase-view-distance": "binding-increase-view-distance",
     "binding-jump": "binding-jump",
     "binding-left": "binding-left",
+    "binding-nui-editor": "binding-nui-editor",
     "binding-pause": "binding-pause",
     "binding-right": "binding-right",
     "binding-show-online-players": "binding-show-online-players",
@@ -42,6 +43,7 @@
     "category-inventory": "category-inventory",
     "category-mouse": "category-mouse",
     "category-movement": "category-movement",
+    "category-nui": "category-nui",
     "clamp-lighting": "clamp-lighting",
     "cloud-shadows": "cloud-shadows",
     "create-game": "create-game",
@@ -50,7 +52,6 @@
     "custom-servers": "custom-servers",
     "death-screen-title": "death-screen-title",
     "default-binding": "default-binding",
-
     "delete-game": "delete-game",
     "dialog-cancel": "dialog-cancel",
     "dialog-ok": "dialog-ok",

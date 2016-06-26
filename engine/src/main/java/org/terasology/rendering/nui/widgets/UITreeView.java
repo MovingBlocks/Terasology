@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
@@ -115,6 +116,10 @@ public class UITreeView<T> extends CoreWidget {
      * The individual expand/contract button listeners.
      */
     private final List<ExpandButtonInteractionListener> expandListeners = Lists.newArrayList();
+    /**
+     * Tree item update listeners.
+     */
+    private List<TreeViewUpdateListener> updateListeners = Lists.newArrayList();
 
     public UITreeView() {
     }
@@ -133,22 +138,27 @@ public class UITreeView<T> extends CoreWidget {
             if (id == Keyboard.KeyId.UP || id == Keyboard.KeyId.DOWN) {
                 // Up/Down: change a node's position within the parent node.
                 moveSelected(id);
+                fireUpdateListeners();
                 return true;
             } else if (id == Keyboard.KeyId.DELETE) {
                 // Delete: remove a node (and all its' children).
                 removeSelected();
+                fireUpdateListeners();
                 return true;
             } else if ((ctrlDown && id == Keyboard.KeyId.A) || id == Keyboard.KeyId.INSERT) {
                 // Ctrl+A / Insert: add a new child with a placeholder value to the currently selected node.
                 addToSelected();
+                fireUpdateListeners();
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.C) {
                 // Ctrl+C: copy a selected node.
                 copySelected();
+                fireUpdateListeners();
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.V) {
                 // Ctrl+V: paste the copied node as a child of the currently selected node.
                 pasteSelected();
+                fireUpdateListeners();
                 return true;
             } else {
                 return false;
@@ -156,6 +166,10 @@ public class UITreeView<T> extends CoreWidget {
         }
 
         return false;
+    }
+
+    private void fireUpdateListeners() {
+        updateListeners.forEach(TreeViewUpdateListener::onChange);
     }
 
     private void moveSelected(int keyId) {
@@ -343,6 +357,10 @@ public class UITreeView<T> extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         canvas.setPart(TREE_ITEM);
 
+        if (model.get().getItemCount() == 0) {
+            return new Vector2i();
+        }
+
         model.get().setEnumerateExpandedOnly(false);
         Vector2i result = new Vector2i();
         for (int i = 0; i < model.get().getItemCount(); i++) {
@@ -366,16 +384,31 @@ public class UITreeView<T> extends CoreWidget {
         return result;
     }
 
+    public TreeModel<T> getModel() {
+        return model.get();
+    }
+
     public void setModel(Tree<T> root) {
         setModel(new TreeModel<>(root));
     }
 
     public void setModel(TreeModel<T> newModel) {
         model.set(newModel);
+        selectedIndex.set(null);
     }
 
     public void setDefaultValue(T value) {
         defaultValue.set(value);
+    }
+
+    public void subscribe(TreeViewUpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        updateListeners.add(listener);
+    }
+
+    public void unsubscribe(TreeViewUpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        updateListeners.remove(listener);
     }
 
     private class ExpandButtonInteractionListener extends BaseInteractionListener {

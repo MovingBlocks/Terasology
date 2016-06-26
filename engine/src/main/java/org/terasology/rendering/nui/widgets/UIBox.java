@@ -21,7 +21,6 @@ import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -32,6 +31,9 @@ public class UIBox extends CoreWidget {
 
     @LayoutConfig
     private UIWidget content;
+
+    @LayoutConfig
+    private boolean updateContent = true;
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -48,6 +50,13 @@ public class UIBox extends CoreWidget {
         return Vector2i.zero();
     }
 
+    @Override
+    public void update(float delta) {
+        if (updateContent) {
+            super.update(delta);
+        }
+    }
+
     public UIWidget getContent() {
         return content;
     }
@@ -55,13 +64,20 @@ public class UIBox extends CoreWidget {
     public void setContent(UIWidget content) {
         this.content = content;
         content.setEnabled(isEnabled());
+    }
 
+    public boolean getUpdateContent() {
+        return updateContent;
+    }
+
+    public void setUpdateContent(Boolean value) {
+        updateContent = value;
     }
 
     @Override
     public Iterator<UIWidget> iterator() {
         if (content != null) {
-            return Arrays.asList(content).iterator();
+            return Collections.singletonList(content).iterator();
         }
         return Collections.emptyIterator();
     }

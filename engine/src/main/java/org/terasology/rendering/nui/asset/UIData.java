@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 package org.terasology.rendering.nui.asset;
 
 import org.terasology.assets.AssetData;
+import org.terasology.assets.format.AssetDataFile;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
  * UIData contains a UI widget that has been loaded from a UI asset, ready to be added to the
- *
  */
 @API
 public class UIData implements AssetData {
     private UIWidget rootWidget;
+
+    private transient AssetDataFile source;
 
     public UIData(UIWidget rootWidget) {
         this.rootWidget = rootWidget;
@@ -36,5 +38,19 @@ public class UIData implements AssetData {
      */
     public UIWidget getRootWidget() {
         return rootWidget;
+    }
+
+    /**
+     * @param source The {@AssetDataFile} this asset has been loaded from.
+     */
+    public void setSource(AssetDataFile source) {
+        this.source = source;
+    }
+
+    /**
+     * @return The {@link AssetDataFile} this asset has been loaded from.
+     */
+    public AssetDataFile getSource() {
+        return source;
     }
 }

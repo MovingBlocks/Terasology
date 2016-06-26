@@ -1,0 +1,76 @@
+{
+    "type": "engine:nuiEditorScreen",
+    "skin": "engine:nuiEditorScreen",
+    "contents": {
+        "type": "migLayout",
+        "layoutConstraints": "",
+        "colConstraints": "[min][grow, fill]",
+        "rowConstraints": "[min][grow, fill][min]",
+        "debug": true,
+        "contents": [
+            {
+                "type": "UIBox",
+                "id": "selectedScreen",
+                "updateContent": false,
+                "layoutInfo": {
+                    "cc": "cell 1 0, spany 2"
+                }
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 2, spanx 3"
+                },
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "id": "copy",
+                        "text": "Copy Tree"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "paste",
+                        "text": "Paste Tree"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "undo",
+                        "text": "Undo"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "redo",
+                        "text": "Redo"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "settings",
+                        "text": "Settings"
+                    }
+                ]
+            },
+            {
+                "type": "UITreeView",
+                "id": "editor",
+                "layoutInfo": {
+                    "cc": "cell 0 1"
+                }
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 0"
+                },
+                "contents": [
+                    {
+                        "type": "UIDropdownScrollable",
+                        "id": "availableAssets",
+                        "layoutInfo": {
+                            "cc": "w 300!"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

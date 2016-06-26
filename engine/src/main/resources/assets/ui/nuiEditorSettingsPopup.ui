@@ -1,6 +1,6 @@
 {
-    "type": "confirmPopup",
-    "skin": "messageBox",
+    "type": "engine:NUIEditorSettingsPopup",
+    "skin": "popup",
     "contents": {
         "type": "relativeLayout",
         "contents": [
@@ -19,8 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Title",
-                            "id": "title",
+                            "text": "NUI Editor Settings",
                             "family": "title"
                         },
                         {
@@ -32,8 +31,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Message",
-                            "id": "message"
+                            "text": "Et harum quidem rerum facilis est et expedita distinctio."
                         },
                         {
                             "type": "UISpace",
@@ -44,7 +42,7 @@
                         },
                         {
                             "type": "RowLayout",
-                            "horizontalSpacing": 4,
+                            "horizontalSpacing": 16,
                             "contents": [
                                 {
                                     "type": "UIButton",
@@ -56,11 +54,7 @@
                                     "text": "${engine:menu#dialog-cancel}",
                                     "id": "cancel"
                                 }
-                            ],
-                            "layoutInfo": {
-                                "width": 200,
-                                "position-right": {}
-                            }
+                            ]
                         }
                     ]
                 }
