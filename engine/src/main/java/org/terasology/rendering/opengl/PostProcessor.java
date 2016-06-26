@@ -49,15 +49,12 @@ import java.util.Date;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.terasology.rendering.opengl.OpenGLUtils.*;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -274,47 +271,6 @@ public class PostProcessor {
     public void dispose() {
         buffersManager = null;
         fullScale = null;
-    }
-
-    /**
-     * Part of the deferred lighting technique, this method applies lighting through screen-space
-     * calculations to the previously flat-lit world rendering stored in the primary FBO.   // TODO: rename sceneOpaque* FBOs to primaryA/B
-     *
-     * See http://en.wikipedia.org/wiki/Deferred_shading as a starting point.
-     */
-    public void applyLightBufferPass() {
-
-        int texId = 0;
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffers.sceneOpaque.bindTexture();
-        materials.lightBufferPass.setInt("texSceneOpaque", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffers.sceneOpaque.bindDepthTexture();
-        materials.lightBufferPass.setInt("texSceneOpaqueDepth", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffers.sceneOpaque.bindNormalsTexture();
-        materials.lightBufferPass.setInt("texSceneOpaqueNormals", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffers.sceneOpaque.bindLightBufferTexture();
-        materials.lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
-
-        buffers.sceneOpaquePingPong.bind();
-        setRenderBufferMask(buffers.sceneOpaquePingPong, true, true, true);
-
-        setViewportToSizeOf(buffers.sceneOpaquePingPong);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-        renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToWholeDisplay();    // TODO: verify this is necessary
-
-        buffersManager.swapSceneOpaqueFBOs();
-        buffers.sceneOpaque.attachDepthBufferTo(buffers.sceneReflectiveRefractive);
     }
 
     /**
@@ -821,41 +777,6 @@ public class PostProcessor {
         materials.ocDistortion.setFloat2("ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
         materials.ocDistortion.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
     }
-
-    /**
-     * Renders a quad filling the whole currently set viewport.
-     */
-    public void renderFullscreenQuad() {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-
-        renderQuad();
-
-        glPopMatrix();
-
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-    }
-
-    /**
-     * First sets a viewport and then renders a quad filling it.
-     *
-     * @param x an integer representing the x coordinate (in pixels) of the origin of the viewport.
-     * @param y an integer representing the y coordinate (in pixels) of the origin of the viewport.
-     * @param viewportWidth an integer representing the width (in pixels) the viewport.
-     * @param viewportHeight an integer representing the height (in pixels) the viewport.
-     */
-    // TODO: perhaps remove this method and make sure the viewport is set explicitely.
-    public void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
-        glViewport(x, y, viewportWidth, viewportHeight);
-        renderFullscreenQuad();
-    }
-
 
     private void setViewportToWholeDisplay() {
         glViewport(0, 0, fullScale.width(), fullScale.height());
