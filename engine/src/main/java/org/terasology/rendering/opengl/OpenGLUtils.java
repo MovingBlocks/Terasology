@@ -175,7 +175,8 @@ public final class OpenGLUtils {
      * @param viewportWidth  an integer representing the width (in pixels) the viewport.
      * @param viewportHeight an integer representing the height (in pixels) the viewport.
      */
-    // TODO: perhaps remove this method and make sure the viewport is set explicitely.
+    // TODO: perhaps remove this method and make sure the viewport is set explicitly.
+    // TODO: find a much more suitable name for this method
     public static void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
         glViewport(x, y, viewportWidth, viewportHeight);
         renderFullscreenQuad();

@@ -92,6 +92,7 @@ public class DirectionalLightsNode implements Node {
         // TODO: iterating over RenderSystems for rendering multiple lights
         worldRenderer.renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
 
+        // TODO: Investigate these might be redundant
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
