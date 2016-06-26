@@ -1,11 +1,11 @@
 {
     "type": "engine:treeViewTestScreen",
-    "skin": "engine:mainMenu",
+    "skin": "engine:treeViewTestScreen",
     "contents": {
         "type": "migLayout",
         "layoutConstraints": "",
         "colConstraints": "[min][pref][pref]",
-        "rowConstraints": "[min]",
+        "rowConstraints": "[min][min]",
         "debug": true,
         "contents": [
             {
@@ -41,18 +41,24 @@
                 }
             },
             {
-                "type": "UITreeView",
-                "id": "treeViewDisabled",
-                "layoutInfo": {
-                    "cc": ""
-                },
-                "enabled": false
+                "type": "ScrollableArea",
+                "content": {
+                    "type": "UITreeView",
+                    "id": "treeViewDisabled",
+                    "layoutInfo": {
+                        "cc": ""
+                    },
+                    "enabled": false
+                }
             },
             {
-                "type": "UITreeView",
-                "id": "treeViewEnabled",
-                "layoutInfo": {
-                    "cc": ""
+                "type": "ScrollableArea",
+                "content": {
+                    "type": "UITreeView",
+                    "id": "treeViewEnabled",
+                    "layoutInfo": {
+                        "cc": ""
+                    }
                 }
             }
         ]

@@ -20,20 +20,15 @@ import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.models.Tree;
@@ -56,24 +51,10 @@ public class UITreeView<T> extends CoreWidget {
     private static final String EXPAND_MODE = "expand";
     private static final String EXPAND_HOVER_MODE = "expand-hover";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
-
-    /**
-     * Whether the widget is enabled and accepts user changes to its' structure.
-     */
-    @LayoutConfig
-    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
-    /**
-     * The maximum amount of items displayed before a scrollbar is created.
-     */
-    private Binding<Integer> maxItems = new DefaultBinding<>(10);
     /**
      * The indentation of one level in the tree.
      */
     private Binding<Integer> itemIndent = new DefaultBinding<>(25);
-    /**
-     * A {@code UIScrollbar}; used when the amount of items exceeds {@code maxItems}.
-     */
-    private UIScrollbar verticalBar = new UIScrollbar(true);
     /**
      * The underlying tree model - a wrapper around a {@code Tree<T>}.
      */
@@ -94,19 +75,6 @@ public class UITreeView<T> extends CoreWidget {
      * The item renderer used for drawing the items in the tree.
      */
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
-
-    private InteractionListener mainListener = new BaseInteractionListener() {
-        @Override
-        public boolean onMouseWheel(NUIMouseWheelEvent event) {
-            // Mouse wheel: scroll up/down.
-            if (enabled.get()) {
-                int scrollMultiplier = 0 - verticalBar.getRange() / model.get().getItemCount();
-                verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * scrollMultiplier);
-                return true;
-            }
-            return false;
-        }
-    };
 
     /**
      * The individual item listeners.
@@ -226,76 +194,21 @@ public class UITreeView<T> extends CoreWidget {
 
         canvas.setPart(TREE_ITEM);
 
-        int itemHeight = canvas.getCurrentStyle().getMargin().getTotalHeight() + canvas.getCurrentStyle().getFont().getLineHeight();
-        canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y));
-
-        if (model.get().getItemCount() > maxItems.get()) {
-            drawScrollbarItems(canvas, itemHeight);
-        } else {
-            drawNonScrollItems(canvas, itemHeight);
-        }
-    }
-
-    private void drawScrollbarItems(Canvas canvas, int itemHeight) {
-        Border itemMargin = canvas.getCurrentStyle().getMargin();
-
-        // Calculate scrollbar dimensions.
-        int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x;
-        int scrollbarHeight = canvas.size().y - itemMargin.getTotalHeight();
-        int availableWidth = canvas.size().x - scrollbarWidth;
-        int scrollbarXPosition = canvas.size().x - scrollbarWidth - itemMargin.getRight();
-        int scrollbarYPosition = itemMargin.getTop();
-
-        Rect2i scrollableArea = Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y);
-
-        // Draw the scrollbar.
-        Rect2i scrollbarRegion = Rect2i.createFromMinAndSize(scrollbarXPosition, scrollbarYPosition, scrollbarWidth, scrollbarHeight);
-        canvas.drawWidget(verticalBar, scrollbarRegion);
-
-        // Set the scrollbar range.
-        int maxScrollbarRange = itemHeight * (model.get().getItemCount() - maxItems.get()) + itemMargin.getBottom();
-        verticalBar.setRange(maxScrollbarRange);
-
+        int currentHeight = 0;
         for (int i = 0; i < model.get().getItemCount(); i++) {
             Tree<T> item = model.get().getItem(i);
             ItemInteractionListener itemListener = itemListeners.get(i);
             ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
-            if (!item.isLeaf()) {
-                canvas.setPart(EXPAND_BUTTON);
-                setButtonMode(canvas, item, buttonListener);
-                Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
-                        i * itemHeight - verticalBar.getValue(),
-                        itemIndent.get(),
-                        itemHeight);
-                try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
-                    drawButton(canvas, buttonRegion, buttonListener);
-                }
-            }
-
-            canvas.setPart(TREE_ITEM);
-            setItemMode(canvas, item, itemListener);
-            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
-                    i * itemHeight - verticalBar.getValue(),
-                    availableWidth - (item.getDepth() + 1) * itemIndent.get(),
-                    itemHeight);
-            try (SubRegion ignored = canvas.subRegion(scrollableArea, true)) {
-                drawItem(canvas, itemRegion, item, itemListener);
-            }
-        }
-    }
-
-    private void drawNonScrollItems(Canvas canvas, int itemHeight) {
-        for (int i = 0; i < model.get().getItemCount(); i++) {
-            Tree<T> item = model.get().getItem(i);
-            ItemInteractionListener itemListener = itemListeners.get(i);
-            ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
+            int itemHeight = canvas.getCurrentStyle().getMargin()
+                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()))
+                    .getY();
 
             if (!item.isLeaf()) {
                 canvas.setPart(EXPAND_BUTTON);
                 setButtonMode(canvas, item, buttonListener);
                 Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
-                        i * itemHeight,
+                        currentHeight,
                         itemIndent.get(),
                         itemHeight);
                 drawButton(canvas, buttonRegion, buttonListener);
@@ -304,10 +217,11 @@ public class UITreeView<T> extends CoreWidget {
             canvas.setPart(TREE_ITEM);
             setItemMode(canvas, item, itemListener);
             Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
-                    i * itemHeight,
+                    currentHeight,
                     canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
                     itemHeight);
             drawItem(canvas, itemRegion, item, itemListener);
+            currentHeight += itemHeight;
         }
     }
 
@@ -368,15 +282,9 @@ public class UITreeView<T> extends CoreWidget {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
                     .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()));
             result.x = Math.max(result.x, preferredSize.x);
-
-            if (i < maxItems.get()) {
-                result.y += preferredSize.y;
-            }
+            result.y += preferredSize.y;
         }
         model.get().setEnumerateExpandedOnly(true);
-
-        // Account for the width of the vertical scrollbar.
-        result.addX(canvas.calculateRestrictedSize(verticalBar, new Vector2i(canvas.size().x, canvas.size().y)).x);
 
         // Account for the expand/contract button.
         result.addX(itemIndent.get());

@@ -50,8 +50,13 @@
                 ]
             },
             {
-                "type": "UITreeView",
-                "id": "editor",
+                "type": "ScrollableArea",
+                "content": {
+                    "type": "UITreeView",
+                    "id": "editor"
+                },
+                "verticalScrollbar": true,
+                "horizontalScrollbar": true,
                 "layoutInfo": {
                     "cc": "cell 0 1"
                 }
