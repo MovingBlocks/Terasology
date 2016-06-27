@@ -235,9 +235,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 return new JoinStatusImpl("Failed to connect to server - " + connectCheck.getCause().getMessage());
             } else {
                 allChannels.add(connectCheck.getChannel());
-                mode = NetworkMode.CLIENT;
-                nextNetworkTick = time.getRealTimeInMs();
-                logger.info("Connected to server");
                 ClientConnectionHandler connectionHandler = connectCheck.getChannel().getPipeline().get(ClientConnectionHandler.class);
                 if (connectionHandler == null) {
                     JoinStatusImpl status = new JoinStatusImpl();
@@ -892,6 +889,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     void setServer(ServerImpl server) {
+    	if (server != null) {
+    		mode = NetworkMode.CLIENT;
+			nextNetworkTick = time.getRealTimeInMs();
+			logger.info("Connected to server");
+    	}
         this.server = server;
 
     }
