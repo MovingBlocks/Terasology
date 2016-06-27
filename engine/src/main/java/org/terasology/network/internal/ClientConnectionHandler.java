@@ -117,6 +117,9 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 			} else if (message.hasModuleData()) {
 				receiveModule(ctx, message.getModuleData());
 			} else if (message.hasJoinComplete()) {
+				if (missingModules.size() > 0) {
+					logger.error("THe server did not send all of the modules that were needed before ending module transmission.");
+				}
 				completeJoin(ctx, message.getJoinComplete());
 			} else {
 				logger.error("Received unexpected message");
