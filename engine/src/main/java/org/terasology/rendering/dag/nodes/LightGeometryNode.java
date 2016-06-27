@@ -19,7 +19,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
@@ -60,7 +59,6 @@ public class LightGeometryNode extends Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Light Geometry");
         // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
         /*
         graphicState.preRenderSetupLightGeometryStencil();
@@ -93,8 +91,6 @@ public class LightGeometryNode extends Node {
             worldRenderer.renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
         postRenderCleanupLightGeometry();
-
-
     }
 
     // TODO: figure how lighting works and what this does

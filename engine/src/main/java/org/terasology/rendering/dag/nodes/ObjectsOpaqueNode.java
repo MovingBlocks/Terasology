@@ -19,7 +19,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.Node;
 
@@ -45,13 +44,9 @@ public class ObjectsOpaqueNode extends Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render World");
         enableWireframeIf(renderingDebugConfig.isWireframe());
-
-        PerformanceMonitor.startActivity("Render Objects (Opaque)");
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
-        PerformanceMonitor.endActivity();
     }
 }

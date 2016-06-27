@@ -17,6 +17,7 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Maps;
 import org.terasology.context.Context;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
@@ -42,6 +43,7 @@ import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappedSceneNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -103,10 +105,15 @@ public class RenderingPipeline {
     }
 
     public void process() {
-        for (Map.Entry<String, Node> nodeEntry : nodeMap.entrySet()) {
-            nodeEntry.getValue().process();
+        for (Node node : getTopologicalOrder()) {
+            PerformanceMonitor.startActivity("rendering/" + node.getIdentifier());
+            node.process();
+            PerformanceMonitor.endActivity();
         }
     }
 
+    public Collection<Node> getTopologicalOrder() {
+        return nodeMap.values();
+    }
 
 }

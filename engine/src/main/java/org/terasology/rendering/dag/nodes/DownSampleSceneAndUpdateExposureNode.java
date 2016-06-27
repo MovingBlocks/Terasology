@@ -23,7 +23,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.math.TeraMath;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -102,8 +101,6 @@ public class DownSampleSceneAndUpdateExposureNode extends Node {
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         if (renderingConfig.isEyeAdaptation()) {
-            PerformanceMonitor.startActivity("Updating exposure");
-
             downsampleSceneInto1x1pixelsBuffer();
 
             frameBuffersManager.getCurrentReadbackPBO().copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
@@ -147,12 +144,9 @@ public class DownSampleSceneAndUpdateExposureNode extends Node {
                 postProcessor.setExposure(hdrExposureDefault);
             }
         }
-        PerformanceMonitor.endActivity();
     }
 
     private void downsampleSceneInto1x1pixelsBuffer() {
-        PerformanceMonitor.startActivity("Rendering eye adaption");
-
         downSampler.enable();
         FBO downSampledFBO;
 
@@ -179,8 +173,6 @@ public class DownSampleSceneAndUpdateExposureNode extends Node {
         }
 
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
-
-        PerformanceMonitor.endActivity();
     }
 
     /**

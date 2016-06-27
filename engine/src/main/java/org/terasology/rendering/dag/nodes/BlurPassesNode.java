@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -74,8 +73,6 @@ public class BlurPassesNode extends Node {
     @Override
     public void process() {
         if (renderingConfig.getBlurIntensity() != 0) {
-            PerformanceMonitor.startActivity("rendering/blurpasses");
-
             sceneBlur0 = frameBuffersManager.getFBO("sceneBlur0");
             sceneBlur1 = frameBuffersManager.getFBO("sceneBlur1");
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
@@ -83,7 +80,6 @@ public class BlurPassesNode extends Node {
 
             generateBlur(sceneBlur0);
             generateBlur(sceneBlur1);
-            PerformanceMonitor.endActivity();
         }
     }
 

@@ -20,7 +20,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -93,7 +92,6 @@ public class ShadowMapNode extends Node {
             return;
         }
 
-        PerformanceMonitor.startActivity("Render World (Shadow Map)");
         // preRenderSetupSceneShadowMap
         shadowMap.bind();
         setViewportToSizeOf(shadowMap);
@@ -112,8 +110,6 @@ public class ShadowMapNode extends Node {
         // postRenderCleanupSceneShadowMap
         GL11.glEnable(GL_CULL_FACE);
         bindDisplay();
-
-        PerformanceMonitor.endActivity();
     }
 
     private void positionShadowMapCamera() {

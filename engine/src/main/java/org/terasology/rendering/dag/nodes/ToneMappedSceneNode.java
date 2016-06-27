@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -63,7 +62,6 @@ public class ToneMappedSceneNode extends Node {
     // TODO: see what it does.
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Tone mapping");
         disableWireframeIf(renderingDebugConfig.isWireframe());
         FBO sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
@@ -78,7 +76,5 @@ public class ToneMappedSceneNode extends Node {
 
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
-
-        PerformanceMonitor.endActivity();
     }
 }

@@ -20,7 +20,6 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -100,8 +99,6 @@ public class FinalPostProcessingNode extends Node {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/finalpostprocessing");
-
         ocUndistorted = frameBuffersManager.getFBO("ocUndistorted");
         sceneFinal = frameBuffersManager.getFBO("sceneFinal");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
@@ -119,8 +116,6 @@ public class FinalPostProcessingNode extends Node {
         } else {
             renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         }
-
-        PerformanceMonitor.endActivity();
     }
 
     private void renderFinalMonoImage() {

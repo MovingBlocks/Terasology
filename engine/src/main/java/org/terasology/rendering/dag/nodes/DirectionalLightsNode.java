@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -91,7 +90,6 @@ public class DirectionalLightsNode extends Node {
         bindDisplay();
 
         applyLightBufferPass();
-        PerformanceMonitor.endActivity(); // Render Light Geometry
     }
 
     /**

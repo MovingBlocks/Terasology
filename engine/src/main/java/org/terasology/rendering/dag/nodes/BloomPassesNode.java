@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -81,8 +80,6 @@ public class BloomPassesNode extends Node {
     @Override
     public void process() {
         if (renderingConfig.isBloom()) {
-            PerformanceMonitor.startActivity("rendering/bloompasses");
-
             sceneBloom0 = frameBuffersManager.getFBO("sceneBloom0");
             sceneBloom1 = frameBuffersManager.getFBO("sceneBloom1");
             sceneBloom2 = frameBuffersManager.getFBO("sceneBloom2");
@@ -93,8 +90,6 @@ public class BloomPassesNode extends Node {
             generateBloom(sceneBloom0);
             generateBloom(sceneBloom1);
             generateBloom(sceneBloom2);
-
-            PerformanceMonitor.endActivity();
         }
     }
 

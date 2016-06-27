@@ -20,7 +20,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.opengl.FBO;
@@ -59,7 +58,6 @@ public class SimpleBlendMaterialsNode extends Node {
     @Override
     public void process() {
         disableWireframeIf(renderingDebugConfig.isWireframe());
-        PerformanceMonitor.startActivity("Render Objects (Transparent)");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         preRenderSetupSimpleBlendMaterials();
 
@@ -68,7 +66,6 @@ public class SimpleBlendMaterialsNode extends Node {
         }
 
         postRenderCleanupSimpleBlendMaterials();
-        PerformanceMonitor.endActivity();
     }
 
     /**

@@ -15,22 +15,17 @@
  */
 package org.terasology.rendering.dag;
 
-
 /**
- * TODO: add javadocs
+ * TODO: add javadoc
  */
-class StateManager {
+public class States {
+    private boolean wireframe;
 
-
-    private States currentStates;
-
-    private RenderingPipeline renderingPipeline;
-
-    StateManager(RenderingPipeline renderingPipeline) {
-        this.renderingPipeline = renderingPipeline;
-
-
+    public boolean isWireframe() {
+        return wireframe;
     }
 
-
+    public void setWireframe(boolean wireframe) {
+        this.wireframe = wireframe;
+    }
 }

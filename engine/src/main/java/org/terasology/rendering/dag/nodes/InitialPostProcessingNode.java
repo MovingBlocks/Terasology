@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -59,7 +58,6 @@ public class InitialPostProcessingNode extends Node {
     @Override
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        PerformanceMonitor.startActivity("Initial Post-Processing");
         disableWireframeIf(renderingDebugConfig.isWireframe());
         FBO scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
@@ -75,7 +73,5 @@ public class InitialPostProcessingNode extends Node {
 
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
-
-        PerformanceMonitor.endActivity();
     }
 }

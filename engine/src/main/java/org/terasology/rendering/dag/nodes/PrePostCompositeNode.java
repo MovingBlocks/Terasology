@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -79,6 +78,5 @@ public class PrePostCompositeNode extends Node {
 
         frameBuffersManager.swapSceneOpaqueFBOs();
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
-        PerformanceMonitor.endActivity(); // End of activity "Pre-post composite"
     }
 }

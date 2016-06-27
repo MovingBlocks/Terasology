@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.Node;
@@ -60,12 +59,10 @@ public class ChunksAlphaRejectNode extends Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Chunks (Alpha Reject)");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         worldRenderer.renderChunks(renderQueues.chunksAlphaReject,
                 ChunkMesh.RenderPhase.ALPHA_REJECT, playerCamera,
                 WorldRendererImpl.ChunkRenderMode.DEFAULT);
-        PerformanceMonitor.endActivity();
     }
 }

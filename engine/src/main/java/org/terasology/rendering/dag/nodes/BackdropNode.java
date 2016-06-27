@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
@@ -61,7 +60,6 @@ public class BackdropNode extends Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Sky");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
         enableWireframeIf(renderingDebugConfig.isWireframe());

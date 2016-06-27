@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.Node;
@@ -53,16 +52,12 @@ public class ChunksRefractiveReflectiveNode extends Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Chunks (Refractive/Reflective)");
-
         boolean isHeadUnderWater = worldRenderer.isHeadUnderWater();
         preRenderSetupSceneReflectiveRefractive(isHeadUnderWater);
 
         worldRenderer.renderChunks(renderQueues.chunksAlphaBlend, ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, WorldRendererImpl.ChunkRenderMode.DEFAULT);
 
         postRenderCleanupSceneReflectiveRefractive(isHeadUnderWater);
-        PerformanceMonitor.endActivity();
-        PerformanceMonitor.endActivity(); // end "Render World" activity
     }
 
     /**

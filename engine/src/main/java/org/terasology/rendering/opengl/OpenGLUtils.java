@@ -93,6 +93,17 @@ public final class OpenGLUtils {
     }
 
     /**
+     * Disables wireframe rendering. Used together with enableWireFrameIf().
+     *
+     * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
+     */
+    public static void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
+        if (wireframeIsEnabledInRenderingDebugConfig) {
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+    }
+
+    /**
      * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
      * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
      * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
@@ -197,16 +208,5 @@ public final class OpenGLUtils {
         }
 
         glCallList(displayListQuad);
-    }
-
-    /**
-     * Disables wireframe rendering. Used together with enableWireFrameIf().
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
-     */
-    public static void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
     }
 }

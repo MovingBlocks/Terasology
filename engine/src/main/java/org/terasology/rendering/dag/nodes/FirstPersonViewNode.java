@@ -20,7 +20,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.Node;
@@ -56,7 +55,6 @@ public class FirstPersonViewNode extends Node {
     @Override
     public void process() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
-            PerformanceMonitor.startActivity("Render First Person");
             disableWireframeIf(renderingDebugConfig.isWireframe());
 
 
@@ -85,8 +83,6 @@ public class FirstPersonViewNode extends Node {
              */
             GL11.glDepthFunc(GL_LEQUAL);
             GL11.glPopMatrix();
-
-            PerformanceMonitor.endActivity();
         }
     }
 }

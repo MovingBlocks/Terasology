@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -71,7 +70,6 @@ public class OutlineNode extends Node {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Pre-post composite");
         if (renderingConfig.isOutline()) {
             // TODO: a candidate for redundant state elimination
             disableWireframeIf(renderingDebugConfig.isWireframe());
@@ -92,6 +90,5 @@ public class OutlineNode extends Node {
             bindDisplay();  // TODO: verify this is necessary
             setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
         }
-
     }
 }

@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -73,7 +72,6 @@ public class WorldReflectionNode extends Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render World (Reflection)");
         FBO sceneReflected = frameBuffersManager.getFBO("sceneReflected");
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
@@ -101,7 +99,5 @@ public class WorldReflectionNode extends Node {
         GL11.glCullFace(GL11.GL_BACK);
         bindDisplay();
         setViewportToSizeOf(sceneOpaque);
-
-        PerformanceMonitor.endActivity();
     }
 }

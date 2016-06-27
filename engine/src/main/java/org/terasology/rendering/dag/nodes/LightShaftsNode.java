@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.Node;
@@ -55,7 +54,6 @@ public class LightShaftsNode extends Node {
     @Override
     public void process() {
         if (renderingConfig.isLightShafts()) {
-            PerformanceMonitor.startActivity("rendering/lightshafts");
             FBO lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
             FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
@@ -70,8 +68,6 @@ public class LightShaftsNode extends Node {
 
             bindDisplay();     // TODO: verify this is necessary
             setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
-
-            PerformanceMonitor.endActivity();
         }
     }
 }
