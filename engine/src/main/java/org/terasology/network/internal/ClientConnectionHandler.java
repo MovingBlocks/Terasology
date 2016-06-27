@@ -137,7 +137,10 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                 channelHandlerContext.getChannel().close();
             } else {
                 String sizeString = getSizeString(moduleDataHeader.getSize());
-                joinStatus.setCurrentActivity("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " (" + sizeString + ")");
+                joinStatus.setCurrentActivity("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " (" + sizeString + ","
+                		+ missingModules.size() + " modules remain)");
+                logger.info("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " (" + sizeString + ","
+                		+ missingModules.size() + " modules remain)");
                 receivingModule = moduleDataHeader;
                 lengthReceived = 0;
                 try {
