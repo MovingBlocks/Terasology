@@ -41,6 +41,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Timer;
 
 /**
  */
@@ -58,27 +59,69 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private Path tempModuleLocation;
     private BufferedOutputStream downloadingModule;
     private long lengthReceived;
+    private Timer timeoutTimer = new Timer();
+    private long timeoutPoint = System.currentTimeMillis();
+    private final long timeoutThreshold = 10000;
 
     public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
         this.joinStatus = joinStatus;
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
+        logger.info("constructed CCH");
+		timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+        timeoutTimer.schedule(new java.util.TimerTask() {
+    		@Override
+    		public void run() {
+    			synchronized (joinStatus) {
+    				logger.info("callback");
+					if (System.currentTimeMillis() > timeoutPoint && joinStatus.getStatus() != JoinStatus.Status.COMPLETE) {
+						joinStatus.setErrorMessage("Server stopped responding.");
+						logger.error("Server timeout threshold of {} ms exceeded.",timeoutThreshold);
+					}
+    			}
+            }
+    		}, 
+	   timeoutThreshold + 200
+    	);
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {	
+    	// Handle timeout
+    	timeoutTimer.schedule(new java.util.TimerTask() {
+    		@Override
+    		public void run() {
+    			synchronized (joinStatus) {
+					if (System.currentTimeMillis() > timeoutPoint && joinStatus.getStatus() != JoinStatus.Status.COMPLETE) {
+						joinStatus.setErrorMessage("Server stopped responding.");
+						logger.error("Server timeout threshold of {} ms exceeded.",timeoutThreshold);
+					}
+    			}
+            }
+    		}, 
+		   timeoutThreshold + 200 
+    	);
+    	// If we timed out, don't handle anymore messages.
+    	if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
+    		return;
+    	}
+    
+    	// Handle message
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
-        if (message.hasServerInfo()) {
-            receivedServerInfo(ctx, message.getServerInfo());
-        } else if (message.hasModuleDataHeader()) {
-            receiveModuleStart(ctx, message.getModuleDataHeader());
-        } else if (message.hasModuleData()) {
-            receiveModule(ctx, message.getModuleData());
-        } else if (message.hasJoinComplete()) {
-            completeJoin(ctx, message.getJoinComplete());
-        } else {
-            logger.error("Received unexpected message");
-        }
+        synchronized (joinStatus) {
+			timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+			if (message.hasServerInfo()) {
+				receivedServerInfo(ctx, message.getServerInfo());
+			} else if (message.hasModuleDataHeader()) {
+				receiveModuleStart(ctx, message.getModuleDataHeader());
+			} else if (message.hasModuleData()) {
+				receiveModule(ctx, message.getModuleData());
+			} else if (message.hasJoinComplete()) {
+				completeJoin(ctx, message.getJoinComplete());
+			} else {
+				logger.error("Received unexpected message");
+			}
+		}
     }
 
     private void receiveModuleStart(ChannelHandlerContext channelHandlerContext, NetData.ModuleDataHeader moduleDataHeader) {
@@ -219,6 +262,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     }
 
     public JoinStatus getJoinStatus() {
-        return joinStatus;
+    	synchronized (joinStatus) {
+			return joinStatus;
+    	}
     }
 }
