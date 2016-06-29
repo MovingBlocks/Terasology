@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.logic;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;

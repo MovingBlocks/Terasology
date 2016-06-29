@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;

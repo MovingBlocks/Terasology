@@ -15,7 +15,7 @@
  */
 package org.terasology.entitySystem.prefab.internal;
 
-import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.Component;

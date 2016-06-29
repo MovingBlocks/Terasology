@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.models;
 
-import com.google.api.client.util.Lists;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayDeque;
 import java.util.Collection;

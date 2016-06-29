@@ -17,9 +17,9 @@ package org.terasology.rendering.animation;
 
 import java.util.function.Consumer;
 
+import com.google.common.base.Preconditions;
 import org.terasology.math.geom.Rect2f;
 
-import com.google.api.client.util.Preconditions;
 
 /**
  * Interpolates rectangles

@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.world;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;

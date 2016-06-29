@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.logic;
 
-import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.client.util.Maps;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.base.Preconditions;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;

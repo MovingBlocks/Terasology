@@ -15,7 +15,7 @@
  */
 package org.terasology.engine;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import com.google.common.base.Preconditions;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
