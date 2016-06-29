@@ -69,8 +69,8 @@ public class OutlineNode implements Node {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/outline");
         if (renderingConfig.isOutline()) {
+            PerformanceMonitor.startActivity("rendering/outline");
             outlineFBO = frameBuffersManager.getFBO("outline");
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
@@ -86,7 +86,7 @@ public class OutlineNode implements Node {
 
             bindDisplay();  // TODO: verify this is necessary
             setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+            PerformanceMonitor.endActivity();
         }
-        PerformanceMonitor.endActivity();
     }
 }

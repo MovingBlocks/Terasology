@@ -68,8 +68,8 @@ public class AmbientOcclusionPassesNode implements Node {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/ambientocclusionpasses");
         if (renderingConfig.isSsao()) {
+            PerformanceMonitor.startActivity("rendering/ambientocclusionpasses");
             // TODO: consider moving these into initialise without breaking existing implementation
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
             ssaoBlurredFBO = frameBuffersManager.getFBO("ssaoBlurred");
@@ -77,8 +77,8 @@ public class AmbientOcclusionPassesNode implements Node {
 
             generateSSAO();
             generateBlurredSSAO();
+            PerformanceMonitor.endActivity();
         }
-        PerformanceMonitor.endActivity();
     }
 
 
