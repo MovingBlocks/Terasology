@@ -16,34 +16,14 @@
 package org.terasology.rendering.dag;
 
 
-import com.google.api.client.util.Maps;
-import java.util.Map;
+public class NotAnalyzedException extends Exception {
 
-
-
-public abstract class Node {
-    protected Map<State, Boolean> desiredStates;
-
-    private String identifier;
-
-    protected void setDesiredStates() {
-        throw new UnsupportedOperationException("Method is not overridden.");
+    public NotAnalyzedException(String message) {
+        super(message);
     }
 
-    protected Map<State, Boolean> getDesiredStates() {
-        return desiredStates;
+    public NotAnalyzedException(String message, Throwable throwable) {
+        super(message, throwable);
     }
-    
-    public void initialise(String id) {
-        this.identifier = id;
-        desiredStates = Maps.newHashMap();
-    }
-
-    public abstract void process();
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
 
 }

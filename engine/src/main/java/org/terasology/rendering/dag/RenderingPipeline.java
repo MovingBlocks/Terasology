@@ -52,10 +52,15 @@ import java.util.Map;
 public class RenderingPipeline {
     private Context context;
     private Map<String, Node> nodeMap;
+    private StateManager stateManager;
+    private Collection<Node> topologicalOrder;
+    private boolean analyzed;
 
     public RenderingPipeline(Context context) {
         this.context = context;
         this.nodeMap = Maps.newLinkedHashMap();
+        this.stateManager = new StateManager();
+        this.analyzed = false;
     }
 
     public static RenderingPipeline createDefault(Context context) {
@@ -83,7 +88,14 @@ public class RenderingPipeline {
         pipeline.add("bloompasses", BloomPassesNode.class);
         pipeline.add("blurpasses", BlurPassesNode.class);
         pipeline.add("finalpostprocessing", FinalPostProcessingNode.class);
+        pipeline.analyze();
         return pipeline;
+    }
+
+    public void analyze() {
+        topologicalOrder = getTopologicalOrder();
+        stateManager.findStateChanges(topologicalOrder);
+        analyzed = true;
     }
 
     public void add(Node node) {
@@ -104,15 +116,21 @@ public class RenderingPipeline {
         return nodeMap.get(identifier);
     }
 
-    public void process() {
-        for (Node node : getTopologicalOrder()) {
+    public void process() throws NotAnalyzedException {
+        if (!analyzed) {
+            throw new NotAnalyzedException("RenderingPipeline must be analyzed before processing step.");
+        }
+
+        for (Node node : this.topologicalOrder) {
             PerformanceMonitor.startActivity("rendering/" + node.getIdentifier());
+            stateManager.prepareFor(node);
             node.process();
             PerformanceMonitor.endActivity();
         }
     }
 
-    public Collection<Node> getTopologicalOrder() {
+    // TODO: getTopologicalOrder will be a complex task, therefore calling  it multiple times will be expensive
+    private Collection<Node> getTopologicalOrder() {
         return nodeMap.values();
     }
 

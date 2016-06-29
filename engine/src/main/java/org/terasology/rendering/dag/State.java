@@ -15,17 +15,7 @@
  */
 package org.terasology.rendering.dag;
 
-/**
- * TODO: add javadoc
- */
-public class States {
-    private boolean wireframe;
 
-    public boolean isWireframe() {
-        return wireframe;
-    }
-
-    public void setWireframe(boolean wireframe) {
-        this.wireframe = wireframe;
-    }
+public enum State {
+    WIREFRAME
 }

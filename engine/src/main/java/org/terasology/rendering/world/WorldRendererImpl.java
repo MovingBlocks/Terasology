@@ -34,6 +34,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.NotAnalyzedException;
 import org.terasology.rendering.dag.RenderingPipeline;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.logic.LightComponent;
@@ -273,7 +274,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        renderingPipeline.process();
+        try {
+            renderingPipeline.process();
+        } catch (NotAnalyzedException e) {
+            e.printStackTrace(); // TODO: better handling
+        }
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
