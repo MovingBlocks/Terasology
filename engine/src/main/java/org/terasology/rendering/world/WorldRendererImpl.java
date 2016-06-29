@@ -20,10 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -40,6 +37,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.BackdropNode;
 import org.terasology.rendering.dag.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.ChunksOpaqueNode;
@@ -49,8 +47,11 @@ import org.terasology.rendering.dag.FirstPersonViewNode;
 import org.terasology.rendering.dag.LightGeometryNode;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.ObjectsOpaqueNode;
+import org.terasology.rendering.dag.OutlineNode;
 import org.terasology.rendering.dag.OverlaysNode;
+import org.terasology.rendering.dag.PrePostCompositeNode;
 import org.terasology.rendering.dag.ShadowMapNode;
+import org.terasology.rendering.dag.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.SkyBandsNode;
 import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
@@ -92,13 +93,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final EntityManager entityManager;
     private final Camera playerCamera;
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
     private Material chunkShader;
-    private Material lightGeometryShader;
     // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
@@ -115,7 +114,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Z_PRE_PASS
     }
 
-    private ComponentSystemManager systemManager;
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
     private FrameBuffersManager buffersManager;
@@ -146,9 +144,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
-        this.systemManager = context.get(ComponentSystemManager.class);
         this.shaderManager = context.get(ShaderManager.class);
-        this.entityManager = context.get(EntityManager.class);
 
         if (renderingConfig.isOculusVrSupport()) {
             playerCamera = new OculusStereoCamera();
@@ -193,7 +189,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initMaterials() {
         chunkShader = getMaterial("engine:prog.chunk");
-        lightGeometryShader = getMaterial("engine:prog.lightGeometryPass");
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
@@ -211,6 +206,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node lightGeometryNode = createInstance(LightGeometryNode.class, context);
         Node directionalLightsNode = createInstance(DirectionalLightsNode.class, context);
         Node chunksRefractiveReflectiveNode = createInstance(ChunksRefractiveReflectiveNode.class, context);
+        Node outlineNode = createInstance(OutlineNode.class, context);
+        Node ambientOcclusionPassesNode = createInstance(AmbientOcclusionPassesNode.class, context);
+        Node prePostCompositeNode = createInstance(PrePostCompositeNode.class, context);
+        Node simpleBlendMaterialsNode = createInstance(SimpleBlendMaterialsNode.class, context);
 
         renderingPipeline = Lists.newArrayList();
         renderingPipeline.add(shadowMapNode);
@@ -225,6 +224,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderingPipeline.add(lightGeometryNode);
         renderingPipeline.add(directionalLightsNode);
         renderingPipeline.add(chunksRefractiveReflectiveNode);
+        renderingPipeline.add(outlineNode);
+        renderingPipeline.add(ambientOcclusionPassesNode);
+        renderingPipeline.add(prePostCompositeNode);
+        renderingPipeline.add(simpleBlendMaterialsNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -328,16 +331,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderingPipeline.forEach(Node::process);
 
-        graphicState.disableWireframeIf(renderingDebugConfig.isWireframe());
-
-        PerformanceMonitor.startActivity("Pre-post composite");
-        postProcessor.generateOutline();                    // into outline buffer
-        postProcessor.generateAmbientOcclusionPasses();     // into ssao and ssaoBlurred buffers
-        postProcessor.generatePrePostComposite();           // into sceneOpaquePingPong, then make it the new sceneOpaque buffer
-        PerformanceMonitor.endActivity();
-
-        renderSimpleBlendMaterials();                       // into sceneOpaque buffer
-
         PerformanceMonitor.startActivity("Post-Processing");
         postProcessor.generateLightShafts();                // into lightShafts buffer
 
@@ -422,19 +415,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
 
         return true;
-    }
-
-
-    private void renderSimpleBlendMaterials() {
-        PerformanceMonitor.startActivity("Render Objects (Transparent)");
-        graphicState.preRenderSetupSimpleBlendMaterials();
-
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderAlphaBlend();
-        }
-
-        graphicState.postRenderCleanupSimpleBlendMaterials();
-        PerformanceMonitor.endActivity();
     }
 
     @Override
