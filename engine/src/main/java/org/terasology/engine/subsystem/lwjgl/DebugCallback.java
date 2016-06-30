@@ -63,7 +63,7 @@ class DebugCallback implements KHRDebugCallback.Handler {
                 break;
             default:
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                logger.info(logFormat, args);
+                logger.trace(logFormat, args);
                 break;
         }
     }
