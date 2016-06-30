@@ -67,14 +67,18 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         this.networkSystem = networkSystem;
         this.joinStatus = joinStatus;
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
-        logger.info("constructed CCH");
-		timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+        scheduleTimeout();
+    }    
+    
+    private void scheduleTimeout() {
+    	timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
         timeoutTimer.schedule(new java.util.TimerTask() {
     		@Override
     		public void run() {
     			synchronized (joinStatus) {
-    				logger.info("callback");
-					if (System.currentTimeMillis() > timeoutPoint && joinStatus.getStatus() != JoinStatus.Status.COMPLETE) {
+					if (System.currentTimeMillis() > timeoutPoint && 
+							joinStatus.getStatus() != JoinStatus.Status.COMPLETE &&
+							joinStatus.getStatus() != JoinStatus.Status.FAILED) {
 						joinStatus.setErrorMessage("Server stopped responding.");
 						logger.error("Server timeout threshold of {} ms exceeded.",timeoutThreshold);
 					}
@@ -87,20 +91,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {	
-    	// Handle timeout
-    	timeoutTimer.schedule(new java.util.TimerTask() {
-    		@Override
-    		public void run() {
-    			synchronized (joinStatus) {
-					if (System.currentTimeMillis() > timeoutPoint && joinStatus.getStatus() != JoinStatus.Status.COMPLETE) {
-						joinStatus.setErrorMessage("Server stopped responding.");
-						logger.error("Server timeout threshold of {} ms exceeded.",timeoutThreshold);
-					}
-    			}
-            }
-    		}, 
-		   timeoutThreshold + 200 
-    	);
+        scheduleTimeout();
+    	
     	// If we timed out, don't handle anymore messages.
     	if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
     		return;
@@ -118,7 +110,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 				receiveModule(ctx, message.getModuleData());
 			} else if (message.hasJoinComplete()) {
 				if (missingModules.size() > 0) {
-					logger.error("THe server did not send all of the modules that were needed before ending module transmission.");
+					logger.error("The server did not send all of the modules that were needed before ending module transmission.");
 				}
 				completeJoin(ctx, message.getJoinComplete());
 			} else {
