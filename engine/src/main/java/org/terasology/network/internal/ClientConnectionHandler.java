@@ -68,39 +68,37 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         this.joinStatus = joinStatus;
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
         scheduleTimeout();
-    }    
-    
-    private void scheduleTimeout() {
-    	timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
-        timeoutTimer.schedule(new java.util.TimerTask() {
-    		@Override
-    		public void run() {
-    			synchronized (joinStatus) {
-					if (System.currentTimeMillis() > timeoutPoint && 
-							joinStatus.getStatus() != JoinStatus.Status.COMPLETE &&
-							joinStatus.getStatus() != JoinStatus.Status.FAILED) {
-						joinStatus.setErrorMessage("Server stopped responding.");
-						logger.error("Server timeout threshold of {} ms exceeded.",timeoutThreshold);
-					}
-    			}
-            }
-    		}, 
-	   timeoutThreshold + 200
-    	);
     }
 
+	private void scheduleTimeout() {
+		timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
+		timeoutTimer.schedule(new java.util.TimerTask() {
+			@Override
+			public void run() {
+				synchronized (joinStatus) {
+					if (System.currentTimeMillis() > timeoutPoint
+							&& joinStatus.getStatus() != JoinStatus.Status.COMPLETE
+							&& joinStatus.getStatus() != JoinStatus.Status.FAILED) {
+						joinStatus.setErrorMessage("Server stopped responding.");
+						logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
+					}
+				}
+			}
+		}, timeoutThreshold + 200);
+	}
+
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {	
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         scheduleTimeout();
-    	
-    	// If we timed out, don't handle anymore messages.
-    	if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
-    		return;
-    	}
-    
-    	// Handle message
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
-        synchronized (joinStatus) {
+
+        // If we timed out, don't handle anymore messages.
+        if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
+            return;
+        }
+
+        // Handle message
+		NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+		synchronized (joinStatus) {
 			timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
 			if (message.hasServerInfo()) {
 				receivedServerInfo(ctx, message.getServerInfo());
@@ -110,14 +108,15 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 				receiveModule(ctx, message.getModuleData());
 			} else if (message.hasJoinComplete()) {
 				if (missingModules.size() > 0) {
-					logger.error("The server did not send all of the modules that were needed before ending module transmission.");
+					logger.error(
+							"The server did not send all of the modules that were needed before ending module transmission.");
 				}
 				completeJoin(ctx, message.getJoinComplete());
 			} else {
 				logger.error("Received unexpected message");
 			}
 		}
-    }
+	}
 
     private void receiveModuleStart(ChannelHandlerContext channelHandlerContext, NetData.ModuleDataHeader moduleDataHeader) {
         if (receivingModule != null) {
@@ -133,9 +132,9 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
             } else {
                 String sizeString = getSizeString(moduleDataHeader.getSize());
                 joinStatus.setCurrentActivity("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " (" + sizeString + ","
-                		+ missingModules.size() + " modules remain)");
+                        + missingModules.size() + " modules remain)");
                 logger.info("Downloading " + moduleDataHeader.getId() + ":" + moduleDataHeader.getVersion() + " (" + sizeString + ","
-                		+ missingModules.size() + " modules remain)");
+                        + missingModules.size() + " modules remain)");
                 receivingModule = moduleDataHeader;
                 lengthReceived = 0;
                 try {
@@ -259,9 +258,9 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
     }
 
-    public JoinStatus getJoinStatus() {
-    	synchronized (joinStatus) {
+	public JoinStatus getJoinStatus() {
+		synchronized (joinStatus) {
 			return joinStatus;
-    	}
-    }
+		}
+	}
 }

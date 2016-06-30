@@ -889,11 +889,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     void setServer(ServerImpl server) {
-    	if (server != null) {
-    		mode = NetworkMode.CLIENT;
-			nextNetworkTick = time.getRealTimeInMs();
-			logger.info("Connected to server");
-    	}
+        if (server != null) {
+            mode = NetworkMode.CLIENT;
+            nextNetworkTick = time.getRealTimeInMs();
+            logger.info("Connected to server");
+        }
         this.server = server;
 
     }
