@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;

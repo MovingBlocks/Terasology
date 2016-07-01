@@ -29,7 +29,6 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;

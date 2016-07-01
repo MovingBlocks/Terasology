@@ -24,7 +24,7 @@ import org.terasology.registry.In;
 import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
-/*
+/**
  * TODO: Diagram of this node
  */
 public class ObjectsOpaqueNode implements Node {
