@@ -57,7 +57,6 @@ public class FirstPersonViewNode implements Node {
             PerformanceMonitor.startActivity("rendering/firstpersonview");
             enableWireframeIf(renderingDebugConfig.isWireframe());
 
-
             /**
              * Sets the state to render the First Person View.
              *
@@ -66,7 +65,6 @@ public class FirstPersonViewNode implements Node {
             GL11.glPushMatrix();
             GL11.glLoadIdentity();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
-
 
             playerCamera.updateMatrices(90f);
             playerCamera.loadProjectionMatrix();

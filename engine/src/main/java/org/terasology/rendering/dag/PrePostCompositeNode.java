@@ -41,6 +41,9 @@ public class PrePostCompositeNode implements Node {
     private WorldRenderer worldRenderer;
 
     private Material prePostComposite;
+    private FBO sceneOpaque;
+    private FBO sceneOpaquePingPong;
+    private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
@@ -55,9 +58,9 @@ public class PrePostCompositeNode implements Node {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prepostcomposite");
         prePostComposite.enable();
-        FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        FBO sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
-        FBO sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
+        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
 
         // TODO: verify if there should be bound textures here.
         sceneOpaquePingPong.bind();

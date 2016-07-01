@@ -62,6 +62,8 @@ public class DirectionalLightsNode implements Node {
     private FBO sceneOpaque;
     private Material lightGeometryShader;
     private Material lightBufferPass;
+    private FBO sceneOpaquePingPong;
+    private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
@@ -130,8 +132,8 @@ public class DirectionalLightsNode implements Node {
         sceneOpaque.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        FBO sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
-        FBO sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
+        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
 
         sceneOpaquePingPong.bind();
         setRenderBufferMask(sceneOpaquePingPong, true, true, true);

@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -75,7 +74,6 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     private PostProcessor postProcessor;
 
     private RenderingConfig renderingConfig;
-    private RenderingDebugConfig renderingDebugConfig;
     private FBO sceneOpaque;
     private FBO scenePrePost;
     private FBO[] downSampledScene = new FBO[5];
@@ -84,7 +82,6 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        renderingDebugConfig = renderingConfig.getDebug();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
         obtainStaticFBOs();
     }
@@ -96,11 +93,10 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     // TODO: verify if this can be achieved entirely in the GPU, during tone mapping perhaps?
     @Override
     public void process() {
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         if (renderingConfig.isEyeAdaptation()) {
-            PerformanceMonitor.startActivity("Updating exposure");
+            PerformanceMonitor.startActivity("rendering/downsamplesceneandupdateexposure");
 
             downsampleSceneInto1x1pixelsBuffer();
 
@@ -138,6 +134,7 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
 
             postProcessor.setExposure(TeraMath.lerp(postProcessor.getExposure(), targetExposure, hdrExposureAdjustmentSpeed));
 
+            PerformanceMonitor.endActivity();
         } else {
             if (backdropProvider.getDaylight() == 0.0) {
                 postProcessor.setExposure(hdrMaxExposureNight);
@@ -145,7 +142,7 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
                 postProcessor.setExposure(hdrExposureDefault);
             }
         }
-        PerformanceMonitor.endActivity();
+
     }
 
     private void downsampleSceneInto1x1pixelsBuffer() {

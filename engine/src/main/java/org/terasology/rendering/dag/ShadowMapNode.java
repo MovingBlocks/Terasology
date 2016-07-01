@@ -72,6 +72,8 @@ public class ShadowMapNode implements Node {
     private FBO shadowMap;
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
+    private float texelSize;
+    private float stepSize;
 
     @Override
     public void initialise() {
@@ -88,32 +90,30 @@ public class ShadowMapNode implements Node {
         positionShadowMapCamera();
 
         // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame
-        boolean processCondition = renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame();
-        if (!processCondition) {
-            return;
+        // TODO: check these conditions before adding this node inside the DAG, removing this condition completely from process()
+        if (renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame()) {
+            PerformanceMonitor.startActivity("rendering/shadowmap");
+            // preRenderSetupSceneShadowMap
+            shadowMap.bind();
+            setViewportToSizeOf(shadowMap);
+            // TODO: verify the need to clear color buffer
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            GL11.glDisable(GL_CULL_FACE);
+
+            // render
+            shadowMapCamera.lookThrough();
+
+            shadowMapShader.enable();
+            // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
+            worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
+            playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
+
+            // postRenderCleanupSceneShadowMap
+            GL11.glEnable(GL_CULL_FACE);
+            bindDisplay();
+
+            PerformanceMonitor.endActivity();
         }
-
-        PerformanceMonitor.startActivity("rendering/shadowmap");
-        // preRenderSetupSceneShadowMap
-        shadowMap.bind();
-        setViewportToSizeOf(shadowMap);
-        // TODO: verify the need to clear color buffer
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glDisable(GL_CULL_FACE);
-
-        // render
-        shadowMapCamera.lookThrough();
-
-        shadowMapShader.enable();
-        // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
-        worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
-        playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
-
-        // postRenderCleanupSceneShadowMap
-        GL11.glEnable(GL_CULL_FACE);
-        bindDisplay();
-
-        PerformanceMonitor.endActivity();
     }
 
     private void positionShadowMapCamera() {
@@ -121,7 +121,7 @@ public class ShadowMapNode implements Node {
         Vector3f lightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z);
 
         // Project the shadowMapCamera position to light space and make sure it is only moved in texel steps (avoids flickering when moving the shadowMapCamera)
-        float texelSize = 1.0f / renderingConfig.getShadowMapResolution();
+        texelSize = 1.0f / renderingConfig.getShadowMapResolution();
         texelSize *= 2.0f;
 
         shadowMapCamera.getViewProjectionMatrix().transformPoint(lightPosition);
@@ -132,7 +132,7 @@ public class ShadowMapNode implements Node {
         // quite a bit into the direction of the sun (our main light).
 
         // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
-        float stepSize = 50f;
+        stepSize = 50f;
         Vector3f sunDirection = backdropProvider.getQuantizedSunDirection(stepSize);
 
         Vector3f sunPosition = new Vector3f(sunDirection);
@@ -147,5 +147,4 @@ public class ShadowMapNode implements Node {
         shadowMapCamera.getViewingDirection().set(negSunDirection);
         shadowMapCamera.update(worldRenderer.getSecondsSinceLastFrame());
     }
-
 }

@@ -73,7 +73,6 @@ public class FinalPostProcessingNode implements Node {
         renderingConfig = config.getRendering();
         renderingDebugConfig = renderingConfig.getDebug();
 
-
         ocDistortion = worldRenderer.getMaterial("engine:prog.ocDistortion");
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
@@ -225,5 +224,4 @@ public class FinalPostProcessingNode implements Node {
         ocDistortion.setFloat2("ocScale", (w / 2) * scaleFactor, (h / 2) * scaleFactor * as, true);
         ocDistortion.setFloat2("ocScaleIn", (2 / w), (2 / h) / as, true);
     }
-
 }

@@ -140,6 +140,4 @@ public class LightGeometryNode implements Node {
         setRenderBufferMask(sceneOpaque, true, true, true); // TODO: probably redundant - verify
         bindDisplay();
     }
-
-
 }

@@ -81,7 +81,6 @@ public class AmbientOcclusionPassesNode implements Node {
         }
     }
 
-
     private void generateSSAO() {
         ssaoShader.enable();
         ssaoShader.setFloat2("texelSize", 1.0f / ssaoFBO.width(), 1.0f / ssaoFBO.height(), true);

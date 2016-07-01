@@ -42,7 +42,9 @@ public class ChunksRefractiveReflectiveNode implements Node {
     @In
     private FrameBuffersManager frameBuffersManager;
 
+    private FBO sceneReflectiveRefractive;
     private Camera playerCamera;
+    private boolean isHeadUnderWater;
 
     @Override
     public void initialise() {
@@ -51,16 +53,16 @@ public class ChunksRefractiveReflectiveNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Render Chunks (Refractive/Reflective)");
+        PerformanceMonitor.startActivity("rendering/chunksrefractivereflective");
 
-        boolean isHeadUnderWater = worldRenderer.isHeadUnderWater();
-        preRenderSetupSceneReflectiveRefractive(isHeadUnderWater);
+        // TODO: Eliminate this assignment
+        isHeadUnderWater = worldRenderer.isHeadUnderWater();
+        preRenderSetupSceneReflectiveRefractive();
 
         worldRenderer.renderChunks(renderQueues.chunksAlphaBlend, ChunkMesh.RenderPhase.REFRACTIVE, playerCamera, WorldRendererImpl.ChunkRenderMode.DEFAULT);
 
-        postRenderCleanupSceneReflectiveRefractive(isHeadUnderWater);
+        postRenderCleanupSceneReflectiveRefractive();
         PerformanceMonitor.endActivity();
-        PerformanceMonitor.endActivity(); // end "Render World" activity
     }
 
     /**
@@ -71,11 +73,9 @@ public class ChunksRefractiveReflectiveNode implements Node {
      * <p>
      * If the isHeadUnderWater argument is set to True, the state is further modified to
      * accommodate the rendering of the water surface from an underwater point of view.
-     *
-     * @param isHeadUnderWater Set to True if the point of view is underwater, to render the water surface correctly.
      */
-    private void preRenderSetupSceneReflectiveRefractive(boolean isHeadUnderWater) {
-        FBO sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+    private void preRenderSetupSceneReflectiveRefractive() {
+        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
         sceneReflectiveRefractive.bind();
 
         // Make sure the water surface is rendered if the player is underwater.
@@ -88,14 +88,11 @@ public class ChunksRefractiveReflectiveNode implements Node {
      * Resets the state after the rendering of the reflective/refractive features of the scene.
      * <p>
      * See preRenderSetupSceneReflectiveRefractive() for additional information.
-     *
-     * @param isHeadUnderWater Set to True if the point of view is underwater, for some additional resetting.
      */
-    private void postRenderCleanupSceneReflectiveRefractive(boolean isHeadUnderWater) {
+    private void postRenderCleanupSceneReflectiveRefractive() {
         if (isHeadUnderWater) {
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
-
         bindDisplay();
     }
 }

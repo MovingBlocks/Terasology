@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -33,7 +32,6 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
  * TODO: Add diagram of this node
  */
 public class ToneMappedSceneNode implements Node {
-
     @In
     private FrameBuffersManager frameBuffersManager;
 
@@ -43,12 +41,12 @@ public class ToneMappedSceneNode implements Node {
     @In
     private Config config;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Material toneMapping;
+    private FBO sceneToneMapped;
+    private FBO sceneOpaque;
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 
@@ -61,10 +59,9 @@ public class ToneMappedSceneNode implements Node {
     // TODO: see what it does.
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("Tone mapping");
-        disableWireframeIf(renderingDebugConfig.isWireframe());
-        FBO sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
-        FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        PerformanceMonitor.startActivity("rendering/tonemapped");
+        sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
         toneMapping.enable();
 
@@ -79,5 +76,4 @@ public class ToneMappedSceneNode implements Node {
 
         PerformanceMonitor.endActivity();
     }
-
 }

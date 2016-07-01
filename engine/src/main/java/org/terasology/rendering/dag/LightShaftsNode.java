@@ -31,6 +31,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
  * TODO: Add diagram of this node
  */
 public class LightShaftsNode implements Node {
+
     @In
     private Config config;
 
@@ -40,9 +41,10 @@ public class LightShaftsNode implements Node {
     @In
     private WorldRenderer worldRenderer;
 
-
     private RenderingConfig renderingConfig;
     private Material lightShaftsShader;
+    private FBO lightShaftsFBO;
+    private FBO sceneOpaque;
 
     @Override
     public void initialise() {
@@ -54,8 +56,8 @@ public class LightShaftsNode implements Node {
     public void process() {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightshafts");
-            FBO lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
-            FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+            lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
+            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
             lightShaftsShader.enable();
             // TODO: verify what the inputs are
