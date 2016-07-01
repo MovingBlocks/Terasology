@@ -49,7 +49,7 @@ public class RegisterBiomes extends SingleStepLoadProcess {
         BiomeManager biomeManager;
         if (networkSystem.getMode().isAuthority()) {
             biomeManager = new BiomeManager(moduleEnvironment, gameManifest.getBiomeIdMap());
-//            biomeManager.subscribe(CoreRegistry.get(NetworkSystem.class));
+//            biomeManager.subscribeTreeViewUpdate(CoreRegistry.get(NetworkSystem.class));
             // TODO figure out what this does
         } else {
             biomeManager = new BiomeManager(moduleEnvironment, gameManifest.getBiomeIdMap());

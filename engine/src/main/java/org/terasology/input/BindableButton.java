@@ -72,7 +72,7 @@ public interface BindableButton {
     ButtonState getState();
 
     /**
-     * Used to directly subscribe to the button's events
+     * Used to directly subscribeTreeViewUpdate to the button's events
      *
      * @param subscriber
      */

@@ -1,0 +1,8 @@
+{
+    "type": "engine:nuiEditorContextMenu",
+    "skin": "engine:nuiEditorContextMenu",
+    "contents": {
+        "type": "UIList",
+        "id": "menu"
+    }
+}

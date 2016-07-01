@@ -75,19 +75,78 @@ public class UITreeView<T> extends CoreWidget {
      * The item renderer used for drawing the items in the tree.
      */
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
-
     /**
      * The individual item listeners.
      */
-    private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
+    private final List<ItemInteractionListener> itemInteractionListeners = Lists.newArrayList();
     /**
      * The individual expand/contract button listeners.
      */
     private final List<ExpandButtonInteractionListener> expandListeners = Lists.newArrayList();
     /**
-     * Tree item update listeners.
+     * Tree view item update listeners.
      */
-    private List<TreeViewUpdateListener> updateListeners = Lists.newArrayList();
+    private List<TreeViewUpdateListener> treeViewUpdateListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private List<ItemMouseClickListener> itemListeners = Lists.newArrayList();
+
+    private class ExpandButtonInteractionListener extends BaseInteractionListener {
+        private int index;
+
+        ExpandButtonInteractionListener(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                // Expand or contract and item on LMB - works even if the tree is disabled.
+                model.get().getItem(index).setExpanded(!model.get().getItem(index).isExpanded());
+
+                Tree<T> selectedItem = selectedIndex.get() != null ? model.get().getItem(selectedIndex.get()) : null;
+                model.get().resetItems();
+
+                // Update the index of the selected item.
+                if (selectedItem != null) {
+                    int newIndex = model.get().indexOf(selectedItem);
+                    if (newIndex == -1) {
+                        selectedIndex.set(null);
+                    } else {
+                        selectedIndex.set(newIndex);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private class ItemInteractionListener extends BaseInteractionListener {
+        private int index;
+
+        ItemInteractionListener(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            for (ItemMouseClickListener listener : itemListeners) {
+                listener.onMouseClick(event, model.get().getItem(index));
+            }
+            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                // Select the item on LMB - deselect when selected again.
+                if (selectedIndex.get() != null && selectedIndex.get().equals(index)) {
+                    selectedIndex.set(null);
+                } else {
+                    selectedIndex.set(index);
+                }
+                return true;
+            }
+            return false;
+        }
+    }
 
     public UITreeView() {
     }
@@ -95,6 +154,69 @@ public class UITreeView<T> extends CoreWidget {
     public UITreeView(String id) {
         super(id);
     }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        updateListeners();
+
+        canvas.setPart(TREE_ITEM);
+
+        int currentHeight = 0;
+        for (int i = 0; i < model.get().getItemCount(); i++) {
+            Tree<T> item = model.get().getItem(i);
+            ItemInteractionListener itemListener = itemInteractionListeners.get(i);
+            ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
+
+            int itemHeight = canvas.getCurrentStyle().getMargin()
+                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()))
+                    .getY();
+
+            if (!item.isLeaf()) {
+                canvas.setPart(EXPAND_BUTTON);
+                setButtonMode(canvas, item, buttonListener);
+                Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+                        currentHeight,
+                        itemIndent.get(),
+                        itemHeight);
+                drawButton(canvas, buttonRegion, buttonListener);
+            }
+
+            canvas.setPart(TREE_ITEM);
+            setItemMode(canvas, item, itemListener);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
+                    currentHeight,
+                    canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
+                    itemHeight);
+            drawItem(canvas, itemRegion, item, itemListener);
+            currentHeight += itemHeight;
+        }
+    }
+
+    @Override
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
+        canvas.setPart(TREE_ITEM);
+
+        if (model.get().getItemCount() == 0) {
+            return new Vector2i();
+        }
+
+        model.get().setEnumerateExpandedOnly(false);
+        Vector2i result = new Vector2i();
+        for (int i = 0; i < model.get().getItemCount(); i++) {
+            Tree<T> item = model.get().getItem(i);
+            Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
+                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()));
+            result.x = Math.max(result.x, preferredSize.x);
+            result.y += preferredSize.y;
+        }
+        model.get().setEnumerateExpandedOnly(true);
+
+        // Account for the expand/contract button.
+        result.addX(itemIndent.get());
+
+        return result;
+    }
+
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -137,7 +259,7 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void fireUpdateListeners() {
-        updateListeners.forEach(TreeViewUpdateListener::onChange);
+        treeViewUpdateListeners.forEach(TreeViewUpdateListener::onChange);
     }
 
     private void moveSelected(int keyId) {
@@ -188,43 +310,6 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        updateListeners();
-
-        canvas.setPart(TREE_ITEM);
-
-        int currentHeight = 0;
-        for (int i = 0; i < model.get().getItemCount(); i++) {
-            Tree<T> item = model.get().getItem(i);
-            ItemInteractionListener itemListener = itemListeners.get(i);
-            ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
-
-            int itemHeight = canvas.getCurrentStyle().getMargin()
-                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()))
-                    .getY();
-
-            if (!item.isLeaf()) {
-                canvas.setPart(EXPAND_BUTTON);
-                setButtonMode(canvas, item, buttonListener);
-                Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
-                        currentHeight,
-                        itemIndent.get(),
-                        itemHeight);
-                drawButton(canvas, buttonRegion, buttonListener);
-            }
-
-            canvas.setPart(TREE_ITEM);
-            setItemMode(canvas, item, itemListener);
-            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
-                    currentHeight,
-                    canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
-                    itemHeight);
-            drawItem(canvas, itemRegion, item, itemListener);
-            currentHeight += itemHeight;
-        }
-    }
-
     private void setButtonMode(Canvas canvas, Tree<T> item, ExpandButtonInteractionListener listener) {
         if (listener.isMouseOver()) {
             canvas.setMode(item.isExpanded() ? CONTRACT_HOVER_MODE : EXPAND_HOVER_MODE);
@@ -257,39 +342,14 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void updateListeners() {
-        while (itemListeners.size() > model.get().getItemCount()) {
-            itemListeners.remove(itemListeners.size() - 1);
+        while (itemInteractionListeners.size() > model.get().getItemCount()) {
+            itemInteractionListeners.remove(itemInteractionListeners.size() - 1);
             expandListeners.remove(expandListeners.size() - 1);
         }
-        while (itemListeners.size() < model.get().getItemCount()) {
-            itemListeners.add(new ItemInteractionListener(itemListeners.size()));
+        while (itemInteractionListeners.size() < model.get().getItemCount()) {
+            itemInteractionListeners.add(new ItemInteractionListener(itemInteractionListeners.size()));
             expandListeners.add(new ExpandButtonInteractionListener(expandListeners.size()));
         }
-    }
-
-    @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        canvas.setPart(TREE_ITEM);
-
-        if (model.get().getItemCount() == 0) {
-            return new Vector2i();
-        }
-
-        model.get().setEnumerateExpandedOnly(false);
-        Vector2i result = new Vector2i();
-        for (int i = 0; i < model.get().getItemCount(); i++) {
-            Tree<T> item = model.get().getItem(i);
-            Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
-                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()));
-            result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y;
-        }
-        model.get().setEnumerateExpandedOnly(true);
-
-        // Account for the expand/contract button.
-        result.addX(itemIndent.get());
-
-        return result;
     }
 
     public TreeModel<T> getModel() {
@@ -309,66 +369,13 @@ public class UITreeView<T> extends CoreWidget {
         defaultValue.set(value);
     }
 
-    public void subscribe(TreeViewUpdateListener listener) {
+    public void subscribeTreeViewUpdate(TreeViewUpdateListener listener) {
         Preconditions.checkNotNull(listener);
-        updateListeners.add(listener);
+        treeViewUpdateListeners.add(listener);
     }
 
-    public void unsubscribe(TreeViewUpdateListener listener) {
+    public void subscribeItemMouseClick(ItemMouseClickListener listener) {
         Preconditions.checkNotNull(listener);
-        updateListeners.remove(listener);
-    }
-
-    private class ExpandButtonInteractionListener extends BaseInteractionListener {
-        private int index;
-
-        ExpandButtonInteractionListener(int index) {
-            this.index = index;
-        }
-
-        @Override
-        public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                // Expand or contract and item on LMB - works even if the tree is disabled.
-                model.get().getItem(index).setExpanded(!model.get().getItem(index).isExpanded());
-
-                Tree<T> selectedItem = selectedIndex.get() != null ? model.get().getItem(selectedIndex.get()) : null;
-                model.get().resetItems();
-
-                // Update the index of the selected item.
-                if (selectedItem != null) {
-                    int newIndex = model.get().indexOf(selectedItem);
-                    if (newIndex == -1) {
-                        selectedIndex.set(null);
-                    } else {
-                        selectedIndex.set(newIndex);
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private class ItemInteractionListener extends BaseInteractionListener {
-        private int index;
-
-        ItemInteractionListener(int index) {
-            this.index = index;
-        }
-
-        @Override
-        public boolean onMouseClick(NUIMouseClickEvent event) {
-            if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                // Select the item on LMB - deselect when selected again.
-                if (selectedIndex.get() != null && selectedIndex.get().equals(index)) {
-                    selectedIndex.set(null);
-                } else {
-                    selectedIndex.set(index);
-                }
-                return true;
-            }
-            return false;
-        }
+        itemListeners.add(listener);
     }
 }
