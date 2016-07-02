@@ -54,7 +54,7 @@ public class FirstPersonViewNode implements Node {
     @Override
     public void process() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
-            PerformanceMonitor.startActivity("rendering/firstpersonview");
+            PerformanceMonitor.startActivity("rendering/firstPersonView");
             enableWireframeIf(renderingDebugConfig.isWireframe());
 
             /**

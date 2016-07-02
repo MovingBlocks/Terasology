@@ -81,7 +81,8 @@ public class BloomPassesNode implements Node {
     public void process() {
         if (renderingConfig.isBloom()) {
             PerformanceMonitor.startActivity("rendering/bloompasses");
-
+            // TODO: review - would it make sense to split these operations into one highpass node and
+            // TODO: three blur nodes with different parameters?
             sceneBloom0 = frameBuffersManager.getFBO("sceneBloom0");
             sceneBloom1 = frameBuffersManager.getFBO("sceneBloom1");
             sceneBloom2 = frameBuffersManager.getFBO("sceneBloom2");
@@ -114,12 +115,12 @@ public class BloomPassesNode implements Node {
         sceneHighPass.bind();
 
         setViewportToSizeOf(sceneHighPass);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
-        bindDisplay();
-        setViewportToSizeOf(sceneOpaque);
+        bindDisplay(); // TODO: verify this is necessary
+        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
     }
 
     private void generateBloom(FBO sceneBloom) {

@@ -48,7 +48,7 @@ public class SimpleBlendMaterialsNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/simpleblendmaterials");
+        PerformanceMonitor.startActivity("rendering/simpleBlendMaterials");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         preRenderSetupSimpleBlendMaterials();
 

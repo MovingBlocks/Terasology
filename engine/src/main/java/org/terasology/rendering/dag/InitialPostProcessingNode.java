@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -29,7 +28,6 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 
 /**
  * TODO: Add diagram of this node
@@ -45,12 +43,12 @@ public class InitialPostProcessingNode implements Node {
     @In
     private WorldRenderer worldRenderer;
 
-    private RenderingDebugConfig renderingDebugConfig;
+    private FBO scenePrePost;
+    private FBO sceneOpaque;
     private Material initialPost;
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
     }
 
@@ -61,10 +59,9 @@ public class InitialPostProcessingNode implements Node {
     @Override
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        PerformanceMonitor.startActivity("rendering/initialpostprocessing");
-        disableWireframeIf(renderingDebugConfig.isWireframe());
-        FBO scenePrePost = frameBuffersManager.getFBO("scenePrePost");
-        FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        PerformanceMonitor.startActivity("rendering/initialPostProcessing");
+        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         initialPost.enable();
 
         // TODO: verify what the inputs are

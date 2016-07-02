@@ -92,7 +92,7 @@ public class ShadowMapNode implements Node {
         // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame
         // TODO: check these conditions before adding this node inside the DAG, removing this condition completely from process()
         if (renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame()) {
-            PerformanceMonitor.startActivity("rendering/shadowmap");
+            PerformanceMonitor.startActivity("rendering/shadowMap");
             // preRenderSetupSceneShadowMap
             shadowMap.bind();
             setViewportToSizeOf(shadowMap);

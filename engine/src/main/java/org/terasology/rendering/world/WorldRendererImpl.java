@@ -58,7 +58,7 @@ import org.terasology.rendering.dag.PrePostCompositeNode;
 import org.terasology.rendering.dag.ShadowMapNode;
 import org.terasology.rendering.dag.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.SkyBandsNode;
-import org.terasology.rendering.dag.ToneMappedSceneNode;
+import org.terasology.rendering.dag.ToneMappingNode;
 import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -125,7 +125,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
-    private List<Node> renderingPipeline; // TODO: will be replaced by a DirectedAcyclicGraph data structure
+    private List<Node> renderGraph; // TODO: will be replaced by a DirectedAcyclicGraph data structure
     private ShadowMapNode shadowMapNode;
 
     /**
@@ -190,7 +190,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(WorldRenderer.class, this);
         context.put(RenderQueuesHelper.class, renderQueues);
         context.put(RenderableWorld.class, renderableWorld);
-        initPipeline();
+        initRenderGraph();
     }
 
     private void initMaterials() {
@@ -198,7 +198,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
-    private void initPipeline() {
+    private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
         shadowMapNode = createInstance(ShadowMapNode.class, context);
         Node worldReflectionNode = createInstance(WorldReflectionNode.class, context);
@@ -219,36 +219,36 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node lightShaftsNode = createInstance(LightShaftsNode.class, context);
         Node initialPostProcessingNode = createInstance(InitialPostProcessingNode.class, context);
         Node downSampleSceneAndUpdateExposure = createInstance(DownSampleSceneAndUpdateExposureNode.class, context);
-        Node toneMappedSceneNode = createInstance(ToneMappedSceneNode.class, context);
+        Node toneMappedSceneNode = createInstance(ToneMappingNode.class, context);
         Node bloomPassesNode = createInstance(BloomPassesNode.class, context);
         Node blurPassesNode = createInstance(BlurPassesNode.class, context);
         Node finalPostProcessingNode = createInstance(FinalPostProcessingNode.class, context);
 
-        renderingPipeline = Lists.newArrayList();
-        renderingPipeline.add(shadowMapNode);
-        renderingPipeline.add(worldReflectionNode);
-        renderingPipeline.add(backdropNode);
-        renderingPipeline.add(skybandsNode);
-        renderingPipeline.add(objectOpaqueNode);
-        renderingPipeline.add(chunksOpaqueNode);
-        renderingPipeline.add(chunksAlphaRejectNode);
-        renderingPipeline.add(overlaysNode);
-        renderingPipeline.add(firstPersonViewNode);
-        renderingPipeline.add(lightGeometryNode);
-        renderingPipeline.add(directionalLightsNode);
-        renderingPipeline.add(chunksRefractiveReflectiveNode);
-        renderingPipeline.add(outlineNode);
-        renderingPipeline.add(ambientOcclusionPassesNode);
-        renderingPipeline.add(prePostCompositeNode);
-        renderingPipeline.add(simpleBlendMaterialsNode);
+        renderGraph = Lists.newArrayList();
+        renderGraph.add(shadowMapNode);
+        renderGraph.add(worldReflectionNode);
+        renderGraph.add(backdropNode);
+        renderGraph.add(skybandsNode);
+        renderGraph.add(objectOpaqueNode);
+        renderGraph.add(chunksOpaqueNode);
+        renderGraph.add(chunksAlphaRejectNode);
+        renderGraph.add(overlaysNode);
+        renderGraph.add(firstPersonViewNode);
+        renderGraph.add(lightGeometryNode);
+        renderGraph.add(directionalLightsNode);
+        renderGraph.add(chunksRefractiveReflectiveNode);
+        renderGraph.add(outlineNode);
+        renderGraph.add(ambientOcclusionPassesNode);
+        renderGraph.add(prePostCompositeNode);
+        renderGraph.add(simpleBlendMaterialsNode);
         // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
-        renderingPipeline.add(lightShaftsNode);
-        renderingPipeline.add(initialPostProcessingNode);
-        renderingPipeline.add(downSampleSceneAndUpdateExposure);
-        renderingPipeline.add(toneMappedSceneNode);
-        renderingPipeline.add(bloomPassesNode);
-        renderingPipeline.add(blurPassesNode);
-        renderingPipeline.add(finalPostProcessingNode);
+        renderGraph.add(lightShaftsNode);
+        renderGraph.add(initialPostProcessingNode);
+        renderGraph.add(downSampleSceneAndUpdateExposure);
+        renderGraph.add(toneMappedSceneNode);
+        renderGraph.add(bloomPassesNode);
+        renderGraph.add(blurPassesNode);
+        renderGraph.add(finalPostProcessingNode);
     }
 
     private static <T extends Node> T createInstance(Class<T> type, Context context) {
@@ -351,7 +351,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        renderingPipeline.forEach(Node::process);
+        renderGraph.forEach(Node::process);
 
         playerCamera.updatePrevViewProjectionMatrix();
     }

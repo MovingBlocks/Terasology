@@ -43,7 +43,7 @@ public class ObjectsOpaqueNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/objectsopaque");
+        PerformanceMonitor.startActivity("rendering/objectsOpaque");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {

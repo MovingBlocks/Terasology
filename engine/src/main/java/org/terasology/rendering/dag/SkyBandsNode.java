@@ -67,7 +67,7 @@ public class SkyBandsNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/skybands");
+        PerformanceMonitor.startActivity("rendering/skyBands");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");

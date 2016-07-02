@@ -102,7 +102,7 @@ public class BlurPassesNode implements Node {
 
         renderFullscreenQuad();
 
-        bindDisplay();
-        setViewportToSizeOf(sceneOpaque);
+        bindDisplay(); // TODO: verify this is necessary
+        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
     }
 }

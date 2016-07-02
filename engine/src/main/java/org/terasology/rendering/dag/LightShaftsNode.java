@@ -58,7 +58,7 @@ public class LightShaftsNode implements Node {
     @Override
     public void process() {
         if (renderingConfig.isLightShafts()) {
-            PerformanceMonitor.startActivity("rendering/lightshafts");
+            PerformanceMonitor.startActivity("rendering/lightShafts");
             lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 

@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 /**
  * TODO: Add diagram of this node
  */
-public class ToneMappedSceneNode implements Node {
+public class ToneMappingNode implements Node {
     @In
     private FrameBuffersManager frameBuffersManager;
 
@@ -60,7 +60,7 @@ public class ToneMappedSceneNode implements Node {
     // TODO: see what it does.
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/tonemapped");
+        PerformanceMonitor.startActivity("rendering/toneMapping");
         sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 

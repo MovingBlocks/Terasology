@@ -55,7 +55,7 @@ public class PrePostCompositeNode implements Node {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/prepostcomposite");
+        PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");

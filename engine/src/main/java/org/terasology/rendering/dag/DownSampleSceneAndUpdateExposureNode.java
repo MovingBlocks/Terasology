@@ -78,8 +78,12 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     private RenderingConfig renderingConfig;
     private FBO sceneOpaque;
     private FBO scenePrePost;
+    private FBO downSampledFBO;
     private FBO[] downSampledScene = new FBO[5];
     private Material downSampler;
+    private ByteBuffer pixels;
+    private float targetExposure;
+    private float maxExposure;
 
     @Override
     public void initialise() {
@@ -95,18 +99,16 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
     // TODO: verify if this can be achieved entirely in the GPU, during tone mapping perhaps?
     @Override
     public void process() {
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         if (renderingConfig.isEyeAdaptation()) {
-            PerformanceMonitor.startActivity("rendering/downsamplesceneandupdateexposure");
+            PerformanceMonitor.startActivity("rendering/updateExposure");
 
-            downsampleSceneInto1x1pixelsBuffer();
+            downSampleSceneInto1x1pixelsBuffer();
 
             frameBuffersManager.getCurrentReadbackPBO().copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
             frameBuffersManager.swapReadbackPBOs();
 
-            ByteBuffer pixels = frameBuffersManager.getCurrentReadbackPBO().readBackPixels();
+            pixels = frameBuffersManager.getCurrentReadbackPBO().readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -116,13 +118,13 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
             // TODO: make this line more readable by breaking it in smaller pieces
             currentSceneLuminance = 0.2126f * (pixels.get(2) & 0xFF) / 255.f + 0.7152f * (pixels.get(1) & 0xFF) / 255.f + 0.0722f * (pixels.get(0) & 0xFF) / 255.f;
 
-            float targetExposure = hdrMaxExposure;
+            targetExposure = hdrMaxExposure;
 
             if (currentSceneLuminance > 0) {
                 targetExposure = hdrTargetLuminance / currentSceneLuminance;
             }
 
-            float maxExposure = hdrMaxExposure;
+            maxExposure = hdrMaxExposure;
 
             if (backdropProvider.getDaylight() == 0.0) {    // TODO: fetch the backdropProvider earlier and only once
                 maxExposure = hdrMaxExposureNight;
@@ -147,21 +149,22 @@ public class DownSampleSceneAndUpdateExposureNode implements Node {
 
     }
 
-    private void downsampleSceneInto1x1pixelsBuffer() {
-        PerformanceMonitor.startActivity("Rendering eye adaption");
+    private void downSampleSceneInto1x1pixelsBuffer() {
+        PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
 
         downSampler.enable();
-        FBO downSampledFBO;
+
 
         for (int i = 4; i >= 0; i--) {
-
             downSampledFBO = downSampledScene[i];
             downSampler.setFloat("size", downSampledFBO.width(), true);
 
             downSampledFBO.bind();
 
             setViewportToSizeOf(downSampledFBO);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
             // TODO: move this block above, for consistency
             if (i == 4) {

@@ -75,6 +75,7 @@ public class FinalPostProcessingNode implements Node {
         ocDistortion = worldRenderer.getMaterial("engine:prog.ocDistortion");
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
+        // TODO: rethink debug strategy in light of the DAG-based architecture
     }
 
     /**
@@ -96,7 +97,7 @@ public class FinalPostProcessingNode implements Node {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/finalpostprocessing");
+        PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
         ocUndistorted = frameBuffersManager.getFBO("ocUndistorted");
         sceneFinal = frameBuffersManager.getFBO("sceneFinal");
@@ -127,7 +128,8 @@ public class FinalPostProcessingNode implements Node {
         } else {
             sceneFinal.bind();
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
 
             postProcessor.saveScreenshot();
@@ -143,14 +145,14 @@ public class FinalPostProcessingNode implements Node {
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(RenderingStage renderingStage) {
-        if (postProcessor.isNotTakingScreenshot()) {
-            sceneFinal.bind();
-        } else {
-            ocUndistorted.bind();
-        }
-
         switch (renderingStage) {
             case LEFT_EYE:
+                if (postProcessor.isNotTakingScreenshot()) { // TODO: verify if this works
+                    sceneFinal.bind();
+                } else {
+                    ocUndistorted.bind();
+                }
+
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad(0, 0, fullScale.width() / 2, fullScale.height());
 
