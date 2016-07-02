@@ -294,7 +294,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     private void addWidget(JsonTree item) {
         getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
-        getManager().getScreen(WidgetSelectionScreen.ASSET_URI)
+        getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
     }
 
     private void copyJson() {
