@@ -71,7 +71,7 @@ public class BlurPassesNode implements Node {
     @Override
     public void process() {
         if (renderingConfig.getBlurIntensity() != 0) {
-            PerformanceMonitor.startActivity("rendering/blurpasses");
+            PerformanceMonitor.startActivity("rendering/blurPasses");
 
             sceneBlur0 = frameBuffersManager.getFBO("sceneBlur0");
             sceneBlur1 = frameBuffersManager.getFBO("sceneBlur1");

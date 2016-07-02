@@ -52,7 +52,7 @@ public class ChunksOpaqueNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/chunksopaque");
+        PerformanceMonitor.startActivity("rendering/chunksOpaque");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         worldRenderer.renderChunks(renderQueues.chunksOpaque,
