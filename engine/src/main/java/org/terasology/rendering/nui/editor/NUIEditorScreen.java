@@ -31,7 +31,6 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -57,6 +56,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -69,6 +69,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
+
+    // Context menu options.
+    public static final String OPTION_COPY = "Copy";
+    public static final String OPTION_PASTE = "Paste";
 
     @In
     private NUIEditorSystem nuiEditorSystem;
@@ -104,14 +108,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * The index of the currently displayed tree view model state.
      */
     private int editorHistoryPosition;
-    /**
-     * Whether a context menu is currently being displayed.
-     */
-    private boolean contextMenuActive;
-    /**
-     * The position of the context menu.
-     */
-    private Vector2i contextMenuPosition;
 
     @Override
     public void initialise() {
@@ -159,8 +155,40 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         editorTreeView.subscribeItemMouseClick((event, item) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                getManager().pushScreen(NUIEditorContextMenu.ASSET_URI, NUIEditorContextMenu.class);
-                ((NUIEditorContextMenu) getManager().getScreen(NUIEditorContextMenu.ASSET_URI)).setMenuPosition(event.getRelativeMousePosition());
+                if (!getManager().isOpen(ContextMenuScreen.ASSET_URI)) {
+                    getManager().pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
+                }
+                ((JsonTree) item).setSelected(true);
+
+                ContextMenuScreen contextMenuScreen = (ContextMenuScreen) getManager().getScreen(ContextMenuScreen.ASSET_URI);
+                contextMenuScreen
+                        .setList(Arrays.asList(OPTION_COPY, OPTION_PASTE));
+                contextMenuScreen
+                        .setMenuPosition(event.getMouse().getPosition());
+                contextMenuScreen
+                        .bindSelection(new Binding() {
+                            @Override
+                            public Object get() {
+                                return null;
+                            }
+
+                            @Override
+                            public void set(Object value) {
+                                getManager().closeScreen(ContextMenuScreen.ASSET_URI);
+                                ((JsonTree) item).setSelected(false);
+
+                                if (value.equals(OPTION_COPY)) {
+                                    editorTreeView.copy(item);
+                                } else if (value.equals(OPTION_PASTE)) {
+                                    editorTreeView.paste(item);
+                                } else {
+                                    throw new IllegalStateException(String.format("Invalid context menu selection: %s", value));
+                                }
+                            }
+                        });
+                contextMenuScreen.subscribeClose(() -> {
+                    ((JsonTree) item).setSelected(false);
+                });
             }
         });
 
@@ -245,6 +273,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 editorHistory.add(tree);
                 editorHistoryPosition = 0;
             }
+
+            if (selectedUrn != null) {
+                assetManager.getAsset(selectedUrn, UIElement.class).get().dispose();
+            }
+
             selectedUrn = urn;
         }
     }

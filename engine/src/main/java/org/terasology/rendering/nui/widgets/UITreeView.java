@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
+import org.terasology.rendering.nui.widgets.models.JsonTree;
 import org.terasology.rendering.nui.widgets.models.Tree;
 import org.terasology.rendering.nui.widgets.models.TreeModel;
 
@@ -51,6 +52,8 @@ public class UITreeView<T> extends CoreWidget {
     private static final String EXPAND_MODE = "expand";
     private static final String EXPAND_HOVER_MODE = "expand-hover";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
+    private static final String SELECTED_MODE = "selected";
+
     /**
      * The indentation of one level in the tree.
      */
@@ -86,7 +89,7 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * Tree view item update listeners.
      */
-    private List<TreeViewUpdateListener> treeViewUpdateListeners = Lists.newArrayList();
+    private List<UpdateListener> updateListeners = Lists.newArrayList();
     /**
      *
      */
@@ -242,12 +245,12 @@ public class UITreeView<T> extends CoreWidget {
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.C) {
                 // Ctrl+C: copy a selected node.
-                copySelected();
+                copy(model.get().getItem(selectedIndex.get()));
                 fireUpdateListeners();
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.V) {
                 // Ctrl+V: paste the copied node as a child of the currently selected node.
-                pasteSelected();
+                paste(model.get().getItem(selectedIndex.get()));
                 fireUpdateListeners();
                 return true;
             } else {
@@ -259,7 +262,7 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void fireUpdateListeners() {
-        treeViewUpdateListeners.forEach(TreeViewUpdateListener::onChange);
+        updateListeners.forEach(UpdateListener::onChange);
     }
 
     private void moveSelected(int keyId) {
@@ -300,13 +303,13 @@ public class UITreeView<T> extends CoreWidget {
         model.get().getItem(selectedIndex.get()).addChild(defaultValue.get());
     }
 
-    private void copySelected() {
-        clipboard.set(model.get().getItem(selectedIndex.get()).copy());
+    public void copy(Tree<T> item) {
+        clipboard.set(item.copy());
     }
 
-    private void pasteSelected() {
+    public void paste(Tree<T> item) {
         if (clipboard.get() != null) {
-            model.get().getItem(selectedIndex.get()).addChild(clipboard.get());
+            item.addChild(clipboard.get());
         }
     }
 
@@ -319,7 +322,9 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void setItemMode(Canvas canvas, Tree<T> item, ItemInteractionListener listener) {
-        if (selectedIndex.get() != null && Objects.equals(item, model.get().getItem(selectedIndex.get()))) {
+        if (item instanceof JsonTree && ((JsonTree) item).isSelected()) {
+            canvas.setMode(SELECTED_MODE);
+        } else if (selectedIndex.get() != null && Objects.equals(item, model.get().getItem(selectedIndex.get()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listener.isMouseOver()) {
             canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
@@ -369,9 +374,9 @@ public class UITreeView<T> extends CoreWidget {
         defaultValue.set(value);
     }
 
-    public void subscribeTreeViewUpdate(TreeViewUpdateListener listener) {
+    public void subscribeTreeViewUpdate(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
-        treeViewUpdateListeners.add(listener);
+        updateListeners.add(listener);
     }
 
     public void subscribeItemMouseClick(ItemMouseClickListener listener) {

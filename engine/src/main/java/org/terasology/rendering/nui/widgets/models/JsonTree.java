@@ -19,6 +19,8 @@ package org.terasology.rendering.nui.widgets.models;
  * A tree representation of a JSON hierarchy, constructed from a {@link com.google.gson.JsonElement}.
  */
 public class JsonTree extends Tree<JsonTreeNode> {
+    private boolean selected;
+
     public JsonTree(JsonTreeNode childValue) {
         this.setValue(childValue);
     }
@@ -56,5 +58,13 @@ public class JsonTree extends Tree<JsonTreeNode> {
             copy.addChild(child.copy());
         }
         return copy;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
