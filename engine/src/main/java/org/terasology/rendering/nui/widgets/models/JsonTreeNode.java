@@ -16,11 +16,15 @@
 package org.terasology.rendering.nui.widgets.models;
 
 import com.google.gson.JsonElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The value type for the tree representation of a {@link JsonElement}.
  */
 public class JsonTreeNode {
+    private static final Logger logger = LoggerFactory.getLogger(JsonTreeNode.class);
+
     /**
      * The type of the JSON node.
      */
@@ -102,6 +106,7 @@ public class JsonTreeNode {
         } else if (type == ElementType.ARRAY) {
             return key != null ? key : ARRAY_STRING;
         } else if (type == ElementType.OBJECT) {
+            System.out.println(key);
             return key != null ? key : OBJECT_STRING;
         } else {
             return key != null ? key : NULL_STRING;

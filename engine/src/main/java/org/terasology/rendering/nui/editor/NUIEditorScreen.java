@@ -165,7 +165,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 List<String> options = Lists.newArrayList();
                 options.add(OPTION_COPY);
                 options.add(OPTION_PASTE);
-                if (((JsonTree) item).acceptsChildren()) {
+                if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree)item).getValue().getKey().equals("contents")) {
                     options.add(OPTION_ADD_WIDGET);
                 }
 
@@ -196,7 +196,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                                 }
                             }
                         });
-                contextMenuScreen.subscribeClose(() -> {
+                contextMenuScreen.subscribeSelection(() -> {
                     ((JsonTree) item).setSelected(false);
                 });
             }
@@ -293,8 +293,18 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     private void addWidget(JsonTree item) {
+        editorHistory.add((JsonTree) editorTreeView.getModel().getItem(0).getRoot());
+        editorHistoryPosition++;
+
         getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
-        getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
+
+        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
+        widgetSelectionScreen.setItem(item);
+        widgetSelectionScreen.subscribeClose(() -> {
+            editorTreeView.setModel(item.getRoot());
+            updateTreeView(item.getRoot());
+            updateWidget(item.getRoot());
+        });
     }
 
     private void copyJson() {
@@ -359,7 +369,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
-    private void updateTreeView(JsonTree tree) {
+    private void updateTreeView(Tree tree) {
         Iterator it = tree.getDepthFirstIterator(false);
         while (it.hasNext()) {
             ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
@@ -369,7 +379,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         editorTreeView.setModel(tree.copy());
     }
 
-    private void updateWidget(JsonTree tree) {
+    private void updateWidget(Tree tree) {
         // Update the widget.
         UIWidget widget;
         try {

@@ -32,23 +32,39 @@ import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
 
+/**
+ * A generic context menu, implemented as a {@link CoreScreenLayer} spanning the canvas area it should be created within.
+ */
 public class ContextMenuScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
+    /**
+     * The list containing the available context menu options.
+     */
     private UIList menu;
+    /**
+     * The absolute mouse position of {@code menu}.
+     */
     private Vector2i menuPosition = Vector2i.zero();
-    private List<UpdateListener> closeListeners = Lists.newArrayList();
+    /**
+     * Listeners triggered when a context menu option is selected.
+     */
+    private List<UpdateListener> selectionListeners = Lists.newArrayList();
 
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
+            // Close the context menu on click outside it.
             getManager().closeScreen(ASSET_URI);
             return false;
         }
 
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
+            // Close the context menu on mouse wheel scroll outside it.
             getManager().closeScreen(ASSET_URI);
+
+            // Consume the event to prevent awkward rendering if the menu is within a scrollable widget.
             return true;
         }
     };
@@ -67,7 +83,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        closeListeners.forEach(UpdateListener::onChange);
+        selectionListeners.forEach(UpdateListener::onChange);
     }
 
     public void setList(List list) {
@@ -82,13 +98,13 @@ public class ContextMenuScreen extends CoreScreenLayer {
         menuPosition = position;
     }
 
-    public void subscribeClose(UpdateListener listener) {
+    public void subscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
-        closeListeners.add(listener);
+        selectionListeners.add(listener);
     }
 
-    public void unsubscribe(UpdateListener listener) {
+    public void unsubscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
-        closeListeners.remove(listener);
+        selectionListeners.remove(listener);
     }
 }
