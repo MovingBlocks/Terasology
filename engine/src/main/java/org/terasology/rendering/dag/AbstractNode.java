@@ -15,20 +15,31 @@
  */
 package org.terasology.rendering.dag;
 
+
+import com.google.api.client.util.Maps;
 import java.util.Map;
 import org.terasology.rendering.dag.states.StateType;
 import org.terasology.rendering.dag.states.StateValue;
 
-/**
- *
- */
-public interface Node {
 
-    void initialise();
+public abstract class AbstractNode implements Node {
+    protected Map<StateType, StateValue> desiredStates;
+    private String identifier;
 
-    void process();
+    public AbstractNode(String id) {
+        this.identifier = id;
+        desiredStates = Maps.newHashMap();
+    }
 
-    Map<StateType, StateValue> getDesiredStates();
+    protected void addDesiredState(StateType stateType, StateValue value) {
+        desiredStates.put(stateType, value);
+    }
 
-    String getIdentifier();
+    public Map<StateType, StateValue> getDesiredStates() {
+        return desiredStates;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
 }

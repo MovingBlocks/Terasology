@@ -22,7 +22,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
@@ -31,7 +31,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 /**
  * TODO: Diagram of this node
  */
-public class FirstPersonViewNode extends Node {
+public class FirstPersonViewNode extends AbstractNode {
 
     @In
     private Config config;
@@ -45,9 +45,12 @@ public class FirstPersonViewNode extends Node {
     private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
 
+    public FirstPersonViewNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingDebugConfig = config.getRendering().getDebug();
         playerCamera = worldRenderer.getActiveCamera();
     }

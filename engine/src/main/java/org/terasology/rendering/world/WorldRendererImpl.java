@@ -35,7 +35,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.NotAnalyzedException;
-import org.terasology.rendering.dag.RenderingPipeline;
+import org.terasology.rendering.dag.RenderingGraph;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -102,7 +102,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
-    private RenderingPipeline renderingPipeline;
+    private RenderingGraph renderingGraph;
     private ShadowMapNode shadowMapNode;
 
     /**
@@ -177,9 +177,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initPipeline() {
         // FIXME: init pipeline without specifying them as a field in this class
-        renderingPipeline = RenderingPipeline.createDefault(context);
+        renderingGraph = RenderingGraph.createDefault(context);
 
-        shadowMapNode = (ShadowMapNode) renderingPipeline.get("shadowmap"); // TODO: remove shadow map node from world renderer
+        shadowMapNode = (ShadowMapNode) renderingGraph.get("shadowmap"); // TODO: remove shadow map node from world renderer
     }
 
 
@@ -275,7 +275,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         preRenderUpdate(renderingStage);
 
         try {
-            renderingPipeline.process();
+            renderingGraph.process();
         } catch (NotAnalyzedException e) {
             e.printStackTrace(); // TODO: better handling
         }

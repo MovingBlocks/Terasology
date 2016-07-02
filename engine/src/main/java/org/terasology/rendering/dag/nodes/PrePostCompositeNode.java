@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add diagram of this node
  */
-public class PrePostCompositeNode extends Node {
+public class PrePostCompositeNode extends AbstractNode {
 
     @In
     private FrameBuffersManager frameBuffersManager;
@@ -46,9 +46,12 @@ public class PrePostCompositeNode extends Node {
     private Material prePostComposite;
     private RenderingDebugConfig renderingDebugConfig;
 
+    public PrePostCompositeNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
         renderingDebugConfig = config.getRendering().getDebug();
     }

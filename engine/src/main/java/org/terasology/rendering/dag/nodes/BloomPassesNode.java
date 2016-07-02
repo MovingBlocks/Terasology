@@ -20,7 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -34,7 +34,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add diagram of this node
  */
-public class BloomPassesNode extends Node {
+public class BloomPassesNode extends AbstractNode {
 
     @Range(min = 0.0f, max = 5.0f)
     private float bloomHighPassThreshold = 0.05f;
@@ -60,9 +60,12 @@ public class BloomPassesNode extends Node {
     private FBO sceneBloom2;
     private FBO sceneHighPass;
 
+    public BloomPassesNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass

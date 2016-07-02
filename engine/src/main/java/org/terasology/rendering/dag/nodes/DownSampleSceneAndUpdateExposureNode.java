@@ -26,7 +26,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -41,7 +41,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add node of this diagram
  */
-public class DownSampleSceneAndUpdateExposureNode extends Node {
+public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
 
     @Range(min = 0.0f, max = 10.0f)
@@ -81,9 +81,12 @@ public class DownSampleSceneAndUpdateExposureNode extends Node {
     private FBO[] downSampledScene = new FBO[5];
     private Material downSampler;
 
+    public DownSampleSceneAndUpdateExposureNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingConfig = config.getRendering();
         renderingDebugConfig = renderingConfig.getDebug();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler

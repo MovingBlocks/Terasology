@@ -21,7 +21,7 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 
@@ -35,7 +35,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 /**
  * TODO: Add diagram of this node
  */
-public class SimpleBlendMaterialsNode extends Node {
+public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @In
     private ComponentSystemManager componentSystemManager;
@@ -49,9 +49,12 @@ public class SimpleBlendMaterialsNode extends Node {
     private FBO sceneOpaque;
     private RenderingDebugConfig renderingDebugConfig;
 
+    public SimpleBlendMaterialsNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingDebugConfig = config.getRendering().getDebug();
     }
 

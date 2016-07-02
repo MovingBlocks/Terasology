@@ -19,63 +19,93 @@ package org.terasology.rendering.dag;
 import com.google.api.client.util.Maps;
 import java.util.Collection;
 import java.util.Map;
-import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
+import org.terasology.rendering.dag.states.State;
+import org.terasology.rendering.dag.states.StateType;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
+import org.terasology.rendering.dag.states.Wireframe;
 
 /**
  * TODO: add javadocs
  */
 public class StateManager {
 
-    private Map<String, Map<State, Boolean>> stateChanges; // TODO: better name?
+    private Map<String, Map<StateType, StateValue>> stateChanges; // TODO: better name?
+    private Map<StateType, State> availableStates;
+
 
     public StateManager() {
         stateChanges = Maps.newHashMap();
+        availableStates = Maps.newHashMap();
     }
 
-    void findStateChanges(Collection<Node> nodes) {
-        Map<State, Boolean> states = Maps.newHashMap();
+    public static StateManager createDefault() {
+        StateManager stateManager = new StateManager();
+        stateManager.addAvailableStates();
+        return stateManager;
+    }
+
+
+    public void addState(StateType stateType, State state) {
+        availableStates.put(stateType, state);
+    }
+
+    public void findStateChanges(Collection<Node> nodes) {
+        Map<StateType, StateValue> states = Maps.newHashMap();
 
         for (Node node : nodes) {
-            Map<State, Boolean> plannedStateChanges = Maps.newHashMap();
-            for (Map.Entry<State, Boolean> entry : node.getDesiredStates().entrySet()) {
-                State state = entry.getKey();
-                boolean value = entry.getValue();
+            Map<StateType, StateValue> plannedStateChange = Maps.newHashMap();
+
+            Map<StateType, StateValue> desiredStates = node.getDesiredStates();
+            // handle desired states
+            for (Map.Entry<StateType, StateValue> entry : desiredStates.entrySet()) {
+                StateType stateType = entry.getKey();
+                StateValue value = entry.getValue();
 
                 // TODO: investigate options for simplifying this if-clause
-                if (states.get(state) == null) {
-                    plannedStateChanges.put(state, value);
-                } else if (states.get(state) != null && states.get(state) != value) {
-                    plannedStateChanges.put(state, value);
+                if (states.get(stateType) == null) {
+                    plannedStateChange.put(stateType, value);
+                    states.put(stateType, value);
+                } else {
+                    if (states.get(stateType) != value) {
+                        plannedStateChange.put(stateType, value);
+                        states.put(stateType, value);
+                    }
                 }
-
             }
 
-            stateChanges.put(node.getIdentifier(), plannedStateChanges);
+            // disable unconsidered but enabled states
+            for (StateType stateType : states.keySet()) {
+                if (desiredStates.get(stateType) == null) {
+                    if (states.get(stateType) == StateValue.ENABLED) {
+                        states.put(stateType, StateValue.DISABLED);
+                        plannedStateChange.put(stateType, StateValue.DISABLED);
+                    }
+                }
+            }
+
+
+            stateChanges.put(node.getIdentifier(), plannedStateChange);
         }
+    }
+
+    public Map<String, Map<StateType, StateValue>> getScheduledStateChanges() {
+        return stateChanges;
     }
 
 
     public void prepareFor(Node node) {
-        Map<State, Boolean> plannedStateChanges = stateChanges.get(node.getIdentifier());
-        for (Map.Entry<State, Boolean> entry : plannedStateChanges.entrySet()) {
+        Map<StateType, StateValue> plannedStateChanges = stateChanges.get(node.getIdentifier());
+        for (Map.Entry<StateType, StateValue> entry : plannedStateChanges.entrySet()) {
             changeState(entry.getKey(), entry.getValue());
         }
     }
 
-    private void changeState(State state, Boolean value) { // TODO: Moving this method into a separate class?
-        switch (state) {
-            case WIREFRAME:
-                if (value) {
-                    GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                } else {
-                    GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                }
-                break;
-        }
+    private void addAvailableStates() {
+        addState(StateTypeImpl.WIREFRAME, new Wireframe());
     }
 
-
+    private void changeState(StateType stateType, StateValue value) { // TODO: Moving this method into a separate class?
+        availableStates.get(stateType).set(value);
+    }
 }

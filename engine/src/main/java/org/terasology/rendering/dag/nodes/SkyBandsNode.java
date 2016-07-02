@@ -21,12 +21,12 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
-import org.terasology.rendering.dag.State;
+import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
@@ -37,7 +37,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
  * TODO: Diagram of this node
  * TODO: Separate this node into multiple SkyBandNode's
  */
-public class SkyBandsNode extends Node {
+public class SkyBandsNode extends AbstractNode {
 
     @In
     private Config config;
@@ -55,21 +55,18 @@ public class SkyBandsNode extends Node {
     private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
 
+    public SkyBandsNode(String id) {
+        super(id);
+
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingConfig = config.getRendering();
         renderingDebugConfig = renderingConfig.getDebug();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
         playerCamera = worldRenderer.getActiveCamera();
-        setDesiredStates();
-    }
-
-    @Override
-    protected void setDesiredStates() {
-        if (renderingDebugConfig.isWireframe()) {
-            desiredStates.put(State.WIREFRAME, true);
-        }
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
     }
 
     @Override

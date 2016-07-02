@@ -13,9 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.states;
 
+/**
+ *
+ */
+public class AbstractState implements State {
+    private StateValue value;
 
-public enum State {
-    WIREFRAME
+    @Override
+    public void set(StateValue stateValue) {
+        this.value = stateValue;
+    }
+
+    @Override
+    public StateValue getValue() {
+        return value;
+    }
 }

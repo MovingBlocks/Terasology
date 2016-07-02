@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -30,7 +30,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add diagram of this node
  */
-public class LightShaftsNode extends Node {
+public class LightShaftsNode extends AbstractNode {
     @In
     private Config config;
 
@@ -44,9 +44,12 @@ public class LightShaftsNode extends Node {
     private RenderingConfig renderingConfig;
     private Material lightShaftsShader;
 
+    public LightShaftsNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingConfig = config.getRendering();
         lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
     }

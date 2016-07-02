@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
-
-import java.util.Map;
-import org.terasology.rendering.dag.states.StateType;
-import org.terasology.rendering.dag.states.StateValue;
+package org.terasology.rendering.dag.states;
 
 /**
  *
  */
-public interface Node {
+public interface State {
+    void set(StateValue stateValue);
 
-    void initialise();
-
-    void process();
-
-    Map<StateType, StateValue> getDesiredStates();
-
-    String getIdentifier();
+    StateValue getValue();
 }

@@ -49,22 +49,22 @@ import java.util.Map;
 /**
  * TODO: Add javadocs
  */
-public class RenderingPipeline {
+public class RenderingGraph {
     private Context context;
     private Map<String, Node> nodeMap;
     private StateManager stateManager;
     private Collection<Node> topologicalOrder;
     private boolean analyzed;
 
-    public RenderingPipeline(Context context) {
+    public RenderingGraph(Context context) {
         this.context = context;
-        this.nodeMap = Maps.newLinkedHashMap();
-        this.stateManager = new StateManager();
+        this.nodeMap = Maps.newLinkedHashMap(); // insert order is important for now
+        this.stateManager = StateManager.createDefault();
         this.analyzed = false;
     }
 
-    public static RenderingPipeline createDefault(Context context) {
-        RenderingPipeline pipeline = new RenderingPipeline(context);
+    public static RenderingGraph createDefault(Context context) {
+        RenderingGraph pipeline = new RenderingGraph(context);
         pipeline.add("shadowmap", ShadowMapNode.class);
         pipeline.add("worldreflective", WorldReflectionNode.class);
         pipeline.add("backdrop", BackdropNode.class);
@@ -98,17 +98,18 @@ public class RenderingPipeline {
         analyzed = true;
     }
 
-    public void add(Node node) {
+    public void add(AbstractNode node) {
         nodeMap.put(node.getIdentifier(), node);
     }
 
 
-    public <T extends Node> void add(String identifier, Class<T> type) {
+    public <T extends AbstractNode> void add(String identifier, Class<T> type) {
         // Attempt constructor-based injection first
+        context.put(String.class, identifier);
         T node = InjectionHelper.createWithConstructorInjection(type, context);
         // Then fill @In fields
         InjectionHelper.inject(node, context);
-        node.initialise(identifier);
+        node.initialise();
         this.add(type.cast(node));
     }
 

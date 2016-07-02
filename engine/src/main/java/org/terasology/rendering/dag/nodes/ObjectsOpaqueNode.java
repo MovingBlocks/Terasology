@@ -20,14 +20,14 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /*
  * TODO: Diagram of this node
  */
-public class ObjectsOpaqueNode extends Node {
+public class ObjectsOpaqueNode extends AbstractNode {
     @In
     private Config config;
 
@@ -36,9 +36,12 @@ public class ObjectsOpaqueNode extends Node {
 
     private RenderingDebugConfig renderingDebugConfig;
 
+    public ObjectsOpaqueNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingDebugConfig = config.getRendering().getDebug();
     }
 

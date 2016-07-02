@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Add diagram of this node
  */
-public class ToneMappedSceneNode extends Node {
+public class ToneMappedSceneNode extends AbstractNode {
 
     @In
     private FrameBuffersManager frameBuffersManager;
@@ -46,9 +46,12 @@ public class ToneMappedSceneNode extends Node {
     private RenderingDebugConfig renderingDebugConfig;
     private Material toneMapping;
 
+    public ToneMappedSceneNode(String id) {
+        super(id);
+    }
+
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         renderingDebugConfig = config.getRendering().getDebug();
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }

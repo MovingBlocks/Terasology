@@ -21,7 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -33,7 +33,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
 /**
  * TODO: Diagram of this node
  */
-public class DirectionalLightsNode extends Node {
+public class DirectionalLightsNode extends AbstractNode {
 
     @In
     private BackdropProvider backdropProvider;
@@ -52,14 +52,8 @@ public class DirectionalLightsNode extends Node {
     private Material lightGeometryShader;
     private Material lightBufferPass;
 
-    @Override
-    public void initialise(String id) {
-        super.initialise(id);
-        playerCamera = worldRenderer.getActiveCamera();
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
-        lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-        initMainDirectionalLight();
+    public DirectionalLightsNode(String id) {
+        super(id);
     }
 
     // TODO: one day the main light (sun/moon) should be just another light in the scene.
@@ -68,6 +62,15 @@ public class DirectionalLightsNode extends Node {
         mainDirectionalLight.lightAmbientIntensity = 0.75f;
         mainDirectionalLight.lightDiffuseIntensity = 0.75f;
         mainDirectionalLight.lightSpecularPower = 100f;
+    }
+
+    @Override
+    public void initialise() {
+        playerCamera = worldRenderer.getActiveCamera();
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
+        lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
+        initMainDirectionalLight();
     }
 
     @Override

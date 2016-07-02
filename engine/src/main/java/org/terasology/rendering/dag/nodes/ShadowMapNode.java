@@ -25,7 +25,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -43,7 +43,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.*;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
-public class ShadowMapNode extends Node {
+public class ShadowMapNode extends AbstractNode {
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
@@ -70,10 +70,13 @@ public class ShadowMapNode extends Node {
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
 
+    public ShadowMapNode(String id) {
+        super(id);
+    }
+
 
     @Override
-    public void initialise(String id) {
-        super.initialise(id);
+    public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
         this.shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
         this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
