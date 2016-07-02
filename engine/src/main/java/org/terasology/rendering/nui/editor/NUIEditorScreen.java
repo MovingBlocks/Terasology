@@ -56,7 +56,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -73,6 +72,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     // Context menu options.
     public static final String OPTION_COPY = "Copy";
     public static final String OPTION_PASTE = "Paste";
+    public static final String OPTION_ADD_WIDGET = "Add Widget";
 
     @In
     private NUIEditorSystem nuiEditorSystem;
@@ -161,8 +161,16 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 ((JsonTree) item).setSelected(true);
 
                 ContextMenuScreen contextMenuScreen = (ContextMenuScreen) getManager().getScreen(ContextMenuScreen.ASSET_URI);
+
+                List<String> options = Lists.newArrayList();
+                options.add(OPTION_COPY);
+                options.add(OPTION_PASTE);
+                if (((JsonTree) item).acceptsChildren()) {
+                    options.add(OPTION_ADD_WIDGET);
+                }
+
                 contextMenuScreen
-                        .setList(Arrays.asList(OPTION_COPY, OPTION_PASTE));
+                        .setList(options);
                 contextMenuScreen
                         .setMenuPosition(event.getMouse().getPosition());
                 contextMenuScreen
@@ -181,6 +189,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
                                     editorTreeView.copy(item);
                                 } else if (value.equals(OPTION_PASTE)) {
                                     editorTreeView.paste(item);
+                                } else if (value.equals(OPTION_ADD_WIDGET)) {
+                                    addWidget((JsonTree) item);
                                 } else {
                                     throw new IllegalStateException(String.format("Invalid context menu selection: %s", value));
                                 }
@@ -280,6 +290,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
             selectedUrn = urn;
         }
+    }
+
+    private void addWidget(JsonTree item) {
+        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+        getManager().getScreen(WidgetSelectionScreen.ASSET_URI)
     }
 
     private void copyJson() {

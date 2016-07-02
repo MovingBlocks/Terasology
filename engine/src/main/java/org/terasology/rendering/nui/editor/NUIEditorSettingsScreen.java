@@ -25,11 +25,11 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "ok", button -> {
-            getManager().popScreen();
+            getManager().closeScreen(ASSET_URI);
         });
 
         WidgetUtil.trySubscribe(this, "cancel", button -> {
-            getManager().popScreen();
+            getManager().closeScreen(ASSET_URI);
         });
     }
 }

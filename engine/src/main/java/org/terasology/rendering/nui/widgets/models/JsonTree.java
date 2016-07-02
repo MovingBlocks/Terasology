@@ -25,6 +25,11 @@ public class JsonTree extends Tree<JsonTreeNode> {
         this.setValue(childValue);
     }
 
+    public boolean acceptsChildren() {
+        return !(getValue().getType() != JsonTreeNode.ElementType.ARRAY
+                && getValue().getType() != JsonTreeNode.ElementType.OBJECT);
+    }
+
     @Override
     public boolean acceptsChild(Tree<JsonTreeNode> child) {
         // Only non-null children are allowed.
