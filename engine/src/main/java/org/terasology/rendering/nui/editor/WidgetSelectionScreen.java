@@ -71,7 +71,7 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
             }
             item.addChild(scaffolding);
 
-            closeListeners.forEach(UpdateListener::onChange);
+            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
         });
 

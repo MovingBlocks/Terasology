@@ -37,6 +37,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.asset.UIFormat;
+import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.widgets.UIBox;
@@ -155,50 +156,18 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         editorTreeView.subscribeItemMouseClick((event, item) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                if (!getManager().isOpen(ContextMenuScreen.ASSET_URI)) {
-                    getManager().pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
-                }
                 ((JsonTree) item).setSelected(true);
 
-                ContextMenuScreen contextMenuScreen = (ContextMenuScreen) getManager().getScreen(ContextMenuScreen.ASSET_URI);
-
-                List<String> options = Lists.newArrayList();
-                options.add(OPTION_COPY);
-                options.add(OPTION_PASTE);
-                if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree)item).getValue().getKey().equals("contents")) {
-                    options.add(OPTION_ADD_WIDGET);
+                ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
+                contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) item);
+                contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) item);
+                if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
+                    contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) item);
                 }
-
-                contextMenuScreen
-                        .setList(options);
-                contextMenuScreen
-                        .setMenuPosition(event.getMouse().getPosition());
-                contextMenuScreen
-                        .bindSelection(new Binding() {
-                            @Override
-                            public Object get() {
-                                return null;
-                            }
-
-                            @Override
-                            public void set(Object value) {
-                                getManager().closeScreen(ContextMenuScreen.ASSET_URI);
-                                ((JsonTree) item).setSelected(false);
-
-                                if (value.equals(OPTION_COPY)) {
-                                    editorTreeView.copy(item);
-                                } else if (value.equals(OPTION_PASTE)) {
-                                    editorTreeView.paste(item);
-                                } else if (value.equals(OPTION_ADD_WIDGET)) {
-                                    addWidget((JsonTree) item);
-                                } else {
-                                    throw new IllegalStateException(String.format("Invalid context menu selection: %s", value));
-                                }
-                            }
-                        });
-                contextMenuScreen.subscribeSelection(() -> {
+                contextMenuBuilder.subscribeSelection(() -> {
                     ((JsonTree) item).setSelected(false);
                 });
+                contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
         });
 
@@ -290,6 +259,14 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
             selectedUrn = urn;
         }
+    }
+
+    private void copy(JsonTree item) {
+        editorTreeView.copy(item);
+    }
+
+    private void paste(JsonTree item) {
+        editorTreeView.paste(item);
     }
 
     private void addWidget(JsonTree item) {

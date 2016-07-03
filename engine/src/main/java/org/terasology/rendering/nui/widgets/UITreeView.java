@@ -262,7 +262,7 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void fireUpdateListeners() {
-        updateListeners.forEach(UpdateListener::onChange);
+        updateListeners.forEach(UpdateListener::onAction);
     }
 
     private void moveSelected(int keyId) {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.contextMenu;
 
 import com.google.api.client.util.Lists;
 import com.google.common.base.Preconditions;
@@ -83,7 +83,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        selectionListeners.forEach(UpdateListener::onChange);
+        selectionListeners.forEach(UpdateListener::onAction);
     }
 
     public void setList(List list) {

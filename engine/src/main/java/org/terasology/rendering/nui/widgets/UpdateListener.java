@@ -17,5 +17,5 @@ package org.terasology.rendering.nui.widgets;
 
 @FunctionalInterface
 public interface UpdateListener {
-    void onChange();
+    void onAction();
 }
