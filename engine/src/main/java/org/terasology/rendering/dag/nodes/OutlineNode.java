@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
@@ -46,7 +45,6 @@ public class OutlineNode extends AbstractNode {
 
     private RenderingConfig renderingConfig;
     private Material outline;
-    private RenderingDebugConfig renderingDebugConfig;
 
     public OutlineNode(String id) {
         super(id);
@@ -56,7 +54,6 @@ public class OutlineNode extends AbstractNode {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        renderingDebugConfig = renderingConfig.getDebug();
         outline = worldRenderer.getMaterial("engine:prog.sobel");
     }
 
@@ -75,7 +72,6 @@ public class OutlineNode extends AbstractNode {
     public void process() {
         if (renderingConfig.isOutline()) {
             // TODO: a candidate for redundant state elimination
-            disableWireframeIf(renderingDebugConfig.isWireframe());
 
             FBO outlineFBO = frameBuffersManager.getFBO("outline");
             FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");

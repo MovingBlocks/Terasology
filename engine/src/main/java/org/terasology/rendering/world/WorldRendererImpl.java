@@ -179,7 +179,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // FIXME: init pipeline without specifying them as a field in this class
         renderingGraph = RenderingGraph.createDefault(context);
 
-        shadowMapNode = (ShadowMapNode) renderingGraph.get("shadowmap"); // TODO: remove shadow map node from world renderer
+        shadowMapNode = (ShadowMapNode) renderingGraph.get("shadowMap"); // TODO: remove shadow map node from world renderer
     }
 
 

@@ -29,7 +29,6 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
@@ -60,7 +59,6 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @Override
     public void process() {
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         preRenderSetupSimpleBlendMaterials();
 

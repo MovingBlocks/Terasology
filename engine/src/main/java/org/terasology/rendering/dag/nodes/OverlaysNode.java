@@ -16,13 +16,13 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 
 /**
  * TODO: Diagram of this node
@@ -35,21 +35,17 @@ public class OverlaysNode extends AbstractNode {
     @In
     private ComponentSystemManager componentSystemManager;
 
-    private RenderingDebugConfig renderingDebugConfig;
-
     public OverlaysNode(String id) {
         super(id);
     }
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
     }
 
     @Override
     public void process() {
-        enableWireframeIf(renderingDebugConfig.isWireframe());
-
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }

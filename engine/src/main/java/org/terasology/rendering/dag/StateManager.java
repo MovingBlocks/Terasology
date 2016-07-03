@@ -19,6 +19,7 @@ package org.terasology.rendering.dag;
 import com.google.api.client.util.Maps;
 import java.util.Collection;
 import java.util.Map;
+import org.terasology.context.Context;
 import org.terasology.rendering.dag.states.State;
 import org.terasology.rendering.dag.states.StateType;
 import org.terasology.rendering.dag.states.StateTypeImpl;
@@ -30,17 +31,26 @@ import org.terasology.rendering.dag.states.Wireframe;
  */
 public class StateManager {
 
+    private Context context;
     private Map<String, Map<StateType, StateValue>> stateChanges; // TODO: better name?
     private Map<StateType, State> availableStates;
 
-
     public StateManager() {
+        initialise();
+    }
+
+    public StateManager(Context context) {
+        this.context = context;
+        initialise();
+    }
+
+    private void initialise() {
         stateChanges = Maps.newHashMap();
         availableStates = Maps.newHashMap();
     }
 
-    public static StateManager createDefault() {
-        StateManager stateManager = new StateManager();
+    public static StateManager createDefault(Context context) {
+        StateManager stateManager = new StateManager(context);
         stateManager.addAvailableStates();
         return stateManager;
     }
@@ -102,7 +112,7 @@ public class StateManager {
     }
 
     private void addAvailableStates() {
-        addState(StateTypeImpl.WIREFRAME, new Wireframe());
+        addState(StateTypeImpl.WIREFRAME, new Wireframe(context));
     }
 
     private void changeState(StateType stateType, StateValue value) { // TODO: Moving this method into a separate class?

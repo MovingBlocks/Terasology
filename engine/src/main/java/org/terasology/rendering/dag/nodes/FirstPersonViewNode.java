@@ -23,10 +23,11 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 
 /**
  * TODO: Diagram of this node
@@ -51,16 +52,14 @@ public class FirstPersonViewNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
         playerCamera = worldRenderer.getActiveCamera();
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
+        renderingDebugConfig = config.getRendering().getDebug();
     }
 
     @Override
     public void process() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
-            disableWireframeIf(renderingDebugConfig.isWireframe());
-
-
             /**
              * Sets the state to render the First Person View.
              *

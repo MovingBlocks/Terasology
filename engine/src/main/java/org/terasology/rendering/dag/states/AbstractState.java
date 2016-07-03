@@ -15,11 +15,21 @@
  */
 package org.terasology.rendering.dag.states;
 
+import org.terasology.context.Context;
+
 /**
  *
  */
 public class AbstractState implements State {
+    private Context context;
     private StateValue value;
+
+    public AbstractState(Context context) {
+        this.context = context;
+    }
+
+    public AbstractState() {
+    }
 
     @Override
     public void set(StateValue stateValue) {

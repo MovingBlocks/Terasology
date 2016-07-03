@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
@@ -44,7 +43,6 @@ public class PrePostCompositeNode extends AbstractNode {
     private Config config;
 
     private Material prePostComposite;
-    private RenderingDebugConfig renderingDebugConfig;
 
     public PrePostCompositeNode(String id) {
         super(id);
@@ -53,7 +51,6 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
-        renderingDebugConfig = config.getRendering().getDebug();
     }
 
     /**
@@ -62,7 +59,6 @@ public class PrePostCompositeNode extends AbstractNode {
      */
     @Override
     public void process() {
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         prePostComposite.enable();
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         FBO sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");

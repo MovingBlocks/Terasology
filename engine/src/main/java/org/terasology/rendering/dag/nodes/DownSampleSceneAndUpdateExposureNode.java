@@ -100,7 +100,6 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     // TODO: verify if this can be achieved entirely in the GPU, during tone mapping perhaps?
     @Override
     public void process() {
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         if (renderingConfig.isEyeAdaptation()) {

@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
@@ -52,7 +51,6 @@ public class SkyBandsNode extends AbstractNode {
     private Material blurShader;
     private FBO sceneOpaque;
     private FBO sceneSkyBand0;
-    private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
 
     public SkyBandsNode(String id) {
@@ -63,7 +61,6 @@ public class SkyBandsNode extends AbstractNode {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        renderingDebugConfig = renderingConfig.getDebug();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
@@ -86,7 +83,6 @@ public class SkyBandsNode extends AbstractNode {
 
         playerCamera.lookThrough();
 
-        disableWireframeIf(renderingDebugConfig.isWireframe());
     }
 
     private void generateSkyBand(FBO skyBand) {

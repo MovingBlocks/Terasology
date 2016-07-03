@@ -92,6 +92,75 @@ public class StateManagerTest {
         assertEquals("101", dummyStateA.getHistory());
     }
 
+    @Test
+    public void testOneStateSixNodes2() {
+        StateManager stateManager = new StateManager();
+        DummyState dummyStateA = new DummyState();
+        stateManager.addState(DummyStateType.A, dummyStateA);
+        DummyNode node1 = new DummyNode("node1");
+        DummyNode node2 = new DummyNode("node2");
+        DummyNode node3 = instantiateDummyNodeWithState("node3", DummyStateType.A, StateValue.ENABLED);
+        DummyNode node4 = instantiateDummyNodeWithState("node4", DummyStateType.A, StateValue.ENABLED);
+        DummyNode node5 = new DummyNode("node5");
+        DummyNode node6 = new DummyNode("node6");
+
+        Collection<Node> dummyPipeline = createDummyPipeline(node1, node2, node3, node4, node5, node6);
+        stateManager.findStateChanges(dummyPipeline);
+
+        // run pipeline
+        for (Node node : dummyPipeline) {
+            stateManager.prepareFor(node);
+        }
+
+        assertEquals("10", dummyStateA.getHistory());
+    }
+
+    @Test
+    public void testOneStateSixNodes3() {
+        StateManager stateManager = new StateManager();
+        DummyState dummyStateA = new DummyState();
+        stateManager.addState(DummyStateType.A, dummyStateA);
+        DummyNode node1 = new DummyNode("node1");
+        DummyNode node2 = new DummyNode("node2");
+        DummyNode node3 = instantiateDummyNodeWithState("node3", DummyStateType.A, StateValue.ENABLED);
+        DummyNode node4 = instantiateDummyNodeWithState("node4", DummyStateType.A, StateValue.ENABLED);
+        DummyNode node5 = instantiateDummyNodeWithState("node5", DummyStateType.A, StateValue.DISABLED);
+        DummyNode node6 = instantiateDummyNodeWithState("node6", DummyStateType.A, StateValue.DISABLED);
+
+        Collection<Node> dummyPipeline = createDummyPipeline(node1, node2, node3, node4, node5, node6);
+        stateManager.findStateChanges(dummyPipeline);
+
+        // run pipeline
+        for (Node node : dummyPipeline) {
+            stateManager.prepareFor(node);
+        }
+
+        assertEquals("10", dummyStateA.getHistory());
+    }
+
+    @Test
+    public void testOneStateSixNodes4() {
+        StateManager stateManager = new StateManager();
+        DummyState dummyStateA = new DummyState();
+        stateManager.addState(DummyStateType.A, dummyStateA);
+        DummyNode node1 = instantiateDummyNodeWithState("node1", DummyStateType.A, StateValue.DISABLED);
+        DummyNode node2 = instantiateDummyNodeWithState("node2", DummyStateType.A, StateValue.DISABLED);
+        DummyNode node3 = instantiateDummyNodeWithState("node3", DummyStateType.A, StateValue.ENABLED);
+        DummyNode node4 = instantiateDummyNodeWithState("node4", DummyStateType.A, StateValue.ENABLED);
+        DummyNode node5 = instantiateDummyNodeWithState("node5", DummyStateType.A, StateValue.DISABLED);
+        DummyNode node6 = instantiateDummyNodeWithState("node6", DummyStateType.A, StateValue.DISABLED);
+
+        Collection<Node> dummyPipeline = createDummyPipeline(node1, node2, node3, node4, node5, node6);
+        stateManager.findStateChanges(dummyPipeline);
+
+        // run pipeline
+        for (Node node : dummyPipeline) {
+            stateManager.prepareFor(node);
+        }
+
+        assertEquals("010", dummyStateA.getHistory());
+    }
+
     private DummyNode instantiateDummyNodeWithState(String identifier, StateType stateType, StateValue stateValue) {
         DummyNode node1 = new DummyNode(identifier);
         node1.addDependentState(stateType, stateValue);
@@ -115,6 +184,7 @@ public class StateManagerTest {
         private StringBuilder stringBuilder = new StringBuilder();
 
         DummyState() {
+
         }
 
         @Override

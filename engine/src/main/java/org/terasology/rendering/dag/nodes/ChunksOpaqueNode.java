@@ -16,16 +16,15 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
  * TODO: Diagram of this node
@@ -41,7 +40,6 @@ public class ChunksOpaqueNode extends AbstractNode {
     @In
     private RenderQueuesHelper renderQueues;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
 
     public ChunksOpaqueNode(String id) {
@@ -50,13 +48,12 @@ public class ChunksOpaqueNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
         playerCamera = worldRenderer.getActiveCamera();
     }
 
     @Override
     public void process() {
-        enableWireframeIf(renderingDebugConfig.isWireframe());
         worldRenderer.renderChunks(renderQueues.chunksOpaque,
                 ChunkMesh.RenderPhase.OPAQUE,
                 playerCamera,

@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
@@ -45,7 +44,6 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
     private Config config;
 
     private RenderingConfig renderingConfig;
-    private RenderingDebugConfig renderingDebugConfig;
     private FBO sceneOpaque;
     private FBO ssaoBlurredFBO;
     private FBO ssaoFBO;
@@ -59,7 +57,6 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        renderingDebugConfig = renderingConfig.getDebug();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
     }
@@ -75,7 +72,6 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
     public void process() {
         if (renderingConfig.isSsao()) {
             // TODO: consider moving these into initialise without breaking existing implementation
-            disableWireframeIf(renderingDebugConfig.isWireframe());
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
             ssaoBlurredFBO = frameBuffersManager.getFBO("ssaoBlurred");
             ssaoFBO = frameBuffersManager.getFBO("ssao");

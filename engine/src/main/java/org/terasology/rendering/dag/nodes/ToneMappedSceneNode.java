@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
@@ -43,7 +42,6 @@ public class ToneMappedSceneNode extends AbstractNode {
     @In
     private Config config;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Material toneMapping;
 
     public ToneMappedSceneNode(String id) {
@@ -52,7 +50,6 @@ public class ToneMappedSceneNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 
@@ -65,7 +62,6 @@ public class ToneMappedSceneNode extends AbstractNode {
     // TODO: see what it does.
     @Override
     public void process() {
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         FBO sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 

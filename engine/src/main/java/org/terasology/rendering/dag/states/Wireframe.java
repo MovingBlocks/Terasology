@@ -16,24 +16,39 @@
 package org.terasology.rendering.dag.states;
 
 import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import static org.lwjgl.opengl.GL11.GL_LINE;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 
 /**
  *
  */
 public class Wireframe extends AbstractState {
+    private RenderingDebugConfig renderingDebugConfig;
+
+    public Wireframe(Context context) {
+        super(context);
+        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
+    }
 
     @Override
     public void set(StateValue stateValue) {
         super.set(stateValue);
+
+        if (!renderingDebugConfig.isWireframe()) {
+            return;
+        }
+
         switch (stateValue) {
             case ENABLED:
                 GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 break;
 
             case DISABLED:
-                GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+                GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL_FILL);
                 break;
 
             case OPTIONAL:
@@ -42,3 +57,4 @@ public class Wireframe extends AbstractState {
         }
     }
 }
+

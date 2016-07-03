@@ -21,8 +21,9 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -48,7 +49,6 @@ public class LightGeometryNode extends AbstractNode {
 
     private Material lightGeometryShader;
     private FBO sceneOpaque;
-    private Camera playerCamera;
 
     public LightGeometryNode(String id) {
         super(id);
@@ -57,7 +57,7 @@ public class LightGeometryNode extends AbstractNode {
     @Override
     public void initialise() {
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
-        playerCamera = worldRenderer.getActiveCamera();
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
     }
 
     @Override

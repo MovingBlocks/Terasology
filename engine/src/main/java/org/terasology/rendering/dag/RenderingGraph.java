@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.Maps;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.InjectionHelper;
@@ -50,44 +51,46 @@ import java.util.Map;
  * TODO: Add javadocs
  */
 public class RenderingGraph {
-    private Context context;
+    private final Context context;
     private Map<String, Node> nodeMap;
     private StateManager stateManager;
     private Collection<Node> topologicalOrder;
+    private Config config;
     private boolean analyzed;
 
     public RenderingGraph(Context context) {
         this.context = context;
         this.nodeMap = Maps.newLinkedHashMap(); // insert order is important for now
-        this.stateManager = StateManager.createDefault();
+        this.config = context.get(Config.class);
+        this.stateManager = StateManager.createDefault(context);
         this.analyzed = false;
     }
 
     public static RenderingGraph createDefault(Context context) {
         RenderingGraph pipeline = new RenderingGraph(context);
-        pipeline.add("shadowmap", ShadowMapNode.class);
-        pipeline.add("worldreflective", WorldReflectionNode.class);
+        pipeline.add("shadowMap", ShadowMapNode.class);
+        pipeline.add("worldReflective", WorldReflectionNode.class);
         pipeline.add("backdrop", BackdropNode.class);
-        pipeline.add("skybands", SkyBandsNode.class);
-        pipeline.add("objectsopaque", ObjectsOpaqueNode.class);
-        pipeline.add("chunksopaque", ChunksOpaqueNode.class);
-        pipeline.add("chunksalphareject", ChunksAlphaRejectNode.class);
+        pipeline.add("skyBands", SkyBandsNode.class);
+        pipeline.add("objectsOpaque", ObjectsOpaqueNode.class);
+        pipeline.add("chunksOpaque", ChunksOpaqueNode.class);
+        pipeline.add("chunksAlphaReject", ChunksAlphaRejectNode.class);
         pipeline.add("overlays", OverlaysNode.class);
-        pipeline.add("firstpersonview", FirstPersonViewNode.class);
-        pipeline.add("lightgeometry", LightGeometryNode.class);
-        pipeline.add("directionallights", DirectionalLightsNode.class);
-        pipeline.add("chunksrefractivereflective", ChunksRefractiveReflectiveNode.class);
+        pipeline.add("firstPersonView", FirstPersonViewNode.class);
+        pipeline.add("lightGeometry", LightGeometryNode.class);
+        pipeline.add("directionalLights", DirectionalLightsNode.class);
+        pipeline.add("chunksRefractiveReflective", ChunksRefractiveReflectiveNode.class);
         pipeline.add("outline", OutlineNode.class);
-        pipeline.add("ambientocclusionpasses", AmbientOcclusionPassesNode.class);
-        pipeline.add("prepostcomposite", PrePostCompositeNode.class);
-        pipeline.add("simpleblendmaterials", SimpleBlendMaterialsNode.class);
-        pipeline.add("lightshafts", LightShaftsNode.class);
-        pipeline.add("initialpostprocessing", InitialPostProcessingNode.class);
-        pipeline.add("downsamplesceneandupdateexposure", DownSampleSceneAndUpdateExposureNode.class); // TODO: a rename needed :)
-        pipeline.add("tonemappedscene", ToneMappedSceneNode.class);
-        pipeline.add("bloompasses", BloomPassesNode.class);
-        pipeline.add("blurpasses", BlurPassesNode.class);
-        pipeline.add("finalpostprocessing", FinalPostProcessingNode.class);
+        pipeline.add("ambientOcclusionPasses", AmbientOcclusionPassesNode.class);
+        pipeline.add("prePostComposite", PrePostCompositeNode.class);
+        pipeline.add("simpleBlendMaterials", SimpleBlendMaterialsNode.class);
+        pipeline.add("lightShafts", LightShaftsNode.class);
+        pipeline.add("initialPostprocessing", InitialPostProcessingNode.class);
+        pipeline.add("downSampleSceneAndUpdateExposure", DownSampleSceneAndUpdateExposureNode.class); // TODO: a rename needed :)
+        pipeline.add("toneMapping", ToneMappedSceneNode.class);
+        pipeline.add("bloomPasses", BloomPassesNode.class);
+        pipeline.add("blurPasses", BlurPassesNode.class);
+        pipeline.add("finalPostProcessing", FinalPostProcessingNode.class);
         pipeline.analyze();
         return pipeline;
     }
@@ -101,7 +104,6 @@ public class RenderingGraph {
     public void add(AbstractNode node) {
         nodeMap.put(node.getIdentifier(), node);
     }
-
 
     public <T extends AbstractNode> void add(String identifier, Class<T> type) {
         // Attempt constructor-based injection first

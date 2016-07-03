@@ -19,6 +19,8 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -51,6 +53,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
     }
 
     @Override

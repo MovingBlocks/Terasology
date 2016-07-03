@@ -61,7 +61,6 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Override
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         FBO scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         initialPost.enable();

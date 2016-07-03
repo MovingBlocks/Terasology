@@ -16,18 +16,18 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.states.StateTypeImpl;
+import org.terasology.rendering.dag.states.StateValue;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
@@ -47,7 +47,6 @@ public class BackdropNode extends AbstractNode {
     @In
     private FrameBuffersManager frameBuffersManager;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
     private FBO sceneOpaque;
 
@@ -57,7 +56,7 @@ public class BackdropNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
+        addDesiredState(StateTypeImpl.WIREFRAME, StateValue.ENABLED);
         playerCamera = worldRenderer.getActiveCamera();
     }
 
@@ -65,7 +64,6 @@ public class BackdropNode extends AbstractNode {
     public void process() {
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
-        enableWireframeIf(renderingDebugConfig.isWireframe());
         initialClearing();
 
         sceneOpaque.bind();
