@@ -219,7 +219,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node lightShaftsNode = createInstance(LightShaftsNode.class, context);
         Node initialPostProcessingNode = createInstance(InitialPostProcessingNode.class, context);
         Node downSampleSceneAndUpdateExposure = createInstance(DownSampleSceneAndUpdateExposureNode.class, context);
-        Node toneMappedSceneNode = createInstance(ToneMappingNode.class, context);
+        Node toneMappingNode = createInstance(ToneMappingNode.class, context);
         Node bloomPassesNode = createInstance(BloomPassesNode.class, context);
         Node blurPassesNode = createInstance(BlurPassesNode.class, context);
         Node finalPostProcessingNode = createInstance(FinalPostProcessingNode.class, context);
@@ -245,7 +245,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.add(lightShaftsNode);
         renderGraph.add(initialPostProcessingNode);
         renderGraph.add(downSampleSceneAndUpdateExposure);
-        renderGraph.add(toneMappedSceneNode);
+        renderGraph.add(toneMappingNode);
         renderGraph.add(bloomPassesNode);
         renderGraph.add(blurPassesNode);
         renderGraph.add(finalPostProcessingNode);
