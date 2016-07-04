@@ -40,11 +40,8 @@ import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterHeldItemComponent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.*;
+import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -356,22 +353,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
 
         localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
+        entity.send(new OnItemUseEvent());
 
-        long currentTime = time.getGameTimeInMs();
         // TODO: send this data back to the server so that other players can visualize this item use
-        // TODO: extract this into an event someplace so that this code does not have to exist both here and in CharacterInventorySystem
-        characterHeldItemComponent.lastItemUsedTime = currentTime;
-        characterHeldItemComponent.nextItemUseTime = currentTime;
-        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
-        if (itemComponent != null) {
-            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
-        } else {
-            characterHeldItemComponent.nextItemUseTime += 200;
-        }
+
         entity.saveComponent(characterHeldItemComponent);
         event.consume();
     }
-
 
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
         return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
