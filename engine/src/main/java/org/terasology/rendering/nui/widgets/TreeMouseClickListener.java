@@ -19,6 +19,6 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.widgets.models.Tree;
 
 @FunctionalInterface
-public interface ItemMouseClickListener {
+public interface TreeMouseClickListener {
     void onMouseClick(NUIMouseClickEvent event, Tree item);
 }

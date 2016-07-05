@@ -38,9 +38,13 @@ public class ContextMenuBuilder {
      */
     private Map<String, ConsumerObjectPair> options = Maps.newHashMap();
     /**
-     * Context menu close listeners. Activated when an item is selected or the menu is closed.
+     * Listeners fired when an item is selected.
      */
     private List<UpdateListener> selectionListeners = Lists.newArrayList();
+    /**
+     * Listeners fired when the menu is closed.
+     */
+    private List<UpdateListener> closeListeners = Lists.newArrayList();
 
     /**
      * Adds an action to the available options.
@@ -87,8 +91,8 @@ public class ContextMenuBuilder {
                     }
                 });
 
-        contextMenuScreen.subscribeSelection(() -> {
-            selectionListeners.forEach(UpdateListener::onAction);
+        contextMenuScreen.subscribeClose(() -> {
+            closeListeners.forEach(UpdateListener::onAction);
         });
     }
 
@@ -100,6 +104,16 @@ public class ContextMenuBuilder {
     public void unsubscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         selectionListeners.remove(listener);
+    }
+
+    public void subscribeClose(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        closeListeners.add(listener);
+    }
+
+    public void unsubscribeClose(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        closeListeners.remove(listener);
     }
 
     /**

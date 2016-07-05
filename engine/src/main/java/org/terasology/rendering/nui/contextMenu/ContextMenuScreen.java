@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-import com.google.api.client.util.Lists;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
@@ -47,9 +47,9 @@ public class ContextMenuScreen extends CoreScreenLayer {
      */
     private Vector2i menuPosition = Vector2i.zero();
     /**
-     * Listeners triggered when a context menu option is selected.
+     * Listeners fired when the menu is closed.
      */
-    private List<UpdateListener> selectionListeners = Lists.newArrayList();
+    private List<UpdateListener> closeListeners = Lists.newArrayList();
 
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
@@ -83,7 +83,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        selectionListeners.forEach(UpdateListener::onAction);
+        closeListeners.forEach(UpdateListener::onAction);
     }
 
     public void setList(List list) {
@@ -98,13 +98,13 @@ public class ContextMenuScreen extends CoreScreenLayer {
         menuPosition = position;
     }
 
-    public void subscribeSelection(UpdateListener listener) {
+    public void subscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
-        selectionListeners.add(listener);
+        closeListeners.add(listener);
     }
 
-    public void unsubscribeSelection(UpdateListener listener) {
+    public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
-        selectionListeners.remove(listener);
+        closeListeners.remove(listener);
     }
 }

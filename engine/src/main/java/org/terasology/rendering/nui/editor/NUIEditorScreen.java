@@ -156,7 +156,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         editorTreeView.subscribeItemMouseClick((event, item) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                ((JsonTree) item).setSelected(true);
+                item.setSelected(true);
 
                 ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
                 contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) item);
@@ -164,8 +164,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
                     contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) item);
                 }
-                contextMenuBuilder.subscribeSelection(() -> {
-                    ((JsonTree) item).setSelected(false);
+                contextMenuBuilder.subscribeClose(() -> {
+                    item.setSelected(false);
                 });
                 contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
@@ -263,10 +263,13 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     private void copy(JsonTree item) {
         editorTreeView.copy(item);
+        item.setSelected(false);
     }
 
     private void paste(JsonTree item) {
         editorTreeView.paste(item);
+        item.setSelected(false);
+
     }
 
     private void addWidget(JsonTree item) {
