@@ -34,6 +34,7 @@ import org.terasology.logic.characters.events.ActivationRequestDenied;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
+import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -91,22 +92,11 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
 
         entity.send(new AttackRequest(selectedItemEntity));
+        entity.send(new OnItemUseEvent());
 
-        long currentTime = time.getGameTimeInMs();
-        // TODO: send this data back to the server so that other players can visualize this attack
-        // TODO: extract this into an event someplace so that this code does not have to exist both here and in LocalPlayerSystem
-        characterHeldItemComponent.lastItemUsedTime = currentTime;
-        characterHeldItemComponent.nextItemUseTime = currentTime;
-        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
-        if (itemComponent != null) {
-            characterHeldItemComponent.nextItemUseTime += itemComponent.cooldownTime;
-        } else {
-            characterHeldItemComponent.nextItemUseTime += 200;
-        }
         entity.saveComponent(characterHeldItemComponent);
         event.consume();
     }
-
 
     @ReceiveEvent(components = LocationComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onAttackRequest(AttackRequest event, EntityRef character) {
@@ -128,6 +118,29 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (result.isHit()) {
             result.getEntity().send(new AttackEvent(character, event.getItem()));
         }
+    }
+
+    @ReceiveEvent(components = {CharacterComponent.class})
+    public void onItemUse(OnItemUseEvent event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+        EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
+
+        long currentTime = time.getGameTimeInMs();
+        characterHeldItemComponent.lastItemUsedTime = currentTime;
+        characterHeldItemComponent.nextItemUseTime = currentTime;
+        ItemComponent itemComponent = selectedItemEntity.getComponent(ItemComponent.class);
+
+        // Add the cooldown time for the next use of this item.
+        if (itemComponent != null) {
+            // Send out this event so other systems can alter the cooldown time.
+            AffectItemUseCooldownTimeEvent affectItemUseCooldownTimeEvent
+                    = new AffectItemUseCooldownTimeEvent(itemComponent.baseCooldownTime);
+            entity.send(affectItemUseCooldownTimeEvent);
+            characterHeldItemComponent.nextItemUseTime += affectItemUseCooldownTimeEvent.getResultValue();
+        } else {
+            characterHeldItemComponent.nextItemUseTime += 200;
+        }
+
+        entity.saveComponent(characterHeldItemComponent);
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, netFilter = RegisterMode.AUTHORITY)
