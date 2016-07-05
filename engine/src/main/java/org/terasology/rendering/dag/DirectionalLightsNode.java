@@ -66,7 +66,6 @@ public class DirectionalLightsNode implements Node {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
         initMainDirectionalLight();
@@ -83,6 +82,7 @@ public class DirectionalLightsNode implements Node {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/directionallights");
+        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         sceneOpaque.bind();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
