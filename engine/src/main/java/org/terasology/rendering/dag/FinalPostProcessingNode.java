@@ -145,14 +145,14 @@ public class FinalPostProcessingNode implements Node {
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(RenderingStage renderingStage) {
+        if (postProcessor.isNotTakingScreenshot()) { // TODO: verify if this works
+            sceneFinal.bind();
+        } else {
+            ocUndistorted.bind();
+        }
+
         switch (renderingStage) {
             case LEFT_EYE:
-                if (postProcessor.isNotTakingScreenshot()) { // TODO: verify if this works
-                    sceneFinal.bind();
-                } else {
-                    ocUndistorted.bind();
-                }
-
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad(0, 0, fullScale.width() / 2, fullScale.height());
 
