@@ -65,6 +65,9 @@ public final class CharacterMovementComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public int numberOfJumpsMax = 1; // Maximum number of jumps allowed starting from solid ground.
 
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public int numberOfJumpsLeft = baseNumberOfJumpsMax; // Remaining number of jumps a player can perform.
+
     public float distanceBetweenFootsteps = 1f;
     public boolean faceMovementDirection;
 
