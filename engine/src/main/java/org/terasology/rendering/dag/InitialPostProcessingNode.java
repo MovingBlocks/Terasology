@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag;
 
+import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -25,13 +26,16 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
  * TODO: Add diagram of this node
  */
-public class PrePostCompositeNode implements Node {
+public class InitialPostProcessingNode implements Node {
+
+    @In
+    private Config config;
 
     @In
     private FrameBuffersManager frameBuffersManager;
@@ -39,32 +43,31 @@ public class PrePostCompositeNode implements Node {
     @In
     private WorldRenderer worldRenderer;
 
-    private Material prePostComposite;
+    private FBO scenePrePost;
     private FBO sceneOpaque;
-    private FBO sceneOpaquePingPong;
-    private FBO sceneReflectiveRefractive;
+    private Material initialPost;
 
     @Override
     public void initialise() {
-        prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
+        initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
     }
 
     /**
-     * Adds outlines and ambient occlusion to the rendering obtained so far stored in the primary FBO.
-     * Stores the resulting output back into the primary buffer.
+     * Adds chromatic aberration, light shafts, 1/8th resolution bloom, vignette onto the rendering achieved so far.
+     * Stores the result into its own buffer to be used at a later stage.
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/prePostComposite");
-        prePostComposite.enable();
+        // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
+        PerformanceMonitor.startActivity("rendering/initialPostProcessing");
+        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        initialPost.enable();
 
-        // TODO: verify if there should be bound textures here.
-        sceneOpaquePingPong.bind();
+        // TODO: verify what the inputs are
+        scenePrePost.bind(); // TODO: see if we could write this straight into sceneOpaque
 
-        setViewportToSizeOf(sceneOpaquePingPong);
+        setViewportToSizeOf(scenePrePost);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -72,8 +75,6 @@ public class PrePostCompositeNode implements Node {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        frameBuffersManager.swapSceneOpaqueFBOs();
-        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();
     }
 }

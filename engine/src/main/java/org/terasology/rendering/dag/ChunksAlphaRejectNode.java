@@ -57,7 +57,7 @@ public class ChunksAlphaRejectNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/chunksalphareject");
+        PerformanceMonitor.startActivity("rendering/chunksAlphaReject");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         worldRenderer.renderChunks(renderQueues.chunksAlphaReject,

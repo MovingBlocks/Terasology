@@ -68,7 +68,7 @@ public class LightGeometryNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/lightgeometry");
+        PerformanceMonitor.startActivity("rendering/lightGeometry");
         // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
         /*
         graphicState.preRenderSetupLightGeometryStencil();
@@ -140,6 +140,4 @@ public class LightGeometryNode implements Node {
         setRenderBufferMask(sceneOpaque, true, true, true); // TODO: probably redundant - verify
         bindDisplay();
     }
-
-
 }

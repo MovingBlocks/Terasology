@@ -27,13 +27,16 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
  * TODO: Add diagram of this node
  */
-public class OutlineNode implements Node {
+public class LightShaftsNode implements Node {
+
+    @In
+    private Config config;
 
     @In
     private FrameBuffersManager frameBuffersManager;
@@ -41,50 +44,36 @@ public class OutlineNode implements Node {
     @In
     private WorldRenderer worldRenderer;
 
-    @In
-    private Config config;
-
     private RenderingConfig renderingConfig;
-    private Material outline;
-    private FBO outlineFBO;
+    private Material lightShaftsShader;
+    private FBO lightShaftsFBO;
     private FBO sceneOpaque;
 
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        outline = worldRenderer.getMaterial("engine:prog.sobel");
+        lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
     }
 
-    /**
-     * Enabled by the "outline" option in the render settings, this method generates
-     * landscape/objects outlines and stores them into a buffer in its own FBO. The
-     * stored image is eventually combined with others.
-     * <p>
-     * The outlines visually separate a given object (including the landscape) or parts of it
-     * from sufficiently distant objects it overlaps. It is effectively a depth-based edge
-     * detection technique and internally uses a Sobel operator.
-     * <p>
-     * For further information see: http://en.wikipedia.org/wiki/Sobel_operator
-     */
     @Override
     public void process() {
-        if (renderingConfig.isOutline()) {
-            PerformanceMonitor.startActivity("rendering/outline");
-            outlineFBO = frameBuffersManager.getFBO("outline");
+        if (renderingConfig.isLightShafts()) {
+            PerformanceMonitor.startActivity("rendering/lightShafts");
+            lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
-            outline.enable();
+            lightShaftsShader.enable();
+            // TODO: verify what the inputs are
+            lightShaftsFBO.bind();
 
-            // TODO: verify inputs: shouldn't there be a texture binding here?
-            outlineFBO.bind();
-
-            setViewportToSizeOf(outlineFBO);
+            setViewportToSizeOf(lightShaftsFBO);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
             renderFullscreenQuad();
 
-            bindDisplay();  // TODO: verify this is necessary
-            setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+            bindDisplay();     // TODO: verify this is necessary
+            setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+
             PerformanceMonitor.endActivity();
         }
     }

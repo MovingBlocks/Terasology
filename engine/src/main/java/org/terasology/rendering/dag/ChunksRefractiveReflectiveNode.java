@@ -25,7 +25,6 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
@@ -93,7 +92,6 @@ public class ChunksRefractiveReflectiveNode implements Node {
         if (isHeadUnderWater) {
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
-
         bindDisplay();
     }
 }

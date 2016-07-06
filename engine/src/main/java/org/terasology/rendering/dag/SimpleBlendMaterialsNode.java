@@ -22,7 +22,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
-
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -49,7 +48,7 @@ public class SimpleBlendMaterialsNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/simpleblendmaterials");
+        PerformanceMonitor.startActivity("rendering/simpleBlendMaterials");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         preRenderSetupSimpleBlendMaterials();
 

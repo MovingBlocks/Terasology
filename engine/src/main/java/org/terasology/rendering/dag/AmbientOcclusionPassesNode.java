@@ -23,7 +23,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
@@ -69,7 +68,7 @@ public class AmbientOcclusionPassesNode implements Node {
     @Override
     public void process() {
         if (renderingConfig.isSsao()) {
-            PerformanceMonitor.startActivity("rendering/ambientocclusionpasses");
+            PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
             sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
             ssaoBlurredFBO = frameBuffersManager.getFBO("ssaoBlurred");
@@ -80,7 +79,6 @@ public class AmbientOcclusionPassesNode implements Node {
             PerformanceMonitor.endActivity();
         }
     }
-
 
     private void generateSSAO() {
         ssaoShader.enable();

@@ -24,7 +24,7 @@ import org.terasology.registry.In;
 import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
-/*
+/**
  * TODO: Diagram of this node
  */
 public class ObjectsOpaqueNode implements Node {
@@ -43,7 +43,7 @@ public class ObjectsOpaqueNode implements Node {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/objectsopaque");
+        PerformanceMonitor.startActivity("rendering/objectsOpaque");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {

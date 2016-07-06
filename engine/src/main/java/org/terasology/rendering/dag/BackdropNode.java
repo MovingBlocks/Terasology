@@ -53,6 +53,7 @@ public class BackdropNode implements Node {
     private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
     private FBO sceneOpaque;
+    private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
@@ -93,7 +94,7 @@ public class BackdropNode implements Node {
      */
     // It's unclear why these buffers need to be cleared while all the others don't...
     private void initialClearing() {
-        FBO sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
         sceneOpaque.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         sceneReflectiveRefractive.bind();

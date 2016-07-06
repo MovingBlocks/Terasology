@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ public class ShaderParametersHdr extends ShaderParametersBase {
         buffersManager.bindFboColorTexture("scenePrePost");
 
         program.setInt("texScene", 0, true);
+        // TODO: move to DownSampleSceneAndUpdateExposure
         program.setFloat("exposure", postProcessor.getExposure() * exposureBias, true);
         program.setFloat("whitePoint", whitePoint, true);
     }
