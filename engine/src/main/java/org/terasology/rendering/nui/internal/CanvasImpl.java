@@ -739,7 +739,8 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawFilledRectangle(Rect2i region, Color color) {
-        drawTexture(whiteTexture, region, color);
+        drawTextureRaw(whiteTexture, region, color, ScaleMode.STRETCH);
+
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
