@@ -169,7 +169,9 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            onItemMouseOver(index, MouseOverItemType.TOP);
+            if (!model.get().getItem(index).isRoot()) {
+                onItemMouseOver(index, MouseOverItemType.TOP);
+            }
         }
 
         @Override
@@ -227,7 +229,9 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            onItemMouseOver(index, MouseOverItemType.BOTTOM);
+            if (!model.get().getItem(index).isRoot()) {
+                onItemMouseOver(index, MouseOverItemType.BOTTOM);
+            }
         }
 
         @Override
@@ -512,10 +516,10 @@ public class UITreeView<T> extends CoreWidget {
         } else if (mouseOverItemType == MouseOverItemType.CENTER) {
             canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.minY(), Color.WHITE);
             canvas.drawLine(itemRegion.maxX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
-            canvas.drawLine(itemRegion.maxX(), itemRegion.maxY(), itemRegion.minX(), itemRegion.maxY(), Color.WHITE);
-            canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.minX(), itemRegion.minY(), Color.WHITE);
+            canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.minX(), itemRegion.maxY(), Color.WHITE);
+            canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
         } else if (mouseOverItemType == MouseOverItemType.BOTTOM) {
-            canvas.drawLine(itemRegion.maxX(), itemRegion.maxY(), itemRegion.minX(), itemRegion.maxY(), Color.WHITE);
+            canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
         }
     }
 
