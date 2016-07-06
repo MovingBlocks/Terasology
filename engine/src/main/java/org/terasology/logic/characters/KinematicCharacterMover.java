@@ -89,9 +89,6 @@ public class KinematicCharacterMover implements CharacterMover {
     private WorldProvider worldProvider;
     private PhysicsEngine physics;
 
-    // Store the number of jumps left.
-    private int numberOfJumpsLeft;
-
     public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
         physics = physicsEngine;
@@ -638,7 +635,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         // Upon hitting solid ground, reset the number of jumps back to the maximum value.
         if (state.isGrounded()) {
-            numberOfJumpsLeft = movementComp.numberOfJumpsMax;
+            movementComp.numberOfJumpsLeft = movementComp.numberOfJumpsMax;
         }
 
         if (moveResult.isBottomHit()) {
@@ -650,7 +647,7 @@ public class KinematicCharacterMover implements CharacterMover {
                     entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
                 }
                 state.setGrounded(true);
-                numberOfJumpsLeft = movementComp.numberOfJumpsMax;
+                movementComp.numberOfJumpsLeft = movementComp.numberOfJumpsMax;
             }
             endVelocity.y = 0;
 
@@ -672,7 +669,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 entity.send(affectMultiJumpEvent);
                 movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
 
-                numberOfJumpsLeft--;
+                movementComp.numberOfJumpsLeft--;
             }
         }
         else {
@@ -681,7 +678,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
-            if (input.isJumpRequested() && numberOfJumpsLeft > 0) {
+            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
                 state.setGrounded(false);
 
                 // Send event to allow for other systems to modify the jump force.
@@ -697,7 +694,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 entity.send(affectMultiJumpEvent);
                 movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
 
-                numberOfJumpsLeft--;
+                movementComp.numberOfJumpsLeft--;
             }
 
             state.setGrounded(false);
