@@ -169,16 +169,7 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (draggedItemIndex != null) {
-                if (mouseOverItemIndex != null) {
-                    model.get().getItem(mouseOverItemIndex).setSelected(false);
-                }
-                if (draggedItemIndex != index) {
-                    mouseOverItemIndex = index;
-                    model.get().getItem(index).setSelected(true);
-                    mouseOverItemType = MouseOverItemType.TOP;
-                }
-            }
+            onItemMouseOver(index, MouseOverItemType.TOP);
         }
 
         @Override
@@ -207,16 +198,7 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (draggedItemIndex != null) {
-                if (mouseOverItemIndex != null) {
-                    model.get().getItem(mouseOverItemIndex).setSelected(false);
-                }
-                if (draggedItemIndex != index) {
-                    mouseOverItemIndex = index;
-                    model.get().getItem(index).setSelected(true);
-                    mouseOverItemType = MouseOverItemType.CENTER;
-                }
-            }
+            onItemMouseOver(index, MouseOverItemType.CENTER);
         }
 
         @Override
@@ -245,16 +227,7 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (draggedItemIndex != null) {
-                if (mouseOverItemIndex != null) {
-                    model.get().getItem(mouseOverItemIndex).setSelected(false);
-                }
-                if (draggedItemIndex != index) {
-                    mouseOverItemIndex = index;
-                    model.get().getItem(index).setSelected(true);
-                    mouseOverItemType = MouseOverItemType.BOTTOM;
-                }
-            }
+            onItemMouseOver(index, MouseOverItemType.BOTTOM);
         }
 
         @Override
@@ -279,7 +252,37 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
+    private void onItemMouseOver(int index, MouseOverItemType type) {
+        if (draggedItemIndex != null) {
+            if (mouseOverItemIndex != null) {
+                model.get().getItem(mouseOverItemIndex).setSelected(false);
+            }
+            if (draggedItemIndex != index && model.get().getItem(index).acceptsChild(model.get().getItem(draggedItemIndex))) {
+                mouseOverItemIndex = index;
+                model.get().getItem(index).setSelected(true);
+                mouseOverItemType = type;
+            } else {
+                mouseOverItemIndex = null;
+            }
+        }
+    }
+
     private void onItemMouseRelease() {
+        if (draggedItemIndex != null && mouseOverItemIndex != null) {
+            Tree<T> child = model.get().getItem(draggedItemIndex);
+            Tree<T> parent = model.get().getItem(mouseOverItemIndex);
+            if (mouseOverItemType == MouseOverItemType.TOP) {
+                child.getParent().removeChild(child);
+                parent.getParent().addChild(parent.getParent().indexOf(parent), child);
+            } else if (mouseOverItemType == MouseOverItemType.CENTER) {
+                child.getParent().removeChild(child);
+                parent.addChild(child);
+            } else {
+                child.getParent().removeChild(child);
+                parent.getParent().addChild(parent.getParent().indexOf(parent) + 1, child);
+            }
+            fireUpdateListeners();
+        }
         if (draggedItemIndex != null) {
             selectedIndex.set(null);
             draggedItemIndex = null;

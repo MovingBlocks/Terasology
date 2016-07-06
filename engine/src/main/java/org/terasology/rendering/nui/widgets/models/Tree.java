@@ -180,7 +180,33 @@ public abstract class Tree<T> {
      * @param child The child to be added.
      * @return Whether the specified child can be added to the tree.
      */
-    public abstract boolean acceptsChild(Tree<T> child);
+    public boolean acceptsChild(Tree<T> child) {
+        // Only non-null children are allowed.
+        if (child == null) {
+            return false;
+        }
+
+        if (this.isChildOf(child)) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private boolean isChildOf(Tree<T> parent) {
+        if (this.parent == parent) {
+            return true;
+        }
+        if (this.isRoot()) {
+            return false;
+        }
+        return this.parent.isChildOf(parent);
+    }
+
+    public int indexOf(Tree<T> child) {
+        return this.children.indexOf(child);
+    }
 
     /**
      * Instantiates and adds a child with a specified value to this tree.

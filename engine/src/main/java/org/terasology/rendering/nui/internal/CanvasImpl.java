@@ -723,15 +723,17 @@ public class CanvasImpl implements CanvasControl {
         Rect2i absoluteRegion = relativeToAbsolute(region);
         Rect2i finalRegion = state.cropRegion.intersect(absoluteRegion);
 
-        int sx = finalRegion.minX();
-        int sy = finalRegion.minY();
-        int ex = finalRegion.maxX();
-        int ey = finalRegion.maxY();
+        if (!finalRegion.isEmpty()) {
+            int sx = finalRegion.minX();
+            int sy = finalRegion.minY();
+            int ex = finalRegion.maxX();
+            int ey = finalRegion.maxY();
 
-        if (state.drawOnTop) {
-            drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
-        } else {
-            renderer.drawLine(sx, sy, ex, ey, color);
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
+            } else {
+                renderer.drawLine(sx, sy, ex, ey, color);
+            }
         }
     }
 
