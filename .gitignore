@@ -41,6 +41,7 @@ engine-tests/engine-tests.iml
 /*.iml
 /*.ipr
 /*.iws
+/projectFilesBackup*
 
 # Ignore Eclipse
 .checkstyle
