@@ -39,15 +39,28 @@ import java.util.Map;
 public class WidgetSelectionScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:widgetSelectionScreen");
 
+    /**
+     * The dropdown containing the values of {@code widgets}.
+     */
     private UIDropdownScrollable availableWidgets;
+    /**
+     * The JsonTree a selected widget is to be added to.
+     */
     private JsonTree item;
+    /**
+     * The list of available UIWidget instances, excluding CoreScreenLayer overrides.
+     */
     private Map<String, ClassMetadata> widgets = Maps.newHashMap();
+    /**
+     * Listeners fired when the screen is closed (without selecting a widget).
+     */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
 
     @Override
     public void initialise() {
         availableWidgets = find("availableWidgets", UIDropdownScrollable.class);
 
+        // Populate the widget list.
         ClassLibrary<UIWidget> metadataLibrary = getManager().getWidgetMetadataLibrary();
         for (ClassMetadata metadata : metadataLibrary) {
             if (!CoreScreenLayer.class.isAssignableFrom(metadata.getType())) {
@@ -65,10 +78,15 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
             ClassMetadata metadata = widgets.get(selection);
 
             JsonTree scaffolding = new JsonTree(new JsonTreeNode(null, null, JsonTreeNode.ElementType.OBJECT));
+
+            // Always add a "type" node with its' value being equal to the selected widget's type.
             scaffolding.addChild(new JsonTreeNode("type", selection, JsonTreeNode.ElementType.KEY_VALUE_PAIR));
+
+            // If the widget is an UILayout override, add a "contents" array node.
             if (UILayout.class.isAssignableFrom(metadata.getType())) {
                 scaffolding.addChild(new JsonTreeNode("contents", null, JsonTreeNode.ElementType.ARRAY));
             }
+
             item.addChild(scaffolding);
 
             closeListeners.forEach(UpdateListener::onAction);
@@ -96,7 +114,7 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
         closeListeners.add(listener);
     }
 
-    public void unsubscribe(UpdateListener listener) {
+    public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);
     }

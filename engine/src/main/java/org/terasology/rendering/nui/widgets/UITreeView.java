@@ -53,11 +53,11 @@ public class UITreeView<T> extends CoreWidget {
         BOTTOM
     }
 
-    ;
-
+    // Canvas parts.
     private static final String EXPAND_BUTTON = "expand-button";
     private static final String TREE_ITEM = "tree-item";
 
+    // Canvas modes.
     private static final String CONTRACT_MODE = "contract";
     private static final String CONTRACT_HOVER_MODE = "contract-hover";
     private static final String EXPAND_MODE = "expand";
@@ -78,6 +78,20 @@ public class UITreeView<T> extends CoreWidget {
      */
     private Binding<Integer> selectedIndex = new DefaultBinding<>();
     /**
+     * The index of the item being drag&dropped, or null if no item is dragged.
+     */
+    private Binding<Integer> draggedItemIndex = new DefaultBinding<>();
+    /**
+     * The index of the item being moused over if another item is currently dragged.
+     * Null if no item is either dragged or moused over.
+     */
+    private Binding<Integer> mouseOverItemIndex = new DefaultBinding<>();
+    /**
+     * The index of the item being moused over if another item is currently dragged.
+     * Null if no item is either dragged or moused over.
+     */
+    private Binding<MouseOverItemType> mouseOverItemType = new DefaultBinding<>();
+    /**
      * The item currently being copied, or null if no item has been copied.
      */
     private Binding<Tree<T>> clipboard = new DefaultBinding<>();
@@ -92,7 +106,7 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * The individual item listeners.
      */
-    private final List<ItemListenerSet> itemListenerSets = Lists.newArrayList();
+    private final List<TreeViewListenerSet> treeViewListenerSets = Lists.newArrayList();
     /**
      * The individual expand/contract button listeners.
      */
@@ -105,18 +119,6 @@ public class UITreeView<T> extends CoreWidget {
      * Tree view item click listeners.
      */
     private List<TreeMouseClickListener> itemListeners = Lists.newArrayList();
-    /**
-     *
-     */
-    private Integer draggedItemIndex;
-    /**
-     *
-     */
-    private Integer mouseOverItemIndex;
-    /**
-     *
-     */
-    private MouseOverItemType mouseOverItemType;
 
     private class ExpandButtonInteractionListener extends BaseInteractionListener {
         private int index;
@@ -163,7 +165,7 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            draggedItemIndex = index;
+            onItemMouseDrag(index);
         }
 
         @Override
@@ -194,13 +196,16 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            draggedItemIndex = index;
+            onItemMouseDrag(index);
         }
 
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            onItemMouseOver(index, MouseOverItemType.CENTER);
+            if (draggedItemIndex.get() != null
+                    && model.get().getItem(index).acceptsChild(model.get().getItem(draggedItemIndex.get()))) {
+                onItemMouseOver(index, MouseOverItemType.CENTER);
+            }
         }
 
         @Override
@@ -223,7 +228,7 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            draggedItemIndex = index;
+            onItemMouseDrag(index);
         }
 
         @Override
@@ -256,44 +261,59 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
+    private void onItemMouseDrag(int index) {
+        draggedItemIndex.set(index);
+    }
+
     private void onItemMouseOver(int index, MouseOverItemType type) {
-        if (draggedItemIndex != null) {
-            if (mouseOverItemIndex != null) {
-                model.get().getItem(mouseOverItemIndex).setSelected(false);
+        // Set temporary index variables for the dragged/target items.
+        if (draggedItemIndex.get() != null) {
+            if (mouseOverItemIndex.get() != null) {
+                model.get().getItem(mouseOverItemIndex.get()).setSelected(false);
             }
-            if (draggedItemIndex != index && model.get().getItem(index).acceptsChild(model.get().getItem(draggedItemIndex))) {
-                mouseOverItemIndex = index;
+            if (draggedItemIndex.get() != index) {
+                mouseOverItemIndex.set(index);
                 model.get().getItem(index).setSelected(true);
-                mouseOverItemType = type;
+                mouseOverItemType.set(type);
             } else {
-                mouseOverItemIndex = null;
+                mouseOverItemIndex.set(null);
+                mouseOverItemType.set(null);
             }
         }
     }
 
     private void onItemMouseRelease() {
-        if (draggedItemIndex != null && mouseOverItemIndex != null) {
-            Tree<T> child = model.get().getItem(draggedItemIndex);
-            Tree<T> parent = model.get().getItem(mouseOverItemIndex);
-            if (mouseOverItemType == MouseOverItemType.TOP) {
+        if (draggedItemIndex.get() != null && mouseOverItemIndex.get() != null) {
+            Tree<T> child = model.get().getItem(draggedItemIndex.get());
+            Tree<T> parent = model.get().getItem(mouseOverItemIndex.get());
+
+            // Handle item drag&dropping.
+            if (mouseOverItemType.get() == MouseOverItemType.TOP) {
+                // Insert the dragged item before the target item (as a child of the same tree).
                 child.getParent().removeChild(child);
                 parent.getParent().addChild(parent.getParent().indexOf(parent), child);
-            } else if (mouseOverItemType == MouseOverItemType.CENTER) {
+            } else if (mouseOverItemType.get() == MouseOverItemType.CENTER) {
+                // Insert the dragged item as a child of the target item.
                 child.getParent().removeChild(child);
                 parent.addChild(child);
             } else {
+                // Insert the dragged item after the target item (as a child of the same tree).
                 child.getParent().removeChild(child);
                 parent.getParent().addChild(parent.getParent().indexOf(parent) + 1, child);
             }
+
             fireUpdateListeners();
         }
-        if (draggedItemIndex != null) {
+
+        // Reset the temporary index variables.
+        if (draggedItemIndex.get() != null) {
             selectedIndex.set(null);
-            draggedItemIndex = null;
+            draggedItemIndex.set(null);
         }
-        if (mouseOverItemIndex != null) {
-            model.get().getItem(mouseOverItemIndex).setSelected(false);
-            mouseOverItemIndex = null;
+        if (mouseOverItemIndex.get() != null) {
+            model.get().getItem(mouseOverItemIndex.get()).setSelected(false);
+            mouseOverItemIndex.set(null);
+            mouseOverItemType.set(null);
         }
     }
 
@@ -313,13 +333,14 @@ public class UITreeView<T> extends CoreWidget {
         int currentHeight = 0;
         for (int i = 0; i < model.get().getItemCount(); i++) {
             Tree<T> item = model.get().getItem(i);
-            ItemListenerSet itemListenerSet = itemListenerSets.get(i);
+            TreeViewListenerSet treeViewListenerSet = treeViewListenerSets.get(i);
             ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
             int itemHeight = canvas.getCurrentStyle().getMargin()
                     .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()))
                     .getY();
 
+            // Draw the expand/contract button.
             if (!item.isLeaf()) {
                 canvas.setPart(EXPAND_BUTTON);
                 setButtonMode(canvas, item, buttonListener);
@@ -330,17 +351,19 @@ public class UITreeView<T> extends CoreWidget {
                 drawButton(canvas, buttonRegion, buttonListener);
             }
 
+            // Draw the item itself.
             canvas.setPart(TREE_ITEM);
-            setItemMode(canvas, item, itemListenerSet);
+            setItemMode(canvas, item, treeViewListenerSet);
             Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
                     currentHeight,
                     canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
                     itemHeight);
-            drawItem(canvas, itemRegion, item, itemListenerSet);
+            drawItem(canvas, itemRegion, item, treeViewListenerSet);
             currentHeight += itemHeight;
 
-            if (mouseOverItemIndex != null
-                    && mouseOverItemIndex == i) {
+            // Draw the item dragging hints if the current item is a drag&drop target.
+            if (mouseOverItemIndex.get() != null
+                    && mouseOverItemIndex.get() == i) {
                 drawDragHint(canvas, itemRegion);
             }
         }
@@ -472,7 +495,7 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    private void setItemMode(Canvas canvas, Tree<T> item, ItemListenerSet listenerSet) {
+    private void setItemMode(Canvas canvas, Tree<T> item, TreeViewListenerSet listenerSet) {
         if (item.isSelected()) {
             canvas.setMode(SELECTED_MODE);
         } else if (selectedIndex.get() != null && Objects.equals(item, model.get().getItem(selectedIndex.get()))) {
@@ -491,41 +514,49 @@ public class UITreeView<T> extends CoreWidget {
         canvas.addInteractionRegion(listener, buttonRegion);
     }
 
-    private void drawItem(Canvas canvas, Rect2i itemRegion, Tree<T> item, ItemListenerSet listenerSet) {
+    private void drawItem(Canvas canvas, Rect2i itemRegion, Tree<T> item, TreeViewListenerSet listenerSet) {
         canvas.drawBackground(itemRegion);
         itemRenderer.draw(item.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
 
+        // Add the top listener.
         canvas.addInteractionRegion(listenerSet.getTopListener(), itemRenderer.getTooltip(item.getValue()),
                 Rect2i.createFromMinAndSize(itemRegion.minX(), itemRegion.minY(),
                         itemRegion.width(), itemRegion.height() / 3));
 
+        // Add the central listener.
         canvas.addInteractionRegion(listenerSet.getCenterListener(), itemRenderer.getTooltip(item.getValue()),
                 Rect2i.createFromMinAndSize(itemRegion.minX(), itemRegion.minY() + itemRegion.height() / 3,
                         itemRegion.width(), itemRegion.height() / 3));
 
         int heightOffset = itemRegion.height() - 3 * (itemRegion.height() / 3);
 
+        // Add the bottom listener.
         canvas.addInteractionRegion(listenerSet.getBottomListener(), itemRenderer.getTooltip(item.getValue()),
                 Rect2i.createFromMinAndSize(itemRegion.minX(), itemRegion.minY() + 2 * itemRegion.height() / 3,
                         itemRegion.width(), heightOffset + itemRegion.height() / 3));
     }
 
     private void drawDragHint(Canvas canvas, Rect2i itemRegion) {
-        if (mouseOverItemType == MouseOverItemType.TOP) {
+        if (mouseOverItemType.get() == MouseOverItemType.TOP) {
+            // Draw a line at the top of the item.
             canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.minY(), Color.WHITE);
-        } else if (mouseOverItemType == MouseOverItemType.CENTER) {
+        } else if (mouseOverItemType.get() == MouseOverItemType.CENTER) {
+            // Draw a border around the item.
             canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.minY(), Color.WHITE);
             canvas.drawLine(itemRegion.maxX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
             canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.minX(), itemRegion.maxY(), Color.WHITE);
             canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
-        } else if (mouseOverItemType == MouseOverItemType.BOTTOM) {
+        } else if (mouseOverItemType.get() == MouseOverItemType.BOTTOM) {
+            // Draw a line at the bottom of the item.
             canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
         }
     }
 
     private void updateListeners() {
+        // If no item is being moused over, call onItemMouseRelease().
+        // (This will reset the temporary index variables)
         boolean mouseOver = false;
-        for (ItemListenerSet set : itemListenerSets) {
+        for (TreeViewListenerSet set : treeViewListenerSets) {
             if (set.isMouseOver()) {
                 mouseOver = true;
                 break;
@@ -535,15 +566,16 @@ public class UITreeView<T> extends CoreWidget {
             onItemMouseRelease();
         }
 
-        while (itemListenerSets.size() > model.get().getItemCount()) {
-            itemListenerSets.remove(itemListenerSets.size() - 1);
+        // Update the listener sets.
+        while (treeViewListenerSets.size() > model.get().getItemCount()) {
+            treeViewListenerSets.remove(treeViewListenerSets.size() - 1);
             expandListeners.remove(expandListeners.size() - 1);
         }
-        while (itemListenerSets.size() < model.get().getItemCount()) {
-            itemListenerSets.add(new ItemListenerSet(
-                    new ItemTopListener(itemListenerSets.size()),
-                    new ItemCenterListener(itemListenerSets.size()),
-                    new ItemBottomListener(itemListenerSets.size())));
+        while (treeViewListenerSets.size() < model.get().getItemCount()) {
+            treeViewListenerSets.add(new TreeViewListenerSet(
+                    new ItemTopListener(treeViewListenerSets.size()),
+                    new ItemCenterListener(treeViewListenerSets.size()),
+                    new ItemBottomListener(treeViewListenerSets.size())));
             expandListeners.add(new ExpandButtonInteractionListener(expandListeners.size()));
         }
     }
@@ -576,31 +608,52 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     /**
-     * A set of tree element sublisteners.
+     * A set of tree element sub-listeners.
      */
-    private class ItemListenerSet {
+    private class TreeViewListenerSet {
+        /**
+         * The top listener.
+         */
         private ItemTopListener topListener;
+        /**
+         * The central listener.
+         */
         private ItemCenterListener centerListener;
+        /**
+         * The bottom listener.
+         */
         private ItemBottomListener bottomListener;
 
-        private ItemListenerSet(ItemTopListener topListener, ItemCenterListener centerListener, ItemBottomListener bottomListener) {
+        private TreeViewListenerSet(ItemTopListener topListener, ItemCenterListener centerListener, ItemBottomListener bottomListener) {
             this.topListener = topListener;
             this.centerListener = centerListener;
             this.bottomListener = bottomListener;
         }
 
+        /**
+         * @return The top listener.
+         */
         public ItemTopListener getTopListener() {
             return topListener;
         }
 
+        /**
+         * @return The central listener.
+         */
         public ItemCenterListener getCenterListener() {
             return centerListener;
         }
 
+        /**
+         * @return The bottom listener.
+         */
         public ItemBottomListener getBottomListener() {
             return bottomListener;
         }
 
+        /**
+         * @return Whether any of the listeners are currently moused over.
+         */
         public boolean isMouseOver() {
             return topListener.isMouseOver() || centerListener.isMouseOver() || bottomListener.isMouseOver();
         }

@@ -52,6 +52,9 @@ public class NUIEditorSystem extends BaseComponentSystem {
         editorActive = !editorActive;
     }
 
+    /**
+     * @return Whether the editor is currently active.
+     */
     public boolean isEditorActive() {
         return editorActive;
     }

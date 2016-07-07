@@ -96,46 +96,43 @@ public class ContextMenuBuilder {
         });
     }
 
+    /**
+     * Subscribe to an item being selected.
+     *
+     * @param listener The listener to be added.
+     */
     public void subscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         selectionListeners.add(listener);
     }
 
+    /**
+     * Unsubscribe from an item being selected.
+     *
+     * @param listener The listener to be removed.
+     */
     public void unsubscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         selectionListeners.remove(listener);
     }
 
+    /**
+     * Subscribe to the menu being closed.
+     *
+     * @param listener The listener to be added.
+     */
     public void subscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.add(listener);
     }
 
+    /**
+     * Unsubscribe from an item being selected.
+     *
+     * @param listener The listener to be removed.
+     */
     public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);
-    }
-
-    /**
-     * A pair of a {@link Consumer} and an input object instance.
-     *
-     * @param <E> The type of the input to the consumer.
-     */
-    private class ConsumerObjectPair<E> {
-        private Consumer<E> consumer;
-        private E object;
-
-        public ConsumerObjectPair(Consumer<E> consumer, E object) {
-            this.consumer = consumer;
-            this.object = object;
-        }
-
-        public Consumer<E> getConsumer() {
-            return consumer;
-        }
-
-        public E getObject() {
-            return object;
-        }
     }
 }

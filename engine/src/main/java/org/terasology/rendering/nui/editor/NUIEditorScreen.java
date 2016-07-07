@@ -66,6 +66,7 @@ import java.util.stream.Collectors;
  * NUI editor overlay - contains file selection & editing widgets.
  */
 public class NUIEditorScreen extends CoreScreenLayer {
+
     private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
@@ -154,24 +155,30 @@ public class NUIEditorScreen extends CoreScreenLayer {
             updateWidget(tree);
         });
 
+        // When the item is right-clicked, construct the context menu according to its' value.
         editorTreeView.subscribeItemMouseClick((event, item) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
                 item.setSelected(true);
 
                 ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
+
                 contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) item);
                 contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) item);
+
+                // "Add Widget" only allowed for "contents" objects.
                 if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
                     contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) item);
                 }
+
                 contextMenuBuilder.subscribeClose(() -> {
                     item.setSelected(false);
                 });
+
                 contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
         });
 
-        // Set the handler for the editor buttons.
+        // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button -> {
             getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class);
         });
@@ -191,11 +198,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "redo", button -> {
             redo();
         });
-    }
-
-    @Override
-    public boolean isEscapeToCloseAllowed() {
-        return false;
     }
 
     @Override
@@ -220,6 +222,12 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
         }
 
+        return false;
+    }
+
+    @Override
+    public boolean isEscapeToCloseAllowed() {
+        // Escape to close is handled in onKeyEvent() to pass the editor's state to NUIEditorSystem.
         return false;
     }
 
@@ -273,11 +281,13 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     private void addWidget(JsonTree item) {
+        // Add the item to the editor history.
         editorHistory.add((JsonTree) editorTreeView.getModel().getItem(0).getRoot());
         editorHistoryPosition++;
 
         getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
 
+        // Push and configure WidgetSelectionScreen.
         WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
         widgetSelectionScreen.setItem(item);
         widgetSelectionScreen.subscribeClose(() -> {
@@ -355,12 +365,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
             ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
         }
 
-        // Set the tree view's internal model to the resulting tree.
         editorTreeView.setModel(tree.copy());
     }
 
     private void updateWidget(Tree tree) {
-        // Update the widget.
         UIWidget widget;
         try {
             JsonElement element = JsonTreeConverter.deserialize(tree);

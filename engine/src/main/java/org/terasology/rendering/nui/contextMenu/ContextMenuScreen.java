@@ -36,6 +36,7 @@ import java.util.List;
  * A generic context menu, implemented as a {@link CoreScreenLayer} spanning the canvas area it should be created within.
  */
 public class ContextMenuScreen extends CoreScreenLayer {
+
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
     /**
@@ -47,7 +48,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
      */
     private Vector2i menuPosition = Vector2i.zero();
     /**
-     * Listeners fired when the menu is closed.
+     * Listeners fired when the menu is closed (without selecting an option).
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
 
@@ -56,6 +57,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
         public boolean onMouseClick(NUIMouseClickEvent event) {
             // Close the context menu on click outside it.
             getManager().closeScreen(ASSET_URI);
+
             return false;
         }
 

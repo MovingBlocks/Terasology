@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+/**
+ * A general-use listener class.
+ * <p>
+ * Does not accept any arguments or make any assumptions about the action being performed.
+ */
 @FunctionalInterface
 public interface UpdateListener {
     void onAction();
