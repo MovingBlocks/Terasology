@@ -180,7 +180,7 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            onItemMouseRelease();
+            onItemMouseRelease(index);
         }
     }
 
@@ -212,7 +212,7 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            onItemMouseRelease();
+            onItemMouseRelease(index);
         }
     }
 
@@ -245,7 +245,7 @@ public class UITreeView<T> extends CoreWidget {
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            onItemMouseRelease();
+            onItemMouseRelease(index);
         }
     }
 
@@ -282,7 +282,7 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    private void onItemMouseRelease() {
+    private void onItemMouseRelease(int index) {
         if (draggedItemIndex.get() != null && mouseOverItemIndex.get() != null) {
             Tree<T> child = model.get().getItem(draggedItemIndex.get());
             Tree<T> parent = model.get().getItem(mouseOverItemIndex.get());
@@ -307,7 +307,9 @@ public class UITreeView<T> extends CoreWidget {
 
         // Reset the temporary index variables.
         if (draggedItemIndex.get() != null) {
-            selectedIndex.set(null);
+            if (draggedItemIndex.get() != index) {
+                selectedIndex.set(null);
+            }
             draggedItemIndex.set(null);
         }
         if (mouseOverItemIndex.get() != null) {
@@ -552,8 +554,6 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void updateListeners() {
-        // If no item is being moused over, call onItemMouseRelease().
-        // (This will reset the temporary index variables)
         boolean mouseOver = false;
         for (TreeViewListenerSet set : treeViewListenerSets) {
             if (set.isMouseOver()) {
@@ -564,7 +564,6 @@ public class UITreeView<T> extends CoreWidget {
         if (!mouseOver) {
             // Reset the temporary index variables.
             if (draggedItemIndex.get() != null) {
-                selectedIndex.set(null);
                 draggedItemIndex.set(null);
             }
             if (mouseOverItemIndex.get() != null) {
