@@ -34,9 +34,17 @@ public class JsonTree extends Tree<JsonTreeNode> {
                 && getValue().getType() != JsonTreeNode.ElementType.OBJECT) {
             return false;
         }
-        // Additionally, only objects can have child key-value pairs.
+
+        // Objects cannot have empty object children.
+        if (getValue().getType() == JsonTreeNode.ElementType.OBJECT
+                && child.getValue().getType() == JsonTreeNode.ElementType.OBJECT
+                && child.getValue().getKey() == null) {
+            return false;
+        }
+
+        // Only objects can have child key-value pairs.
         if (getValue().getType() == JsonTreeNode.ElementType.ARRAY
-                && child.getValue().getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR) {
+                && (child.getValue().getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR)) {
             return false;
         }
         return true;
