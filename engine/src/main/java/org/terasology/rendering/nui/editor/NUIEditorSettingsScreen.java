@@ -19,17 +19,17 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 
-public class NUIEditorSettingsPopup extends CoreScreenLayer {
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorSettingsPopup");
+public class NUIEditorSettingsScreen extends CoreScreenLayer {
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorSettingsScreen");
 
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "ok", button -> {
-            getManager().popScreen();
+            getManager().closeScreen(ASSET_URI);
         });
 
         WidgetUtil.trySubscribe(this, "cancel", button -> {
-            getManager().popScreen();
+            getManager().closeScreen(ASSET_URI);
         });
     }
 }

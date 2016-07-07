@@ -25,18 +25,26 @@ public class JsonTree extends Tree<JsonTreeNode> {
 
     @Override
     public boolean acceptsChild(Tree<JsonTreeNode> child) {
-        // Only non-null children are allowed.
-        if (child == null) {
+        if (!super.acceptsChild(child)) {
             return false;
         }
+
         // Only arrays or objects can have children.
         if (getValue().getType() != JsonTreeNode.ElementType.ARRAY
                 && getValue().getType() != JsonTreeNode.ElementType.OBJECT) {
             return false;
         }
-        // Additionally, only objects can have child key-value pairs.
+
+        // Objects cannot have empty object children.
+        if (getValue().getType() == JsonTreeNode.ElementType.OBJECT
+                && child.getValue().getType() == JsonTreeNode.ElementType.OBJECT
+                && child.getValue().getKey() == null) {
+            return false;
+        }
+
+        // Only objects can have child key-value pairs.
         if (getValue().getType() == JsonTreeNode.ElementType.ARRAY
-                && child.getValue().getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR) {
+                && (child.getValue().getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR)) {
             return false;
         }
         return true;
@@ -50,7 +58,7 @@ public class JsonTree extends Tree<JsonTreeNode> {
     @Override
     public Tree<JsonTreeNode> copy() {
         Tree<JsonTreeNode> copy = new JsonTree(this.value);
-        copy.setExpanded(this.expanded);
+        copy.setExpanded(this.isExpanded());
 
         for (Tree<JsonTreeNode> child : this.children) {
             copy.addChild(child.copy());

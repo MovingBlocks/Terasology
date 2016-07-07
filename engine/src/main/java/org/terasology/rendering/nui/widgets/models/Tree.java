@@ -41,9 +41,13 @@ public abstract class Tree<T> {
      */
     protected T value;
     /**
-     * Whether the tree is expanded.
+     * Whether the tree is expanded, i.e. its' child elements are visible.
      */
-    protected boolean expanded;
+    private boolean expanded;
+    /**
+     * Whether the tree is selected, i.e. it is outlined within the user interface.
+     */
+    private boolean selected;
     /**
      * The parent of this tree.
      */
@@ -79,6 +83,20 @@ public abstract class Tree<T> {
      */
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
+    }
+
+    /**
+     * @return Whether the tree is selected.
+     */
+    public boolean isSelected() {
+        return selected;
+    }
+
+    /**
+     * @param selected The new selected state of this tree.
+     */
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     /**
@@ -162,7 +180,38 @@ public abstract class Tree<T> {
      * @param child The child to be added.
      * @return Whether the specified child can be added to the tree.
      */
-    public abstract boolean acceptsChild(Tree<T> child);
+    public boolean acceptsChild(Tree<T> child) {
+        // Only non-null children are allowed.
+        if (child == null) {
+            return false;
+        }
+
+        // Can't make an item a child of itself.
+        if (this == child) {
+            return false;
+        }
+
+        if (this.isChildOf(child)) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private boolean isChildOf(Tree<T> parent) {
+        if (this.parent == parent) {
+            return true;
+        }
+        if (this.isRoot()) {
+            return false;
+        }
+        return this.parent.isChildOf(parent);
+    }
+
+    public int indexOf(Tree<T> child) {
+        return this.children.indexOf(child);
+    }
 
     /**
      * Instantiates and adds a child with a specified value to this tree.

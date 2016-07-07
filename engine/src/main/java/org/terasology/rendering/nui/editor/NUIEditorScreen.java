@@ -29,6 +29,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.input.Keyboard;
+import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -36,16 +37,24 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.asset.UIFormat;
+import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.widgets.*;
+import org.terasology.rendering.nui.widgets.UIBox;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
 import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
 import org.terasology.rendering.nui.widgets.models.Tree;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Comparator;
@@ -57,9 +66,15 @@ import java.util.stream.Collectors;
  * NUI editor overlay - contains file selection & editing widgets.
  */
 public class NUIEditorScreen extends CoreScreenLayer {
+
     private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
+
+    // Context menu options.
+    public static final String OPTION_COPY = "Copy";
+    public static final String OPTION_PASTE = "Paste";
+    public static final String OPTION_ADD_WIDGET = "Add Widget";
 
     @In
     private NUIEditorSystem nuiEditorSystem;
@@ -68,7 +83,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private AssetManager assetManager;
 
     /**
-     * The list of loaded {@link UIElement} asset {@link ResourceUrn}s.
+     * A list of available {@link UIElement} asset {@link ResourceUrn}s.
      */
     private List<ResourceUrn> availableAssetList = Lists.newArrayList();
     /**
@@ -80,7 +95,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
      */
     private ResourceUrn selectedUrn;
     /**
-     * The tree view containing a {@link JsonTree} representation of the asset being edited.
+     * A tree view containing a {@link JsonTree} representation of the asset being edited.
      */
     private UITreeView editorTreeView;
     /**
@@ -88,11 +103,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
      */
     private UIBox selectedScreenContainer;
     /**
-     *
+     * A list of tree view model states (earliest first).
      */
     private List<JsonTree> editorHistory = Lists.newArrayList();
     /**
-     *
+     * The index of the currently displayed tree view model state.
      */
     private int editorHistoryPosition;
 
@@ -129,7 +144,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         });
 
         // When the tree view is updated, update the widget accordingly.
-        editorTreeView.subscribe(() -> {
+        editorTreeView.subscribeTreeViewUpdate(() -> {
             JsonTree tree = (JsonTree) (editorTreeView.getModel().getItem(0).getRoot());
             if (editorHistoryPosition < editorHistory.size() - 1) {
                 editorHistory = editorHistory.subList(0, editorHistoryPosition + 1);
@@ -140,58 +155,41 @@ public class NUIEditorScreen extends CoreScreenLayer {
             updateWidget(tree);
         });
 
-        // Set the handler for the Copy button.
-        WidgetUtil.trySubscribe(this, "copy", button -> {
-            if (selectedUrn != null) {
-                // Deserialize the tree view's internal JsonTree into the original JSON string.
-                JsonElement json = JsonTreeConverter.deserialize(editorTreeView.getModel().getItem(0).getRoot());
-                String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
+        // When the item is right-clicked, construct the context menu according to its' value.
+        editorTreeView.subscribeItemMouseClick((event, item) -> {
+            if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
+                item.setSelected(true);
 
-                // Set the clipboard contents to the JSON string.
-                // ClipboardManager not used here to make the editor accessible within the main menu.
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                try {
-                    clipboard.setContents(new StringSelection(jsonString), null);
-                } catch (IllegalStateException e) {
-                    logger.warn("Clipboard inaccessible.", e);
+                ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
+
+                contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) item);
+                contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) item);
+
+                // "Add Widget" only allowed for "contents" objects.
+                if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
+                    contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) item);
                 }
+
+                contextMenuBuilder.subscribeClose(() -> {
+                    item.setSelected(false);
+                });
+
+                contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
         });
 
-        // Set the handler for the Paste button.
-        WidgetUtil.trySubscribe(this, "paste", button -> {
-            // Fetch the clipboard contents.
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            Transferable t = clipboard.getContents(null);
-
-            String clipboardContents = null;
-            try {
-                if (t != null) {
-                    clipboardContents = (String) t.getTransferData(DataFlavor.stringFlavor);
-                }
-            } catch (UnsupportedFlavorException | IOException e) {
-                logger.warn("Could not fetch clipboard contents.", e);
-            }
-
-            if (clipboardContents != null) {
-                try {
-                    // If the clipboard contents are a valid JSON string, serialize them into a JsonTree.
-                    JsonElement json = new JsonParser().parse(clipboardContents);
-                    JsonTree tree = JsonTreeConverter.serialize(json);
-                    updateTreeView(tree);
-                    updateWidget(tree);
-                } catch (JsonSyntaxException | NullPointerException e) {
-                    logger.warn("Could not construct a valid tree from clipboard contents.", e);
-                }
-            }
-        });
-
-        // Set the handler for the Settings button.
+        // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button -> {
-            getManager().pushScreen(NUIEditorSettingsPopup.ASSET_URI, NUIEditorSettingsPopup.class);
+            getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class);
         });
 
-        // Set the handlers for the Undo/Redo buttons.
+        WidgetUtil.trySubscribe(this, "copy", button -> {
+            copyJson();
+        });
+
+        WidgetUtil.trySubscribe(this, "paste", button -> {
+            pasteJson();
+        });
 
         WidgetUtil.trySubscribe(this, "undo", button -> {
             undo();
@@ -200,51 +198,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "redo", button -> {
             redo();
         });
-    }
-
-    private void updateTreeView(JsonTree tree) {
-        Iterator it = tree.getDepthFirstIterator(false);
-        while (it.hasNext()) {
-            ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
-        }
-
-        // Set the tree view's internal model to the resulting tree.
-        editorTreeView.setModel(tree.copy());
-    }
-
-    private void updateWidget(JsonTree tree) {
-        // Update the widget.
-        UIWidget widget;
-        try {
-            JsonElement element = JsonTreeConverter.deserialize(tree);
-            widget = new UIFormat().load(element).getRootWidget();
-        } catch (Exception e) {
-            widget = new UILabel(ExceptionUtils.getStackTrace(e));
-        }
-        selectedScreenContainer.setContent(widget);
-    }
-
-    private void undo() {
-        if (editorHistoryPosition > 0) {
-            editorHistoryPosition--;
-            JsonTree tree = editorHistory.get(editorHistoryPosition);
-            updateTreeView(tree);
-            updateWidget(tree);
-        }
-    }
-
-    private void redo() {
-        if (editorHistoryPosition < editorHistory.size() - 1) {
-            editorHistoryPosition++;
-            JsonTree tree = editorHistory.get(editorHistoryPosition);
-            updateTreeView(tree);
-            updateWidget(tree);
-        }
-    }
-
-    @Override
-    public boolean isEscapeToCloseAllowed() {
-        return false;
     }
 
     @Override
@@ -269,6 +222,12 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
         }
 
+        return false;
+    }
+
+    @Override
+    public boolean isEscapeToCloseAllowed() {
+        // Escape to close is handled in onKeyEvent() to pass the editor's state to NUIEditorSystem.
         return false;
     }
 
@@ -301,7 +260,122 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 editorHistory.add(tree);
                 editorHistoryPosition = 0;
             }
+
+            if (selectedUrn != null) {
+                assetManager.getAsset(selectedUrn, UIElement.class).get().dispose();
+            }
+
             selectedUrn = urn;
         }
+    }
+
+    private void copy(JsonTree item) {
+        editorTreeView.copy(item);
+        item.setSelected(false);
+    }
+
+    private void paste(JsonTree item) {
+        editorTreeView.paste(item);
+        item.setSelected(false);
+
+    }
+
+    private void addWidget(JsonTree item) {
+        // Add the item to the editor history.
+        editorHistory.add((JsonTree) editorTreeView.getModel().getItem(0).getRoot());
+        editorHistoryPosition++;
+
+        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+
+        // Push and configure WidgetSelectionScreen.
+        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
+        widgetSelectionScreen.setItem(item);
+        widgetSelectionScreen.subscribeClose(() -> {
+            editorTreeView.setModel(item.getRoot());
+            updateTreeView(item.getRoot());
+            updateWidget(item.getRoot());
+        });
+    }
+
+    private void copyJson() {
+        if (selectedUrn != null) {
+            // Deserialize the tree view's internal JsonTree into the original JSON string.
+            JsonElement json = JsonTreeConverter.deserialize(editorTreeView.getModel().getItem(0).getRoot());
+            String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
+
+            // Set the clipboard contents to the JSON string.
+            // ClipboardManager not used here to make the editor accessible within the main menu.
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            try {
+                clipboard.setContents(new StringSelection(jsonString), null);
+            } catch (IllegalStateException e) {
+                logger.warn("Clipboard inaccessible.", e);
+            }
+        }
+    }
+
+    private void pasteJson() {
+        // Fetch the clipboard contents.
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable t = clipboard.getContents(null);
+
+        String clipboardContents = null;
+        try {
+            if (t != null) {
+                clipboardContents = (String) t.getTransferData(DataFlavor.stringFlavor);
+            }
+        } catch (UnsupportedFlavorException | IOException e) {
+            logger.warn("Could not fetch clipboard contents.", e);
+        }
+
+        if (clipboardContents != null) {
+            try {
+                // If the clipboard contents are a valid JSON string, serialize them into a JsonTree.
+                JsonElement json = new JsonParser().parse(clipboardContents);
+                JsonTree tree = JsonTreeConverter.serialize(json);
+                updateTreeView(tree);
+                updateWidget(tree);
+            } catch (JsonSyntaxException | NullPointerException e) {
+                logger.warn("Could not construct a valid tree from clipboard contents.", e);
+            }
+        }
+    }
+
+    private void undo() {
+        if (editorHistoryPosition > 0) {
+            editorHistoryPosition--;
+            JsonTree tree = editorHistory.get(editorHistoryPosition);
+            updateTreeView(tree);
+            updateWidget(tree);
+        }
+    }
+
+    private void redo() {
+        if (editorHistoryPosition < editorHistory.size() - 1) {
+            editorHistoryPosition++;
+            JsonTree tree = editorHistory.get(editorHistoryPosition);
+            updateTreeView(tree);
+            updateWidget(tree);
+        }
+    }
+
+    private void updateTreeView(Tree tree) {
+        Iterator it = tree.getDepthFirstIterator(false);
+        while (it.hasNext()) {
+            ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
+        }
+
+        editorTreeView.setModel(tree.copy());
+    }
+
+    private void updateWidget(Tree tree) {
+        UIWidget widget;
+        try {
+            JsonElement element = JsonTreeConverter.deserialize(tree);
+            widget = new UIFormat().load(element).getRootWidget();
+        } catch (Exception e) {
+            widget = new UILabel(ExceptionUtils.getStackTrace(e));
+        }
+        selectedScreenContainer.setContent(widget);
     }
 }

@@ -139,8 +139,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
         currentTextureCropRegion = requestedCropRegion;
-        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
+                requestedCropRegion.minY(), requestedCropRegion.maxY());
     }
 
     @Override
@@ -199,7 +199,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         finalMat.mul(translateTransform);
         MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
 
-        material.setFloat4(CROPPING_BOUNDARIES_PARAM, cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+        material.setFloat4(CROPPING_BOUNDARIES_PARAM, cropRegion.minX(), cropRegion.maxX(), cropRegion.minY(), cropRegion.maxY());
         material.setMatrix4("posMatrix", translateTransform);
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -271,8 +271,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.contains(absoluteRegion) && requestedCropRegion.contains(absoluteRegion))) {
-            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
+                    requestedCropRegion.minY(), requestedCropRegion.maxY());
             currentTextureCropRegion = requestedCropRegion;
         }
 
@@ -354,8 +354,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         fontMesh.entrySet().stream().filter(entry -> entry.getKey().isRenderable()).forEach(entry -> {
             entry.getKey().bindTextures();
-            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
+                    requestedCropRegion.minY(), requestedCropRegion.maxY());
             entry.getKey().setFloat2("offset", offset.x, offset.y);
             entry.getKey().setFloat("alpha", alpha);
             entry.getValue().render();
@@ -370,8 +370,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.contains(region) && requestedCropRegion.contains(region))) {
-            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
+                    requestedCropRegion.minY(), requestedCropRegion.maxY());
             currentTextureCropRegion = requestedCropRegion;
         }
 

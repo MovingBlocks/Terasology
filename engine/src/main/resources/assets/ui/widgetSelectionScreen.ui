@@ -1,5 +1,5 @@
 {
-    "type": "engine:NUIEditorSettingsPopup",
+    "type": "engine:widgetSelectionScreen",
     "skin": "popup",
     "contents": {
         "type": "relativeLayout",
@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "NUI Editor Settings",
+                            "text": "Widget Selection",
                             "family": "title"
                         },
                         {
@@ -31,7 +31,18 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Et harum quidem rerum facilis est et expedita distinctio."
+                            "text": "Select a widget to add:"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "UIDropdownScrollable",
+                            "id": "availableWidgets"
                         },
                         {
                             "type": "UISpace",

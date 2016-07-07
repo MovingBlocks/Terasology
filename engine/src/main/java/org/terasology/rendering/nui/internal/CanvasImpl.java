@@ -718,21 +718,29 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawLine(int startX, int startY, int endX, int endY, Color color) {
-        int sx = startX + state.drawRegion.minX();
-        int sy = startY + state.drawRegion.minY();
-        int ex = state.drawRegion.minX() + endX;
-        int ey = state.drawRegion.minY() + endY;
+        Rect2i region = Rect2i.createFromMinAndMax(Math.min(startX, endX), Math.min(startY, endY),
+                Math.max(startX, endX), Math.max(startY, endY));
+        Rect2i absoluteRegion = relativeToAbsolute(region);
+        Rect2i finalRegion = state.cropRegion.intersect(absoluteRegion);
 
-        if (state.drawOnTop) {
-            drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
-        } else {
-            renderer.drawLine(sx, sy, ex, ey, color);
+        if (!finalRegion.isEmpty()) {
+            int sx = finalRegion.minX();
+            int sy = finalRegion.minY();
+            int ex = finalRegion.maxX();
+            int ey = finalRegion.maxY();
+
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
+            } else {
+                renderer.drawLine(sx, sy, ex, ey, color);
+            }
         }
     }
 
     @Override
     public void drawFilledRectangle(Rect2i region, Color color) {
-        drawTexture(whiteTexture, region, color);
+        drawTextureRaw(whiteTexture, region, color, ScaleMode.STRETCH);
+
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {

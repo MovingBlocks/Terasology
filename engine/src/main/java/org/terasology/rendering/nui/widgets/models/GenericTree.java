@@ -40,7 +40,7 @@ public class GenericTree<T> extends Tree<T> {
     @Override
     public Tree<T> copy() {
         Tree<T> copy = new GenericTree<>(this.value);
-        copy.setExpanded(this.expanded);
+        copy.setExpanded(this.isExpanded());
 
         for (Tree<T> child : this.children) {
             copy.addChild(child.copy());
