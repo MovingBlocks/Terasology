@@ -171,7 +171,9 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (!model.get().getItem(index).isRoot()) {
+            if (draggedItemIndex.get() != null
+                    && !model.get().getItem(index).isRoot()
+                    && model.get().getItem(index).getParent().acceptsChild(model.get().getItem(draggedItemIndex.get()))) {
                 onItemMouseOver(index, MouseOverItemType.TOP);
             }
         }
@@ -234,7 +236,9 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (!model.get().getItem(index).isRoot()) {
+            if (draggedItemIndex.get() != null
+                    && !model.get().getItem(index).isRoot()
+                    && model.get().getItem(index).getParent().acceptsChild(model.get().getItem(draggedItemIndex.get()))) {
                 onItemMouseOver(index, MouseOverItemType.BOTTOM);
             }
         }
@@ -268,12 +272,8 @@ public class UITreeView<T> extends CoreWidget {
     private void onItemMouseOver(int index, MouseOverItemType type) {
         // Set temporary index variables for the dragged/target items.
         if (draggedItemIndex.get() != null) {
-            if (mouseOverItemIndex.get() != null) {
-                model.get().getItem(mouseOverItemIndex.get()).setSelected(false);
-            }
             if (draggedItemIndex.get() != index) {
                 mouseOverItemIndex.set(index);
-                model.get().getItem(index).setSelected(true);
                 mouseOverItemType.set(type);
             } else {
                 mouseOverItemIndex.set(null);
@@ -311,7 +311,6 @@ public class UITreeView<T> extends CoreWidget {
             draggedItemIndex.set(null);
         }
         if (mouseOverItemIndex.get() != null) {
-            model.get().getItem(mouseOverItemIndex.get()).setSelected(false);
             mouseOverItemIndex.set(null);
             mouseOverItemType.set(null);
         }
@@ -563,7 +562,15 @@ public class UITreeView<T> extends CoreWidget {
             }
         }
         if (!mouseOver) {
-            onItemMouseRelease();
+            // Reset the temporary index variables.
+            if (draggedItemIndex.get() != null) {
+                selectedIndex.set(null);
+                draggedItemIndex.set(null);
+            }
+            if (mouseOverItemIndex.get() != null) {
+                mouseOverItemIndex.set(null);
+                mouseOverItemType.set(null);
+            }
         }
 
         // Update the listener sets.

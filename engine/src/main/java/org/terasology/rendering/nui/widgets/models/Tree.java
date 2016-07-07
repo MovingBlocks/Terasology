@@ -186,6 +186,11 @@ public abstract class Tree<T> {
             return false;
         }
 
+        // Can't make an item a child of itself.
+        if (this == child) {
+            return false;
+        }
+
         if (this.isChildOf(child)) {
             return false;
         }
