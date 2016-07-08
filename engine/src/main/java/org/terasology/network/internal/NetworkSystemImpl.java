@@ -250,10 +250,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public void shutdown() {
-        if (mode != NetworkMode.NONE) {
-            allChannels.close().awaitUninterruptibly();
-            factory.releaseExternalResources();
-        }
+        allChannels.close().awaitUninterruptibly();
+        factory.releaseExternalResources();
         processPendingDisconnects();
         clientList.forEach(this::processRemovedClient);
         server = null;

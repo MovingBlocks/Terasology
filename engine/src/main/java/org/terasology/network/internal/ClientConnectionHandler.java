@@ -16,6 +16,7 @@
 package org.terasology.network.internal;
 
 import com.google.common.collect.Sets;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
@@ -62,15 +63,16 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private Timer timeoutTimer = new Timer();
     private long timeoutPoint = System.currentTimeMillis();
     private final long timeoutThreshold = 10000;
+    private Channel channel;
 
     public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
         this.joinStatus = joinStatus;
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
-        scheduleTimeout();
     }
 
-	private void scheduleTimeout() {
+	private void scheduleTimeout(Channel inputChannel) {
+        channel = inputChannel;
 		timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
 		timeoutTimer.schedule(new java.util.TimerTask() {
 			@Override
@@ -80,6 +82,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 							&& joinStatus.getStatus() != JoinStatus.Status.COMPLETE
 							&& joinStatus.getStatus() != JoinStatus.Status.FAILED) {
 						joinStatus.setErrorMessage("Server stopped responding.");
+                        channel.close();
 						logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
 					}
 				}
@@ -89,12 +92,11 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        scheduleTimeout();
-
         // If we timed out, don't handle anymore messages.
         if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             return;
         }
+        scheduleTimeout(ctx.getChannel());
 
         // Handle message
 		NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
