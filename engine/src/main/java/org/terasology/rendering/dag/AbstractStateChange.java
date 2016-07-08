@@ -15,11 +15,18 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+/**
+ *
+ */
+public abstract class AbstractStateChange<T> implements StateChange<T> {
+    private T value;
 
-    void initialise();
+    AbstractStateChange(T value) {
+        this.value = value;
+    }
 
-    void process();
-
-    // TODO: add a "Set getStateChanges();" method here
+    @Override
+    public T getValue() {
+        return value;
+    }
 }

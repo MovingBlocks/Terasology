@@ -37,30 +37,35 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.dag.AmbientOcclusionPassesNode;
-import org.terasology.rendering.dag.BackdropNode;
-import org.terasology.rendering.dag.BloomPassesNode;
-import org.terasology.rendering.dag.BlurPassesNode;
-import org.terasology.rendering.dag.ChunksAlphaRejectNode;
-import org.terasology.rendering.dag.ChunksOpaqueNode;
-import org.terasology.rendering.dag.ChunksRefractiveReflectiveNode;
-import org.terasology.rendering.dag.DirectionalLightsNode;
-import org.terasology.rendering.dag.DownSampleSceneAndUpdateExposureNode;
-import org.terasology.rendering.dag.FinalPostProcessingNode;
-import org.terasology.rendering.dag.FirstPersonViewNode;
-import org.terasology.rendering.dag.InitialPostProcessingNode;
-import org.terasology.rendering.dag.LightGeometryNode;
-import org.terasology.rendering.dag.LightShaftsNode;
+import org.terasology.rendering.dag.NodeFactory;
+import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.dag.RenderPipelineExecutor;
+import org.terasology.rendering.dag.RenderPipelineGenerator;
+import org.terasology.rendering.dag.RenderPipelineOptimizer;
+import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
+import org.terasology.rendering.dag.nodes.BackdropNode;
+import org.terasology.rendering.dag.nodes.BloomPassesNode;
+import org.terasology.rendering.dag.nodes.BlurPassesNode;
+import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
+import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
+import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
+import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
+import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
+import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
+import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
+import org.terasology.rendering.dag.nodes.LightGeometryNode;
+import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.Node;
-import org.terasology.rendering.dag.ObjectsOpaqueNode;
-import org.terasology.rendering.dag.OutlineNode;
-import org.terasology.rendering.dag.OverlaysNode;
-import org.terasology.rendering.dag.PrePostCompositeNode;
-import org.terasology.rendering.dag.ShadowMapNode;
-import org.terasology.rendering.dag.SimpleBlendMaterialsNode;
-import org.terasology.rendering.dag.SkyBandsNode;
-import org.terasology.rendering.dag.ToneMappingNode;
-import org.terasology.rendering.dag.WorldReflectionNode;
+import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
+import org.terasology.rendering.dag.nodes.OutlineNode;
+import org.terasology.rendering.dag.nodes.OverlaysNode;
+import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
+import org.terasology.rendering.dag.nodes.ShadowMapNode;
+import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
+import org.terasology.rendering.dag.nodes.SkyBandsNode;
+import org.terasology.rendering.dag.nodes.ToneMappingNode;
+import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
@@ -124,7 +129,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderingDebugConfig renderingDebugConfig;
     private FrameBuffersManager buffersManager;
     private PostProcessor postProcessor;
-    private List<Node> renderGraph; // TODO: will be replaced by a DirectedAcyclicGraph data structure
+    private RenderPipelineExecutor renderPipelineExecutor;
     private ShadowMapNode shadowMapNode;
 
     /**
@@ -196,31 +201,32 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
-        shadowMapNode = createInstance(ShadowMapNode.class, context);
-        Node worldReflectionNode = createInstance(WorldReflectionNode.class, context);
-        Node backdropNode = createInstance(BackdropNode.class, context);
-        Node skybandsNode = createInstance(SkyBandsNode.class, context);
-        Node objectOpaqueNode = createInstance(ObjectsOpaqueNode.class, context);
-        Node chunksOpaqueNode = createInstance(ChunksOpaqueNode.class, context);
-        Node chunksAlphaRejectNode = createInstance(ChunksAlphaRejectNode.class, context);
-        Node overlaysNode = createInstance(OverlaysNode.class, context);
-        Node firstPersonViewNode = createInstance(FirstPersonViewNode.class, context);
-        Node lightGeometryNode = createInstance(LightGeometryNode.class, context);
-        Node directionalLightsNode = createInstance(DirectionalLightsNode.class, context);
-        Node chunksRefractiveReflectiveNode = createInstance(ChunksRefractiveReflectiveNode.class, context);
-        Node outlineNode = createInstance(OutlineNode.class, context);
-        Node ambientOcclusionPassesNode = createInstance(AmbientOcclusionPassesNode.class, context);
-        Node prePostCompositeNode = createInstance(PrePostCompositeNode.class, context);
-        Node simpleBlendMaterialsNode = createInstance(SimpleBlendMaterialsNode.class, context);
-        Node lightShaftsNode = createInstance(LightShaftsNode.class, context);
-        Node initialPostProcessingNode = createInstance(InitialPostProcessingNode.class, context);
-        Node downSampleSceneAndUpdateExposure = createInstance(DownSampleSceneAndUpdateExposureNode.class, context);
-        Node toneMappingNode = createInstance(ToneMappingNode.class, context);
-        Node bloomPassesNode = createInstance(BloomPassesNode.class, context);
-        Node blurPassesNode = createInstance(BlurPassesNode.class, context);
-        Node finalPostProcessingNode = createInstance(FinalPostProcessingNode.class, context);
+        NodeFactory nodeFactory = new NodeFactory(context);
+        shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+        Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
+        Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
+        Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
+        Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
+        Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
+        Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
+        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
+        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
+        Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
+        Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
+        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(ChunksRefractiveReflectiveNode.class);
+        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
+        Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
+        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
+        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
+        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
+        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
+        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class);
+        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
+        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
+        Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
+        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
-        renderGraph = Lists.newArrayList();
+        RenderGraph renderGraph = new RenderGraph();
         renderGraph.add(shadowMapNode);
         renderGraph.add(worldReflectionNode);
         renderGraph.add(backdropNode);
@@ -245,15 +251,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.add(bloomPassesNode);
         renderGraph.add(blurPassesNode);
         renderGraph.add(finalPostProcessingNode);
-    }
 
-    private static <T extends Node> T createInstance(Class<T> type, Context context) {
-        // Attempt constructor-based injection first
-        T node = InjectionHelper.createWithConstructorInjection(type, context);
-        // Then fill @In fields
-        InjectionHelper.inject(node, context);
-        node.initialise();
-        return type.cast(node);
+        RenderPipelineGenerator generator = new RenderPipelineGenerator(renderGraph);
+        RenderPipelineOptimizer optimizer = new RenderPipelineOptimizer(generator.generate());
+        renderPipelineExecutor = new RenderPipelineExecutor(optimizer.optimize());
     }
 
     @Override
@@ -347,7 +348,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        renderGraph.forEach(Node::process);
+        renderPipelineExecutor.execute();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }

@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
-
-    void initialise();
-
-    void process();
-
-    // TODO: add a "Set getStateChanges();" method here
+/**
+ *
+ */
+public class WireframeStateChange extends AbstractStateChange<Boolean> {
+    WireframeStateChange(Boolean value) {
+        super(value);
+    }
 }
