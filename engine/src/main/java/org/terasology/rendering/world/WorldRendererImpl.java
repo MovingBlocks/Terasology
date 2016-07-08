@@ -16,6 +16,7 @@
 package org.terasology.rendering.world;
 
 import com.google.api.client.util.Lists;
+import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -62,7 +63,6 @@ import org.terasology.rendering.dag.ToneMappingNode;
 import org.terasology.rendering.dag.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
-import org.terasology.rendering.opengl.GraphicState;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
@@ -123,7 +123,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
     private FrameBuffersManager buffersManager;
-    private GraphicState graphicState;
     private PostProcessor postProcessor;
     private List<Node> renderGraph; // TODO: will be replaced by a DirectedAcyclicGraph data structure
     private ShadowMapNode shadowMapNode;
@@ -175,11 +174,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         buffersManager = new FrameBuffersManager();
         context.put(FrameBuffersManager.class, buffersManager);
 
-        graphicState = new GraphicState(buffersManager);
         postProcessor = new PostProcessor(buffersManager);
         context.put(PostProcessor.class, postProcessor);
 
-        buffersManager.setGraphicState(graphicState);
         buffersManager.setPostProcessor(postProcessor);
         buffersManager.initialize();
 
@@ -469,7 +466,16 @@ public final class WorldRendererImpl implements WorldRenderer {
                     chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
                 }
 
-                graphicState.preRenderSetupChunk(chunkPositionRelativeToCamera);
+
+                /**
+                 * Sets the state prior to the rendering of a chunk.
+                 *
+                 * In practice this just positions the chunk appropriately, relative to the camera.
+                 *
+                 * @param chunkPositionRelativeToCamera Effectively: chunkCoordinates * chunkDimensions - cameraCoordinate
+                 */
+                GL11.glPushMatrix();
+                GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
                     AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
@@ -480,7 +486,11 @@ public final class WorldRendererImpl implements WorldRenderer {
                 chunk.getMesh().render(phase);
                 statRenderedTriangles += chunk.getMesh().triangleCount();
 
-                graphicState.postRenderCleanupChunk();
+                /**
+                 * Resets the state after the rendering of a chunk.
+                 *
+                 */
+                GL11.glPopMatrix();
 
             } else {
                 statChunkNotReady++;
@@ -503,7 +513,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
-        graphicState.dispose();
         postProcessor.dispose();
     }
 

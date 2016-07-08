@@ -77,7 +77,6 @@ public class FrameBuffersManager {
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
-    private GraphicState graphicState;
     private PostProcessor postProcessor;
 
     public FrameBuffersManager() {
@@ -94,11 +93,9 @@ public class FrameBuffersManager {
 
         setDynamicFBOsDimensions();
         createDynamicFBOs();
-        graphicState.refreshDynamicFBOs();
         postProcessor.refreshDynamicFBOs();
 
         createShadowMapFBO();
-        graphicState.setSceneShadowMap(sceneShadowMap);
     }
 
     // Static FBOs do not change during the lifetime of a FrameBuffersManager instance.
@@ -141,13 +138,11 @@ public class FrameBuffersManager {
         if (sceneOpaque.dimensions().areDifferentFrom(fullScale)) {
             disposeOfAllDynamicFBOs();
             recreateDynamicFBOs();
-            graphicState.refreshDynamicFBOs();
             postProcessor.refreshDynamicFBOs();
         }
 
         if (sceneShadowMap != null && sceneShadowMap.width() != renderingConfig.getShadowMapResolution()) {
             recreateShadowMapFBO();
-            graphicState.setSceneShadowMap(sceneShadowMap);
         }
     }
 
@@ -405,7 +400,6 @@ public class FrameBuffersManager {
         fboLookup.put("sceneOpaquePingPong", fboLookup.get("sceneOpaque"));
         fboLookup.put("sceneOpaque", currentSceneOpaquePingPong);
 
-        graphicState.setSceneOpaqueFBO(currentSceneOpaquePingPong);
         postProcessor.refreshSceneOpaqueFBOs();
     }
 
@@ -426,16 +420,6 @@ public class FrameBuffersManager {
      */
     public PBO getCurrentReadbackPBO() {
         return currentReadbackPBO;
-    }
-
-    /**
-     * Sets an internal reference to the GraphicState instance. This reference is used to inform the GraphicState
-     * instance that changes have occurred and that it should refresh its references to the FBOs it uses.
-     *
-     * @param graphicState a GraphicState instance
-     */
-    public void setGraphicState(GraphicState graphicState) {
-        this.graphicState = graphicState;
     }
 
     /**
