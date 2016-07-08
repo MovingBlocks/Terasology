@@ -27,7 +27,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
@@ -77,7 +76,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
-import java.util.List;
 import java.util.PriorityQueue;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
