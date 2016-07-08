@@ -15,11 +15,23 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+/**
+ *
+ */
+public class RenderPipelineGenerator {
+    private RenderGraph renderGraph;
 
-    void initialise();
+    public RenderPipelineGenerator(RenderGraph renderGraph) {
+        this.renderGraph = renderGraph;
+    }
 
-    void process();
+    public RenderPipeline generate() {
+        RenderPipeline renderPipeline = new RenderPipeline();
+        for (Node node : renderGraph.getNodesInTopologicalOrder()) {
+            // TODO: add "renderPipeline.addAll(node.getDesiredStateChanges())" here
+            renderPipeline.add(node);
+        }
 
-    // TODO: add a "Set getStateChanges();" method here
+        return renderPipeline;
+    }
 }

@@ -15,11 +15,10 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+/**
+ *
+ */
+public interface StateChange<T> {
 
-    void initialise();
-
-    void process();
-
-    // TODO: add a "Set getStateChanges();" method here
+    T getValue();
 }

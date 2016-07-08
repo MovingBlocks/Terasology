@@ -15,11 +15,18 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+/**
+ *
+ */
+public class NodeTask implements PipelineTask {
+    private Node node;
 
-    void initialise();
+    public NodeTask(Node node) {
+        this.node = node;
+    }
 
-    void process();
-
-    // TODO: add a "Set getStateChanges();" method here
+    @Override
+    public void execute() {
+        node.process();
+    }
 }

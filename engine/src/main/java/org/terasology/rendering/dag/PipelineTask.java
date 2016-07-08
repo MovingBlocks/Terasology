@@ -15,11 +15,9 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
-
-    void initialise();
-
-    void process();
-
-    // TODO: add a "Set getStateChanges();" method here
+/**
+ *
+ */
+public interface PipelineTask {
+    void execute();
 }

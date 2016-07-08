@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
@@ -21,6 +21,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;

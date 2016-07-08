@@ -13,52 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.engine.ComponentSystemManager;
+import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.world.RenderQueuesHelper;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.rendering.world.WorldRendererImpl;
+import org.terasology.rendering.dag.Node;
 import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
  * TODO: Diagram of this node
  */
-public class ChunksOpaqueNode implements Node {
-
+public class ObjectsOpaqueNode implements Node {
     @In
     private Config config;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private RenderQueuesHelper renderQueues;
+    private ComponentSystemManager componentSystemManager;
 
     private RenderingDebugConfig renderingDebugConfig;
-    private Camera playerCamera;
 
     @Override
     public void initialise() {
         renderingDebugConfig = config.getRendering().getDebug();
-        playerCamera = worldRenderer.getActiveCamera();
     }
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/chunksOpaque");
+        PerformanceMonitor.startActivity("rendering/objectsOpaque");
         enableWireframeIf(renderingDebugConfig.isWireframe());
 
-        worldRenderer.renderChunks(renderQueues.chunksOpaque,
-                ChunkMesh.RenderPhase.OPAQUE,
-                playerCamera,
-                WorldRendererImpl.ChunkRenderMode.DEFAULT);
+        for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
+            renderer.renderOpaque();
+        }
 
         disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();

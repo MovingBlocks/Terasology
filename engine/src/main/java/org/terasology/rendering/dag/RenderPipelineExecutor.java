@@ -15,11 +15,20 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+import java.util.List;
 
-    void initialise();
+/**
+ *
+ */
+public class RenderPipelineExecutor {
 
-    void process();
+    private List<PipelineTask> taskList;
 
-    // TODO: add a "Set getStateChanges();" method here
+    public RenderPipelineExecutor(List<PipelineTask> taskList) {
+        this.taskList = taskList;
+    }
+
+    public void execute() {
+        taskList.forEach(PipelineTask::execute);
+    }
 }

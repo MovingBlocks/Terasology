@@ -15,11 +15,26 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+import org.terasology.context.Context;
+import org.terasology.registry.InjectionHelper;
 
-    void initialise();
+/**
+ *
+ */
+public class NodeFactory {
 
-    void process();
+    private Context context;
 
-    // TODO: add a "Set getStateChanges();" method here
+    public NodeFactory(Context context) {
+        this.context = context;
+    }
+
+    public <T extends Node> T createInstance(Class<T> type) {
+        // Attempt constructor-based injection first
+        T node = InjectionHelper.createWithConstructorInjection(type, context);
+        // Then fill @In fields
+        InjectionHelper.inject(node, context);
+        node.initialise();
+        return type.cast(node);
+    }
 }

@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.dag;
 
-public interface Node {
+import java.util.ArrayList;
 
-    void initialise();
+/**
+ *
+ */
+public class RenderPipeline extends ArrayList<Object> {
 
-    void process();
-
-    // TODO: add a "Set getStateChanges();" method here
 }

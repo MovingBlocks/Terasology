@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -32,7 +34,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 /**
  * TODO: Add diagram of this node
  */
-public class InitialPostProcessingNode implements Node {
+public class LightShaftsNode implements Node {
 
     @In
     private Config config;
@@ -43,38 +45,37 @@ public class InitialPostProcessingNode implements Node {
     @In
     private WorldRenderer worldRenderer;
 
-    private FBO scenePrePost;
+    private RenderingConfig renderingConfig;
+    private Material lightShaftsShader;
+    private FBO lightShaftsFBO;
     private FBO sceneOpaque;
-    private Material initialPost;
 
     @Override
     public void initialise() {
-        initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
+        renderingConfig = config.getRendering();
+        lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
     }
 
-    /**
-     * Adds chromatic aberration, light shafts, 1/8th resolution bloom, vignette onto the rendering achieved so far.
-     * Stores the result into its own buffer to be used at a later stage.
-     */
     @Override
     public void process() {
-        // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
-        PerformanceMonitor.startActivity("rendering/initialPostProcessing");
-        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        initialPost.enable();
+        if (renderingConfig.isLightShafts()) {
+            PerformanceMonitor.startActivity("rendering/lightShafts");
+            lightShaftsFBO = frameBuffersManager.getFBO("lightShafts");
+            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
-        // TODO: verify what the inputs are
-        scenePrePost.bind(); // TODO: see if we could write this straight into sceneOpaque
+            lightShaftsShader.enable();
+            // TODO: verify what the inputs are
+            lightShaftsFBO.bind();
 
-        setViewportToSizeOf(scenePrePost);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
+            setViewportToSizeOf(lightShaftsFBO);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
-        renderFullscreenQuad();
+            renderFullscreenQuad();
 
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+            bindDisplay();     // TODO: verify this is necessary
+            setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        PerformanceMonitor.endActivity();
+            PerformanceMonitor.endActivity();
+        }
     }
 }
