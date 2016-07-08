@@ -22,8 +22,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.utilities.Assets;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -73,12 +71,9 @@ import java.util.Date;
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
 public class PostProcessor {
-
     private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
 
     private FrameBuffersManager buffersManager;
-    private Materials materials = new Materials();
-    private Buffers buffers = new Buffers();
 
     private boolean isTakingScreenshot;
 
@@ -103,60 +98,6 @@ public class PostProcessor {
     }
 
     /**
-     * Initializes the internal references to Materials assets.
-     *
-     * Must be called at least once before the PostProcessor instance is in use. Failure to do so will result
-     * in NullPointerExceptions. Calling it additional times shouldn't hurt but shouldn't be necessary either:
-     * the asset system refreshes the assets behind the scenes if necessary.
-     */
-    public void initializeMaterials() {
-
-        // final post-processing
-        materials.ocDistortion = getMaterial("engine:prog.ocDistortion");
-        materials.finalPost = getMaterial("engine:prog.post");           // TODO: rename shader to finalPost
-        materials.debug = getMaterial("engine:prog.debug");
-    }
-
-    private Material getMaterial(String assetId) {
-        return Assets.getMaterial(assetId).orElseThrow(() ->
-                new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));
-    }
-
-    /**
-     * Fetches a number of FBOs from the FrameBuffersManager instance and initializes or refreshes
-     * a number of internal references with them. These FBOs may become obsolete over the lifetime
-     * of a PostProcessor instance and refreshing the internal references might be needed.
-     * These FBOs are therefore referred to as "dynamic" FBOs.
-     *
-     * This method must be called at least once for the PostProcessor instance to function.
-     * Failure to do so will result in NullPointerExceptions. It will then need to be called
-     * every time the dynamic FBOs become obsolete and the internal references need to be
-     * refreshed with new FBOs.
-     */
-    public void refreshDynamicFBOs() {
-        // initial renderings
-        buffers.sceneOpaque         = buffersManager.getFBO("sceneOpaque");
-        buffers.sceneOpaquePingPong = buffersManager.getFBO("sceneOpaquePingPong");
-
-
-
-        // final post-processing
-        buffers.ocUndistorted   = buffersManager.getFBO("ocUndistorted");
-        buffers.sceneFinal      = buffersManager.getFBO("sceneFinal");
-
-    }
-
-    /**
-     * In a number of occasions the rendering loop swaps two important FBOs.
-     * This method is used to trigger the PostProcessor instance into
-     * refreshing the internal references to these FBOs.
-     */
-    public void refreshSceneOpaqueFBOs() {
-        buffers.sceneOpaque         = buffersManager.getFBO("sceneOpaque");
-        buffers.sceneOpaquePingPong = buffersManager.getFBO("sceneOpaquePingPong");
-    }
-
-    /**
      * Disposes of the PostProcessor instance.
      */
     // Not strictly necessary given the simplicity of the objects being nulled,
@@ -176,7 +117,7 @@ public class PostProcessor {
         return currentExposure;
     }
 
-    // TODO: Remove this method, temporarly here for DownSampleSceneAndUpdateExposure
+    // TODO: Remove this method, temporarily here for DownSampleSceneAndUpdateExposure
     public void setExposure(float exposure) {
         this.currentExposure = exposure;
     }
@@ -211,8 +152,8 @@ public class PostProcessor {
             return;
         }
 
-        int width = buffers.sceneFinal.width();
-        int height = buffers.sceneFinal.height();
+        int width = buffersManager.getFBO("ocUndistorted").width();
+        int height = buffersManager.getFBO("sceneFinal").height();
 
         Runnable task = () -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
@@ -253,25 +194,5 @@ public class PostProcessor {
     // for code readability it make sense to have this method rather than its opposite.
     public boolean isNotTakingScreenshot() {
         return !isTakingScreenshot;
-    }
-
-
-    private class Materials {
-        // final post-processing
-        public Material ocDistortion;
-        public Material finalPost;
-        public Material debug;
-    }
-
-    private class Buffers {
-        // initial renderings
-        public FBO sceneOpaque;
-        public FBO sceneOpaquePingPong;
-
-
-
-        // final post-processing
-        public FBO ocUndistorted;
-        public FBO sceneFinal;
     }
 }

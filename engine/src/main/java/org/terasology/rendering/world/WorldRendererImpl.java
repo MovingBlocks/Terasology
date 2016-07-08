@@ -181,7 +181,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         buffersManager.initialize();
 
         shaderManager.initShaders();
-        postProcessor.initializeMaterials();
         initMaterials();
 
         context.put(WorldRenderer.class, this);

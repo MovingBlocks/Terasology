@@ -93,7 +93,6 @@ public class FrameBuffersManager {
 
         setDynamicFBOsDimensions();
         createDynamicFBOs();
-        postProcessor.refreshDynamicFBOs();
 
         createShadowMapFBO();
     }
@@ -138,7 +137,6 @@ public class FrameBuffersManager {
         if (sceneOpaque.dimensions().areDifferentFrom(fullScale)) {
             disposeOfAllDynamicFBOs();
             recreateDynamicFBOs();
-            postProcessor.refreshDynamicFBOs();
         }
 
         if (sceneShadowMap != null && sceneShadowMap.width() != renderingConfig.getShadowMapResolution()) {
@@ -400,7 +398,6 @@ public class FrameBuffersManager {
         fboLookup.put("sceneOpaquePingPong", fboLookup.get("sceneOpaque"));
         fboLookup.put("sceneOpaque", currentSceneOpaquePingPong);
 
-        postProcessor.refreshSceneOpaqueFBOs();
     }
 
     /**
