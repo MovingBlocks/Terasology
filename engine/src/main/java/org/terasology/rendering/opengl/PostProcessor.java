@@ -152,8 +152,9 @@ public class PostProcessor {
             return;
         }
 
-        int width = buffersManager.getFBO("ocUndistorted").width();
-        int height = buffersManager.getFBO("sceneFinal").height();
+        FBO sceneFinal = buffersManager.getFBO("sceneFinal");
+        int width = sceneFinal.width();
+        int height = sceneFinal.height();
 
         Runnable task = () -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
