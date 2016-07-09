@@ -46,6 +46,12 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
     private SortedSetMultimap<Long, EntityRef> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
     private SortedSetMultimap<Long, EntityRef> periodicOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
+    // ONLY use this for testing. DO NOT use this during regular usage.
+    void setTime(Time t)
+    {
+        time = t;
+    }
+
     @Override
     public void update(float delta) {
         final long currentWorldTime = time.getGameTimeInMs();
@@ -145,6 +151,11 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
                 delayedOperationsSortedByTime.remove(oldWakeUp, entity);
                 delayedOperationsSortedByTime.put(newWakeUp, entity);
             }
+            // Even if the oldWakeUp time is greater than or equal to the new one, the next action should still be added
+            // to the delayedOperationsSortedByTime mapping.
+            else {
+                delayedOperationsSortedByTime.put(scheduleTime, entity);
+            }
         } else {
             delayedActionComponent = new DelayedActionComponent();
             delayedActionComponent.addActionId(actionId, scheduleTime);
@@ -165,6 +176,11 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             if (oldWakeUp < newWakeUp) {
                 periodicOperationsSortedByTime.remove(oldWakeUp, entity);
                 periodicOperationsSortedByTime.put(newWakeUp, entity);
+            }
+            // Even if the oldWakeUp time is greater than or equal to the new one, the next action should still be added
+            // to the delayedOperationsSortedByTime mapping.
+            else {
+                periodicOperationsSortedByTime.put(scheduleTime, entity);
             }
         } else {
             periodicActionComponent = new PeriodicActionComponent();
