@@ -147,6 +147,7 @@ public class JoinServer implements LoadProcess {
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             StateMainMenu mainMenu = new StateMainMenu("Failed to connect to server: " + joinStatus.getErrorMessage());
             context.get(GameEngine.class).changeState(mainMenu);
+            networkSystem.shutdown();
         }
         return false;
     }
