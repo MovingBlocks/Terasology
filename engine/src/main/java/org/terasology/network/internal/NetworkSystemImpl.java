@@ -251,7 +251,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public void shutdown() {
         allChannels.close().awaitUninterruptibly();
-        factory.releaseExternalResources();
+        // Factory may be null if a local game session has happened, yet be initialized if networking has been used
+        if (factory != null) {
+            factory.releaseExternalResources();
+        }
         processPendingDisconnects();
         clientList.forEach(this::processRemovedClient);
         server = null;
