@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 public class UITextEntry<T> extends UIText {
     private static final Logger logger = LoggerFactory.getLogger(UITextEntry.class);
-    
+
     private Binding<T> value = new DefaultBinding<>();
     private Binding<String> stringValue = new DefaultBinding<>("");
     private Parser<T> parser;

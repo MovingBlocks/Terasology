@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
@@ -26,6 +27,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -39,6 +41,7 @@ import org.terasology.rendering.nui.widgets.models.Tree;
 import org.terasology.rendering.nui.widgets.models.TreeModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -119,6 +122,10 @@ public class UITreeView<T> extends CoreWidget {
      * Tree view item click listeners.
      */
     private List<TreeMouseClickListener> itemListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private Map<Integer, UIWidget> alternativeWidgets = Maps.newHashMap();
 
     private class ExpandButtonInteractionListener extends BaseInteractionListener {
         private int index;
@@ -260,6 +267,7 @@ public class UITreeView<T> extends CoreWidget {
             } else {
                 selectedIndex.set(index);
             }
+            clearAlternativeWidgets();
             return true;
         }
         return false;
@@ -341,31 +349,40 @@ public class UITreeView<T> extends CoreWidget {
                     .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()))
                     .getY();
 
+            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
+                    currentHeight,
+                    canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
+                    itemHeight);
+
             // Draw the expand/contract button.
             if (!item.isLeaf()) {
                 canvas.setPart(EXPAND_BUTTON);
+
                 setButtonMode(canvas, item, buttonListener);
                 Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
                         currentHeight,
                         itemIndent.get(),
                         itemHeight);
                 drawButton(canvas, buttonRegion, buttonListener);
+
+                canvas.setPart(TREE_ITEM);
             }
 
-            // Draw the item itself.
-            canvas.setPart(TREE_ITEM);
-            setItemMode(canvas, item, treeViewListenerSet);
-            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
-                    currentHeight,
-                    canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
-                    itemHeight);
-            drawItem(canvas, itemRegion, item, treeViewListenerSet);
-            currentHeight += itemHeight;
+            if (alternativeWidgets.containsKey(i)) {
+                canvas.drawWidget(alternativeWidgets.get(i), itemRegion);
+                currentHeight += itemHeight;
+            } else {
+                // Draw the item itself.
+                setItemMode(canvas, item, treeViewListenerSet);
 
-            // Draw the item dragging hints if the current item is a drag&drop target.
-            if (mouseOverItemIndex.get() != null
-                    && mouseOverItemIndex.get() == i) {
-                drawDragHint(canvas, itemRegion);
+                drawItem(canvas, itemRegion, item, treeViewListenerSet);
+                currentHeight += itemHeight;
+
+                // Draw the item dragging hints if the current item is a drag&drop target.
+                if (mouseOverItemIndex.get() != null
+                        && mouseOverItemIndex.get() == i) {
+                    drawDragHint(canvas, itemRegion);
+                }
             }
         }
     }
@@ -406,27 +423,22 @@ public class UITreeView<T> extends CoreWidget {
             if (id == Keyboard.KeyId.UP || id == Keyboard.KeyId.DOWN) {
                 // Up/Down: change a node's position within the parent node.
                 moveSelected(id);
-                fireUpdateListeners();
                 return true;
             } else if (id == Keyboard.KeyId.DELETE) {
                 // Delete: remove a node (and all its' children).
                 removeSelected();
-                fireUpdateListeners();
                 return true;
             } else if ((ctrlDown && id == Keyboard.KeyId.A) || id == Keyboard.KeyId.INSERT) {
                 // Ctrl+A / Insert: add a new child with a placeholder value to the currently selected node.
                 addToSelected();
-                fireUpdateListeners();
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.C) {
                 // Ctrl+C: copy a selected node.
                 copy(model.get().getItem(selectedIndex.get()));
-                fireUpdateListeners();
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.V) {
                 // Ctrl+V: paste the copied node as a child of the currently selected node.
                 paste(model.get().getItem(selectedIndex.get()));
-                fireUpdateListeners();
                 return true;
             } else {
                 return false;
@@ -436,7 +448,8 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
-    private void fireUpdateListeners() {
+    public void fireUpdateListeners() {
+        clearAlternativeWidgets();
         updateListeners.forEach(UpdateListener::onAction);
     }
 
@@ -456,6 +469,8 @@ public class UITreeView<T> extends CoreWidget {
 
                     // Re-select the moved item.
                     selectedIndex.set(model.get().indexOf(selectedItem));
+
+                    fireUpdateListeners();
                 } else if (keyId == Keyboard.KeyId.DOWN && itemIndex < parent.getChildren().size() - 1) {
                     // Move the item down, unless it is the last item.
                     parent.removeChild(selectedItem);
@@ -464,6 +479,8 @@ public class UITreeView<T> extends CoreWidget {
 
                     // Re-select the moved item.
                     selectedIndex.set(model.get().indexOf(selectedItem));
+
+                    fireUpdateListeners();
                 }
             }
         }
@@ -472,10 +489,14 @@ public class UITreeView<T> extends CoreWidget {
     private void removeSelected() {
         model.get().removeItem(selectedIndex.get());
         selectedIndex.set(null);
+
+        fireUpdateListeners();
     }
 
     private void addToSelected() {
         model.get().getItem(selectedIndex.get()).addChild(defaultValue.get());
+
+        fireUpdateListeners();
     }
 
     public void copy(Tree<T> item) {
@@ -485,6 +506,8 @@ public class UITreeView<T> extends CoreWidget {
     public void paste(Tree<T> item) {
         if (clipboard.get() != null) {
             item.addChild(clipboard.get());
+
+            fireUpdateListeners();
         }
     }
 
@@ -596,6 +619,7 @@ public class UITreeView<T> extends CoreWidget {
 
     public void setModel(TreeModel<T> newModel) {
         model.set(newModel);
+        alternativeWidgets.clear();
         selectedIndex.set(null);
     }
 
@@ -611,6 +635,14 @@ public class UITreeView<T> extends CoreWidget {
     public void subscribeItemMouseClick(TreeMouseClickListener listener) {
         Preconditions.checkNotNull(listener);
         itemListeners.add(listener);
+    }
+
+    public void addAlternativeWidget(int index, UIWidget widget) {
+        alternativeWidgets.put(index, widget);
+    }
+
+    public void clearAlternativeWidgets() {
+        alternativeWidgets.clear();
     }
 
     /**
