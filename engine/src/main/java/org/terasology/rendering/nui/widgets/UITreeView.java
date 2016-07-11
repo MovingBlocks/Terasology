@@ -671,21 +671,21 @@ public class UITreeView<T> extends CoreWidget {
         /**
          * @return The top listener.
          */
-        public ItemTopListener getTopListener() {
+        ItemTopListener getTopListener() {
             return topListener;
         }
 
         /**
          * @return The central listener.
          */
-        public ItemCenterListener getCenterListener() {
+        ItemCenterListener getCenterListener() {
             return centerListener;
         }
 
         /**
          * @return The bottom listener.
          */
-        public ItemBottomListener getBottomListener() {
+        ItemBottomListener getBottomListener() {
             return bottomListener;
         }
 

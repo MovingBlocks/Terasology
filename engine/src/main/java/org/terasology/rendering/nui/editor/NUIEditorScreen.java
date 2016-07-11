@@ -52,7 +52,6 @@ import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.models.JsonTree;
 import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
-import org.terasology.rendering.nui.widgets.models.Tree;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -66,6 +65,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -96,7 +96,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     /**
      * The dropdown containing a list of available asset {@link ResourceUrn}s.
      */
-    private UIDropdownScrollable availableAssetDropdown;
+    private UIDropdownScrollable<ResourceUrn> availableAssetDropdown;
     /**
      * The Urn of the currently selected UIElement.
      */
@@ -104,7 +104,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     /**
      * A tree view containing a {@link JsonTree} representation of the asset being edited.
      */
-    private UITreeView editorTreeView;
+    private UITreeView<JsonTreeNode> editorTreeView;
     /**
      * The {@link UIBox} containing the screen being edited.
      */
@@ -132,7 +132,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 .collect(Collectors.toList()));
 
         // Exclude screens used by the NUI editor, then sort the list.
-        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(this.ASSET_URI));
+        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ASSET_URI));
         availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ContextMenuScreen.ASSET_URI));
         availableAssetList.removeIf(asset -> asset.getRootUrn().equals(NUIEditorSettingsScreen.ASSET_URI));
         availableAssetList.removeIf(asset -> asset.getRootUrn().equals(WidgetSelectionScreen.ASSET_URI));
@@ -175,43 +175,33 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) item);
                 contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) item);
 
+                JsonTreeNode.ElementType type = ((JsonTree) item).getValue().getType();
                 // "Add Widget" only allowed for "contents" objects.
-                if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
+
+                if (type == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
                     contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) item);
                 }
 
-                if (((JsonTree) item).getValue().getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::edit, (JsonTree) item);
+                if (type == JsonTreeNode.ElementType.KEY_VALUE_PAIR) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editKeyValuePair, (JsonTree) item);
+                } else if (type == JsonTreeNode.ElementType.OBJECT) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editObject, (JsonTree) item);
+                } else if (type == JsonTreeNode.ElementType.ARRAY) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editArray, (JsonTree) item);
                 }
 
-                contextMenuBuilder.subscribeClose(() -> {
-                    item.setSelected(false);
-                });
+                contextMenuBuilder.subscribeClose(() -> item.setSelected(false));
 
                 contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
         });
 
         // Set the handlers for the editor buttons.
-        WidgetUtil.trySubscribe(this, "settings", button -> {
-            getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class);
-        });
-
-        WidgetUtil.trySubscribe(this, "copy", button -> {
-            copyJson();
-        });
-
-        WidgetUtil.trySubscribe(this, "paste", button -> {
-            pasteJson();
-        });
-
-        WidgetUtil.trySubscribe(this, "undo", button -> {
-            undo();
-        });
-
-        WidgetUtil.trySubscribe(this, "redo", button -> {
-            redo();
-        });
+        WidgetUtil.trySubscribe(this, "settings", button -> getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class));
+        WidgetUtil.trySubscribe(this, "copy", button -> copyJson());
+        WidgetUtil.trySubscribe(this, "paste", button -> pasteJson());
+        WidgetUtil.trySubscribe(this, "undo", button -> undo());
+        WidgetUtil.trySubscribe(this, "redo", button -> redo());
     }
 
     @Override
@@ -249,8 +239,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * @param urn The Urn of the file to be edited.
      */
     public void selectFile(ResourceUrn urn) {
-        if (assetManager.getAsset(urn, UIElement.class).isPresent()) {
-            UIElement element = assetManager.getAsset(urn, UIElement.class).get();
+        Optional<UIElement> asset = assetManager.getAsset(urn, UIElement.class);
+        if (asset.isPresent()) {
+            UIElement element = asset.get();
 
             // Fetch the file from the asset Urn.
             AssetDataFile source = element.getSource();
@@ -276,7 +267,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
 
             if (selectedUrn != null) {
-                assetManager.getAsset(selectedUrn, UIElement.class).get().dispose();
+                Optional<UIElement> selectedAsset = assetManager.getAsset(selectedUrn, UIElement.class);
+                if (selectedAsset.isPresent()) {
+                    selectedAsset.get().dispose();
+                }
             }
 
             selectedUrn = urn;
@@ -303,13 +297,13 @@ public class NUIEditorScreen extends CoreScreenLayer {
         widgetSelectionScreen.subscribeClose(() -> {
             editorTreeView.setModel(item.getRoot());
             editorTreeView.fireUpdateListeners();
-            updateTreeView(item.getRoot());
+            updateTreeView((JsonTree) item.getRoot());
         });
     }
 
-    private void edit(JsonTree item) {
-        UITextEntry<JsonTree> inlineEditorEntry = new UITextEntry();
 
+    private void edit(JsonTree item, UITextEntry.Formatter<JsonTree> formatter, UITextEntry.Parser<JsonTree> parser) {
+        UITextEntry<JsonTree> inlineEditorEntry = new UITextEntry<>();
         inlineEditorEntry.bindValue(new Binding<JsonTree>() {
             @Override
             public JsonTree get() {
@@ -321,13 +315,25 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 if (value != null) {
                     item.setValue(value.getValue());
                     editorTreeView.clearAlternativeWidgets();
-                    updateTreeView(item.getRoot());
-                    updateWidget(item.getRoot());
+                    JsonTree tree = (JsonTree) (editorTreeView.getModel().getItem(0).getRoot());
+                    if (editorHistoryPosition < editorHistory.size() - 1) {
+                        editorHistory = editorHistory.subList(0, editorHistoryPosition + 1);
+                    }
+                    editorHistory.add(tree);
+                    editorHistoryPosition++;
+                    updateTreeView((JsonTree) item.getRoot());
+                    updateWidget((JsonTree) item.getRoot());
                 }
             }
         });
+        inlineEditorEntry.setFormatter(formatter);
+        inlineEditorEntry.setParser(parser);
+        editorTreeView.clearAlternativeWidgets();
+        editorTreeView.addAlternativeWidget(editorTreeView.getModel().indexOf(item), inlineEditorEntry);
+    }
 
-        inlineEditorEntry.setFormatter(value -> {
+    private void editKeyValuePair(JsonTree item) {
+        UITextEntry.Formatter<JsonTree> formatter = value -> {
             JsonObject jsonObject = new JsonObject();
 
             String jsonKey = value.getValue().getKey();
@@ -345,9 +351,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
             String jsonString = new Gson().toJson(jsonObject);
             return jsonString.substring(1, jsonString.length() - 1);
-        });
+        };
 
-        inlineEditorEntry.setParser(value -> {
+        UITextEntry.Parser<JsonTree> parser = value -> {
             String jsonString = String.format("{%s}", value);
             try {
                 JsonElement jsonElement = new JsonParser().parse(jsonString);
@@ -372,10 +378,25 @@ public class NUIEditorScreen extends CoreScreenLayer {
             } catch (JsonSyntaxException e) {
                 return null;
             }
-        });
+        };
 
-        editorTreeView.clearAlternativeWidgets();
-        editorTreeView.addAlternativeWidget(editorTreeView.getModel().indexOf(item), inlineEditorEntry);
+        edit(item, formatter, parser);
+    }
+
+    private void editObject(JsonTree item) {
+        UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().getKey();
+
+        UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeNode(value, null, JsonTreeNode.ElementType.OBJECT));
+
+        edit(item, formatter, parser);
+    }
+
+    private void editArray(JsonTree item) {
+        UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().getKey();
+
+        UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeNode(value, null, JsonTreeNode.ElementType.ARRAY));
+
+        edit(item, formatter, parser);
     }
 
     private void copyJson() {
@@ -440,16 +461,19 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
-    private void updateTreeView(Tree tree) {
-        Iterator it = tree.getDepthFirstIterator(false);
+    private void updateTreeView(JsonTree tree) {
+        // Serialize & deserialize fixes some invalid JSON edits (e.g. named objects as array elements).
+        JsonTree fixedTree = JsonTreeConverter.serialize(JsonTreeConverter.deserialize(tree));
+
+        Iterator it = fixedTree.getDepthFirstIterator(false);
         while (it.hasNext()) {
-            ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
+            ((JsonTree) it.next()).setExpanded(true);
         }
 
-        editorTreeView.setModel(tree.copy());
+        editorTreeView.setModel(fixedTree.copy());
     }
 
-    private void updateWidget(Tree tree) {
+    private void updateWidget(JsonTree tree) {
         UIWidget widget;
         try {
             JsonElement element = JsonTreeConverter.deserialize(tree);
@@ -460,3 +484,4 @@ public class NUIEditorScreen extends CoreScreenLayer {
         selectedScreenContainer.setContent(widget);
     }
 }
+
