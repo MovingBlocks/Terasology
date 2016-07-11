@@ -15,9 +15,25 @@
  */
 package org.terasology.rendering.dag;
 
+import com.google.api.client.util.Lists;
+import java.util.List;
+
 /**
- *
+ * TODO: Add javadocs
  */
-public interface PipelineTask {
-    void execute();
+public final class RenderTaskListGenerator {
+
+    private RenderTaskListGenerator() {
+
+    }
+
+    public static List<RenderPipelineTask> createFrom(List<Node> orderedNodes) {
+        List<Object> renderPipeline = Lists.newArrayList();
+        for (Node node : orderedNodes) {
+            // TODO: add "renderPipeline.addAll(node.getDesiredStateChanges())" here
+            renderPipeline.add(node);
+        }
+        RenderPipelineOptimizer optimizer = new RenderPipelineOptimizer(renderPipeline);
+        return optimizer.optimize();
+    }
 }

@@ -15,25 +15,40 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.common.collect.Lists;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
-public class RenderPipelineOptimizer {
-    private RenderPipeline renderPipeline;
+class RenderPipelineOptimizer {
+    private static final Logger logger = LoggerFactory.getLogger(RenderPipelineOptimizer.class);
+    private List<Object> renderPipeline;
+    private Map<Class<? extends StateChange>, Class<? extends RenderPipelineTask>> stateChangeTaskMap;
+    private DefaultStateChangeStorage defaultStateChangeStorage; // TODO: use default storage
 
-    public RenderPipelineOptimizer(RenderPipeline renderPipeline) {
+    RenderPipelineOptimizer(List<Object> renderPipeline) {
         this.renderPipeline = renderPipeline;
+        stateChangeTaskMap = Maps.newHashMap();
+        stateChangeTaskMap.put(WireframeStateChange.class, WireframeTask.class);
+        defaultStateChangeStorage = new DefaultStateChangeStorage();
     }
 
-    public List<PipelineTask> optimize() {
-        List<PipelineTask> taskList = Lists.newArrayList();
+    List<RenderPipelineTask> optimize() {
+        List<RenderPipelineTask> taskList = Lists.newArrayList();
+
         for (Object object : renderPipeline) {
             // TODO: eliminate redundant steps here
 
-            PipelineTask task = generateTask(object);
+            RenderPipelineTask task = generateTask(object);
+            // TODO: remove the null check when the system does not allow for StateChange implementations
+            // TODO: without corresponding RenderPipelineTask implementation.
             if (task != null) {
                 taskList.add(task);
             }
@@ -41,22 +56,26 @@ public class RenderPipelineOptimizer {
         return taskList;
     }
 
-    private PipelineTask generateTask(Object object) {
-        PipelineTask task = null;
-        if (object instanceof Node) {
-            task = new NodeTask((Node) object);
-        } else if (object instanceof StateChange) {
-            task = generateStateChangeTask((StateChange) object);
+    private RenderPipelineTask generateTask(Object object) {
+        if (object instanceof StateChange) {
+            return generateStateChangeTask((StateChange) object);
+        } else {
+            return new NodeTask((Node) object);
         }
-        return task;
     }
 
-    private PipelineTask generateStateChangeTask(StateChange object) {
-        PipelineTask task = null;
-        if (object instanceof WireframeStateChange) {
-            task = new WireframeTask(object);
-        }
+    private RenderPipelineTask generateStateChangeTask(StateChange object) {
+        Class<? extends RenderPipelineTask> taskClass = stateChangeTaskMap.get(object.getClass());
 
-        return task;
+        try {
+            Constructor constructor = taskClass.getConstructor(Object.class);
+            Object value = object.getValue();
+            RenderPipelineTask task = (RenderPipelineTask) constructor.newInstance(value);
+
+            return task;
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            logger.error("Failed to instantiate task class: {}", taskClass, e);
+            return null;
+        }
     }
 }

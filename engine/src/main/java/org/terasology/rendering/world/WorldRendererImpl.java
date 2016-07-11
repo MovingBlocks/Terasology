@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.world;
 
+import java.util.List;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -36,9 +37,8 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.dag.RenderPipelineExecutor;
-import org.terasology.rendering.dag.RenderPipelineGenerator;
-import org.terasology.rendering.dag.RenderPipelineOptimizer;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
@@ -127,7 +127,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
-    private RenderPipelineExecutor renderPipelineExecutor;
+    private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
     /**
@@ -228,34 +228,33 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
         RenderGraph renderGraph = new RenderGraph();
-        renderGraph.add(shadowMapNode);
-        renderGraph.add(worldReflectionNode);
-        renderGraph.add(backdropNode);
-        renderGraph.add(skybandsNode);
-        renderGraph.add(objectOpaqueNode);
-        renderGraph.add(chunksOpaqueNode);
-        renderGraph.add(chunksAlphaRejectNode);
-        renderGraph.add(overlaysNode);
-        renderGraph.add(firstPersonViewNode);
-        renderGraph.add(lightGeometryNode);
-        renderGraph.add(directionalLightsNode);
-        renderGraph.add(chunksRefractiveReflectiveNode);
-        renderGraph.add(outlineNode);
-        renderGraph.add(ambientOcclusionPassesNode);
-        renderGraph.add(prePostCompositeNode);
-        renderGraph.add(simpleBlendMaterialsNode);
+        renderGraph.addNode(shadowMapNode, "shadowMapNode");
+        renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
+        renderGraph.addNode(backdropNode, "backdropNode");
+        renderGraph.addNode(skybandsNode, "skybandsNode");
+        renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
+        renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
+        renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+        renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
+        renderGraph.addNode(directionalLightsNode, "directionalLightsNode");
+        renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+        renderGraph.addNode(outlineNode, "outlineNode");
+        renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
+        renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
+        renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
         // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
-        renderGraph.add(lightShaftsNode);
-        renderGraph.add(initialPostProcessingNode);
-        renderGraph.add(downSampleSceneAndUpdateExposure);
-        renderGraph.add(toneMappingNode);
-        renderGraph.add(bloomPassesNode);
-        renderGraph.add(blurPassesNode);
-        renderGraph.add(finalPostProcessingNode);
+        renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
+        renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
+        renderGraph.addNode(downSampleSceneAndUpdateExposure, "downSampleSceneAndUpdateExposure");
+        renderGraph.addNode(toneMappingNode, "toneMappingNode");
+        renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
+        renderGraph.addNode(blurPassesNode, "blurPassesNode");
+        renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
-        RenderPipelineGenerator generator = new RenderPipelineGenerator(renderGraph);
-        RenderPipelineOptimizer optimizer = new RenderPipelineOptimizer(generator.generate());
-        renderPipelineExecutor = new RenderPipelineExecutor(optimizer.optimize());
+        List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
+        renderPipelineTaskList = RenderTaskListGenerator.createFrom(orderedNodes);
     }
 
     @Override
@@ -349,7 +348,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        renderPipelineExecutor.execute();
+        // TODO: Add a method here to check wireframe configuration and regenerate "renderPipelineTask" accordingly.
+
+        renderPipelineTaskList.forEach(RenderPipelineTask::execute);
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
