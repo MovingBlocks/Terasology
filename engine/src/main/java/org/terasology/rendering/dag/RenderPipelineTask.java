@@ -15,20 +15,9 @@
  */
 package org.terasology.rendering.dag;
 
-import java.util.List;
-
 /**
  *
  */
-public class RenderPipelineExecutor {
-
-    private List<PipelineTask> taskList;
-
-    public RenderPipelineExecutor(List<PipelineTask> taskList) {
-        this.taskList = taskList;
-    }
-
-    public void execute() {
-        taskList.forEach(PipelineTask::execute);
-    }
+public interface RenderPipelineTask {
+    void execute();
 }

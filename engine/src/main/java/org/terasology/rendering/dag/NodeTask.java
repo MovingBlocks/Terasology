@@ -18,7 +18,7 @@ package org.terasology.rendering.dag;
 /**
  *
  */
-public class NodeTask implements PipelineTask {
+public class NodeTask implements RenderPipelineTask {
     private Node node;
 
     public NodeTask(Node node) {

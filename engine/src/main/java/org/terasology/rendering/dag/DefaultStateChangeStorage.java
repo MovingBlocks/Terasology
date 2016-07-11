@@ -15,23 +15,19 @@
  */
 package org.terasology.rendering.dag;
 
+import java.util.HashMap;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+
 /**
- *
+ * TODO: Add javadocs
  */
-public class RenderPipelineGenerator {
-    private RenderGraph renderGraph;
+class DefaultStateChangeStorage extends HashMap<Class<? extends StateChange>, StateChange> {
 
-    public RenderPipelineGenerator(RenderGraph renderGraph) {
-        this.renderGraph = renderGraph;
-    }
+    DefaultStateChangeStorage() {
+        // TODO: add more default values of StateChange's here
+        // TODO: be sure every custom state change has a default value here
 
-    public RenderPipeline generate() {
-        RenderPipeline renderPipeline = new RenderPipeline();
-        for (Node node : renderGraph.getNodesInTopologicalOrder()) {
-            // TODO: add "renderPipeline.addAll(node.getDesiredStateChanges())" here
-            renderPipeline.add(node);
-        }
-
-        return renderPipeline;
+        put(WireframeStateChange.class, new WireframeStateChange(GL_FILL));
     }
 }
+

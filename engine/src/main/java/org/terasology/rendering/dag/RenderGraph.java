@@ -28,19 +28,14 @@ public class RenderGraph { // TODO: add extends DirectedAcyclicGraph<Node>
         nodes = Lists.newArrayList();
     }
 
-    public String add(Node node, String suggestedId) {
+    public String addNode(Node node, String suggestedId) {
         nodes.add(node);
         return null; // TODO: for instance if "blur" present make id "blur1" and return it
     }
 
-    public String add(Node node) {
-        nodes.add(node);
-        return null; // TODO: returns a unique id
-    }
-
     // TODO: add remove, get, addEdge, removeEdge methods here
 
-    protected List<Node> getNodesInTopologicalOrder() {
+    public List<Node> getNodesInTopologicalOrder() {
         return nodes;
     }
 }

@@ -16,29 +16,20 @@
 package org.terasology.rendering.dag;
 
 import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
+import org.terasology.registry.In;
 
 /**
  *
  */
-public class WireframeTask implements PipelineTask { // TODO: separate this into SetWireframeOnTask and SetWireframeOffTask?
+public class WireframeTask implements RenderPipelineTask { // TODO: separate this into SetWireframeOnTask and SetWireframeOffTask?
 
-    private final boolean enabled;
-
-    public WireframeTask(StateChange<Boolean> stateChange) {
-        this.enabled = stateChange.getValue();
-    }
+    @In
+    private int mode;
 
     @Override
     public void execute() {
-        // TODO: "if(wireframeIsEnabledInRenderingDebugConfig) {" here?
+        GL11.glPolygonMode(GL_FRONT_AND_BACK, mode);
 
-        if (enabled) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        } else {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
     }
 }

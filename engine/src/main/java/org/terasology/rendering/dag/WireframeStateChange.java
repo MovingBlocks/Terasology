@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.dag;
 
+
 /**
  *
  */
-public class WireframeStateChange extends AbstractStateChange<Boolean> {
-    WireframeStateChange(Boolean value) {
+public class WireframeStateChange extends AbstractStateChange<Integer> {
+    WireframeStateChange(Integer value) {
         super(value);
     }
 }
