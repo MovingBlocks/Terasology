@@ -49,9 +49,9 @@ import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.widgets.UITreeView;
-import org.terasology.rendering.nui.widgets.models.JsonTree;
-import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
-import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
+import org.terasology.rendering.nui.widgets.treeView.JsonTree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeNode;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -478,10 +478,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
         try {
             JsonElement element = JsonTreeConverter.deserialize(tree);
             widget = new UIFormat().load(element).getRootWidget();
+            selectedScreenContainer.setContent(widget);
         } catch (Exception e) {
-            widget = new UILabel(ExceptionUtils.getStackTrace(e));
+            selectedScreenContainer.setContent(new UILabel(ExceptionUtils.getStackTrace(e)));
         }
-        selectedScreenContainer.setContent(widget);
     }
 }
 

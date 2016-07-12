@@ -29,8 +29,8 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UpdateListener;
-import org.terasology.rendering.nui.widgets.models.JsonTree;
-import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
+import org.terasology.rendering.nui.widgets.treeView.JsonTree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeNode;
 
 import java.util.Collections;
 import java.util.List;

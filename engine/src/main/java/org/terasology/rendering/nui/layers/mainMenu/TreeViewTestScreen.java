@@ -26,10 +26,10 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.widgets.UITreeView;
-import org.terasology.rendering.nui.widgets.models.JsonTree;
-import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
-import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
-import org.terasology.rendering.nui.widgets.models.Tree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeNode;
+import org.terasology.rendering.nui.widgets.treeView.Tree;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
