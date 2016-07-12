@@ -28,6 +28,8 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.dag.NodeTask;
+import org.terasology.rendering.dag.RenderTaskSystem;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -74,6 +76,8 @@ public class DebugOverlay extends CoreScreenLayer {
     @In
     private StorageManager storageManager;
 
+    @In
+    private RenderTaskSystem renderTaskSystem;
 
     @Override
     public void initialise() {
@@ -142,6 +146,17 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
         }
+
+        UILabel debugLine5 = find("debugLine5", UILabel.class);
+        if (debugLine5 != null) {
+            debugLine5.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return String.format("Executed final node task: %s", ((NodeTask) renderTaskSystem.getCursorTask()).getNode().getClass().getSimpleName());
+                }
+            });
+        }
+
         UILabel saveStatusLabel = find("saveStatusLabel", UILabel.class);
         // clients do not have a storage manager
         if (saveStatusLabel != null && storageManager != null) {

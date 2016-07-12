@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.debug.DebugProperties;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.dag.RenderTaskSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -53,6 +54,9 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private RenderTaskSystem renderTaskSystem;
 
     private DebugOverlay overlay;
 
@@ -147,6 +151,10 @@ public class DebugControlSystem extends BaseComponentSystem {
                     break;
                 case Keyboard.KeyId.F9:
                     config.getRendering().getDebug().setWireframe(!config.getRendering().getDebug().isWireframe());
+                    event.consume();
+                    break;
+                case Keyboard.KeyId.F11:
+                    renderTaskSystem.toggle();
                     event.consume();
                     break;
                 default:

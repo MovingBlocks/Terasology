@@ -19,6 +19,7 @@ package org.terasology.rendering.dag;
  * TODO: Add javadocs
  */
 public class NodeTask implements RenderPipelineTask {
+
     private Node node;
 
     public NodeTask(Node node) {
@@ -28,5 +29,9 @@ public class NodeTask implements RenderPipelineTask {
     @Override
     public void execute() {
         node.process();
+    }
+
+    public Node getNode() {
+        return node;
     }
 }

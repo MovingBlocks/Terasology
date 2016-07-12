@@ -25,6 +25,10 @@
                     },
                     {
                         "type" : "UILabel",
+                        "id": "debugLine5"
+                    },
+                    {
+                        "type": "UILabel",
                         "id" : "metrics"
                     }
                 ],

@@ -26,6 +26,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
@@ -39,6 +40,7 @@ import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
+import org.terasology.rendering.dag.RenderTaskSystem;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
@@ -127,8 +129,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     private FrameBuffersManager buffersManager;
     private GraphicState graphicState;
     private PostProcessor postProcessor;
-    private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
+    private RenderTaskSystem renderTaskSystem;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -255,7 +257,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
         RenderTaskListGenerator generator = new RenderTaskListGenerator();
-        renderPipelineTaskList = generator.generateFrom(orderedNodes);
+        List<RenderPipelineTask> taskList = generator.generateFrom(orderedNodes);
+        renderTaskSystem = CoreRegistry.get(RenderTaskSystem.class);
+        renderTaskSystem.setTaskList(taskList);
     }
 
     @Override
@@ -349,9 +353,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void render(RenderingStage renderingStage) {
         preRenderUpdate(renderingStage);
 
-        // TODO: Add a method here to check wireframe configuration and regenerate "renderPipelineTask" accordingly.
-
-        renderPipelineTaskList.forEach(RenderPipelineTask::execute);
+        // TODO: Add a method here to check wireframe configuration and regenerate new task list accordingly.
+        renderTaskSystem.executeAll();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
