@@ -18,6 +18,6 @@ package org.terasology.rendering.dag;
 /**
  *
  */
-interface RenderPipelineTask {
+public interface RenderPipelineTask {
     void execute();
 }
