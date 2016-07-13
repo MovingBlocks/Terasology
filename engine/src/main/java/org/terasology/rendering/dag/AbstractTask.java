@@ -16,12 +16,12 @@
 package org.terasology.rendering.dag;
 
 /**
- *
+ * TODO: Add javadocs
  */
 public abstract class AbstractTask<T> implements RenderPipelineTask {
     protected T value;
 
-    AbstractTask(Object value) {
+    public AbstractTask(Object value) {
         this.value = (T) value;
     }
 }

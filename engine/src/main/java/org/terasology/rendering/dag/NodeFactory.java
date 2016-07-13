@@ -19,7 +19,7 @@ import org.terasology.context.Context;
 import org.terasology.registry.InjectionHelper;
 
 /**
- *
+ * TODO: Add javadocs
  */
 public class NodeFactory {
 

@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.dag.stateChanges.FBOStateChange;
+import org.terasology.rendering.dag.stateChanges.WireframeStateChange;
+import org.terasology.rendering.dag.tasks.FBOTask;
+import org.terasology.rendering.dag.tasks.WireframeTask;
 
 /**
  * TODO: Add javadocs
