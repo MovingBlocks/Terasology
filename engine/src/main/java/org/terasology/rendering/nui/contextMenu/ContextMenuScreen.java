@@ -56,6 +56,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             // Close the context menu on click outside it.
+            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
 
             return false;
@@ -64,6 +65,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
             // Close the context menu on mouse wheel scroll outside it.
+            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
 
             // Consume the event to prevent awkward rendering if the menu is within a scrollable widget.
@@ -81,11 +83,6 @@ public class ContextMenuScreen extends CoreScreenLayer {
         canvas.addInteractionRegion(mainListener);
         Rect2i region = Rect2i.createFromMinAndSize(menuPosition, canvas.calculatePreferredSize(menu));
         canvas.drawWidget(menu, region);
-    }
-
-    @Override
-    public void onClosed() {
-        closeListeners.forEach(UpdateListener::onAction);
     }
 
     public void setList(List list) {

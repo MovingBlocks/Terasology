@@ -168,7 +168,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
         // When the node is right-clicked, construct the context menu according to its' value.
         editorTreeView.subscribeNodeClick((event, node) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                node.setSelected(true);
+                editorTreeView.setSelectedIndex(editorTreeView.getModel().indexOf(node));
+                editorTreeView.setAlternativeWidget(null);
 
                 ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
 
@@ -184,13 +185,17 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
                 if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                     contextMenuBuilder.addOption(OPTION_EDIT, this::editKeyValuePair, (JsonTree) node);
-                } else if (type == JsonTreeValue.Type.OBJECT) {
+                } else if (type == JsonTreeValue.Type.OBJECT &&
+                        !(!node.isRoot() && ((JsonTree) node).getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                     contextMenuBuilder.addOption(OPTION_EDIT, this::editObject, (JsonTree) node);
                 } else if (type == JsonTreeValue.Type.ARRAY) {
                     contextMenuBuilder.addOption(OPTION_EDIT, this::editArray, (JsonTree) node);
                 }
 
-                contextMenuBuilder.subscribeClose(() -> node.setSelected(false));
+                contextMenuBuilder.subscribeClose(() -> {
+                    editorTreeView.setAlternativeWidget(null);
+                    editorTreeView.setSelectedIndex(null);
+                });
 
                 contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
@@ -202,7 +207,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
                 if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                     editKeyValuePair((JsonTree) node);
-                } else if (type == JsonTreeValue.Type.OBJECT) {
+                } else if (type == JsonTreeValue.Type.OBJECT &&
+                        !(!node.isRoot() && ((JsonTree) node).getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                     editObject((JsonTree) node);
                 } else if (type == JsonTreeValue.Type.ARRAY) {
                     editArray((JsonTree) node);
@@ -212,14 +218,15 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         editorTreeView.subscribeKeyEvent(event -> {
             if (event.isDown() && event.getKey() == Keyboard.Key.F2) {
-                Integer selectedIndex = editorTreeView.getState().getSelectedIndex();
+                Integer selectedIndex = editorTreeView.getSelectedIndex();
                 if (selectedIndex != null) {
                     JsonTree node = (JsonTree) editorTreeView.getModel().getNode(selectedIndex);
                     JsonTreeValue.Type type = node.getValue().getType();
 
                     if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                         editKeyValuePair(node);
-                    } else if (type == JsonTreeValue.Type.OBJECT) {
+                    } else if (type == JsonTreeValue.Type.OBJECT &&
+                            !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                         editObject(node);
                     } else if (type == JsonTreeValue.Type.ARRAY) {
                         editArray(node);
@@ -311,13 +318,12 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     private void copy(JsonTree node) {
         editorTreeView.copy(node);
-        node.setSelected(false);
+        editorTreeView.setSelectedIndex(null);
     }
 
     private void paste(JsonTree node) {
         editorTreeView.paste(node);
-        node.setSelected(false);
-
+        editorTreeView.setSelectedIndex(null);
     }
 
     private void addWidget(JsonTree node) {
@@ -346,7 +352,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             public void set(JsonTree value) {
                 if (value != null) {
                     node.setValue(value.getValue());
-                    editorTreeView.clearAlternativeWidgets();
+                    editorTreeView.setAlternativeWidget(null);
 
                     JsonTree tree = (JsonTree) (editorTreeView.getModel().getNode(0).getRoot());
                     if (editorHistoryPosition < editorHistory.size() - 1) {
@@ -366,8 +372,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             // Required so that ENTER/NUMPAD_ENTER saves the changes.
             inlineEditorEntry.onLoseFocus();
         });
-        editorTreeView.clearAlternativeWidgets();
-        editorTreeView.addAlternativeWidget(editorTreeView.getModel().indexOf(node), inlineEditorEntry);
+        editorTreeView.setAlternativeWidget(inlineEditorEntry);
     }
 
     private void editKeyValuePair(JsonTree node) {

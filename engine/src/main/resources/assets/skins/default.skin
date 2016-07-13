@@ -552,9 +552,6 @@
                     },
                     "texture-scale-mode": "scale fit",
                     "modes": {
-                        "selected": {
-                            "background": "buttonDown"
-                        },
                         "hover": {
                             "background": "buttonOver"
                         },

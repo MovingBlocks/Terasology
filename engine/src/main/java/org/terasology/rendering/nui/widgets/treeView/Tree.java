@@ -45,10 +45,6 @@ public abstract class Tree<T> {
      */
     private boolean expanded;
     /**
-     * Whether the tree is selected, i.e. it is outlined within the user interface.
-     */
-    private boolean selected;
-    /**
      * The parent of this tree.
      */
     protected Tree<T> parent;
@@ -83,20 +79,6 @@ public abstract class Tree<T> {
      */
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
-    }
-
-    /**
-     * @return Whether the tree is selected.
-     */
-    public boolean isSelected() {
-        return selected;
-    }
-
-    /**
-     * @param selected The new selected state of this tree.
-     */
-    public void setSelected(boolean selected) {
-        this.selected = selected;
     }
 
     /**

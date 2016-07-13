@@ -69,7 +69,6 @@ public class UITreeView<T> extends CoreWidget {
     private static final String EXPAND_MODE = "expand";
     private static final String EXPAND_HOVER_MODE = "expand-hover";
     private static final String HOVER_DISABLED_MODE = "hover-disabled";
-    private static final String SELECTED_MODE = "selected";
 
     /**
      * The horizontal indentation, in pixels, corresponding to one level in the tree.
@@ -161,10 +160,11 @@ public class UITreeView<T> extends CoreWidget {
                 canvas.setPart(TREE_NODE);
             }
 
-            if (state.getAlternativeWidgets().containsKey(i)) {
+            if (state.getSelectedIndex() != null && state.getSelectedIndex() == i
+                    && state.getAlternativeWidget() != null) {
                 //Draw an alternative widget in place of the node (with the same size).
 
-                canvas.drawWidget(state.getAlternativeWidgets().get(i), nodeRegion);
+                canvas.drawWidget(state.getAlternativeWidget(), nodeRegion);
                 currentHeight += nodeHeight;
             } else {
                 // Draw the node itself.
@@ -247,16 +247,20 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
-    public void addAlternativeWidget(int index, UIWidget widget) {
-        state.getAlternativeWidgets().put(index, widget);
+    public Integer getSelectedIndex() {
+        return state.getSelectedIndex();
     }
 
-    public void clearAlternativeWidgets() {
-        state.getAlternativeWidgets().clear();
+    public void setSelectedIndex(Integer index) {
+        state.setSelectedIndex(index);
+    }
+
+    public void setAlternativeWidget(UIWidget widget) {
+        state.setAlternativeWidget(widget);
     }
 
     public void fireUpdateListeners() {
-        clearAlternativeWidgets();
+        state.setAlternativeWidget(null);
         updateListeners.forEach(UpdateListener::onAction);
     }
 
@@ -282,12 +286,8 @@ public class UITreeView<T> extends CoreWidget {
 
     public void setModel(TreeModel<T> newModel) {
         model.set(newModel);
-        state.getAlternativeWidgets().clear();
+        state.setAlternativeWidget(null);
         state.setSelectedIndex(null);
-    }
-
-    public TreeViewState<T> getState() {
-        return state;
     }
 
     public void setDefaultValue(T value) {
@@ -323,9 +323,7 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void setNodeMode(Canvas canvas, Tree<T> node, TreeViewListenerSet listenerSet) {
-        if (node.isSelected()) {
-            canvas.setMode(SELECTED_MODE);
-        } else if (state.getSelectedIndex() != null && Objects.equals(node, model.get().getNode(state.getSelectedIndex()))) {
+        if (state.getSelectedIndex() != null && Objects.equals(node, model.get().getNode(state.getSelectedIndex()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listenerSet.isMouseOver()) {
             canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
@@ -473,7 +471,7 @@ public class UITreeView<T> extends CoreWidget {
             } else {
                 state.setSelectedIndex(index);
             }
-            clearAlternativeWidgets();
+            state.setAlternativeWidget(null);
             return true;
         }
         return false;

@@ -15,42 +15,48 @@
  */
 package org.terasology.rendering.nui.widgets.treeView;
 
-import com.google.common.collect.Maps;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.UITreeView;
 
-import java.util.Map;
-
 public class TreeViewState<T> {
     /**
-     * The index of the currently selected node, or null if no node is selected.
+     * The index of the currently selected node.
+     * <p>
+     * {@code null} if no node is selected.
      */
     private Binding<Integer> selectedIndex = new DefaultBinding<>();
     /**
-     * The index of the node being drag&dropped, or null if no node is dragged.
+     * The index of the node being drag&dropped.
+     * <p>
+     * {@code null} if no node is dragged.
      */
     private Binding<Integer> draggedIndex = new DefaultBinding<>();
     /**
      * The index of the node being moused over if another node is currently dragged.
-     * Null if no node is either dragged or moused over.
+     * <p>
+     * {@code null} if no node is either dragged or moused over.
      */
     private Binding<Integer> mouseOverIndex = new DefaultBinding<>();
     /**
      * The index of the node being moused over if another node is currently dragged.
-     * Null if no node is either dragged or moused over.
+     * <p>
+     * {@code null} if no node is either dragged or moused over.
      */
     private Binding<UITreeView.MouseOverType> mouseOverType = new DefaultBinding<>();
     /**
-     * The node currently being copied, or null if no node has been copied.
+     * The node currently being copied.
+     * <p>
+     * {@code null} if no node has been copied.
      */
     private Binding<Tree<T>> clipboard = new DefaultBinding<>();
     /**
-     * A map containing an node index as key and the widget to be drawn in place of the
-     * specified node as value.
+     * The widget to be drawn in place of a selected item.
+     * <p>
+     * {@code null} if no alternative widget is to be drawn.
      */
-    private Map<Integer, UIWidget> alternativeWidgets = Maps.newHashMap();
+    private Binding<UIWidget> alternativeWidget = new DefaultBinding<>();
 
     public Integer getSelectedIndex() {
         return selectedIndex.get();
@@ -92,11 +98,11 @@ public class TreeViewState<T> {
         this.clipboard.set(clipboard);
     }
 
-    public Map<Integer, UIWidget> getAlternativeWidgets() {
-        return alternativeWidgets;
+    public UIWidget getAlternativeWidget() {
+        return alternativeWidget.get();
     }
 
-    public void setAlternativeWidgets(Map<Integer, UIWidget> alternativeWidgets) {
-        this.alternativeWidgets = alternativeWidgets;
+    public void setAlternativeWidget(UIWidget alternativeWidget) {
+        this.alternativeWidget.set(alternativeWidget);
     }
 }
