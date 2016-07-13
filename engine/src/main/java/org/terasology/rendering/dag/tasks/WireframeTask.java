@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.tasks;
 
-
-import static org.lwjgl.opengl.GL11.GL_FILL;
+import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import org.terasology.rendering.dag.AbstractTask;
 
 /**
- *
+ * TODO: Add javadocs
  */
-public class WireframeStateChange extends AbstractStateChange<Integer> {
-    private static WireframeStateChange defaultInstance = new WireframeStateChange(GL_FILL);
-
-    WireframeStateChange(Integer value) {
+public final class WireframeTask extends AbstractTask<Integer> {
+    private WireframeTask(Object value) {
         super(value);
     }
 
     @Override
-    public StateChange getDefaultInstance() {
-        return defaultInstance;
+    public void execute() {
+        GL11.glPolygonMode(GL_FRONT_AND_BACK, value);
+
     }
 }

@@ -17,6 +17,9 @@ package org.terasology.rendering.dag;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
+/**
+ * TODO: Add javadocs
+ */
 public interface Node {
 
     void initialise();

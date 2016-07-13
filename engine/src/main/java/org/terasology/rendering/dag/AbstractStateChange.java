@@ -21,7 +21,7 @@ package org.terasology.rendering.dag;
 public abstract class AbstractStateChange<T> implements StateChange<T> {
     private final T value;
 
-    AbstractStateChange(T value) {
+    public AbstractStateChange(T value) {
         this.value = value;
     }
 
