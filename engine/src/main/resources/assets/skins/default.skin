@@ -534,7 +534,7 @@
                         }
                     }
                 },
-                "tree-item": {
+                "tree-node": {
                     "text-align-horizontal": "left",
                     "text-align-vertical": "middle",
                     "background": "button",

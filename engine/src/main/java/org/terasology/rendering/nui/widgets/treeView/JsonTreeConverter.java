@@ -47,33 +47,33 @@ public final class JsonTreeConverter {
         if (json.isJsonPrimitive()) {
             JsonPrimitive primitive = json.getAsJsonPrimitive();
             if (primitive.isBoolean()) {
-                return new JsonTree(new JsonTreeNode(name, json.getAsBoolean(),
-                        name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
+                return new JsonTree(new JsonTreeValue(name, json.getAsBoolean(),
+                        name != null ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.VALUE));
             } else if (primitive.isNumber()) {
-                return new JsonTree(new JsonTreeNode(name, json.getAsNumber(),
-                        name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
+                return new JsonTree(new JsonTreeValue(name, json.getAsNumber(),
+                        name != null ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.VALUE));
             } else if (primitive.isString()) {
-                return new JsonTree(new JsonTreeNode(name, json.getAsString(),
-                        name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
+                return new JsonTree(new JsonTreeValue(name, json.getAsString(),
+                        name != null ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.VALUE));
             } else {
-                return new JsonTree(new JsonTreeNode(name, null, name != null ? JsonTreeNode.ElementType.KEY_VALUE_PAIR : JsonTreeNode.ElementType.VALUE));
+                return new JsonTree(new JsonTreeValue(name, null, name != null ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.VALUE));
             }
         } else if (json.isJsonArray()) {
-            JsonTree tree = new JsonTree(new JsonTreeNode(name, null, JsonTreeNode.ElementType.ARRAY));
+            JsonTree tree = new JsonTree(new JsonTreeValue(name, null, JsonTreeValue.Type.ARRAY));
             JsonArray array = json.getAsJsonArray();
             for (int i = 0; i < array.size(); i++) {
                 tree.addChild(serialize(array.get(i)));
             }
             return tree;
         } else if (json.isJsonObject()) {
-            JsonTree tree = new JsonTree(new JsonTreeNode(name, null, JsonTreeNode.ElementType.OBJECT));
+            JsonTree tree = new JsonTree(new JsonTreeValue(name, null, JsonTreeValue.Type.OBJECT));
             JsonObject object = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 tree.addChild(serialize(entry.getKey(), entry.getValue()));
             }
             return tree;
         } else {
-            return new JsonTree(new JsonTreeNode(name, null, JsonTreeNode.ElementType.NULL));
+            return new JsonTree(new JsonTreeValue(name, null, JsonTreeValue.Type.NULL));
         }
     }
 
@@ -81,28 +81,28 @@ public final class JsonTreeConverter {
      * @param tree A tree hierarchy based on a {@link JsonElement}, created by the serialize() method.
      * @return The initial {@link JsonElement} reconstructed from the tree.
      */
-    public static JsonElement deserialize(Tree<JsonTreeNode> tree) {
-        JsonTreeNode node = tree.getValue();
-        if (node.getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR || node.getType() == JsonTreeNode.ElementType.VALUE) {
-            Object value = node.getValue();
-            if (value instanceof Boolean) {
-                return new JsonPrimitive((Boolean) value);
-            } else if (value instanceof Number) {
-                return new JsonPrimitive((Number) value);
-            } else if (value instanceof String) {
-                return new JsonPrimitive((String) value);
+    public static JsonElement deserialize(Tree<JsonTreeValue> tree) {
+        JsonTreeValue value = tree.getValue();
+        if (value.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR || value.getType() == JsonTreeValue.Type.VALUE) {
+            Object primitive = value.getValue();
+            if (primitive instanceof Boolean) {
+                return new JsonPrimitive((Boolean) primitive);
+            } else if (primitive instanceof Number) {
+                return new JsonPrimitive((Number) primitive);
+            } else if (primitive instanceof String) {
+                return new JsonPrimitive((String) primitive);
             } else {
                 return JsonNull.INSTANCE;
             }
-        } else if (node.getType() == JsonTreeNode.ElementType.ARRAY) {
+        } else if (value.getType() == JsonTreeValue.Type.ARRAY) {
             JsonArray array = new JsonArray();
-            for (Tree<JsonTreeNode> child : tree.getChildren()) {
+            for (Tree<JsonTreeValue> child : tree.getChildren()) {
                 array.add(deserialize(child));
             }
             return array;
-        } else if (node.getType() == JsonTreeNode.ElementType.OBJECT) {
+        } else if (value.getType() == JsonTreeValue.Type.OBJECT) {
             JsonObject object = new JsonObject();
-            for (Tree<JsonTreeNode> child : tree.getChildren()) {
+            for (Tree<JsonTreeValue> child : tree.getChildren()) {
                 object.add(child.getValue().getKey(), deserialize(child));
             }
             return object;

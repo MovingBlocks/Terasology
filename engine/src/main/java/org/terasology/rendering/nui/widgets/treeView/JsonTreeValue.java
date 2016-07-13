@@ -20,11 +20,11 @@ import com.google.gson.JsonElement;
 /**
  * The value type for the tree representation of a {@link JsonElement}.
  */
-public class JsonTreeNode {
+public class JsonTreeValue {
     /**
      * The type of the JSON node.
      */
-    public enum ElementType {
+    public enum Type {
         /**
          * Primitive data type (string, boolean, array).
          */
@@ -70,9 +70,9 @@ public class JsonTreeNode {
     /**
      * The type of the node.
      */
-    private ElementType type;
+    private Type type;
 
-    public JsonTreeNode(String key, Object value, ElementType type) {
+    public JsonTreeValue(String key, Object value, Type type) {
         this.key = key;
         this.value = value;
         this.type = type;
@@ -86,22 +86,22 @@ public class JsonTreeNode {
         return this.value;
     }
 
-    public ElementType getType() {
+    public Type getType() {
         return this.type;
     }
 
     @Override
     public String toString() {
-        if (type == ElementType.KEY_VALUE_PAIR) {
+        if (type == Type.KEY_VALUE_PAIR) {
             if (key != null && value != null) {
                 return key + ": " + value;
             }
             return key == null ? value.toString() : key;
-        } else if (type == ElementType.VALUE) {
+        } else if (type == Type.VALUE) {
             return value.toString();
-        } else if (type == ElementType.ARRAY) {
+        } else if (type == Type.ARRAY) {
             return key != null ? key : ARRAY_STRING;
-        } else if (type == ElementType.OBJECT) {
+        } else if (type == Type.OBJECT) {
             return key != null ? key : OBJECT_STRING;
         } else {
             return key != null ? key : NULL_STRING;

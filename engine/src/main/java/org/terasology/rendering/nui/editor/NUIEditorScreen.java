@@ -51,7 +51,7 @@ import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
-import org.terasology.rendering.nui.widgets.treeView.JsonTreeNode;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -104,7 +104,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     /**
      * A tree view containing a {@link JsonTree} representation of the asset being edited.
      */
-    private UITreeView<JsonTreeNode> editorTreeView;
+    private UITreeView<JsonTreeValue> editorTreeView;
     /**
      * The {@link UIBox} containing the screen being edited.
      */
@@ -155,7 +155,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         // When the tree view is updated, update the widget accordingly.
         editorTreeView.subscribeTreeViewUpdate(() -> {
-            JsonTree tree = (JsonTree) (editorTreeView.getModel().getItem(0).getRoot());
+            JsonTree tree = (JsonTree) (editorTreeView.getModel().getNode(0).getRoot());
             if (editorHistoryPosition < editorHistory.size() - 1) {
                 editorHistory = editorHistory.subList(0, editorHistoryPosition + 1);
             }
@@ -165,37 +165,68 @@ public class NUIEditorScreen extends CoreScreenLayer {
             updateWidget(tree);
         });
 
-        // When the item is right-clicked, construct the context menu according to its' value.
-        editorTreeView.subscribeItemMouseClick((event, item) -> {
+        // When the node is right-clicked, construct the context menu according to its' value.
+        editorTreeView.subscribeNodeClick((event, node) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                item.setSelected(true);
+                node.setSelected(true);
 
                 ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
 
-                contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) item);
-                contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) item);
+                contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) node);
+                contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) node);
 
-                JsonTreeNode.ElementType type = ((JsonTree) item).getValue().getType();
+                JsonTreeValue.Type type = ((JsonTree) node).getValue().getType();
                 // "Add Widget" only allowed for "contents" objects.
 
-                if (type == JsonTreeNode.ElementType.ARRAY && ((JsonTree) item).getValue().getKey().equals("contents")) {
-                    contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) item);
+                if (type == JsonTreeValue.Type.ARRAY && ((JsonTree) node).getValue().getKey().equals("contents")) {
+                    contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) node);
                 }
 
-                if (type == JsonTreeNode.ElementType.KEY_VALUE_PAIR) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editKeyValuePair, (JsonTree) item);
-                } else if (type == JsonTreeNode.ElementType.OBJECT) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editObject, (JsonTree) item);
-                } else if (type == JsonTreeNode.ElementType.ARRAY) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editArray, (JsonTree) item);
+                if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editKeyValuePair, (JsonTree) node);
+                } else if (type == JsonTreeValue.Type.OBJECT) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editObject, (JsonTree) node);
+                } else if (type == JsonTreeValue.Type.ARRAY) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editArray, (JsonTree) node);
                 }
 
-                contextMenuBuilder.subscribeClose(() -> item.setSelected(false));
+                contextMenuBuilder.subscribeClose(() -> node.setSelected(false));
 
                 contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
             }
         });
 
+        editorTreeView.subscribeNodeDoubleClick((event, node) -> {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                JsonTreeValue.Type type = ((JsonTree) node).getValue().getType();
+
+                if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                    editKeyValuePair((JsonTree) node);
+                } else if (type == JsonTreeValue.Type.OBJECT) {
+                    editObject((JsonTree) node);
+                } else if (type == JsonTreeValue.Type.ARRAY) {
+                    editArray((JsonTree) node);
+                }
+            }
+        });
+
+        editorTreeView.subscribeKeyEvent(event -> {
+            if (event.isDown() && event.getKey() == Keyboard.Key.F2) {
+                Integer selectedIndex = editorTreeView.getState().getSelectedIndex();
+                if (selectedIndex != null) {
+                    JsonTree node = (JsonTree) editorTreeView.getModel().getNode(selectedIndex);
+                    JsonTreeValue.Type type = node.getValue().getType();
+
+                    if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                        editKeyValuePair(node);
+                    } else if (type == JsonTreeValue.Type.OBJECT) {
+                        editObject(node);
+                    } else if (type == JsonTreeValue.Type.ARRAY) {
+                        editArray(node);
+                    }
+                }
+            }
+        });
         // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button -> getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class));
         WidgetUtil.trySubscribe(this, "copy", button -> copyJson());
@@ -267,6 +298,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
 
             if (selectedUrn != null) {
+                // Dispose of the assets so that further calls use a new, initialised, instance.
                 Optional<UIElement> selectedAsset = assetManager.getAsset(selectedUrn, UIElement.class);
                 if (selectedAsset.isPresent()) {
                     selectedAsset.get().dispose();
@@ -277,62 +309,68 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
-    private void copy(JsonTree item) {
-        editorTreeView.copy(item);
-        item.setSelected(false);
+    private void copy(JsonTree node) {
+        editorTreeView.copy(node);
+        node.setSelected(false);
     }
 
-    private void paste(JsonTree item) {
-        editorTreeView.paste(item);
-        item.setSelected(false);
+    private void paste(JsonTree node) {
+        editorTreeView.paste(node);
+        node.setSelected(false);
 
     }
 
-    private void addWidget(JsonTree item) {
+    private void addWidget(JsonTree node) {
         getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
 
         // Push and configure WidgetSelectionScreen.
         WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
-        widgetSelectionScreen.setItem(item);
+        widgetSelectionScreen.setNode(node);
         widgetSelectionScreen.subscribeClose(() -> {
-            editorTreeView.setModel(item.getRoot());
+            editorTreeView.setModel(node.getRoot());
             editorTreeView.fireUpdateListeners();
-            updateTreeView((JsonTree) item.getRoot());
+            updateTreeView((JsonTree) node.getRoot());
         });
     }
 
 
-    private void edit(JsonTree item, UITextEntry.Formatter<JsonTree> formatter, UITextEntry.Parser<JsonTree> parser) {
+    private void edit(JsonTree node, UITextEntry.Formatter<JsonTree> formatter, UITextEntry.Parser<JsonTree> parser) {
         UITextEntry<JsonTree> inlineEditorEntry = new UITextEntry<>();
         inlineEditorEntry.bindValue(new Binding<JsonTree>() {
             @Override
             public JsonTree get() {
-                return item;
+                return node;
             }
 
             @Override
             public void set(JsonTree value) {
                 if (value != null) {
-                    item.setValue(value.getValue());
+                    node.setValue(value.getValue());
                     editorTreeView.clearAlternativeWidgets();
-                    JsonTree tree = (JsonTree) (editorTreeView.getModel().getItem(0).getRoot());
+
+                    JsonTree tree = (JsonTree) (editorTreeView.getModel().getNode(0).getRoot());
                     if (editorHistoryPosition < editorHistory.size() - 1) {
                         editorHistory = editorHistory.subList(0, editorHistoryPosition + 1);
                     }
                     editorHistory.add(tree);
                     editorHistoryPosition++;
-                    updateTreeView((JsonTree) item.getRoot());
-                    updateWidget((JsonTree) item.getRoot());
+
+                    updateTreeView((JsonTree) node.getRoot());
+                    updateWidget((JsonTree) node.getRoot());
                 }
             }
         });
         inlineEditorEntry.setFormatter(formatter);
         inlineEditorEntry.setParser(parser);
+        inlineEditorEntry.subscribe(widget -> {
+            // Required so that ENTER/NUMPAD_ENTER saves the changes.
+            inlineEditorEntry.onLoseFocus();
+        });
         editorTreeView.clearAlternativeWidgets();
-        editorTreeView.addAlternativeWidget(editorTreeView.getModel().indexOf(item), inlineEditorEntry);
+        editorTreeView.addAlternativeWidget(editorTreeView.getModel().indexOf(node), inlineEditorEntry);
     }
 
-    private void editKeyValuePair(JsonTree item) {
+    private void editKeyValuePair(JsonTree node) {
         UITextEntry.Formatter<JsonTree> formatter = value -> {
             JsonObject jsonObject = new JsonObject();
 
@@ -360,49 +398,48 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 Map.Entry keyValuePair = jsonElement.getAsJsonObject().entrySet().iterator().next();
 
                 String jsonKey = (String) keyValuePair.getKey();
-                JsonTreeNode node;
-
+                JsonTreeValue parsedNode;
                 if (keyValuePair.getValue() == null) {
-                    node = new JsonTreeNode(jsonKey, null, JsonTreeNode.ElementType.KEY_VALUE_PAIR);
+                    parsedNode = new JsonTreeValue(jsonKey, null, JsonTreeValue.Type.KEY_VALUE_PAIR);
                 } else {
                     JsonPrimitive jsonValue = (JsonPrimitive) keyValuePair.getValue();
                     if (jsonValue.isBoolean()) {
-                        node = new JsonTreeNode(jsonKey, jsonValue.getAsBoolean(), JsonTreeNode.ElementType.KEY_VALUE_PAIR);
+                        parsedNode = new JsonTreeValue(jsonKey, jsonValue.getAsBoolean(), JsonTreeValue.Type.KEY_VALUE_PAIR);
                     } else if (jsonValue.isNumber()) {
-                        node = new JsonTreeNode(jsonKey, jsonValue.getAsNumber(), JsonTreeNode.ElementType.KEY_VALUE_PAIR);
+                        parsedNode = new JsonTreeValue(jsonKey, jsonValue.getAsNumber(), JsonTreeValue.Type.KEY_VALUE_PAIR);
                     } else {
-                        node = new JsonTreeNode(jsonKey, jsonValue.getAsString(), JsonTreeNode.ElementType.KEY_VALUE_PAIR);
+                        parsedNode = new JsonTreeValue(jsonKey, jsonValue.getAsString(), JsonTreeValue.Type.KEY_VALUE_PAIR);
                     }
                 }
-                return new JsonTree(node);
+                return new JsonTree(parsedNode);
             } catch (JsonSyntaxException e) {
                 return null;
             }
         };
 
-        edit(item, formatter, parser);
+        edit(node, formatter, parser);
     }
 
-    private void editObject(JsonTree item) {
+    private void editObject(JsonTree node) {
         UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().getKey();
 
-        UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeNode(value, null, JsonTreeNode.ElementType.OBJECT));
+        UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeValue(value, null, JsonTreeValue.Type.OBJECT));
 
-        edit(item, formatter, parser);
+        edit(node, formatter, parser);
     }
 
-    private void editArray(JsonTree item) {
+    private void editArray(JsonTree node) {
         UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().getKey();
 
-        UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeNode(value, null, JsonTreeNode.ElementType.ARRAY));
+        UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeValue(value, null, JsonTreeValue.Type.ARRAY));
 
-        edit(item, formatter, parser);
+        edit(node, formatter, parser);
     }
 
     private void copyJson() {
         if (selectedUrn != null) {
             // Deserialize the tree view's internal JsonTree into the original JSON string.
-            JsonElement json = JsonTreeConverter.deserialize(editorTreeView.getModel().getItem(0).getRoot());
+            JsonElement json = JsonTreeConverter.deserialize(editorTreeView.getModel().getNode(0).getRoot());
             String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
 
             // Set the clipboard contents to the JSON string.

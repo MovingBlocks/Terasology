@@ -18,49 +18,49 @@ package org.terasology.rendering.nui.widgets.treeView;
 /**
  * A tree representation of a JSON hierarchy, constructed from a {@link com.google.gson.JsonElement}.
  */
-public class JsonTree extends Tree<JsonTreeNode> {
-    public JsonTree(JsonTreeNode childValue) {
+public class JsonTree extends Tree<JsonTreeValue> {
+    public JsonTree(JsonTreeValue childValue) {
         this.setValue(childValue);
     }
 
     @Override
-    public boolean acceptsChild(Tree<JsonTreeNode> child) {
+    public boolean acceptsChild(Tree<JsonTreeValue> child) {
         if (!super.acceptsChild(child)) {
             return false;
         }
 
         // Only arrays or objects can have children.
-        if (getValue().getType() != JsonTreeNode.ElementType.ARRAY
-                && getValue().getType() != JsonTreeNode.ElementType.OBJECT) {
+        if (getValue().getType() != JsonTreeValue.Type.ARRAY
+                && getValue().getType() != JsonTreeValue.Type.OBJECT) {
             return false;
         }
 
         // Objects cannot have empty object children.
-        if (getValue().getType() == JsonTreeNode.ElementType.OBJECT
-                && child.getValue().getType() == JsonTreeNode.ElementType.OBJECT
+        if (getValue().getType() == JsonTreeValue.Type.OBJECT
+                && child.getValue().getType() == JsonTreeValue.Type.OBJECT
                 && child.getValue().getKey() == null) {
             return false;
         }
 
         // Only objects can have child key-value pairs.
-        if (getValue().getType() == JsonTreeNode.ElementType.ARRAY
-                && (child.getValue().getType() == JsonTreeNode.ElementType.KEY_VALUE_PAIR)) {
+        if (getValue().getType() == JsonTreeValue.Type.ARRAY
+                && (child.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR)) {
             return false;
         }
         return true;
     }
 
     @Override
-    public void addChild(JsonTreeNode childValue) {
+    public void addChild(JsonTreeValue childValue) {
         this.addChild(new JsonTree(childValue));
     }
 
     @Override
-    public Tree<JsonTreeNode> copy() {
-        Tree<JsonTreeNode> copy = new JsonTree(this.value);
+    public Tree<JsonTreeValue> copy() {
+        Tree<JsonTreeValue> copy = new JsonTree(this.value);
         copy.setExpanded(this.isExpanded());
 
-        for (Tree<JsonTreeNode> child : this.children) {
+        for (Tree<JsonTreeValue> child : this.children) {
             copy.addChild(child.copy());
         }
         return copy;

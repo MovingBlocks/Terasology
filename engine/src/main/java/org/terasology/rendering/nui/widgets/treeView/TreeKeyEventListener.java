@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.treeView;
 
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 @FunctionalInterface
-public interface TreeMouseClickListener {
-    void onMouseClick(NUIMouseClickEvent event, Tree node);
+public interface TreeKeyEventListener {
+    void onKeyEvent(NUIKeyEvent event);
 }

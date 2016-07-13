@@ -32,12 +32,14 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.treeView.Tree;
+import org.terasology.rendering.nui.widgets.treeView.TreeKeyEventListener;
 import org.terasology.rendering.nui.widgets.treeView.TreeModel;
 import org.terasology.rendering.nui.widgets.treeView.TreeMouseClickListener;
 import org.terasology.rendering.nui.widgets.treeView.TreeViewState;
@@ -51,7 +53,7 @@ import java.util.Objects;
  * @param <T> Type of objects stored in the underlying tree.
  */
 public class UITreeView<T> extends CoreWidget {
-    public enum MouseOverItemType {
+    public enum MouseOverType {
         TOP,
         CENTER,
         BOTTOM
@@ -59,7 +61,7 @@ public class UITreeView<T> extends CoreWidget {
 
     // Canvas parts.
     private static final String EXPAND_BUTTON = "expand-button";
-    private static final String TREE_ITEM = "tree-item";
+    private static final String TREE_NODE = "tree-node";
 
     // Canvas modes.
     private static final String CONTRACT_MODE = "contract";
@@ -73,7 +75,7 @@ public class UITreeView<T> extends CoreWidget {
      * The horizontal indentation, in pixels, corresponding to one level in the tree.
      */
     @LayoutConfig
-    private Binding<Integer> itemIndent = new DefaultBinding<>(25);
+    private Binding<Integer> levelIndent = new DefaultBinding<>(25);
     /**
      * The underlying tree model - a wrapper around a {@code Tree<T>}.
      */
@@ -88,25 +90,33 @@ public class UITreeView<T> extends CoreWidget {
      */
     private Binding<T> defaultValue = new DefaultBinding<>();
     /**
-     * The item renderer used for drawing the items in the tree.
+     * The item renderer used for drawing the values of the tree.
      */
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     /**
-     * The individual item listeners.
+     * Listeners fired when a node is clicked. Internally instantiated.
      */
     private final List<TreeViewListenerSet> treeViewListenerSets = Lists.newArrayList();
     /**
-     * The individual expand/contract button listeners.
+     * Listeners fired when the expand/contract button is clicked.
      */
     private final List<ExpandButtonInteractionListener> expandListeners = Lists.newArrayList();
     /**
-     * Tree view item update listeners.
+     * Listeners fired when the model of the tree is updated.
      */
     private List<UpdateListener> updateListeners = Lists.newArrayList();
     /**
-     * Tree view item click listeners.
+     * Listeners fired when a node is clicked. Can be subscribed to.
      */
-    private List<TreeMouseClickListener> itemListeners = Lists.newArrayList();
+    private List<TreeMouseClickListener> nodeClickListeners = Lists.newArrayList();
+    /**
+     * Listeners fired when a node is double-clicked. Can be subscribed to.
+     */
+    private List<TreeMouseClickListener> nodeDoubleClickListeners = Lists.newArrayList();
+    /**
+     * Listeners fired when a key is pressed. Can be subscribed to.
+     */
+    private List<TreeKeyEventListener> keyEventListeners = Lists.newArrayList();
 
     public UITreeView() {
     }
@@ -119,54 +129,53 @@ public class UITreeView<T> extends CoreWidget {
     public void onDraw(Canvas canvas) {
         updateListeners();
 
-        canvas.setPart(TREE_ITEM);
+        canvas.setPart(TREE_NODE);
 
         int currentHeight = 0;
-        for (int i = 0; i < model.get().getItemCount(); i++) {
-            Tree<T> item = model.get().getItem(i);
+        for (int i = 0; i < model.get().getNodeCount(); i++) {
+            Tree<T> node = model.get().getNode(i);
             TreeViewListenerSet treeViewListenerSet = treeViewListenerSets.get(i);
             ExpandButtonInteractionListener buttonListener = expandListeners.get(i);
 
-            // Calculate the item height and overall region.
-
-            int itemHeight = canvas.getCurrentStyle().getMargin()
-                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()))
+            // Calculate the node's height and overall region.
+            int nodeHeight = canvas.getCurrentStyle().getMargin()
+                    .grow(itemRenderer.getPreferredSize(node.getValue(), canvas).addX(node.getDepth() * levelIndent.get()))
                     .getY();
 
-            Rect2i itemRegion = Rect2i.createFromMinAndSize((item.getDepth() + 1) * itemIndent.get(),
+            Rect2i nodeRegion = Rect2i.createFromMinAndSize((node.getDepth() + 1) * levelIndent.get(),
                     currentHeight,
-                    canvas.size().x - (item.getDepth() + 1) * itemIndent.get(),
-                    itemHeight);
+                    canvas.size().x - (node.getDepth() + 1) * levelIndent.get(),
+                    nodeHeight);
 
             // Draw the expand/contract button.
-            if (!item.isLeaf()) {
+            if (!node.isLeaf()) {
                 canvas.setPart(EXPAND_BUTTON);
 
-                setButtonMode(canvas, item, buttonListener);
-                Rect2i buttonRegion = Rect2i.createFromMinAndSize(item.getDepth() * itemIndent.get(),
+                setButtonMode(canvas, node, buttonListener);
+                Rect2i buttonRegion = Rect2i.createFromMinAndSize(node.getDepth() * levelIndent.get(),
                         currentHeight,
-                        itemIndent.get(),
-                        itemHeight);
+                        levelIndent.get(),
+                        nodeHeight);
                 drawButton(canvas, buttonRegion, buttonListener);
 
-                canvas.setPart(TREE_ITEM);
+                canvas.setPart(TREE_NODE);
             }
 
             if (state.getAlternativeWidgets().containsKey(i)) {
-                //Draw an alternative widget in place of the item (with the same size).
+                //Draw an alternative widget in place of the node (with the same size).
 
-                canvas.drawWidget(state.getAlternativeWidgets().get(i), itemRegion);
-                currentHeight += itemHeight;
+                canvas.drawWidget(state.getAlternativeWidgets().get(i), nodeRegion);
+                currentHeight += nodeHeight;
             } else {
-                // Draw the item itself.
-                setItemMode(canvas, item, treeViewListenerSet);
+                // Draw the node itself.
+                setNodeMode(canvas, node, treeViewListenerSet);
 
-                drawItem(canvas, itemRegion, item, treeViewListenerSet);
-                currentHeight += itemHeight;
+                drawNode(canvas, nodeRegion, node, treeViewListenerSet);
+                currentHeight += nodeHeight;
 
-                // Draw the item dragging hints if the current item is a drag&drop target.
-                if (state.getMouseOverItemIndex() != null && state.getMouseOverItemIndex() == i) {
-                    drawDragHint(canvas, itemRegion);
+                // Draw the dragging hints if the current node is a drag&drop target.
+                if (state.getMouseOverIndex() != null && state.getMouseOverIndex() == i) {
+                    drawDragHint(canvas, nodeRegion);
                 }
             }
         }
@@ -174,25 +183,26 @@ public class UITreeView<T> extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        canvas.setPart(TREE_ITEM);
+        canvas.setPart(TREE_NODE);
 
-        if (model.get().getItemCount() == 0) {
+        if (model.get().getNodeCount() == 0) {
             return new Vector2i();
         }
 
         model.get().setEnumerateExpandedOnly(false);
         Vector2i result = new Vector2i();
-        for (int i = 0; i < model.get().getItemCount(); i++) {
-            Tree<T> item = model.get().getItem(i);
+        for (int i = 0; i < model.get().getNodeCount(); i++) {
+            Tree<T> node = model.get().getNode(i);
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
-                    .grow(itemRenderer.getPreferredSize(item.getValue(), canvas).addX(item.getDepth() * itemIndent.get()));
+                    .grow(itemRenderer.getPreferredSize(node.getValue(), canvas)
+                            .addX(node.getDepth() * levelIndent.get()));
             result.x = Math.max(result.x, preferredSize.x);
             result.y += preferredSize.y;
         }
         model.get().setEnumerateExpandedOnly(true);
 
         // Account for the expand/contract button!
-        result.addX(itemIndent.get());
+        result.addX(levelIndent.get());
 
         return result;
     }
@@ -200,6 +210,10 @@ public class UITreeView<T> extends CoreWidget {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
+        for (TreeKeyEventListener listener : keyEventListeners) {
+            listener.onKeyEvent(event);
+        }
+
         if (event.isDown()) {
             int id = event.getKey().getId();
             KeyboardDevice keyboard = event.getKeyboard();
@@ -219,11 +233,11 @@ public class UITreeView<T> extends CoreWidget {
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.C) {
                 // Ctrl+C: copy a selected node.
-                copy(model.get().getItem(state.getSelectedIndex()));
+                copy(model.get().getNode(state.getSelectedIndex()));
                 return true;
             } else if (ctrlDown && id == Keyboard.KeyId.V) {
                 // Ctrl+V: paste the copied node as a child of the currently selected node.
-                paste(model.get().getItem(state.getSelectedIndex()));
+                paste(model.get().getNode(state.getSelectedIndex()));
                 return true;
             } else {
                 return false;
@@ -246,13 +260,13 @@ public class UITreeView<T> extends CoreWidget {
         updateListeners.forEach(UpdateListener::onAction);
     }
 
-    public void copy(Tree<T> item) {
-        state.setClipboard(item.copy());
+    public void copy(Tree<T> node) {
+        state.setClipboard(node.copy());
     }
 
-    public void paste(Tree<T> item) {
+    public void paste(Tree<T> node) {
         if (state.getClipboard() != null) {
-            item.addChild(state.getClipboard());
+            node.addChild(state.getClipboard());
 
             fireUpdateListeners();
         }
@@ -272,6 +286,10 @@ public class UITreeView<T> extends CoreWidget {
         state.setSelectedIndex(null);
     }
 
+    public TreeViewState<T> getState() {
+        return state;
+    }
+
     public void setDefaultValue(T value) {
         defaultValue.set(value);
     }
@@ -281,23 +299,33 @@ public class UITreeView<T> extends CoreWidget {
         updateListeners.add(listener);
     }
 
-    public void subscribeItemMouseClick(TreeMouseClickListener listener) {
+    public void subscribeNodeClick(TreeMouseClickListener listener) {
         Preconditions.checkNotNull(listener);
-        itemListeners.add(listener);
+        nodeClickListeners.add(listener);
     }
 
-    private void setButtonMode(Canvas canvas, Tree<T> item, ExpandButtonInteractionListener listener) {
+    public void subscribeNodeDoubleClick(TreeMouseClickListener listener) {
+        Preconditions.checkNotNull(listener);
+        nodeDoubleClickListeners.add(listener);
+    }
+
+    public void subscribeKeyEvent(TreeKeyEventListener listener) {
+        Preconditions.checkNotNull(listener);
+        keyEventListeners.add(listener);
+    }
+
+    private void setButtonMode(Canvas canvas, Tree<T> node, ExpandButtonInteractionListener listener) {
         if (listener.isMouseOver()) {
-            canvas.setMode(item.isExpanded() ? CONTRACT_HOVER_MODE : EXPAND_HOVER_MODE);
+            canvas.setMode(node.isExpanded() ? CONTRACT_HOVER_MODE : EXPAND_HOVER_MODE);
         } else {
-            canvas.setMode(item.isExpanded() ? CONTRACT_MODE : EXPAND_MODE);
+            canvas.setMode(node.isExpanded() ? CONTRACT_MODE : EXPAND_MODE);
         }
     }
 
-    private void setItemMode(Canvas canvas, Tree<T> item, TreeViewListenerSet listenerSet) {
-        if (item.isSelected()) {
+    private void setNodeMode(Canvas canvas, Tree<T> node, TreeViewListenerSet listenerSet) {
+        if (node.isSelected()) {
             canvas.setMode(SELECTED_MODE);
-        } else if (state.getSelectedIndex() != null && Objects.equals(item, model.get().getItem(state.getSelectedIndex()))) {
+        } else if (state.getSelectedIndex() != null && Objects.equals(node, model.get().getNode(state.getSelectedIndex()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listenerSet.isMouseOver()) {
             canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
@@ -313,41 +341,41 @@ public class UITreeView<T> extends CoreWidget {
         canvas.addInteractionRegion(listener, buttonRegion);
     }
 
-    private void drawItem(Canvas canvas, Rect2i itemRegion, Tree<T> item, TreeViewListenerSet listenerSet) {
-        canvas.drawBackground(itemRegion);
-        itemRenderer.draw(item.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
+    private void drawNode(Canvas canvas, Rect2i nodeRegion, Tree<T> node, TreeViewListenerSet listenerSet) {
+        canvas.drawBackground(nodeRegion);
+        itemRenderer.draw(node.getValue(), canvas, canvas.getCurrentStyle().getMargin().shrink(nodeRegion));
 
         // Add the top listener.
-        canvas.addInteractionRegion(listenerSet.getTopListener(), itemRenderer.getTooltip(item.getValue()),
-                Rect2i.createFromMinAndSize(itemRegion.minX(), itemRegion.minY(),
-                        itemRegion.width(), itemRegion.height() / 3));
+        canvas.addInteractionRegion(listenerSet.getTopListener(), itemRenderer.getTooltip(node.getValue()),
+                Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY(),
+                        nodeRegion.width(), nodeRegion.height() / 3));
 
         // Add the central listener.
-        canvas.addInteractionRegion(listenerSet.getCenterListener(), itemRenderer.getTooltip(item.getValue()),
-                Rect2i.createFromMinAndSize(itemRegion.minX(), itemRegion.minY() + itemRegion.height() / 3,
-                        itemRegion.width(), itemRegion.height() / 3));
+        canvas.addInteractionRegion(listenerSet.getCenterListener(), itemRenderer.getTooltip(node.getValue()),
+                Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY() + nodeRegion.height() / 3,
+                        nodeRegion.width(), nodeRegion.height() / 3));
 
-        int heightOffset = itemRegion.height() - 3 * (itemRegion.height() / 3);
+        int heightOffset = nodeRegion.height() - 3 * (nodeRegion.height() / 3);
 
         // Add the bottom listener.
-        canvas.addInteractionRegion(listenerSet.getBottomListener(), itemRenderer.getTooltip(item.getValue()),
-                Rect2i.createFromMinAndSize(itemRegion.minX(), itemRegion.minY() + 2 * itemRegion.height() / 3,
-                        itemRegion.width(), heightOffset + itemRegion.height() / 3));
+        canvas.addInteractionRegion(listenerSet.getBottomListener(), itemRenderer.getTooltip(node.getValue()),
+                Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY() + 2 * nodeRegion.height() / 3,
+                        nodeRegion.width(), heightOffset + nodeRegion.height() / 3));
     }
 
-    private void drawDragHint(Canvas canvas, Rect2i itemRegion) {
-        if (state.getMouseOverItemType() == MouseOverItemType.TOP) {
-            // Draw a line at the top of the item.
-            canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.minY(), Color.WHITE);
-        } else if (state.getMouseOverItemType() == MouseOverItemType.CENTER) {
-            // Draw a border around the item.
-            canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.minY(), Color.WHITE);
-            canvas.drawLine(itemRegion.maxX(), itemRegion.minY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
-            canvas.drawLine(itemRegion.minX(), itemRegion.minY(), itemRegion.minX(), itemRegion.maxY(), Color.WHITE);
-            canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
-        } else { // MouseOverItemType.BOTTOM
-            // Draw a line at the bottom of the item.
-            canvas.drawLine(itemRegion.minX(), itemRegion.maxY(), itemRegion.maxX(), itemRegion.maxY(), Color.WHITE);
+    private void drawDragHint(Canvas canvas, Rect2i nodeRegion) {
+        if (state.getMouseOverType() == MouseOverType.TOP) {
+            // Draw a line at the top of the node.
+            canvas.drawLine(nodeRegion.minX(), nodeRegion.minY(), nodeRegion.maxX(), nodeRegion.minY(), Color.WHITE);
+        } else if (state.getMouseOverType() == MouseOverType.CENTER) {
+            // Draw a border around the node.
+            canvas.drawLine(nodeRegion.minX(), nodeRegion.minY(), nodeRegion.maxX(), nodeRegion.minY(), Color.WHITE);
+            canvas.drawLine(nodeRegion.maxX(), nodeRegion.minY(), nodeRegion.maxX(), nodeRegion.maxY(), Color.WHITE);
+            canvas.drawLine(nodeRegion.minX(), nodeRegion.minY(), nodeRegion.minX(), nodeRegion.maxY(), Color.WHITE);
+            canvas.drawLine(nodeRegion.minX(), nodeRegion.maxY(), nodeRegion.maxX(), nodeRegion.maxY(), Color.WHITE);
+        } else { // MouseOverType.BOTTOM
+            // Draw a line at the bottom of the node.
+            canvas.drawLine(nodeRegion.minX(), nodeRegion.maxY(), nodeRegion.maxX(), nodeRegion.maxY(), Color.WHITE);
         }
     }
 
@@ -361,55 +389,55 @@ public class UITreeView<T> extends CoreWidget {
         }
         if (!mouseOver) {
             // Reset the temporary index variables.
-            if (state.getDraggedItemIndex() != null) {
-                state.setDraggedItemIndex(null);
+            if (state.getDraggedIndex() != null) {
+                state.setDraggedIndex(null);
             }
-            if (state.getMouseOverItemIndex() != null) {
-                state.setMouseOverItemIndex(null);
-                state.setMouseOverItemType(null);
+            if (state.getMouseOverIndex() != null) {
+                state.setMouseOverIndex(null);
+                state.setMouseOverType(null);
             }
         }
 
         // Update the listener sets.
-        while (treeViewListenerSets.size() > model.get().getItemCount()) {
+        while (treeViewListenerSets.size() > model.get().getNodeCount()) {
             treeViewListenerSets.remove(treeViewListenerSets.size() - 1);
             expandListeners.remove(expandListeners.size() - 1);
         }
-        while (treeViewListenerSets.size() < model.get().getItemCount()) {
+        while (treeViewListenerSets.size() < model.get().getNodeCount()) {
             treeViewListenerSets.add(new TreeViewListenerSet(
-                    new ItemTopListener(treeViewListenerSets.size()),
-                    new ItemCenterListener(treeViewListenerSets.size()),
-                    new ItemBottomListener(treeViewListenerSets.size())));
+                    new NodeTopListener(treeViewListenerSets.size()),
+                    new NodeCenterListener(treeViewListenerSets.size()),
+                    new NodeBottomListener(treeViewListenerSets.size())));
             expandListeners.add(new ExpandButtonInteractionListener(expandListeners.size()));
         }
     }
 
     private void moveSelected(int keyId) {
         if (state.getSelectedIndex() != null) {
-            Tree<T> selectedItem = model.get().getItem(state.getSelectedIndex());
-            Tree<T> parent = selectedItem.getParent();
+            Tree<T> selectedNode = model.get().getNode(state.getSelectedIndex());
+            Tree<T> parent = selectedNode.getParent();
 
-            if (!selectedItem.isRoot()) {
-                int itemIndex = parent.getIndex(selectedItem);
+            if (!selectedNode.isRoot()) {
+                int nodeIndex = parent.getIndex(selectedNode);
 
-                if (keyId == Keyboard.KeyId.UP && itemIndex > 0) {
-                    // Move the item up, unless it is the first item.
-                    parent.removeChild(selectedItem);
-                    parent.addChild(itemIndex - 1, selectedItem);
-                    model.get().resetItems();
+                if (keyId == Keyboard.KeyId.UP && nodeIndex > 0) {
+                    // Move the node up, unless it is the first node.
+                    parent.removeChild(selectedNode);
+                    parent.addChild(nodeIndex - 1, selectedNode);
+                    model.get().resetNodes();
 
-                    // Re-select the moved item.
-                    state.setSelectedIndex(model.get().indexOf(selectedItem));
+                    // Re-select the moved node.
+                    state.setSelectedIndex(model.get().indexOf(selectedNode));
 
                     fireUpdateListeners();
-                } else if (keyId == Keyboard.KeyId.DOWN && itemIndex < parent.getChildren().size() - 1) {
-                    // Move the item down, unless it is the last item.
-                    parent.removeChild(selectedItem);
-                    parent.addChild(itemIndex + 1, selectedItem);
-                    model.get().resetItems();
+                } else if (keyId == Keyboard.KeyId.DOWN && nodeIndex < parent.getChildren().size() - 1) {
+                    // Move the node down, unless it is the last node.
+                    parent.removeChild(selectedNode);
+                    parent.addChild(nodeIndex + 1, selectedNode);
+                    model.get().resetNodes();
 
-                    // Re-select the moved item.
-                    state.setSelectedIndex(model.get().indexOf(selectedItem));
+                    // Re-select the moved node.
+                    state.setSelectedIndex(model.get().indexOf(selectedNode));
 
                     fireUpdateListeners();
                 }
@@ -419,7 +447,7 @@ public class UITreeView<T> extends CoreWidget {
 
     private void removeSelected() {
         if (state.getSelectedIndex() != null) {
-            model.get().removeItem(state.getSelectedIndex());
+            model.get().removeNode(state.getSelectedIndex());
             state.setSelectedIndex(null);
 
             fireUpdateListeners();
@@ -428,18 +456,18 @@ public class UITreeView<T> extends CoreWidget {
 
     private void addToSelected() {
         if (state.getSelectedIndex() != null) {
-            model.get().getItem(state.getSelectedIndex()).addChild(defaultValue.get());
+            model.get().getNode(state.getSelectedIndex()).addChild(defaultValue.get());
 
             fireUpdateListeners();
         }
     }
 
-    private boolean onItemMouseClick(int index, NUIMouseClickEvent event) {
-        for (TreeMouseClickListener listener : itemListeners) {
-            listener.onMouseClick(event, model.get().getItem(index));
+    private boolean onNodeClick(int index, NUIMouseClickEvent event) {
+        for (TreeMouseClickListener listener : nodeClickListeners) {
+            listener.onMouseClick(event, model.get().getNode(index));
         }
         if (isEnabled() && event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-            // Select the item on LMB - deselect when selected again.
+            // Select the node on LMB - deselect when selected again.
             if (state.getSelectedIndex() != null && state.getSelectedIndex() == index) {
                 state.setSelectedIndex(null);
             } else {
@@ -451,39 +479,46 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
-    private void onItemMouseDrag(int index) {
-        state.setDraggedItemIndex(index);
+    private boolean onNodeDoubleClick(int index, NUIMouseDoubleClickEvent event) {
+        for (TreeMouseClickListener listener : nodeDoubleClickListeners) {
+            listener.onMouseClick(event, model.get().getNode(index));
+        }
+        return true;
     }
 
-    private void onItemMouseOver(int index, MouseOverItemType type) {
-        // Set temporary index variables for the dragged/target items.
-        if (state.getDraggedItemIndex() != null) {
-            if (state.getDraggedItemIndex() != index) {
-                state.setMouseOverItemIndex(index);
-                state.setMouseOverItemType(type);
+    private void onNodeMouseDrag(int index) {
+        state.setDraggedIndex(index);
+    }
+
+    private void onNodeMouseOver(int index, MouseOverType type) {
+        // Set temporary index variables for the dragged/target nodes.
+        if (state.getDraggedIndex() != null) {
+            if (state.getDraggedIndex() != index) {
+                state.setMouseOverIndex(index);
+                state.setMouseOverType(type);
             } else {
-                state.setMouseOverItemIndex(null);
-                state.setMouseOverItemType(null);
+                state.setMouseOverIndex(null);
+                state.setMouseOverType(null);
             }
         }
     }
 
-    private void onItemMouseRelease(int index) {
-        if (state.getDraggedItemIndex() != null && state.getMouseOverItemIndex() != null) {
-            Tree<T> child = model.get().getItem(state.getDraggedItemIndex());
-            Tree<T> parent = model.get().getItem(state.getMouseOverItemIndex());
+    private void onNodeMouseRelease(int index) {
+        if (state.getDraggedIndex() != null && state.getMouseOverIndex() != null) {
+            Tree<T> child = model.get().getNode(state.getDraggedIndex());
+            Tree<T> parent = model.get().getNode(state.getMouseOverIndex());
 
-            // Handle item drag&dropping.
-            if (state.getMouseOverItemType() == MouseOverItemType.TOP) {
-                // Insert the dragged item before the target item (as a child of the same tree).
+            // Handle node drag&dropping.
+            if (state.getMouseOverType() == MouseOverType.TOP) {
+                // Insert the dragged node before the target node (as a child of the same tree).
                 child.getParent().removeChild(child);
                 parent.getParent().addChild(parent.getParent().indexOf(parent), child);
-            } else if (state.getMouseOverItemType() == MouseOverItemType.CENTER) {
-                // Insert the dragged item as a child of the target item.
+            } else if (state.getMouseOverType() == MouseOverType.CENTER) {
+                // Insert the dragged node as a child of the target node.
                 child.getParent().removeChild(child);
                 parent.addChild(child);
-            } else { // MouseOverItemType.BOTTOM
-                // Insert the dragged item after the target item (as a child of the same tree).
+            } else { // MouseOverType.BOTTOM
+                // Insert the dragged node after the target node (as a child of the same tree).
                 child.getParent().removeChild(child);
                 parent.getParent().addChild(parent.getParent().indexOf(parent) + 1, child);
             }
@@ -492,13 +527,15 @@ public class UITreeView<T> extends CoreWidget {
         }
 
         // Reset the temporary index variables.
-        if (state.getDraggedItemIndex() != null) {
-            state.setSelectedIndex(null);
-            state.setDraggedItemIndex(null);
+        if (state.getDraggedIndex() != null) {
+            if (state.getMouseOverIndex() != null && state.getMouseOverIndex() != index) {
+                state.setSelectedIndex(null);
+            }
+            state.setDraggedIndex(null);
         }
-        if (state.getMouseOverItemIndex() != null) {
-            state.setMouseOverItemIndex(null);
-            state.setMouseOverItemType(null);
+        if (state.getMouseOverIndex() != null) {
+            state.setMouseOverIndex(null);
+            state.setMouseOverType(null);
         }
     }
 
@@ -512,15 +549,15 @@ public class UITreeView<T> extends CoreWidget {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                // Expand or contract and item on LMB - works even if the tree is disabled.
-                model.get().getItem(index).setExpanded(!model.get().getItem(index).isExpanded());
+                // Expand or contract a node on LMB - works even if the tree is disabled.
+                model.get().getNode(index).setExpanded(!model.get().getNode(index).isExpanded());
 
-                Tree<T> selectedItem = state.getSelectedIndex() != null ? model.get().getItem(state.getSelectedIndex()) : null;
-                model.get().resetItems();
+                Tree<T> selectedNode = state.getSelectedIndex() != null ? model.get().getNode(state.getSelectedIndex()) : null;
+                model.get().resetNodes();
 
-                // Update the index of the selected item.
-                if (selectedItem != null) {
-                    int newIndex = model.get().indexOf(selectedItem);
+                // Update the index of the selected node.
+                if (selectedNode != null) {
+                    int newIndex = model.get().indexOf(selectedNode);
                     if (newIndex == -1) {
                         state.setSelectedIndex(null);
                     } else {
@@ -533,122 +570,143 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    private class ItemTopListener extends BaseInteractionListener {
+    private class NodeTopListener extends BaseInteractionListener {
         private int index;
 
-        ItemTopListener(int index) {
+        NodeTopListener(int index) {
             this.index = index;
         }
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            return onItemMouseClick(index, event);
+            return onNodeClick(index, event);
+        }
+
+        @Override
+        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
+            return onNodeDoubleClick(index, event);
         }
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            onItemMouseDrag(index);
+            onNodeMouseDrag(index);
         }
 
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (state.getDraggedItemIndex() != null
-                    && !model.get().getItem(index).isRoot()
-                    && model.get().getItem(index).getParent().acceptsChild(model.get().getItem(state.getDraggedItemIndex()))) {
-                onItemMouseOver(index, MouseOverItemType.TOP);
+
+            // This node's parent exists and accepts the node being dragged as a child.
+            if (state.getDraggedIndex() != null
+                    && !model.get().getNode(index).isRoot()
+                    && model.get().getNode(index).getParent().acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
+                onNodeMouseOver(index, MouseOverType.TOP);
             }
         }
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            onItemMouseRelease(index);
+            onNodeMouseRelease(index);
         }
     }
 
-    private class ItemCenterListener extends BaseInteractionListener {
+    private class NodeCenterListener extends BaseInteractionListener {
         private int index;
 
-        ItemCenterListener(int index) {
+        NodeCenterListener(int index) {
             this.index = index;
         }
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            return onItemMouseClick(index, event);
+            return onNodeClick(index, event);
+        }
+
+        @Override
+        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
+            return onNodeDoubleClick(index, event);
         }
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            onItemMouseDrag(index);
+            onNodeMouseDrag(index);
         }
 
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (state.getDraggedItemIndex() != null
-                    && model.get().getItem(index).acceptsChild(model.get().getItem(state.getDraggedItemIndex()))) {
-                onItemMouseOver(index, MouseOverItemType.CENTER);
+
+            // This node accepts the node being dragged as a child.
+            if (state.getDraggedIndex() != null
+                    && model.get().getNode(index).acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
+                onNodeMouseOver(index, MouseOverType.CENTER);
             }
         }
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            onItemMouseRelease(index);
+            onNodeMouseRelease(index);
         }
     }
 
-    private class ItemBottomListener extends BaseInteractionListener {
+    private class NodeBottomListener extends BaseInteractionListener {
         private int index;
 
-        ItemBottomListener(int index) {
+        NodeBottomListener(int index) {
             this.index = index;
         }
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
-            return onItemMouseClick(index, event);
+            return onNodeClick(index, event);
+        }
+
+        @Override
+        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
+            return onNodeDoubleClick(index, event);
         }
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            onItemMouseDrag(index);
+            onNodeMouseDrag(index);
         }
 
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
             super.onMouseOver(event);
-            if (state.getDraggedItemIndex() != null
-                    && !model.get().getItem(index).isRoot()
-                    && model.get().getItem(index).getParent().acceptsChild(model.get().getItem(state.getDraggedItemIndex()))) {
-                onItemMouseOver(index, MouseOverItemType.BOTTOM);
+
+            // This node's parent exists and accepts the node being dragged as a child.
+            if (state.getDraggedIndex() != null
+                    && !model.get().getNode(index).isRoot()
+                    && model.get().getNode(index).getParent().acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
+                onNodeMouseOver(index, MouseOverType.BOTTOM);
             }
         }
 
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
-            onItemMouseRelease(index);
+            onNodeMouseRelease(index);
         }
     }
 
     /**
-     * A set of tree element sub-listeners.
+     * A set of tree node sub-listeners.
      */
     private class TreeViewListenerSet {
         /**
          * The top listener.
          */
-        private ItemTopListener topListener;
+        private NodeTopListener topListener;
         /**
          * The central listener.
          */
-        private ItemCenterListener centerListener;
+        private NodeCenterListener centerListener;
         /**
          * The bottom listener.
          */
-        private ItemBottomListener bottomListener;
+        private NodeBottomListener bottomListener;
 
-        private TreeViewListenerSet(ItemTopListener topListener, ItemCenterListener centerListener, ItemBottomListener bottomListener) {
+        private TreeViewListenerSet(NodeTopListener topListener, NodeCenterListener centerListener, NodeBottomListener bottomListener) {
             this.topListener = topListener;
             this.centerListener = centerListener;
             this.bottomListener = bottomListener;
@@ -657,21 +715,21 @@ public class UITreeView<T> extends CoreWidget {
         /**
          * @return The top listener.
          */
-        ItemTopListener getTopListener() {
+        NodeTopListener getTopListener() {
             return topListener;
         }
 
         /**
          * @return The central listener.
          */
-        ItemCenterListener getCenterListener() {
+        NodeCenterListener getCenterListener() {
             return centerListener;
         }
 
         /**
          * @return The bottom listener.
          */
-        ItemBottomListener getBottomListener() {
+        NodeBottomListener getBottomListener() {
             return bottomListener;
         }
 

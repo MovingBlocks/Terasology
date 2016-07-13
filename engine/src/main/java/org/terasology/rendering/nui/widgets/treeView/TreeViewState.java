@@ -25,30 +25,30 @@ import java.util.Map;
 
 public class TreeViewState<T> {
     /**
-     * The index of the currently selected item, or null if no item is selected.
+     * The index of the currently selected node, or null if no node is selected.
      */
     private Binding<Integer> selectedIndex = new DefaultBinding<>();
     /**
-     * The index of the item being drag&dropped, or null if no item is dragged.
+     * The index of the node being drag&dropped, or null if no node is dragged.
      */
-    private Binding<Integer> draggedItemIndex = new DefaultBinding<>();
+    private Binding<Integer> draggedIndex = new DefaultBinding<>();
     /**
-     * The index of the item being moused over if another item is currently dragged.
-     * Null if no item is either dragged or moused over.
+     * The index of the node being moused over if another node is currently dragged.
+     * Null if no node is either dragged or moused over.
      */
-    private Binding<Integer> mouseOverItemIndex = new DefaultBinding<>();
+    private Binding<Integer> mouseOverIndex = new DefaultBinding<>();
     /**
-     * The index of the item being moused over if another item is currently dragged.
-     * Null if no item is either dragged or moused over.
+     * The index of the node being moused over if another node is currently dragged.
+     * Null if no node is either dragged or moused over.
      */
-    private Binding<UITreeView.MouseOverItemType> mouseOverItemType = new DefaultBinding<>();
+    private Binding<UITreeView.MouseOverType> mouseOverType = new DefaultBinding<>();
     /**
-     * The item currently being copied, or null if no item has been copied.
+     * The node currently being copied, or null if no node has been copied.
      */
     private Binding<Tree<T>> clipboard = new DefaultBinding<>();
     /**
-     * A map containing an item index as key and the widget to be drawn in place of the
-     * specified item as value.
+     * A map containing an node index as key and the widget to be drawn in place of the
+     * specified node as value.
      */
     private Map<Integer, UIWidget> alternativeWidgets = Maps.newHashMap();
 
@@ -60,28 +60,28 @@ public class TreeViewState<T> {
         this.selectedIndex.set(selectedIndex);
     }
 
-    public Integer getDraggedItemIndex() {
-        return draggedItemIndex.get();
+    public Integer getDraggedIndex() {
+        return draggedIndex.get();
     }
 
-    public void setDraggedItemIndex(Integer draggedItemIndex) {
-        this.draggedItemIndex.set(draggedItemIndex);
+    public void setDraggedIndex(Integer draggedIndex) {
+        this.draggedIndex.set(draggedIndex);
     }
 
-    public Integer getMouseOverItemIndex() {
-        return mouseOverItemIndex.get();
+    public Integer getMouseOverIndex() {
+        return mouseOverIndex.get();
     }
 
-    public void setMouseOverItemIndex(Integer mouseOverItemIndex) {
-        this.mouseOverItemIndex.set(mouseOverItemIndex);
+    public void setMouseOverIndex(Integer mouseOverIndex) {
+        this.mouseOverIndex.set(mouseOverIndex);
     }
 
-    public UITreeView.MouseOverItemType getMouseOverItemType() {
-        return mouseOverItemType.get();
+    public UITreeView.MouseOverType getMouseOverType() {
+        return mouseOverType.get();
     }
 
-    public void setMouseOverItemType(UITreeView.MouseOverItemType mouseOverItemType) {
-        this.mouseOverItemType.set(mouseOverItemType);
+    public void setMouseOverType(UITreeView.MouseOverType mouseOverType) {
+        this.mouseOverType.set(mouseOverType);
     }
 
     public Tree<T> getClipboard() {
