@@ -20,4 +20,6 @@ package org.terasology.rendering.dag;
  */
 public interface StateChange<T> {
     T getValue();
+
+    StateChange getDefaultInstance();
 }

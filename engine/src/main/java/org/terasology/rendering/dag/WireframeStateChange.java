@@ -16,11 +16,20 @@
 package org.terasology.rendering.dag;
 
 
+import static org.lwjgl.opengl.GL11.GL_FILL;
+
 /**
  *
  */
 public class WireframeStateChange extends AbstractStateChange<Integer> {
+    private static WireframeStateChange defaultInstance = new WireframeStateChange(GL_FILL);
+
     WireframeStateChange(Integer value) {
         super(value);
+    }
+
+    @Override
+    public StateChange getDefaultInstance() {
+        return defaultInstance;
     }
 }

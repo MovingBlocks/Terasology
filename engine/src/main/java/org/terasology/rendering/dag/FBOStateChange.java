@@ -15,19 +15,18 @@
  */
 package org.terasology.rendering.dag;
 
-import java.util.HashMap;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-
 /**
  * TODO: Add javadocs
  */
-class DefaultStateChangeStorage extends HashMap<Class<? extends StateChange>, StateChange> {
+public class FBOStateChange extends AbstractStateChange<Integer> {
+    private static FBOStateChange defaultInstance = new FBOStateChange(0);
 
-    DefaultStateChangeStorage() {
-        // TODO: add more default values of StateChange's here
-        // TODO: be sure every custom state change has a default value here
+    FBOStateChange(Integer value) {
+        super(value);
+    }
 
-        put(WireframeStateChange.class, new WireframeStateChange(GL_FILL));
+    @Override
+    public StateChange getDefaultInstance() {
+        return defaultInstance;
     }
 }
-
