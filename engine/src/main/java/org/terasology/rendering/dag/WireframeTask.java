@@ -17,19 +17,18 @@ package org.terasology.rendering.dag;
 
 import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import org.terasology.registry.In;
 
 /**
  *
  */
-public class WireframeTask implements RenderPipelineTask { // TODO: separate this into SetWireframeOnTask and SetWireframeOffTask?
-
-    @In
-    private int mode;
+final class WireframeTask extends AbstractTask<Integer> {
+    private WireframeTask(Object value) {
+        super(value);
+    }
 
     @Override
     public void execute() {
-        GL11.glPolygonMode(GL_FRONT_AND_BACK, mode);
+        GL11.glPolygonMode(GL_FRONT_AND_BACK, value);
 
     }
 }

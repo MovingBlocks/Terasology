@@ -15,32 +15,19 @@
  */
 package org.terasology.rendering.dag;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+
 /**
- * TODO: Add javadocs
+ *
  */
-public abstract class AbstractStateChange<T> implements StateChange<T> {
-    private final T value;
-
-    AbstractStateChange(T value) {
-        this.value = value;
+final class FBOTask extends AbstractTask<Integer> {
+    FBOTask(Object value) {
+        super(value);
     }
 
     @Override
-    public T getValue() {
-        return value;
-    }
-
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AbstractStateChange) {
-            return value == ((AbstractStateChange) obj).value;
-        }
-        return super.equals(obj);
+    public void execute() {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, value);
     }
 }

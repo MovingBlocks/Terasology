@@ -16,31 +16,12 @@
 package org.terasology.rendering.dag;
 
 /**
- * TODO: Add javadocs
+ *
  */
-public abstract class AbstractStateChange<T> implements StateChange<T> {
-    private final T value;
+public abstract class AbstractTask<T> implements RenderPipelineTask {
+    protected T value;
 
-    AbstractStateChange(T value) {
-        this.value = value;
-    }
-
-    @Override
-    public T getValue() {
-        return value;
-    }
-
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AbstractStateChange) {
-            return value == ((AbstractStateChange) obj).value;
-        }
-        return super.equals(obj);
+    AbstractTask(Object value) {
+        this.value = (T) value;
     }
 }

@@ -251,7 +251,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-        renderPipelineTaskList = RenderTaskListGenerator.createFrom(orderedNodes);
+        RenderTaskListGenerator generator = new RenderTaskListGenerator();
+        renderPipelineTaskList = generator.generateFrom(orderedNodes);
     }
 
     @Override
