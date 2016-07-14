@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package org.terasology.rendering.nui.itemRendering;
-
+import org.terasology.i18n.TranslationSystem;
 import java.util.Objects;
 
 /**
@@ -23,8 +23,22 @@ import java.util.Objects;
  */
 public class ToStringTextRenderer<T> extends StringTextRenderer<T> {
 
+    private TranslationSystem translationSystem;
+
+    public ToStringTextRenderer() { }
+
+    public ToStringTextRenderer(TranslationSystem translationSystemInput) {
+        translationSystem = translationSystemInput;
+    }
+
+
     @Override
     public String getString(T value) {
-        return Objects.toString(value);
+        if (translationSystem == null) {
+            return Objects.toString(value);
+        }
+        else {
+            return translationSystem.translate(Objects.toString(value));
+        }
     }
 }
