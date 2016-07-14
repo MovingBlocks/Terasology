@@ -194,6 +194,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     contextMenuBuilder.addOption(OPTION_EDIT, this::editObject, (JsonTree) node);
                 } else if (type == JsonTreeValue.Type.ARRAY) {
                     contextMenuBuilder.addOption(OPTION_EDIT, this::editArray, (JsonTree) node);
+                } else if (type == JsonTreeValue.Type.VALUE) {
+                    contextMenuBuilder.addOption(OPTION_EDIT, this::editValue, (JsonTree) node);
                 }
 
                 contextMenuBuilder.subscribeClose(() -> {
@@ -203,18 +205,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
                 contextMenuBuilder.subscribeScreenClosed(() -> {
                     if (inlineEditorEntry != null) {
-                        getManager().setFocus(inlineEditorEntry);
-                        inlineEditorEntry.resetValue();
-
-                        if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
-                            // Select the value string only. Account for the key quotes + colon.
-                            inlineEditorEntry.setCursorPosition(((JsonTree) node).getValue().getKey().length() + "\"\":".length(), true);
-                            inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
-                        } else {
-                            // Select the entire editor string.
-                            inlineEditorEntry.setCursorPosition(0, true);
-                            inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
-                        }
+                        focusInlineEditor((JsonTree) node);
                     }
                 });
 
@@ -228,11 +219,17 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
                 if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                     editKeyValuePair((JsonTree) node);
+                    focusInlineEditor((JsonTree) node);
                 } else if (type == JsonTreeValue.Type.OBJECT &&
                         !(!node.isRoot() && ((JsonTree) node).getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                     editObject((JsonTree) node);
+                    focusInlineEditor((JsonTree) node);
                 } else if (type == JsonTreeValue.Type.ARRAY) {
                     editArray((JsonTree) node);
+                    focusInlineEditor((JsonTree) node);
+                } else if (type == JsonTreeValue.Type.VALUE) {
+                    editValue((JsonTree) node);
+                    focusInlineEditor((JsonTree) node);
                 }
             }
         });
@@ -246,11 +243,17 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
                     if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                         editKeyValuePair(node);
+                        focusInlineEditor(node);
                     } else if (type == JsonTreeValue.Type.OBJECT &&
                             !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                         editObject(node);
+                        focusInlineEditor(node);
                     } else if (type == JsonTreeValue.Type.ARRAY) {
                         editArray(node);
+                        focusInlineEditor(node);
+                    } else if (type == JsonTreeValue.Type.VALUE) {
+                        editValue(node);
+                        focusInlineEditor(node);
                     }
                 }
             }
@@ -460,6 +463,45 @@ public class NUIEditorScreen extends CoreScreenLayer {
         UITextEntry.Parser<JsonTree> parser = value -> new JsonTree(new JsonTreeValue(value, null, JsonTreeValue.Type.ARRAY));
 
         edit(node, formatter, parser);
+    }
+
+    private void editValue(JsonTree node) {
+        UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().toString();
+
+        UITextEntry.Parser<JsonTree> parser = value -> {
+            try {
+                Double valueDouble = Double.parseDouble(value);
+                return new JsonTree(new JsonTreeValue(null, valueDouble, JsonTreeValue.Type.VALUE));
+            } catch (NumberFormatException e) {
+                if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                    return new JsonTree(new JsonTreeValue(null, Boolean.parseBoolean(value), JsonTreeValue.Type.VALUE));
+                } else {
+                    return new JsonTree(new JsonTreeValue(null, value, JsonTreeValue.Type.VALUE));
+                }
+            }
+        };
+
+        edit(node, formatter, parser);
+    }
+
+    private void focusInlineEditor(JsonTree node) {
+        getManager().setFocus(inlineEditorEntry);
+        inlineEditorEntry.resetValue();
+
+        if (node.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+            // Select the value string only. Account for the key quotes + colon.
+            if (node.getValue().getValue() instanceof String) {
+                inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":\"".length(), true);
+                inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length() - "\"".length(), false);
+            } else {
+                inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":".length(), true);
+                inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
+            }
+        } else {
+            // Select the entire editor string.
+            inlineEditorEntry.setCursorPosition(0, true);
+            inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
+        }
     }
 
     private void copyJson() {
