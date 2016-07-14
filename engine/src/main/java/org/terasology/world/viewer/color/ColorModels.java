@@ -19,7 +19,7 @@ package org.terasology.world.viewer.color;
 import java.awt.image.DirectColorModel;
 
 /**
- * A collection of constants for different color models.
+ * A collection of constants for different color treeView.
  */
 public final class ColorModels {
 

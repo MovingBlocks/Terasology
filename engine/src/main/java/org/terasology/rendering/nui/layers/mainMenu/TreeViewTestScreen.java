@@ -26,10 +26,10 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.widgets.UITreeView;
-import org.terasology.rendering.nui.widgets.models.JsonTree;
-import org.terasology.rendering.nui.widgets.models.JsonTreeConverter;
-import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
-import org.terasology.rendering.nui.widgets.models.Tree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.rendering.nui.widgets.treeView.Tree;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -60,7 +60,7 @@ public class TreeViewTestScreen extends CoreScreenLayer {
         JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
         Iterator it = tree.getDepthFirstIterator(false);
         while (it.hasNext()) {
-            ((Tree<JsonTreeNode>) it.next()).setExpanded(true);
+            ((Tree<JsonTreeValue>) it.next()).setExpanded(true);
         }
 
         for (String id : new String[]{"treeViewDisabled", "treeViewEnabled"}) {

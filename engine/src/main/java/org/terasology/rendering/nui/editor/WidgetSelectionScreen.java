@@ -29,8 +29,8 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UpdateListener;
-import org.terasology.rendering.nui.widgets.models.JsonTree;
-import org.terasology.rendering.nui.widgets.models.JsonTreeNode;
+import org.terasology.rendering.nui.widgets.treeView.JsonTree;
+import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,9 +44,9 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
      */
     private UIDropdownScrollable availableWidgets;
     /**
-     * The JsonTree a selected widget is to be added to.
+     * The {@link JsonTree} a selected widget is to be added to.
      */
-    private JsonTree item;
+    private JsonTree node;
     /**
      * The list of available UIWidget instances, excluding CoreScreenLayer overrides.
      */
@@ -77,17 +77,17 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
             ClassMetadata metadata = widgets.get(selection);
 
-            JsonTree scaffolding = new JsonTree(new JsonTreeNode(null, null, JsonTreeNode.ElementType.OBJECT));
+            JsonTree scaffolding = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
 
             // Always add a "type" node with its' value being equal to the selected widget's type.
-            scaffolding.addChild(new JsonTreeNode("type", selection, JsonTreeNode.ElementType.KEY_VALUE_PAIR));
+            scaffolding.addChild(new JsonTreeValue("type", selection, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
             // If the widget is an UILayout override, add a "contents" array node.
             if (UILayout.class.isAssignableFrom(metadata.getType())) {
-                scaffolding.addChild(new JsonTreeNode("contents", null, JsonTreeNode.ElementType.ARRAY));
+                scaffolding.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
             }
 
-            item.addChild(scaffolding);
+            node.addChild(scaffolding);
 
             closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
@@ -105,8 +105,8 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
         });
     }
 
-    public void setItem(JsonTree item) {
-        this.item = item;
+    public void setNode(JsonTree node) {
+        this.node = node;
     }
 
     public void subscribeClose(UpdateListener listener) {

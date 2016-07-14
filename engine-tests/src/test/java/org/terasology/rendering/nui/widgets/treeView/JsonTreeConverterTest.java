@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.models;
+package org.terasology.rendering.nui.widgets.treeView;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.models;
+package org.terasology.rendering.nui.widgets.treeView;
 
 import com.google.api.client.util.Lists;
 
@@ -25,11 +25,11 @@ import java.util.List;
  */
 public class TreeModel<T> {
     /**
-     * A list of items, fetched from a {@code Tree} iterator.
+     * A list of nodes, fetched from a {@code Tree} iterator.
      */
-    private List<Tree<T>> items = Lists.newArrayList();
+    private List<Tree<T>> nodes = Lists.newArrayList();
     /**
-     * Whether the children of non-expanded items are excluded from the enumeration.
+     * Whether the children of non-expanded nodes are excluded from the enumeration.
      */
     private boolean enumerateExpandedOnly = true;
 
@@ -38,26 +38,26 @@ public class TreeModel<T> {
     }
 
     public TreeModel(Tree<T> root) {
-        this.resetItems(root);
+        this.resetNodes(root);
     }
 
     /**
-     * Reset the items in the tree.
+     * Reset the nodes in the tree.
      */
-    public void resetItems() {
-        this.resetItems(this.items.get(0).getRoot());
+    public void resetNodes() {
+        this.resetNodes(this.nodes.get(0).getRoot());
     }
 
     /**
-     * @param root The tree the list of items is to be fetched from.
+     * @param root The tree the list of nodes is to be fetched from.
      */
-    private void resetItems(Tree<T> root) {
-        this.items = Lists.newArrayList();
+    private void resetNodes(Tree<T> root) {
+        this.nodes = Lists.newArrayList();
 
         Iterator it = root.getDepthFirstIterator(enumerateExpandedOnly);
 
         while (it.hasNext()) {
-            this.items.add((Tree<T>) it.next());
+            this.nodes.add((Tree<T>) it.next());
         }
     }
 
@@ -65,32 +65,32 @@ public class TreeModel<T> {
      * @param index The index.
      * @return The item located at a given index.
      */
-    public Tree<T> getItem(int index) {
-        return this.items.get(index);
+    public Tree<T> getNode(int index) {
+        return this.nodes.get(index);
     }
 
     /**
-     * @param item The item.
-     * @return The index of the given item.
+     * @param node The node.
+     * @return The index of the given node.
      */
-    public int indexOf(Tree<T> item) {
-        return items.indexOf(item);
+    public int indexOf(Tree<T> node) {
+        return nodes.indexOf(node);
     }
 
     /**
-     * Removes the item located at a given index.
+     * Removes the node located at a given index.
      *
      * @param index The index.
      */
-    public void removeItem(int index) {
-        Tree<T> item = this.getItem(index);
+    public void removeNode(int index) {
+        Tree<T> item = this.getNode(index);
 
         // Never remove the root node.
         if (item.isRoot()) {
             return;
         }
 
-        Iterator it = this.items.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
+        Iterator it = this.nodes.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
 
         while (it.hasNext()) {
             Tree<T> next = (Tree<T>) it.next();
@@ -99,21 +99,21 @@ public class TreeModel<T> {
                 break;
             }
         }
-        this.resetItems(this.items.get(0).getRoot());
+        this.resetNodes(this.nodes.get(0).getRoot());
     }
 
     /**
-     * @return The amount of items in the tree.
+     * @return The amount of nodes in the tree.
      */
-    public int getItemCount() {
-        return this.items.size();
+    public int getNodeCount() {
+        return this.nodes.size();
     }
 
     /**
-     * @param enumerateExpandedOnly Whether the children of non-expanded items are excluded from the enumeration.
+     * @param enumerateExpandedOnly Whether the children of non-expanded nodes are excluded from the enumeration.
      */
     public void setEnumerateExpandedOnly(boolean enumerateExpandedOnly) {
         this.enumerateExpandedOnly = enumerateExpandedOnly;
-        this.resetItems();
+        this.resetNodes();
     }
 }

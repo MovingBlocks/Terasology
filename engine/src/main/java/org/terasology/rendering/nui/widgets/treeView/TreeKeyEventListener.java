@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets;
+package org.terasology.rendering.nui.widgets.treeView;
 
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.widgets.models.Tree;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 @FunctionalInterface
-public interface TreeMouseClickListener {
-    void onMouseClick(NUIMouseClickEvent event, Tree item);
+public interface TreeKeyEventListener {
+    void onKeyEvent(NUIKeyEvent event);
 }

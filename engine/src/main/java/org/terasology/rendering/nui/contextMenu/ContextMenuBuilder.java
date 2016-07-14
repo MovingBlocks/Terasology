@@ -45,6 +45,10 @@ public class ContextMenuBuilder {
      * Listeners fired when the menu is closed.
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
     /**
      * Adds an action to the available options.
@@ -83,16 +87,19 @@ public class ContextMenuBuilder {
 
                     @Override
                     public void set(String value) {
-                        selectionListeners.forEach(UpdateListener::onAction);
-                        manager.closeScreen(ContextMenuScreen.ASSET_URI);
-
                         ConsumerObjectPair pair = options.get(value);
                         pair.getConsumer().accept(pair.getObject());
+                        selectionListeners.forEach(UpdateListener::onAction);
+                        manager.closeScreen(ContextMenuScreen.ASSET_URI);
                     }
                 });
 
         contextMenuScreen.subscribeClose(() -> {
             closeListeners.forEach(UpdateListener::onAction);
+        });
+
+        contextMenuScreen.subscribeScreenClosed(() -> {
+            screenClosedListeners.forEach(UpdateListener::onAction);
         });
     }
 
@@ -134,5 +141,15 @@ public class ContextMenuBuilder {
     public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);
+    }
+
+    public void subscribeScreenClosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.add(listener);
+    }
+
+    public void unsubscribeScreenclosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.remove(listener);
     }
 }

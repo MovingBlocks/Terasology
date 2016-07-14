@@ -534,7 +534,7 @@
                         }
                     }
                 },
-                "tree-item": {
+                "tree-node": {
                     "text-align-horizontal": "left",
                     "text-align-vertical": "middle",
                     "background": "button",
@@ -552,9 +552,6 @@
                     },
                     "texture-scale-mode": "scale fit",
                     "modes": {
-                        "selected": {
-                            "background": "buttonDown"
-                        },
                         "hover": {
                             "background": "buttonOver"
                         },

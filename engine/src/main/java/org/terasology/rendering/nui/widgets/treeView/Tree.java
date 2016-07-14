@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.models;
+package org.terasology.rendering.nui.widgets.treeView;
 
 import com.google.api.client.util.Lists;
 import com.google.common.base.Preconditions;
@@ -44,10 +44,6 @@ public abstract class Tree<T> {
      * Whether the tree is expanded, i.e. its' child elements are visible.
      */
     private boolean expanded;
-    /**
-     * Whether the tree is selected, i.e. it is outlined within the user interface.
-     */
-    private boolean selected;
     /**
      * The parent of this tree.
      */
@@ -83,20 +79,6 @@ public abstract class Tree<T> {
      */
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
-    }
-
-    /**
-     * @return Whether the tree is selected.
-     */
-    public boolean isSelected() {
-        return selected;
-    }
-
-    /**
-     * @param selected The new selected state of this tree.
-     */
-    public void setSelected(boolean selected) {
-        this.selected = selected;
     }
 
     /**

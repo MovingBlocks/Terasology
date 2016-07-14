@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 public class UITextEntry<T> extends UIText {
     private static final Logger logger = LoggerFactory.getLogger(UITextEntry.class);
-    
+
     private Binding<T> value = new DefaultBinding<>();
     private Binding<String> stringValue = new DefaultBinding<>("");
     private Parser<T> parser;
@@ -45,7 +45,7 @@ public class UITextEntry<T> extends UIText {
     @Override
     public void onDraw(Canvas canvas) {
         if (!isFocused()) {
-            stringValue.set(formatter.toString(value.get()));
+            resetValue();
         }
         super.onDraw(canvas);
     }
@@ -62,6 +62,10 @@ public class UITextEntry<T> extends UIText {
             // ignore
             logger.debug("Failed to parse text value", e);
         }
+    }
+
+    public void resetValue() {
+        stringValue.set(formatter.toString(value.get()));
     }
 
     public void bindValue(Binding<T> binding) {

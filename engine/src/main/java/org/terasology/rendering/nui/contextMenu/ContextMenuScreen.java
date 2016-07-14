@@ -51,11 +51,16 @@ public class ContextMenuScreen extends CoreScreenLayer {
      * Listeners fired when the menu is closed (without selecting an option).
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             // Close the context menu on click outside it.
+            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
 
             return false;
@@ -64,6 +69,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
             // Close the context menu on mouse wheel scroll outside it.
+            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
 
             // Consume the event to prevent awkward rendering if the menu is within a scrollable widget.
@@ -74,6 +80,12 @@ public class ContextMenuScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         menu = find("menu", UIList.class);
+        menu.setCanBeFocus(false);
+    }
+
+    @Override
+    public void onClosed() {
+        screenClosedListeners.forEach(UpdateListener::onAction);
     }
 
     @Override
@@ -81,11 +93,6 @@ public class ContextMenuScreen extends CoreScreenLayer {
         canvas.addInteractionRegion(mainListener);
         Rect2i region = Rect2i.createFromMinAndSize(menuPosition, canvas.calculatePreferredSize(menu));
         canvas.drawWidget(menu, region);
-    }
-
-    @Override
-    public void onClosed() {
-        closeListeners.forEach(UpdateListener::onAction);
     }
 
     public void setList(List list) {
@@ -108,5 +115,15 @@ public class ContextMenuScreen extends CoreScreenLayer {
     public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);
+    }
+
+    public void subscribeScreenClosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.add(listener);
+    }
+
+    public void unsubscribeScreenClosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.remove(listener);
     }
 }
