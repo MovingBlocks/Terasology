@@ -117,6 +117,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * The index of the currently displayed tree view model state.
      */
     private int editorHistoryPosition;
+    /**
+     *
+     */
+    private UITextEntry<JsonTree> inlineEditorEntry;
 
     @Override
     public void initialise() {
@@ -195,6 +199,23 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 contextMenuBuilder.subscribeClose(() -> {
                     editorTreeView.setAlternativeWidget(null);
                     editorTreeView.setSelectedIndex(null);
+                });
+
+                contextMenuBuilder.subscribeScreenClosed(() -> {
+                    if (inlineEditorEntry != null) {
+                        getManager().setFocus(inlineEditorEntry);
+                        inlineEditorEntry.resetValue();
+
+                        if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                            // Select the value string only. Account for the key quotes + colon.
+                            inlineEditorEntry.setCursorPosition(((JsonTree) node).getValue().getKey().length() + "\"\":".length(), true);
+                            inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
+                        } else {
+                            // Select the entire editor string.
+                            inlineEditorEntry.setCursorPosition(0, true);
+                            inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
+                        }
+                    }
                 });
 
                 contextMenuBuilder.show(getManager(), event.getMouse().getPosition());
@@ -341,7 +362,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
 
     private void edit(JsonTree node, UITextEntry.Formatter<JsonTree> formatter, UITextEntry.Parser<JsonTree> parser) {
-        UITextEntry<JsonTree> inlineEditorEntry = new UITextEntry<>();
+        inlineEditorEntry = new UITextEntry<>();
         inlineEditorEntry.bindValue(new Binding<JsonTree>() {
             @Override
             public JsonTree get() {

@@ -36,6 +36,7 @@ import java.util.Objects;
 
 /**
  * A list widget.
+ *
  * @param <T> the list element type
  */
 public class UIList<T> extends CoreWidget {
@@ -47,7 +48,7 @@ public class UIList<T> extends CoreWidget {
     private Binding<T> selection = new DefaultBinding<>();
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
-
+    private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
 
     public UIList() {
 
@@ -101,6 +102,11 @@ public class UIList<T> extends CoreWidget {
     }
 
     @Override
+    public boolean canBeFocus() {
+        return canBeFocus.get();
+    }
+
+    @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         canvas.setPart("item");
         Vector2i result = new Vector2i();
@@ -134,6 +140,10 @@ public class UIList<T> extends CoreWidget {
 
     public void setSelectable(boolean value) {
         selectable.set(value);
+    }
+
+    public void setCanBeFocus(boolean value) {
+        canBeFocus.set(value);
     }
 
     public void bindSelection(Binding<T> binding) {

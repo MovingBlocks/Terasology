@@ -18,7 +18,9 @@ package org.terasology.rendering.nui.contextMenu;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UpdateListener;
@@ -33,6 +35,9 @@ import java.util.function.Consumer;
  * Should be used in favor of manually creating the screen.
  */
 public class ContextMenuBuilder {
+    @In
+    private AssetManager assetManager;
+
     /**
      * A list of available consumer/object actions mapped to a string.
      */
@@ -45,6 +50,10 @@ public class ContextMenuBuilder {
      * Listeners fired when the menu is closed.
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
     /**
      * Adds an action to the available options.
@@ -83,16 +92,19 @@ public class ContextMenuBuilder {
 
                     @Override
                     public void set(String value) {
-                        selectionListeners.forEach(UpdateListener::onAction);
-                        manager.closeScreen(ContextMenuScreen.ASSET_URI);
-
                         ConsumerObjectPair pair = options.get(value);
                         pair.getConsumer().accept(pair.getObject());
+                        selectionListeners.forEach(UpdateListener::onAction);
+                        manager.closeScreen(ContextMenuScreen.ASSET_URI);
                     }
                 });
 
         contextMenuScreen.subscribeClose(() -> {
             closeListeners.forEach(UpdateListener::onAction);
+        });
+
+        contextMenuScreen.subscribeScreenClosed(() -> {
+            screenClosedListeners.forEach(UpdateListener::onAction);
         });
     }
 
@@ -134,5 +146,15 @@ public class ContextMenuBuilder {
     public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);
+    }
+
+    public void subscribeScreenClosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.add(listener);
+    }
+
+    public void unsubscribeScreenclosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.remove(listener);
     }
 }

@@ -45,7 +45,7 @@ public class UITextEntry<T> extends UIText {
     @Override
     public void onDraw(Canvas canvas) {
         if (!isFocused()) {
-            stringValue.set(formatter.toString(value.get()));
+            resetValue();
         }
         super.onDraw(canvas);
     }
@@ -62,6 +62,10 @@ public class UITextEntry<T> extends UIText {
             // ignore
             logger.debug("Failed to parse text value", e);
         }
+    }
+
+    public void resetValue() {
+        stringValue.set(formatter.toString(value.get()));
     }
 
     public void bindValue(Binding<T> binding) {

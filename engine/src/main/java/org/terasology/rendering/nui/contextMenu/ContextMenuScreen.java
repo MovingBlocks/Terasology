@@ -51,6 +51,10 @@ public class ContextMenuScreen extends CoreScreenLayer {
      * Listeners fired when the menu is closed (without selecting an option).
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
@@ -76,6 +80,12 @@ public class ContextMenuScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         menu = find("menu", UIList.class);
+        menu.setCanBeFocus(false);
+    }
+
+    @Override
+    public void onClosed() {
+        screenClosedListeners.forEach(UpdateListener::onAction);
     }
 
     @Override
@@ -105,5 +115,15 @@ public class ContextMenuScreen extends CoreScreenLayer {
     public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);
+    }
+
+    public void subscribeScreenClosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.add(listener);
+    }
+
+    public void unsubscribeScreenClosed(UpdateListener listener) {
+        Preconditions.checkNotNull(listener);
+        screenClosedListeners.remove(listener);
     }
 }

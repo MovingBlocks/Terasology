@@ -207,6 +207,13 @@ public class UITreeView<T> extends CoreWidget {
         return result;
     }
 
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (state.getAlternativeWidget() != null) {
+            state.getAlternativeWidget().update(delta);
+        }
+    }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
