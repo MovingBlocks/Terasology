@@ -13,23 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.tasks;
+package org.terasology.rendering.dag.stateChanges;
 
-import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import org.terasology.rendering.dag.AbstractTask;
+
+import org.terasology.rendering.dag.AbstractStateChange;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.StateChange;
 
 /**
  * TODO: Add javadocs
  */
-public final class WireframeTask extends AbstractTask<Integer> {
-    private WireframeTask(Object value) {
-        super(value);
+public class BindFBO extends AbstractStateChange<Integer> {
+    private static final int DEFAULT_FRAME_BUFFER = 0;
+    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER);
+
+    public BindFBO(Integer fboToBind) {
+        super(fboToBind);
     }
 
     @Override
-    public void execute() {
-        GL11.glPolygonMode(GL_FRONT_AND_BACK, value);
+    public StateChange getDefaultInstance() {
+        return defaultInstance;
+    }
 
+    @Override
+    public RenderPipelineTask generateTask() {
+        return null;
     }
 }

@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.tasks;
+
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
  * TODO: Add javadocs
  */
-public abstract class AbstractTask<T> implements RenderPipelineTask {
-    protected T value;
+public final class BindFBOTask implements RenderPipelineTask {
+    private Integer fboToBind;
 
-    public AbstractTask(Object value) {
-        this.value = (T) value;
+    BindFBOTask(Object fboToBind) {
+        this.fboToBind = (Integer) fboToBind;
+    }
+
+    @Override
+    public void execute() {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboToBind);
     }
 }

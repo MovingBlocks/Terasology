@@ -15,29 +15,14 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.common.collect.Maps;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.rendering.dag.stateChanges.FBOStateChange;
-import org.terasology.rendering.dag.stateChanges.WireframeStateChange;
-import org.terasology.rendering.dag.tasks.FBOTask;
-import org.terasology.rendering.dag.tasks.WireframeTask;
 
 /**
  * TODO: Add javadocs
  */
 public final class RenderTaskListGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
-    private Map<Class<? extends StateChange>, Class<? extends RenderPipelineTask>> stateChangeTaskMap;
 
     public RenderTaskListGenerator() {
-        stateChangeTaskMap = Maps.newHashMap();
-        stateChangeTaskMap.put(WireframeStateChange.class, WireframeTask.class);
-        stateChangeTaskMap.put(FBOStateChange.class, FBOTask.class);
 
     }
 
@@ -62,23 +47,9 @@ public final class RenderTaskListGenerator {
 
     private RenderPipelineTask generateTask(Object object) {
         if (object instanceof StateChange) {
-            return generateStateChangeTask((StateChange) object);
+            return ((StateChange) object).generateTask();
         } else {
             return new NodeTask((Node) object);
-        }
-    }
-
-    private RenderPipelineTask generateStateChangeTask(StateChange object) {
-        Class<? extends RenderPipelineTask> taskClass = stateChangeTaskMap.get(object.getClass());
-
-        try {
-            Constructor constructor = taskClass.getConstructor(Object.class);
-            Object value = object.getValue();
-            return (RenderPipelineTask) constructor.newInstance(value);
-
-        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            logger.error("Failed to instantiate task class: {}", taskClass, e);
-            return null;
         }
     }
 }

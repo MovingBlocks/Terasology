@@ -22,4 +22,6 @@ public interface StateChange<T> {
     T getValue();
 
     StateChange getDefaultInstance();
+
+    RenderPipelineTask generateTask();
 }

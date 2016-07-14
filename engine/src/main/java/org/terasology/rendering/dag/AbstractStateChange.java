@@ -29,18 +29,4 @@ public abstract class AbstractStateChange<T> implements StateChange<T> {
     public T getValue() {
         return value;
     }
-
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AbstractStateChange) {
-            return value == ((AbstractStateChange) obj).value;
-        }
-        return super.equals(obj);
-    }
 }

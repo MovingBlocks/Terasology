@@ -13,22 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.tasks;
+package org.terasology.rendering.dag.stateChanges;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
-import org.terasology.rendering.dag.AbstractTask;
+
+import org.terasology.rendering.dag.AbstractStateChange;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.StateChange;
 
 /**
  * TODO: Add javadocs
  */
-public final class FBOTask extends AbstractTask<Integer> {
-    FBOTask(Object value) {
+public class SetWireframe extends AbstractStateChange<Boolean> {
+    private static SetWireframe defaultInstance = new SetWireframe(false);
+
+    public SetWireframe(Boolean value) {
         super(value);
     }
 
     @Override
-    public void execute() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, value);
+    public StateChange getDefaultInstance() {
+        return defaultInstance;
+    }
+
+    @Override
+    public RenderPipelineTask generateTask() {
+        return null;
     }
 }
