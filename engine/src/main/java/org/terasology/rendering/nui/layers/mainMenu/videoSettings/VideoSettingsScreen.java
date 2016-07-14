@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -72,24 +73,28 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
+            videoQuality.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.LOW, Preset.MEDIUM, Preset.HIGH, Preset.ULTRA));
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 
         UIDropdown<ViewDistance> viewDistance = find("viewDistance", UIDropdown.class);
         if (viewDistance != null) {
+            viewDistance.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             viewDistance.setOptions(Arrays.asList(ViewDistance.values()));
             viewDistance.bindSelection(BindHelper.bindBeanProperty("viewDistance", config.getRendering(), ViewDistance.class));
         }
 
         UIDropdown<WaterReflection> waterReflection = find("reflections", UIDropdown.class);
         if (waterReflection != null) {
+            waterReflection.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             waterReflection.setOptions(Lists.newArrayList(WaterReflection.SKY, WaterReflection.GLOBAL, WaterReflection.LOCAL));
             waterReflection.bindSelection(new WaterReflectionBinding(config.getRendering()));
         }
 
         UIDropdown<ScreenshotSize> screenshotSize = find("screenshotSize", UIDropdown.class);
         if (screenshotSize != null) {
+            screenshotSize.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             screenshotSize.setOptions(Arrays.asList(ScreenshotSize.values()));
             screenshotSize.bindSelection(BindHelper.bindBeanProperty("screenshotSize", config.getRendering(), ScreenshotSize.class));
         }
@@ -110,13 +115,13 @@ public class VideoSettingsScreen extends CoreScreenLayer {
                 public String getString(Integer value) {
                     switch (value) {
                         case 1:
-                            return "Some";
+                            return translationSystem.translate("${engine:menu#camera-blur-some}");
                         case 2:
-                            return "Normal";
+                            return translationSystem.translate("${engine:menu#camera-blur-normal}");
                         case 3:
-                            return "Max";
+                            return translationSystem.translate("${engine:menu#camera-blur-max}");
                         default:
-                            return "Off";
+                            return translationSystem.translate("${engine:menu#camera-blur-off}");
                     }
                 }
             });
@@ -124,6 +129,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<DynamicShadows> dynamicShadows = find("shadows", UIDropdown.class);
         if (dynamicShadows != null) {
+            dynamicShadows.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             dynamicShadows.setOptions(Arrays.asList(DynamicShadows.values()));
             dynamicShadows.bindSelection(new DynamicShadowsBinding(config.getRendering()));
         }
@@ -224,6 +230,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
         if (cameraSetting != null) {
+            cameraSetting.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             cameraSetting.setOptions(Arrays.asList(CameraSetting.values()));
             cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }

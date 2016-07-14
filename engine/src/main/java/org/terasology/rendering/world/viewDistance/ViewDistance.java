@@ -24,13 +24,13 @@ import org.terasology.math.geom.Vector3i;
  */
 public enum ViewDistance {
 
-    LEGALLY_BLIND("Legally Blind", 0, new Vector3i(5, 5, 5)),
-    NEAR("Near", 1, new Vector3i(9, 7, 9)),
-    MODERATE("Moderate", 2, new Vector3i(13, 7, 13)),
-    FAR("Far", 3, new Vector3i(17, 7, 17)),
-    ULTRA("Ultra", 4, new Vector3i(25, 7, 25)),
-    MEGA("Mega", 5, new Vector3i(33, 7, 33)),
-    EXTREME("Extreme", 6, new Vector3i(63, 7, 63));
+    LEGALLY_BLIND("${engine:menu#view-distance-blind}", 0, new Vector3i(5, 5, 5)),
+    NEAR("${engine:menu#view-distance-near}", 1, new Vector3i(9, 7, 9)),
+    MODERATE("${engine:menu#view-distance-moderate}", 2, new Vector3i(13, 7, 13)),
+    FAR("${engine:menu#view-distance-far}", 3, new Vector3i(17, 7, 17)),
+    ULTRA("${engine:menu#view-distance-ultra}", 4, new Vector3i(25, 7, 25)),
+    MEGA("${engine:menu#view-distance-mega}", 5, new Vector3i(33, 7, 33)),
+    EXTREME("${engine:menu#view-distance-extreme}", 6, new Vector3i(63, 7, 63));
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 

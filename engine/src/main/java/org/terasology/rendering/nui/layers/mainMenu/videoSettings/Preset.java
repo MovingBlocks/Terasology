@@ -20,7 +20,7 @@ import org.terasology.config.RenderingConfig;
 /**
  */
 public enum Preset {
-    MINIMAL("Minimal") {
+    MINIMAL("${engine:menu#video-preset-minimal}") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(false);
@@ -36,7 +36,7 @@ public enum Preset {
             renderConfig.setNormalMapping(false);
         }
     },
-    LOW("Low") {
+    LOW("${engine:menu#video-preset-low}") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -52,7 +52,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    MEDIUM("Medium") {
+    MEDIUM("${engine:menu#video-preset-medium}") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -68,7 +68,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    HIGH("High") {
+    HIGH("${engine:menu#video-preset-high}") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -84,7 +84,7 @@ public enum Preset {
             renderConfig.setSsao(false);
         }
     },
-    ULTRA("Ultra") {
+    ULTRA("${engine:menu#video-preset-ultra}") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -101,7 +101,7 @@ public enum Preset {
 
         }
     },
-    CUSTOM("Custom") {
+    CUSTOM("${engine:menu#video-preset-custom}") {
         @Override
         public void apply(RenderingConfig renderConfig) {
         }
