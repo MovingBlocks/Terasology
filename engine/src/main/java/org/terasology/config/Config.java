@@ -62,7 +62,6 @@ import java.util.Set;
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
  * and loaded in a JSON format.
- *
  */
 public final class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
@@ -110,6 +109,10 @@ public final class Config {
 
     public SecurityConfig getSecurity() {
         return config.getSecurity();
+    }
+
+    public NUIEditorConfig getNuiEditor() {
+        return config.getNuiEditor();
     }
 
     public String renderConfigAsJson(Object configObject) {

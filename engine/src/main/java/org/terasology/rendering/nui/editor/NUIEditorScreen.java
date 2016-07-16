@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.config.Config;
+import org.terasology.config.NUIEditorConfig;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
@@ -44,6 +46,7 @@ import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
+import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -89,6 +92,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
     @In
     private AssetManager assetManager;
 
+    @In
+    private Config config;
+
     /**
      * A list of available {@link UIElement} asset {@link ResourceUrn}s.
      */
@@ -118,7 +124,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
      */
     private int editorHistoryPosition;
     /**
-     *
+     * The common widget used as an inline JSON property editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
 
@@ -264,6 +270,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "paste", button -> pasteJson());
         WidgetUtil.trySubscribe(this, "undo", button -> undo());
         WidgetUtil.trySubscribe(this, "redo", button -> redo());
+
+        // Apply the config parameters.
+        updateConfig();
     }
 
     @Override
@@ -295,6 +304,12 @@ public class NUIEditorScreen extends CoreScreenLayer {
     public boolean isEscapeToCloseAllowed() {
         // Escape to close is handled in onKeyEvent() to pass the editor's state to NUIEditorSystem.
         return false;
+    }
+
+    public void updateConfig() {
+        NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
+        editorTreeView.setItemRenderer(nuiEditorConfig.isDisableIcons() ?
+                new ToStringTextRenderer<>() : new NUIEditorItemRenderer());
     }
 
     /**
