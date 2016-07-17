@@ -61,6 +61,7 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [1..0] - Change the active toolbar slot
 * [I] - Toggle inventory screen
 * [B] - Show infinite block inventory (requires "BlockPicker" module active)
+* [C] - Show character screen for stats and equipment (requires "Equipment" module active)
 * [H] - Hide user interface
 * [T] - Toggle chat interface (effectively a mini-console that only does chat)
 * [Tab] - Auto-completion in the console
