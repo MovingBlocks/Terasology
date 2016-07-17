@@ -28,7 +28,7 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
  */
 public final class BindFBO extends AbstractStateChange<String> implements FBOManagerSubscriber {
     private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
-    private static final String DEFAULT_FRAME_BUFFER_NAME = "";
+    private static final String DEFAULT_FRAME_BUFFER_NAME = "display";
     private static BindFBO defaultInstance = new BindFBO();
 
     private Integer fboId;
