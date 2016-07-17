@@ -19,6 +19,7 @@ import com.google.api.client.util.Lists;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @param <T> Type of objects stored in the underlying tree.
@@ -63,10 +64,19 @@ public class TreeModel<T> {
 
     /**
      * @param index The index.
-     * @return The item located at a given index.
+     * @return The node located at a given index.
      */
     public Tree<T> getNode(int index) {
         return this.nodes.get(index);
+    }
+
+    /**
+     * @param value A node value.
+     * @return The node with the given value.
+     */
+    public Tree<T> getNodeByValue(T value) {
+        Optional<Tree<T>> node = this.nodes.stream().filter(n -> n.getValue().equals(value)).findFirst();
+        return node.isPresent() ? node.get() : null;
     }
 
     /**

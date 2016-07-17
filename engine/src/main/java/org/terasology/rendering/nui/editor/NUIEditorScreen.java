@@ -309,7 +309,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     public void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
         editorTreeView.setItemRenderer(nuiEditorConfig.isDisableIcons() ?
-                new ToStringTextRenderer<>() : new NUIEditorItemRenderer());
+                new ToStringTextRenderer<>() : new NUIEditorItemRenderer(editorTreeView.getModel()));
     }
 
     /**
@@ -352,6 +352,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
 
             selectedUrn = urn;
+            updateConfig();
         }
     }
 

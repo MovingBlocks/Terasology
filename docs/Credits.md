@@ -35,3 +35,5 @@ Additional Notes
 A few of Terasology's base textures use the awesome [Good Morning Craft](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1227051-16x-good-morning-craft) texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
 
 Our default font is ["Noto" by Google](http://www.google.com/get/noto), which is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) just like Terasology. More on the [font in the wiki](https://github.com/MovingBlocks/Terasology/wiki/Text-and-Font).
+
+Some NUI editor icons belong to ["Fugue Icons" by Yusuke Kamiyamane](http://p.yusukekamiyamane.com/), licensed under the [Creative Commons Attribution 3.0 License](https://creativecommons.org/licenses/by/3.0/).
