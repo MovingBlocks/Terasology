@@ -15,18 +15,25 @@
  */
 package org.terasology.rendering.dag;
 
-//TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
-
+import com.google.common.collect.Sets;
 import java.util.Set;
 
 /**
  * TODO: Add javadocs
  */
-public interface Node {
+public abstract class AbstractNode implements Node {
+    private Set<StateChange> stateChanges;
 
-    void initialise();
+    protected AbstractNode() {
+        stateChanges = Sets.newLinkedHashSet();
+    }
 
-    void process();
+    protected boolean addStateChange(StateChange stateChange) {
+        return stateChanges.add(stateChange);
+    }
 
-    Set<StateChange> getStateChanges();
+    @Override
+    public Set<StateChange> getStateChanges() {
+        return stateChanges;
+    }
 }

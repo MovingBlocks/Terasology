@@ -23,7 +23,7 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 /**
  * TODO: Diagram of this node
  */
-public class FirstPersonViewNode implements Node {
+public class FirstPersonViewNode extends AbstractNode {
 
     @In
     private Config config;

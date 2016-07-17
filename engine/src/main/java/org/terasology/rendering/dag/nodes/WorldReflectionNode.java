@@ -24,7 +24,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -42,7 +42,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
-public class WorldReflectionNode implements Node {
+public class WorldReflectionNode extends AbstractNode {
 
     @In
     private FrameBuffersManager frameBuffersManager;

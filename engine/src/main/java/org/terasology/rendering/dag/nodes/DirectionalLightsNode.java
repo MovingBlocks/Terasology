@@ -22,7 +22,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -45,7 +45,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 /**
  * TODO: Diagram of this node
  */
-public class DirectionalLightsNode implements Node {
+public class DirectionalLightsNode extends AbstractNode {
 
     @In
     private BackdropProvider backdropProvider;

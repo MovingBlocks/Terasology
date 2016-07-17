@@ -26,7 +26,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -43,7 +43,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 /**
  * TODO: Add node of this diagram
  */
-public class DownSampleSceneAndUpdateExposureNode implements Node {
+public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
 
     @Range(min = 0.0f, max = 10.0f)

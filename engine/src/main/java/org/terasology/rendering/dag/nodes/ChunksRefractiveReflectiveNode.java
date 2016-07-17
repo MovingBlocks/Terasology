@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -31,7 +31,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 /**
  * TODO: Diagram of this node
  */
-public class ChunksRefractiveReflectiveNode implements Node {
+public class ChunksRefractiveReflectiveNode extends AbstractNode {
 
     @In
     private RenderQueuesHelper renderQueues;

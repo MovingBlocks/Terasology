@@ -25,7 +25,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -47,7 +48,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
-public class ShadowMapNode implements Node {
+public class ShadowMapNode extends AbstractNode {
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
@@ -83,11 +84,11 @@ public class ShadowMapNode implements Node {
         this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
+        addStateChange(new BindFBO("sceneShadowMap", frameBuffersManager));
     }
 
     @Override
     public void process() {
-        shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
         positionShadowMapCamera();
 
         // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame

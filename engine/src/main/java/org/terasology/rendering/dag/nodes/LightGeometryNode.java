@@ -22,7 +22,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -48,7 +48,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 /**
  * TODO: Diagram of this node
  */
-public class LightGeometryNode implements Node {
+public class LightGeometryNode extends AbstractNode {
 
     @In
     private FrameBuffersManager frameBuffersManager;

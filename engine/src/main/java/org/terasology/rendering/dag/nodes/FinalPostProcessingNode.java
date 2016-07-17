@@ -23,7 +23,7 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -41,7 +41,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  * TODO: Break into two different nodes
  */
-public class FinalPostProcessingNode implements Node {
+public class FinalPostProcessingNode extends AbstractNode {
 
     @In
     private WorldRenderer worldRenderer;

@@ -20,7 +20,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 /**
  * TODO: Add diagram of this node
  */
-public class SimpleBlendMaterialsNode implements Node {
+public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @In
     private ComponentSystemManager componentSystemManager;

@@ -21,7 +21,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
@@ -36,7 +36,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 /**
  * TODO: Add diagram of this node
  */
-public class BloomPassesNode implements Node {
+public class BloomPassesNode extends AbstractNode {
 
     @Range(min = 0.0f, max = 5.0f)
     private float bloomHighPassThreshold = 0.05f;

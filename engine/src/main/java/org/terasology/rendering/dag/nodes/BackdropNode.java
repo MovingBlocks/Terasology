@@ -21,7 +21,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -37,7 +37,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 /**
  * TODO: Diagram of this node
  */
-public class BackdropNode implements Node {
+public class BackdropNode extends AbstractNode {
 
     @In
     private Config config;

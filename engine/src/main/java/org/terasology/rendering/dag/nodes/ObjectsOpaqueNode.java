@@ -21,14 +21,14 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.AbstractNode;
 import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
  * TODO: Diagram of this node
  */
-public class ObjectsOpaqueNode implements Node {
+public class ObjectsOpaqueNode extends AbstractNode {
     @In
     private Config config;
 
