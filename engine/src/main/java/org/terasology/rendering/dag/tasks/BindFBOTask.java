@@ -24,10 +24,10 @@ import org.terasology.rendering.dag.RenderPipelineTask;
  */
 public final class BindFBOTask implements RenderPipelineTask {
 
-    private Integer fboToBind;
+    private int fboToBind;
 
-    public BindFBOTask(Object fboToBind) {
-        this.fboToBind = (Integer) fboToBind;
+    public BindFBOTask(int fboToBind) {
+        this.fboToBind = fboToBind;
     }
 
     @Override
@@ -35,7 +35,7 @@ public final class BindFBOTask implements RenderPipelineTask {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboToBind);
     }
 
-    public void setFboToBind(Integer fboToBind) {
+    public void setFboToBind(int fboToBind) {
         this.fboToBind = fboToBind;
     }
 }

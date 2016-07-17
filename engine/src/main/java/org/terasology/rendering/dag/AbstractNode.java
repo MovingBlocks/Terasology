@@ -22,18 +22,17 @@ import java.util.Set;
  * TODO: Add javadocs
  */
 public abstract class AbstractNode implements Node {
-    private Set<StateChange> stateChanges;
+    private Set<StateChange> desiredStateChanges;
 
     protected AbstractNode() {
-        stateChanges = Sets.newLinkedHashSet();
+        desiredStateChanges = Sets.newLinkedHashSet();
     }
 
     protected boolean addStateChange(StateChange stateChange) {
-        return stateChanges.add(stateChange);
+        return desiredStateChanges.add(stateChange);
     }
 
-    @Override
-    public Set<StateChange> getStateChanges() {
-        return stateChanges;
+    public Set<StateChange> getDesiredStateChanges() {
+        return desiredStateChanges;
     }
 }

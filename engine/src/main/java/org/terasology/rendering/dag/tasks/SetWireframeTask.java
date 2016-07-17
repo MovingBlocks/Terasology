@@ -23,10 +23,10 @@ import org.terasology.rendering.dag.RenderPipelineTask;
  * TODO: Add javadocs
  */
 public final class SetWireframeTask implements RenderPipelineTask {
-    private Integer mode;
+    private int mode;
 
-    public SetWireframeTask(Object mode) {
-        this.mode = (Integer) mode;
+    public SetWireframeTask(int mode) {
+        this.mode = mode;
     }
 
     @Override

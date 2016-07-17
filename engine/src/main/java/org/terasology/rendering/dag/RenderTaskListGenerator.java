@@ -38,7 +38,7 @@ public final class RenderTaskListGenerator {
             // TODO: add state changes to reset all desired state changes back to default.
 
             // TODO: eliminate redundant steps here
-            for (StateChange stateChange : node.getStateChanges()) {
+            for (StateChange stateChange : node.getDesiredStateChanges()) {
                 taskList.add(generateTask(stateChange));
             }
 

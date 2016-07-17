@@ -28,5 +28,5 @@ public interface Node {
 
     void process();
 
-    Set<StateChange> getStateChanges();
+    Set<StateChange> getDesiredStateChanges();
 }
