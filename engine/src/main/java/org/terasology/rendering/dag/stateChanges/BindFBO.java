@@ -17,18 +17,34 @@ package org.terasology.rendering.dag.stateChanges;
 
 
 import org.terasology.rendering.dag.AbstractStateChange;
+import org.terasology.rendering.dag.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.tasks.BindFBOTask;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * TODO: Add javadocs
  */
-public class BindFBO extends AbstractStateChange<Integer> {
-    private static final int DEFAULT_FRAME_BUFFER = 0;
-    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER);
+public final class BindFBO extends AbstractStateChange<String> implements FBOManagerSubscriber {
+    private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
+    private static final String DEFAULT_FRAME_BUFFER_NAME = "";
+    private static BindFBO defaultInstance = new BindFBO();
 
-    public BindFBO(Integer fboToBind) {
-        super(fboToBind);
+    private Integer fboId;
+    private BindFBOTask task;
+    private FrameBuffersManager frameBuffersManager;
+
+    public BindFBO(String fboName, FrameBuffersManager frameBuffersManager) {
+        super(fboName);
+        fboId = frameBuffersManager.getFBO(this.getValue()).fboId;
+        frameBuffersManager.subscribe(this);
+        this.frameBuffersManager = frameBuffersManager;
+    }
+
+    private BindFBO() {
+        super(DEFAULT_FRAME_BUFFER_NAME);
+        fboId = DEFAULT_FRAME_BUFFER_ID;
     }
 
     @Override
@@ -38,6 +54,13 @@ public class BindFBO extends AbstractStateChange<Integer> {
 
     @Override
     public RenderPipelineTask generateTask() {
-        return null;
+        task = new BindFBOTask(fboId);
+        return task;
+    }
+
+    @Override
+    public void update() {
+        fboId = frameBuffersManager.getFBO(this.getValue()).fboId;
+        task.setFboToBind(fboId);
     }
 }

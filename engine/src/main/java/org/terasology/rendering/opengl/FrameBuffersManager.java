@@ -15,7 +15,9 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.List;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -24,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.dag.FBOManagerSubscriber;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO.Dimensions;
 
@@ -70,7 +74,7 @@ public class FrameBuffersManager {
     private Dimensions one16thScale;
     private Dimensions one32thScale;
 
-    // Note: this assumes that the settings in the configs might change at runtime,
+    // Note: this assumes ethat the settings in the configs might change at runtime,
     // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
@@ -78,6 +82,7 @@ public class FrameBuffersManager {
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
     private PostProcessor postProcessor;
+    private List<FBOManagerSubscriber> fboManagerSubscribers;
 
     public FrameBuffersManager() {
         // nothing to do here, everything happens at initialization time,
@@ -89,6 +94,8 @@ public class FrameBuffersManager {
     Also instructs the PostProcessor and the GraphicState instances to fetch the FBOs they require.
      */
     public void initialize() {
+        fboManagerSubscribers = Lists.newArrayList();
+
         createStaticFBOs();
 
         setDynamicFBOsDimensions();
@@ -242,6 +249,13 @@ public class FrameBuffersManager {
 
         new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
         new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
+        notifySubscribers();
+    }
+
+    private void notifySubscribers() {
+        for (FBOManagerSubscriber subscriber : fboManagerSubscribers) {
+            subscriber.update();
+        }
     }
 
     private void recreateShadowMapFBO() {
@@ -427,6 +441,15 @@ public class FrameBuffersManager {
      */
     public void setPostProcessor(PostProcessor postProcessor) {
         this.postProcessor = postProcessor;
+    }
+
+    /**
+     * TODO: java doc
+     *
+     * @param bindFBO
+     */
+    public void subscribe(BindFBO bindFBO) {
+        fboManagerSubscribers.add(bindFBO);
     }
 
     /**

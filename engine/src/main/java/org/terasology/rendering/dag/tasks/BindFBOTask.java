@@ -23,14 +23,19 @@ import org.terasology.rendering.dag.RenderPipelineTask;
  * TODO: Add javadocs
  */
 public final class BindFBOTask implements RenderPipelineTask {
+
     private Integer fboToBind;
 
-    BindFBOTask(Object fboToBind) {
+    public BindFBOTask(Object fboToBind) {
         this.fboToBind = (Integer) fboToBind;
     }
 
     @Override
     public void execute() {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboToBind);
+    }
+
+    public void setFboToBind(Integer fboToBind) {
+        this.fboToBind = fboToBind;
     }
 }

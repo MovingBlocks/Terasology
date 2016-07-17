@@ -13,24 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.tasks;
-
-import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import org.terasology.rendering.dag.RenderPipelineTask;
+package org.terasology.rendering.dag;
 
 /**
- * TODO: Add javadocs
+ * TODO: add javadocs
  */
-public final class SetWireframeTask implements RenderPipelineTask {
-    private Integer mode;
-
-    public SetWireframeTask(Object mode) {
-        this.mode = (Integer) mode;
-    }
-
-    @Override
-    public void execute() {
-        GL11.glPolygonMode(GL_FRONT_AND_BACK, mode);
-    }
+public interface FBOManagerSubscriber {
+    void update();
 }
