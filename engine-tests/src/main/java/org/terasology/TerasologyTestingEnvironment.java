@@ -64,7 +64,7 @@ public abstract class TerasologyTestingEnvironment {
     private static AudioManager audioManager;
     private static CollisionGroupManager collisionGroupManager;
     private static ModuleManager moduleManager;
-    private static AssetManager assetManager;
+    public static AssetManager assetManager;
 
     private static HeadlessEnvironment env;
 
@@ -78,10 +78,10 @@ public abstract class TerasologyTestingEnvironment {
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
         /*
-         * Create at least for each class a new headless environemnt as it is fast and prevents side effects
+         * Create at least for each class a new headless environment as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
          */
-        env = new HeadlessEnvironment(new Name("engine"));
+        env = new HeadlessEnvironment(new Name("engine"), new Name("Core"));
         context = env.getContext();
         assetManager = context.get(AssetManager.class);
         blockManager = context.get(BlockManager.class);
