@@ -43,17 +43,26 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
 
     @Override
     public String getString(JsonTreeValue value) {
-        if (value.getType() == JsonTreeValue.Type.OBJECT && value.getKey() == null) {
+        if (value.getType() == JsonTreeValue.Type.OBJECT) {
             JsonTree node = (JsonTree) editorTreeViewModel.getNodeByValue(value);
 
-            // If the current node is a widget with a set id, use the id for the string representation.
+            // If a node has "type": "..." and/or "id": "..." children, use them to build the result string.
             if (node != null) {
+                String resultString = "";
                 for (Tree<JsonTreeValue> child : node.getChildren()) {
                     JsonTreeValue childValue = child.getValue();
-                    if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR
-                            && childValue.getKey().equalsIgnoreCase("id")) {
-                        return String.format("{%s}", childValue.getValue());
+
+                    if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                        if (childValue.getKey().equalsIgnoreCase("type")) {
+                            resultString += String.format("\"type\": \"%s\"", childValue.getValue());
+                        } else if (childValue.getKey().equalsIgnoreCase("id")) {
+                            resultString += String.format("; \"id\": \"%s\"", childValue.getValue());
+                        }
                     }
+                }
+
+                if (!resultString.isEmpty()) {
+                    return String.format("%s{ %s }", value.getKey() != null ? value.getKey() + " " : "", resultString);
                 }
             }
         }
@@ -67,10 +76,10 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
 
         if (value.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
             textureName = ATTRIBUTE_TEXTURE_NAME;
-        } else if (value.getType() == JsonTreeValue.Type.OBJECT && value.getKey() == null) {
+        } else if (value.getType() == JsonTreeValue.Type.OBJECT) {
             JsonTree node = (JsonTree) editorTreeViewModel.getNodeByValue(value);
 
-            // If the node is a widget, use the type's name for the texture instead of the default name.
+            // If the node has a "type": "..." child, use the type name to retrieve the texture.
             if (node != null) {
                 for (Tree<JsonTreeValue> child : node.getChildren()) {
                     JsonTreeValue childValue = child.getValue();
@@ -81,6 +90,7 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
                 }
             }
 
+            // Otherwise use the default texture.
             if (textureName == null) {
                 textureName = OBJECT_TEXTURE_NAME;
             }
@@ -94,11 +104,11 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
             Optional<Texture> texture = Assets.getTexture(String.format("engine:editor_%s", textureName));
             if (texture.isPresent()) {
                 return texture.get();
-            } else {
-                return null;
             }
-        } else {
             return null;
         }
+
+        // null return values can be handled by the parent renderer.
+        return null;
     }
 }
