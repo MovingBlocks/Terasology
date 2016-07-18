@@ -18,9 +18,7 @@ package org.terasology.rendering.dag;
 /**
  * TODO: Add javadocs
  */
-public interface StateChange<T> {
-    T getValue();
-
+public interface StateChange {
     StateChange getDefaultInstance();
 
     RenderPipelineTask generateTask();

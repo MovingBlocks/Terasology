@@ -27,37 +27,49 @@ public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
 
     public RenderTaskListGenerator() {
-
     }
 
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
         logger.info("Task List: "); // TODO: remove in the future or turn it into debug
+        List<Object> intermediateList = generateIntermediateList(orderedNodes);
+        eliminateRedundantStateChanges(intermediateList);
+        return generateTaskList(intermediateList);
+    }
+
+    private void eliminateRedundantStateChanges(List<Object> intermediateList) {
+        // TODO: make elimination of redundant state changes here
+    }
+
+    private List<RenderPipelineTask> generateTaskList(List<Object> intermediateList) {
         List<RenderPipelineTask> taskList = Lists.newArrayList();
-        for (Node node : orderedNodes) {
 
-            // TODO: add state changes to reset all desired state changes back to default.
-
-            // TODO: eliminate redundant steps here
-            for (StateChange stateChange : node.getDesiredStateChanges()) {
-                taskList.add(generateTask(stateChange));
-            }
-
-            RenderPipelineTask task = generateTask(node);
-            // TODO: remove the null check when the system does not allow for StateChange implementations
-            // TODO: without corresponding RenderPipelineTask implementation.
-            taskList.add(task);
+        for (Object o : intermediateList) {
+            taskList.add(generateTask(o));
         }
 
         return taskList;
     }
 
+    private List<Object> generateIntermediateList(List<Node> orderedNodes) {
+        List<Object> intermediateList = Lists.newArrayList();
+
+        for (Node node : orderedNodes) {
+            intermediateList.addAll(node.getDesiredStateChanges());
+            intermediateList.add(node);
+            // Add state changes to reset all desired state changes back to default.
+            for (StateChange stateChange : node.getDesiredStateChanges()) {
+                intermediateList.add(stateChange.getDefaultInstance());
+            }
+        }
+        return intermediateList;
+    }
+
     private RenderPipelineTask generateTask(Object object) {
-        logger.info(object.getClass().getSimpleName()); // TODO: remove in the future or turn it into debug
+        logger.info(object.toString()); // TODO: remove in the future or turn it into debug
         if (object instanceof StateChange) {
             return ((StateChange) object).generateTask();
         } else {
             return new NodeTask((Node) object);
         }
     }
-
 }

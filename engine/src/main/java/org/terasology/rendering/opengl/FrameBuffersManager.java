@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.opengl;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.List;
+import com.google.common.collect.Sets;
+import java.util.Set;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -27,7 +27,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.dag.FBOManagerSubscriber;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO.Dimensions;
 
@@ -74,7 +73,7 @@ public class FrameBuffersManager {
     private Dimensions one16thScale;
     private Dimensions one32thScale;
 
-    // Note: this assumes ethat the settings in the configs might change at runtime,
+    // Note: this assumes that the settings in the configs might change at runtime,
     // but the config objects will not. At some point this might change, i.e. implementing presets.
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
@@ -82,7 +81,7 @@ public class FrameBuffersManager {
     private Map<String, FBO> fboLookup = Maps.newHashMap();
 
     private PostProcessor postProcessor;
-    private List<FBOManagerSubscriber> fboManagerSubscribers;
+    private Set<FBOManagerSubscriber> fboManagerSubscribers;
 
     public FrameBuffersManager() {
         // nothing to do here, everything happens at initialization time,
@@ -94,7 +93,7 @@ public class FrameBuffersManager {
     Also instructs the PostProcessor and the GraphicState instances to fetch the FBOs they require.
      */
     public void initialize() {
-        fboManagerSubscribers = Lists.newArrayList();
+        fboManagerSubscribers = Sets.newHashSet();
 
         createStaticFBOs();
 
@@ -444,12 +443,22 @@ public class FrameBuffersManager {
     }
 
     /**
-     * TODO: java doc
+     * TODO: add javadocs
      *
-     * @param bindFBO
+     * @param subscriber
      */
-    public void subscribe(BindFBO bindFBO) {
-        fboManagerSubscribers.add(bindFBO);
+    public boolean subscribe(FBOManagerSubscriber subscriber) {
+        return fboManagerSubscribers.add(subscriber);
+    }
+
+    /**
+     * TODO: add javadocs
+     *
+     * @param subscriber
+     * @return
+     */
+    public boolean unsubscribe(FBOManagerSubscriber subscriber) {
+        return fboManagerSubscribers.remove(subscriber);
     }
 
     /**

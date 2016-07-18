@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.stateChanges;
 
 import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_LINE;
-import org.terasology.rendering.dag.AbstractStateChange;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetWireframeTask;
@@ -26,11 +25,12 @@ import org.terasology.rendering.dag.tasks.SetWireframeTask;
 /**
  * TODO: Add javadocs
  */
-public final class SetWireframe extends AbstractStateChange<Boolean> {
+public final class SetWireframe implements StateChange {
     private static SetWireframe defaultInstance = new SetWireframe(false);
+    private boolean enabled;
 
-    private SetWireframe(Boolean value) {
-        super(value);
+    private SetWireframe(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -40,15 +40,15 @@ public final class SetWireframe extends AbstractStateChange<Boolean> {
 
     @Override
     public RenderPipelineTask generateTask() {
-        if (isEnabled()) {
+        if (enabled) {
             return new SetWireframeTask(GL_FILL);
         } else {
             return new SetWireframeTask(GL_LINE);
         }
     }
 
-    private Boolean isEnabled() {
-        return this.getValue();
+    @Override
+    public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
+        return this.getClass().getSimpleName() + ": " + enabled;
     }
-
 }
