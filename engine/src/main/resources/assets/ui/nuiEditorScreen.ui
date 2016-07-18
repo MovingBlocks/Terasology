@@ -4,7 +4,7 @@
     "contents": {
         "type": "migLayout",
         "layoutConstraints": "",
-        "colConstraints": "[min][grow, fill]",
+        "colConstraints": "[grow, 20%][grow, 80%]",
         "rowConstraints": "[min][grow, fill][min]",
         "debug": true,
         "contents": [
@@ -69,10 +69,7 @@
                 "contents": [
                     {
                         "type": "UIDropdownScrollable",
-                        "id": "availableAssets",
-                        "layoutInfo": {
-                            "cc": "w 300!"
-                        }
+                        "id": "availableAssets"
                     }
                 ]
             }

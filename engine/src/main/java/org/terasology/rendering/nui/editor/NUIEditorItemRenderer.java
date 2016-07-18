@@ -94,7 +94,7 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
             if (textureName == null) {
                 textureName = OBJECT_TEXTURE_NAME;
             }
-        } else if (value.getType() == JsonTreeValue.Type.ARRAY && value.getKey() == null) {
+        } else if (value.getType() == JsonTreeValue.Type.ARRAY) {
             textureName = ARRAY_TEXTURE_NAME;
         } else {
             textureName = value.getKey();
