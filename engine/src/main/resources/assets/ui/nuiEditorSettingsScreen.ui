@@ -30,8 +30,18 @@
                             ]
                         },
                         {
-                            "type": "UILabel",
-                            "text": "WIP - no settings to modify yet :)"
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "Disable tree view icons:"
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "disableIcons"
+                                }
+                            ]
                         },
                         {
                             "type": "UISpace",
@@ -41,20 +51,9 @@
                             ]
                         },
                         {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 16,
-                            "contents": [
-                                {
-                                    "type": "UIButton",
-                                    "text": "${engine:menu#dialog-ok}",
-                                    "id": "ok"
-                                },
-                                {
-                                    "type": "UIButton",
-                                    "text": "${engine:menu#dialog-cancel}",
-                                    "id": "cancel"
-                                }
-                            ]
+                            "type": "UIButton",
+                            "text": "${engine:menu#back}",
+                            "id": "close"
                         }
                     ]
                 }

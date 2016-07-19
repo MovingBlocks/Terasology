@@ -16,20 +16,26 @@
 package org.terasology.rendering.nui.editor;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.BindHelper;
 
 public class NUIEditorSettingsScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorSettingsScreen");
 
+    @In
+    private Config config;
+
     @Override
     public void initialise() {
-        WidgetUtil.trySubscribe(this, "ok", button -> {
-            getManager().closeScreen(ASSET_URI);
-        });
+        WidgetUtil.tryBindCheckbox(this, "disableIcons", BindHelper.bindBeanProperty("disableIcons", config.getNuiEditor(), Boolean.TYPE));
+        WidgetUtil.trySubscribe(this, "close", button -> getManager().closeScreen(ASSET_URI));
+    }
 
-        WidgetUtil.trySubscribe(this, "cancel", button -> {
-            getManager().closeScreen(ASSET_URI);
-        });
+    @Override
+    public void onClosed() {
+        ((NUIEditorScreen) getManager().getScreen(NUIEditorScreen.ASSET_URI)).updateConfig();
     }
 }

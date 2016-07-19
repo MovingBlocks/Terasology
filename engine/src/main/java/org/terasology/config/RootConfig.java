@@ -19,12 +19,12 @@ package org.terasology.config;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import org.terasology.engine.SimpleUri;
+
 import java.util.Map;
 
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
  * and loaded in a JSON format.
- *
  */
 public final class RootConfig {
     private SystemConfig system = new SystemConfig();
@@ -38,6 +38,7 @@ public final class RootConfig {
     private Map<SimpleUri, Map<String, JsonElement>> moduleConfigs = Maps.newHashMap();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
+    private NUIEditorConfig nuiEditor = new NUIEditorConfig();
 
     /**
      * Create a new, empty config
@@ -86,6 +87,10 @@ public final class RootConfig {
 
     public SecurityConfig getSecurity() {
         return security;
+    }
+
+    public NUIEditorConfig getNuiEditor() {
+        return nuiEditor;
     }
 
     public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {

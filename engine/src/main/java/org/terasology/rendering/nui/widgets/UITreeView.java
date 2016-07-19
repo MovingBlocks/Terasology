@@ -301,6 +301,10 @@ public class UITreeView<T> extends CoreWidget {
         defaultValue.set(value);
     }
 
+    public void setItemRenderer(ItemRenderer<T> itemRenderer) {
+        this.itemRenderer = itemRenderer;
+    }
+
     public void subscribeTreeViewUpdate(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         updateListeners.add(listener);

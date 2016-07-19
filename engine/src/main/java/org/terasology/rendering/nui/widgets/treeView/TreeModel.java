@@ -19,6 +19,7 @@ import com.google.api.client.util.Lists;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @param <T> Type of objects stored in the underlying tree.
@@ -54,7 +55,7 @@ public class TreeModel<T> {
     private void resetNodes(Tree<T> root) {
         this.nodes = Lists.newArrayList();
 
-        Iterator it = root.getDepthFirstIterator(enumerateExpandedOnly);
+        Iterator it = root.getDepthFirstIterator(this.enumerateExpandedOnly);
 
         while (it.hasNext()) {
             this.nodes.add((Tree<T>) it.next());
@@ -63,10 +64,19 @@ public class TreeModel<T> {
 
     /**
      * @param index The index.
-     * @return The item located at a given index.
+     * @return The node located at a given index.
      */
     public Tree<T> getNode(int index) {
         return this.nodes.get(index);
+    }
+
+    /**
+     * @param value A node value.
+     * @return The node with the given value.
+     */
+    public Tree<T> getNodeByValue(T value) {
+        Optional<Tree<T>> node = this.nodes.stream().filter(n -> n.getValue().equals(value)).findFirst();
+        return node.isPresent() ? node.get() : null;
     }
 
     /**
@@ -90,7 +100,7 @@ public class TreeModel<T> {
             return;
         }
 
-        Iterator it = this.nodes.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
+        Iterator it = this.nodes.get(0).getRoot().getDepthFirstIterator(this.enumerateExpandedOnly);
 
         while (it.hasNext()) {
             Tree<T> next = (Tree<T>) it.next();
