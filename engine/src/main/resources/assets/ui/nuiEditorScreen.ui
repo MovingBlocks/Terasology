@@ -4,7 +4,7 @@
     "contents": {
         "type": "migLayout",
         "layoutConstraints": "",
-        "colConstraints": "[grow, 20%][grow, 80%]",
+        "colConstraints": "[grow, 25%][grow, 75%]",
         "rowConstraints": "[min][grow, fill][min]",
         "debug": true,
         "contents": [

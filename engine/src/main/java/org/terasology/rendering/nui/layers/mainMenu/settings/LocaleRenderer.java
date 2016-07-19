@@ -28,11 +28,12 @@ import java.util.Optional;
  * Renders locale in the format "{@literal <native name> (<English name>)}" along with a flag icon.
  */
 public class LocaleRenderer extends StringTextIconRenderer<Locale> {
+    private static final String ICON_BLANK = "engine:icon_blank";
 
     private final TranslationSystem translationSystem;
 
     /**
-     * @param translationSystem the translation system to use for locale formatting
+     * @param translationSystem The translation system to be used for locale formatting.
      */
     public LocaleRenderer(TranslationSystem translationSystem) {
         this.translationSystem = translationSystem;
@@ -51,7 +52,7 @@ public class LocaleRenderer extends StringTextIconRenderer<Locale> {
         if (texture.isPresent()) {
             return texture.get();
         } else {
-            return Assets.getTexture("engine:flag_fallback").get();
+            return Assets.getTexture(ICON_BLANK).get();
         }
     }
 }

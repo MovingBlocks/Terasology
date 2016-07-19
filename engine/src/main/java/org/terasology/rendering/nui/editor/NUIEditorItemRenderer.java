@@ -26,17 +26,18 @@ import org.terasology.utilities.Assets;
 import java.util.Optional;
 
 public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue> {
-    private static final String OBJECT_TEXTURE_NAME = "object";
     private static final String ARRAY_TEXTURE_NAME = "array";
     private static final String ATTRIBUTE_TEXTURE_NAME = "attribute";
+    private static final String ICON_BLANK = "engine:icon_blank";
+    private static final String OBJECT_TEXTURE_NAME = "object";
 
     /**
      * The tree model the nodes of which are to be rendered
      * using this renderer.
      */
-    private TreeModel editorTreeViewModel;
+    private TreeModel<JsonTreeValue> editorTreeViewModel;
 
-    public NUIEditorItemRenderer(TreeModel editorTreeViewModel) {
+    public NUIEditorItemRenderer(TreeModel<JsonTreeValue> editorTreeViewModel) {
         super(false, 2, 2, 5, 5);
         this.editorTreeViewModel = editorTreeViewModel;
     }
@@ -46,7 +47,7 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
         if (value.getType() == JsonTreeValue.Type.OBJECT) {
             JsonTree node = (JsonTree) editorTreeViewModel.getNodeByValue(value);
 
-            // If a node has "type": "..." and/or "id": "..." children, use them to build the result string.
+            // If a node has "type": "..." and/or "id": "..." children, use their values to build the result string.
             if (node != null) {
                 String resultString = "";
                 for (Tree<JsonTreeValue> child : node.getChildren()) {
@@ -67,6 +68,7 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
             }
         }
 
+        // Otherwise use JsonTreeValue.toString() output.
         return value.toString();
     }
 
@@ -79,13 +81,18 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
         } else if (value.getType() == JsonTreeValue.Type.OBJECT) {
             JsonTree node = (JsonTree) editorTreeViewModel.getNodeByValue(value);
 
-            // If the node has a "type": "..." child, use the type name to retrieve the texture.
+            // If the node has a "type": "..." child, retrieve the texture by the type name.
             if (node != null) {
-                for (Tree<JsonTreeValue> child : node.getChildren()) {
-                    JsonTreeValue childValue = child.getValue();
-                    if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR
-                            && childValue.getKey().equalsIgnoreCase("type")) {
-                        textureName = (String) childValue.getValue();
+                // If the node has no type and is a root node, do not draw an icon.
+                if (node.isRoot()) {
+                    return null;
+                } else {
+                    for (Tree<JsonTreeValue> child : node.getChildren()) {
+                        JsonTreeValue childValue = child.getValue();
+                        if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR
+                                && childValue.getKey().equalsIgnoreCase("type")) {
+                            textureName = (String) childValue.getValue();
+                        }
                     }
                 }
             }
@@ -96,8 +103,10 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
             }
         } else if (value.getType() == JsonTreeValue.Type.ARRAY) {
             textureName = ARRAY_TEXTURE_NAME;
-        } else {
+        } else if (value.getKey() != null) {
             textureName = value.getKey();
+        } else {
+            return null;
         }
 
         if (textureName != null) {
@@ -105,10 +114,9 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
             if (texture.isPresent()) {
                 return texture.get();
             }
-            return null;
         }
 
-        // null return values can be handled by the parent renderer.
-        return null;
+        // Use a transparent 16x16 icon for consistent child rendering.
+        return Assets.getTexture(ICON_BLANK).get();
     }
 }

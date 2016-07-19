@@ -55,7 +55,7 @@ public class TreeModel<T> {
     private void resetNodes(Tree<T> root) {
         this.nodes = Lists.newArrayList();
 
-        Iterator it = root.getDepthFirstIterator(enumerateExpandedOnly);
+        Iterator it = root.getDepthFirstIterator(this.enumerateExpandedOnly);
 
         while (it.hasNext()) {
             this.nodes.add((Tree<T>) it.next());
@@ -100,7 +100,7 @@ public class TreeModel<T> {
             return;
         }
 
-        Iterator it = this.nodes.get(0).getRoot().getDepthFirstIterator(enumerateExpandedOnly);
+        Iterator it = this.nodes.get(0).getRoot().getDepthFirstIterator(this.enumerateExpandedOnly);
 
         while (it.hasNext()) {
             Tree<T> next = (Tree<T>) it.next();

@@ -55,6 +55,7 @@ import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.rendering.nui.widgets.treeView.Tree;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -341,7 +342,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
                 JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
 
-                updateTreeView(tree);
+                updateTreeView(tree, true);
                 updateWidget(tree);
 
                 editorHistory.clear();
@@ -382,7 +383,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         widgetSelectionScreen.subscribeClose(() -> {
             editorTreeView.setModel(node.getRoot());
             editorTreeView.fireUpdateListeners();
-            updateTreeView((JsonTree) node.getRoot());
+            updateTreeView((JsonTree) node.getRoot(), false);
         });
     }
 
@@ -409,7 +410,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     editorHistory.add(tree);
                     editorHistoryPosition++;
 
-                    updateTreeView((JsonTree) node.getRoot());
+                    updateTreeView((JsonTree) node.getRoot(), false);
                     updateWidget((JsonTree) node.getRoot());
                 }
             }
@@ -564,7 +565,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 // If the clipboard contents are a valid JSON string, serialize them into a JsonTree.
                 JsonElement json = new JsonParser().parse(clipboardContents);
                 JsonTree tree = JsonTreeConverter.serialize(json);
-                updateTreeView(tree);
+                updateTreeView(tree, true);
                 updateWidget(tree);
             } catch (JsonSyntaxException | NullPointerException e) {
                 logger.warn("Could not construct a valid tree from clipboard contents.", e);
@@ -576,7 +577,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         if (editorHistoryPosition > 0) {
             editorHistoryPosition--;
             JsonTree tree = editorHistory.get(editorHistoryPosition);
-            updateTreeView(tree);
+            updateTreeView(tree, false);
             updateWidget(tree);
         }
     }
@@ -585,22 +586,34 @@ public class NUIEditorScreen extends CoreScreenLayer {
         if (editorHistoryPosition < editorHistory.size() - 1) {
             editorHistoryPosition++;
             JsonTree tree = editorHistory.get(editorHistoryPosition);
-            updateTreeView(tree);
+            updateTreeView(tree, false);
             updateWidget(tree);
         }
     }
 
-    private void updateTreeView(JsonTree tree) {
-        // Serialize & deserialize fixes some invalid JSON edits (e.g. named objects as array elements).
-        JsonTree fixedTree = JsonTreeConverter.serialize(JsonTreeConverter.deserialize(tree));
-
-        Iterator it = fixedTree.getDepthFirstIterator(false);
-        while (it.hasNext()) {
-            ((JsonTree) it.next()).setExpanded(true);
+    private void updateTreeView(JsonTree tree, boolean expandNodes) {
+        if (expandNodes) {
+            // Expand all the tree nodes. Used for deserialized trees (from asset, clipboard etc.)
+            Iterator it = tree.getDepthFirstIterator(false);
+            if (it.hasNext()) {
+                expandTree(tree);
+            }
         }
 
-        editorTreeView.setModel(fixedTree.copy());
+        editorTreeView.setModel(tree.copy());
         updateConfig();
+    }
+
+    private void expandTree(JsonTree tree) {
+        // Do not expand OBJECT children of ARRAY parents (generally this concerns widget lists).
+        if (!(tree.getValue().getType() == JsonTreeValue.Type.OBJECT
+                && !tree.isRoot() && tree.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+            tree.setExpanded(true);
+        }
+
+        for (Tree node : tree.getChildren()) {
+            expandTree((JsonTree) node);
+        }
     }
 
     private void updateWidget(JsonTree tree) {
