@@ -145,6 +145,20 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     }
 
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    public void onImpulse(CharacterImpulseEvent event, EntityRef entity) {
+        Vector3f impulse = event.getDirection();
+
+        CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
+        CharacterStateEvent lastState = stateBuffer.getLast();
+        CharacterStateEvent newState = new CharacterStateEvent(lastState);
+        newState.setVelocity(impulse.add(newState.getVelocity()));
+        newState.setTime(time.getGameTimeInMs());
+        newState.setMode(MovementMode.WALKING);
+        stateBuffer.add(newState);
+        characterMovementSystemUtility.setToState(entity, newState);
+    }
+
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);

@@ -98,6 +98,10 @@ public class CharacterStateEvent extends NetworkEvent {
         return velocity;
     }
 
+    public void setVelocity(Vector3f velocity) {
+        this.velocity.set(velocity);
+    }
+
     public void setTime(long time) {
         this.time = time;
     }
