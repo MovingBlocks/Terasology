@@ -32,12 +32,7 @@ public final class RenderTaskListGenerator {
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
         logger.info("Task List: "); // TODO: remove in the future or turn it into debug
         List<Object> intermediateList = generateIntermediateList(orderedNodes);
-        eliminateRedundantStateChanges(intermediateList);
         return generateTaskList(intermediateList);
-    }
-
-    private void eliminateRedundantStateChanges(List<Object> intermediateList) {
-        // TODO: make elimination of redundant state changes here
     }
 
     private List<RenderPipelineTask> generateTaskList(List<Object> intermediateList) {

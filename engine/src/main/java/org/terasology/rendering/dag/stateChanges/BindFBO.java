@@ -59,7 +59,9 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
                 frameBuffersManager.subscribe(this);
             }
         } else {
-            update();
+            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
+                update();
+            }
         }
         return task;
     }

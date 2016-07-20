@@ -28,7 +28,7 @@ public abstract class AbstractNode implements Node {
         desiredStateChanges = Sets.newLinkedHashSet();
     }
 
-    protected boolean addStateChange(StateChange stateChange) {
+    protected boolean addDesiredStateChange(StateChange stateChange) {
         return desiredStateChanges.add(stateChange);
     }
 

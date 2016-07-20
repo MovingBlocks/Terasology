@@ -84,7 +84,7 @@ public class ShadowMapNode extends AbstractNode {
         this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
-        addStateChange(new BindFBO("sceneShadowMap", frameBuffersManager));
+        addDesiredStateChange(new BindFBO("sceneShadowMap", frameBuffersManager));
     }
 
     @Override
