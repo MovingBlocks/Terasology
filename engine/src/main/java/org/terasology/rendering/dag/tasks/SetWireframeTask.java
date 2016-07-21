@@ -33,4 +33,9 @@ public final class SetWireframeTask implements RenderPipelineTask {
     public void execute() {
         GL11.glPolygonMode(GL_FRONT_AND_BACK, mode);
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ": " + mode;
+    }
 }

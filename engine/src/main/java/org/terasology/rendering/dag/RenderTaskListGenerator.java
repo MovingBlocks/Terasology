@@ -15,8 +15,11 @@
  */
 package org.terasology.rendering.dag;
 
+import com.google.api.client.util.Maps;
+
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,29 +28,48 @@ import org.slf4j.LoggerFactory;
  */
 public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
+    private List<Object> intermediateList;
+    private List<RenderPipelineTask> taskList;
 
     public RenderTaskListGenerator() {
+        taskList = Lists.newArrayList();
+        intermediateList = Lists.newArrayList();
     }
 
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
-        logger.info("Task List: "); // TODO: remove in the future or turn it into debug
-        List<Object> intermediateList = generateIntermediateList(orderedNodes);
-        return generateTaskList(intermediateList);
-    }
-
-    private List<RenderPipelineTask> generateTaskList(List<Object> intermediateList) {
-        List<RenderPipelineTask> taskList = Lists.newArrayList();
-
-        for (Object o : intermediateList) {
-            taskList.add(generateTask(o));
-        }
-
+        generateIntermediateList(orderedNodes);
+        logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
+        generateTaskList();
+        logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
         return taskList;
     }
 
-    private List<Object> generateIntermediateList(List<Node> orderedNodes) {
-        List<Object> intermediateList = Lists.newArrayList();
+    private void logList(String title, List<?> list) {
+        logger.info(title);
+        for (Object o : list) {
+            logger.info(o.toString());
+        }
+    }
 
+    private void generateTaskList() {
+        taskList.clear();
+
+        Map map = Maps.newHashMap();
+        for (Object object : intermediateList) {
+            if (object instanceof StateChange) {
+                map.put(object.getClass(), object);
+            } else {
+                for (Object o : map.values()) {
+                    taskList.add(((StateChange) o).generateTask());
+                }
+                map.clear();
+                taskList.add(new NodeTask((Node) object));
+            }
+        }
+    }
+
+    private void generateIntermediateList(List<Node> orderedNodes) {
+        intermediateList.clear();
         for (Node node : orderedNodes) {
             intermediateList.addAll(node.getDesiredStateChanges());
             intermediateList.add(node);
@@ -55,16 +77,6 @@ public final class RenderTaskListGenerator {
             for (StateChange stateChange : node.getDesiredStateChanges()) {
                 intermediateList.add(stateChange.getDefaultInstance());
             }
-        }
-        return intermediateList;
-    }
-
-    private RenderPipelineTask generateTask(Object object) {
-        logger.info(object.toString()); // TODO: remove in the future or turn it into debug
-        if (object instanceof StateChange) {
-            return ((StateChange) object).generateTask();
-        } else {
-            return new NodeTask((Node) object);
         }
     }
 }

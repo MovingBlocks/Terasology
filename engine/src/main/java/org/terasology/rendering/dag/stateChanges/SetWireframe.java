@@ -29,7 +29,7 @@ public final class SetWireframe implements StateChange {
     private static SetWireframe defaultInstance = new SetWireframe(false);
     private boolean enabled;
 
-    private SetWireframe(Boolean enabled) {
+    public SetWireframe(boolean enabled) {
         this.enabled = enabled;
     }
 

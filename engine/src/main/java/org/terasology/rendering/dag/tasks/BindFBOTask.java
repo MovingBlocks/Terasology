@@ -38,4 +38,9 @@ public final class BindFBOTask implements RenderPipelineTask {
     public void setFboToBind(int fboToBind) {
         this.fboToBind = fboToBind;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ": " + fboToBind;
+    }
 }

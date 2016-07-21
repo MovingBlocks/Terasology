@@ -39,7 +39,6 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 
@@ -80,7 +79,6 @@ public class ShadowMapNode extends AbstractNode {
     @Override
     public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
-        this.shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
         this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
@@ -95,8 +93,8 @@ public class ShadowMapNode extends AbstractNode {
         // TODO: check these conditions before adding this node inside the DAG, removing this condition completely from process()
         if (renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
+            shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
             // preRenderSetupSceneShadowMap
-            shadowMap.bind();
             setViewportToSizeOf(shadowMap);
             // TODO: verify the need to clear color buffer
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -106,13 +104,13 @@ public class ShadowMapNode extends AbstractNode {
             shadowMapCamera.lookThrough();
 
             shadowMapShader.enable();
-            // FIXME: storing chuncksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
+            // FIXME: storing chunksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
             worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
             playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
 
             // postRenderCleanupSceneShadowMap
             GL11.glEnable(GL_CULL_FACE);
-            bindDisplay();
+
 
             PerformanceMonitor.endActivity();
         }

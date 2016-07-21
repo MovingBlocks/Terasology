@@ -29,4 +29,9 @@ public class NodeTask implements RenderPipelineTask {
     public void execute() {
         node.process();
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ": " + node.getClass().getSimpleName();
+    }
 }

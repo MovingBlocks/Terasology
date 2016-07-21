@@ -25,6 +25,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -70,6 +71,7 @@ public class WorldReflectionNode extends AbstractNode {
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new BindFBO("sceneReflected", frameBuffersManager));
     }
 
     @Override
@@ -78,8 +80,7 @@ public class WorldReflectionNode extends AbstractNode {
         sceneReflected = frameBuffersManager.getFBO("sceneReflected");
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
-        sceneReflected.bind();
-        setViewportToSizeOf(sceneReflected);
+        setViewportToSizeOf(sceneReflected); // TODO: add setViewportSizeOf state change and remove this line
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glCullFace(GL11.GL_FRONT);
         playerCamera.setReflected(true);
@@ -100,8 +101,8 @@ public class WorldReflectionNode extends AbstractNode {
         playerCamera.setReflected(false);
 
         GL11.glCullFace(GL11.GL_BACK);
-        bindDisplay();
-        setViewportToSizeOf(sceneOpaque);
+        bindDisplay(); // TODO: remove since its reset by default BindFBO state change
+        setViewportToSizeOf(sceneOpaque); // TODO: add setViewportSizeOf state change and remove this line
 
         PerformanceMonitor.endActivity();
     }

@@ -35,4 +35,9 @@ public abstract class AbstractNode implements Node {
     public Set<StateChange> getDesiredStateChanges() {
         return desiredStateChanges;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }
