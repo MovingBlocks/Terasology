@@ -154,7 +154,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
         newState.setVelocity(impulse.add(newState.getVelocity()));
         newState.setTime(time.getGameTimeInMs());
-        newState.setMode(MovementMode.WALKING);
+        newState.setGrounded(false);
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
     }
