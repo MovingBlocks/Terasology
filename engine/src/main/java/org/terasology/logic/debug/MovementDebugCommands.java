@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.debug;
 
+import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -78,6 +79,14 @@ public class MovementDebugCommands extends BaseComponentSystem {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
         return "Teleporting  to " + x + " " + y + " " + z;
+    }
+
+    @Command(value  = "pushCharacter", shortDescription = "Pushes you in the direction (x, y, z)", runOnServer = true)
+    public String pushCharacterCommand(@Sender EntityRef sender,
+                              @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        clientComponent.character.send(new CharacterImpulseEvent(new Vector3f(x, y, z)));
+        return "Pushing character with " + x + " " + y + " " + z;
     }
 
     @Command(shortDescription = "Set jump speed", runOnServer = true,
