@@ -18,9 +18,9 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 /**
  */
 public enum CameraSetting {
-    NORMAL("Normal", 1),
-    SMOOTH("Smooth", 5),
-    CINEMATIC("Cinematic", 60);
+    NORMAL("${engine:menu#camera-setting-normal}", 1),
+    SMOOTH("${engine:menu#camera-setting-smooth}", 5),
+    CINEMATIC("${engine:menu#camera-setting-cinematic}", 60);
 
     private String displayName;
     private int smoothingFrames;
