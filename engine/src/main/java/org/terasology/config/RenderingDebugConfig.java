@@ -56,6 +56,14 @@ public class RenderingDebugConfig extends AbstractSubscribable {
         }
     }
 
+    public static final String WIREFRAME = "wireframe";
+    public static final String ENABLED = "enabled";
+    public static final String STAGE = "stage";
+    public static final String FIRST_PERSON_ELEMENTS_HIDDEN = "FirstPersonElementsHidden";
+    public static final String HUD_HIDDEN = "hudHidden";
+    public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
+    public static final String RENDER_SKELETONS = "renderSkeletons";
+
     private boolean enabled;
     private DebugRenderingStage stage;
     private boolean firstPersonElementsHidden;
@@ -64,25 +72,24 @@ public class RenderingDebugConfig extends AbstractSubscribable {
     private boolean renderChunkBoundingBoxes;
     private boolean renderSkeletons;
 
-
     public boolean isWireframe() {
         return wireframe;
     }
 
-    public static final String WIREFRAME = "wireframe";
-    public void setWireframe(boolean Wireframe) {
-        this.wireframe = Wireframe;
-        propertyChangeSupport.firePropertyChange(WIREFRAME, !this.wireframe, this.wireframe);
+    public void setWireframe(boolean wireframe) {
+        boolean oldValue = this.wireframe;
+        this.wireframe = wireframe;
+        propertyChangeSupport.firePropertyChange(WIREFRAME, oldValue, this.wireframe);
     }
 
     public boolean isEnabled() {
         return enabled;
     }
 
-    public static final String ENABLED = "enabled";
     public void setEnabled(boolean enabled) {
+        boolean oldValue = this.enabled;
         this.enabled = enabled;
-        propertyChangeSupport.firePropertyChange(ENABLED, !this.enabled, this.enabled);
+        propertyChangeSupport.firePropertyChange(ENABLED, oldValue, this.enabled);
     }
 
     public void cycleStage() {
@@ -93,7 +100,6 @@ public class RenderingDebugConfig extends AbstractSubscribable {
         return stage;
     }
 
-    public static final String STAGE = "stage";
     public void setStage(DebugRenderingStage stage) {
         DebugRenderingStage oldStage = this.stage;
         this.stage = stage;
@@ -104,40 +110,40 @@ public class RenderingDebugConfig extends AbstractSubscribable {
         return firstPersonElementsHidden;
     }
 
-    public static final String FIRST_PERSON_ELEMENTS_HIDDEN = "FirstPersonElementsHidden";
-    public void setFirstPersonElementsHidden(boolean FirstPersonElementsHidden) {
-        this.firstPersonElementsHidden = FirstPersonElementsHidden;
-        propertyChangeSupport.firePropertyChange(FIRST_PERSON_ELEMENTS_HIDDEN, !this.firstPersonElementsHidden, this.firstPersonElementsHidden);
+    public void setFirstPersonElementsHidden(boolean firstPersonElementsHidden) {
+        boolean oldValue = this.firstPersonElementsHidden;
+        this.firstPersonElementsHidden = firstPersonElementsHidden;
+        propertyChangeSupport.firePropertyChange(FIRST_PERSON_ELEMENTS_HIDDEN, oldValue, this.firstPersonElementsHidden);
     }
 
     public boolean isHudHidden() {
         return hudHidden;
     }
 
-    public static final String HUD_HIDDEN = "hudHidden";
     public void setHudHidden(boolean hudHidden) {
+        boolean oldValue = this.hudHidden;
         this.hudHidden = hudHidden;
-        propertyChangeSupport.firePropertyChange(HUD_HIDDEN, !this.hudHidden, this.hudHidden);
+        propertyChangeSupport.firePropertyChange(HUD_HIDDEN, oldValue, this.hudHidden);
     }
 
     public boolean isRenderChunkBoundingBoxes() {
         return renderChunkBoundingBoxes;
     }
 
-    public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public void setRenderChunkBoundingBoxes(boolean renderChunkBoundingBoxes) {
+        boolean oldValue = this.renderChunkBoundingBoxes;
         this.renderChunkBoundingBoxes = renderChunkBoundingBoxes;
-        propertyChangeSupport.firePropertyChange(RENDER_CHUNK_BOUNDING_BOXES, !this.renderChunkBoundingBoxes, this.renderChunkBoundingBoxes);
+        propertyChangeSupport.firePropertyChange(RENDER_CHUNK_BOUNDING_BOXES, oldValue, this.renderChunkBoundingBoxes);
     }
 
     public boolean isRenderSkeletons() {
         return renderSkeletons;
     }
 
-    public static final String RENDER_SKELETONS = "renderSkeletons";
     public void setRenderSkeletons(boolean renderSkeletons) {
+        boolean oldValue = this.renderSkeletons;
         this.renderSkeletons = renderSkeletons;
-        propertyChangeSupport.firePropertyChange(RENDER_SKELETONS, !this.renderSkeletons, this.renderSkeletons);
+        propertyChangeSupport.firePropertyChange(RENDER_SKELETONS, oldValue, this.renderSkeletons);
     }
 
 }
