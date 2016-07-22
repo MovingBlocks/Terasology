@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.tasks;
 import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 
 /**
  * TODO: Add javadocs
@@ -36,6 +37,10 @@ public final class SetWireframeTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + mode;
+        String status = "disabled";
+        if (mode == SetWireframe.ENABLED) {
+            status = "enabled";
+        }
+        return String.format("%s: wireframe %s", this.getClass().getSimpleName(), status);
     }
 }

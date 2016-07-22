@@ -26,6 +26,9 @@ import org.terasology.rendering.dag.tasks.SetWireframeTask;
  * TODO: Add javadocs
  */
 public final class SetWireframe implements StateChange {
+    public static final int ENABLED = GL_LINE;
+    public static final int DISABLED = GL_FILL;
+
     private static SetWireframe defaultInstance = new SetWireframe(false);
     private boolean enabled;
 
@@ -41,14 +44,19 @@ public final class SetWireframe implements StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (enabled) {
-            return new SetWireframeTask(GL_FILL);
+            return new SetWireframeTask(ENABLED);
         } else {
-            return new SetWireframeTask(GL_LINE);
+            return new SetWireframeTask(DISABLED);
         }
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return this.getClass().getSimpleName() + ": " + enabled;
+        String status = "disabled";
+        if (enabled) {
+            status = "enabled";
+        }
+
+        return String.format("%s: wireframe %s", this.getClass().getSimpleName(), status);
     }
 }

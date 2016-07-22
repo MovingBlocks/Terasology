@@ -29,4 +29,6 @@ public interface Node {
     void process();
 
     Set<StateChange> getDesiredStateChanges();
+
+    RenderPipelineTask generateTask();
 }

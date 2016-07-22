@@ -24,23 +24,29 @@ import org.terasology.rendering.dag.RenderPipelineTask;
  */
 public final class BindFBOTask implements RenderPipelineTask {
 
-    private int fboToBind;
+    private int fboId;
+    private String fboName;
 
-    public BindFBOTask(int fboToBind) {
-        this.fboToBind = fboToBind;
+    public BindFBOTask(int fboId, String fboName) {
+        this.fboId = fboId;
+        this.fboName = fboName;
     }
 
     @Override
     public void execute() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboToBind);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
     }
 
-    public void setFboToBind(int fboToBind) {
-        this.fboToBind = fboToBind;
+    public void setFboId(int fboId) {
+        this.fboId = fboId;
+    }
+
+    public void setFboName(String fboName) {
+        this.fboName = fboName;
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": " + fboToBind;
+        return String.format("%16s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 }

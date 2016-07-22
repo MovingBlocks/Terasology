@@ -53,7 +53,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new BindFBOTask(fboId);
+            task = new BindFBOTask(fboId, fboName);
             // Subscription is only needed if fboID is different than default frame buffer id.
             if (fboId != DEFAULT_FRAME_BUFFER_ID) {
                 frameBuffersManager.subscribe(this);
@@ -69,11 +69,12 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public void update() {
         fboId = frameBuffersManager.getFBO(fboName).fboId;
-        task.setFboToBind(fboId);
+        task.setFboId(fboId);
+        task.setFboName(fboName);
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return this.getClass().getSimpleName() + ": " + fboName;
+        return String.format("%12s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 }

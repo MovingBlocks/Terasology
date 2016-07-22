@@ -52,18 +52,20 @@ public final class RenderTaskListGenerator {
     }
 
     private void generateTaskList() {
+        // TODO: Optimization task: verify if we can avoid clearing the whole list
+        // TODO: whenever changes in the render graph or in the intermediate list arise
         taskList.clear();
 
-        Map map = Maps.newHashMap();
+        Map intranodesStateChanges = Maps.newHashMap();
         for (Object object : intermediateList) {
             if (object instanceof StateChange) {
-                map.put(object.getClass(), object);
+                intranodesStateChanges.put(object.getClass(), object);
             } else {
-                for (Object o : map.values()) {
-                    taskList.add(((StateChange) o).generateTask());
+                for (Object stateChange : intranodesStateChanges.values()) {
+                    taskList.add(((StateChange) stateChange).generateTask());
                 }
-                map.clear();
-                taskList.add(new NodeTask((Node) object));
+                intranodesStateChanges.clear();
+                taskList.add(((Node) object).generateTask());
             }
         }
     }

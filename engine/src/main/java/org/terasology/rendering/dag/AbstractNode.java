@@ -23,6 +23,7 @@ import java.util.Set;
  */
 public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateChanges;
+    private NodeTask task;
 
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
@@ -34,6 +35,13 @@ public abstract class AbstractNode implements Node {
 
     public Set<StateChange> getDesiredStateChanges() {
         return desiredStateChanges;
+    }
+
+    public RenderPipelineTask generateTask() {
+        if (task == null) {
+            task = new NodeTask(this);
+        }
+        return task;
     }
 
     @Override
