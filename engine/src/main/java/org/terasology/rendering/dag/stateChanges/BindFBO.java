@@ -67,6 +67,14 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     }
 
     @Override
+    public boolean compare(StateChange stateChange) {
+        if (stateChange instanceof BindFBO) {
+            return this.fboName.equals(((BindFBO) stateChange).fboName);
+        }
+        return false;
+    }
+
+    @Override
     public void update() {
         fboId = frameBuffersManager.getFBO(fboName).fboId;
         task.setFboId(fboId);

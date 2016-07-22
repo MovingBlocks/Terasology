@@ -51,6 +51,15 @@ public final class SetWireframe implements StateChange {
     }
 
     @Override
+    public boolean compare(StateChange stateChange) {
+        if (stateChange instanceof SetWireframe) {
+            return this.enabled == ((SetWireframe) stateChange).enabled;
+        }
+
+        return false;
+    }
+
+    @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         String status = "disabled";
         if (enabled) {

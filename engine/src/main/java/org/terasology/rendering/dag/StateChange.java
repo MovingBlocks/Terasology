@@ -22,4 +22,7 @@ public interface StateChange {
     StateChange getDefaultInstance();
 
     RenderPipelineTask generateTask();
+
+    // TODO: investigate a better way?
+    boolean compare(StateChange stateChange);
 }

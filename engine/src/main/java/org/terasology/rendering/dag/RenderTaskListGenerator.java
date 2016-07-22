@@ -18,6 +18,7 @@ package org.terasology.rendering.dag;
 import com.google.api.client.util.Maps;
 
 import com.google.common.collect.Lists;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -54,20 +55,53 @@ public final class RenderTaskListGenerator {
     private void generateTaskList() {
         // TODO: Optimization task: verify if we can avoid clearing the whole list
         // TODO: whenever changes in the render graph or in the intermediate list arise
+        // TODO: think about refactoring (a heavy method)
         taskList.clear();
 
+        List<Object> semiReducedStateChanges = Lists.newArrayList(); // TODO: a better name, any suggestions?
         Map intranodesStateChanges = Maps.newHashMap();
+
         for (Object object : intermediateList) {
             if (object instanceof StateChange) {
                 intranodesStateChanges.put(object.getClass(), object);
             } else {
-                for (Object stateChange : intranodesStateChanges.values()) {
-                    taskList.add(((StateChange) stateChange).generateTask());
+                Iterator iterator = intranodesStateChanges.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry entry = (Map.Entry) iterator.next();
+
+                    semiReducedStateChanges.add(entry.getValue());
+                    iterator.remove();
                 }
-                intranodesStateChanges.clear();
+
+                semiReducedStateChanges.add(object);
+            }
+        }
+
+        // Add remaining state changes
+        for (Object stateChange : intranodesStateChanges.values()) {
+            semiReducedStateChanges.add(stateChange);
+        }
+
+        Map persistentStateChanges = Maps.newHashMap();
+        for (Object object : semiReducedStateChanges) {
+            if (object instanceof StateChange) {
+                StateChange stateChange = (StateChange) object;
+                if (!persistentStateChanges.containsKey(object.getClass())) {
+                    persistentStateChanges.put(object.getClass(), object);
+                    taskList.add(stateChange.generateTask());
+                } else {
+                    StateChange persistenStateChange = (StateChange) persistentStateChanges.get(object.getClass());
+                    if (!persistenStateChange.compare(stateChange)) {
+                        persistentStateChanges.put(stateChange.getClass(), stateChange);
+                        taskList.add(stateChange.generateTask());
+                    }
+                }
+            } else {
                 taskList.add(((Node) object).generateTask());
             }
         }
+
+
     }
 
     private void generateIntermediateList(List<Node> orderedNodes) {
