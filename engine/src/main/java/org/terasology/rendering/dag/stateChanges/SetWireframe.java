@@ -15,9 +15,6 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_LINE;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetWireframeTask;
@@ -26,10 +23,10 @@ import org.terasology.rendering.dag.tasks.SetWireframeTask;
  * TODO: Add javadocs
  */
 public final class SetWireframe implements StateChange {
-    public static final int ENABLED = GL_LINE;
-    public static final int DISABLED = GL_FILL;
-
     private static SetWireframe defaultInstance = new SetWireframe(false);
+    private static SetWireframeTask enablingTask;
+    private static SetWireframeTask disablingTask;
+
     private boolean enabled;
 
     public SetWireframe(boolean enabled) {
@@ -44,9 +41,15 @@ public final class SetWireframe implements StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (enabled) {
-            return new SetWireframeTask(ENABLED);
+            if (enablingTask == null) {
+                enablingTask = new SetWireframeTask(true);
+            }
+            return enablingTask;
         } else {
-            return new SetWireframeTask(DISABLED);
+            if (disablingTask == null) {
+                disablingTask = new SetWireframeTask(false);
+            }
+            return enablingTask;
         }
     }
 

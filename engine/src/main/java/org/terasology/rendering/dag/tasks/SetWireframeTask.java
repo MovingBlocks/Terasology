@@ -16,18 +16,25 @@
 package org.terasology.rendering.dag.tasks;
 
 import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LINE;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetWireframeTask implements RenderPipelineTask {
+    private static final int ENABLED = GL_LINE;
+    private static final int DISABLED = GL_FILL;
     private int mode;
 
-    public SetWireframeTask(int mode) {
-        this.mode = mode;
+    public SetWireframeTask(boolean enabled) {
+        if (enabled) {
+            this.mode = ENABLED;
+        } else {
+            this.mode = DISABLED;
+        }
     }
 
     @Override
@@ -38,7 +45,7 @@ public final class SetWireframeTask implements RenderPipelineTask {
     @Override
     public String toString() {
         String status = "disabled";
-        if (mode == SetWireframe.ENABLED) {
+        if (mode == ENABLED) {
             status = "enabled";
         }
         return String.format("%s: wireframe %s", this.getClass().getSimpleName(), status);

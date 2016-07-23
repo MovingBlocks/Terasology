@@ -41,10 +41,6 @@ public final class BindFBOTask implements RenderPipelineTask {
         this.fboId = fboId;
     }
 
-    public void setFboName(String fboName) {
-        this.fboName = fboName;
-    }
-
     @Override
     public String toString() {
         return String.format("%16s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);

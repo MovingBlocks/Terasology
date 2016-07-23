@@ -78,7 +78,6 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     public void update() {
         fboId = frameBuffersManager.getFBO(fboName).fboId;
         task.setFboId(fboId);
-        task.setFboName(fboName);
     }
 
     @Override
