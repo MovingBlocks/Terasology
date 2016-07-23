@@ -173,7 +173,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#extra-Lighting}: "
+                                    "text": "${engine:menu#extra-lighting}: "
                                 },
                                 {
                                     "type": "UICheckbox",
