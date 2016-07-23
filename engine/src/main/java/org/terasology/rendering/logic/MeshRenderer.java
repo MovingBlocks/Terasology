@@ -18,6 +18,9 @@ package org.terasology.rendering.logic;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import java.nio.FloatBuffer;
+import java.util.Arrays;
+import java.util.Set;
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +49,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-
-import java.nio.FloatBuffer;
-import java.util.Arrays;
-import java.util.Set;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
@@ -192,8 +191,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null
-                            || !worldProvider.isBlockRelevant(location.getWorldPosition())) {
+                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null || !isRelevant(entity, location.getWorldPosition())) {
                         continue;
                     }
                     if (meshComp.mesh.isDisposed()) {
@@ -242,6 +240,21 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 }
             }
         }
+    }
+
+    /**
+     * Checks whether the entity at the given position is relevant.
+     * <p>
+     * The entity is at the given position is relevant if
+     * a) the entity itself is always relevant, or
+     * b) if the block at the position is relevant.
+     *
+     * @param entity   the entity to check for relevance
+     * @param position the position the entity is located
+     * @return true if the entity itself or the block at the given position are relevant, false otherwise.
+     */
+    private boolean isRelevant(EntityRef entity, Vector3f position) {
+        return entity.isAlwaysRelevant() || worldProvider.isBlockRelevant(position);
     }
 
     @Override
