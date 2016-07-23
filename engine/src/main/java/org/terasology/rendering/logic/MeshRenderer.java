@@ -245,16 +245,16 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     /**
      * Checks whether the entity at the given position is relevant.
      * <p>
-     * The entity is at the given position is relevant if
+     * The entity at the given position is relevant if
      * a) the entity itself is always relevant, or
-     * b) if the block at the position is relevant.
+     * b) the block at the position is relevant.
      *
      * @param entity   the entity to check for relevance
-     * @param position the position the entity is located
+     * @param position the world position the entity is located
      * @return true if the entity itself or the block at the given position are relevant, false otherwise.
      */
     private boolean isRelevant(EntityRef entity, Vector3f position) {
-        return entity.isAlwaysRelevant() || worldProvider.isBlockRelevant(position);
+        return worldProvider.isBlockRelevant(position) || entity.isAlwaysRelevant();
     }
 
     @Override
