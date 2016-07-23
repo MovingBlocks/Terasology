@@ -138,13 +138,13 @@ public class UITreeView<T> extends CoreWidget {
 
             // Calculate the node's height and overall region.
             int nodeHeight = canvas.getCurrentStyle().getMargin()
-                    .grow(itemRenderer.getPreferredSize(node.getValue(), canvas).addX(node.getDepth() * levelIndent.get()))
-                    .getY();
+                .grow(itemRenderer.getPreferredSize(node.getValue(), canvas).addX(node.getDepth() * levelIndent.get()))
+                .getY();
 
             Rect2i nodeRegion = Rect2i.createFromMinAndSize((node.getDepth() + 1) * levelIndent.get(),
-                    currentHeight,
-                    canvas.size().x - (node.getDepth() + 1) * levelIndent.get(),
-                    nodeHeight);
+                currentHeight,
+                canvas.size().x - (node.getDepth() + 1) * levelIndent.get(),
+                nodeHeight);
 
             // Draw the expand/contract button.
             if (!node.isLeaf()) {
@@ -152,16 +152,16 @@ public class UITreeView<T> extends CoreWidget {
 
                 setButtonMode(canvas, node, buttonListener);
                 Rect2i buttonRegion = Rect2i.createFromMinAndSize(node.getDepth() * levelIndent.get(),
-                        currentHeight,
-                        levelIndent.get(),
-                        nodeHeight);
+                    currentHeight,
+                    levelIndent.get(),
+                    nodeHeight);
                 drawButton(canvas, buttonRegion, buttonListener);
 
                 canvas.setPart(TREE_NODE);
             }
 
             if (state.getSelectedIndex() != null && state.getSelectedIndex() == i
-                    && state.getAlternativeWidget() != null) {
+                && state.getAlternativeWidget() != null) {
                 //Draw an alternative widget in place of the node (with the same size).
 
                 canvas.drawWidget(state.getAlternativeWidget(), nodeRegion);
@@ -194,8 +194,8 @@ public class UITreeView<T> extends CoreWidget {
         for (int i = 0; i < model.get().getNodeCount(); i++) {
             Tree<T> node = model.get().getNode(i);
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
-                    .grow(itemRenderer.getPreferredSize(node.getValue(), canvas)
-                            .addX(node.getDepth() * levelIndent.get()));
+                .grow(itemRenderer.getPreferredSize(node.getValue(), canvas)
+                    .addX(node.getDepth() * levelIndent.get()));
             result.x = Math.max(result.x, preferredSize.x);
             result.y += preferredSize.y;
         }
@@ -356,20 +356,20 @@ public class UITreeView<T> extends CoreWidget {
 
         // Add the top listener.
         canvas.addInteractionRegion(listenerSet.getTopListener(), itemRenderer.getTooltip(node.getValue()),
-                Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY(),
-                        nodeRegion.width(), nodeRegion.height() / 3));
+            Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY(),
+                nodeRegion.width(), nodeRegion.height() / 3));
 
         // Add the central listener.
         canvas.addInteractionRegion(listenerSet.getCenterListener(), itemRenderer.getTooltip(node.getValue()),
-                Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY() + nodeRegion.height() / 3,
-                        nodeRegion.width(), nodeRegion.height() / 3));
+            Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY() + nodeRegion.height() / 3,
+                nodeRegion.width(), nodeRegion.height() / 3));
 
         int heightOffset = nodeRegion.height() - 3 * (nodeRegion.height() / 3);
 
         // Add the bottom listener.
         canvas.addInteractionRegion(listenerSet.getBottomListener(), itemRenderer.getTooltip(node.getValue()),
-                Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY() + 2 * nodeRegion.height() / 3,
-                        nodeRegion.width(), heightOffset + nodeRegion.height() / 3));
+            Rect2i.createFromMinAndSize(nodeRegion.minX(), nodeRegion.minY() + 2 * nodeRegion.height() / 3,
+                nodeRegion.width(), heightOffset + nodeRegion.height() / 3));
     }
 
     private void drawDragHint(Canvas canvas, Rect2i nodeRegion) {
@@ -414,9 +414,9 @@ public class UITreeView<T> extends CoreWidget {
         }
         while (treeViewListenerSets.size() < model.get().getNodeCount()) {
             treeViewListenerSets.add(new TreeViewListenerSet(
-                    new NodeTopListener(treeViewListenerSets.size()),
-                    new NodeCenterListener(treeViewListenerSets.size()),
-                    new NodeBottomListener(treeViewListenerSets.size())));
+                new NodeTopListener(treeViewListenerSets.size()),
+                new NodeCenterListener(treeViewListenerSets.size()),
+                new NodeBottomListener(treeViewListenerSets.size())));
             expandListeners.add(new ExpandButtonInteractionListener(expandListeners.size()));
         }
     }
@@ -607,8 +607,8 @@ public class UITreeView<T> extends CoreWidget {
 
             // This node's parent exists and accepts the node being dragged as a child.
             if (state.getDraggedIndex() != null
-                    && !model.get().getNode(index).isRoot()
-                    && model.get().getNode(index).getParent().acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
+                && !model.get().getNode(index).isRoot()
+                && model.get().getNode(index).getParent().acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
                 onNodeMouseOver(index, MouseOverType.TOP);
             }
         }
@@ -647,7 +647,7 @@ public class UITreeView<T> extends CoreWidget {
 
             // This node accepts the node being dragged as a child.
             if (state.getDraggedIndex() != null
-                    && model.get().getNode(index).acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
+                && model.get().getNode(index).acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
                 onNodeMouseOver(index, MouseOverType.CENTER);
             }
         }
@@ -686,8 +686,8 @@ public class UITreeView<T> extends CoreWidget {
 
             // This node's parent exists and accepts the node being dragged as a child.
             if (state.getDraggedIndex() != null
-                    && !model.get().getNode(index).isRoot()
-                    && model.get().getNode(index).getParent().acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
+                && !model.get().getNode(index).isRoot()
+                && model.get().getNode(index).getParent().acceptsChild(model.get().getNode(state.getDraggedIndex()))) {
                 onNodeMouseOver(index, MouseOverType.BOTTOM);
             }
         }

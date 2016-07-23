@@ -81,6 +81,7 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
             // Always add a "type" node with its' value being equal to the selected widget's type.
             scaffolding.addChild(new JsonTreeValue("type", selection, JsonTreeValue.Type.KEY_VALUE_PAIR));
+            scaffolding.addChild(new JsonTreeValue("id", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
 
             // If the widget is an UILayout override, add a "contents" array node.
             if (UILayout.class.isAssignableFrom(metadata.getType())) {

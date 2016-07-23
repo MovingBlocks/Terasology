@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
+import com.google.api.client.util.Maps;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * A builder class to construct and show {@link ContextMenuScreen} instances.
@@ -33,10 +32,7 @@ import java.util.function.Consumer;
  * Should be used in favor of manually creating the screen.
  */
 public class ContextMenuBuilder {
-    /**
-     * A list of available consumer/object actions mapped to a string.
-     */
-    private Map<String, ConsumerObjectPair> options = Maps.newHashMap();
+    private Map<String, ContextMenuLevel> menuLevels = Maps.newLinkedHashMap();
     /**
      * Listeners fired when an item is selected.
      */
@@ -50,16 +46,14 @@ public class ContextMenuBuilder {
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
-    /**
-     * Adds an action to the available options.
-     *
-     * @param name     The name of the action.
-     * @param consumer The consumer.
-     * @param item     The input object.
-     * @param <E>      The type of the input to the consumer.
-     */
-    public <E> void addOption(String name, Consumer<E> consumer, E item) {
-        options.put(name, new ConsumerObjectPair<E>(consumer, item));
+    public ContextMenuLevel getLevel(String key) {
+        return menuLevels.get(key);
+    }
+
+    public ContextMenuLevel addLevel(String key) {
+        ContextMenuLevel level = new ContextMenuLevel();
+        menuLevels.put(key, level);
+        return level;
     }
 
     /**
@@ -73,26 +67,29 @@ public class ContextMenuBuilder {
             manager.pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
         }
 
-        ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
-        contextMenuScreen
-                .setList(Lists.newArrayList(options.keySet()));
-        contextMenuScreen
-                .setMenuPosition(position);
-        contextMenuScreen
-                .bindSelection(new Binding<String>() {
-                    @Override
-                    public String get() {
-                        return null;
-                    }
+        ContextMenuLevel firstLevel = menuLevels.entrySet().iterator().next().getValue();
+        firstLevel.setVisible(true);
+        firstLevel.setPosition(position);
+        for (ContextMenuLevel level : menuLevels.values()) {
+            level.getMenuWidget().bindSelection(new Binding<String>() {
+                @Override
+                public String get() {
+                    return null;
+                }
 
-                    @Override
-                    public void set(String value) {
-                        ConsumerObjectPair pair = options.get(value);
-                        pair.getConsumer().accept(pair.getObject());
+                @Override
+                public void set(String value) {
+                    level.accept(value);
+                    if (((ContextMenuOption) level.getOptions().get(value)).isFinalized()) {
                         selectionListeners.forEach(UpdateListener::onAction);
                         manager.closeScreen(ContextMenuScreen.ASSET_URI);
                     }
-                });
+                }
+            });
+        }
+
+        ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
+        contextMenuScreen.setMenuLevels(Lists.newArrayList(menuLevels.values()));
 
         contextMenuScreen.subscribeClose(() -> {
             closeListeners.forEach(UpdateListener::onAction);

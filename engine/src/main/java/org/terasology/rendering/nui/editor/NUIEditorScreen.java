@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.slf4j.Logger;
@@ -36,13 +37,19 @@ import org.terasology.config.NUIEditorConfig;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.persistence.ModuleContext;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
+import org.terasology.rendering.nui.contextMenu.ContextMenuLevel;
 import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -56,8 +63,9 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.rendering.nui.widgets.treeView.Tree;
+import org.terasology.utilities.ReflectionUtil;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -65,6 +73,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -81,9 +90,13 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
 
+    private static final String LEVEL_PRIMARY = "Primary";
+    private static final String LEVEL_ADD_EXTENDED = "Add";
+
     // Context menu options.
     private static final String OPTION_COPY = "Copy";
     private static final String OPTION_PASTE = "Paste";
+    private static final String OPTION_ADD_EXTENDED = "Add...";
     private static final String OPTION_ADD_WIDGET = "Add Widget";
     private static final String OPTION_EDIT = "Edit";
 
@@ -128,6 +141,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * The common widget used as an inline JSON property editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
+    /**
+     *
+     */
+    private ContextMenuBuilder contextMenuBuilder;
 
     @Override
     public void initialise() {
@@ -138,9 +155,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         // Populate the asset dropdown with the asset list.
         availableAssetList.addAll(assetManager
-                .getAvailableAssets(UIElement.class)
-                .stream()
-                .collect(Collectors.toList()));
+            .getAvailableAssets(UIElement.class)
+            .stream()
+            .collect(Collectors.toList()));
 
         // Exclude screens used by the NUI editor, then sort the list.
         availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ASSET_URI));
@@ -183,29 +200,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 editorTreeView.setSelectedIndex(editorTreeView.getModel().indexOf(node));
                 editorTreeView.setAlternativeWidget(null);
 
-                ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
-
-                contextMenuBuilder.addOption(OPTION_COPY, this::copy, (JsonTree) node);
-                contextMenuBuilder.addOption(OPTION_PASTE, this::paste, (JsonTree) node);
-
-                JsonTreeValue.Type type = ((JsonTree) node).getValue().getType();
-
-                // "Add Widget" only allowed for "contents" ARRAY nodes.
-                if (type == JsonTreeValue.Type.ARRAY && ((JsonTree) node).getValue().getKey().equals("contents")) {
-                    contextMenuBuilder.addOption(OPTION_ADD_WIDGET, this::addWidget, (JsonTree) node);
-                }
-
-                // "Edit" node handlers vary depending on the node's type.
-                if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editKeyValuePair, (JsonTree) node);
-                } else if (type == JsonTreeValue.Type.OBJECT &&
-                        !(!node.isRoot() && ((JsonTree) node).getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editObject, (JsonTree) node);
-                } else if (type == JsonTreeValue.Type.ARRAY) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editArray, (JsonTree) node);
-                } else if (type == JsonTreeValue.Type.VALUE) {
-                    contextMenuBuilder.addOption(OPTION_EDIT, this::editValue, (JsonTree) node);
-                }
+                contextMenuBuilder = new ContextMenuBuilder();
+                buildContextMenu((JsonTree) node);
 
                 contextMenuBuilder.subscribeClose(() -> {
                     editorTreeView.setAlternativeWidget(null);
@@ -231,7 +227,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     editKeyValuePair((JsonTree) node);
                     focusInlineEditor((JsonTree) node);
                 } else if (type == JsonTreeValue.Type.OBJECT &&
-                        !(!node.isRoot() && ((JsonTree) node).getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+                           !(!node.isRoot() && ((JsonTree) node).getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                     editObject((JsonTree) node);
                     focusInlineEditor((JsonTree) node);
                 } else if (type == JsonTreeValue.Type.ARRAY) {
@@ -256,7 +252,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                         editKeyValuePair(node);
                         focusInlineEditor(node);
                     } else if (type == JsonTreeValue.Type.OBJECT &&
-                            !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+                               !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                         editObject(node);
                         focusInlineEditor(node);
                     } else if (type == JsonTreeValue.Type.ARRAY) {
@@ -315,7 +311,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     public void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
         editorTreeView.setItemRenderer(nuiEditorConfig.isDisableIcons() ?
-                new ToStringTextRenderer<>() : new NUIEditorItemRenderer(editorTreeView.getModel()));
+            new ToStringTextRenderer<>() : new NUIEditorItemRenderer(editorTreeView.getModel()));
     }
 
     /**
@@ -364,6 +360,72 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
+    private ContextMenuLevel buildContextMenu(JsonTree node) {
+        ContextMenuLevel primaryLevel = contextMenuBuilder.addLevel(LEVEL_PRIMARY);
+        primaryLevel.setVisible(true);
+
+        primaryLevel.addOption(OPTION_COPY, this::copy, node, true);
+        primaryLevel.addOption(OPTION_PASTE, this::paste, node, true);
+
+        JsonTreeValue.Type type = node.getValue().getType();
+
+        if (type == JsonTreeValue.Type.ARRAY || type == JsonTreeValue.Type.OBJECT) {
+            primaryLevel.addOption(OPTION_ADD_EXTENDED, this::addExtended, node, false);
+
+            ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
+
+            if (type == JsonTreeValue.Type.ARRAY) {
+                addLevel.addOption("Boolean attribute", jsonTree -> {
+                    jsonTree.addChild(new JsonTreeValue(null, false, JsonTreeValue.Type.VALUE));
+                    editorTreeView.fireUpdateListeners();
+                    updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                }, node, true);
+                addLevel.addOption("Number attribute", jsonTree -> {
+                    jsonTree.addChild(new JsonTreeValue(null, 0.0f, JsonTreeValue.Type.VALUE));
+                    editorTreeView.fireUpdateListeners();
+                    updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                }, node, true);
+                addLevel.addOption("String attribute", jsonTree -> {
+                    jsonTree.addChild(new JsonTreeValue(null, "", JsonTreeValue.Type.VALUE));
+                    editorTreeView.fireUpdateListeners();
+                    updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                }, node, true);
+            } else {
+                addLevel.addOption("Key/value pair", jsonTree -> {
+                    jsonTree.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+                    editorTreeView.fireUpdateListeners();
+                    updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                }, node, true);
+                if (node.hasChildWithKey("type")) {
+                    scaffoldWidgetProperties(node);
+                } else if (node.getValue().getKey().equalsIgnoreCase("layoutInfo")) {
+                    scaffoldLayoutInfoProperties(node);
+                } else {
+                    scaffoldGenericProperties(node);
+                }
+            }
+        }
+
+        // "Add Widget" only allowed for "contents" ARRAY nodes.
+        if (type == JsonTreeValue.Type.ARRAY && node.getValue().getKey().equals("contents")) {
+            primaryLevel.addOption(OPTION_ADD_WIDGET, this::addWidget, node, true);
+        }
+
+        // "Edit" node handlers vary depending on the node's type.
+        if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+            primaryLevel.addOption(OPTION_EDIT, this::editKeyValuePair, node, true);
+        } else if (type == JsonTreeValue.Type.OBJECT &&
+                   !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+            primaryLevel.addOption(OPTION_EDIT, this::editObject, node, true);
+        } else if (type == JsonTreeValue.Type.ARRAY) {
+            primaryLevel.addOption(OPTION_EDIT, this::editArray, node, true);
+        } else if (type == JsonTreeValue.Type.VALUE) {
+            primaryLevel.addOption(OPTION_EDIT, this::editValue, node, true);
+        }
+
+        return primaryLevel;
+    }
+
     private void copy(JsonTree node) {
         editorTreeView.copy(node);
         editorTreeView.setSelectedIndex(null);
@@ -381,12 +443,120 @@ public class NUIEditorScreen extends CoreScreenLayer {
         WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager().getScreen(WidgetSelectionScreen.ASSET_URI);
         widgetSelectionScreen.setNode(node);
         widgetSelectionScreen.subscribeClose(() -> {
-            editorTreeView.setModel(node.getRoot());
             editorTreeView.fireUpdateListeners();
             updateTreeView((JsonTree) node.getRoot(), false);
         });
     }
 
+    private void addExtended(JsonTree node) {
+        ContextMenuLevel addLevel = contextMenuBuilder.getLevel(LEVEL_ADD_EXTENDED);
+        addLevel.setVisible(!addLevel.isVisible());
+    }
+
+    private void scaffoldWidgetProperties(JsonTree node) {
+        ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
+        String type = node.getChildWithKey("type").getValue().getValue().toString();
+        ClassMetadata<? extends UIWidget, ?> elementMetadata =
+            getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
+        if (elementMetadata != null) {
+            for (FieldMetadata field : elementMetadata.getFields()) {
+                Field internalField = field.getField();
+                String name;
+                if (internalField.isAnnotationPresent(SerializedName.class)) {
+                    name = internalField.getAnnotation(SerializedName.class).value();
+                } else {
+                    name = internalField.getName();
+                }
+                if (internalField.isAnnotationPresent(LayoutConfig.class)
+                    && !node.hasChildWithKey(internalField.getName())) {
+                    addLevel.addOption(name, jsonTree -> {
+                        if (List.class.isAssignableFrom(field.getType())) {
+                            jsonTree.addChild(new JsonTreeValue(name, null, JsonTreeValue.Type.ARRAY));
+                        } else {
+                            internalField.setAccessible(true);
+                            try {
+                                jsonTree.addChild(new JsonTreeValue(name,
+                                    internalField.get(elementMetadata.newInstance()), JsonTreeValue.Type.KEY_VALUE_PAIR));
+                                editorTreeView.fireUpdateListeners();
+                                updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                            } catch (IllegalAccessException e) {
+                                // Should not be triggered as the setAccessible flag is set to true.
+                            }
+                        }
+                    }, node, true);
+                }
+            }
+        } else {
+            logger.warn("Unknown UIWidget type {}", type);
+        }
+    }
+
+    private void scaffoldLayoutInfoProperties(JsonTree node) {
+        ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
+        String type = node.getSiblingWithKey("type").getValue().getKey();
+        ClassMetadata<? extends UIWidget, ?> elementMetadata =
+            getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
+
+        Class<? extends LayoutHint> layoutHintType;
+        try {
+            layoutHintType = (Class<? extends LayoutHint>)
+                ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
+        } catch (NullPointerException e) {
+            return;
+        }
+
+        if (layoutHintType != null) {
+            for (Field field : layoutHintType.getDeclaredFields()) {
+                String name;
+                if (field.isAnnotationPresent(SerializedName.class)) {
+                    name = field.getAnnotation(SerializedName.class).value();
+                } else {
+                    name = field.getName();
+                }
+                if (!node.hasChildWithKey(name)) {
+                    addLevel.addOption(name, jsonTree -> {
+                        try {
+                            jsonTree.addChild(new JsonTreeValue(name,
+                                field.get(elementMetadata.newInstance()), JsonTreeValue.Type.KEY_VALUE_PAIR));
+                            editorTreeView.fireUpdateListeners();
+                            updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                        } catch (IllegalAccessException e) {
+                            // Should not be triggered as the setAccessible flag is set to true.
+                        }
+                    }, node, true);
+                }
+            }
+        } else {
+            logger.warn("Unknown layout type {}", type);
+        }
+    }
+
+    private void scaffoldGenericProperties(JsonTree node) {
+        ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
+
+        if (node.hasSiblingWithKey("type")) {
+            String type = node.getSiblingWithKey("type").getValue().getKey();
+            ClassMetadata<? extends UIWidget, ?> elementMetadata =
+                getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
+            Class clazz = elementMetadata.getField(node.getValue().getKey()).getType();
+
+            for (Field field : clazz.getDeclaredFields()) {
+                String name;
+                if (field.isAnnotationPresent(SerializedName.class)) {
+                    name = field.getAnnotation(SerializedName.class).value();
+                } else {
+                    name = field.getName();
+                }
+                if (!node.hasChildWithKey(name)) {
+                    addLevel.addOption(name, jsonTree -> {
+                        jsonTree.addChild(new JsonTreeValue(name, "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+                        editorTreeView.fireUpdateListeners();
+                        updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                    }, node, true);
+                }
+            }
+        }
+    }
 
     private void edit(JsonTree node, UITextEntry.Formatter<JsonTree> formatter, UITextEntry.Parser<JsonTree> parser) {
         inlineEditorEntry = new UITextEntry<>();
@@ -400,16 +570,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             public void set(JsonTree value) {
                 if (value != null) {
                     node.setValue(value.getValue());
-                    editorTreeView.setAlternativeWidget(null);
-
-                    // Add the edited tree to the editor history.
-                    JsonTree tree = (JsonTree) (editorTreeView.getModel().getNode(0).getRoot());
-                    if (editorHistoryPosition < editorHistory.size() - 1) {
-                        editorHistory = editorHistory.subList(0, editorHistoryPosition + 1);
-                    }
-                    editorHistory.add(tree);
-                    editorHistoryPosition++;
-
+                    editorTreeView.fireUpdateListeners();
                     updateTreeView((JsonTree) node.getRoot(), false);
                     updateWidget((JsonTree) node.getRoot());
                 }
@@ -607,7 +768,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private void expandTree(JsonTree tree) {
         // Do not expand OBJECT children of ARRAY parents (generally this concerns widget lists).
         if (!(tree.getValue().getType() == JsonTreeValue.Type.OBJECT
-                && !tree.isRoot() && tree.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+              && !tree.isRoot() && tree.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
             tree.setExpanded(true);
         }
 
