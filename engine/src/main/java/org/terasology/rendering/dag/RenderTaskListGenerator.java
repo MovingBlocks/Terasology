@@ -16,9 +16,7 @@
 package org.terasology.rendering.dag;
 
 import com.google.api.client.util.Maps;
-
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -56,47 +54,57 @@ public final class RenderTaskListGenerator {
         // TODO: Optimization task: verify if we can avoid clearing the whole list
         // TODO: whenever changes in the render graph or in the intermediate list arise
         // TODO: think about refactoring (a heavy method)
-        taskList.clear();
 
-        List<Object> semiReducedStateChanges = Lists.newArrayList(); // TODO: a better name, any suggestions?
+        StateChange stateChange;
+        StateChange persistentStateChange;
+        Map persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
         Map intranodesStateChanges = Maps.newHashMap();
 
+        taskList.clear();
+
         for (Object object : intermediateList) {
+
             if (object instanceof StateChange) {
                 intranodesStateChanges.put(object.getClass(), object);
+
             } else {
-                Iterator iterator = intranodesStateChanges.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry entry = (Map.Entry) iterator.next();
+                for (Object preCastStateChange : intranodesStateChanges.values()) {
+                    stateChange = (StateChange) preCastStateChange;
 
-                    semiReducedStateChanges.add(entry.getValue());
-                    iterator.remove();
-                }
+                    persistentStateChange = (StateChange) persistentStateChanges.get(stateChange.getClass());
+                    if (persistentStateChange == null) {
+                        if (!stateChange.isTheDefaultInstance()) { // yep, new (convenience) method, just for readability
+                            // defensive programming here: the check is probably unnecessary as for every default
+                            // instance of a state change subType there should be a non-default one already in the
+                            // persistentStateChangeS map, falling within cases handled below.
+                            taskList.add(stateChange.generateTask());
+                            persistentStateChanges.put(stateChange.getClass(), stateChange);
 
-                semiReducedStateChanges.add(object);
-            }
-        }
+                        } // else {
+                        // do nothing: we do not want a back-to-default state change if there was no known
+                        // non-default state change already taking place.
+                        // }
+                    } else {
+                        if (stateChange.isTheDefaultInstance()) { // I know, I'm a sucker for almost plain-english code
+                            // non redundant default state change, eliminates subType entry in the map, to keep map small
+                            taskList.add(stateChange.generateTask());
+                            persistentStateChanges.remove(stateChange.getClass());
 
-        // Add remaining state changes
-        for (Object stateChange : intranodesStateChanges.values()) {
-            semiReducedStateChanges.add(stateChange);
-        }
+                        } else if (!stateChange.isEqualTo(persistentStateChange)) { // another new method, just for readability
+                            // non-redundant state change of the same subType but different value, becomes new map entry
+                            taskList.add(stateChange.generateTask());
+                            persistentStateChanges.put(stateChange.getClass(), stateChange);
 
-        Map persistentStateChanges = Maps.newHashMap();
-        for (Object object : semiReducedStateChanges) {
-            if (object instanceof StateChange) {
-                StateChange stateChange = (StateChange) object;
-                if (!persistentStateChanges.containsKey(object.getClass())) {
-                    persistentStateChanges.put(object.getClass(), object);
-                    taskList.add(stateChange.generateTask());
-                } else {
-                    StateChange persistenStateChange = (StateChange) persistentStateChanges.get(object.getClass());
-                    if (!persistenStateChange.compare(stateChange)) {
-                        persistentStateChanges.put(stateChange.getClass(), stateChange);
-                        taskList.add(stateChange.generateTask());
+                        } // else {
+                        // the non-redundant state change being examined is not a default one and is identical
+                        // in value to the one stored in the persistentStateChange map: it is redundant after all
+                        // and we ignore it
+                        // }
                     }
+
                 }
-            } else {
+
+                intranodesStateChanges.clear();
                 taskList.add(((Node) object).generateTask());
             }
         }

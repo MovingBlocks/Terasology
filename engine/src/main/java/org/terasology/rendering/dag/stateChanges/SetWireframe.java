@@ -54,12 +54,17 @@ public final class SetWireframe implements StateChange {
     }
 
     @Override
-    public boolean compare(StateChange stateChange) {
+    public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof SetWireframe) {
             return this.enabled == ((SetWireframe) stateChange).enabled;
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isTheDefaultInstance() {
+        return this == defaultInstance;
     }
 
     @Override

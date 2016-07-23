@@ -51,6 +51,11 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     }
 
     @Override
+    public boolean isTheDefaultInstance() {
+        return this == defaultInstance;
+    }
+
+    @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
             task = new BindFBOTask(fboId, fboName);
@@ -67,7 +72,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     }
 
     @Override
-    public boolean compare(StateChange stateChange) {
+    public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof BindFBO) {
             return this.fboName.equals(((BindFBO) stateChange).fboName);
         }

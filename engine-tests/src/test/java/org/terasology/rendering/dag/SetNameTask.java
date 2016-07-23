@@ -18,13 +18,20 @@ package org.terasology.rendering.dag;
 /**
  * TODO: Add javadocs
  */
-public interface StateChange {
-    StateChange getDefaultInstance();
+public class SetNameTask implements RenderPipelineTask {
+    private String name;
 
-    RenderPipelineTask generateTask();
+    SetNameTask(String name) {
+        this.name = name;
+    }
 
-    // TODO: investigate a better way?
-    boolean isEqualTo(StateChange stateChange);
+    @Override
+    public void execute() {
 
-    boolean isTheDefaultInstance();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s: %s", this.getClass().getSimpleName(), name);
+    }
 }
