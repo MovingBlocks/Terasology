@@ -77,18 +77,18 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
             ClassMetadata metadata = widgets.get(selection);
 
-            JsonTree scaffolding = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
+            JsonTree childNode = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
 
             // Always add a "type" node with its' value being equal to the selected widget's type.
-            scaffolding.addChild(new JsonTreeValue("type", selection, JsonTreeValue.Type.KEY_VALUE_PAIR));
-            scaffolding.addChild(new JsonTreeValue("id", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+            childNode.addChild(new JsonTreeValue("type", selection, JsonTreeValue.Type.KEY_VALUE_PAIR));
+            childNode.addChild(new JsonTreeValue("id", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
 
             // If the widget is an UILayout override, add a "contents" array node.
             if (UILayout.class.isAssignableFrom(metadata.getType())) {
-                scaffolding.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
+                childNode.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
             }
 
-            node.addChild(scaffolding);
+            node.addChild(childNode);
 
             closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);

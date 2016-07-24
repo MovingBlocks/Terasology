@@ -65,7 +65,7 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.rendering.nui.widgets.treeView.Tree;
 import org.terasology.utilities.ReflectionUtil;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -82,7 +82,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * NUI editor overlay - contains file selection & editing widgets.
+ * The main NUI editor screen.
+ * Contains file selection, editing & preview widgets.
  */
 public class NUIEditorScreen extends CoreScreenLayer {
 
@@ -90,6 +91,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
 
+    // Available asset dropdown option to create a new screen.
+    private static final String CREATE_NEW_SCREEN = "New Screen";
+
+    // Context menu level names.
     private static final String LEVEL_PRIMARY = "Primary";
     private static final String LEVEL_ADD_EXTENDED = "Add";
 
@@ -110,17 +115,17 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private Config config;
 
     /**
-     * A list of available {@link UIElement} asset {@link ResourceUrn}s.
+     * A list of available {@link UIElement} asset {@link ResourceUrn}s and an option to add a new screen.
      */
-    private List<ResourceUrn> availableAssetList = Lists.newArrayList();
+    private List<String> availableAssetList = Lists.newArrayList();
     /**
      * The dropdown containing a list of available asset {@link ResourceUrn}s.
      */
-    private UIDropdownScrollable<ResourceUrn> availableAssetDropdown;
+    private UIDropdownScrollable<String> availableAssetDropdown;
     /**
-     * The Urn of the currently selected UIElement.
+     * The currently selected UIElement.
      */
-    private ResourceUrn selectedUrn;
+    private String selection;
     /**
      * A tree view containing a {@link JsonTree} representation of the asset being edited.
      */
@@ -141,10 +146,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * The common widget used as an inline JSON property editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
-    /**
-     *
-     */
-    private ContextMenuBuilder contextMenuBuilder;
 
     @Override
     public void initialise() {
@@ -154,29 +155,36 @@ public class NUIEditorScreen extends CoreScreenLayer {
         selectedScreenContainer = find("selectedScreen", UIBox.class);
 
         // Populate the asset dropdown with the asset list.
-        availableAssetList.addAll(assetManager
+        availableAssetList.add(CREATE_NEW_SCREEN);
+
+        List<ResourceUrn> availableAssetUrns = assetManager
             .getAvailableAssets(UIElement.class)
             .stream()
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList());
 
         // Exclude screens used by the NUI editor, then sort the list.
-        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ASSET_URI));
-        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(ContextMenuScreen.ASSET_URI));
-        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(NUIEditorSettingsScreen.ASSET_URI));
-        availableAssetList.removeIf(asset -> asset.getRootUrn().equals(WidgetSelectionScreen.ASSET_URI));
-        availableAssetList.sort(Comparator.comparing(ResourceUrn::toString));
+        availableAssetUrns.removeIf(asset -> asset.getRootUrn().equals(ASSET_URI));
+        availableAssetUrns.removeIf(asset -> asset.getRootUrn().equals(ContextMenuScreen.ASSET_URI));
+        availableAssetUrns.removeIf(asset -> asset.getRootUrn().equals(NUIEditorSettingsScreen.ASSET_URI));
+        availableAssetUrns.removeIf(asset -> asset.getRootUrn().equals(WidgetSelectionScreen.ASSET_URI));
+        availableAssetUrns.sort(Comparator.comparing(ResourceUrn::toString));
+
+        availableAssetList.addAll(availableAssetUrns.stream().map(ResourceUrn::toString).collect(Collectors.toList()));
 
         availableAssetDropdown.setOptions(availableAssetList);
-        availableAssetDropdown.bindSelection(new Binding<ResourceUrn>() {
+        availableAssetDropdown.bindSelection(new Binding<String>() {
             @Override
-            public ResourceUrn get() {
-                return selectedUrn;
+            public String get() {
+                return selection;
             }
 
             @Override
-            public void set(ResourceUrn value) {
-                if (selectedUrn != value) {
-                    selectFile(value);
+            public void set(String value) {
+                if (value.equals(CREATE_NEW_SCREEN)) {
+                    setTree(NUIEditorTemplateUtils.newTree());
+                    selection = value;
+                } else if (selection == null || !selection.toString().equals(value)) {
+                    selectFile(new ResourceUrn(value));
                 }
             }
         });
@@ -200,8 +208,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 editorTreeView.setSelectedIndex(editorTreeView.getModel().indexOf(node));
                 editorTreeView.setAlternativeWidget(null);
 
-                contextMenuBuilder = new ContextMenuBuilder();
-                buildContextMenu((JsonTree) node);
+                ContextMenuBuilder contextMenuBuilder = new ContextMenuBuilder();
+                buildContextMenu((JsonTree) node, contextMenuBuilder);
 
                 contextMenuBuilder.subscribeClose(() -> {
                     editorTreeView.setAlternativeWidget(null);
@@ -337,30 +345,33 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 // Serialize the JSON string into a JsonTree and expand its' nodes.
 
                 JsonTree tree = JsonTreeConverter.serialize(new JsonParser().parse(content));
-
-                updateTreeView(tree, true);
-                updateWidget(tree);
-
-                editorHistory.clear();
-                editorHistory.add(tree);
-                editorHistoryPosition = 0;
+                setTree(tree);
+                selection = urn.toString();
             }
-
-            if (selectedUrn != null) {
-                // Dispose of the assets so that further calls use a new, initialised, instance.
-
-                Optional<UIElement> selectedAsset = assetManager.getAsset(selectedUrn, UIElement.class);
-                if (selectedAsset.isPresent()) {
-                    selectedAsset.get().dispose();
-                }
-            }
-
-            selectedUrn = urn;
-            updateConfig();
         }
     }
 
-    private ContextMenuLevel buildContextMenu(JsonTree node) {
+    private void setTree(JsonTree tree) {
+        updateTreeView(tree, true);
+        updateWidget(tree);
+
+        editorHistory.clear();
+        editorHistory.add(tree);
+        editorHistoryPosition = 0;
+
+        if (selection != null) {
+            // Dispose of the assets so that further calls use a new, initialised, instance.
+
+            Optional<UIElement> selectedAsset = assetManager.getAsset(selection, UIElement.class);
+            if (selectedAsset.isPresent()) {
+                selectedAsset.get().dispose();
+            }
+        }
+
+        updateConfig();
+    }
+
+    private ContextMenuLevel buildContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
         ContextMenuLevel primaryLevel = contextMenuBuilder.addLevel(LEVEL_PRIMARY);
         primaryLevel.setVisible(true);
 
@@ -370,9 +381,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.ARRAY || type == JsonTreeValue.Type.OBJECT) {
-            primaryLevel.addOption(OPTION_ADD_EXTENDED, this::addExtended, node, false);
-
             ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
+
+            primaryLevel.addOption(OPTION_ADD_EXTENDED, jsonTree -> {
+                contextMenuBuilder.getLevel(LEVEL_ADD_EXTENDED).setVisible(!addLevel.isVisible());
+            }, node, false);
 
             if (type == JsonTreeValue.Type.ARRAY) {
                 addLevel.addOption("Boolean attribute", jsonTree -> {
@@ -397,11 +410,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     updateTreeView((JsonTree) jsonTree.getRoot(), false);
                 }, node, true);
                 if (node.hasChildWithKey("type")) {
-                    scaffoldWidgetProperties(node);
+                    populateWidgetContextMenu(node, contextMenuBuilder);
                 } else if (node.getValue().getKey().equalsIgnoreCase("layoutInfo")) {
-                    scaffoldLayoutInfoProperties(node);
+                    populateLayoutContextMenu(node, contextMenuBuilder);
                 } else {
-                    scaffoldGenericProperties(node);
+                    populateGenericContextMenu(node, contextMenuBuilder);
                 }
             }
         }
@@ -448,12 +461,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         });
     }
 
-    private void addExtended(JsonTree node) {
-        ContextMenuLevel addLevel = contextMenuBuilder.getLevel(LEVEL_ADD_EXTENDED);
-        addLevel.setVisible(!addLevel.isVisible());
-    }
-
-    private void scaffoldWidgetProperties(JsonTree node) {
+    private void populateWidgetContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
         ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
         String type = node.getChildWithKey("type").getValue().getValue().toString();
         ClassMetadata<? extends UIWidget, ?> elementMetadata =
@@ -491,7 +499,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
-    private void scaffoldLayoutInfoProperties(JsonTree node) {
+    private void populateLayoutContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
         ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
         String type = node.getSiblingWithKey("type").getValue().getKey();
         ClassMetadata<? extends UIWidget, ?> elementMetadata =
@@ -531,7 +539,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
-    private void scaffoldGenericProperties(JsonTree node) {
+    private void populateGenericContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
         ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
 
         if (node.hasSiblingWithKey("type")) {
@@ -691,7 +699,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     private void copyJson() {
-        if (selectedUrn != null) {
+        if (editorTreeView.getModel() != null) {
             // Deserialize the tree view's internal JsonTree into the original JSON string.
             JsonElement json = JsonTreeConverter.deserialize(editorTreeView.getModel().getNode(0).getRoot());
             String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
