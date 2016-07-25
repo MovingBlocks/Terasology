@@ -75,7 +75,7 @@ public class JsonTree extends Tree<JsonTreeValue> {
 
     public boolean hasSiblingWithKey(String key) {
         for (Tree<JsonTreeValue> child : parent.getChildren()) {
-            if (child.getValue().getKey().equals(key) && child != this) {
+            if (child.getValue().getKey() != null && child.getValue().getKey().equals(key) && child != this) {
                 return true;
             }
         }

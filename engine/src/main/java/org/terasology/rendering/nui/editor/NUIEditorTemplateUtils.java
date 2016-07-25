@@ -35,18 +35,24 @@ public class NUIEditorTemplateUtils {
 
         JsonTree contents = new JsonTree(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
 
-        JsonTree label = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
-        label.addChild(new JsonTreeValue("type", "UILabel", JsonTreeValue.Type.KEY_VALUE_PAIR));
-        label.addChild(new JsonTreeValue("id", "sampleLabel", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        JsonTree label = newWidget("UILabel", "sampleLabel");
         label.addChild(new JsonTreeValue("text", SAMPLE_LABEL_TEXT, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
-        JsonTree layoutInfo = new JsonTree(new JsonTreeValue("layoutInfo", null, JsonTreeValue.Type.OBJECT));
-        layoutInfo.addChild(new JsonTreeValue("cc", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
-
-        label.addChild(layoutInfo);
         contents.addChild(label);
         layout.addChild(contents);
         tree.addChild(layout);
         return tree;
+    }
+
+    public static JsonTree newWidget(String type, String id) {
+        JsonTree widget = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
+        widget.addChild(new JsonTreeValue("type", type, JsonTreeValue.Type.KEY_VALUE_PAIR));
+        widget.addChild(new JsonTreeValue("id", id, JsonTreeValue.Type.KEY_VALUE_PAIR));
+
+        JsonTree layoutInfo = new JsonTree(new JsonTreeValue("layoutInfo", null, JsonTreeValue.Type.OBJECT));
+        layoutInfo.addChild(new JsonTreeValue("cc", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+
+        widget.addChild(layoutInfo);
+        return widget;
     }
 }

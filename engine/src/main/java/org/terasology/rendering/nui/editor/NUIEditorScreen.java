@@ -44,6 +44,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
+import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
@@ -54,6 +55,7 @@ import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
+import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -461,9 +463,55 @@ public class NUIEditorScreen extends CoreScreenLayer {
         });
     }
 
+    private JsonTree buildNodeFromField(String name, Field field, ClassMetadata<? extends UIWidget, ?> elementMetadata) throws IllegalAccessException {
+        JsonTreeValue treeValue = new JsonTreeValue();
+        treeValue.setKey(name);
+
+        Object value;
+        if (UILayout.class.isAssignableFrom(elementMetadata.getType())) {
+            Class<? extends LayoutHint> layoutHintType = (Class<? extends LayoutHint>)
+                ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
+            try {
+                value = field.get(layoutHintType.newInstance());
+            } catch (InstantiationException e) {
+                return null;
+            }
+        } else if (Binding.class.isAssignableFrom(field.getType())) {
+            Binding binding = (Binding) field.get(elementMetadata.newInstance());
+            value = binding.get();
+        } else {
+            value = field.get(elementMetadata.newInstance());
+        }
+
+        treeValue.setType(convertsToJsonPrimitive(field, value) ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.OBJECT);
+
+        if (UISkin.class.isAssignableFrom(field.getType())) {
+            value = "engine:default";
+        }
+
+        if ((Binding.class.isAssignableFrom(field.getType())
+             && UIWidget.class.isAssignableFrom((Class<?>) ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0)))
+            || (UIWidget.class.isAssignableFrom(field.getType()))) {
+            treeValue.setValue(null);
+            JsonTree node = new JsonTree(treeValue);
+            JsonTree widget = NUIEditorTemplateUtils.newWidget("UILabel", "newWidget");
+            widget.getChildren().forEach(node::addChild);
+            node.addChild(new JsonTreeValue("text", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+            return node;
+        }
+
+        treeValue.setValue(value);
+        return new JsonTree(treeValue);
+    }
+
+    private boolean convertsToJsonPrimitive(Field field, Object value) {
+        return UISkin.class.isAssignableFrom(field.getType())
+               || (value instanceof Boolean || value instanceof String || value instanceof Number);
+    }
+
     private void populateWidgetContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
         ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
-        String type = node.getChildWithKey("type").getValue().getValue().toString();
+        String type = (String) node.getChildWithKey("type").getValue().getValue();
         ClassMetadata<? extends UIWidget, ?> elementMetadata =
             getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
         if (elementMetadata != null) {
@@ -483,8 +531,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                         } else {
                             internalField.setAccessible(true);
                             try {
-                                jsonTree.addChild(new JsonTreeValue(name,
-                                    internalField.get(elementMetadata.newInstance()), JsonTreeValue.Type.KEY_VALUE_PAIR));
+                                jsonTree.addChild(buildNodeFromField(name, internalField, elementMetadata));
                                 editorTreeView.fireUpdateListeners();
                                 updateTreeView((JsonTree) jsonTree.getRoot(), false);
                             } catch (IllegalAccessException e) {
@@ -501,19 +548,33 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     private void populateLayoutContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
         ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
-        String type = node.getSiblingWithKey("type").getValue().getKey();
-        ClassMetadata<? extends UIWidget, ?> elementMetadata =
-            getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
 
-        Class<? extends LayoutHint> layoutHintType;
-        try {
-            layoutHintType = (Class<? extends LayoutHint>)
-                ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
-        } catch (NullPointerException e) {
-            return;
+        Class<? extends LayoutHint> layoutHintType = null;
+        String type = "";
+        ClassMetadata<? extends UIWidget, ?> currentMetadata = null;
+        JsonTree currentNode = node;
+        while (layoutHintType == null) {
+            if (currentNode.hasSiblingWithKey("type")) {
+                type = (String) currentNode.getSiblingWithKey("type").getValue().getValue();
+                currentMetadata = getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
+
+                try {
+                    layoutHintType = (Class<? extends LayoutHint>)
+                        ReflectionUtil.getTypeParameter(currentMetadata.getType().getGenericSuperclass(), 0);
+                } catch (NullPointerException e) {
+                    layoutHintType = null;
+                }
+            }
+            if (layoutHintType == null) {
+                if (currentNode.isRoot()) {
+                    break;
+                }
+                currentNode = (JsonTree) currentNode.getParent();
+            }
         }
 
         if (layoutHintType != null) {
+            ClassMetadata<? extends UIWidget, ?> elementMetadata = currentMetadata;
             for (Field field : layoutHintType.getDeclaredFields()) {
                 String name;
                 if (field.isAnnotationPresent(SerializedName.class)) {
@@ -522,10 +583,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     name = field.getName();
                 }
                 if (!node.hasChildWithKey(name)) {
+                    field.setAccessible(true);
                     addLevel.addOption(name, jsonTree -> {
                         try {
-                            jsonTree.addChild(new JsonTreeValue(name,
-                                field.get(elementMetadata.newInstance()), JsonTreeValue.Type.KEY_VALUE_PAIR));
+                            jsonTree.addChild(buildNodeFromField(name, field, elementMetadata));
                             editorTreeView.fireUpdateListeners();
                             updateTreeView((JsonTree) jsonTree.getRoot(), false);
                         } catch (IllegalAccessException e) {
@@ -543,9 +604,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
         ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
 
         if (node.hasSiblingWithKey("type")) {
-            String type = node.getSiblingWithKey("type").getValue().getKey();
+            String type = (String) node.getSiblingWithKey("type").getValue().getValue();
             ClassMetadata<? extends UIWidget, ?> elementMetadata =
                 getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
+
             Class clazz = elementMetadata.getField(node.getValue().getKey()).getType();
 
             for (Field field : clazz.getDeclaredFields()) {
@@ -556,10 +618,15 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     name = field.getName();
                 }
                 if (!node.hasChildWithKey(name)) {
+                    field.setAccessible(true);
                     addLevel.addOption(name, jsonTree -> {
-                        jsonTree.addChild(new JsonTreeValue(name, "", JsonTreeValue.Type.KEY_VALUE_PAIR));
-                        editorTreeView.fireUpdateListeners();
-                        updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                        try {
+                            jsonTree.addChild(buildNodeFromField(name, field, elementMetadata));
+                            editorTreeView.fireUpdateListeners();
+                            updateTreeView((JsonTree) jsonTree.getRoot(), false);
+                        } catch (IllegalAccessException e) {
+                            // Should not be triggered as the setAccessible flag is set to true.
+                        }
                     }, node, true);
                 }
             }

@@ -63,6 +63,7 @@ public class JsonTreeValue {
      * The name of the node.
      */
     private String key;
+
     /**
      * The value stored within the node.
      */
@@ -71,6 +72,10 @@ public class JsonTreeValue {
      * The type of the node.
      */
     private Type type;
+
+    public JsonTreeValue() {
+        this(null, null, Type.NULL);
+    }
 
     public JsonTreeValue(String key, Object value, Type type) {
         this.key = key;
@@ -82,12 +87,24 @@ public class JsonTreeValue {
         return this.key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public Object getValue() {
         return this.value;
     }
 
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
     public Type getType() {
         return this.type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override
