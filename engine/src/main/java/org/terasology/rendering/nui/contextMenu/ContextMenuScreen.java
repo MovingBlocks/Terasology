@@ -97,8 +97,8 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 }
                 Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
                     canvas.calculatePreferredSize(level.getMenuWidget()));
+                currentWidth = level.getMenuWidget().getPreferredContentSize(canvas, null).getX();
                 canvas.drawWidget(level.getMenuWidget(), region);
-                currentWidth += region.width();
             }
         }
     }
