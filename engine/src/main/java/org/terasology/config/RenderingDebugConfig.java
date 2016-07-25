@@ -15,9 +15,11 @@
  */
 package org.terasology.config;
 
+import org.terasology.utilities.subscribables.AbstractSubscribable;
+
 /**
  */
-public class RenderingDebugConfig {
+public class RenderingDebugConfig extends AbstractSubscribable {
 
     public enum DebugRenderingStage {
         OPAQUE_COLOR(0, "DEBUG_STAGE_OPAQUE_COLOR"),
@@ -40,7 +42,7 @@ public class RenderingDebugConfig {
         private int index;
         private String defineName;
 
-        private DebugRenderingStage(int index, String defineName) {
+        DebugRenderingStage(int index, String defineName) {
             this.index = index;
             this.defineName = defineName;
         }
@@ -53,6 +55,14 @@ public class RenderingDebugConfig {
             return defineName;
         }
     }
+
+    public static final String WIREFRAME = "wireframe";
+    public static final String ENABLED = "enabled";
+    public static final String STAGE = "stage";
+    public static final String FIRST_PERSON_ELEMENTS_HIDDEN = "FirstPersonElementsHidden";
+    public static final String HUD_HIDDEN = "hudHidden";
+    public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
+    public static final String RENDER_SKELETONS = "renderSkeletons";
 
     private boolean enabled;
     private DebugRenderingStage stage;
@@ -67,7 +77,9 @@ public class RenderingDebugConfig {
     }
 
     public void setWireframe(boolean wireframe) {
+        boolean oldValue = this.wireframe;
         this.wireframe = wireframe;
+        propertyChangeSupport.firePropertyChange(WIREFRAME, oldValue, this.wireframe);
     }
 
     public boolean isEnabled() {
@@ -75,7 +87,9 @@ public class RenderingDebugConfig {
     }
 
     public void setEnabled(boolean enabled) {
+        boolean oldValue = this.enabled;
         this.enabled = enabled;
+        propertyChangeSupport.firePropertyChange(ENABLED, oldValue, this.enabled);
     }
 
     public void cycleStage() {
@@ -87,7 +101,9 @@ public class RenderingDebugConfig {
     }
 
     public void setStage(DebugRenderingStage stage) {
+        DebugRenderingStage oldStage = this.stage;
         this.stage = stage;
+        propertyChangeSupport.firePropertyChange(STAGE, oldStage, this.stage);
     }
 
     public boolean isFirstPersonElementsHidden() {
@@ -95,7 +111,9 @@ public class RenderingDebugConfig {
     }
 
     public void setFirstPersonElementsHidden(boolean firstPersonElementsHidden) {
+        boolean oldValue = this.firstPersonElementsHidden;
         this.firstPersonElementsHidden = firstPersonElementsHidden;
+        propertyChangeSupport.firePropertyChange(FIRST_PERSON_ELEMENTS_HIDDEN, oldValue, this.firstPersonElementsHidden);
     }
 
     public boolean isHudHidden() {
@@ -103,7 +121,9 @@ public class RenderingDebugConfig {
     }
 
     public void setHudHidden(boolean hudHidden) {
+        boolean oldValue = this.hudHidden;
         this.hudHidden = hudHidden;
+        propertyChangeSupport.firePropertyChange(HUD_HIDDEN, oldValue, this.hudHidden);
     }
 
     public boolean isRenderChunkBoundingBoxes() {
@@ -111,7 +131,9 @@ public class RenderingDebugConfig {
     }
 
     public void setRenderChunkBoundingBoxes(boolean renderChunkBoundingBoxes) {
+        boolean oldValue = this.renderChunkBoundingBoxes;
         this.renderChunkBoundingBoxes = renderChunkBoundingBoxes;
+        propertyChangeSupport.firePropertyChange(RENDER_CHUNK_BOUNDING_BOXES, oldValue, this.renderChunkBoundingBoxes);
     }
 
     public boolean isRenderSkeletons() {
@@ -119,6 +141,9 @@ public class RenderingDebugConfig {
     }
 
     public void setRenderSkeletons(boolean renderSkeletons) {
+        boolean oldValue = this.renderSkeletons;
         this.renderSkeletons = renderSkeletons;
+        propertyChangeSupport.firePropertyChange(RENDER_SKELETONS, oldValue, this.renderSkeletons);
     }
+
 }

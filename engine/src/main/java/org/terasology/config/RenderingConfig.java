@@ -21,14 +21,60 @@ import org.lwjgl.opengl.PixelFormat;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 /**
  */
-public class RenderingConfig {
+public class RenderingConfig extends AbstractSubscribable {
+
+    public static final String PIXEL_FORMAT = "PixelFormat";
+    public static final String WINDOW_POS_X = "WindowPosX";
+    public static final String WINDOW_POS_Y = "WindowPosY";
+    public static final String WINDOW_WIDTH = "WindowWidth";
+    public static final String WINDOW_HEIGHT = "WindowHeight";
+    public static final String FULLSCREEN = "FullScreen";
+    public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
+    public static final String FLICKERING_LIGHT = "FlickeringLight";
+    public static final String ANIMATE_GRASS = "AnimateGrass";
+    public static final String ANIMATE_WATER = "AnimateWater";
+    public static final String DYNAMIC_SHADOWS = "DynamicShadows";
+    public static final String FIELD_OF_VIEW = "FieldOfView";
+    public static final String CAMERA_BOBBING = "CameraBobbing";
+    public static final String RENDER_PLACING_BOX = "RenderPlacingBox";
+    public static final String BLUR_INTENSITY = "BlurIntensity";
+    public static final String REFLECTIVE_WATER = "ReflectiveWater";
+    public static final String VIGNETTE = "Vignette";
+    public static final String MOTION_BLUR = "MotionBlur";
+    public static final String SSAO = "Ssao";
+    public static final String FILM_GRAIN = "FilmGrain";
+    public static final String OUTLINE = "Outline";
+    public static final String LIGHT_SHAFTS = "LightShafts";
+    public static final String EYE_ADAPTATION = "EyeAdaptation";
+    public static final String BLOOM = "Bloom";
+    public static final String OCULUS_VR_SUPPORT = "OculusVrSupport";
+    public static final String MAX_TEXTURE_ATLAS_RESOLUTION = "MaxTextureAtlasResolution";
+    public static final String MAX_CHUNKS_USED_FOR_SHADOW_MAPPING = "MaxChunksUsedForShadowMapping";
+    public static final String SHADOW_MAP_RESOLUTION = "ShadowMapResolution";
+    public static final String NORMAL_MAPPING = "NormalMapping";
+    public static final String PARALLAX_MAPPING = "ParallaxMapping";
+    public static final String DYNAMIC_SHADOWS_PCF_FILTERING = "DynamicShadowsPcfFiltering";
+    public static final String CLOUD_SHADOWS = "CloudShadows";
+    public static final String LOCAL_REFLECTIONS = "LocalReflections";
+    public static final String INSCATTERING = "Inscattering";
+    public static final String RENDER_NEAREST = "RenderNearest";
+    public static final String PARTICLE_EFFECT_LIMIT = "ParticleEffectLimit";
+    public static final String MESH_LIMIT = "MeshLimit";
+    public static final String V_SYNC = "VSync";
+    public static final String FRAME_LIMIT = "FrameLimit";
+    public static final String FBO_SCALE = "FboScale";
+    public static final String CLAMP_LIGHTING = "ClampLighting";
+    public static final String SCREENSHOT_SIZE = "screenshotSize";
+    public static final String SCREENSHOT_FORMAT = "ScreenshotFormat";
+    public static final String DUMP_SHADERS = "DumpShaders";
+    public static final String VOLUMETRIC_FOG = "VolumetricFog";
 
     private PixelFormat pixelFormat;
     private int windowPosX;
@@ -80,9 +126,6 @@ public class RenderingConfig {
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
-    private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
-
     public PerspectiveCameraSettings getCameraSettings() {
         return cameraSettings;
     }
@@ -92,23 +135,33 @@ public class RenderingConfig {
     }
 
     public void setPixelFormat(PixelFormat pixelFormat) {
+        PixelFormat oldFormat = this.pixelFormat;
         this.pixelFormat = pixelFormat;
+        propertyChangeSupport.firePropertyChange(PIXEL_FORMAT, oldFormat, this.pixelFormat);
+        // propertyChangeSupport fires only if oldObject != newObject.
+        // This method could theoretically use a better equality check then. In practice
+        // it's unlikely a new PixelFormat instance will ever be value-per-value identical
+        // to the previous one.
     }
 
     public int getWindowPosX() {
         return windowPosX;
     }
 
-    public void setWindowPosX(int posX) {
-        this.windowPosX = posX;
+    public void setWindowPosX(int windowPosX) {
+        int oldValue = this.windowPosX;
+        this.windowPosX = windowPosX;
+        propertyChangeSupport.firePropertyChange(WINDOW_POS_X, oldValue, this.windowPosX);
     }
 
     public int getWindowPosY() {
         return windowPosY;
     }
 
-    public void setWindowPosY(int posY) {
-        this.windowPosY = posY;
+    public void setWindowPosY(int windowPosY) {
+        int oldValue = this.windowPosY;
+        this.windowPosY = windowPosY;
+        propertyChangeSupport.firePropertyChange(WINDOW_POS_Y, oldValue, this.windowPosY);
     }
 
     public int getWindowWidth() {
@@ -116,7 +169,9 @@ public class RenderingConfig {
     }
 
     public void setWindowWidth(int windowWidth) {
+        int oldValue = this.windowWidth;
         this.windowWidth = windowWidth;
+        propertyChangeSupport.firePropertyChange(WINDOW_WIDTH, oldValue, this.windowWidth);
     }
 
     public int getWindowHeight() {
@@ -124,7 +179,9 @@ public class RenderingConfig {
     }
 
     public void setWindowHeight(int windowHeight) {
-        this.windowHeight = windowHeight;
+            int oldValue = this.windowHeight;
+            this.windowHeight = windowHeight;
+            propertyChangeSupport.firePropertyChange(WINDOW_HEIGHT, oldValue, this.windowHeight);
     }
 
     public DisplayMode getDisplayMode() {
@@ -136,7 +193,9 @@ public class RenderingConfig {
     }
 
     public void setFullscreen(boolean fullscreen) {
+        boolean oldValue = this.fullscreen;
         this.fullscreen = fullscreen;
+        propertyChangeSupport.firePropertyChange(FULLSCREEN, oldValue, this.fullscreen);
     }
 
     public boolean isAnimatedMenu() {
@@ -144,7 +203,9 @@ public class RenderingConfig {
     }
 
     public void setAnimatedMenu(boolean animatedMenu) {
+        boolean oldValue = this.animatedMenu;
         this.animatedMenu = animatedMenu;
+        propertyChangeSupport.firePropertyChange(ANIMATED_MENU, oldValue, this.animatedMenu);
     }
 
     public ViewDistance getViewDistance() {
@@ -157,9 +218,9 @@ public class RenderingConfig {
      * @param viewDistance the new view distance
      */
     public void setViewDistance(ViewDistance viewDistance) {
-        ViewDistance oldValue = this.viewDistance;
+        ViewDistance oldDistance = this.viewDistance;
         this.viewDistance = viewDistance;
-        propertyChangeSupport.firePropertyChange(VIEW_DISTANCE, oldValue, viewDistance);
+        propertyChangeSupport.firePropertyChange(VIEW_DISTANCE, oldDistance, viewDistance);
     }
 
     public boolean isFlickeringLight() {
@@ -167,7 +228,9 @@ public class RenderingConfig {
     }
 
     public void setFlickeringLight(boolean flickeringLight) {
+        boolean oldValue = this.flickeringLight;
         this.flickeringLight = flickeringLight;
+        propertyChangeSupport.firePropertyChange(FLICKERING_LIGHT, oldValue, this.flickeringLight);
     }
 
     public boolean isAnimateGrass() {
@@ -175,7 +238,9 @@ public class RenderingConfig {
     }
 
     public void setAnimateGrass(boolean animateGrass) {
+        boolean oldValue = this.animateGrass;
         this.animateGrass = animateGrass;
+        propertyChangeSupport.firePropertyChange(ANIMATE_GRASS, oldValue, this.animateGrass);
     }
 
     public boolean isAnimateWater() {
@@ -183,7 +248,9 @@ public class RenderingConfig {
     }
 
     public void setAnimateWater(boolean animateWater) {
+        boolean oldValue = this.animateWater;
         this.animateWater = animateWater;
+        propertyChangeSupport.firePropertyChange(ANIMATE_WATER, oldValue, this.animateWater);
     }
 
     public boolean isDynamicShadows() {
@@ -191,7 +258,9 @@ public class RenderingConfig {
     }
 
     public void setDynamicShadows(boolean dynamicShadows) {
+        boolean oldValue = this.dynamicShadows;
         this.dynamicShadows = dynamicShadows;
+        propertyChangeSupport.firePropertyChange(DYNAMIC_SHADOWS, oldValue, this.dynamicShadows);
     }
 
     public float getFieldOfView() {
@@ -199,7 +268,9 @@ public class RenderingConfig {
     }
 
     public void setFieldOfView(float fieldOfView) {
+        float oldFieldOfView = this.fieldOfView;
         this.fieldOfView = fieldOfView;
+        propertyChangeSupport.firePropertyChange(FIELD_OF_VIEW, oldFieldOfView, this.fieldOfView);
     }
 
     public boolean isCameraBobbing() {
@@ -207,7 +278,9 @@ public class RenderingConfig {
     }
 
     public void setCameraBobbing(boolean cameraBobbing) {
+        boolean oldValue = this.cameraBobbing;
         this.cameraBobbing = cameraBobbing;
+        propertyChangeSupport.firePropertyChange(CAMERA_BOBBING, oldValue, this.cameraBobbing);
     }
 
     public boolean isRenderPlacingBox() {
@@ -215,7 +288,9 @@ public class RenderingConfig {
     }
 
     public void setRenderPlacingBox(boolean renderPlacingBox) {
+        boolean oldValue = this.renderPlacingBox;
         this.renderPlacingBox = renderPlacingBox;
+        propertyChangeSupport.firePropertyChange(RENDER_PLACING_BOX, oldValue, this.renderPlacingBox);
     }
 
     public int getBlurRadius() {
@@ -227,7 +302,9 @@ public class RenderingConfig {
     }
 
     public void setBlurIntensity(int blurIntensity) {
+        int oldIntensity = this.blurIntensity;
         this.blurIntensity = blurIntensity;
+        propertyChangeSupport.firePropertyChange(BLUR_INTENSITY, oldIntensity, this.blurIntensity);
     }
 
     public boolean isReflectiveWater() {
@@ -235,7 +312,9 @@ public class RenderingConfig {
     }
 
     public void setReflectiveWater(boolean reflectiveWater) {
+        boolean oldValue = this.reflectiveWater;
         this.reflectiveWater = reflectiveWater;
+        propertyChangeSupport.firePropertyChange(REFLECTIVE_WATER, oldValue, this.reflectiveWater);
     }
 
     public boolean isVignette() {
@@ -243,7 +322,9 @@ public class RenderingConfig {
     }
 
     public void setVignette(boolean vignette) {
+        boolean oldValue = this.vignette;
         this.vignette = vignette;
+        propertyChangeSupport.firePropertyChange(VIGNETTE, oldValue, this.vignette);
     }
 
     public boolean isMotionBlur() {
@@ -251,7 +332,9 @@ public class RenderingConfig {
     }
 
     public void setMotionBlur(boolean motionBlur) {
+        boolean oldValue = this.motionBlur;
         this.motionBlur = motionBlur;
+        propertyChangeSupport.firePropertyChange(MOTION_BLUR, oldValue, this.motionBlur);
     }
 
     public boolean isSsao() {
@@ -259,7 +342,9 @@ public class RenderingConfig {
     }
 
     public void setSsao(boolean ssao) {
+        boolean oldValue = this.ssao;
         this.ssao = ssao;
+        propertyChangeSupport.firePropertyChange(SSAO, oldValue, this.ssao);
     }
 
     public boolean isFilmGrain() {
@@ -267,7 +352,9 @@ public class RenderingConfig {
     }
 
     public void setFilmGrain(boolean filmGrain) {
+        boolean oldValue = this.filmGrain;
         this.filmGrain = filmGrain;
+        propertyChangeSupport.firePropertyChange(FILM_GRAIN, oldValue, this.filmGrain);
     }
 
     public boolean isOutline() {
@@ -275,7 +362,9 @@ public class RenderingConfig {
     }
 
     public void setOutline(boolean outline) {
+        boolean oldValue = this.outline;
         this.outline = outline;
+        propertyChangeSupport.firePropertyChange(OUTLINE, oldValue, this.outline);
     }
 
     public boolean isLightShafts() {
@@ -283,7 +372,9 @@ public class RenderingConfig {
     }
 
     public void setLightShafts(boolean lightShafts) {
+        boolean oldValue = this.lightShafts;
         this.lightShafts = lightShafts;
+        propertyChangeSupport.firePropertyChange(LIGHT_SHAFTS, oldValue, this.lightShafts);
     }
 
     public boolean isEyeAdaptation() {
@@ -291,7 +382,9 @@ public class RenderingConfig {
     }
 
     public void setEyeAdaptation(boolean eyeAdaptation) {
+        boolean oldValue = this.eyeAdaptation;
         this.eyeAdaptation = eyeAdaptation;
+        propertyChangeSupport.firePropertyChange(EYE_ADAPTATION, oldValue, this.eyeAdaptation);
     }
 
     public boolean isBloom() {
@@ -299,7 +392,9 @@ public class RenderingConfig {
     }
 
     public void setBloom(boolean bloom) {
+        boolean oldValue = this.bloom;
         this.bloom = bloom;
+        propertyChangeSupport.firePropertyChange(BLOOM, oldValue, this.bloom);
     }
 
     public boolean isOculusVrSupport() {
@@ -307,15 +402,19 @@ public class RenderingConfig {
     }
 
     public void setOculusVrSupport(boolean oculusVrSupport) {
+        boolean oldValue = this.oculusVrSupport;
         this.oculusVrSupport = oculusVrSupport;
-    }
+        propertyChangeSupport.firePropertyChange(OCULUS_VR_SUPPORT, oldValue, this.oculusVrSupport);
+    }    
 
     public int getMaxTextureAtlasResolution() {
         return maxTextureAtlasResolution;
     }
 
     public void setMaxTextureAtlasResolution(int maxTextureAtlasResolution) {
+        int oldResolution = this.maxTextureAtlasResolution;
         this.maxTextureAtlasResolution = maxTextureAtlasResolution;
+        propertyChangeSupport.firePropertyChange(MAX_TEXTURE_ATLAS_RESOLUTION, oldResolution, this.maxTextureAtlasResolution);
     }
 
     public int getMaxChunksUsedForShadowMapping() {
@@ -323,7 +422,9 @@ public class RenderingConfig {
     }
 
     public void setMaxChunksUsedForShadowMapping(int maxChunksUsedForShadowMapping) {
+        int oldValue = this.maxChunksUsedForShadowMapping;
         this.maxChunksUsedForShadowMapping = maxChunksUsedForShadowMapping;
+        propertyChangeSupport.firePropertyChange(MAX_CHUNKS_USED_FOR_SHADOW_MAPPING, oldValue, this.maxChunksUsedForShadowMapping);
     }
 
     public int getShadowMapResolution() {
@@ -331,23 +432,28 @@ public class RenderingConfig {
     }
 
     public void setShadowMapResolution(int shadowMapResolution) {
+        int oldResolution = this.shadowMapResolution;
         this.shadowMapResolution = shadowMapResolution;
+        propertyChangeSupport.firePropertyChange(SHADOW_MAP_RESOLUTION, oldResolution, this.shadowMapResolution);
     }
-
     public boolean isNormalMapping() {
         return normalMapping;
     }
 
     public void setNormalMapping(boolean normalMapping) {
+        boolean oldValue = this.normalMapping;
         this.normalMapping = normalMapping;
+        propertyChangeSupport.firePropertyChange(NORMAL_MAPPING, oldValue, this.normalMapping);
     }
-
+    
     public boolean isParallaxMapping() {
         return parallaxMapping;
     }
 
     public void setParallaxMapping(boolean parallaxMapping) {
+        boolean oldValue = this.parallaxMapping;
         this.parallaxMapping = parallaxMapping;
+        propertyChangeSupport.firePropertyChange(PARALLAX_MAPPING, oldValue, this.parallaxMapping);
     }
 
     public boolean isDynamicShadowsPcfFiltering() {
@@ -355,7 +461,9 @@ public class RenderingConfig {
     }
 
     public void setDynamicShadowsPcfFiltering(boolean dynamicShadowsPcfFiltering) {
+        boolean oldValue = this.dynamicShadowsPcfFiltering;
         this.dynamicShadowsPcfFiltering = dynamicShadowsPcfFiltering;
+        propertyChangeSupport.firePropertyChange(DYNAMIC_SHADOWS_PCF_FILTERING, oldValue, this.dynamicShadowsPcfFiltering);
     }
 
     public boolean isCloudShadows() {
@@ -363,7 +471,9 @@ public class RenderingConfig {
     }
 
     public void setCloudShadows(boolean cloudShadows) {
+        boolean oldValue = this.cloudShadows;
         this.cloudShadows = cloudShadows;
+        propertyChangeSupport.firePropertyChange(CLOUD_SHADOWS, oldValue, this.cloudShadows);
     }
 
     public boolean isLocalReflections() {
@@ -371,7 +481,9 @@ public class RenderingConfig {
     }
 
     public void setLocalReflections(boolean localReflections) {
+        boolean oldValue = this.localReflections;
         this.localReflections = localReflections;
+        propertyChangeSupport.firePropertyChange(LOCAL_REFLECTIONS, oldValue, this.localReflections);
     }
 
     public boolean isInscattering() {
@@ -379,7 +491,9 @@ public class RenderingConfig {
     }
 
     public void setInscattering(boolean inscattering) {
+        boolean oldValue = this.inscattering;
         this.inscattering = inscattering;
+        propertyChangeSupport.firePropertyChange(INSCATTERING, oldValue, this.inscattering);
     }
 
     public boolean isRenderNearest() {
@@ -387,15 +501,18 @@ public class RenderingConfig {
     }
 
     public void setRenderNearest(boolean renderNearest) {
+        boolean oldValue = this.renderNearest;
         this.renderNearest = renderNearest;
+        propertyChangeSupport.firePropertyChange(RENDER_NEAREST, oldValue, this.renderNearest);
     }
-
     public int getParticleEffectLimit() {
         return particleEffectLimit;
     }
 
     public void setParticleEffectLimit(int particleEffectLimit) {
+        int oldLimit = this.particleEffectLimit;
         this.particleEffectLimit = particleEffectLimit;
+        propertyChangeSupport.firePropertyChange(PARTICLE_EFFECT_LIMIT, oldLimit, this.particleEffectLimit);
     }
 
     public int getMeshLimit() {
@@ -403,15 +520,18 @@ public class RenderingConfig {
     }
 
     public void setMeshLimit(int meshLimit) {
+        int oldLimit = this.meshLimit;
         this.meshLimit = meshLimit;
+        propertyChangeSupport.firePropertyChange(MESH_LIMIT, oldLimit, this.meshLimit);
     }
-
     public boolean isVSync() {
         return this.vSync;
     }
 
-    public void setVSync(boolean value) {
-        this.vSync = value;
+    public void setVSync(boolean vsync) {
+        boolean oldValue = this.vSync;
+        this.vSync = vsync;
+        propertyChangeSupport.firePropertyChange(V_SYNC, oldValue, this.vSync);
     }
 
     public RenderingDebugConfig getDebug() {
@@ -423,7 +543,9 @@ public class RenderingConfig {
     }
 
     public void setFrameLimit(int frameLimit) {
+        int oldLimit = this.frameLimit;
         this.frameLimit = frameLimit;
+        propertyChangeSupport.firePropertyChange(FRAME_LIMIT, oldLimit, this.frameLimit);
     }
 
     public int getFboScale() {
@@ -431,7 +553,9 @@ public class RenderingConfig {
     }
 
     public void setFboScale(int fboScale) {
+        int oldScale = this.fboScale;
         this.fboScale = fboScale;
+        propertyChangeSupport.firePropertyChange(FBO_SCALE, oldScale, this.fboScale);
     }
 
     public boolean isClampLighting() {
@@ -439,7 +563,9 @@ public class RenderingConfig {
     }
 
     public void setClampLighting(boolean clampLighting) {
+        boolean oldValue = this.clampLighting;
         this.clampLighting = clampLighting;
+        propertyChangeSupport.firePropertyChange(CLAMP_LIGHTING, oldValue, this.clampLighting);
     }
 
     public ScreenshotSize getScreenshotSize() {
@@ -447,7 +573,13 @@ public class RenderingConfig {
     }
 
     public void setScreenshotSize(ScreenshotSize screenshotSize) {
+        ScreenshotSize oldSize = this.screenshotSize;
         this.screenshotSize = screenshotSize;
+        propertyChangeSupport.firePropertyChange(SCREENSHOT_SIZE, oldSize, this.screenshotSize);
+        // propertyChangeSupport fires only if oldObject != newObject.
+        // This method could theoretically use a better equality check then. In practice
+        // it's unlikely a new ScreenshotSize instance will ever be value-per-value identical
+        // to the previous one, not requiring the event to be fired.
     }
 
     public String getScreenshotFormat() {
@@ -455,7 +587,15 @@ public class RenderingConfig {
     }
 
     public void setScreenshotFormat(String screenshotFormat) {
-        this.screenshotFormat = screenshotFormat;
+
+        // propertyChangeSupport fires if oldFormat != newFormat which in the case of strings is always true.
+        // For this case we therefore use the equals method to prevent identical strings triggering the
+        // firing of the change event.
+        if (!this.screenshotFormat.equals(screenshotFormat)) {
+            String oldFormat = this.screenshotFormat;
+            this.screenshotFormat = screenshotFormat;
+            propertyChangeSupport.firePropertyChange(SCREENSHOT_FORMAT, oldFormat, this.screenshotFormat);
+        }
     }
 
     public boolean isDumpShaders() {
@@ -463,25 +603,19 @@ public class RenderingConfig {
     }
 
     public void setDumpShaders(boolean dumpShaders) {
+        boolean oldValue = this.dumpShaders;
         this.dumpShaders = dumpShaders;
+        propertyChangeSupport.firePropertyChange(DUMP_SHADERS, oldValue, this.dumpShaders);
     }
-
-    /**
-     * Subscribe a listener that gets nofified when a property cahnges..
-     */
-    public void subscribe(PropertyChangeListener changeListener) {
-        this.propertyChangeSupport.addPropertyChangeListener(changeListener);
-    }
-
-    public void unsubscribe(PropertyChangeListener changeListener) {
-        this.propertyChangeSupport.removePropertyChangeListener(changeListener);
-    }
-
+    
     public boolean isVolumetricFog() {
         return volumetricFog;
     }
 
     public void setVolumetricFog(boolean volumetricFog) {
+        boolean oldValue = this.volumetricFog;
         this.volumetricFog = volumetricFog;
+        propertyChangeSupport.firePropertyChange(VOLUMETRIC_FOG, oldValue, this.volumetricFog);
     }
+
 }
