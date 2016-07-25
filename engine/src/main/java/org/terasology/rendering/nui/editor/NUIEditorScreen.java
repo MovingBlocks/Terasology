@@ -76,6 +76,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -385,11 +386,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
         if (type == JsonTreeValue.Type.ARRAY || type == JsonTreeValue.Type.OBJECT) {
             ContextMenuLevel addLevel = contextMenuBuilder.addLevel(LEVEL_ADD_EXTENDED);
 
-            primaryLevel.addOption(OPTION_ADD_EXTENDED, jsonTree -> {
-                contextMenuBuilder.getLevel(LEVEL_ADD_EXTENDED).setVisible(!addLevel.isVisible());
-            }, node, false);
-
-            if (type == JsonTreeValue.Type.ARRAY) {
+            if (type == JsonTreeValue.Type.ARRAY && !node.getValue().getKey().equals("contents")) {
+                primaryLevel.addOption(OPTION_ADD_EXTENDED, jsonTree -> {
+                    contextMenuBuilder.getLevel(LEVEL_ADD_EXTENDED).setVisible(!addLevel.isVisible());
+                }, node, false);
                 addLevel.addOption("Boolean attribute", jsonTree -> {
                     jsonTree.addChild(new JsonTreeValue(null, false, JsonTreeValue.Type.VALUE));
                     editorTreeView.fireUpdateListeners();
@@ -405,7 +405,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
                     editorTreeView.fireUpdateListeners();
                     updateTreeView((JsonTree) jsonTree.getRoot(), false);
                 }, node, true);
-            } else {
+            } else if (type == JsonTreeValue.Type.OBJECT) {
+                primaryLevel.addOption(OPTION_ADD_EXTENDED, jsonTree -> {
+                    contextMenuBuilder.getLevel(LEVEL_ADD_EXTENDED).setVisible(!addLevel.isVisible());
+                }, node, false);
                 addLevel.addOption("Key/value pair", jsonTree -> {
                     jsonTree.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
                     editorTreeView.fireUpdateListeners();
@@ -473,8 +476,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
             try {
                 value = field.get(layoutHintType.newInstance());
-            } catch (InstantiationException e) {
-                return null;
+            } catch (NullPointerException | InstantiationException e) {
+                value = field.get(elementMetadata.newInstance());
             }
         } else if (Binding.class.isAssignableFrom(field.getType())) {
             Binding binding = (Binding) field.get(elementMetadata.newInstance());
@@ -490,6 +493,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
 
         if ((Binding.class.isAssignableFrom(field.getType())
+             && elementMetadata.getType().getGenericSuperclass() instanceof ParameterizedType
              && UIWidget.class.isAssignableFrom((Class<?>) ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0)))
             || (UIWidget.class.isAssignableFrom(field.getType()))) {
             treeValue.setValue(null);

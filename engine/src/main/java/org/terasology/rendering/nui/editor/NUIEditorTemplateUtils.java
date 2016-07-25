@@ -31,7 +31,7 @@ public class NUIEditorTemplateUtils {
         tree.addChild(new JsonTreeValue("skin", "engine:default", JsonTreeValue.Type.KEY_VALUE_PAIR));
 
         JsonTree layout = new JsonTree(new JsonTreeValue("contents", null, JsonTreeValue.Type.OBJECT));
-        layout.addChild(new JsonTreeValue("type", "relativeLayout", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        layout.addChild(new JsonTreeValue("type", "RelativeLayout", JsonTreeValue.Type.KEY_VALUE_PAIR));
 
         JsonTree contents = new JsonTree(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
 
@@ -50,8 +50,13 @@ public class NUIEditorTemplateUtils {
         widget.addChild(new JsonTreeValue("id", id, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
         JsonTree layoutInfo = new JsonTree(new JsonTreeValue("layoutInfo", null, JsonTreeValue.Type.OBJECT));
-        layoutInfo.addChild(new JsonTreeValue("cc", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        layoutInfo.addChild(new JsonTreeValue("width", 500, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
+        JsonTree hPosition = new JsonTree(new JsonTreeValue("position-horizontal-center", null, JsonTreeValue.Type.OBJECT));
+        JsonTree vPosition = new JsonTree(new JsonTreeValue("position-vertical-center", null, JsonTreeValue.Type.OBJECT));
+
+        layoutInfo.addChild(hPosition);
+        layoutInfo.addChild(vPosition);
         widget.addChild(layoutInfo);
         return widget;
     }

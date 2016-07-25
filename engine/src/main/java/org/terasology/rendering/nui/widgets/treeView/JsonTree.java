@@ -57,7 +57,7 @@ public class JsonTree extends Tree<JsonTreeValue> {
 
     public boolean hasChildWithKey(String key) {
         for (Tree<JsonTreeValue> child : getChildren()) {
-            if (child.getValue().getKey().equals(key)) {
+            if (child.getValue().getKey() != null && child.getValue().getKey().equals(key)) {
                 return true;
             }
         }

@@ -38,7 +38,7 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
     private TreeModel<JsonTreeValue> editorTreeViewModel;
 
     public NUIEditorItemRenderer(TreeModel<JsonTreeValue> editorTreeViewModel) {
-        super(false, 2, 2, 5, 5);
+        super(2, 2, 5, 5);
         this.editorTreeViewModel = editorTreeViewModel;
     }
 
@@ -90,7 +90,7 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
                     for (Tree<JsonTreeValue> child : node.getChildren()) {
                         JsonTreeValue childValue = child.getValue();
                         if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR
-                                && childValue.getKey().equalsIgnoreCase("type")) {
+                            && childValue.getKey().equalsIgnoreCase("type")) {
                             textureName = (String) childValue.getValue();
                         }
                     }
