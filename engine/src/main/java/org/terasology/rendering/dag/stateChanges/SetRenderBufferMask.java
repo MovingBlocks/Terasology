@@ -26,7 +26,7 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
  * TODO: Add javadocs
  */
 public final class SetRenderBufferMask implements FBOManagerSubscriber, StateChange {
-    private static final String DEFAULT_FBO_NAME = "sceneOpaque";
+    private static final String DEFAULT_FBO = "sceneOpaque";
     private static final boolean DEFAULT_COLOR_MASK = true;
     private static final boolean DEFAULT_NORMAL_MASK = true;
     private static final boolean DEFAULT_LIGHT_BUFFER_MASK = true;
@@ -51,7 +51,7 @@ public final class SetRenderBufferMask implements FBOManagerSubscriber, StateCha
     }
 
     private SetRenderBufferMask() {
-        this.fboName = DEFAULT_FBO_NAME;
+        this.fboName = DEFAULT_FBO;
         color = DEFAULT_COLOR_MASK;
         normal = DEFAULT_NORMAL_MASK;
         lightBuffer = DEFAULT_LIGHT_BUFFER_MASK;

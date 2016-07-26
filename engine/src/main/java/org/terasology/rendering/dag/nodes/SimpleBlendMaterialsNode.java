@@ -33,7 +33,7 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
 
-    private static final String SCENE_OPAQUE_FBO_NAME = "sceneOpaque";
+    private static final String SCENE_OPAQUE_FBO = "sceneOpaque";
 
     @In
     private ComponentSystemManager componentSystemManager;
@@ -44,8 +44,8 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO_NAME, frameBuffersManager));
-        addDesiredStateChange(new SetRenderBufferMask(SCENE_OPAQUE_FBO_NAME, frameBuffersManager, true, true, true));
+        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO, frameBuffersManager));
+        addDesiredStateChange(new SetRenderBufferMask(SCENE_OPAQUE_FBO, frameBuffersManager, true, true, true));
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }
 
