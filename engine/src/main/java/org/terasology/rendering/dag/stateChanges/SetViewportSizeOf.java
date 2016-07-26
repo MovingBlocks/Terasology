@@ -38,11 +38,6 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
         this.fboName = fboName;
         this.frameBuffersManager = frameBuffersManager;
         fbo = frameBuffersManager.getFBO(fboName);
-        // TODO: a very dirty approach :(, however defaultInstance requires a frameBuffer instance, any suggestions?
-        if (defaultInstance.frameBuffersManager == null) {
-            defaultInstance.frameBuffersManager = frameBuffersManager;
-            defaultInstance.fbo = frameBuffersManager.getFBO(DEFAULT_FBO_NAME);
-        }
     }
 
     public SetViewportSizeOf() {
@@ -51,6 +46,11 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public StateChange getDefaultInstance() {
+        // TODO: a very dirty approach :(, however defaultInstance requires a frameBuffer instance, any suggestions?
+        if (defaultInstance.frameBuffersManager == null) {
+            defaultInstance.frameBuffersManager = frameBuffersManager;
+            defaultInstance.fbo = frameBuffersManager.getFBO(DEFAULT_FBO_NAME);
+        }
         return defaultInstance;
     }
 
