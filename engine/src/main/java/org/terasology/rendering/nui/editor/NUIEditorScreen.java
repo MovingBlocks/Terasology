@@ -41,6 +41,7 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
@@ -476,14 +477,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
             try {
                 value = field.get(layoutHintType.newInstance());
-            } catch (NullPointerException | InstantiationException e) {
-                value = field.get(elementMetadata.newInstance());
+            } catch (Exception e) {
+                value = getValueOrBinding(field, elementMetadata);
             }
-        } else if (Binding.class.isAssignableFrom(field.getType())) {
-            Binding binding = (Binding) field.get(elementMetadata.newInstance());
-            value = binding.get();
         } else {
-            value = field.get(elementMetadata.newInstance());
+            value = getValueOrBinding(field, elementMetadata);
         }
 
         treeValue.setType(convertsToJsonPrimitive(field, value) ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.OBJECT);
@@ -495,6 +493,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
         if ((Binding.class.isAssignableFrom(field.getType())
              && elementMetadata.getType().getGenericSuperclass() instanceof ParameterizedType
              && UIWidget.class.isAssignableFrom((Class<?>) ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0)))
+            || ((Binding.class.isAssignableFrom(field.getType()))
+            && UIWidget.class.isAssignableFrom(((Binding)field.get(elementMetadata.newInstance())).get().getClass()))
             || (UIWidget.class.isAssignableFrom(field.getType()))) {
             treeValue.setValue(null);
             JsonTree node = new JsonTree(treeValue);
@@ -511,6 +511,15 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private boolean convertsToJsonPrimitive(Field field, Object value) {
         return UISkin.class.isAssignableFrom(field.getType())
                || (value instanceof Boolean || value instanceof String || value instanceof Number);
+    }
+
+    private Object getValueOrBinding(Field field, ClassMetadata metadata) throws IllegalAccessException {
+        if (Binding.class.isAssignableFrom(field.getType())) {
+            Binding binding = (Binding) field.get(metadata.newInstance());
+            return binding.get();
+        } else {
+            return field.get(metadata.newInstance());
+        }
     }
 
     private void populateWidgetContextMenu(JsonTree node, ContextMenuBuilder contextMenuBuilder) {
@@ -613,6 +622,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 getManager().getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
 
             Class clazz = elementMetadata.getField(node.getValue().getKey()).getType();
+
+            if (clazz.equals(UIWidget.class)) {
+                clazz = AbstractWidget.class;
+            }
 
             for (Field field : clazz.getDeclaredFields()) {
                 String name;
