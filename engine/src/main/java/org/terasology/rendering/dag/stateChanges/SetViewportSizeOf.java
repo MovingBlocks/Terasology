@@ -18,31 +18,35 @@ package org.terasology.rendering.dag.stateChanges;
 import org.terasology.rendering.dag.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.BindFBOTask;
+import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * TODO: Add javadocs
  */
-public final class BindFBO implements FBOManagerSubscriber, StateChange {
-    private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
-    // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
-    private static final String DEFAULT_FRAME_BUFFER_NAME = "display";
-    private static BindFBO defaultInstance = new BindFBO();
+public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
+    private static final String DEFAULT_FBO_NAME = "sceneOpaque";
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf();
+    private SetViewportSizeOfTask task;
+
+    private FBO fbo;
     private String fboName;
-    private int fboId;
-    private BindFBOTask task;
     private FrameBuffersManager frameBuffersManager;
 
-    public BindFBO(String fboName, FrameBuffersManager frameBuffersManager) {
+    public SetViewportSizeOf(String fboName, FrameBuffersManager frameBuffersManager) {
         this.fboName = fboName;
         this.frameBuffersManager = frameBuffersManager;
-        fboId = frameBuffersManager.getFBO(fboName).fboId;
+        fbo = frameBuffersManager.getFBO(fboName);
+        // TODO: a very dirty approach :(, however defaultInstance requires a frameBuffer instance, any suggestions?
+        if (defaultInstance.frameBuffersManager == null) {
+            defaultInstance.frameBuffersManager = frameBuffersManager;
+            defaultInstance.fbo = frameBuffersManager.getFBO(DEFAULT_FBO_NAME);
+        }
     }
 
-    private BindFBO() {
-        this.fboName = DEFAULT_FRAME_BUFFER_NAME;
-        fboId = DEFAULT_FRAME_BUFFER_ID;
+    public SetViewportSizeOf() {
+        this.fboName = DEFAULT_FBO_NAME;
     }
 
     @Override
@@ -51,42 +55,38 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
-    }
-
-    @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new BindFBOTask(fboId, fboName);
-            // Subscription is only needed if fboID is different than default frame buffer id.
-            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
-                frameBuffersManager.subscribe(this);
-            }
+            task = new SetViewportSizeOfTask(fboName, fbo.width(), fbo.height());
+            frameBuffersManager.subscribe(this);
         } else {
-            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
-                update();
-            }
+            update();
         }
+
         return task;
     }
 
     @Override
     public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof BindFBO) {
-            return this.fboName.equals(((BindFBO) stateChange).fboName);
+        if (stateChange instanceof SetViewportSizeOf) {
+            return this.fboName.equals(((SetViewportSizeOf) stateChange).fboName);
         }
         return false;
     }
 
     @Override
+    public boolean isTheDefaultInstance() {
+        return this == defaultInstance;
+    }
+
+    @Override
     public void update() {
-        fboId = frameBuffersManager.getFBO(fboName).fboId;
-        task.setFboId(fboId);
+        fbo = frameBuffersManager.getFBO(fboName);
+        task.setDimensions(fbo.width(), fbo.height());
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
+        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, fbo.width(), fbo.height());
     }
 }
