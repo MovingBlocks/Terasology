@@ -16,7 +16,6 @@
 package org.terasology.rendering.world;
 
 import java.util.List;
-import com.google.api.client.util.Lists;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -95,6 +94,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  *
  */
 public final class WorldRendererImpl implements WorldRenderer {
+    public static FrameBuffersManager frameBuffersManager;
+
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -125,7 +126,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
-    private FrameBuffersManager buffersManager;
     private PostProcessor postProcessor;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
@@ -174,14 +174,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        buffersManager = new FrameBuffersManager();
-        context.put(FrameBuffersManager.class, buffersManager);
+        frameBuffersManager = new FrameBuffersManager();
+        context.put(FrameBuffersManager.class, frameBuffersManager);
 
-        postProcessor = new PostProcessor(buffersManager);
+        postProcessor = new PostProcessor(frameBuffersManager);
         context.put(PostProcessor.class, postProcessor);
 
-        buffersManager.setPostProcessor(postProcessor);
-        buffersManager.initialize();
+        frameBuffersManager.setPostProcessor(postProcessor);
+        frameBuffersManager.initialize();
 
         shaderManager.initShaders();
         initMaterials();
@@ -315,7 +315,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
-            buffersManager.preRenderUpdate();
+            frameBuffersManager.preRenderUpdate();
 
             millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }

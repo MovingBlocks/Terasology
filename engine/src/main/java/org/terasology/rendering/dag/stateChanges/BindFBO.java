@@ -19,7 +19,7 @@ import org.terasology.rendering.dag.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.BindFBOTask;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import static org.terasology.rendering.world.WorldRendererImpl.frameBuffersManager;
 
 /**
  * TODO: Add javadocs
@@ -32,11 +32,9 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private String fboName;
     private int fboId;
     private BindFBOTask task;
-    private FrameBuffersManager frameBuffersManager;
 
-    public BindFBO(String fboName, FrameBuffersManager frameBuffersManager) {
+    public BindFBO(String fboName) {
         this.fboName = fboName;
-        this.frameBuffersManager = frameBuffersManager;
         fboId = frameBuffersManager.getFBO(fboName).fboId;
     }
 
@@ -74,7 +72,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof BindFBO) {
-            return this.fboName.equals(((BindFBO) stateChange).fboName);
+            return this.fboName.equals(((BindFBO) stateChange).getFboName());
         }
         return false;
     }
@@ -88,5 +86,9 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
+    }
+
+    public String getFboName() {
+        return fboName;
     }
 }

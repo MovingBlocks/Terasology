@@ -20,37 +20,26 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import static org.terasology.rendering.world.WorldRendererImpl.frameBuffersManager;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
-    private static final String DEFAULT_FBO_NAME = "sceneOpaque";
-    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf();
+    private static final String DEFAULT_FBO = "sceneOpaque";
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DEFAULT_FBO);
     private SetViewportSizeOfTask task;
 
     private FBO fbo;
     private String fboName;
-    private FrameBuffersManager frameBuffersManager;
 
-    public SetViewportSizeOf(String fboName, FrameBuffersManager frameBuffersManager) {
+    public SetViewportSizeOf(String fboName) {
         this.fboName = fboName;
-        this.frameBuffersManager = frameBuffersManager;
         fbo = frameBuffersManager.getFBO(fboName);
-    }
-
-    public SetViewportSizeOf() {
-        this.fboName = DEFAULT_FBO_NAME;
     }
 
     @Override
     public StateChange getDefaultInstance() {
-        // TODO: a very dirty approach :(, however defaultInstance requires a frameBuffer instance, any suggestions?
-        if (defaultInstance.frameBuffersManager == null) {
-            defaultInstance.frameBuffersManager = frameBuffersManager;
-            defaultInstance.fbo = frameBuffersManager.getFBO(DEFAULT_FBO_NAME);
-        }
         return defaultInstance;
     }
 
@@ -69,7 +58,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     @Override
     public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof SetViewportSizeOf) {
-            return this.fboName.equals(((SetViewportSizeOf) stateChange).fboName);
+            return this.fboName.equals(((SetViewportSizeOf) stateChange).getFboName());
         }
         return false;
     }
@@ -88,5 +77,9 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, fbo.width(), fbo.height());
+    }
+
+    public String getFboName() {
+        return fboName;
     }
 }
