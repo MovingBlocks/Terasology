@@ -15,8 +15,12 @@
  */
 package org.terasology.rendering.world;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -64,9 +68,6 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
@@ -96,7 +97,11 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  *
  */
-public final class WorldRendererImpl implements WorldRenderer {
+public final class WorldRendererImpl implements WorldRenderer, PropertyChangeListener {
+    // TODO: alternative method
+    public static RenderingDebugConfig renderingDebugConfig;
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -125,9 +130,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         Z_PRE_PASS
     }
 
+    private RenderTaskListGenerator generator;
     private final RenderingConfig renderingConfig;
-    private final RenderingDebugConfig renderingDebugConfig;
-    private FrameBuffersManager frameBuffersManager;
+    private FrameBuffersManager buffersManager;
     private PostProcessor postProcessor;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
@@ -153,7 +158,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
-        this.renderingDebugConfig = renderingConfig.getDebug();
+        renderingDebugConfig = renderingConfig.getDebug();
+        renderingDebugConfig.subscribe(RenderingDebugConfig.WIREFRAME, this);
         this.shaderManager = context.get(ShaderManager.class);
 
         if (renderingConfig.isOculusVrSupport()) {
@@ -176,14 +182,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        frameBuffersManager = new FrameBuffersManager();
-        context.put(FrameBuffersManager.class, frameBuffersManager);
+        buffersManager = new FrameBuffersManager();
+        context.put(FrameBuffersManager.class, buffersManager);
 
-        postProcessor = new PostProcessor(frameBuffersManager);
+        postProcessor = new PostProcessor(buffersManager);
         context.put(PostProcessor.class, postProcessor);
 
-        frameBuffersManager.setPostProcessor(postProcessor);
-        frameBuffersManager.initialize();
+        buffersManager.setPostProcessor(postProcessor);
+        buffersManager.initialize();
 
         shaderManager.initShaders();
         initMaterials();
@@ -252,18 +258,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
-        initDefaultStateChanges();
-
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-        RenderTaskListGenerator generator = new RenderTaskListGenerator();
+        generator = new RenderTaskListGenerator();
         renderPipelineTaskList = generator.generateFrom(orderedNodes);
-    }
-
-    private void initDefaultStateChanges() {
-        SetViewportSizeOf.setDefaultInstance(new SetViewportSizeOf(frameBuffersManager));
-        BindFBO.setDefaultInstance(new BindFBO());
-        SetWireframe.setDefaultInstance(new SetWireframe());
-
     }
 
     @Override
@@ -326,7 +323,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
-            frameBuffersManager.preRenderUpdate();
+            buffersManager.preRenderUpdate();
 
             millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }
@@ -614,6 +611,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     public Camera getLightCamera() {
         //FIXME: remove this method
         return shadowMapNode.shadowMapCamera;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        renderPipelineTaskList = generator.regenerate();
+        logger.info("Set {} property to {}. ", evt.getPropertyName().toUpperCase(), evt.getNewValue());
     }
 
     @Override

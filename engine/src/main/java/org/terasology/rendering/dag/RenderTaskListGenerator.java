@@ -35,11 +35,14 @@ public final class RenderTaskListGenerator {
         intermediateList = Lists.newArrayList();
     }
 
+    public List<RenderPipelineTask> regenerate() {
+        generateTaskList();
+        return taskList;
+    }
+
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
         generateIntermediateList(orderedNodes);
-        logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
         generateTaskList();
-        logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
         return taskList;
     }
 
@@ -77,7 +80,7 @@ public final class RenderTaskListGenerator {
                             // defensive programming here: the check is probably unnecessary as for every default
                             // instance of a state change subType there should be a non-default one already in the
                             // persistentStateChangeS map, falling within cases handled below.
-                            taskList.add(stateChange.generateTask());
+                            addTask(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);
 
                         } // else {
@@ -87,12 +90,12 @@ public final class RenderTaskListGenerator {
                     } else {
                         if (stateChange.isTheDefaultInstance()) { // I know, I'm a sucker for almost plain-english code
                             // non redundant default state change, eliminates subType entry in the map, to keep map small
-                            taskList.add(stateChange.generateTask());
+                            addTask(stateChange.generateTask());
                             persistentStateChanges.remove(stateChange.getClass());
 
                         } else if (!stateChange.isEqualTo(persistentStateChange)) { // another new method, just for readability
                             // non-redundant state change of the same subType but different value, becomes new map entry
-                            taskList.add(stateChange.generateTask());
+                            addTask(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);
 
                         } // else {
@@ -105,11 +108,10 @@ public final class RenderTaskListGenerator {
                 }
 
                 intranodesStateChanges.clear();
-                taskList.add(((Node) object).generateTask());
+                addTask(((Node) object).generateTask());
             }
         }
-
-
+        logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
     }
 
     private void generateIntermediateList(List<Node> orderedNodes) {
@@ -121,6 +123,13 @@ public final class RenderTaskListGenerator {
             for (StateChange stateChange : node.getDesiredStateChanges()) {
                 intermediateList.add(stateChange.getDefaultInstance());
             }
+        }
+        logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
+    }
+
+    private void addTask(RenderPipelineTask task) {
+        if (task != null) {
+            taskList.add(task);
         }
     }
 }

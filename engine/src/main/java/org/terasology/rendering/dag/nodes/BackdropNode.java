@@ -15,13 +15,12 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -30,17 +29,12 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * TODO: Diagram of this node
  */
 public class BackdropNode extends AbstractNode {
-
-    @In
-    private Config config;
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -51,22 +45,19 @@ public class BackdropNode extends AbstractNode {
     @In
     private FrameBuffersManager frameBuffersManager;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
     private FBO sceneOpaque;
     private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
         playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new SetWireframe(true));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        enableWireframeIf(renderingDebugConfig.isWireframe());
-
         sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
         initialClearing();
@@ -86,7 +77,6 @@ public class BackdropNode extends AbstractNode {
         setRenderBufferMask(sceneOpaque, true, false, false);
         backdropRenderer.render(playerCamera);
 
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();
     }
 

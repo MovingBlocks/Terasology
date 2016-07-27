@@ -15,15 +15,12 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 
 /**
  * TODO: Diagram of this node
@@ -31,28 +28,21 @@ import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 public class OverlaysNode extends AbstractNode {
 
     @In
-    private Config config;
-
-    @In
     private ComponentSystemManager componentSystemManager;
-
-    private RenderingDebugConfig renderingDebugConfig;
 
     @Override
     public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
+        addDesiredStateChange(new SetWireframe(true));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/overlays");
-        enableWireframeIf(renderingDebugConfig.isWireframe());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }
 
-        disableWireframeIf(renderingDebugConfig.isWireframe());
         PerformanceMonitor.endActivity();
     }
 }
