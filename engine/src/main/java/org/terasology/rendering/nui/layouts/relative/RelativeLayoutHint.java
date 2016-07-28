@@ -22,8 +22,10 @@ import org.terasology.rendering.nui.LayoutHint;
 /**
  */
 public class RelativeLayoutHint implements LayoutHint {
-
+    @LayoutConfig
     private int width;
+
+    @LayoutConfig
     private int height;
 
     @LayoutConfig
@@ -45,7 +47,6 @@ public class RelativeLayoutHint implements LayoutHint {
     @LayoutConfig
     @SerializedName("position-horizontal-center")
     private HorizontalInfo positionCenterHorizontal;
-
 
     @LayoutConfig
     @SerializedName("position-top")

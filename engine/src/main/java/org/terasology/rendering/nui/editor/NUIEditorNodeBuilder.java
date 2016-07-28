@@ -69,7 +69,7 @@ public class NUIEditorNodeBuilder {
             layoutInfo.addChild(hPosition);
             layoutInfo.addChild(vPosition);
         }
-        
+
         widget.addChild(layoutInfo);
         return widget;
     }
