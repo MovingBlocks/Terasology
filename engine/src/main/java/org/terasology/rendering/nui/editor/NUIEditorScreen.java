@@ -187,6 +187,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, this::copyNode);
                 contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, this::pasteNode);
                 contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
+                contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
                 contextMenuBuilder.subscribeAddContextMenu(() -> editor.fireUpdateListeners());
                 ContextMenuBuilder contextMenu = contextMenuBuilder.createPrimaryContextMenu((JsonTree) node);
 
@@ -553,5 +554,21 @@ public class NUIEditorScreen extends CoreScreenLayer {
     private void pasteNode(JsonTree node) {
         editor.paste(node);
         editor.setSelectedIndex(null);
+    }
+
+    /**
+     * Set up and display {@link WidgetSelectionScreen}. When a widget is selected, add it as a child
+     * of the specified node.
+     *
+     * @param node The node to add the widget to.
+     */
+    private void addWidget(JsonTree node) {
+        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
+            .getScreen(WidgetSelectionScreen.ASSET_URI);
+        widgetSelectionScreen.setNode(node);
+        widgetSelectionScreen.subscribeClose(() -> {
+            editor.fireUpdateListeners();
+        });
     }
 }

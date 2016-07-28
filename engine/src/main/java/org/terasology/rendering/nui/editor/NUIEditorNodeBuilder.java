@@ -57,15 +57,19 @@ public class NUIEditorNodeBuilder {
         widget.addChild(new JsonTreeValue("id", id, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
         JsonTree layoutInfo = new JsonTree(new JsonTreeValue("layoutInfo", null, JsonTreeValue.Type.OBJECT));
-        layoutInfo.addChild(new JsonTreeValue("width", 500, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
-        JsonTree hPosition = new JsonTree(new JsonTreeValue("position-horizontal-center", null, JsonTreeValue.Type
-            .OBJECT));
-        JsonTree vPosition = new JsonTree(new JsonTreeValue("position-vertical-center", null, JsonTreeValue.Type
-            .OBJECT));
+        if (addLayoutInfo) {
+            layoutInfo.addChild(new JsonTreeValue("width", 500, JsonTreeValue.Type.KEY_VALUE_PAIR));
 
-        layoutInfo.addChild(hPosition);
-        layoutInfo.addChild(vPosition);
+            JsonTree hPosition = new JsonTree(new JsonTreeValue("position-horizontal-center", null, JsonTreeValue.Type
+                .OBJECT));
+            JsonTree vPosition = new JsonTree(new JsonTreeValue("position-vertical-center", null, JsonTreeValue.Type
+                .OBJECT));
+
+            layoutInfo.addChild(hPosition);
+            layoutInfo.addChild(vPosition);
+        }
+        
         widget.addChild(layoutInfo);
         return widget;
     }
