@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -95,9 +96,10 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 } else {
                     currentPosition.addX(currentWidth);
                 }
+                UIWidget menuWidget = level.getMenuWidget();
                 Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
-                    canvas.calculatePreferredSize(level.getMenuWidget()));
-                currentWidth = level.getMenuWidget().getPreferredContentSize(canvas, null).getX();
+                    canvas.calculatePreferredSize(menuWidget));
+                currentWidth = canvas.calculatePreferredSize(menuWidget).getX() - 8;
                 canvas.drawWidget(level.getMenuWidget(), region);
             }
         }

@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layouts.relative;
 
 import com.google.gson.annotations.SerializedName;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 
 /**
@@ -24,23 +25,37 @@ public class RelativeLayoutHint implements LayoutHint {
 
     private int width;
     private int height;
+
+    @LayoutConfig
     @SerializedName("use-content-width")
     private boolean usingContentWidth;
+
+    @LayoutConfig
     @SerializedName("use-content-height")
     private boolean usingContentHeight;
 
+    @LayoutConfig
     @SerializedName("position-left")
     private HorizontalInfo positionLeft;
+
+    @LayoutConfig
     @SerializedName("position-right")
     private HorizontalInfo positionRight;
+
+    @LayoutConfig
     @SerializedName("position-horizontal-center")
     private HorizontalInfo positionCenterHorizontal;
 
 
+    @LayoutConfig
     @SerializedName("position-top")
     private VerticalInfo positionTop;
+
+    @LayoutConfig
     @SerializedName("position-bottom")
     private VerticalInfo positionBottom;
+
+    @LayoutConfig
     @SerializedName("position-vertical-center")
     private VerticalInfo positionCenterVertical;
 

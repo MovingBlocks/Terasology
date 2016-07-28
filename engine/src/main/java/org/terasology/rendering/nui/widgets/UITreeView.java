@@ -85,10 +85,6 @@ public class UITreeView<T> extends CoreWidget {
      */
     private TreeViewState<T> state = new TreeViewState<T>();
     /**
-     * The value to be used when adding nodes to the tree.
-     */
-    private Binding<T> defaultValue = new DefaultBinding<>();
-    /**
      * The item renderer used for drawing the values of the tree.
      */
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
@@ -234,10 +230,6 @@ public class UITreeView<T> extends CoreWidget {
                 // Delete: remove a node (and all its' children).
                 removeSelected();
                 return true;
-            } else if ((ctrlDown && id == Keyboard.KeyId.A) || id == Keyboard.KeyId.INSERT) {
-                // Ctrl+A / Insert: add a new child with a placeholder value to the currently selected node.
-                addToSelected();
-                return true;
             } else if (ctrlDown && id == Keyboard.KeyId.C) {
                 // Ctrl+C: copy a selected node.
                 copy(model.get().getNode(state.getSelectedIndex()));
@@ -260,6 +252,10 @@ public class UITreeView<T> extends CoreWidget {
 
     public void setSelectedIndex(Integer index) {
         state.setSelectedIndex(index);
+    }
+
+    public UIWidget getAlternativeWidget() {
+        return state.getAlternativeWidget();
     }
 
     public void setAlternativeWidget(UIWidget widget) {
@@ -295,10 +291,6 @@ public class UITreeView<T> extends CoreWidget {
         model.set(newModel);
         state.setAlternativeWidget(null);
         state.setSelectedIndex(null);
-    }
-
-    public void setDefaultValue(T value) {
-        defaultValue.set(value);
     }
 
     public void setItemRenderer(ItemRenderer<T> itemRenderer) {
@@ -458,14 +450,6 @@ public class UITreeView<T> extends CoreWidget {
         if (state.getSelectedIndex() != null) {
             model.get().removeNode(state.getSelectedIndex());
             state.setSelectedIndex(null);
-
-            fireUpdateListeners();
-        }
-    }
-
-    private void addToSelected() {
-        if (state.getSelectedIndex() != null) {
-            model.get().getNode(state.getSelectedIndex()).addChild(defaultValue.get());
 
             fireUpdateListeners();
         }

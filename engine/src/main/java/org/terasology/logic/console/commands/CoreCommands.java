@@ -73,7 +73,12 @@ import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;

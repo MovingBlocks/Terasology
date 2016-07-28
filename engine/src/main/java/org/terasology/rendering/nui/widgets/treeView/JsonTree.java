@@ -31,20 +31,21 @@ public class JsonTree extends Tree<JsonTreeValue> {
 
         // Only arrays or objects can have children.
         if (getValue().getType() != JsonTreeValue.Type.ARRAY
-            && getValue().getType() != JsonTreeValue.Type.OBJECT) {
+                && getValue().getType() != JsonTreeValue.Type.OBJECT) {
             return false;
         }
 
         // Objects cannot have empty object children.
         if (getValue().getType() == JsonTreeValue.Type.OBJECT
-            && child.getValue().getType() == JsonTreeValue.Type.OBJECT
-            && child.getValue().getKey() == null) {
+                && child.getValue() != null
+                && child.getValue().getType() == JsonTreeValue.Type.OBJECT
+                && child.getValue().getKey() == null) {
             return false;
         }
 
         // Only objects can have child key-value pairs.
         if (getValue().getType() == JsonTreeValue.Type.ARRAY
-            && (child.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR)) {
+                && (child.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR)) {
             return false;
         }
         return true;

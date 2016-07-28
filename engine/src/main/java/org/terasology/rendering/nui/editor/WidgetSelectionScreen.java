@@ -77,7 +77,7 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
             ClassMetadata metadata = widgets.get(selection);
 
-            JsonTree childNode = NUIEditorTemplateUtils.newWidget(selection, "newWidget");
+            JsonTree childNode = NUIEditorNodeBuilder.createNewWidget(selection, "newWidget", false);
 
             // If the widget is an UILayout override, add a "contents" array node.
             if (UILayout.class.isAssignableFrom(metadata.getType())) {
