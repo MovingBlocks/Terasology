@@ -83,7 +83,7 @@ public class UITreeView<T> extends CoreWidget {
      * The state of the tree - includes session-specific information about the currently selected node, copied node etc.
      * See the documentation {@link TreeViewState} for information concerning specific state variables.
      */
-    private TreeViewState<T> state = new TreeViewState<T>();
+    private TreeViewState<T> state = new TreeViewState<>();
     /**
      * The item renderer used for drawing the values of the tree.
      */

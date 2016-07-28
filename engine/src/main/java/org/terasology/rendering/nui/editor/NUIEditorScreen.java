@@ -33,8 +33,10 @@ import org.terasology.config.NUIEditorConfig;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.logic.clipboard.ClipboardManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
@@ -78,80 +80,94 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
 
+    // Editor widget identifiers.
     private static final String AVAILABLE_ASSETS_ID = "availableAssets";
     private static final String EDITOR_TREE_VIEW_ID = "editor";
     private static final String SELECTED_SCREEN_ID = "selectedScreen";
 
     private static final String CREATE_NEW_SCREEN = "New Screen";
 
+    /**
+     * Used to retrieve & dispose of {@link UIElement} assets.
+     */
     @In
     private AssetManager assetManager;
 
+    /**
+     * Used to read from and write to {@link NUIEditorConfig}
+     */
     @In
     private Config config;
 
+    /**
+     * Used to toggle the editor screen on ESCAPE.
+     */
     @In
     private NUIEditorSystem nuiEditorSystem;
 
     /**
-     *
+     * The main editor widget used to display and edit NUI screens.
      */
     private UITreeView editor;
     /**
-     *
+     * The box used to preview a NUI screen modified by the editor.
      */
     private UIBox selectedScreenBox;
     /**
-     *
+     * The Urn of the currently edited asset.
      */
     private String selectedAsset;
     /**
-     *
+     * The list of the editor's states.
      */
     private List<JsonTree> history = Lists.newArrayList();
     /**
-     *
+     * The current position in the list of the editor's states.
      */
     private int historyPosition;
     /**
-     *
+     * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
 
     @Override
     public void initialise() {
+        // Retrieve the widgets based on their identifiers.
         UIDropdownScrollable<String> availableAssetDropdown = find(AVAILABLE_ASSETS_ID, UIDropdownScrollable.class);
         editor = find(EDITOR_TREE_VIEW_ID, UITreeView.class);
         selectedScreenBox = find(SELECTED_SCREEN_ID, UIBox.class);
 
+        // Populate the list of screens.
         List<String> availableAssetList = Lists.newArrayList();
-
         availableAssetList.add(CREATE_NEW_SCREEN);
         availableAssetList.addAll(assetManager.getAvailableAssets(UIElement.class).stream().map(Object::toString).collect(Collectors.toList()));
 
+        // Remove the screens used by the editor to prevent initialization issues.
         availableAssetList.removeIf(asset -> asset.equals(ASSET_URI.toString()));
         availableAssetList.removeIf(asset -> asset.equals(ContextMenuScreen.ASSET_URI.toString()));
         availableAssetList.removeIf(asset -> asset.equals(NUIEditorSettingsScreen.ASSET_URI.toString()));
         availableAssetList.removeIf(asset -> asset.equals(WidgetSelectionScreen.ASSET_URI.toString()));
         Collections.sort(availableAssetList);
 
-        availableAssetDropdown.setOptions(availableAssetList);
-        availableAssetDropdown.bindSelection(new Binding<String>() {
-            @Override
-            public String get() {
-                return selectedAsset;
-            }
-
-            @Override
-            public void set(String value) {
-                if (value.equals(CREATE_NEW_SCREEN)) {
-                    resetState(NUIEditorNodeBuilder.createNewScreen());
-                    selectedAsset = value;
-                } else {
-                    selectFile(new ResourceUrn(value));
+        if (availableAssetDropdown != null) {
+            availableAssetDropdown.setOptions(availableAssetList);
+            availableAssetDropdown.bindSelection(new Binding<String>() {
+                @Override
+                public String get() {
+                    return selectedAsset;
                 }
-            }
-        });
+
+                @Override
+                public void set(String value) {
+                    if (value.equals(CREATE_NEW_SCREEN)) {
+                        resetState(NUIEditorNodeBuilder.createNewScreen());
+                        selectedAsset = value;
+                    } else {
+                        selectAsset(new ResourceUrn(value));
+                    }
+                }
+            });
+        }
 
         editor.subscribeTreeViewUpdate(() -> {
             JsonTree rootNode = (JsonTree) editor.getModel().getNode(0).getRoot();
@@ -160,6 +176,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             updateConfig();
         });
 
+        // Create and display a context menu on RMB.
         editor.subscribeNodeClick((event, node) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
                 editor.setSelectedIndex(editor.getModel().indexOf(node));
@@ -170,9 +187,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, this::copyNode);
                 contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, this::pasteNode);
                 contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
-                contextMenuBuilder.subscribeAddContextMenu(() -> {
-                    editor.fireUpdateListeners();
-                });
+                contextMenuBuilder.subscribeAddContextMenu(() -> editor.fireUpdateListeners());
                 ContextMenuBuilder contextMenu = contextMenuBuilder.createPrimaryContextMenu((JsonTree) node);
 
                 contextMenu.subscribeClose(() -> {
@@ -190,12 +205,14 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
         });
 
+        // Edit a node on double click.
         editor.subscribeNodeDoubleClick((event, node) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 editNode((JsonTree) node);
             }
         });
 
+        // Edit the currently selected node on F2.
         editor.subscribeKeyEvent(event -> {
             if (event.isDown() && event.getKey() == Keyboard.Key.F2) {
                 Integer selectedIndex = editor.getSelectedIndex();
@@ -206,6 +223,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
             }
         });
 
+        // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button ->
             getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class));
         WidgetUtil.trySubscribe(this, "copy", button -> copyJson());
@@ -247,9 +265,11 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * @param urn
+     * Resets the editor's state to a tree representation of a specified {@link UIElement}.
+     *
+     * @param urn The Urn of the UI asset.
      */
-    public void selectFile(ResourceUrn urn) {
+    public void selectAsset(ResourceUrn urn) {
         Optional<UIElement> asset = assetManager.getAsset(urn, UIElement.class);
         if (asset.isPresent()) {
             UIElement element = asset.get();
@@ -273,7 +293,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     *
+     * Updates the editor's state based on config changes.
+     * <p>
+     * Should also be called to update the {@link NUIEditorItemRenderer} when the model is changed.
      */
     public void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
@@ -282,12 +304,14 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
+     * Creates an inline editor widget for the specified node, activates and focuses it.
      *
-     * @param node
+     * @param node The node an editor widget is to be created for.
      */
     private void editNode(JsonTree node) {
         JsonTreeValue.Type type = node.getValue().getType();
 
+        // Create the inline editor depending on the node's type.
         inlineEditorEntry = null;
         if (type == JsonTreeValue.Type.VALUE) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createValueEditor();
@@ -321,13 +345,16 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * @param node
+     * Sets the {@link NUIManager}'s focus to the inline editor widget and select a subset of its' contents.
+     *
+     * @param node The node that is currently being edited.
      */
     private void focusInlineEditor(JsonTree node) {
         getManager().setFocus(inlineEditorEntry);
         inlineEditorEntry.resetValue();
 
         if (node.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+            // If the node is a key/value pair, select the value of the node.
             if (node.getValue().getValue() instanceof String) {
                 inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":\"".length(), true);
                 inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length() - "\"".length(), false);
@@ -336,13 +363,16 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
             }
         } else {
+            // Otherwise fully select the contents of the node.
             inlineEditorEntry.setCursorPosition(0, true);
             inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
         }
     }
 
     /**
-     * @param node
+     * Fully resets the editor state and updates it from a specified {@link JsonTree}.
+     *
+     * @param node The node the editor's state is to be reset to.
      */
     private void resetState(JsonTree node) {
         setTreeViewModel(node, true);
@@ -352,6 +382,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
         history.add(node);
         historyPosition = 0;
 
+        // Dispose of the previously loaded asset so that any other copies of it
+        // are properly initialized.
         if (selectedAsset != null) {
             Optional<UIElement> asset = assetManager.getAsset(selectedAsset, UIElement.class);
             if (asset.isPresent()) {
@@ -363,8 +395,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * @param node
-     * @param expand
+     * Sets the editor widget's state to a copy of a specified {@link JsonTree}.
+     *
+     * @param node   The node the widget's state is to be set to.
+     * @param expand Whether the node should be expanded.
      */
     private void setTreeViewModel(JsonTree node, boolean expand) {
         if (expand) {
@@ -375,9 +409,12 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * @param node
+     * Expands a {@link JsonTree} meeting specific conditions; repeat recursively for its' children.
+     *
+     * @param node The node to be expanded.
      */
     private void expandNode(JsonTree node) {
+        // Do not expand OBJECT children of ARRAY parents. Generally concerns widget lists.
         if (!(node.getValue().getType() == JsonTreeValue.Type.OBJECT
               && !node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
             node.setExpanded(true);
@@ -389,7 +426,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * @param node
+     * Sets the contents of the preview widget to a widget deserialized from a {@link JsonTree}.
+     *
+     * @param node The node containing the preview widget.
      */
     private void setPreviewWidget(JsonTree node) {
         try {
@@ -402,7 +441,9 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * @param node
+     * Adds a {@link JsonTree} to the editor's state history.
+     *
+     * @param node The node to be added to the editor's state history.
      */
     private void addToHistory(JsonTree node) {
         if (historyPosition < history.size() - 1) {
@@ -413,13 +454,17 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     *
+     * Copies the current state of the editor to the system clipboard as a JSON string.
+     * <p>
+     * {@link ClipboardManager} is not used here as it is unavailable within the main menu.
      */
     private void copyJson() {
         if (editor.getModel() != null) {
+            // Deserialize the state of the editor to a JSON string.
             JsonElement json = JsonTreeConverter.deserialize(editor.getModel().getNode(0).getRoot());
             String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
 
+            // Set the contents of the system clipboard to it.
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             try {
                 clipboard.setContents(new StringSelection(jsonString), null);
@@ -430,12 +475,17 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     *
+     * Attempts to serialize the system clipboard's contents to a JSON string -
+     * if successful, sets the current state of the editor to it.
+     * <p>
+     * {@link ClipboardManager} is not used here as it is unavailable within the main menu.
      */
     private void pasteJson() {
+        // Get the clipboard contents.
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable t = clipboard.getContents(null);
 
+        // Attempt to convert them to a string.
         String clipboardContents = null;
         try {
             if (t != null) {
@@ -447,6 +497,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
 
         if (clipboardContents != null) {
             try {
+                // Attempt to serialize them to a JsonTree and reset the editor state.
                 JsonElement json = new JsonParser().parse(clipboardContents);
                 JsonTree node = JsonTreeConverter.serialize(json);
                 resetState(node);
@@ -457,7 +508,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     *
+     * Sets the editor's state to the previous item in the history.
      */
     private void undo() {
         if (historyPosition > 0) {
@@ -470,7 +521,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     *
+     * Sets the editor's state to the next item in the history.
      */
     private void redo() {
         if (historyPosition < history.size() - 1) {
@@ -482,11 +533,23 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
     }
 
+    /**
+     * Copies the specified node to the editor's clipboard,
+     * then deselects it.
+     *
+     * @param node The node to copy.
+     */
     private void copyNode(JsonTree node) {
         editor.copy(node);
         editor.setSelectedIndex(null);
     }
 
+    /**
+     * Pastes the currently copied node as a child of the specified node,
+     * then deselects it.
+     *
+     * @param node The node to paste the copied node to.
+     */
     private void pasteNode(JsonTree node) {
         editor.paste(node);
         editor.setSelectedIndex(null);

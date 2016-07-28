@@ -49,9 +49,7 @@ public class NUIEditorNodeBuilder {
      * @param type          The type of the widget.
      * @param id            The id of the widget.
      * @param addLayoutInfo Whether a few layout settings from {@link RelativeLayout} should be added.
-     *
-     * @return The {@link JsonTree} with the given type/id
-     * to be used as an empty widget template within {@link NUIEditorScreen}.
+     * @return The {@link JsonTree} with the given type/id to be used as an empty widget template within {@link NUIEditorScreen}.
      */
     public static JsonTree createNewWidget(String type, String id, boolean addLayoutInfo) {
         JsonTree widget = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));

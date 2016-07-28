@@ -249,7 +249,7 @@ public class CoreCommands extends BaseComponentSystem {
                 return String.format("No asset found for screen '%s'", uri);
             case 1:
                 ResourceUrn urn = urns.iterator().next();
-                ((NUIEditorScreen) nuiManager.getScreen(NUIEditorScreen.ASSET_URI)).selectFile(urn);
+                ((NUIEditorScreen) nuiManager.getScreen(NUIEditorScreen.ASSET_URI)).selectAsset(urn);
                 return "Success";
             default:
                 return String.format("Multiple matches for screen '%s': {%s}", uri, Arrays.toString(urns.toArray()));
