@@ -64,6 +64,9 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
@@ -94,8 +97,6 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  *
  */
 public final class WorldRendererImpl implements WorldRenderer {
-    public static FrameBuffersManager frameBuffersManager;
-
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -126,6 +127,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
+    private FrameBuffersManager frameBuffersManager;
     private PostProcessor postProcessor;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
@@ -250,9 +252,18 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
+        initDefaultStateChanges();
+
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
         RenderTaskListGenerator generator = new RenderTaskListGenerator();
         renderPipelineTaskList = generator.generateFrom(orderedNodes);
+    }
+
+    private void initDefaultStateChanges() {
+        SetViewportSizeOf.setDefaultInstance(new SetViewportSizeOf(frameBuffersManager));
+        BindFBO.setDefaultInstance(new BindFBO());
+        SetWireframe.setDefaultInstance(new SetWireframe());
+
     }
 
     @Override

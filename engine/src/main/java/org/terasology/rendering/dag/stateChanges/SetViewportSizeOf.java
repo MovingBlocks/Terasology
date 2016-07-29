@@ -20,27 +20,37 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-import static org.terasology.rendering.world.WorldRendererImpl.frameBuffersManager;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
     private static final String DEFAULT_FBO = "sceneOpaque";
-    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DEFAULT_FBO);
+    private static SetViewportSizeOf defaultInstance;
     private SetViewportSizeOfTask task;
 
     private FBO fbo;
     private String fboName;
+    private FrameBuffersManager frameBuffersManager;
 
-    public SetViewportSizeOf(String fboName) {
+    public SetViewportSizeOf(String fboName, FrameBuffersManager frameBuffersManager) {
         this.fboName = fboName;
+        this.frameBuffersManager = frameBuffersManager;
         fbo = frameBuffersManager.getFBO(fboName);
+    }
+
+    public SetViewportSizeOf(FrameBuffersManager frameBuffersManager) {
+        this(DEFAULT_FBO, frameBuffersManager);
     }
 
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
+    }
+
+    public static void setDefaultInstance(SetViewportSizeOf defaultInstance) {
+        SetViewportSizeOf.defaultInstance = defaultInstance;
     }
 
     @Override

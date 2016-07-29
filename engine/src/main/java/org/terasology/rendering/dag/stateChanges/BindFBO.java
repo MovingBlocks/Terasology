@@ -19,7 +19,7 @@ import org.terasology.rendering.dag.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.BindFBOTask;
-import static org.terasology.rendering.world.WorldRendererImpl.frameBuffersManager;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * TODO: Add javadocs
@@ -30,15 +30,17 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static final String DEFAULT_FRAME_BUFFER_NAME = "display";
     private static BindFBO defaultInstance = new BindFBO();
     private String fboName;
+    private FrameBuffersManager frameBuffersManager;
     private int fboId;
     private BindFBOTask task;
 
-    public BindFBO(String fboName) {
+    public BindFBO(String fboName, FrameBuffersManager frameBuffersManager) {
         this.fboName = fboName;
+        this.frameBuffersManager = frameBuffersManager;
         fboId = frameBuffersManager.getFBO(fboName).fboId;
     }
 
-    private BindFBO() {
+    public BindFBO() {
         this.fboName = DEFAULT_FRAME_BUFFER_NAME;
         fboId = DEFAULT_FRAME_BUFFER_ID;
     }
@@ -46,6 +48,11 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
+    }
+
+
+    public static void setDefaultInstance(BindFBO defaultInstance) {
+        BindFBO.defaultInstance = defaultInstance;
     }
 
     @Override
