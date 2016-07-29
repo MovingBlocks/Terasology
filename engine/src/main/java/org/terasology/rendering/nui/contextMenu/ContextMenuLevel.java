@@ -89,19 +89,33 @@ public class ContextMenuLevel {
     }
 
     /**
-     * Add a new option to the map of options.
-     * @param name The name for the option.
-     * @param consumer A consumer operation.
-     * @param item The object to be passed to the consumer operation.
+     * Adds a new option to the map of options.
+     *
+     * @param name      The name for the option.
+     * @param consumer  A consumer operation.
+     * @param item      The object to be passed to the consumer operation.
      * @param finalized Whether the option is final (i.e. on selection closes the context menu
-     * and triggers the relevant listeners, if any).
-     * @param <E> The type of the object passed to the option.
+     *                  and triggers the relevant listeners, if any).
+     * @param <E>       The type of the object passed to the option.
      */
     public <E> void addOption(String name, Consumer<E> consumer, E item, boolean finalized) {
         options.put(name, new ContextMenuOption<E>(consumer, item, finalized));
 
         // Update the widget's list.
         menuWidget.setList(Lists.newArrayList(options.keySet()));
+    }
+
+    /**
+     * Adds a navigation-only option to the map of options that toggles a specific level when selected
+     * without closing the context menu.
+     *
+     * @param name  The name for the option.
+     * @param level The level to be toggled when the option is selected.
+     */
+    public void addNavigationOption(String name, ContextMenuLevel level) {
+        this.addOption(name, l -> {
+            level.setVisible(!level.isVisible());
+        }, level, false);
     }
 
     /**

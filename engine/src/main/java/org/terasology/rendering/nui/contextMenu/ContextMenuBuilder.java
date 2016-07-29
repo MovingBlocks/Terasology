@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-import com.google.api.client.util.Maps;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.terasology.math.geom.Vector2i;
@@ -24,7 +23,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * A builder class to construct and show {@link ContextMenuScreen} instances.
@@ -32,7 +30,10 @@ import java.util.Map;
  * Should be used in favor of manually creating the screen.
  */
 public class ContextMenuBuilder {
-    private Map<String, ContextMenuLevel> menuLevels = Maps.newLinkedHashMap();
+    /**
+     * A list of context menu levels used within the menu.
+     */
+    private List<ContextMenuLevel> menuLevels = Lists.newArrayList();
     /**
      * Listeners fired when an item is selected.
      */
@@ -42,17 +43,21 @@ public class ContextMenuBuilder {
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
     /**
-     *
+     * Listeners fired when the menu is closed, either with or without
+     * selecting an option.
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
-    public ContextMenuLevel getLevel(String key) {
-        return menuLevels.get(key);
-    }
-
-    public ContextMenuLevel addLevel(String key) {
+    /**
+     * Adds a new level to the context menu.
+     *
+     * @param visible Whether the level should be initialized as visible.
+     * @return The newly added level.
+     */
+    public ContextMenuLevel addLevel(boolean visible) {
         ContextMenuLevel level = new ContextMenuLevel();
-        menuLevels.put(key, level);
+        level.setVisible(visible);
+        menuLevels.add(level);
         return level;
     }
 
@@ -67,10 +72,10 @@ public class ContextMenuBuilder {
             manager.pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
         }
 
-        ContextMenuLevel firstLevel = menuLevels.entrySet().iterator().next().getValue();
-        firstLevel.setVisible(true);
-        firstLevel.setPosition(position);
-        for (ContextMenuLevel level : menuLevels.values()) {
+        ContextMenuLevel primaryLevel = menuLevels.get(0);
+        primaryLevel.setVisible(true);
+        primaryLevel.setPosition(position);
+        for (ContextMenuLevel level : menuLevels) {
             level.getMenuWidget().bindSelection(new Binding<String>() {
                 @Override
                 public String get() {
@@ -89,7 +94,7 @@ public class ContextMenuBuilder {
         }
 
         ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
-        contextMenuScreen.setMenuLevels(Lists.newArrayList(menuLevels.values()));
+        contextMenuScreen.setMenuLevels(menuLevels);
 
         contextMenuScreen.subscribeClose(() -> {
             closeListeners.forEach(UpdateListener::onAction);

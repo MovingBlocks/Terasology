@@ -47,10 +47,6 @@ public class NUIEditorContextMenuBuilder {
 
     private Logger logger = LoggerFactory.getLogger(NUIEditorContextMenuBuilder.class);
 
-    // Context menu levels.
-    public static final String LEVEL_ADD_EXTENDED = "Add";
-    public static final String LEVEL_PRIMARY = "Primary";
-
     // Context menu options.
     public static final String OPTION_ADD_EXTENDED = "Add...";
     public static final String OPTION_ADD_WIDGET = "Add Widget";
@@ -85,18 +81,15 @@ public class NUIEditorContextMenuBuilder {
 
     public ContextMenuBuilder createPrimaryContextMenu(JsonTree node) {
         ContextMenuBuilder contextMenu = new ContextMenuBuilder();
-        ContextMenuLevel primaryLevel = contextMenu.addLevel(LEVEL_PRIMARY);
-
-        primaryLevel.setVisible(true);
+        ContextMenuLevel primaryLevel = contextMenu.addLevel(true);
 
         JsonTreeValue.Type type = node.getValue().getType();
 
         // Create the ADD_EXTENDED level.
         if ((type == JsonTreeValue.Type.ARRAY && !node.getValue().getKey().equals("contents"))
             || type == JsonTreeValue.Type.OBJECT) {
-            ContextMenuLevel addLevel = contextMenu.addLevel(LEVEL_ADD_EXTENDED);
-            primaryLevel.addOption(OPTION_ADD_EXTENDED, n ->
-                contextMenu.getLevel(LEVEL_ADD_EXTENDED).setVisible(!addLevel.isVisible()), null, false);
+            ContextMenuLevel addLevel = contextMenu.addLevel(false);
+            primaryLevel.addNavigationOption(OPTION_ADD_EXTENDED, addLevel);
             createAddContextMenu(node, addLevel);
         }
 
@@ -199,11 +192,9 @@ public class NUIEditorContextMenuBuilder {
                 layoutMetadata = nuiManager.getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
 
                 // If one is found, attempt to get the layout hint type.
-                try {
+                if (layoutMetadata.getType().getGenericSuperclass() != null) {
                     layoutHintType = (Class) ReflectionUtil
                         .getTypeParameter(layoutMetadata.getType().getGenericSuperclass(), 0);
-                } catch (NullPointerException e) {
-                    layoutHintType = null;
                 }
             }
             if (layoutHintType == null) {

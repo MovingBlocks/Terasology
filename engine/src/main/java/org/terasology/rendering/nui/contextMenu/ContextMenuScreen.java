@@ -40,15 +40,16 @@ public class ContextMenuScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
     /**
-     *
+     * A list of context menu levels used within the menu.
      */
     private List<ContextMenuLevel> menuLevels = Lists.newArrayList();
     /**
-     * Listeners fired when the menu is closed (without selecting an option).
+     * Listeners fired when the menu is closed without selecting an option.
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
     /**
-     *
+     * Listeners fired when the menu is closed, either with or without
+     * selecting an option.
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
