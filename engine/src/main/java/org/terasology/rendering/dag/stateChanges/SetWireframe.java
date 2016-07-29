@@ -61,7 +61,7 @@ public final class SetWireframe implements StateChange {
             if (disablingTask == null) {
                 disablingTask = new SetWireframeTask(false);
             }
-            return enablingTask;
+            return disablingTask;
         }
     }
 

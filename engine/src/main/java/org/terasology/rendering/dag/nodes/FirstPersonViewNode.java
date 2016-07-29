@@ -16,25 +16,19 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.dag.WireframeNode;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 
 /**
  * TODO: Diagram of this node
  */
-public class FirstPersonViewNode extends AbstractNode {
-
-    @In
-    private Config config;
+public class FirstPersonViewNode extends WireframeNode {
 
     @In
     private WorldRenderer worldRenderer;
@@ -42,14 +36,13 @@ public class FirstPersonViewNode extends AbstractNode {
     @In
     private ComponentSystemManager componentSystemManager;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
 
     @Override
     public void initialise() {
+        super.initialise();
         renderingDebugConfig = config.getRendering().getDebug();
         playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new SetWireframe(true));
     }
 
     @Override

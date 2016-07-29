@@ -19,8 +19,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.dag.WireframeNode;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -29,7 +28,7 @@ import org.terasology.rendering.world.WorldRendererImpl;
 /**
  * TODO: Diagram of this node
  */
-public class ChunksOpaqueNode extends AbstractNode {
+public class ChunksOpaqueNode extends WireframeNode {
 
     @In
     private WorldRenderer worldRenderer;
@@ -41,8 +40,8 @@ public class ChunksOpaqueNode extends AbstractNode {
 
     @Override
     public void initialise() {
+        super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new SetWireframe(true));
     }
 
     @Override

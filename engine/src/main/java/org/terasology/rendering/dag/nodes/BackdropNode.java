@@ -19,8 +19,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.dag.WireframeNode;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -34,7 +33,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 /**
  * TODO: Diagram of this node
  */
-public class BackdropNode extends AbstractNode {
+public class BackdropNode extends WireframeNode {
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -51,8 +50,8 @@ public class BackdropNode extends AbstractNode {
 
     @Override
     public void initialise() {
+        super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new SetWireframe(true));
     }
 
     @Override

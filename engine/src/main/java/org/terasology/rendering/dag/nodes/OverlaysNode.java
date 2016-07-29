@@ -19,20 +19,19 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.dag.WireframeNode;
 
 /**
  * TODO: Diagram of this node
  */
-public class OverlaysNode extends AbstractNode {
+public class OverlaysNode extends WireframeNode {
 
     @In
     private ComponentSystemManager componentSystemManager;
 
     @Override
     public void initialise() {
-        addDesiredStateChange(new SetWireframe(true));
+        super.initialise();
     }
 
     @Override

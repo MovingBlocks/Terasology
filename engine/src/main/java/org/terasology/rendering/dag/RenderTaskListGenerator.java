@@ -29,18 +29,15 @@ public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
     private List<Object> intermediateList;
     private List<RenderPipelineTask> taskList;
+    private List<Node> nodeList;
 
     public RenderTaskListGenerator() {
         taskList = Lists.newArrayList();
         intermediateList = Lists.newArrayList();
     }
 
-    public List<RenderPipelineTask> regenerate() {
-        generateTaskList();
-        return taskList;
-    }
-
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
+        nodeList = orderedNodes;
         generateIntermediateList(orderedNodes);
         generateTaskList();
         return taskList;
@@ -80,7 +77,7 @@ public final class RenderTaskListGenerator {
                             // defensive programming here: the check is probably unnecessary as for every default
                             // instance of a state change subType there should be a non-default one already in the
                             // persistentStateChangeS map, falling within cases handled below.
-                            addTask(stateChange.generateTask());
+                            taskList.add(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);
 
                         } // else {
@@ -90,12 +87,12 @@ public final class RenderTaskListGenerator {
                     } else {
                         if (stateChange.isTheDefaultInstance()) { // I know, I'm a sucker for almost plain-english code
                             // non redundant default state change, eliminates subType entry in the map, to keep map small
-                            addTask(stateChange.generateTask());
+                            taskList.add(stateChange.generateTask());
                             persistentStateChanges.remove(stateChange.getClass());
 
                         } else if (!stateChange.isEqualTo(persistentStateChange)) { // another new method, just for readability
                             // non-redundant state change of the same subType but different value, becomes new map entry
-                            addTask(stateChange.generateTask());
+                            taskList.add(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);
 
                         } // else {
@@ -108,7 +105,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 intranodesStateChanges.clear();
-                addTask(((Node) object).generateTask());
+                taskList.add(((Node) object).generateTask());
             }
         }
         logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
@@ -117,19 +114,21 @@ public final class RenderTaskListGenerator {
     private void generateIntermediateList(List<Node> orderedNodes) {
         intermediateList.clear();
         for (Node node : orderedNodes) {
+            node.setTaskListGenerator(this);
             intermediateList.addAll(node.getDesiredStateChanges());
             intermediateList.add(node);
             // Add state changes to reset all desired state changes back to default.
             for (StateChange stateChange : node.getDesiredStateChanges()) {
                 intermediateList.add(stateChange.getDefaultInstance());
             }
+
         }
         logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
     }
 
-    private void addTask(RenderPipelineTask task) {
-        if (task != null) {
-            taskList.add(task);
-        }
+    public void refresh() {
+        generateIntermediateList(nodeList);
+        generateTaskList();
     }
+
 }
