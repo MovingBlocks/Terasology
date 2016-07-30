@@ -16,7 +16,7 @@
 
 package org.terasology.utilities;
 
-import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import com.google.common.base.Preconditions;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetData;

@@ -354,6 +354,11 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
                 case 'Index' :
                     githubHome = 'Terasology'
                     break;
+
+                case 'CrashReporter' :
+                    // Temporary for testing only
+                    branch = 'embeddedCR'
+                    break;
             }
 
             // Allow user to override the GitHub account to pull from. Supply with -PgithubAccount="TargetAccountName"

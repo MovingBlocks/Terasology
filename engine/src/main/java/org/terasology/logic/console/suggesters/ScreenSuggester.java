@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.suggesters;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;

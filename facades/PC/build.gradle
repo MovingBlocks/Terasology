@@ -39,6 +39,24 @@ group = 'org.terasology.facades'
 
 dependencies {
     compile project(':engine')
+
+    // Dependency on CrashReporter, conditionally either from source or via binary
+    File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
+    println "Scanning for source CrashReporter at: " + wouldBeSrcPath.getAbsolutePath()
+
+    if (wouldBeSrcPath.exists()) {
+        println "*** Identified CrashReporter source, using that"
+        //compile ':libs:CrashReporter:cr-terasology'
+
+        def targetProject = findProject(':libs:CrashReporter:cr-terasology')
+        println "Found the project? " + targetProject
+        //compile targetProject
+
+        compile project(':libs:CrashReporter:cr-terasology')
+    } else {
+        println "*** Setting a CrashReporter binary dependency, not present as source"
+        compile group: 'org.terasology', name: 'CrashReporter-terasology', version: '3.0.0'
+    }
 }
 
 // Instructions for packaging a jar file for the PC facade

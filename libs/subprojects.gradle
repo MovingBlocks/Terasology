@@ -9,6 +9,13 @@ new File(rootDir, 'libs').eachDir { possibleSubprojectDir ->
         def subprojectPath = ':' + subprojectName
         def subproject = project(subprojectPath)
         subproject.projectDir = possibleSubprojectDir
+
+        // Also look for a nested settings.gradle file in case of embedded libraries with their own sub projects
+        File settingsFile = new File(possibleSubprojectDir, "settings.gradle")
+        if (settingsFile.exists()) {
+            println "Library $subprojectName has a settings file so applying it expecting nested sub projects"
+            apply from: settingsFile
+        }
     } else {
         println "Library dir found without a build.gradle, not including $subprojectName in the Gradle project tree"
     }

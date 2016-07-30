@@ -16,9 +16,8 @@
 
 package org.terasology.rendering.animation;
 
+import com.google.common.base.Preconditions;
 import org.terasology.math.TeraMath;
-
-import com.google.api.client.util.Preconditions;
 
 /**
  * A collection of {@link TimeModifier} implementations
