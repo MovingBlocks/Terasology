@@ -55,7 +55,7 @@ dependencies {
         compile project(':libs:CrashReporter:cr-terasology')
     } else {
         println "*** Setting a CrashReporter binary dependency, not present as source"
-        compile group: 'org.terasology', name: 'CrashReporter-terasology', version: '3.0.0'
+        compile group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.0'
     }
 }
 

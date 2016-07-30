@@ -323,7 +323,7 @@ tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
 }
 
 // Dynamic task for fetching project-related libs
-// Sample command: gradlew fetchLibJitter
+// Sample command: gradlew fetchLibCrashReporter
 tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
     if (taskName.startsWith("fetchLib")) {
 
@@ -353,11 +353,6 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
                     break;
                 case 'Index' :
                     githubHome = 'Terasology'
-                    break;
-
-                case 'CrashReporter' :
-                    // Temporary for testing only
-                    branch = 'embeddedCR'
                     break;
             }
 
