@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import org.terasology.world.block.family.BlockFamilyFactory;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 @API
 public class BlockFamilyDefinitionData implements AssetData {
     private boolean template;

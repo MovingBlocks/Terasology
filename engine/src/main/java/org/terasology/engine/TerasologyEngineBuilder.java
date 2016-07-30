@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,13 @@
  */
 package org.terasology.engine;
 
-import com.google.common.collect.Lists;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 
 import java.util.List;
 
-/**
- *
- */
 public class TerasologyEngineBuilder {
 
     private TimeSubsystem timeSubsystem;

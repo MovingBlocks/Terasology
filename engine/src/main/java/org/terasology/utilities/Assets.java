@@ -16,8 +16,8 @@
 
 package org.terasology.utilities;
 
-import com.google.common.base.Strings;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetData;
 import org.terasology.assets.ResourceUrn;

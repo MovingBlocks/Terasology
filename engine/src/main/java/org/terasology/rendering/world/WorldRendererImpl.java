@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import java.util.List;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -36,6 +35,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
@@ -54,7 +54,6 @@ import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.dag.nodes.LightGeometryNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
-import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.OverlaysNode;
@@ -75,6 +74,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
+
+import java.util.List;
 import java.util.PriorityQueue;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
