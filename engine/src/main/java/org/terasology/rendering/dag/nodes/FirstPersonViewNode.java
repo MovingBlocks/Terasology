@@ -21,14 +21,14 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeNode;
+import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 
 /**
  * TODO: Diagram of this node
  */
-public class FirstPersonViewNode extends WireframeNode {
+public class FirstPersonViewNode extends WireframeCapableNode {
 
     @In
     private WorldRenderer worldRenderer;

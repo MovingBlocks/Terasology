@@ -15,12 +15,8 @@
  */
 package org.terasology.rendering.world;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -100,8 +96,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  *
  */
-public final class WorldRendererImpl implements WorldRenderer, PropertyChangeListener {
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
+public final class WorldRendererImpl implements WorldRenderer {
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -159,7 +154,6 @@ public final class WorldRendererImpl implements WorldRenderer, PropertyChangeLis
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
-        this.renderingDebugConfig.subscribe(this); // subscribed to all properties
         this.shaderManager = context.get(ShaderManager.class);
 
         if (renderingConfig.isOculusVrSupport()) {
@@ -620,11 +614,6 @@ public final class WorldRendererImpl implements WorldRenderer, PropertyChangeLis
     public Camera getLightCamera() {
         //FIXME: remove this method
         return shadowMapNode.shadowMapCamera;
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        logger.info("Set {} property to {}. ", evt.getPropertyName().toUpperCase(), evt.getNewValue()); // for debugging purposes
     }
 
     @Override

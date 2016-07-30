@@ -19,12 +19,12 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.WireframeNode;
+import org.terasology.rendering.dag.WireframeCapableNode;
 
 /**
  * TODO: Diagram of this node
  */
-public class ObjectsOpaqueNode extends WireframeNode {
+public class ObjectsOpaqueNode extends WireframeCapableNode {
 
     @In
     private ComponentSystemManager componentSystemManager;

@@ -19,7 +19,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeNode;
+import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -28,7 +28,7 @@ import org.terasology.rendering.world.WorldRendererImpl;
 /**
  * TODO: Diagram of this node
  */
-public class ChunksOpaqueNode extends WireframeNode {
+public class ChunksOpaqueNode extends WireframeCapableNode {
 
     @In
     private WorldRenderer worldRenderer;

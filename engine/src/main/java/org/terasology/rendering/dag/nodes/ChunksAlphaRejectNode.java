@@ -19,7 +19,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeNode;
+import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -29,7 +29,7 @@ import org.terasology.rendering.world.WorldRendererImpl;
  * TODO: Diagram of this node
  * Alpha reject is used for semi-transparent billboards, which in turn are used for ground plants.
  */
-public class ChunksAlphaRejectNode extends WireframeNode {
+public class ChunksAlphaRejectNode extends WireframeCapableNode {
 
     @In
     private ComponentSystemManager componentSystemManager;

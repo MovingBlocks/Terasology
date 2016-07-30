@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.stateChanges.SetWireframe;
 /**
  * TODO: Add javadocs
  */
-public abstract class WireframeNode extends AbstractNode implements PropertyChangeListener {
+public abstract class WireframeCapableNode extends AbstractNode implements PropertyChangeListener {
     @In
     protected Config config;
     protected RenderingDebugConfig renderingDebugConfig;
