@@ -16,7 +16,6 @@
 package org.terasology.rendering.world;
 
 import java.util.List;
-import com.google.api.client.util.Lists;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
