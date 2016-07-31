@@ -228,12 +228,14 @@ public class NUIEditorContextMenuBuilder {
     }
 
     private Object getFieldValue(Field field, Class clazz) throws IllegalAccessException, InstantiationException {
+        Object value;
         if (Binding.class.isAssignableFrom(field.getType())) {
             Binding binding = (Binding) field.get(clazz.newInstance());
-            return binding.get();
+            value = binding.get();
         } else {
-            return field.get(clazz.newInstance());
+            value = field.get(clazz.newInstance());
         }
+        return value != null ? value : field.getType().newInstance();
     }
 
     /**
