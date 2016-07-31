@@ -15,9 +15,10 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+
 import java.util.List;
 import java.util.Set;
 
