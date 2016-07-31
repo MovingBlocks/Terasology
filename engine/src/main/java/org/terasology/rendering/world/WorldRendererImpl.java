@@ -544,6 +544,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public boolean isHeadUnderWater() {
+        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
+        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
         Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
 
         // Compensate for waves

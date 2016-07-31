@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 
@@ -120,7 +119,11 @@ public final class RenderTaskListGenerator {
             intermediateList.add(node);
             // Add state changes to reset all desired state changes back to default.
             for (StateChange stateChange : node.getDesiredStateChanges()) {
-                intermediateList.add(stateChange.getDefaultInstance());
+                // TODO: consider using optional here?
+                StateChange defaultInstance = stateChange.getDefaultInstance();
+                if (defaultInstance != null) {
+                    intermediateList.add(defaultInstance);
+                }
             }
 
         }
