@@ -37,10 +37,10 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     public BindFBO(String fboName) {
         this.fboName = fboName;
-        if (fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
-            fboId = DEFAULT_FRAME_BUFFER_ID;
-        } else {
+        if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
             fboId = frameBuffersManager.getFBO(fboName).fboId;
+        } else {
+            fboId = DEFAULT_FRAME_BUFFER_ID;
         }
     }
 

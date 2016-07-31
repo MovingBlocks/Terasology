@@ -31,14 +31,10 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     private static FrameBuffersManager frameBuffersManager;
     private SetViewportSizeOfTask task;
 
-    private FBO fbo;
     private String fboName;
 
     public SetViewportSizeOf(String fboName) {
         this.fboName = fboName;
-        if (!fboName.equals(DEFAULT_FBO)) {
-            fbo = frameBuffersManager.getFBO(fboName);
-        }
     }
 
     public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
@@ -53,10 +49,8 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            fbo = frameBuffersManager.getFBO(fboName);
-            task = new SetViewportSizeOfTask(fboName, fbo.width(), fbo.height());
+            task = new SetViewportSizeOfTask(fboName);
             frameBuffersManager.subscribe(this);
-        } else {
             update();
         }
 
@@ -78,16 +72,13 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public void update() {
-        fbo = frameBuffersManager.getFBO(fboName);
+        FBO fbo = frameBuffersManager.getFBO(fboName);
         task.setDimensions(fbo.width(), fbo.height());
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        if (isTheDefaultInstance()) { // necessary since default instance is generated before setFrameBuffersManager
-            fbo = frameBuffersManager.getFBO(fboName);
-        }
-        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, fbo.width(), fbo.height());
+        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 
     public String getFboName() {
