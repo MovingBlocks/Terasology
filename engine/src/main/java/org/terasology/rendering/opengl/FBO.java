@@ -59,9 +59,9 @@ public final class FBO {
     public int lightBufferTextureId;
 
     private final Dimensions dimensions;
-    private boolean colorBufferMask;
-    private boolean normalsBufferMask;
-    private boolean lightBufferMask;
+    private boolean writeToColorBuffer;
+    private boolean writeToNormalsBuffer;
+    private boolean writeToLightBuffer;
 
     private Status status;
 
@@ -82,9 +82,9 @@ public final class FBO {
     //                      should be through the static create() method.
     private FBO(int width, int height) {
         dimensions = new Dimensions(width, height);
-        colorBufferMask = DEFAULT_COLOR_MASK;
-        normalsBufferMask = DEFAULT_NORMAL_MASK;
-        lightBufferMask = DEFAULT_LIGHT_BUFFER_MASK;
+        writeToColorBuffer = DEFAULT_COLOR_MASK;
+        writeToNormalsBuffer = DEFAULT_NORMAL_MASK;
+        writeToLightBuffer = DEFAULT_LIGHT_BUFFER_MASK;
     }
 
     /**
@@ -104,18 +104,18 @@ public final class FBO {
      * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
      * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
      *
-     * @param color If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param normals If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param lightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToColorBuffer If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToNormalsBuffer If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToLightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
      */
-    public void setRenderBufferMask(boolean color, boolean normals, boolean lightBuffer) {
-        if (this.colorBufferMask == color && this.normalsBufferMask == normals && this.lightBufferMask == lightBuffer) {
+    public void setRenderBufferMask(boolean renderToColorBuffer, boolean renderToNormalsBuffer, boolean renderToLightBuffer) {
+        if (this.writeToColorBuffer == renderToColorBuffer && this.writeToNormalsBuffer == renderToNormalsBuffer && this.writeToLightBuffer == renderToLightBuffer) {
             return;
         }
 
-        this.colorBufferMask = color;
-        this.normalsBufferMask = normals;
-        this.lightBufferMask = lightBuffer;
+        this.writeToColorBuffer = renderToColorBuffer;
+        this.writeToNormalsBuffer = renderToNormalsBuffer;
+        this.writeToLightBuffer = renderToLightBuffer;
 
         int attachmentId = 0;
 
@@ -124,19 +124,19 @@ public final class FBO {
         // TODO: change GL_COLOR_ATTACHMENT0_EXT + attachmentId into something like COLOR_BUFFER_ATTACHMENT,
         // TODO: in turn set within the class or method
         if (colorBufferTextureId != 0) {
-            if (this.colorBufferMask) {
+            if (this.writeToColorBuffer) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
             attachmentId++;
         }
         if (normalsBufferTextureId != 0) {
-            if (this.normalsBufferMask) {
+            if (this.writeToNormalsBuffer) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
             attachmentId++;
         }
         if (lightBufferTextureId != 0) {
-            if (this.lightBufferMask) {
+            if (this.writeToLightBuffer) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
             }
         }
