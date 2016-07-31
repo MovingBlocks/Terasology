@@ -51,14 +51,17 @@ public class ShaderParametersPost extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: obtain these only once in superclass and monitor from there?
         CameraTargetSystem cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
 
+        // TODO: move into node
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffersManager.bindFboColorTexture("sceneToneMapped");
         program.setInt("texScene", texId++, true);
 
+        // TODO: monitor property rather than check every frame
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             buffersManager.getFBO("sceneBlur1").bindTexture();
@@ -69,9 +72,11 @@ public class ShaderParametersPost extends ShaderParametersBase {
             }
         }
 
+        // TODO: move to node - obtain only once and then subscribe to it
+        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset only if necessary
         Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1").get();
 
-        if (colorGradingLut != null) {
+        if (colorGradingLut != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             glBindTexture(GL12.GL_TEXTURE_3D, colorGradingLut.getId());
             program.setInt("texColorGradingLut", texId++, true);
@@ -79,17 +84,23 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         FBO sceneCombined = buffersManager.getFBO("sceneOpaque");
 
-        if (sceneCombined != null) {
+        if (sceneCombined != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneCombined.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
 
+            // TODO: review - is this loading a noise texture every frame? And why is it not in the IF(grain) block?
+            // TODO:          and must it be monitored like a standard texture?
             ResourceUrn noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
             Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri).get();
 
+            // TODO: monitor property rather than check every frame
             if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
+                // TODO: move into node
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
+
+                // TODO: move into material?
                 program.setInt("texNoise", texId++, true);
                 program.setFloat("grainIntensity", filmGrainIntensity, true);
                 program.setFloat("noiseOffset", rand.nextFloat(), true);
@@ -99,8 +110,10 @@ public class ShaderParametersPost extends ShaderParametersBase {
             }
         }
 
+        // TODO: monitor property rather than check every frame
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         if (activeCamera != null && CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
+            // TODO: move into material?
             program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
             program.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix(), true);
         }

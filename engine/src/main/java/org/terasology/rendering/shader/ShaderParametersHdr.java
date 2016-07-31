@@ -40,9 +40,11 @@ public class ShaderParametersHdr extends ShaderParametersBase {
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
         PostProcessor postProcessor = CoreRegistry.get(PostProcessor.class);
 
+        // TODO: move into a node
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         buffersManager.bindFboColorTexture("scenePrePost");
 
+        // TODO: move into a material?
         program.setInt("texScene", 0, true);
         // TODO: move to DownSampleSceneAndUpdateExposure
         program.setFloat("exposure", postProcessor.getExposure() * exposureBias, true);

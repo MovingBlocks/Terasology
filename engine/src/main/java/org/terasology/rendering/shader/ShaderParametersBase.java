@@ -43,9 +43,11 @@ public class ShaderParametersBase implements ShaderParameters {
 
         program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f, true);
 
+        // TODO: obtain once in superclass?
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
+        // TODO: move into BaseMaterial?
         if (worldRenderer != null && backdropProvider != null) {
             program.setFloat("daylight", backdropProvider.getDaylight(), true);
             program.setFloat("swimming", worldRenderer.isHeadUnderWater() ? 1.0f : 0.0f, true);

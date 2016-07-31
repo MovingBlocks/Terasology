@@ -40,11 +40,13 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: obtain once in the superclass and monitor from there?
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
         FBO sceneOpaque = buffersManager.getFBO("sceneOpaque");
 
         int texId = 0;
         if (sceneOpaque != null) {
+            // TODO: move content of this block into the node
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindDepthTexture();
             program.setInt("texSceneOpaqueDepth", texId++, true);
@@ -58,7 +60,9 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
+        // TODO: monitor property by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
+            // TODO: move into node
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             buffersManager.bindFboDepthTexture("sceneShadowMap");
             program.setInt("texSceneShadowMap", texId++, true);
@@ -67,6 +71,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
             if (lightCamera != null && activeCamera != null) {
+                // TODO: move into material?
                 program.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
                 program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
 
@@ -76,6 +81,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
             }
 
             if (CoreRegistry.get(Config.class).getRendering().isCloudShadows()) {
+                // TODO: move into node - make sure to obtain texture only once and subscribe to it
                 Texture clouds = Assets.getTexture("engine:perlinNoiseTileable").get();
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

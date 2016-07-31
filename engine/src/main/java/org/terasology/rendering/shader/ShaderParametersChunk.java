@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.config.RenderingConfig;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector4f;
@@ -76,6 +77,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: move in material or node, take advantage of texture.subscribeToDisposal()
         Optional<Texture> terrain = Assets.getTexture("engine:terrain");
         Optional<Texture> terrainNormal = Assets.getTexture("engine:terrainNormal");
         Optional<Texture> terrainHeight = Assets.getTexture("engine:terrainHeight");
@@ -91,45 +93,59 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         }
 
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
+        RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
 
+        // TODO move texture binding and setting into nodes
         int texId = 0;
+        // TODO: group these three lines in a method somewhere
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, terrain.get().getId());
         program.setInt("textureAtlas", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, water.get().getId());
         program.setInt("textureWater", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, lava.get().getId());
         program.setInt("textureLava", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, waterNormal.get().getId());
         program.setInt("textureWaterNormal", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, waterNormalAlt.get().getId());
         program.setInt("textureWaterNormalAlt", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, effects.get().getId());
         program.setInt("textureEffects", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffersManager.bindFboColorTexture("sceneReflected");
         program.setInt("textureWaterReflection", texId++, true);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         buffersManager.bindFboColorTexture("sceneOpaque");
         program.setInt("texSceneOpaque", texId++, true);
 
-        if (CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
+        // TODO: monitor the renderingConfig for changes rather than check every frame
+        if (renderingConfig.isNormalMapping()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             glBindTexture(GL11.GL_TEXTURE_2D, terrainNormal.get().getId());
             program.setInt("textureAtlasNormal", texId++, true);
 
-            if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()) {
+            if (renderingConfig.isParallaxMapping()) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 glBindTexture(GL11.GL_TEXTURE_2D, terrainHeight.get().getId());
                 program.setInt("textureAtlasHeight", texId++, true);
+
+                program.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
         }
 
+        // TODO: move into Material?
         Vector4f lightingSettingsFrag = new Vector4f();
         lightingSettingsFrag.z = waterSpecExp;
         program.setFloat4("lightingSettingsFrag", lightingSettingsFrag, true);
@@ -145,7 +161,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         alternativeWaterSettingsFrag.x = waterTint;
         program.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag, true);
 
-        if (CoreRegistry.get(Config.class).getRendering().isAnimateWater()) {
+        // TODO: monitor the renderingConfig for changes rather than check every frame
+        if (renderingConfig.isAnimateWater()) {
             program.setFloat("waveIntensFalloff", waveIntensFalloff, true);
             program.setFloat("waveSizeFalloff", waveSizeFalloff, true);
             program.setFloat("waveSize", waveSize, true);
@@ -156,10 +173,5 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             program.setFloat("waveOverallScale", waveOverallScale, true);
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isParallaxMapping()
-                && CoreRegistry.get(Config.class).getRendering().isNormalMapping()) {
-            program.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-        }
     }
-
 }

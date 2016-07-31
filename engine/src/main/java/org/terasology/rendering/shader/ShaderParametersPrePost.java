@@ -51,10 +51,12 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: often used objects: perhaps to be obtained in BaseMaterial?
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
+        // TODO: move what follows into material and/or node
         Vector3f tint = worldProvider.getBlock(activeCamera.getPosition()).getTint();
         program.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
 
@@ -63,6 +65,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         buffersManager.bindFboColorTexture("sceneOpaque");
         program.setInt("texScene", texId++, true);
 
+        // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             buffersManager.bindFboColorTexture("sceneBloom2");
@@ -73,12 +76,14 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         program.setFloat2("aberrationOffset", aberrationOffsetX, aberrationOffsetY, true);
 
+        // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             buffersManager.bindFboColorTexture("lightShafts");
             program.setInt("texLightShafts", texId++, true);
         }
 
+        // TODO: obtain once, monitor using Texture.subscribeToDisposal(Runnable)
         Optional<? extends Texture> vignetteTexture = Assets.getTexture("engine:vignette");
 
         if (vignetteTexture.isPresent()) {

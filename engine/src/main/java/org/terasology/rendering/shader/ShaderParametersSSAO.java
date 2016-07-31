@@ -95,6 +95,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
         int texId = 0;
 
+        // TODO: move to node
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             scene.bindDepthTexture();
@@ -110,6 +111,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
         program.setInt("texNoise", texId++, true);
 
+        // TODO: move to material?
         program.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
 
         if (CoreRegistry.get(WorldRenderer.class) != null) {
@@ -122,6 +124,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     }
 
     private Texture updateNoiseTexture() {
+        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset only if necessary
         Optional<Texture> texture = CoreRegistry.get(AssetManager.class).getAsset("engine:ssaoNoise", Texture.class);
         if (!texture.isPresent()) {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
