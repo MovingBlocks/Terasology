@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-import com.google.api.client.util.Lists;
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UIList;

@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.treeView;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.List;

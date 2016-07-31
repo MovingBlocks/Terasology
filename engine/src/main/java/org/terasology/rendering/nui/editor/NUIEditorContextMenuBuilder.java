@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.editor;
 
-import com.google.api.client.util.Lists;
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
