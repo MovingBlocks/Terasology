@@ -17,13 +17,12 @@ package org.terasology.rendering.nui.editor;
 
 import com.google.api.client.util.Lists;
 import com.google.api.client.util.Maps;
+import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -39,8 +38,11 @@ import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class NUIEditorContextMenuBuilder {
@@ -114,6 +116,7 @@ public class NUIEditorContextMenuBuilder {
 
     public void createAddContextMenu(JsonTree node, ContextMenuLevel addLevel) {
         JsonTreeValue.Type type = node.getValue().getType();
+        logger.info("node type: " + getNodeType(node));
 
         if (type == JsonTreeValue.Type.ARRAY) {
             // Add generic item addition options.
@@ -136,134 +139,38 @@ public class NUIEditorContextMenuBuilder {
                 addContextMenuListeners.forEach(UpdateListener::onAction);
             }, node, true);
 
-            // Populate the menu with additional options.
-            if (node.hasChildWithKey("type")) {
-                populateWidgetContextMenu(node, addLevel);
-            } else if (node.getValue().getKey().equalsIgnoreCase("layoutInfo")) {
-                populateLayoutContextMenu(node, addLevel);
-            } else {
-                populateGenericContextMenu(node, addLevel);
-            }
+            populateContextMenu(node, addLevel);
         }
     }
 
-    private void populateWidgetContextMenu(JsonTree node, ContextMenuLevel addLevel) {
-        // Get the ClassMetadata of the widget with the given type.
-        String type = (String) node.getChildWithKey("type").getValue().getValue();
-        ClassMetadata<? extends UIWidget, ?> elementMetadata = nuiManager
-            .getWidgetMetadataLibrary()
-            .resolve(type, ModuleContext.getContext());
+    private void populateContextMenu(JsonTree node, ContextMenuLevel addLevel) {
+        Class clazz = getNodeType(node);
 
-        if (elementMetadata != null) {
-            for (FieldMetadata fieldMetadata : elementMetadata.getFields()) {
-                Field field = fieldMetadata.getField();
-                field.setAccessible(true);
-
-                // Add options for all @LayoutConfig-annotated fields.
-                if (field.isAnnotationPresent(LayoutConfig.class)) {
-                    String name = getNodeName(field);
-                    if (!node.hasChildWithKey(name)) {
-                        addLevel.addOption(name, n -> {
-                            try {
-                                createChild(name, node, field, elementMetadata);
-                            } catch (IllegalAccessException e) {
-                                return;
-                            }
-                            addContextMenuListeners.forEach(UpdateListener::onAction);
-                        }, node, true);
-                    }
-                }
-            }
-        } else {
-            logger.warn("Unknown widget type: {}", type);
-        }
-    }
-
-    private void populateLayoutContextMenu(JsonTree node, ContextMenuLevel addLevel) {
-        String type = "";
-        JsonTree currentNode = node;
-        ClassMetadata layoutMetadata = null;
-        Class layoutHintType = null;
-
-        // Iterate down the tree and attempt to find a UILayout node.
-        while (layoutHintType == null) {
-            if (currentNode.hasSiblingWithKey("type")) {
-                type = (String) currentNode.getSiblingWithKey("type").getValue().getValue();
-                layoutMetadata = nuiManager.getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
-
-                // If one is found, attempt to get the layout hint type.
-                if (layoutMetadata.getType().getGenericSuperclass() != null) {
-                    layoutHintType = (Class) ReflectionUtil
-                        .getTypeParameter(layoutMetadata.getType().getGenericSuperclass(), 0);
-                }
-            }
-            if (layoutHintType == null) {
-                if (currentNode.isRoot()) {
-                    break;
-                }
-                currentNode = (JsonTree) currentNode.getParent();
-            }
-        }
-
-        if (layoutHintType != null) {
-            for (Field field : layoutHintType.getDeclaredFields()) {
-                field.setAccessible(true);
-
-                // Add options for all @LayoutConfig-annotated fields.
-                if (field.isAnnotationPresent(LayoutConfig.class)) {
-                    String name = getNodeName(field);
-                    ClassMetadata finalMetadata = layoutMetadata;
-                    if (!node.hasChildWithKey(name)) {
-                        addLevel.addOption(name, n -> {
-                            try {
-                                createChild(name, node, field, finalMetadata);
-                            } catch (IllegalAccessException e) {
-                                return;
-                            }
-                            addContextMenuListeners.forEach(UpdateListener::onAction);
-                        }, node, true);
-                    }
-                }
-            }
-        } else {
-            logger.warn("Unknown layout type: {}", type);
-        }
-    }
-
-    private void populateGenericContextMenu(JsonTree node, ContextMenuLevel addLevel) {
-        if (node.hasSiblingWithKey("type")) {
-            // Get the ClassMetadata of the widget with the given type.
-            String type = (String) node.getSiblingWithKey("type").getValue().getValue();
-            ClassMetadata elementMetadata = nuiManager.getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
-
-            // Get the type of the node as a field within the widget.
-            Class clazz = elementMetadata.getField(node.getValue().getKey()).getType();
-
-            if (clazz.equals(UIWidget.class)) {
-                clazz = AbstractWidget.class;
-            }
-
-            for (Field field : clazz.getDeclaredFields()) {
-                field.setAccessible(true);
-                String name = getNodeName(field);
-
-                // Add options for all fields of the class.
-                if (!node.hasChildWithKey(name)) {
+        if (clazz != null) {
+            for (Field field : ReflectionUtils.getAllFields(clazz)) {
+                if (!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class)) {
                     field.setAccessible(true);
-                    addLevel.addOption(name, n -> {
-                        try {
-                            createChild(name, node, field, elementMetadata);
-                        } catch (IllegalAccessException e) {
-                            return;
-                        }
-                        addContextMenuListeners.forEach(UpdateListener::onAction);
-                    }, node, true);
+                    String name = getNodeName(field);
+                    Class finalClazz = clazz;
+                    if (!node.hasChildWithKey(name)) {
+                        addLevel.addOption(name, n -> {
+                            try {
+                                createChild(name, node, field, finalClazz);
+                                addContextMenuListeners.forEach(UpdateListener::onAction);
+                            } catch (IllegalAccessException | InstantiationException e) {
+                                logger.warn("Could not add child", e);
+                            }
+                        }, node, true);
+                    }
                 }
             }
+        } else {
+            logger.warn("Could not get class for node ", node.getValue().toString());
         }
     }
 
-    private void createChild(String name, JsonTree node, Field field, ClassMetadata metadata) throws IllegalAccessException {
+    private void createChild(String name, JsonTree node, Field field, Class clazz)
+        throws IllegalAccessException, InstantiationException {
         JsonTreeValue childValue = new JsonTreeValue();
         childValue.setKey(name);
 
@@ -271,30 +178,20 @@ public class NUIEditorContextMenuBuilder {
             // Skin fields should always be KEY_VALUE_PAIR nodes with string values.
             childValue.setValue("engine:default");
             childValue.setType(JsonTreeValue.Type.KEY_VALUE_PAIR);
-        } else if (UILayout.class.isAssignableFrom(metadata.getType())) {
-            // If the current node is a layout hint, add options to add its' nodes.
-            Class layoutHintType = (Class) ReflectionUtil.getTypeParameter(metadata.getType().getGenericSuperclass(), 0);
-            try {
-                childValue.setValue(field.get(layoutHintType.newInstance()));
-                childValue.setType(getNodeType(field.get(layoutHintType.newInstance())));
-            } catch (Exception e) {
-                childValue.setValue(getFieldValue(field, metadata));
-                childValue.setType(getNodeType(getFieldValue(field, metadata)));
-            }
         } else {
-            if (isWidget(field, metadata)) {
+            if (isWidget(field)) {
                 createWidgetChild(name, node);
                 return;
             } else {
-                childValue.setValue(getFieldValue(field, metadata));
-                childValue.setType(getNodeType(getFieldValue(field, metadata)));
+                childValue.setValue(getFieldValue(field, clazz));
+                childValue.setType(getNodeType(getFieldValue(field, clazz)));
             }
         }
 
         node.addChild(childValue);
     }
 
-    private boolean isWidget(Field field, ClassMetadata metadata) throws IllegalAccessException {
+    private boolean isWidget(Field field) throws IllegalAccessException {
         // The field is a Binding<? extends UIWidget>.
         if (Binding.class.isAssignableFrom(field.getType())
             && UIWidget.class.isAssignableFrom((Class<?>)
@@ -330,12 +227,106 @@ public class NUIEditorContextMenuBuilder {
             ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.OBJECT;
     }
 
-    private Object getFieldValue(Field field, ClassMetadata metadata) throws IllegalAccessException {
+    private Object getFieldValue(Field field, Class clazz) throws IllegalAccessException, InstantiationException {
         if (Binding.class.isAssignableFrom(field.getType())) {
-            Binding binding = (Binding) field.get(metadata.newInstance());
+            Binding binding = (Binding) field.get(clazz.newInstance());
             return binding.get();
         } else {
-            return field.get(metadata.newInstance());
+            return field.get(clazz.newInstance());
         }
+    }
+
+    /**
+     * @param node A node in an asset tree.
+     * @return The type of the field this node represents.
+     */
+    private Class getNodeType(JsonTree node) {
+        Deque<JsonTree> pathToRoot = Queues.newArrayDeque();
+
+        // Create a stack with the root node at the top and the argument at the bottom.
+        JsonTree currentNode = node;
+        while (!currentNode.isRoot()) {
+            pathToRoot.push(currentNode);
+            currentNode = (JsonTree) currentNode.getParent();
+        }
+        pathToRoot.push(currentNode);
+
+        // Start iterating from top to bottom.
+        Class currentClass = null;
+        Class activeLayoutClass = null;
+        for (JsonTree n : pathToRoot) {
+            if (n.isRoot()) {
+                // currentClass is not set - set it to the screen type.
+                String type = (String) n.getChildWithKey("type").getValue().getValue();
+                currentClass = nuiManager
+                    .getWidgetMetadataLibrary()
+                    .resolve(type, ModuleContext.getContext())
+                    .getType();
+            } else {
+                if (List.class.isAssignableFrom(currentClass) &&
+                    n.getValue().getKey() == null &&
+                    n.getParent().getValue().getKey().equals("contents")) {
+                    // Transition from a "contents" list to a UIWidget.
+                    currentClass = UIWidget.class;
+                } else {
+                    // Retrieve the type of an unspecified UIWidget.
+                    if (currentClass == UIWidget.class && n.hasSiblingWithKey("type")) {
+                        String type = (String) n.getSiblingWithKey("type").getValue().getValue();
+                        currentClass = nuiManager
+                            .getWidgetMetadataLibrary()
+                            .resolve(type, ModuleContext.getContext())
+                            .getType();
+                    }
+
+                    // If the current class is a layout, remember its' value (but do not set until later on!)
+                    Class layoutClass = null;
+                    if (UILayout.class.isAssignableFrom(currentClass)) {
+                        layoutClass = currentClass;
+                    }
+
+                    if (UILayout.class.isAssignableFrom(currentClass) && n.getValue().getKey().equals("contents")) {
+                        // "contents" fields of a layout are always (widget) lists.
+                        currentClass = List.class;
+                    } else if (UIWidget.class.isAssignableFrom(currentClass) && n.getValue().getKey().equals("layoutInfo")) {
+                        // Set currentClass to the layout hint type for the active layout.
+                        currentClass = (Class) ReflectionUtil.getTypeParameter(activeLayoutClass.getGenericSuperclass(), 0);
+                    } else {
+                        String value = n.getValue().toString();
+                        Set<Field> fields = ReflectionUtils.getAllFields(currentClass);
+                        Optional<Field> newField = fields
+                            .stream().filter(f -> f.getName().equalsIgnoreCase(value)).findFirst();
+
+                        if (newField.isPresent()) {
+                            currentClass = newField.get().getType();
+                        } else {
+                            Optional<Field> serializedNameField = fields
+                                .stream()
+                                .filter(f -> f.isAnnotationPresent(SerializedName.class)
+                                             && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
+                            if (serializedNameField.isPresent()) {
+                                currentClass = serializedNameField.get().getType();
+                            } else {
+                                return null;
+                            }
+                        }
+                    }
+
+                    // Set the layout class value.
+                    if (layoutClass != null) {
+                        activeLayoutClass = layoutClass;
+                    }
+                }
+            }
+        }
+
+        // If the final result is a generic UIWidget, attempt to retrieve its' type.
+        if (currentClass == UIWidget.class && node.hasChildWithKey("type")) {
+            String type = (String) node.getChildWithKey("type").getValue().getValue();
+            currentClass = nuiManager
+                .getWidgetMetadataLibrary()
+                .resolve(type, ModuleContext.getContext())
+                .getType();
+        }
+        return currentClass;
     }
 }
