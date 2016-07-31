@@ -23,9 +23,7 @@ import org.terasology.rendering.dag.tasks.SetWireframeTask;
  * TODO: Add javadocs
  */
 public final class SetWireframe implements StateChange {
-    private static final boolean DEFAULT_VALUE = false;
-
-    private static SetWireframe defaultInstance;
+    private static SetWireframe defaultInstance = new SetWireframe(false);
     private static SetWireframeTask enablingTask;
     private static SetWireframeTask disablingTask;
 
@@ -35,19 +33,9 @@ public final class SetWireframe implements StateChange {
         this.enabled = enabled;
     }
 
-    public SetWireframe() {
-        this(DEFAULT_VALUE);
-    }
-
-
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-
-    public static void setDefaultInstance(SetWireframe defaultInstance) {
-        SetWireframe.defaultInstance = defaultInstance;
     }
 
     @Override

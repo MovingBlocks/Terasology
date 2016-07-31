@@ -65,7 +65,6 @@ import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
@@ -202,6 +201,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
+        initStateChanges();
+
         NodeFactory nodeFactory = new NodeFactory(context);
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
@@ -253,18 +254,15 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
-        initDefaultStateChanges();
-
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
 
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
 
-    private void initDefaultStateChanges() {
-        SetViewportSizeOf.setDefaultInstance(new SetViewportSizeOf(frameBuffersManager));
-        BindFBO.setDefaultInstance(new BindFBO());
-        SetWireframe.setDefaultInstance(new SetWireframe());
+    private void initStateChanges() {
+        SetViewportSizeOf.setFrameBuffersManager(frameBuffersManager);
+        BindFBO.setFrameBuffersManager(frameBuffersManager);
     }
 
     @Override

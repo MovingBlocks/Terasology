@@ -27,21 +27,22 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
     private static final String DEFAULT_FBO = "sceneOpaque";
-    private static SetViewportSizeOf defaultInstance;
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DEFAULT_FBO);
+    private static FrameBuffersManager frameBuffersManager;
     private SetViewportSizeOfTask task;
 
     private FBO fbo;
     private String fboName;
-    private FrameBuffersManager frameBuffersManager;
 
-    public SetViewportSizeOf(String fboName, FrameBuffersManager frameBuffersManager) {
+    public SetViewportSizeOf(String fboName) {
         this.fboName = fboName;
-        this.frameBuffersManager = frameBuffersManager;
-        fbo = frameBuffersManager.getFBO(fboName);
+        if (!fboName.equals(DEFAULT_FBO)) {
+            fbo = frameBuffersManager.getFBO(fboName);
+        }
     }
 
-    public SetViewportSizeOf(FrameBuffersManager frameBuffersManager) {
-        this(DEFAULT_FBO, frameBuffersManager);
+    public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
+        SetViewportSizeOf.frameBuffersManager = frameBuffersManager;
     }
 
     @Override
@@ -49,13 +50,10 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
         return defaultInstance;
     }
 
-    public static void setDefaultInstance(SetViewportSizeOf defaultInstance) {
-        SetViewportSizeOf.defaultInstance = defaultInstance;
-    }
-
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
+            fbo = frameBuffersManager.getFBO(fboName);
             task = new SetViewportSizeOfTask(fboName, fbo.width(), fbo.height());
             frameBuffersManager.subscribe(this);
         } else {
@@ -86,6 +84,9 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
+        if (isTheDefaultInstance()) { // necessary since default instance is generated before setFrameBuffersManager
+            fbo = frameBuffersManager.getFBO(fboName);
+        }
         return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, fbo.width(), fbo.height());
     }
 
