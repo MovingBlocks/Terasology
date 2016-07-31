@@ -31,4 +31,6 @@ public interface Node {
     Set<StateChange> getDesiredStateChanges();
 
     RenderPipelineTask generateTask();
+
+    void setTaskListGenerator(RenderTaskListGenerator taskListGenerator);
 }

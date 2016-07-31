@@ -27,7 +27,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -39,7 +39,6 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 
 /**
@@ -48,8 +47,12 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends AbstractNode {
+    private static final String SCENE_SHADOW_MAP = "sceneShadowMap";
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
+
+    @In
+    private FrameBuffersManager frameBuffersManager;
 
     @In
     private RenderableWorld renderableWorld;
@@ -61,20 +64,17 @@ public class ShadowMapNode extends AbstractNode {
     private Config config;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
-
-    @In
     private WorldRenderer worldRenderer;
 
     @In
     private BackdropProvider backdropProvider;
 
     private Material shadowMapShader;
-    private FBO shadowMap;
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
     private float texelSize;
     private float stepSize;
+
 
     @Override
     public void initialise() {
@@ -82,7 +82,9 @@ public class ShadowMapNode extends AbstractNode {
         this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
-        addDesiredStateChange(new BindFBO("sceneShadowMap", frameBuffersManager));
+
+        addDesiredStateChange(new BindFBO(SCENE_SHADOW_MAP, frameBuffersManager));
+        addDesiredStateChange(new SetViewportSizeOf(SCENE_SHADOW_MAP, frameBuffersManager));
     }
 
     @Override
@@ -93,9 +95,8 @@ public class ShadowMapNode extends AbstractNode {
         // TODO: check these conditions before adding this node inside the DAG, removing this condition completely from process()
         if (renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
-            shadowMap = frameBuffersManager.getFBO("sceneShadowMap");
+
             // preRenderSetupSceneShadowMap
-            setViewportToSizeOf(shadowMap);
             // TODO: verify the need to clear color buffer
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             GL11.glDisable(GL_CULL_FACE);

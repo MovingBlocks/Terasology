@@ -16,26 +16,19 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.terasology.rendering.opengl.OpenGLUtils.disableWireframeIf;
-import static org.terasology.rendering.opengl.OpenGLUtils.enableWireframeIf;
 
 /**
  * TODO: Diagram of this node
  */
-public class FirstPersonViewNode extends AbstractNode {
-
-    @In
-    private Config config;
+public class FirstPersonViewNode extends WireframeCapableNode {
 
     @In
     private WorldRenderer worldRenderer;
@@ -43,11 +36,11 @@ public class FirstPersonViewNode extends AbstractNode {
     @In
     private ComponentSystemManager componentSystemManager;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private Camera playerCamera;
 
     @Override
     public void initialise() {
+        super.initialise();
         renderingDebugConfig = config.getRendering().getDebug();
         playerCamera = worldRenderer.getActiveCamera();
     }
@@ -56,7 +49,6 @@ public class FirstPersonViewNode extends AbstractNode {
     public void process() {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
-            enableWireframeIf(renderingDebugConfig.isWireframe());
 
             /**
              * Sets the state to render the First Person View.
@@ -83,7 +75,6 @@ public class FirstPersonViewNode extends AbstractNode {
             GL11.glDepthFunc(GL_LEQUAL);
             GL11.glPopMatrix();
 
-            disableWireframeIf(renderingDebugConfig.isWireframe());
             PerformanceMonitor.endActivity();
         }
     }

@@ -63,6 +63,9 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
@@ -125,7 +128,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
-    private FrameBuffersManager buffersManager;
+    private FrameBuffersManager frameBuffersManager;
     private PostProcessor postProcessor;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
@@ -174,14 +177,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        buffersManager = new FrameBuffersManager();
-        context.put(FrameBuffersManager.class, buffersManager);
+        frameBuffersManager = new FrameBuffersManager();
+        context.put(FrameBuffersManager.class, frameBuffersManager);
 
-        postProcessor = new PostProcessor(buffersManager);
+        postProcessor = new PostProcessor(frameBuffersManager);
         context.put(PostProcessor.class, postProcessor);
 
-        buffersManager.setPostProcessor(postProcessor);
-        buffersManager.initialize();
+        frameBuffersManager.setPostProcessor(postProcessor);
+        frameBuffersManager.initialize();
 
         shaderManager.initShaders();
         initMaterials();
@@ -250,9 +253,18 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
+        initDefaultStateChanges();
+
+        RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-        RenderTaskListGenerator generator = new RenderTaskListGenerator();
-        renderPipelineTaskList = generator.generateFrom(orderedNodes);
+
+        renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
+    }
+
+    private void initDefaultStateChanges() {
+        SetViewportSizeOf.setDefaultInstance(new SetViewportSizeOf(frameBuffersManager));
+        BindFBO.setDefaultInstance(new BindFBO());
+        SetWireframe.setDefaultInstance(new SetWireframe());
     }
 
     @Override
@@ -315,7 +327,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
-            buffersManager.preRenderUpdate();
+            frameBuffersManager.preRenderUpdate();
 
             millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,16 @@
  */
 package org.terasology.config;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 /**
  */
-public class RenderingDebugConfig extends AbstractSubscribable {
-
+public class RenderingDebugConfig extends AbstractSubscribable implements PropertyChangeListener {
     public enum DebugRenderingStage {
         OPAQUE_COLOR(0, "DEBUG_STAGE_OPAQUE_COLOR"),
         TRANSPARENT_COLOR(1, "DEBUG_STAGE_TRANSPARENT_COLOR"),
@@ -63,6 +67,7 @@ public class RenderingDebugConfig extends AbstractSubscribable {
     public static final String HUD_HIDDEN = "hudHidden";
     public static final String RENDER_CHUNK_BOUNDING_BOXES = "renderChunkBoundingBoxes";
     public static final String RENDER_SKELETONS = "renderSkeletons";
+    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
 
     private boolean enabled;
     private DebugRenderingStage stage;
@@ -71,6 +76,10 @@ public class RenderingDebugConfig extends AbstractSubscribable {
     private boolean wireframe;
     private boolean renderChunkBoundingBoxes;
     private boolean renderSkeletons;
+
+    public RenderingDebugConfig() {
+        subscribe(this);
+    }
 
     public boolean isWireframe() {
         return wireframe;
@@ -146,4 +155,8 @@ public class RenderingDebugConfig extends AbstractSubscribable {
         propertyChangeSupport.firePropertyChange(RENDER_SKELETONS, oldValue, this.renderSkeletons);
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        logger.info("Set {} property to {}. ", evt.getPropertyName().toUpperCase(), evt.getNewValue()); // for debugging purposes
+    }
 }

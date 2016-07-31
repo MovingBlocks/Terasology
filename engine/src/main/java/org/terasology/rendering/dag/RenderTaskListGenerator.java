@@ -30,6 +30,7 @@ public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
     private List<Object> intermediateList;
     private List<RenderPipelineTask> taskList;
+    private List<Node> nodeList;
 
     public RenderTaskListGenerator() {
         taskList = Lists.newArrayList();
@@ -37,10 +38,9 @@ public final class RenderTaskListGenerator {
     }
 
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
+        nodeList = orderedNodes;
         generateIntermediateList(orderedNodes);
-        logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
         generateTaskList();
-        logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
         return taskList;
     }
 
@@ -109,19 +109,27 @@ public final class RenderTaskListGenerator {
                 taskList.add(((Node) object).generateTask());
             }
         }
-
-
+        logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
     }
 
     private void generateIntermediateList(List<Node> orderedNodes) {
         intermediateList.clear();
         for (Node node : orderedNodes) {
+            node.setTaskListGenerator(this);
             intermediateList.addAll(node.getDesiredStateChanges());
             intermediateList.add(node);
             // Add state changes to reset all desired state changes back to default.
             for (StateChange stateChange : node.getDesiredStateChanges()) {
                 intermediateList.add(stateChange.getDefaultInstance());
             }
+
         }
+        logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
     }
+
+    public void refresh() {
+        generateIntermediateList(nodeList);
+        generateTaskList();
+    }
+
 }

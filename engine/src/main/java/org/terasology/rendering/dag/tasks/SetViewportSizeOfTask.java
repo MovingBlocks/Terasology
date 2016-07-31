@@ -15,34 +15,35 @@
  */
 package org.terasology.rendering.dag.tasks;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import static org.lwjgl.opengl.GL11.glViewport;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
  * TODO: Add javadocs
  */
-public final class BindFBOTask implements RenderPipelineTask {
-
-    private int fboId;
+public class SetViewportSizeOfTask implements RenderPipelineTask {
+    private int width;
+    private int height;
     private String fboName;
 
-    public BindFBOTask(int fboId, String fboName) {
-        this.fboId = fboId;
+    public SetViewportSizeOfTask(String fboName, int width, int height) {
         this.fboName = fboName;
+        this.width = width;
+        this.height = height;
+    }
+
+    public void setDimensions(int w, int h) {
+        this.width = w;
+        this.height = h;
     }
 
     @Override
     public void execute() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-    }
-
-    public void setFboId(int fboId) {
-        this.fboId = fboId;
+        glViewport(0, 0, width, height);
     }
 
     @Override
     public String toString() {
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
+        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
     }
 }

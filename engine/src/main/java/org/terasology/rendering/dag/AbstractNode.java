@@ -15,7 +15,10 @@
  */
 package org.terasology.rendering.dag;
 
+import com.google.api.client.util.Lists;
+import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,13 +27,24 @@ import java.util.Set;
 public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateChanges;
     private NodeTask task;
+    private RenderTaskListGenerator taskListGenerator;
+    private List<Range<Integer>> rangeList;
 
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
+        rangeList = Lists.newArrayList();
     }
 
     protected boolean addDesiredStateChange(StateChange stateChange) {
         return desiredStateChanges.add(stateChange);
+    }
+
+    protected boolean removeDesiredStateChange(StateChange stateChange) {
+        return desiredStateChanges.remove(stateChange);
+    }
+
+    protected void refreshTaskList() {
+        taskListGenerator.refresh();
     }
 
     public Set<StateChange> getDesiredStateChanges() {
@@ -47,5 +61,9 @@ public abstract class AbstractNode implements Node {
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
+    }
+
+    public void setTaskListGenerator(RenderTaskListGenerator taskListGenerator) {
+        this.taskListGenerator = taskListGenerator;
     }
 }

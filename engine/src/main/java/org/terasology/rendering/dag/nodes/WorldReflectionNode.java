@@ -26,7 +26,7 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -35,8 +35,6 @@ import org.terasology.rendering.world.WorldRendererImpl;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 /**
  * Diagram of this node can be viewed from:
@@ -44,6 +42,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends AbstractNode {
+    private static final String SCENE_REFLECTED_FBO = "sceneReflected";
 
     @In
     private FrameBuffersManager frameBuffersManager;
@@ -63,24 +62,22 @@ public class WorldReflectionNode extends AbstractNode {
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
-    private FBO sceneReflected;
-    private FBO sceneOpaque;
+
 
     @Override
     public void initialise() {
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new BindFBO("sceneReflected", frameBuffersManager));
+        addDesiredStateChange(new BindFBO(SCENE_REFLECTED_FBO, frameBuffersManager));
+        addDesiredStateChange(new SetViewportSizeOf(SCENE_REFLECTED_FBO, frameBuffersManager));
+
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/worldReflection");
-        sceneReflected = frameBuffersManager.getFBO("sceneReflected");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
-        setViewportToSizeOf(sceneReflected); // TODO: add setViewportSizeOf state change and remove this line
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GL11.glCullFace(GL11.GL_FRONT);
         playerCamera.setReflected(true);
@@ -101,8 +98,7 @@ public class WorldReflectionNode extends AbstractNode {
         playerCamera.setReflected(false);
 
         GL11.glCullFace(GL11.GL_BACK);
-        bindDisplay(); // TODO: remove since its reset by default BindFBO state change
-        setViewportToSizeOf(sceneOpaque); // TODO: add setViewportSizeOf state change and remove this line
+
 
         PerformanceMonitor.endActivity();
     }
