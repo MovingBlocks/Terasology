@@ -30,12 +30,12 @@ import static org.junit.Assert.fail;
 public class JsonTreeConverterTest {
     @Test
     public void testTreeAdapter() {
-        File file = new File(getClass().getClassLoader().getResource("example.json").getFile());
+        File file = new File(getClass().getClassLoader().getResource("jsonTreeConverterInput.json").getFile());
         String content = null;
         try {
             content = Files.toString(file, Charsets.UTF_8);
         } catch (IOException e) {
-            fail("Could not load sample file");
+            fail("Could not load input file");
         }
         JsonElement element = new JsonParser().parse(content);
         assertEquals(element, JsonTreeConverter.deserialize(JsonTreeConverter.serialize(element)));

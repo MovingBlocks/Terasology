@@ -242,7 +242,7 @@ public class NUIEditorContextMenuBuilder {
      * @param node A node in an asset tree.
      * @return The type of the field this node represents.
      */
-    private Class getNodeType(JsonTree node) {
+    public Class getNodeType(JsonTree node) {
         Deque<JsonTree> pathToRoot = Queues.newArrayDeque();
 
         // Create a stack with the root node at the top and the argument at the bottom.
