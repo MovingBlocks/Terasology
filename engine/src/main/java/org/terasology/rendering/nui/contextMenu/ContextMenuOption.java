@@ -18,23 +18,29 @@ package org.terasology.rendering.nui.contextMenu;
 import java.util.function.Consumer;
 
 /**
- * A pair of a {@link Consumer} and an input object instance.
+ * A single option in a context menu level.
  *
- * @param <E> The type of the input to the consumer.
+ * @param <E> The type of the object passed to the option.
  */
-public class ConsumerObjectPair<E> {
+public class ContextMenuOption<E> {
     /**
-     * The consumer operation.
+     * A consumer operation.
      */
     private Consumer<E> consumer;
     /**
      * An input object instance.
      */
     private E object;
+    /**
+     * Whether the option is final (i.e. on selection closes the context menu
+     * and triggers the relevant listeners, if any).
+     */
+    private boolean finalized;
 
-    public ConsumerObjectPair(Consumer<E> consumer, E object) {
+    public ContextMenuOption(Consumer<E> consumer, E object, boolean finalized) {
         this.consumer = consumer;
         this.object = object;
+        this.finalized = finalized;
     }
 
     /**
@@ -49,5 +55,20 @@ public class ConsumerObjectPair<E> {
      */
     public E getObject() {
         return object;
+    }
+
+    /**
+     * @return Whether the option is final (i.e. on selection closes the context menu
+     * and triggers the relevant listeners, if any)
+     */
+    public boolean isFinalized() {
+        return finalized;
+    }
+
+    /**
+     * Perform the consumer operation on the input object instance.
+     */
+    public void accept() {
+        consumer.accept(object);
     }
 }

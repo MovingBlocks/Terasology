@@ -29,7 +29,6 @@ import java.util.List;
  */
 
 public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> {
-    private final boolean wrap;
 
     private final int marginTop;
     private final int marginBottom;
@@ -37,11 +36,10 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
     private final int marginRight;
 
     protected StringTextIconRenderer() {
-        this(false, 5, 5, 5, 10);
+        this(5, 5, 5, 10);
     }
 
-    protected StringTextIconRenderer(boolean wrap, int marginTop, int marginBottom, int marginLeft, int marginRight) {
-        this.wrap = wrap;
+    protected StringTextIconRenderer(int marginTop, int marginBottom, int marginLeft, int marginRight) {
         this.marginTop = marginTop;
         this.marginBottom = marginBottom;
         this.marginLeft = marginLeft;
@@ -76,48 +74,22 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
         }
 
         Rect2i textRegion = Rect2i.createFromMinAndSize(iconWidth, 0, canvas.getRegion().width() - iconWidth, canvas.getRegion().height());
-
-        if (wrap) {
-            canvas.drawText(text, textRegion);
-        } else {
-            int maxTextWidth = canvas.size().x - iconWidth;
-            Font font = canvas.getCurrentStyle().getFont();
-
-            // If text does not horizontally fit within the canvas, shrink it
-            if (font.getWidth(text) <= maxTextWidth) {
-                canvas.drawText(text, textRegion);
-            } else {
-                String shortText = "...";
-                StringBuilder sb = new StringBuilder(text);
-                while (sb.length() > 0) {
-                    shortText = sb.toString() + "...";
-                    if (font.getWidth(shortText) <= maxTextWidth) {
-                        break;
-                    }
-                    sb.setLength(sb.length() - 1);
-                }
-                canvas.drawText(shortText, textRegion);
-            }
-        }
+        canvas.drawText(text, textRegion);
     }
 
     @Override
     public Vector2i getPreferredSize(T value, Canvas canvas) {
         Font font = canvas.getCurrentStyle().getFont();
         String text = getString(value);
-        List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x);
 
         Texture texture = getTexture(value);
         if (texture == null) {
+            List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x);
             return font.getSize(lines);
         } else {
             int iconWidth = marginLeft + texture.getWidth() + marginRight;
-
-            if (wrap) {
-                return font.getSize(lines).addX(iconWidth);
-            } else {
-                return new Vector2i(font.getWidth(text), font.getLineHeight()).addX(iconWidth);
-            }
+            List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x - iconWidth);
+            return font.getSize(lines).addX(iconWidth);
         }
     }
 

@@ -183,6 +183,7 @@ public class HeadlessEnvironment extends Environment {
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 
+        context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         return assetTypeManager.getAssetManager();
     }
@@ -245,6 +246,7 @@ public class HeadlessEnvironment extends Environment {
 
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 
+        context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         return assetTypeManager.getAssetManager();
     }

@@ -17,15 +17,12 @@ package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * A builder class to construct and show {@link ContextMenuScreen} instances.
@@ -34,9 +31,9 @@ import java.util.function.Consumer;
  */
 public class ContextMenuBuilder {
     /**
-     * A list of available consumer/object actions mapped to a string.
+     * A list of context menu levels used within the menu.
      */
-    private Map<String, ConsumerObjectPair> options = Maps.newHashMap();
+    private List<ContextMenuLevel> menuLevels = Lists.newArrayList();
     /**
      * Listeners fired when an item is selected.
      */
@@ -46,20 +43,22 @@ public class ContextMenuBuilder {
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
     /**
-     *
+     * Listeners fired when the menu is closed, either with or without
+     * selecting an option.
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
     /**
-     * Adds an action to the available options.
+     * Adds a new level to the context menu.
      *
-     * @param name     The name of the action.
-     * @param consumer The consumer.
-     * @param item     The input object.
-     * @param <E>      The type of the input to the consumer.
+     * @param visible Whether the level should be initialized as visible.
+     * @return The newly added level.
      */
-    public <E> void addOption(String name, Consumer<E> consumer, E item) {
-        options.put(name, new ConsumerObjectPair<E>(consumer, item));
+    public ContextMenuLevel addLevel(boolean visible) {
+        ContextMenuLevel level = new ContextMenuLevel();
+        level.setVisible(visible);
+        menuLevels.add(level);
+        return level;
     }
 
     /**
@@ -73,26 +72,29 @@ public class ContextMenuBuilder {
             manager.pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
         }
 
-        ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
-        contextMenuScreen
-                .setList(Lists.newArrayList(options.keySet()));
-        contextMenuScreen
-                .setMenuPosition(position);
-        contextMenuScreen
-                .bindSelection(new Binding<String>() {
-                    @Override
-                    public String get() {
-                        return null;
-                    }
+        ContextMenuLevel primaryLevel = menuLevels.get(0);
+        primaryLevel.setVisible(true);
+        primaryLevel.setPosition(position);
+        for (ContextMenuLevel level : menuLevels) {
+            level.getMenuWidget().bindSelection(new Binding<String>() {
+                @Override
+                public String get() {
+                    return null;
+                }
 
-                    @Override
-                    public void set(String value) {
-                        ConsumerObjectPair pair = options.get(value);
-                        pair.getConsumer().accept(pair.getObject());
+                @Override
+                public void set(String value) {
+                    level.accept(value);
+                    if (((ContextMenuOption) level.getOptions().get(value)).isFinalized()) {
                         selectionListeners.forEach(UpdateListener::onAction);
                         manager.closeScreen(ContextMenuScreen.ASSET_URI);
                     }
-                });
+                }
+            });
+        }
+
+        ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
+        contextMenuScreen.setMenuLevels(menuLevels);
 
         contextMenuScreen.subscribeClose(() -> {
             closeListeners.forEach(UpdateListener::onAction);

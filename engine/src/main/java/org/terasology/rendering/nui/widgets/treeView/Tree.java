@@ -180,7 +180,6 @@ public abstract class Tree<T> {
         return true;
     }
 
-
     private boolean isChildOf(Tree<T> parent) {
         if (this.parent == parent) {
             return true;

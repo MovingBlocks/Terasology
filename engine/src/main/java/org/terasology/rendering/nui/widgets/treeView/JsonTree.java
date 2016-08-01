@@ -31,20 +31,21 @@ public class JsonTree extends Tree<JsonTreeValue> {
 
         // Only arrays or objects can have children.
         if (getValue().getType() != JsonTreeValue.Type.ARRAY
-                && getValue().getType() != JsonTreeValue.Type.OBJECT) {
+            && getValue().getType() != JsonTreeValue.Type.OBJECT) {
             return false;
         }
 
         // Objects cannot have empty object children.
         if (getValue().getType() == JsonTreeValue.Type.OBJECT
-                && child.getValue().getType() == JsonTreeValue.Type.OBJECT
-                && child.getValue().getKey() == null) {
+            && child.getValue() != null
+            && child.getValue().getType() == JsonTreeValue.Type.OBJECT
+            && child.getValue().getKey() == null) {
             return false;
         }
 
         // Only objects can have child key-value pairs.
         if (getValue().getType() == JsonTreeValue.Type.ARRAY
-                && (child.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR)) {
+            && (child.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR)) {
             return false;
         }
         return true;
@@ -53,6 +54,46 @@ public class JsonTree extends Tree<JsonTreeValue> {
     @Override
     public void addChild(JsonTreeValue childValue) {
         this.addChild(new JsonTree(childValue));
+    }
+
+    public JsonTree getChildAt(int index) {
+        return (JsonTree) children.toArray()[index];
+    }
+
+    public boolean hasChildWithKey(String key) {
+        for (Tree<JsonTreeValue> child : getChildren()) {
+            if (child.getValue().getKey() != null && child.getValue().getKey().equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public JsonTree getChildWithKey(String key) {
+        for (Tree<JsonTreeValue> child : getChildren()) {
+            if (child.getValue().getKey().equals(key)) {
+                return (JsonTree) child;
+            }
+        }
+        return null;
+    }
+
+    public boolean hasSiblingWithKey(String key) {
+        for (Tree<JsonTreeValue> child : parent.getChildren()) {
+            if (child.getValue().getKey() != null && child.getValue().getKey().equals(key) && child != this) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public JsonTree getSiblingWithKey(String key) {
+        for (Tree<JsonTreeValue> child : parent.getChildren()) {
+            if (child.getValue().getKey().equals(key) && child != this) {
+                return (JsonTree) child;
+            }
+        }
+        return null;
     }
 
     @Override

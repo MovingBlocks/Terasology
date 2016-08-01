@@ -16,12 +16,14 @@
 package org.terasology.rendering.nui.layouts.relative;
 
 import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.LayoutConfig;
 
 /**
  * Information on how to horizontally position a widget.
  *
  */
 public class HorizontalHint {
+    @LayoutConfig
     private int width;
 
     private HorizontalInfo positionLeft;

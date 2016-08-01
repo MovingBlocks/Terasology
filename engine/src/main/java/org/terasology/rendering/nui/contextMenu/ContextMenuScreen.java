@@ -24,7 +24,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -40,19 +40,16 @@ public class ContextMenuScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
     /**
-     * The list containing the available context menu options.
+     * A list of context menu levels used within the menu.
      */
-    private UIList menu;
+    private List<ContextMenuLevel> menuLevels = Lists.newArrayList();
     /**
-     * The absolute mouse position of {@code menu}.
-     */
-    private Vector2i menuPosition = Vector2i.zero();
-    /**
-     * Listeners fired when the menu is closed (without selecting an option).
+     * Listeners fired when the menu is closed without selecting an option.
      */
     private List<UpdateListener> closeListeners = Lists.newArrayList();
     /**
-     *
+     * Listeners fired when the menu is closed, either with or without
+     * selecting an option.
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
@@ -79,8 +76,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        menu = find("menu", UIList.class);
-        menu.setCanBeFocus(false);
+        find("menu", UIList.class).setCanBeFocus(false);
     }
 
     @Override
@@ -91,20 +87,27 @@ public class ContextMenuScreen extends CoreScreenLayer {
     @Override
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(mainListener);
-        Rect2i region = Rect2i.createFromMinAndSize(menuPosition, canvas.calculatePreferredSize(menu));
-        canvas.drawWidget(menu, region);
+
+        Vector2i currentPosition = null;
+        int currentWidth = 0;
+        for (ContextMenuLevel level : menuLevels) {
+            if (level.isVisible()) {
+                if (currentPosition == null) {
+                    currentPosition = new Vector2i(level.getPosition());
+                } else {
+                    currentPosition.addX(currentWidth);
+                }
+                UIWidget menuWidget = level.getMenuWidget();
+                Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
+                    canvas.calculatePreferredSize(menuWidget));
+                currentWidth = canvas.calculatePreferredSize(menuWidget).getX() - 8;
+                canvas.drawWidget(level.getMenuWidget(), region);
+            }
+        }
     }
 
-    public void setList(List list) {
-        menu.setList(list);
-    }
-
-    public void bindSelection(Binding selection) {
-        menu.bindSelection(selection);
-    }
-
-    public void setMenuPosition(Vector2i position) {
-        menuPosition = position;
+    public void setMenuLevels(List<ContextMenuLevel> levels) {
+        menuLevels = levels;
     }
 
     public void subscribeClose(UpdateListener listener) {
