@@ -160,7 +160,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
                 @Override
                 public void set(String value) {
                     if (value.equals(CREATE_NEW_SCREEN)) {
-                        resetState(NUIEditorNodeBuilder.createNewScreen());
+                        resetState(NUIEditorNodeUtils.createNewScreen());
                         selectedAsset = value;
                     } else {
                         selectAsset(new ResourceUrn(value));
@@ -310,38 +310,58 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * @param node The node an editor widget is to be created for.
      */
     private void editNode(JsonTree node) {
-        JsonTreeValue.Type type = node.getValue().getType();
-
-        // Create the inline editor depending on the node's type.
-        inlineEditorEntry = null;
-        if (type == JsonTreeValue.Type.VALUE) {
-            inlineEditorEntry = NUIEditorTextEntryBuilder.createValueEditor();
-        } else if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
-            inlineEditorEntry = NUIEditorTextEntryBuilder.createKeyValueEditor();
-        } else if (type == JsonTreeValue.Type.OBJECT &&
-                   !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
-            inlineEditorEntry = NUIEditorTextEntryBuilder.createObjectEditor();
-        } else if (type == JsonTreeValue.Type.ARRAY) {
-            inlineEditorEntry = NUIEditorTextEntryBuilder.createArrayEditor();
+        Class nodeClass = null;
+        try {
+            nodeClass = NUIEditorNodeUtils
+                .getNodeClass((JsonTree) node.getParent(), getManager())
+                .getDeclaredField(node.getValue().getKey())
+                .getType();
+        } catch (NullPointerException | NoSuchFieldException ignored) {
         }
 
-        if (inlineEditorEntry != null) {
-            inlineEditorEntry.bindValue(new Binding<JsonTree>() {
-                @Override
-                public JsonTree get() {
-                    return node;
-                }
-
-                @Override
-                public void set(JsonTree value) {
-                    if (value != null) {
-                        node.setValue(value.getValue());
-                        editor.fireUpdateListeners();
-                    }
-                }
+        if (nodeClass != null && Enum.class.isAssignableFrom(nodeClass)) {
+            getManager().pushScreen(EnumEditorScreen.ASSET_URI, EnumEditorScreen.class);
+            EnumEditorScreen enumEditorScreen = (EnumEditorScreen) getManager()
+                .getScreen(EnumEditorScreen.ASSET_URI);
+            enumEditorScreen.setNode(node);
+            enumEditorScreen.setEnumClass(nodeClass);
+            enumEditorScreen.subscribeClose(() -> {
+                editor.fireUpdateListeners();
             });
-            editor.setAlternativeWidget(inlineEditorEntry);
-            focusInlineEditor(node);
+        } else {
+            JsonTreeValue.Type type = node.getValue().getType();
+
+            // Create the inline editor depending on the node's type.
+            inlineEditorEntry = null;
+            if (type == JsonTreeValue.Type.VALUE) {
+                inlineEditorEntry = NUIEditorTextEntryBuilder.createValueEditor();
+            } else if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                inlineEditorEntry = NUIEditorTextEntryBuilder.createKeyValueEditor();
+            } else if (type == JsonTreeValue.Type.OBJECT &&
+                       !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+                inlineEditorEntry = NUIEditorTextEntryBuilder.createObjectEditor();
+            } else if (type == JsonTreeValue.Type.ARRAY) {
+                inlineEditorEntry = NUIEditorTextEntryBuilder.createArrayEditor();
+            }
+
+            if (inlineEditorEntry != null) {
+                inlineEditorEntry.bindValue(new Binding<JsonTree>() {
+                    @Override
+                    public JsonTree get() {
+                        return node;
+                    }
+
+                    @Override
+                    public void set(JsonTree value) {
+                        if (value != null) {
+                            node.setValue(value.getValue());
+                            editor.fireUpdateListeners();
+                        }
+                    }
+                });
+                editor.setAlternativeWidget(inlineEditorEntry);
+                focusInlineEditor(node);
+            }
         }
     }
 

@@ -47,7 +47,6 @@ import static org.junit.Assert.fail;
 
 public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
-    private static NUIEditorContextMenuBuilder builder;
 
     @BeforeClass
     public static void setupInput() {
@@ -64,28 +63,31 @@ public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
             fail("Could not load input file");
         }
         inputTree = JsonTreeConverter.serialize(new JsonParser().parse(content));
-        builder = new NUIEditorContextMenuBuilder();
-        builder.setManager(context.get(NUIManager.class));
     }
 
     @Test
     public void testNodeTypes() {
         JsonTree currentNode = inputTree;
-        assertEquals(PlaceholderScreenLayer.class, builder.getNodeType(currentNode));
+
+        assertEquals(PlaceholderScreenLayer.class, getNodeType(currentNode));
         currentNode = currentNode.getChildWithKey("contents");
-        assertEquals(RelativeLayout.class, builder.getNodeType(currentNode));
+        assertEquals(RelativeLayout.class, getNodeType(currentNode));
         currentNode = currentNode.getChildWithKey("contents");
-        assertEquals(UIButton.class, builder.getNodeType(currentNode.getChildAt(0)));
-        assertEquals(RelativeLayoutHint.class, builder.getNodeType(currentNode.getChildAt(0).getChildWithKey("layoutInfo")));
-        assertEquals(VerticalInfo.class, builder.getNodeType(currentNode.getChildAt(0)
+        assertEquals(UIButton.class, getNodeType(currentNode.getChildAt(0)));
+        assertEquals(RelativeLayoutHint.class, getNodeType(currentNode.getChildAt(0).getChildWithKey("layoutInfo")));
+        assertEquals(VerticalInfo.class, getNodeType(currentNode.getChildAt(0)
             .getChildWithKey("layoutInfo").getChildWithKey("position-top")));
-        assertEquals(HorizontalInfo.class, builder.getNodeType(currentNode.getChildAt(0)
+        assertEquals(HorizontalInfo.class, getNodeType(currentNode.getChildAt(0)
             .getChildWithKey("layoutInfo").getChildWithKey("position-horizontal-center")));
         currentNode = currentNode.getChildAt(1);
-        assertEquals(RowLayout.class, builder.getNodeType(currentNode));
-        assertEquals(RelativeLayoutHint.class, builder.getNodeType(currentNode.getChildWithKey("layoutInfo")));
+        assertEquals(RowLayout.class, getNodeType(currentNode));
+        assertEquals(RelativeLayoutHint.class, getNodeType(currentNode.getChildWithKey("layoutInfo")));
         currentNode = currentNode.getChildWithKey("contents").getChildAt(0);
-        assertEquals(UILabel.class, builder.getNodeType(currentNode));
-        assertEquals(RowLayoutHint.class, builder.getNodeType(currentNode.getChildWithKey("layoutInfo")));
+        assertEquals(UILabel.class, getNodeType(currentNode));
+        assertEquals(RowLayoutHint.class, getNodeType(currentNode.getChildWithKey("layoutInfo")));
+    }
+
+    private Class getNodeType(JsonTree node) {
+        return NUIEditorNodeUtils.getNodeClass(node, context.get(NUIManager.class));
     }
 }
