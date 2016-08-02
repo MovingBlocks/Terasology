@@ -21,18 +21,18 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * TODO: Add diagram of this node
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
+
+    private static final String SCENE_OPAQUE_FBO = "sceneOpaque";
 
     @In
     private ComponentSystemManager componentSystemManager;
@@ -40,17 +40,16 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
     @In
     private FrameBuffersManager frameBuffersManager;
 
-    private FBO sceneOpaque;
 
     @Override
     public void initialise() {
-
+        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO, frameBuffersManager));
+        // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/simpleBlendMaterials");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         preRenderSetupSimpleBlendMaterials();
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
@@ -75,9 +74,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      * be reversed, not eliminated, by re-enabling writing to the Depth Buffer.
      */
     private void preRenderSetupSimpleBlendMaterials() {
-        sceneOpaque.bind();
-        setRenderBufferMask(sceneOpaque, true, true, true);
-
+        frameBuffersManager.getFBO(SCENE_OPAQUE_FBO).setRenderBufferMask(true, true, true);
         GL11.glEnable(GL_BLEND);
         GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
         GL11.glDepthMask(false);
@@ -96,8 +93,5 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
     private void postRenderCleanupSimpleBlendMaterials() {
         GL11.glDisable(GL_BLEND);
         GL11.glDepthMask(true);
-
-        setRenderBufferMask(sceneOpaque, true, true, true); // TODO: review - this might be redundant.
-        bindDisplay();
     }
 }

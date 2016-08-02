@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,9 @@ import static org.lwjgl.opengl.GL11.glGenTextures;
  * and unbinding of both the FrameBuffer as a whole or its attachments, and the FrameBuffer's proper disposal.
  */
 public final class FBO {
-
+    private static final boolean DEFAULT_COLOR_MASK = true;
+    private static final boolean DEFAULT_NORMAL_MASK = true;
+    private static final boolean DEFAULT_LIGHT_BUFFER_MASK = true;
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 
     public int fboId;
@@ -57,6 +59,9 @@ public final class FBO {
     public int lightBufferTextureId;
 
     private final Dimensions dimensions;
+    private boolean writeToColorBuffer;
+    private boolean writeToNormalsBuffer;
+    private boolean writeToLightBuffer;
 
     private Status status;
 
@@ -77,6 +82,9 @@ public final class FBO {
     //                      should be through the static create() method.
     private FBO(int width, int height) {
         dimensions = new Dimensions(width, height);
+        writeToColorBuffer = DEFAULT_COLOR_MASK;
+        writeToNormalsBuffer = DEFAULT_NORMAL_MASK;
+        writeToLightBuffer = DEFAULT_LIGHT_BUFFER_MASK;
     }
 
     /**
@@ -89,6 +97,53 @@ public final class FBO {
         // necessary, it'd be easy to add a class variable tracking the currently bound FrameBuffer and the
         // associated checks.
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    }
+
+    /**
+     * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
+     * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
+     * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
+     *
+     * @param renderToColorBuffer If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToNormalsBuffer If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToLightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     */
+    public void setRenderBufferMask(boolean renderToColorBuffer, boolean renderToNormalsBuffer, boolean renderToLightBuffer) {
+        if (this.writeToColorBuffer == renderToColorBuffer && this.writeToNormalsBuffer == renderToNormalsBuffer && this.writeToLightBuffer == renderToLightBuffer) {
+            return;
+        }
+
+        this.writeToColorBuffer = renderToColorBuffer;
+        this.writeToNormalsBuffer = renderToNormalsBuffer;
+        this.writeToLightBuffer = renderToLightBuffer;
+
+        int attachmentId = 0;
+
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
+
+        // TODO: change GL_COLOR_ATTACHMENT0_EXT + attachmentId into something like COLOR_BUFFER_ATTACHMENT,
+        // TODO: in turn set within the class or method
+        if (colorBufferTextureId != 0) {
+            if (this.writeToColorBuffer) {
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+            attachmentId++;
+        }
+        if (normalsBufferTextureId != 0) {
+            if (this.writeToNormalsBuffer) {
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+            attachmentId++;
+        }
+        if (lightBufferTextureId != 0) {
+            if (this.writeToLightBuffer) {
+                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            }
+        }
+
+        bufferIds.flip();
+
+        GL20.glDrawBuffers(bufferIds);
     }
 
     /**
