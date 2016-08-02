@@ -1,6 +1,6 @@
 {
     "parent" : "physicalDamage",
     "blockDamageModifier" : {
-        "materialDamageMultiplier" : {"soil" : 2}
+        "materialDamageMultiplier" : {"leaf" : 1, "soil" : 2}
     }
 }
