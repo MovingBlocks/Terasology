@@ -43,7 +43,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO, frameBuffersManager));
+        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO));
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }
 
