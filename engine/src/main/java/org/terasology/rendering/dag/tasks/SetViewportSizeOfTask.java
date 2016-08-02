@@ -21,7 +21,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 /**
  * TODO: Add javadocs
  */
-public class SetViewportSizeOfTask implements RenderPipelineTask {
+public final class SetViewportSizeOfTask implements RenderPipelineTask {
     private int width;
     private int height;
     private String fboName;

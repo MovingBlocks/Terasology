@@ -31,17 +31,10 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static FrameBuffersManager frameBuffersManager;
     private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_NAME);
     private String fboName;
-
-    private int fboId;
     private BindFBOTask task;
 
     public BindFBO(String fboName) {
         this.fboName = fboName;
-        if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
-            fboId = frameBuffersManager.getFBO(fboName).fboId;
-        } else {
-            fboId = DEFAULT_FRAME_BUFFER_ID;
-        }
     }
 
     public String getFboName() {
@@ -65,13 +58,15 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new BindFBOTask(fboId, fboName);
             // Subscription is only needed if fboID is different than default frame buffer id.
-            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
+            if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
+                task = new BindFBOTask(frameBuffersManager.getFBO(fboName).fboId, fboName);
                 frameBuffersManager.subscribe(this);
+            } else {
+                task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_NAME);
             }
         } else {
-            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
+            if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
                 update();
             }
         }
@@ -88,12 +83,11 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void update() {
-        fboId = frameBuffersManager.getFBO(fboName).fboId;
-        task.setFboId(fboId);
+        task.setFboId(frameBuffersManager.getFBO(fboName).fboId);
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
+        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 }
