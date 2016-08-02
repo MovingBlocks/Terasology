@@ -98,7 +98,7 @@ public class JsonTree extends Tree<JsonTreeValue> {
 
     @Override
     public Tree<JsonTreeValue> copy() {
-        Tree<JsonTreeValue> copy = new JsonTree(this.value);
+        Tree<JsonTreeValue> copy = new JsonTree(this.value.copy());
         copy.setExpanded(this.isExpanded());
 
         for (Tree<JsonTreeValue> child : this.children) {

@@ -124,4 +124,8 @@ public class JsonTreeValue {
             return key != null ? key : NULL_STRING;
         }
     }
+
+    public JsonTreeValue copy() {
+        return new JsonTreeValue(key, value, type);
+    }
 }

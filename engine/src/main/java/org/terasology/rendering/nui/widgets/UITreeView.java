@@ -224,20 +224,24 @@ public class UITreeView<T> extends CoreWidget {
 
             if (id == Keyboard.KeyId.UP || id == Keyboard.KeyId.DOWN) {
                 // Up/Down: change a node's position within the parent node.
-                moveSelected(id);
-                return true;
+                return moveSelected(id);
             } else if (id == Keyboard.KeyId.DELETE) {
                 // Delete: remove a node (and all its' children).
-                removeSelected();
-                return true;
+                return removeSelected();
             } else if (ctrlDown && id == Keyboard.KeyId.C) {
                 // Ctrl+C: copy a selected node.
-                copy(model.get().getNode(state.getSelectedIndex()));
-                return true;
+                if (state.getSelectedIndex() != null) {
+                    copy(model.get().getNode(state.getSelectedIndex()));
+                    return true;
+                }
+                return false;
             } else if (ctrlDown && id == Keyboard.KeyId.V) {
                 // Ctrl+V: paste the copied node as a child of the currently selected node.
-                paste(model.get().getNode(state.getSelectedIndex()));
-                return true;
+                if (state.getSelectedIndex() != null) {
+                    paste(model.get().getNode(state.getSelectedIndex()));
+                    return true;
+                }
+                return false;
             } else {
                 return false;
             }
@@ -413,7 +417,7 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
-    private void moveSelected(int keyId) {
+    private boolean moveSelected(int keyId) {
         if (state.getSelectedIndex() != null) {
             Tree<T> selectedNode = model.get().getNode(state.getSelectedIndex());
             Tree<T> parent = selectedNode.getParent();
@@ -443,16 +447,22 @@ public class UITreeView<T> extends CoreWidget {
                     fireUpdateListeners();
                 }
             }
+
+            return true;
         }
+
+        return false;
     }
 
-    private void removeSelected() {
+    private boolean removeSelected() {
         if (state.getSelectedIndex() != null) {
             model.get().removeNode(state.getSelectedIndex());
             state.setSelectedIndex(null);
 
             fireUpdateListeners();
+            return true;
         }
+        return false;
     }
 
     private boolean onNodeClick(int index, NUIMouseClickEvent event) {

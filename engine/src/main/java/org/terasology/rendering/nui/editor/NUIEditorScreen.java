@@ -170,7 +170,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
 
         editor.subscribeTreeViewUpdate(() -> {
-            JsonTree rootNode = (JsonTree) editor.getModel().getNode(0).getRoot();
+            JsonTree rootNode = (JsonTree) editor.getModel().getNode(0).getRoot().copy();
             addToHistory(rootNode);
             setPreviewWidget(rootNode);
             updateConfig();

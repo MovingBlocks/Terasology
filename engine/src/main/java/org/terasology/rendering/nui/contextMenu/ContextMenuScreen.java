@@ -17,6 +17,8 @@ package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
@@ -37,6 +39,7 @@ import java.util.List;
  */
 public class ContextMenuScreen extends CoreScreenLayer {
 
+    private Logger logger = LoggerFactory.getLogger(ContextMenuScreen.class);
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
     /**
@@ -87,7 +90,6 @@ public class ContextMenuScreen extends CoreScreenLayer {
     @Override
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(mainListener);
-
         Vector2i currentPosition = null;
         int currentWidth = 0;
         for (ContextMenuLevel level : menuLevels) {
@@ -100,6 +102,14 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 UIWidget menuWidget = level.getMenuWidget();
                 Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
                     canvas.calculatePreferredSize(menuWidget));
+                double percentageThreshold = 0.9;
+                if (region.maxY() > canvas.getRegion().height() * percentageThreshold) {
+                    region = Rect2i.createFromMinAndMax(region.minX(),
+                        region.minY() - (region.maxY() - canvas.getRegion().height()) -
+                        (int) (canvas.getRegion().height() * (1 - percentageThreshold)),
+                        region.maxX(),
+                        canvas.getRegion().height());
+                }
                 currentWidth = canvas.calculatePreferredSize(menuWidget).getX() - 8;
                 canvas.drawWidget(level.getMenuWidget(), region);
             }

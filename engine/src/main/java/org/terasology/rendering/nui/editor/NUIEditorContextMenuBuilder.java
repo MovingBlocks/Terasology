@@ -180,7 +180,9 @@ public class NUIEditorContextMenuBuilder {
             }
         }
 
-        node.addChild(childValue);
+        JsonTree child = new JsonTree(childValue);
+        child.setExpanded(true);
+        node.addChild(child);
     }
 
     private boolean isWidget(Field field) throws IllegalAccessException {
@@ -230,6 +232,11 @@ public class NUIEditorContextMenuBuilder {
             } else {
                 value = field.get(clazz.newInstance());
             }
+
+            if (value != null && value instanceof Boolean) {
+                value = !(Boolean) value;
+            }
+            
             return value != null ? value :
                 field.getType().newInstance();
         }

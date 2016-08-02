@@ -75,7 +75,7 @@ public class TreeModel<T> {
      * @return The node with the given value.
      */
     public Tree<T> getNodeByValue(T value) {
-        Optional<Tree<T>> node = this.nodes.stream().filter(n -> n.getValue().equals(value)).findFirst();
+        Optional<Tree<T>> node = this.nodes.stream().filter(n -> n.getValue() == value).findFirst();
         return node.isPresent() ? node.get() : null;
     }
 
