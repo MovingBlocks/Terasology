@@ -67,6 +67,8 @@ public class ShaderParametersSky extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: move to node and/or material?
+        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset only if necessary
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, Assets.getTexture("engine:sky90").get().getId());
@@ -78,6 +80,7 @@ public class ShaderParametersSky extends ShaderParametersBase {
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
+        // TODO: move the rest to material?
         if (worldProvider != null && backdropProvider != null) {
             program.setFloat("colorExp", backdropProvider.getColorExp(), true);
 

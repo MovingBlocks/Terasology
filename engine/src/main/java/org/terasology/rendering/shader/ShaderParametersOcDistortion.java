@@ -30,7 +30,10 @@ public class ShaderParametersOcDistortion extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: move into node
         int texId = 0;
+        // TODO: convert the next three lines in a public method somewhere.
+        // TODO: In the BaseMaterial class perhaps? Or an even more generic utility class?
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         CoreRegistry.get(FrameBuffersManager.class).bindFboColorTexture("sceneFinal");
         program.setInt("texSceneFinal", texId++, true);

@@ -39,6 +39,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
 
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
 
+        // TODO: review - might have to go into a debug node
         switch (config.getRendering().getDebug().getStage()) {
             case SHADOW_MAP:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

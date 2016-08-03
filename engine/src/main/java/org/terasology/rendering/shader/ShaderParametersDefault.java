@@ -31,6 +31,7 @@ public class ShaderParametersDefault extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: verify this is still relevant
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, 0);
     }

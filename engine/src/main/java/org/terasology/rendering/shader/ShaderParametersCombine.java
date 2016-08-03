@@ -49,9 +49,11 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         super.applyParameters(program);
 
         int texId = 0;
+        // TODO: obtain these objects once in superclass and add there monitoring functionality as needed?
         FrameBuffersManager frameBuffersManager = CoreRegistry.get(FrameBuffersManager.class);
         FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
+        // TODO: move texture bindings to the appropriate nodes
         if (sceneOpaque != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             sceneOpaque.bindTexture();
@@ -81,10 +83,13 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
+        // TODO: review - unnecessary? Probably from a time when shaders were initialized
+        // TODO:          on application startup rather than renderer startup.
         if (renderingConfig == null || activeCamera == null) {
             return;
         }
 
+        // TODO: monitor the property subscribing to it
         if (renderingConfig.isLocalReflections()) {
             if (sceneReflectiveRefractive != null) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -96,12 +101,14 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
         }
 
+        // TODO: monitor the property subscribing to it
         if (renderingConfig.isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("ssaoBlurred");
             program.setInt("texSsao", texId++, true);
         }
 
+        // TODO: monitor the property subscribing to it
         if (renderingConfig.isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("outline");
@@ -111,11 +118,13 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setFloat("outlineThickness", outlineThickness, true);
         }
 
+        // TODO: monitor the property subscribing to it
         if (renderingConfig.isVolumetricFog()) {
             program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
             //TODO: Other parameters and volumetric fog test case is needed
         }
 
+        // TODO: monitor the property subscribing to it
         if (renderingConfig.isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             frameBuffersManager.bindFboColorTexture("sceneSkyBand1");

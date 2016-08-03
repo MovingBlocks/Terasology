@@ -37,9 +37,13 @@ public class ShaderParametersSobel extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: obtain once in superclass? The superclass could then have the monitoring functionality.
         FBO scene = CoreRegistry.get(FrameBuffersManager.class).getFBO("sceneOpaque");
 
+        // TODO: move to node
         if (scene != null) {
+
+            // TODO: group these recurring three lines into a method binding a texture from disk or an FBO-bound buffer
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             scene.bindDepthTexture();
             program.setInt("texDepth", 0);

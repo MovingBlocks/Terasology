@@ -46,11 +46,15 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: obtain once in superclass and monitor from there?
         FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
         FBO scene = buffersManager.getFBO("sceneOpaque");
 
         int texId = 0;
 
+        // TODO: - move into node
+        // TODO: - many null checks are happening in these shader parameter classes. I feel they are unnecessary
+        // TODO:   as those objects should never be null. If they are I'd be happy receiving an NPE and debugging as needed.
         if (scene != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             scene.bindTexture();
@@ -60,6 +64,7 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
             program.setInt("texDepth", texId++, true);
         }
 
+        // TODO: move into Material?
         program.setFloat("density", density, true);
         program.setFloat("exposure", exposure, true);
         program.setFloat("weight", weight, true);
@@ -68,7 +73,9 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
+        // TODO: eliminate null check?
         if (worldRenderer != null) {
+            // TODO: move into Material?
             Vector3f sunDirection = backdropProvider.getSunDirection(true);
 
             Camera activeCamera = worldRenderer.getActiveCamera();

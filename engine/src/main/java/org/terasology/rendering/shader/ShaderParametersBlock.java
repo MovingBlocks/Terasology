@@ -37,15 +37,19 @@ public class ShaderParametersBlock extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
+        // TODO: move in material or node, take advantage of texture.subscribeToDisposal()
         Texture terrainTex = Assets.getTexture("engine:terrain").get();
 
+        // TODO: review - unnecessary?
         if (terrainTex == null) {
             return;
         }
 
+        // TODO: move texture binding into the appropriate node(s) as state changes.
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
+        // TODO: move into material
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f, true);
         program.setBoolean("textured", true, true);
         program.setFloat("alpha", 1.0f, true);
