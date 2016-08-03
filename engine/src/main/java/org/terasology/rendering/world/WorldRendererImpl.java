@@ -66,6 +66,7 @@ import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.FBOBuilder;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -177,6 +178,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initRenderingSupport() {
         frameBuffersManager = new FrameBuffersManager();
+        FBOBuilder.setFrameBuffersManager(frameBuffersManager); // FIXME: dirty
+
         context.put(FrameBuffersManager.class, frameBuffersManager);
 
         postProcessor = new PostProcessor(frameBuffersManager);

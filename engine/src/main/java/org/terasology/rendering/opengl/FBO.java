@@ -527,6 +527,13 @@ public final class FBO {
             return new Dimensions(width / divisor, height / divisor);
         }
 
+
+        public Dimensions multiplyBy(float multiplier) {
+            int w = (int) (width * multiplier);
+            int h = (int) (height * multiplier);
+            return new Dimensions(w, h);
+        }
+
         /**
          * Multiplies (in place) both width and height of this Dimensions object by multiplier.
          * @param multiplier A float representing a multiplication factor.

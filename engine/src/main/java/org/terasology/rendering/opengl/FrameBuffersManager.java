@@ -82,6 +82,7 @@ public class FrameBuffersManager {
 
     private PostProcessor postProcessor;
     private Set<FBOManagerSubscriber> fboManagerSubscribers;
+    private Map<String, FBOBuilder> dynamicFBOBuilders;
 
     public FrameBuffersManager() {
         // nothing to do here, everything happens at initialization time,
@@ -93,6 +94,7 @@ public class FrameBuffersManager {
     Also instructs the PostProcessor and the GraphicState instances to fetch the FBOs they require.
      */
     public void initialize() {
+        dynamicFBOBuilders = Maps.newHashMap();
         fboManagerSubscribers = Sets.newHashSet();
 
         createStaticFBOs();
@@ -108,11 +110,11 @@ public class FrameBuffersManager {
     // holding average image brightness data. This is then used in the context of eye adaptation.
     private void createStaticFBOs() {
         // The FBObuilder takes care of registering the new FBOs on the fboLookup map.
-        new FBObuilder("scene16", 16, 16, FBO.Type.DEFAULT).build();
-        new FBObuilder("scene8",   8,  8, FBO.Type.DEFAULT).build();
-        new FBObuilder("scene4",   4,  4, FBO.Type.DEFAULT).build();
-        new FBObuilder("scene2",   2,  2, FBO.Type.DEFAULT).build();
-        new FBObuilder("scene1",   1,  1, FBO.Type.DEFAULT).build();
+        new FBOBuilder("scene16", 16, 16, FBO.Type.DEFAULT).build();
+        new FBOBuilder("scene8", 8, 8, FBO.Type.DEFAULT).build();
+        new FBOBuilder("scene4", 4, 4, FBO.Type.DEFAULT).build();
+        new FBOBuilder("scene2", 2, 2, FBO.Type.DEFAULT).build();
+        new FBOBuilder("scene1", 1, 1, FBO.Type.DEFAULT).build();
 
         // Technically these are not Frame Buffer Objects but Pixel Buffer Objects.
         // Their instantiation and assignments are done here because they are static buffers.
@@ -201,7 +203,6 @@ public class FrameBuffersManager {
                                     // into one buffer to be post-processed.
 
         deleteFBO("lightShafts");       // light shafts rendering
-        deleteFBO("sceneToneMapped");   // HDR tone mapping
 
         deleteFBO("sceneHighPass"); // a number of buffers to create the bloom effect
         deleteFBO("sceneBloom0");
@@ -215,39 +216,47 @@ public class FrameBuffersManager {
                                     // for each eye, with no lens distortion applied.
 
         deleteFBO("sceneFinal");    // the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
+
+        for (String fboName : dynamicFBOBuilders.keySet()) {
+            deleteFBO(fboName);
+        }
     }
 
     private void recreateDynamicFBOs() {
         // The FBObuilder takes care of registering thew new FBOs on the fboLookup hashmap.
-        sceneOpaque = new FBObuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
-        new FBObuilder("sceneOpaquePingPong", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+        sceneOpaque = new FBOBuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
+        new FBOBuilder("sceneOpaquePingPong", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
 
-        new FBObuilder("sceneSkyBand0",   one16thScale, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneSkyBand1",   one32thScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneSkyBand0", one16thScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneSkyBand1", one32thScale, FBO.Type.DEFAULT).build();
 
-        FBO sceneReflectiveRefractive = new FBObuilder("sceneReflectiveRefractive", fullScale, FBO.Type.HDR).useNormalBuffer().build();
+        FBO sceneReflectiveRefractive = new FBOBuilder("sceneReflectiveRefractive", fullScale, FBO.Type.HDR).useNormalBuffer().build();
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
 
-        new FBObuilder("sceneReflected",  halfScale,    FBO.Type.DEFAULT).useDepthBuffer().build();
+        new FBOBuilder("sceneReflected", halfScale, FBO.Type.DEFAULT).useDepthBuffer().build();
 
-        new FBObuilder("outline",         fullScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("ssao",            fullScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("ssaoBlurred",     fullScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("scenePrePost",    fullScale,    FBO.Type.HDR).build();
+        new FBOBuilder("outline", fullScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("ssao", fullScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("ssaoBlurred", fullScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("scenePrePost", fullScale, FBO.Type.HDR).build();
 
-        new FBObuilder("lightShafts",     halfScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneToneMapped", fullScale,    FBO.Type.HDR).build();
+        new FBOBuilder("lightShafts", halfScale, FBO.Type.DEFAULT).build();
 
-        new FBObuilder("sceneHighPass",   fullScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBloom0",     halfScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBloom1",     quarterScale, FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBloom2",     one8thScale,  FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneHighPass", fullScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneBloom0", halfScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneBloom1", quarterScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneBloom2", one8thScale, FBO.Type.DEFAULT).build();
 
-        new FBObuilder("sceneBlur0",      halfScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneBlur1",      halfScale,    FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneBlur0", halfScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneBlur1", halfScale, FBO.Type.DEFAULT).build();
 
-        new FBObuilder("ocUndistorted",   fullScale,    FBO.Type.DEFAULT).build();
-        new FBObuilder("sceneFinal",      fullScale,    FBO.Type.DEFAULT).build();
+        new FBOBuilder("ocUndistorted", fullScale, FBO.Type.DEFAULT).build();
+        new FBOBuilder("sceneFinal", fullScale, FBO.Type.DEFAULT).build();
+
+        for (FBOBuilder builder : dynamicFBOBuilders.values()) {
+            builder.build();
+        }
+
         notifySubscribers();
     }
 
@@ -260,7 +269,7 @@ public class FrameBuffersManager {
     private void recreateShadowMapFBO() {
         int shadowMapResFromSettings = renderingConfig.getShadowMapResolution();
         Dimensions shadowMapResolution =  new Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
-        sceneShadowMap = new FBObuilder("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        sceneShadowMap = new FBOBuilder("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
         handleDisposedShadowMap(sceneShadowMap);
     }
 
@@ -461,158 +470,31 @@ public class FrameBuffersManager {
         return fboManagerSubscribers.remove(subscriber);
     }
 
-    /**
-     * Builder class to simplify the syntax creating an FBO.
-     * <p>
-     * Once the desired characteristics of the FBO are set via the Builder's constructor and its
-     * use*Buffer() methods, the build() method can be called for the actual FBO to be generated,
-     * alongside the underlying FrameBuffer and its attachments on the GPU.
-     * <p>
-     * The new FBO is automatically registered with the LwjglRenderingProcess, overwriting any
-     * existing FBO with the same title.
-     */
-    public class FBObuilder {
-
-        private FBO generatedFBO;
-
-        private String title;
-        private FBO.Dimensions dimensions;
-        private FBO.Type type;
-
-        private boolean useDepthBuffer;
-        private boolean useNormalBuffer;
-        private boolean useLightBuffer;
-        private boolean useStencilBuffer;
-
-        /**
-         * Constructs an FBO builder capable of building the two most basic FBOs:
-         * an FBO with no attachments or one with a single color buffer attached to it.
-         * <p>
-         * To attach additional buffers, see the use*Buffer() methods.
-         * <p>
-         * Example: FBO basicFBO = new FBObuilder("basic", new Dimensions(1920, 1080), Type.DEFAULT).build();
-         *
-         * @param title A string identifier, the title is used to later manipulate the FBO through
-         *              methods such as LwjglRenderingProcess.getFBO(title) and LwjglRenderingProcess.bindFBO(title).
-         * @param dimensions A Dimensions object providing width and height information.
-         * @param type Type.DEFAULT will result in a 32 bit color buffer attached to the FBO. (GL_RGBA, GL11.GL_UNSIGNED_BYTE, GL_LINEAR)
-         *             Type.HDR will result in a 64 bit color buffer attached to the FBO. (GL_RGBA, GL_HALF_FLOAT_ARB, GL_LINEAR)
-         *             Type.NO_COLOR will result in -no- color buffer attached to the FBO
-         *             (WARNING: this could result in an FBO with Status.DISPOSED - see FBO.getStatus()).
-         */
-        public FBObuilder(String title, FBO.Dimensions dimensions, FBO.Type type) {
-            this.title = title;
-            this.dimensions = dimensions;
-            this.type = type;
+    public void addFBO(FBOBuilder fboBuilder) {
+        fboBuilder.build();
+        if (fboBuilder.isFBODynamic()) {
+            dynamicFBOBuilders.put(fboBuilder.getTitle(), fboBuilder);
         }
+    }
 
-        /**
-         * Same as the previous FBObuilder constructor, but taking in input
-         * explicit, integer width and height instead of a Dimensions object.
-         */
-        public FBObuilder(String title, int width, int height, FBO.Type type) {
-            this(title,  new FBO.Dimensions(width, height), type);
-        }
+    public boolean isFBOAvailable(String title) {
+        return fboLookup.containsKey(title);
+    }
 
-/*
- *  * @param useDepthBuffer If true the FBO will have a 24 bit depth buffer attached to it. (GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, GL_NEAREST)
-    * @param useNormalBuffer If true the FBO will have a 32 bit normals buffer attached to it. (GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR)
-    * @param useLightBuffer If true the FBO will have 32/64 bit light buffer attached to it, depending if Type is DEFAULT/HDR.
-*                       (GL_RGBA/GL_RGBA16F_ARB, GL_UNSIGNED_BYTE/GL_HALF_FLOAT_ARB, GL_LINEAR)
-    * @param useStencilBuffer If true the depth buffer will also have an 8 bit Stencil buffer associated with it.
-    *                         (GL_DEPTH24_STENCIL8_EXT, GL_UNSIGNED_INT_24_8_EXT, GL_NEAREST)
-                *                         */
+    public Dimensions getFullScale() {
+        return fullScale;
+    }
 
-        /**
-         * Sets the builder to generate, allocate and attach a 24 bit depth buffer to the FrameBuffer to be built.
-         * If useStencilBuffer() is also used, an 8 bit stencil buffer will also be associated with the depth buffer.
-         * For details on the specific characteristics of the buffers, see the FBO.create() method.
-         *
-         * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useDepthBuffer().build();
-         */
-        public FBObuilder useDepthBuffer() {
-            useDepthBuffer = true;
-            return this;
-        }
+    public void removeFromLookup(String title) {
+        fboLookup.remove(title);
+    }
 
-        /**
-         * Sets the builder to generate, allocate and attach a normals buffer to the FrameBuffer to be built.
-         * For details on the specific characteristics of the buffer, see the FBO.create() method.
-         *
-         * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useNormalsBuffer().build();
-         */
-        public FBObuilder useNormalBuffer() {
-            useNormalBuffer = true;
-            return this;
-        }
+    public void putToLookup(String title, FBO fbo) {
+        fboLookup.put(title, fbo);
+    }
 
-        /**
-         * Sets the builder to generate, allocate and attach a light buffer to the FrameBuffer to be built.
-         * Be aware that the number of bits per channel for this buffer changes with the set FBO.Type.
-         * For details see the FBO.create() method.
-         *
-         * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useLightBuffer().build();
-         */
-        public FBObuilder useLightBuffer() {
-            useLightBuffer = true;
-            return this;
-        }
-
-        /**
-         * -IF- the builder has been set to generate a depth buffer, using this method sets the builder to
-         * generate a depth buffer inclusive of stencil buffer, with the following characteristics:
-         * internal format GL_DEPTH24_STENCIL8_EXT, data type GL_UNSIGNED_INT_24_8_EXT and filtering GL_NEAREST.
-         *
-         * @return The calling instance of FBObuilder, to chain calls,
-         *         i.e.: new FBObuilder(...).useDepthBuffer().useStencilBuffer().build();
-         */
-        public FBObuilder useStencilBuffer() {
-            useStencilBuffer = true;
-            return this;
-        }
-
-        /**
-         * Given information set through the constructor and the use*Buffer() methods, builds and returns
-         * an FBO instance, inclusive the underlying OpenGL FrameBuffer and any requested attachments.
-         * <p>
-         * The FBO is also automatically registered with the LwjglRenderingProcess through its title string.
-         * This allows its retrieval and binding through methods such as getFBO(String title) and
-         * bindFBO(String title). If another FBO is registered with the same title, it is disposed and
-         * the new FBO registered in its place.
-         * <p>
-         * This method is effectively mono-use: calling it more than once will return the exact same FBO
-         * returned the first time. To build a new FBO with identical or different characteristics it's
-         * necessary to instantiate a new builder.
-         *
-         * @return An FBO. Make sure to check it with FBO.getStatus() before using it.
-         */
-        public FBO build() {
-            if (generatedFBO != null) {
-                return generatedFBO;
-            }
-
-            FBO oldFBO = fboLookup.get(title);
-            if (oldFBO != null) {
-                oldFBO.dispose();
-                fboLookup.remove(title);
-                logger.warn("FBO " + title + " has been overwritten. Ideally it would have been deleted first.");
-            }
-
-            generatedFBO = FBO.create(title, dimensions, type, useDepthBuffer, useNormalBuffer, useLightBuffer, useStencilBuffer);
-            handleIncompleteAndUnexpectedStatus(generatedFBO);
-            fboLookup.put(title, generatedFBO);
-            return generatedFBO;
-        }
-
-        private void handleIncompleteAndUnexpectedStatus(FBO fbo) {
-            // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
-            // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
-            if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
-                logger.error("FBO " + title + " is incomplete. Look earlier in the log for details.");
-            } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
-                logger.error("FBO " + title + " has generated an unexpected status code. Look earlier in the log for details.");
-            }
-        }
+    public void dispose(String title) {
+        getFBO(title).dispose();
     }
 }
 

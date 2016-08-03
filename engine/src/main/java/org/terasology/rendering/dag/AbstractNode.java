@@ -15,25 +15,36 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
-
-import java.util.List;
 import java.util.Set;
+import org.terasology.registry.In;
+import org.terasology.rendering.opengl.FBOBuilder;
+import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * TODO: Add javadocs
  */
 public abstract class AbstractNode implements Node {
+    @In
+    private FrameBuffersManager frameBuffersManager;
+
     private Set<StateChange> desiredStateChanges;
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
-    private List<Range<Integer>> rangeList;
 
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
-        rangeList = Lists.newArrayList();
+    }
+
+    protected void requireFBO(FBOBuilder fboBuilder) {
+        if (!frameBuffersManager.isFBOAvailable(fboBuilder.getTitle())) {
+            frameBuffersManager.addFBO(fboBuilder);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        // TODO: FBOBuilder and FBO disposal here
     }
 
     protected boolean addDesiredStateChange(StateChange stateChange) {

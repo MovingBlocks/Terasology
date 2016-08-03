@@ -28,6 +28,9 @@ public interface Node {
 
     void process();
 
+    // TODO: invoked when Node is removed from RenderGraph
+    void dispose();
+
     Set<StateChange> getDesiredStateChanges();
 
     RenderPipelineTask generateTask();
