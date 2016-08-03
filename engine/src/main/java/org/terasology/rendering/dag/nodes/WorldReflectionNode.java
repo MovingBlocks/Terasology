@@ -27,7 +27,6 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,9 +42,6 @@ import static org.lwjgl.opengl.GL11.glClear;
  */
 public class WorldReflectionNode extends AbstractNode {
     private static final String SCENE_REFLECTED_FBO = "sceneReflected";
-
-    @In
-    private FrameBuffersManager frameBuffersManager;
 
     @In
     private RenderQueuesHelper renderQueues;
@@ -69,9 +65,8 @@ public class WorldReflectionNode extends AbstractNode {
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new BindFBO(SCENE_REFLECTED_FBO, frameBuffersManager));
-        addDesiredStateChange(new SetViewportSizeOf(SCENE_REFLECTED_FBO, frameBuffersManager));
-
+        addDesiredStateChange(new BindFBO(SCENE_REFLECTED_FBO));
+        addDesiredStateChange(new SetViewportSizeOf(SCENE_REFLECTED_FBO));
     }
 
     @Override

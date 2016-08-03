@@ -27,21 +27,18 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
     private static final String DEFAULT_FBO = "sceneOpaque";
-    private static SetViewportSizeOf defaultInstance;
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DEFAULT_FBO);
+    private static FrameBuffersManager frameBuffersManager;
     private SetViewportSizeOfTask task;
 
-    private FBO fbo;
     private String fboName;
-    private FrameBuffersManager frameBuffersManager;
 
-    public SetViewportSizeOf(String fboName, FrameBuffersManager frameBuffersManager) {
+    public SetViewportSizeOf(String fboName) {
         this.fboName = fboName;
-        this.frameBuffersManager = frameBuffersManager;
-        fbo = frameBuffersManager.getFBO(fboName);
     }
 
-    public SetViewportSizeOf(FrameBuffersManager frameBuffersManager) {
-        this(DEFAULT_FBO, frameBuffersManager);
+    public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
+        SetViewportSizeOf.frameBuffersManager = frameBuffersManager;
     }
 
     @Override
@@ -49,16 +46,11 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
         return defaultInstance;
     }
 
-    public static void setDefaultInstance(SetViewportSizeOf defaultInstance) {
-        SetViewportSizeOf.defaultInstance = defaultInstance;
-    }
-
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new SetViewportSizeOfTask(fboName, fbo.width(), fbo.height());
+            task = new SetViewportSizeOfTask(fboName);
             frameBuffersManager.subscribe(this);
-        } else {
             update();
         }
 
@@ -80,13 +72,13 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public void update() {
-        fbo = frameBuffersManager.getFBO(fboName);
+        FBO fbo = frameBuffersManager.getFBO(fboName);
         task.setDimensions(fbo.width(), fbo.height());
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, fbo.width(), fbo.height());
+        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 
     public String getFboName() {

@@ -28,31 +28,26 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
     // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
     private static final String DEFAULT_FRAME_BUFFER_NAME = "display";
-    private static BindFBO defaultInstance = new BindFBO();
+    private static FrameBuffersManager frameBuffersManager;
+    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_NAME);
     private String fboName;
-    private FrameBuffersManager frameBuffersManager;
-    private int fboId;
     private BindFBOTask task;
 
-    public BindFBO(String fboName, FrameBuffersManager frameBuffersManager) {
+    public BindFBO(String fboName) {
         this.fboName = fboName;
-        this.frameBuffersManager = frameBuffersManager;
-        fboId = frameBuffersManager.getFBO(fboName).fboId;
     }
 
-    public BindFBO() {
-        this.fboName = DEFAULT_FRAME_BUFFER_NAME;
-        fboId = DEFAULT_FRAME_BUFFER_ID;
+    public String getFboName() {
+        return fboName;
+    }
+
+    public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
+        BindFBO.frameBuffersManager = frameBuffersManager;
     }
 
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-
-    public static void setDefaultInstance(BindFBO defaultInstance) {
-        BindFBO.defaultInstance = defaultInstance;
     }
 
     @Override
@@ -63,13 +58,15 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new BindFBOTask(fboId, fboName);
             // Subscription is only needed if fboID is different than default frame buffer id.
-            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
+            if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
+                task = new BindFBOTask(frameBuffersManager.getFBO(fboName).fboId, fboName);
                 frameBuffersManager.subscribe(this);
+            } else {
+                task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_NAME);
             }
         } else {
-            if (fboId != DEFAULT_FRAME_BUFFER_ID) {
+            if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
                 update();
             }
         }
@@ -86,16 +83,11 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void update() {
-        fboId = frameBuffersManager.getFBO(fboName).fboId;
-        task.setFboId(fboId);
+        task.setFboId(frameBuffersManager.getFBO(fboName).fboId);
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
-    }
-
-    public String getFboName() {
-        return fboName;
+        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 }
