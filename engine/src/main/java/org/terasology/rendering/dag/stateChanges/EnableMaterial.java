@@ -18,49 +18,57 @@ package org.terasology.rendering.dag.stateChanges;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.EnableShaderTask;
+import org.terasology.rendering.dag.tasks.DisableMaterialTask;
+import org.terasology.rendering.dag.tasks.EnableMaterialTask;
 import org.terasology.utilities.Assets;
 
 /**
  * TODO: Add javadocs
  */
-public class EnableShader implements StateChange {
-    private EnableShaderTask task;
-    private String shaderName;
+public class EnableMaterial implements StateChange {
+    private static final String DEFAULT_MATERIAL_NAME = "DEFAULT";
+    private static EnableMaterial defaultInstance = new EnableMaterial(DEFAULT_MATERIAL_NAME);
 
-    public EnableShader(String shaderName) {
-        this.shaderName = shaderName;
+    private RenderPipelineTask task;
+    private String materialName;
+
+    public EnableMaterial(String materialName) {
+        this.materialName = materialName;
     }
 
-    public String getShaderName() {
-        return shaderName;
+    public String getMaterialName() {
+        return materialName;
     }
 
     @Override
     public StateChange getDefaultInstance() {
-        return null;
+        return defaultInstance;
     }
 
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            Material shader = getMaterial(shaderName);
-            task = new EnableShaderTask(shader, shaderName);
+            if (materialName.equals(DEFAULT_MATERIAL_NAME)) {
+                task = new DisableMaterialTask();
+            } else {
+                Material shader = getMaterial(materialName);
+                task = new EnableMaterialTask(shader, materialName);
+            }
         }
         return task;
     }
 
     @Override
     public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof EnableShader) {
-            return shaderName.equals(((EnableShader) stateChange).getShaderName());
+        if (stateChange instanceof EnableMaterial) {
+            return materialName.equals(((EnableMaterial) stateChange).getMaterialName());
         }
         return false;
     }
 
     @Override
     public boolean isTheDefaultInstance() {
-        return false;
+        return this == defaultInstance;
     }
 
     private static Material getMaterial(String assetId) {
@@ -70,6 +78,6 @@ public class EnableShader implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), shaderName);
+        return String.format("%21s(%s)", this.getClass().getSimpleName(), materialName);
     }
 }

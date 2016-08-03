@@ -15,28 +15,16 @@
  */
 package org.terasology.rendering.dag.tasks;
 
-import org.terasology.rendering.assets.material.Material;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
  * TODO: Add javadocs
  */
-public class EnableShaderTask implements RenderPipelineTask {
-    private Material shader;
-    private String shaderName;
-
-    public EnableShaderTask(Material shader, String shaderName) {
-        this.shader = shader;
-        this.shaderName = shaderName;
-    }
+public class DisableMaterialTask implements RenderPipelineTask {
 
     @Override
     public void execute() {
-        shader.enable();
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), shaderName);
+        glUseProgram(0);
     }
 }

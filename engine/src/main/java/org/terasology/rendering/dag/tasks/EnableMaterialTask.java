@@ -15,27 +15,28 @@
  */
 package org.terasology.rendering.dag.tasks;
 
-import org.lwjgl.opengl.GL11;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetCullFace;
 
 /**
  * TODO: Add javadocs
  */
-public class SetCullFaceTask implements RenderPipelineTask {
-    private int mode;
+public class EnableMaterialTask implements RenderPipelineTask {
+    private Material material;
+    private String materialName;
 
-    public SetCullFaceTask(int mode) {
-        this.mode = mode;
+    public EnableMaterialTask(Material material, String materialName) {
+        this.material = material;
+        this.materialName = materialName;
     }
 
     @Override
     public void execute() {
-        GL11.glCullFace(mode);
+        material.enable();
     }
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), SetCullFace.getModeName(mode));
+        return String.format("%21s(%s)", this.getClass().getSimpleName(), materialName);
     }
 }

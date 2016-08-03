@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetCullFaceTask;
@@ -24,26 +28,24 @@ import org.terasology.rendering.dag.tasks.SetCullFaceTask;
  */
 public class SetCullFace implements StateChange {
 
-    /**
-     * CullFace mode defined as an integer value in lwjgl, however in OpenGL documentation mode can be only three
-     * symbolic constants, therefore Mode enumeration ensures just these values are given to this state change, apart
-     * from having an integer with many different values.
-     */
-    public enum Mode {
-        GL_BACK,
-        GL_FRONT,
-        GL_FRONT_AND_BACK
-    }
-
-    private static SetCullFace defaultInstance = new SetCullFace(Mode.GL_BACK); // also specified in OpenGL documentation
+    private static SetCullFace defaultInstance = new SetCullFace(GL_BACK); // also specified in OpenGL documentation
     private SetCullFaceTask task;
-    private Mode mode;
+    private int mode;
 
-    public SetCullFace(Mode mode) {
+    public SetCullFace(int mode) {
         this.mode = mode;
+        validate();
     }
 
-    public Mode getMode() {
+    private void validate() {
+        if (mode != GL_BACK
+                && mode != GL_FRONT
+                && mode != GL_FRONT_AND_BACK) {
+            throw new IllegalArgumentException("Mode must be GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.");
+        }
+    }
+
+    public int getMode() {
         return mode;
     }
 
@@ -74,8 +76,24 @@ public class SetCullFace implements StateChange {
         return defaultInstance == this;
     }
 
+    public static String getModeName(int mode) {
+        String modeName = "N/A";
+        switch (mode) {
+            case GL11.GL_BACK:
+                modeName = "GL_BACK";
+                break;
+            case GL11.GL_FRONT:
+                modeName = "GL_FRONT";
+                break;
+            case GL11.GL_FRONT_AND_BACK:
+                modeName = "GL_FRONT_AND_BACK";
+                break;
+        }
+        return modeName;
+    }
+
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), mode.name());
+        return String.format("%21s(%s)", this.getClass().getSimpleName(), getModeName(mode));
     }
 }
