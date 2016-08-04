@@ -518,6 +518,13 @@ public final class FBO {
         }
 
         /**
+         * @param dimensions
+         */
+        public Dimensions(Dimensions dimensions) {
+            this(dimensions.width(), dimensions.height());
+        }
+
+        /**
          * Returns a new Dimensions object whose width and height have been divided by the divisor.
          * I.e. new Dimensions(20,10).dividedBy(2) returns a Dimensions(10,5) object.
          * @param divisor An integer.

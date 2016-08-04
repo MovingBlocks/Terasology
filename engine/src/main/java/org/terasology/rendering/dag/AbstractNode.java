@@ -18,7 +18,7 @@ package org.terasology.rendering.dag;
 import com.google.common.collect.Sets;
 import java.util.Set;
 import org.terasology.registry.In;
-import org.terasology.rendering.opengl.FBOBuilder;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
@@ -29,22 +29,28 @@ public abstract class AbstractNode implements Node {
     private FrameBuffersManager frameBuffersManager;
 
     private Set<StateChange> desiredStateChanges;
+    private Set<String> fboNames;
+
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
 
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
+        fboNames = Sets.newHashSet();
     }
 
-    protected void requireFBO(FBOBuilder fboBuilder) {
-        if (!frameBuffersManager.isFBOAvailable(fboBuilder.getTitle())) {
-            frameBuffersManager.addFBO(fboBuilder);
+    protected void requireFBO(FBOConfig fboConfig) {
+        if (!frameBuffersManager.isFBOAvailable(fboConfig.getTitle())) {
+            frameBuffersManager.addFBO(fboConfig);
         }
+        fboNames.add(fboConfig.toString());
     }
 
     @Override
     public void dispose() {
-        // TODO: FBOBuilder and FBO disposal here
+        for (String fboName : fboNames) {
+            frameBuffersManager.removeUsage(fboName); // TODO: better naming?
+        }
     }
 
     protected boolean addDesiredStateChange(StateChange stateChange) {

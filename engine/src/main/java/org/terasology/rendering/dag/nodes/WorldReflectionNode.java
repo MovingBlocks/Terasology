@@ -27,6 +27,8 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -62,6 +64,8 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
+        requireFBO(new FBOConfig(SCENE_REFLECTED_FBO, 0.5f, FBO.Type.DEFAULT).useDepthBuffer());
+
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();

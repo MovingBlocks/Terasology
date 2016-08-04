@@ -21,6 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -51,6 +52,8 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Override
     public void initialise() {
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
+        requireFBO(new FBOConfig("scenePrePost", 1.0f, FBO.Type.HDR));
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
     }
 
     /**

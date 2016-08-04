@@ -29,6 +29,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.world.WorldRenderer;
@@ -90,6 +91,14 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
+        requireFBO(new FBOConfig("scene16", 16, 16, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("scene8", 8, 8, FBO.Type.DEFAULT).setStatic());
+        requireFBO(new FBOConfig("scene4", 4, 4, FBO.Type.DEFAULT).setStatic());
+        requireFBO(new FBOConfig("scene2", 2, 2, FBO.Type.DEFAULT).setStatic());
+        requireFBO(new FBOConfig("scene1", 1, 1, FBO.Type.DEFAULT).setStatic());
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireFBO(new FBOConfig("scenePrePost", 1.0f, FBO.Type.HDR));
+
         obtainStaticFBOs();
     }
 

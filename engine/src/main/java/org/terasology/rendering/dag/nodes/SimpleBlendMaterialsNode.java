@@ -22,6 +22,8 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -43,6 +45,8 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @Override
     public void initialise() {
+        requireFBO(new FBOConfig(SCENE_OPAQUE_FBO, 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+
         addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO));
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }

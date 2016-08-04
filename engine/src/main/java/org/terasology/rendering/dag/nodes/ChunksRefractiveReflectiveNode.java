@@ -21,6 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -49,6 +50,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
+        requireFBO(new FBOConfig("sceneReflectiveRefractive", 1.0f, FBO.Type.HDR).useNormalBuffer());
     }
 
     @Override

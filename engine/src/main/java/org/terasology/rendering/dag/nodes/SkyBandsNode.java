@@ -22,6 +22,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -37,7 +38,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
  * TODO: Separate this node into multiple SkyBandNode's
  */
 public class SkyBandsNode extends WireframeCapableNode {
-
+    private static final String SCENE_OPAQUE_FBO = "sceneOpaque";
     @In
     private WorldRenderer worldRenderer;
 
@@ -53,6 +54,10 @@ public class SkyBandsNode extends WireframeCapableNode {
     @Override
     public void initialise() {
         super.initialise();
+        requireFBO(new FBOConfig(SCENE_OPAQUE_FBO, 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireFBO(new FBOConfig("sceneSkyBand0", 0.0625f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneSkyBand1", 0.03125f, FBO.Type.DEFAULT));
+
         renderingConfig = config.getRendering();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
         playerCamera = worldRenderer.getActiveCamera();

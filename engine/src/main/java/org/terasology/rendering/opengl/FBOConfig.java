@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +29,10 @@ import org.slf4j.LoggerFactory;
  * The new FBO is automatically registered with the LwjglRenderingProcess, overwriting any
  * existing FBO with the same title.
  */
-public class FBOBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(FBOBuilder.class);
-    private static FrameBuffersManager frameBuffersManager;
+public class FBOConfig {
+    private static final Logger logger = LoggerFactory.getLogger(FBOConfig.class);
 
     private FBO generatedFBO;
-
     private String title;
     private FBO.Dimensions dimensions;
     private FBO.Type type;
@@ -43,7 +42,8 @@ public class FBOBuilder {
     private boolean useLightBuffer;
     private boolean useStencilBuffer;
     private boolean isStatic;
-
+    private boolean isRelativeToScreenSize;
+    private float scale;
     /**
      * Constructs an FBO builder capable of building the two most basic FBOs:
      * an FBO with no attachments or one with a single color buffer attached to it.
@@ -60,32 +60,33 @@ public class FBOBuilder {
      *                   Type.NO_COLOR will result in -no- color buffer attached to the FBO
      *                   (WARNING: this could result in an FBO with Status.DISPOSED - see FBO.getStatus()).
      */
-    public FBOBuilder(String title, FBO.Dimensions dimensions, FBO.Type type) {
+    public FBOConfig(String title, FBO.Dimensions dimensions, FBO.Type type) {
         this.title = title;
         this.dimensions = dimensions;
         this.type = type;
         this.isStatic = false;
+        isRelativeToScreenSize = false;
     }
 
     /**
      * Same as the previous FBObuilder constructor, but taking in input
      * explicit, integer width and height instead of a Dimensions object.
      */
-    public FBOBuilder(String title, int width, int height, FBO.Type type) {
+    public FBOConfig(String title, int width, int height, FBO.Type type) {
         this(title, new FBO.Dimensions(width, height), type);
     }
 
-    public FBOBuilder(String title, float scale, FBO.Type type) {
-        this(title, frameBuffersManager.getFullScale().multiplyBy(scale), type);
+    public FBOConfig(String title, float scale, FBO.Type type) {
+        Preconditions.checkArgument(scale != 0, "scale can not be zero.");
+        this.title = title;
+        this.type = type;
+        this.scale = scale;
+        this.isRelativeToScreenSize = true;
     }
 
-    public FBOBuilder(String title, float scale, FBO.Type type, boolean isStatic) {
-        this(title, frameBuffersManager.getFullScale().multiplyBy(scale), type);
+    public FBOConfig(String title, float scale, FBO.Type type, boolean isStatic) {
+        this(title, scale, type);
         this.isStatic = isStatic;
-    }
-
-    public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
-        FBOBuilder.frameBuffersManager = frameBuffersManager;
     }
 
     public boolean isFBODynamic() {
@@ -100,6 +101,11 @@ public class FBOBuilder {
     *                         (GL_DEPTH24_STENCIL8_EXT, GL_UNSIGNED_INT_24_8_EXT, GL_NEAREST)
                 *                         */
 
+    public FBOConfig setStatic() {
+        this.isStatic = true;
+        return this;
+    }
+
     /**
      * Sets the builder to generate, allocate and attach a 24 bit depth buffer to the FrameBuffer to be built.
      * If useStencilBuffer() is also used, an 8 bit stencil buffer will also be associated with the depth buffer.
@@ -107,7 +113,7 @@ public class FBOBuilder {
      *
      * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useDepthBuffer().build();
      */
-    public FBOBuilder useDepthBuffer() {
+    public FBOConfig useDepthBuffer() {
         useDepthBuffer = true;
         return this;
     }
@@ -118,7 +124,7 @@ public class FBOBuilder {
      *
      * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useNormalsBuffer().build();
      */
-    public FBOBuilder useNormalBuffer() {
+    public FBOConfig useNormalBuffer() {
         useNormalBuffer = true;
         return this;
     }
@@ -130,7 +136,7 @@ public class FBOBuilder {
      *
      * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useLightBuffer().build();
      */
-    public FBOBuilder useLightBuffer() {
+    public FBOConfig useLightBuffer() {
         useLightBuffer = true;
         return this;
     }
@@ -143,7 +149,7 @@ public class FBOBuilder {
      * @return The calling instance of FBObuilder, to chain calls,
      * i.e.: new FBObuilder(...).useDepthBuffer().useStencilBuffer().build();
      */
-    public FBOBuilder useStencilBuffer() {
+    public FBOConfig useStencilBuffer() {
         useStencilBuffer = true;
         return this;
     }
@@ -163,23 +169,24 @@ public class FBOBuilder {
      *
      * @return An FBO. Make sure to check it with FBO.getStatus() before using it.
      */
-    public FBO build() {
+    public FBO generate(FBO.Dimensions fullScale) {
+        // TODO: Investigate whether removing this would cause any problems
         if (generatedFBO != null) {
             return generatedFBO;
         }
 
-
-        if (frameBuffersManager.isFBOAvailable(title)) {
-            frameBuffersManager.dispose(title);
-            frameBuffersManager.removeFromLookup(title);
-            logger.warn("FBO " + title + " has been overwritten. Ideally it would have been deleted first.");
+        if (isRelativeToScreenSize) {
+            if (dimensions == null || dimensions.areDifferentFrom(fullScale)) {
+                dimensions = new FBO.Dimensions(fullScale);
+                dimensions.multiplySelfBy(scale);
+            }
         }
 
         generatedFBO = FBO.create(title, dimensions, type, useDepthBuffer, useNormalBuffer, useLightBuffer, useStencilBuffer);
         handleIncompleteAndUnexpectedStatus(generatedFBO);
-        frameBuffersManager.putToLookup(title, generatedFBO);
         return generatedFBO;
     }
+
 
     private void handleIncompleteAndUnexpectedStatus(FBO fbo) {
         // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what

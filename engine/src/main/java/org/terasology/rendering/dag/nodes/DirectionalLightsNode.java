@@ -25,6 +25,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
@@ -71,6 +72,10 @@ public class DirectionalLightsNode extends AbstractNode {
         playerCamera = worldRenderer.getActiveCamera();
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
+        requireFBO(new FBOConfig("sceneOpaquePingPong", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireFBO(new FBOConfig("sceneReflectiveRefractive", 1.0f, FBO.Type.HDR).useNormalBuffer());
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+
         initMainDirectionalLight();
     }
 

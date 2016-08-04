@@ -24,6 +24,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -67,6 +68,11 @@ public class BloomPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass
+        requireFBO(new FBOConfig("sceneHighPass", 1.0f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneBloom0", 0.5f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneBloom1", 0.25f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneBloom2", 0.125f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
     }
 
     /**

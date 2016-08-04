@@ -23,6 +23,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -60,6 +61,10 @@ public class BlurPassesNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
+        requireFBO(new FBOConfig("sceneBlur0", 0.5f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneBlur1", 0.5f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireFBO(new FBOConfig("sceneToneMapped", 1.0f, FBO.Type.HDR));
     }
 
     /**

@@ -26,6 +26,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
 import org.terasology.rendering.world.WorldRenderer;
@@ -77,6 +78,9 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireFBO(new FBOConfig("ocUndistorted", 1.0f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig("sceneFinal", 1.0f, FBO.Type.DEFAULT));
     }
 
     /**

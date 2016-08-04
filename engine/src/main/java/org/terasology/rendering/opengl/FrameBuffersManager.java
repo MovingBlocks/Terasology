@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Set;
@@ -50,7 +51,32 @@ import java.util.Map;
  * An important exception is the takeScreenshot() method which prompts the renderer to eventually (not immediately)
  * redirect its output to a file. This is the only public method that is intended to be used from outside the
  * rendering engine.
+ *
+ * Default FBOs:
+ *               sceneOpaque:  Primary FBO: most visual information eventually ends up here
+ *       sceneOpaquePingPong:  The sceneOpaque FBOs are swapped every frame, to use one for reading and the other for writing
+ *                             Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
+ *             sceneSkyBand0:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
+ *             sceneSkyBand1:
+ * sceneReflectiveRefractive:  used to render reflective and refractive surfaces, most obvious case being the water surface
+ *            sceneReflected:  the water surface displays a reflected version of the scene. This version is stored here.
+ *                   outline:  greyscale depth-based rendering of object outlines
+ *                      ssao:  greyscale screen-space ambient occlusion rendering
+ *               ssaoBlurred:  greyscale screen-space ambient occlusion rendering - blurred version
+ *              scenePrePost:  intermediate step, combining a number of renderings made available so far
+ *               lightShafts:  light shafts rendering
+ *             sceneHighPass:  a number of buffers to create the bloom effect
+ *               sceneBloom0:
+ *               sceneBloom1:
+ *               sceneBloom2:
+ *                sceneBlur0:  a pair of buffers holding blurred versions of the rendered scene,
+ *                sceneBlur1:  also used for the bloom effect, but not only.
+ *             ocUndistorted:  if OculusRift support is enabled this buffer holds the side-by-side views
+ *                             for each eye, with no lens distortion applied.
+ *                sceneFinal:  the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
  */
+
+
 public class FrameBuffersManager {
 
     private static final Logger logger = LoggerFactory.getLogger(FrameBuffersManager.class);
@@ -67,11 +93,6 @@ public class FrameBuffersManager {
     // this logic one32thScale would have to be named one1024thResolution and the otherwise
     // straightforward connection between variable names and dimensions would have been lost. -- manu3d
     private Dimensions fullScale;
-    private Dimensions halfScale;
-    private Dimensions quarterScale;
-    private Dimensions one8thScale;
-    private Dimensions one16thScale;
-    private Dimensions one32thScale;
 
     // Note: this assumes that the settings in the configs might change at runtime,
     // but the config objects will not. At some point this might change, i.e. implementing presets.
@@ -79,14 +100,18 @@ public class FrameBuffersManager {
     private RenderingConfig renderingConfig = config.getRendering();
 
     private Map<String, FBO> fboLookup = Maps.newHashMap();
+    private Map<String, Integer> fboUsageCountMap = Maps.newHashMap();
 
     private PostProcessor postProcessor;
     private Set<FBOManagerSubscriber> fboManagerSubscribers;
-    private Map<String, FBOBuilder> dynamicFBOBuilders;
+    private Map<String, FBOConfig> dynamicFBOConfigs;
+    private Map<String, FBOConfig> staticFBOConfigs;
+    private boolean isDynamicFBOsGenerated;
 
     public FrameBuffersManager() {
         // nothing to do here, everything happens at initialization time,
         // after GraphicState and PostProcessors have been set.
+        isDynamicFBOsGenerated = false;
     }
 
     /**
@@ -94,27 +119,19 @@ public class FrameBuffersManager {
     Also instructs the PostProcessor and the GraphicState instances to fetch the FBOs they require.
      */
     public void initialize() {
-        dynamicFBOBuilders = Maps.newHashMap();
+        dynamicFBOConfigs = Maps.newHashMap();
+        staticFBOConfigs = Maps.newHashMap();
         fboManagerSubscribers = Sets.newHashSet();
 
-        createStaticFBOs();
-
+        createPBOs();
         setDynamicFBOsDimensions();
-        createDynamicFBOs();
-
         createShadowMapFBO();
     }
 
     // Static FBOs do not change during the lifetime of a FrameBuffersManager instance.
     // They are used to progressively downsample the image all the way into a 1x1 buffer
     // holding average image brightness data. This is then used in the context of eye adaptation.
-    private void createStaticFBOs() {
-        // The FBObuilder takes care of registering the new FBOs on the fboLookup map.
-        new FBOBuilder("scene16", 16, 16, FBO.Type.DEFAULT).build();
-        new FBOBuilder("scene8", 8, 8, FBO.Type.DEFAULT).build();
-        new FBOBuilder("scene4", 4, 4, FBO.Type.DEFAULT).build();
-        new FBOBuilder("scene2", 2, 2, FBO.Type.DEFAULT).build();
-        new FBOBuilder("scene1", 1, 1, FBO.Type.DEFAULT).build();
+    private void createPBOs() {
 
         // Technically these are not Frame Buffer Objects but Pixel Buffer Objects.
         // Their instantiation and assignments are done here because they are static buffers.
@@ -127,10 +144,6 @@ public class FrameBuffersManager {
         refreshDynamicFBOsDimensions();
     }
 
-    private void createDynamicFBOs() {
-        recreateDynamicFBOs();
-    }
-
     private void createShadowMapFBO() {
         recreateShadowMapFBO();
     }
@@ -141,21 +154,25 @@ public class FrameBuffersManager {
      * references to use the new FBOs.
      */
     public void preRenderUpdate() {
+        // It's run just once
+        if (!isDynamicFBOsGenerated) {
+            recreateDynamicFBOs();
+            isDynamicFBOsGenerated = true;
+        }
+
         refreshDynamicFBOsDimensions();
         if (sceneOpaque.dimensions().areDifferentFrom(fullScale)) {
             disposeOfAllDynamicFBOs();
             recreateDynamicFBOs();
         }
 
+        // TODO: handle special case
         if (sceneShadowMap != null && sceneShadowMap.width() != renderingConfig.getShadowMapResolution()) {
             recreateShadowMapFBO();
         }
     }
 
-    private boolean refreshDynamicFBOsDimensions() {
-        boolean refreshed = false;
-        Dimensions oldFullScale = fullScale;
-
+    private void refreshDynamicFBOsDimensions() {
         if (postProcessor.isNotTakingScreenshot()) {
             fullScale = new Dimensions(Display.getWidth(), Display.getHeight());
             if (renderingConfig.isOculusVrSupport()) {
@@ -169,93 +186,23 @@ public class FrameBuffersManager {
         }
 
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
-
-        if (fullScale.isDifferentFrom(oldFullScale)) {
-            halfScale    = fullScale.dividedBy(2);
-            quarterScale = fullScale.dividedBy(4);
-            one8thScale  = fullScale.dividedBy(8);
-            one16thScale = fullScale.dividedBy(16);
-            one32thScale = fullScale.dividedBy(32);
-            refreshed = true;
-        }
-
-        return refreshed;
     }
 
     // providing a rough guide of each FBO here, as the method that creates them (recreateDynamicFBOs) is quite dense already
     private void disposeOfAllDynamicFBOs() {
-
-        deleteFBO("sceneOpaque");           // Primary FBO: most visual information eventually ends up here
-        deleteFBO("sceneOpaquePingPong");   // The sceneOpaque FBOs are swapped every frame, to use one for reading and the other for writing
-                                            // Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
-
-        deleteFBO("sceneSkyBand0"); // two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
-        deleteFBO("sceneSkyBand1");
-
-        deleteFBO("sceneReflectiveRefractive"); // used to render reflective and refractive surfaces, most obvious case being the water surface
-
-        deleteFBO("sceneReflected"); // the water surface displays a reflected version of the scene. This version is stored here.
-
-        deleteFBO("outline");       // greyscale depth-based rendering of object outlines
-        deleteFBO("ssao");          // greyscale screen-space ambient occlusion rendering
-        deleteFBO("ssaoBlurred");   // greyscale screen-space ambient occlusion rendering - blurred version
-        deleteFBO("scenePrePost");  // intermediate step, combining a number of renderings made available so far
-                                    // into one buffer to be post-processed.
-
-        deleteFBO("lightShafts");       // light shafts rendering
-
-        deleteFBO("sceneHighPass"); // a number of buffers to create the bloom effect
-        deleteFBO("sceneBloom0");
-        deleteFBO("sceneBloom1");
-        deleteFBO("sceneBloom2");
-
-        deleteFBO("sceneBlur0");    // a pair of buffers holding blurred versions of the rendered scene,
-        deleteFBO("sceneBlur1");    // also used for the bloom effect, but not only.
-
-        deleteFBO("ocUndistorted"); // if OculusRift support is enabled this buffer holds the side-by-side views
-                                    // for each eye, with no lens distortion applied.
-
-        deleteFBO("sceneFinal");    // the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
-
-        for (String fboName : dynamicFBOBuilders.keySet()) {
+        for (String fboName : dynamicFBOConfigs.keySet()) {
             deleteFBO(fboName);
         }
     }
 
     private void recreateDynamicFBOs() {
-        // The FBObuilder takes care of registering thew new FBOs on the fboLookup hashmap.
-        sceneOpaque = new FBOBuilder("sceneOpaque", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
-        new FBOBuilder("sceneOpaquePingPong", fullScale, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer().build();
-
-        new FBOBuilder("sceneSkyBand0", one16thScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("sceneSkyBand1", one32thScale, FBO.Type.DEFAULT).build();
-
-        FBO sceneReflectiveRefractive = new FBOBuilder("sceneReflectiveRefractive", fullScale, FBO.Type.HDR).useNormalBuffer().build();
-        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
-
-        new FBOBuilder("sceneReflected", halfScale, FBO.Type.DEFAULT).useDepthBuffer().build();
-
-        new FBOBuilder("outline", fullScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("ssao", fullScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("ssaoBlurred", fullScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("scenePrePost", fullScale, FBO.Type.HDR).build();
-
-        new FBOBuilder("lightShafts", halfScale, FBO.Type.DEFAULT).build();
-
-        new FBOBuilder("sceneHighPass", fullScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("sceneBloom0", halfScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("sceneBloom1", quarterScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("sceneBloom2", one8thScale, FBO.Type.DEFAULT).build();
-
-        new FBOBuilder("sceneBlur0", halfScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("sceneBlur1", halfScale, FBO.Type.DEFAULT).build();
-
-        new FBOBuilder("ocUndistorted", fullScale, FBO.Type.DEFAULT).build();
-        new FBOBuilder("sceneFinal", fullScale, FBO.Type.DEFAULT).build();
-
-        for (FBOBuilder builder : dynamicFBOBuilders.values()) {
-            builder.build();
+        for (FBOConfig builder : dynamicFBOConfigs.values()) {
+            builder.generate(fullScale);
         }
+
+        // TODO: handle special case
+        sceneOpaque = fboLookup.get("sceneOpaque");
+        sceneOpaque.attachDepthBufferTo(fboLookup.get("sceneReflectiveRefractive"));
 
         notifySubscribers();
     }
@@ -269,7 +216,8 @@ public class FrameBuffersManager {
     private void recreateShadowMapFBO() {
         int shadowMapResFromSettings = renderingConfig.getShadowMapResolution();
         Dimensions shadowMapResolution =  new Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
-        sceneShadowMap = new FBOBuilder("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().build();
+        sceneShadowMap = new FBOConfig("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().generate(fullScale);
+        fboLookup.put("sceneShadowMap", sceneShadowMap);
         handleDisposedShadowMap(sceneShadowMap);
     }
 
@@ -470,31 +418,63 @@ public class FrameBuffersManager {
         return fboManagerSubscribers.remove(subscriber);
     }
 
-    public void addFBO(FBOBuilder fboBuilder) {
-        fboBuilder.build();
-        if (fboBuilder.isFBODynamic()) {
-            dynamicFBOBuilders.put(fboBuilder.getTitle(), fboBuilder);
+    public void addFBO(FBOConfig fboConfig) {
+        if (fboUsageCountMap.containsKey(fboConfig.getTitle())) {
+            throw new IllegalArgumentException("There is already an FBO inside FrameBuffersManager, named as: " + fboConfig.getTitle());
         }
+
+        if (fboConfig.isFBODynamic()) {
+            dynamicFBOConfigs.put(fboConfig.getTitle(), fboConfig);
+        } else {
+            staticFBOConfigs.put(fboConfig.getTitle(), fboConfig);
+        }
+        increaseUsage(fboConfig.getTitle());
+
+        buildFBO(fboConfig);
+    }
+
+    private void increaseUsage(String title) {
+        if (!fboUsageCountMap.containsKey(title)) {
+            fboUsageCountMap.put(title, 1);
+            return;
+        }
+        int usageCount = fboUsageCountMap.get(title) + 1;
+        fboUsageCountMap.put(title, usageCount);
+    }
+
+    public void removeUsage(String title) {
+        Preconditions.checkArgument(fboUsageCountMap.containsKey(title), "The given fbo is not used.");
+
+        if (fboUsageCountMap.get(title) == 1) {
+            getFBO(title).dispose();
+            fboLookup.remove(title);
+            if (dynamicFBOConfigs.containsKey(title)) {
+                dynamicFBOConfigs.remove(title);
+            } else if (staticFBOConfigs.containsKey(title)) {
+                staticFBOConfigs.remove(title);
+            }
+        } else {
+            int usageCount = fboUsageCountMap.get(title);
+            fboUsageCountMap.put(title, usageCount - 1);
+        }
+    }
+
+    private void buildFBO(FBOConfig fboConfig) {
+        String title = fboConfig.getTitle();
+        if (isFBOAvailable(title)) {
+            getFBO(title).dispose();
+            fboLookup.remove(title);
+            logger.warn("FBO " + title + " has been overwritten. Ideally it would have been deleted first.");
+        }
+
+        FBO generatedFBO = fboConfig.generate(fullScale);
+        fboLookup.put(title, generatedFBO);
     }
 
     public boolean isFBOAvailable(String title) {
         return fboLookup.containsKey(title);
     }
 
-    public Dimensions getFullScale() {
-        return fullScale;
-    }
 
-    public void removeFromLookup(String title) {
-        fboLookup.remove(title);
-    }
-
-    public void putToLookup(String title, FBO fbo) {
-        fboLookup.put(title, fbo);
-    }
-
-    public void dispose(String title) {
-        getFBO(title).dispose();
-    }
 }
 

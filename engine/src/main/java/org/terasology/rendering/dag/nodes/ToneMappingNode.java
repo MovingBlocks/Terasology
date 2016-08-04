@@ -21,7 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOBuilder;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -52,8 +52,9 @@ public class ToneMappingNode extends AbstractNode {
 
     @Override
     public void initialise() {
+        requireFBO(new FBOConfig(SCENE_TONE_MAPPED_FBO, 1.0f, FBO.Type.HDR));
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
-        requireFBO(new FBOBuilder(SCENE_TONE_MAPPED_FBO, 1.0f, FBO.Type.HDR));
     }
 
     /**

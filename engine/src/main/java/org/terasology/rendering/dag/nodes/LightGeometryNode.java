@@ -25,6 +25,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_BACK;
@@ -65,6 +66,7 @@ public class LightGeometryNode extends AbstractNode {
     @Override
     public void initialise() {
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
+        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
     }
 
     @Override
