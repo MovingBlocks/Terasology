@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
-import com.google.api.client.repackaged.com.google.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Set;
