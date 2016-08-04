@@ -214,6 +214,7 @@ public class FrameBuffersManager {
     }
 
     private void recreateShadowMapFBO() {
+        // TODO: handle special case shadowMap FBO
         int shadowMapResFromSettings = renderingConfig.getShadowMapResolution();
         Dimensions shadowMapResolution =  new Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
         sceneShadowMap = new FBOConfig("sceneShadowMap", shadowMapResolution, FBO.Type.NO_COLOR).useDepthBuffer().generate(fullScale);
@@ -418,7 +419,7 @@ public class FrameBuffersManager {
         return fboManagerSubscribers.remove(subscriber);
     }
 
-    public void addFBO(FBOConfig fboConfig) {
+    public void generateFBOWith(FBOConfig fboConfig) {
         if (fboUsageCountMap.containsKey(fboConfig.getTitle())) {
             throw new IllegalArgumentException("There is already an FBO inside FrameBuffersManager, named as: " + fboConfig.getTitle());
         }
@@ -442,6 +443,11 @@ public class FrameBuffersManager {
         fboUsageCountMap.put(title, usageCount);
     }
 
+    /**
+     * TODO: add javadoc
+     *
+     * @param title
+     */
     public void removeUsage(String title) {
         Preconditions.checkArgument(fboUsageCountMap.containsKey(title), "The given fbo is not used.");
 
@@ -471,8 +477,12 @@ public class FrameBuffersManager {
         fboLookup.put(title, generatedFBO);
     }
 
-    public boolean isFBOAvailable(String title) {
+    private boolean isFBOAvailable(String title) {
         return fboLookup.containsKey(title);
+    }
+
+    public boolean isFBOConfigAvailable(String title) {
+        return dynamicFBOConfigs.containsKey(title) || staticFBOConfigs.containsKey(title);
     }
 
 

@@ -40,8 +40,9 @@ public abstract class AbstractNode implements Node {
     }
 
     protected void requireFBO(FBOConfig fboConfig) {
-        if (!frameBuffersManager.isFBOAvailable(fboConfig.getTitle())) {
-            frameBuffersManager.addFBO(fboConfig);
+
+        if (!frameBuffersManager.isFBOConfigAvailable(fboConfig.getTitle())) {
+            frameBuffersManager.generateFBOWith(fboConfig);
         }
         fboNames.add(fboConfig.toString());
     }
