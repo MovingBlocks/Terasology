@@ -52,7 +52,7 @@
             {
                 "type": "ScrollableArea",
                 "content": {
-                    "type": "UITreeView",
+                    "type": "JsonEditorTreeView",
                     "id": "editor"
                 },
                 "verticalScrollbar": true,

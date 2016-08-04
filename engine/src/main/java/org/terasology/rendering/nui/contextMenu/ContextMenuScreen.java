@@ -17,8 +17,6 @@ package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
@@ -39,7 +37,6 @@ import java.util.List;
  */
 public class ContextMenuScreen extends CoreScreenLayer {
 
-    private Logger logger = LoggerFactory.getLogger(ContextMenuScreen.class);
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
     /**

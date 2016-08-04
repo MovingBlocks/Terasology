@@ -236,7 +236,7 @@ public class NUIEditorContextMenuBuilder {
             if (value != null && value instanceof Boolean) {
                 value = !(Boolean) value;
             }
-            
+
             return value != null ? value :
                 field.getType().newInstance();
         }

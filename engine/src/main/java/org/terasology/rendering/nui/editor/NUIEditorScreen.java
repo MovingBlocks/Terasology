@@ -31,7 +31,6 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.NUIEditorConfig;
 import org.terasology.input.Keyboard;
-import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.logic.clipboard.ClipboardManager;
 import org.terasology.registry.In;
@@ -46,15 +45,14 @@ import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
+import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITextEntry;
-import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.rendering.nui.widgets.treeView.Tree;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -108,7 +106,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     /**
      * The main editor widget used to display and edit NUI screens.
      */
-    private UITreeView editor;
+    private JsonEditorTreeView editor;
     /**
      * The box used to preview a NUI screen modified by the editor.
      */
@@ -118,14 +116,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
      */
     private String selectedAsset;
     /**
-     * The list of the editor's states.
-     */
-    private List<JsonTree> history = Lists.newArrayList();
-    /**
-     * The current position in the list of the editor's states.
-     */
-    private int historyPosition;
-    /**
      * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
@@ -134,7 +124,7 @@ public class NUIEditorScreen extends CoreScreenLayer {
     public void initialise() {
         // Retrieve the widgets based on their identifiers.
         UIDropdownScrollable<String> availableAssetDropdown = find(AVAILABLE_ASSETS_ID, UIDropdownScrollable.class);
-        editor = find(EDITOR_TREE_VIEW_ID, UITreeView.class);
+        editor = find(EDITOR_TREE_VIEW_ID, JsonEditorTreeView.class);
         selectedScreenBox = find(SELECTED_SCREEN_ID, UIBox.class);
 
         // Populate the list of screens.
@@ -170,59 +160,36 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
 
         editor.subscribeTreeViewUpdate(() -> {
-            JsonTree rootNode = (JsonTree) editor.getModel().getNode(0).getRoot().copy();
-            addToHistory(rootNode);
-            setPreviewWidget(rootNode);
+            editor.addToHistory();
+            setPreviewWidget(editor.getRoot());
             updateConfig();
         });
 
-        // Create and display a context menu on RMB.
-        editor.subscribeNodeClick((event, node) -> {
-            if (event.getMouseButton() == MouseInput.MOUSE_RIGHT) {
-                editor.setSelectedIndex(editor.getModel().indexOf(node));
+        editor.setContextMenuProducer(node -> {
+            NUIEditorContextMenuBuilder contextMenuBuilder = new NUIEditorContextMenuBuilder();
+            contextMenuBuilder.setManager(getManager());
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, editor::copyNode);
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, editor::pasteNode);
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
+            contextMenuBuilder.subscribeAddContextMenu(() -> editor.fireUpdateListeners());
+            ContextMenuBuilder contextMenu = contextMenuBuilder.createPrimaryContextMenu(node);
+
+            contextMenu.subscribeClose(() -> {
                 editor.setAlternativeWidget(null);
+                editor.setSelectedIndex(null);
+            });
 
-                NUIEditorContextMenuBuilder contextMenuBuilder = new NUIEditorContextMenuBuilder();
-                contextMenuBuilder.setManager(getManager());
-                contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, this::copyNode);
-                contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, this::pasteNode);
-                contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
-                contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
-                contextMenuBuilder.subscribeAddContextMenu(() -> editor.fireUpdateListeners());
-                ContextMenuBuilder contextMenu = contextMenuBuilder.createPrimaryContextMenu((JsonTree) node);
-
-                contextMenu.subscribeClose(() -> {
-                    editor.setAlternativeWidget(null);
-                    editor.setSelectedIndex(null);
-                });
-
-                contextMenu.subscribeScreenClosed(() -> {
-                    if (editor.getAlternativeWidget() != null) {
-                        focusInlineEditor((JsonTree) node);
-                    }
-                });
-
-                contextMenu.show(getManager(), event.getMouse().getPosition());
-            }
-        });
-
-        // Edit a node on double click.
-        editor.subscribeNodeDoubleClick((event, node) -> {
-            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                editNode((JsonTree) node);
-            }
-        });
-
-        // Edit the currently selected node on F2.
-        editor.subscribeKeyEvent(event -> {
-            if (event.isDown() && event.getKey() == Keyboard.Key.F2) {
-                Integer selectedIndex = editor.getSelectedIndex();
-
-                if (selectedIndex != null) {
-                    editNode((JsonTree) editor.getModel().getNode(selectedIndex));
+            contextMenu.subscribeScreenClosed(() -> {
+                if (editor.getAlternativeWidget() != null) {
+                    focusInlineEditor(node);
                 }
-            }
+            });
+
+            return contextMenu;
         });
+
+        editor.setEditor(this::editNode, getManager());
 
         // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button ->
@@ -396,12 +363,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * @param node The node the editor's state is to be reset to.
      */
     private void resetState(JsonTree node) {
-        setTreeViewModel(node, true);
+        editor.setTreeViewModel(node, true);
         setPreviewWidget(node);
 
-        history.clear();
-        history.add(node);
-        historyPosition = 0;
+        editor.clearHistory();
 
         // Dispose of the previously loaded asset so that any other copies of it
         // are properly initialized.
@@ -413,37 +378,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
         }
 
         updateConfig();
-    }
-
-    /**
-     * Sets the editor widget's state to a copy of a specified {@link JsonTree}.
-     *
-     * @param node   The node the widget's state is to be set to.
-     * @param expand Whether the node should be expanded.
-     */
-    private void setTreeViewModel(JsonTree node, boolean expand) {
-        if (expand) {
-            expandNode(node);
-        }
-
-        editor.setModel(node.copy());
-    }
-
-    /**
-     * Expands a {@link JsonTree} meeting specific conditions; repeat recursively for its' children.
-     *
-     * @param node The node to be expanded.
-     */
-    private void expandNode(JsonTree node) {
-        // Do not expand OBJECT children of ARRAY parents. Generally concerns widget lists.
-        if (!(node.getValue().getType() == JsonTreeValue.Type.OBJECT
-              && !node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
-            node.setExpanded(true);
-        }
-
-        for (Tree child : node.getChildren()) {
-            expandNode((JsonTree) child);
-        }
     }
 
     /**
@@ -459,19 +393,6 @@ public class NUIEditorScreen extends CoreScreenLayer {
         } catch (Throwable t) {
             selectedScreenBox.setContent(new UILabel(ExceptionUtils.getStackTrace(t)));
         }
-    }
-
-    /**
-     * Adds a {@link JsonTree} to the editor's state history.
-     *
-     * @param node The node to be added to the editor's state history.
-     */
-    private void addToHistory(JsonTree node) {
-        if (historyPosition < history.size() - 1) {
-            history = history.subList(0, historyPosition + 1);
-        }
-        history.add(node);
-        historyPosition++;
     }
 
     /**
@@ -532,11 +453,8 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * Sets the editor's state to the previous item in the history.
      */
     private void undo() {
-        if (historyPosition > 0) {
-            historyPosition--;
-            JsonTree node = (JsonTree) history.get(historyPosition).copy();
-            setTreeViewModel(node, false);
-            setPreviewWidget(node);
+        if (editor.undo()) {
+            setPreviewWidget(editor.getRoot());
             updateConfig();
         }
     }
@@ -545,35 +463,10 @@ public class NUIEditorScreen extends CoreScreenLayer {
      * Sets the editor's state to the next item in the history.
      */
     private void redo() {
-        if (historyPosition < history.size() - 1) {
-            historyPosition++;
-            JsonTree node = (JsonTree) history.get(historyPosition).copy();
-            setTreeViewModel(node, false);
-            setPreviewWidget(node);
+        if (editor.redo()) {
+            setPreviewWidget(editor.getRoot());
             updateConfig();
         }
-    }
-
-    /**
-     * Copies the specified node to the editor's clipboard,
-     * then deselects it.
-     *
-     * @param node The node to copy.
-     */
-    private void copyNode(JsonTree node) {
-        editor.copy(node);
-        editor.setSelectedIndex(null);
-    }
-
-    /**
-     * Pastes the currently copied node as a child of the specified node,
-     * then deselects it.
-     *
-     * @param node The node to paste the copied node to.
-     */
-    private void pasteNode(JsonTree node) {
-        editor.paste(node);
-        editor.setSelectedIndex(null);
     }
 
     /**
