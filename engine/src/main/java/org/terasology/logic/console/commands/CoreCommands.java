@@ -43,6 +43,7 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.console.suggesters.ScreenSuggester;
+import org.terasology.logic.console.suggesters.SkinSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
@@ -62,6 +63,8 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.editor.NUIEditorScreen;
 import org.terasology.rendering.nui.editor.NUIEditorSystem;
+import org.terasology.rendering.nui.editor.NUISkinEditorScreen;
+import org.terasology.rendering.nui.editor.NUISkinEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.world.WorldRenderer;
@@ -120,6 +123,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     @In
     private NUIEditorSystem nuiEditorSystem;
+
+    @In
+    private NUISkinEditorSystem nuiSkinEditorSystem;
 
     @In
     private AssetManager assetManager;
@@ -250,6 +256,24 @@ public class CoreCommands extends BaseComponentSystem {
             case 1:
                 ResourceUrn urn = urns.iterator().next();
                 ((NUIEditorScreen) nuiManager.getScreen(NUIEditorScreen.ASSET_URI)).selectAsset(urn);
+                return "Success";
+            default:
+                return String.format("Multiple matches for screen '%s': {%s}", uri, Arrays.toString(urns.toArray()));
+        }
+    }
+
+    @Command(shortDescription = "Opens the NUI editor for a ui skin", requiredPermission = PermissionManager.NO_PERMISSION)
+    public String editSkin(@CommandParam(value = "uri", suggester = SkinSuggester.class) String uri) {
+        if (!nuiSkinEditorSystem.isEditorActive()) {
+            nuiSkinEditorSystem.toggleEditor();
+        }
+        Set<ResourceUrn> urns = assetManager.resolve(uri, UIElement.class);
+        switch (urns.size()) {
+            case 0:
+                return String.format("No asset found for screen '%s'", uri);
+            case 1:
+                ResourceUrn urn = urns.iterator().next();
+                ((NUISkinEditorScreen) nuiManager.getScreen(NUISkinEditorScreen.ASSET_URI)).selectAsset(urn);
                 return "Success";
             default:
                 return String.format("Multiple matches for screen '%s': {%s}", uri, Arrays.toString(urns.toArray()));

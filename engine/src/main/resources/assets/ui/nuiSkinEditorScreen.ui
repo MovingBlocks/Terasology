@@ -1,25 +1,17 @@
 {
-    "type": "engine:nuiEditorScreen",
+    "type": "engine:nuiSkinEditorScreen",
     "skin": "engine:nuiEditorScreen",
     "contents": {
         "type": "migLayout",
         "layoutConstraints": "",
-        "colConstraints": "[grow, 25%][grow, 75%]",
+        "colConstraints": "[grow, fill]",
         "rowConstraints": "[min][grow, fill][min]",
         "debug": true,
         "contents": [
             {
-                "type": "UIBox",
-                "id": "selectedScreen",
-                "updateContent": false,
-                "layoutInfo": {
-                    "cc": "cell 1 0, spany 2"
-                }
-            },
-            {
                 "type": "migLayout",
                 "layoutInfo": {
-                    "cc": "cell 0 2, spanx 3"
+                    "cc": "cell 0 2"
                 },
                 "contents": [
                     {

@@ -60,6 +60,17 @@ public class NUIEditorNodeUtils {
     }
 
     /**
+     * @return The {@link JsonTree} to be used as an initial skin template within {@link NUISkinEditorScreen}.
+     */
+    public static JsonTree createNewSkin() {
+        JsonTree tree = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
+        tree.addChild(new JsonTreeValue("inherit", "default", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        tree.addChild(new JsonTreeValue("elements", null, JsonTreeValue.Type.OBJECT));
+        tree.addChild(new JsonTreeValue("families", null, JsonTreeValue.Type.OBJECT));
+        return tree;
+    }
+
+    /**
      * @param type          The type of the widget.
      * @param id            The id of the widget.
      * @param addLayoutInfo Whether a few layout settings from {@link RelativeLayout} should be added.

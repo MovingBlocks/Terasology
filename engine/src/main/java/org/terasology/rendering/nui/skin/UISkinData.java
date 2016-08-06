@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.skin;
 
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetData;
+import org.terasology.assets.format.AssetDataFile;
 
 import java.util.Map;
 
@@ -25,11 +26,27 @@ import java.util.Map;
 public class UISkinData implements AssetData {
     Map<String, UIStyleFamily> skinFamilies;
 
+    private transient AssetDataFile source;
+
     public UISkinData(Map<String, UIStyleFamily> families) {
         skinFamilies = Maps.newHashMap(families);
     }
 
     public UIStyleFamily getFamily(String familyName) {
         return skinFamilies.get(familyName);
+    }
+
+    /**
+     * @param source The {@link AssetDataFile} this asset has been loaded from.
+     */
+    public void setSource(AssetDataFile source) {
+        this.source = source;
+    }
+
+    /**
+     * @return The {@link AssetDataFile} this asset has been loaded from.
+     */
+    public AssetDataFile getSource() {
+        return source;
     }
 }
