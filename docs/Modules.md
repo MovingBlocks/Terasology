@@ -40,6 +40,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [DamagingBlocks](https://github.com/Terasology/DamagingBlocks) - allows blocks like lava to hurt the player
 * [Durability](https://github.com/Terasology/Durability) - library module to support destructible items (wear and tear eventually breaks them)
 * [DynamicCities](https://github.com/Terasology/DynamicCities) - variant of Cities that places then grows cities dynamically over time 
+* [Economy](https://github.com/Terasology/Economy) - a module to simulate a basic supply & demand economy system
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
 * [Fences](https://github.com/Terasology/Fences) - fences!
@@ -55,6 +56,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
 * [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such. Default toggle key 'J'
+* [Lakes](https://github.com/Terasology/Lakes) - add lakes to any enabled world generator, both surface lakes and subterranean ones (water and lava both!)
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
