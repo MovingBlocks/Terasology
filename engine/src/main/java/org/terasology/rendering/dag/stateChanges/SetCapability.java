@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
@@ -62,5 +63,24 @@ public abstract class SetCapability implements StateChange {
         }
 
         return String.format(": capability %s", status);
+    }
+
+    public static String getCapabilityName(int capability) {
+        String capabilityName = "N/A";
+        switch (capability) {
+            case GL11.GL_BLEND:
+                capabilityName = "GL_BLEND";
+                break;
+            case GL11.GL_DEPTH_TEST:
+                capabilityName = "GL_DEPTH_TEST";
+                break;
+            case GL11.GL_STENCIL_TEST:
+                capabilityName = "GL_STENCIL_TEST";
+                break;
+            case GL11.GL_CULL_FACE:
+                capabilityName = "GL_CULL_FACE";
+                break;
+        }
+        return capabilityName;
     }
 }

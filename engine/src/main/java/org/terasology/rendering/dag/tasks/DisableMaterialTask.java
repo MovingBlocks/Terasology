@@ -27,4 +27,9 @@ public final class DisableMaterialTask implements RenderPipelineTask {
     public void execute() {
         glUseProgram(0);
     }
+
+    @Override
+    public String toString() {
+        return String.format("%21s(0)", this.getClass().getSimpleName());
+    }
 }

@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.stateChanges.SetCapability;
 
 /**
  * TODO: Add javadocs
@@ -31,5 +32,10 @@ public final class DisableCapabilityTask implements RenderPipelineTask {
     @Override
     public void execute() {
         glDisable(this.capability);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%21s: disabled", SetCapability.getCapabilityName(capability));
     }
 }

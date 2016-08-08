@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.GL11.glEnable;
 import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.stateChanges.SetCapability;
 
 /**
  * TODO: Add javadocs
@@ -35,6 +36,6 @@ public final class EnableCapabilityTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return super.toString();
+        return String.format("%21s: enabled", SetCapability.getCapabilityName(capability));
     }
 }
