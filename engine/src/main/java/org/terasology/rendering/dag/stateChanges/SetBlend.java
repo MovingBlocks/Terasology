@@ -15,48 +15,55 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.tasks.DisableCapabilityTask;
 import org.terasology.rendering.dag.tasks.EnableCapabilityTask;
 
 /**
  * TODO: Add javadocs
  */
-public class EnableCapability implements StateChange {
-    private int capability;
-    private EnableCapabilityTask task;
+public final class SetBlend extends SetCapability {
+    private static final int CAPABILITY = GL_BLEND;
+    private static StateChange defaultInstance = new SetCullFace(false);
+    private static RenderPipelineTask enablingTask;
+    private static RenderPipelineTask disablingTask;
 
-    public EnableCapability(int capability) {
-        this.capability = capability;
-    }
-
-    public int getCapability() {
-        return capability;
+    public SetBlend(boolean enabled) {
+        super(enabled);
     }
 
     @Override
     public StateChange getDefaultInstance() {
-        return null;
+        return defaultInstance;
     }
 
     @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new EnableCapabilityTask(capability);
+    protected RenderPipelineTask getDisablingTask() {
+        if (disablingTask == null) {
+            disablingTask = new DisableCapabilityTask(CAPABILITY);
         }
-        return task;
+
+        return disablingTask;
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof EnableCapability) {
-            return capability == ((EnableCapability) stateChange).getCapability();
+    protected RenderPipelineTask getEnablingTask() {
+        if (enablingTask == null) {
+            enablingTask = new EnableCapabilityTask(CAPABILITY);
         }
-        return false;
+
+        return enablingTask;
     }
 
     @Override
     public boolean isTheDefaultInstance() {
-        return false;
+        return this == defaultInstance;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s%s", this.getClass().getSimpleName(), super.toString());
     }
 }

@@ -25,7 +25,7 @@ import org.terasology.utilities.Assets;
 /**
  * TODO: Add javadocs
  */
-public class EnableMaterial implements StateChange {
+public final class EnableMaterial implements StateChange {
     private static final String DEFAULT_MATERIAL_NAME = "DEFAULT";
     private static EnableMaterial defaultInstance = new EnableMaterial(DEFAULT_MATERIAL_NAME);
 

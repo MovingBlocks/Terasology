@@ -21,7 +21,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 /**
  * TODO: Add javadocs
  */
-public class EnableCapabilityTask implements RenderPipelineTask {
+public final class EnableCapabilityTask implements RenderPipelineTask {
     private int capability;
 
     public EnableCapabilityTask(int capability) {
@@ -35,6 +35,6 @@ public class EnableCapabilityTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), capability);
+        return super.toString();
     }
 }

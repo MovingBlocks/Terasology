@@ -21,7 +21,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 /**
  * TODO: Add javadocs
  */
-public class DisableMaterialTask implements RenderPipelineTask {
+public final class DisableMaterialTask implements RenderPipelineTask {
 
     @Override
     public void execute() {

@@ -21,7 +21,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 /**
  * TODO: Add javadocs
  */
-public class DisableCapabilityTask implements RenderPipelineTask {
+public final class DisableCapabilityTask implements RenderPipelineTask {
     private int capability;
 
     public DisableCapabilityTask(int capability) {
@@ -30,11 +30,6 @@ public class DisableCapabilityTask implements RenderPipelineTask {
 
     @Override
     public void execute() {
-        glDisable(capability);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), capability);
+        glDisable(this.capability);
     }
 }

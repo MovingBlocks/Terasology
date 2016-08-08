@@ -15,38 +15,23 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetCullFaceTask;
+import org.terasology.rendering.dag.tasks.DisableCapabilityTask;
+import org.terasology.rendering.dag.tasks.EnableCapabilityTask;
 
 /**
  * TODO: Add javadocs
  */
-public class SetCullFace implements StateChange {
+public final class SetCullFace extends SetCapability {
+    private static final int CAPABILITY = GL_CULL_FACE;
+    private static StateChange defaultInstance = new SetCullFace(false);
+    private static RenderPipelineTask enablingTask;
+    private static RenderPipelineTask disablingTask;
 
-    private static SetCullFace defaultInstance = new SetCullFace(GL_BACK); // also specified in OpenGL documentation
-    private SetCullFaceTask task;
-    private int mode;
-
-    public SetCullFace(int mode) {
-        this.mode = mode;
-        validate();
-    }
-
-    private void validate() {
-        if (mode != GL_BACK
-                && mode != GL_FRONT
-                && mode != GL_FRONT_AND_BACK) {
-            throw new IllegalArgumentException("Mode must be GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.");
-        }
-    }
-
-    public int getMode() {
-        return mode;
+    public SetCullFace(boolean enabled) {
+        super(enabled);
     }
 
     @Override
@@ -55,45 +40,30 @@ public class SetCullFace implements StateChange {
     }
 
     @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetCullFaceTask(mode);
+    protected RenderPipelineTask getDisablingTask() {
+        if (disablingTask == null) {
+            disablingTask = new DisableCapabilityTask(CAPABILITY);
         }
 
-        return task;
+        return disablingTask;
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetCullFace) {
-            return mode == ((SetCullFace) stateChange).getMode();
+    protected RenderPipelineTask getEnablingTask() {
+        if (enablingTask == null) {
+            enablingTask = new EnableCapabilityTask(CAPABILITY);
         }
-        return false;
+
+        return enablingTask;
     }
 
     @Override
     public boolean isTheDefaultInstance() {
-        return defaultInstance == this;
-    }
-
-    public static String getModeName(int mode) {
-        String modeName = "N/A";
-        switch (mode) {
-            case GL11.GL_BACK:
-                modeName = "GL_BACK";
-                break;
-            case GL11.GL_FRONT:
-                modeName = "GL_FRONT";
-                break;
-            case GL11.GL_FRONT_AND_BACK:
-                modeName = "GL_FRONT_AND_BACK";
-                break;
-        }
-        return modeName;
+        return this == defaultInstance;
     }
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), getModeName(mode));
+        return String.format("%s%s", this.getClass().getSimpleName(), super.toString());
     }
 }

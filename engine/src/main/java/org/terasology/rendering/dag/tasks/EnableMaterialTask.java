@@ -21,7 +21,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 /**
  * TODO: Add javadocs
  */
-public class EnableMaterialTask implements RenderPipelineTask {
+public final class EnableMaterialTask implements RenderPipelineTask {
     private Material material;
     private String materialName;
 
