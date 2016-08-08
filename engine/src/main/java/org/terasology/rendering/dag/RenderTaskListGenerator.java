@@ -119,13 +119,9 @@ public final class RenderTaskListGenerator {
             intermediateList.add(node);
             // Add state changes to reset all desired state changes back to default.
             for (StateChange stateChange : node.getDesiredStateChanges()) {
-                // TODO: consider using optional here?
                 StateChange defaultInstance = stateChange.getDefaultInstance();
-                if (defaultInstance != null) {
-                    intermediateList.add(defaultInstance);
-                }
+                intermediateList.add(defaultInstance);
             }
-
         }
         logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
     }
