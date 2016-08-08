@@ -74,16 +74,19 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "ok", button -> {
             String selection = availableWidgets.getSelection().toString();
+            JsonTree childNode;
+            if (node.getValue().getType() == JsonTreeValue.Type.ARRAY) {
+                ClassMetadata metadata = widgets.get(selection);
+                childNode = NUIEditorNodeUtils.createNewWidget(selection, "newWidget", false);
 
-            ClassMetadata metadata = widgets.get(selection);
-
-            JsonTree childNode = NUIEditorNodeUtils.createNewWidget(selection, "newWidget", false);
-
-            // If the widget is an UILayout override, add a "contents" array node.
-            if (UILayout.class.isAssignableFrom(metadata.getType())) {
-                childNode.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
+                // If the widget is an UILayout override, add a "contents" array node.
+                if (UILayout.class.isAssignableFrom(metadata.getType())) {
+                    childNode.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
+                }
+            } else {
+                childNode = new JsonTree(new JsonTreeValue(selection, null, JsonTreeValue.Type.OBJECT));
+                childNode.setExpanded(true);
             }
-
             node.addChild(childNode);
 
             closeListeners.forEach(UpdateListener::onAction);

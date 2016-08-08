@@ -67,6 +67,7 @@ import org.terasology.rendering.nui.editor.NUISkinEditorScreen;
 import org.terasology.rendering.nui.editor.NUISkinEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
+import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
@@ -267,7 +268,7 @@ public class CoreCommands extends BaseComponentSystem {
         if (!nuiSkinEditorSystem.isEditorActive()) {
             nuiSkinEditorSystem.toggleEditor();
         }
-        Set<ResourceUrn> urns = assetManager.resolve(uri, UIElement.class);
+        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkin.class);
         switch (urns.size()) {
             case 0:
                 return String.format("No asset found for screen '%s'", uri);

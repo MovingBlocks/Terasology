@@ -15,53 +15,11 @@
  */
 package org.terasology.logic.console.suggesters;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.rendering.nui.asset.UIElement;
 
-import java.util.Map;
-import java.util.Set;
-
-/**
- * Suggest screen names. When only one screen resource exists for the entire set of loaded modules,
- * the name alone suffices. Otherwise, the module name must be prepended.
- */
-public final class ScreenSuggester implements CommandParameterSuggester<String> {
-    private final AssetManager assetManager;
-
+public final class ScreenSuggester extends AssetSuggester {
     public ScreenSuggester(AssetManager assetManager) {
-        this.assetManager = assetManager;
-    }
-
-    @Override
-    public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
-        Map<String, Set<ResourceUrn>> resourceMap = Maps.newHashMap();
-        Set<String> suggestions = Sets.newHashSet();
-
-        for (ResourceUrn resolvedParameter : assetManager.getAvailableAssets(UIElement.class)) {
-            String resourceName = resolvedParameter.getResourceName().toString();
-            if (!resourceMap.containsKey(resourceName)) {
-                resourceMap.put(resourceName, Sets.newHashSet());
-            }
-
-            resourceMap.get(resourceName).add(resolvedParameter);
-        }
-
-        for (String key : resourceMap.keySet()) {
-            Set<ResourceUrn> set = resourceMap.get(key);
-            if (set.size() == 1) {
-                suggestions.add(set.iterator().next().getResourceName().toString());
-            } else {
-                for (ResourceUrn resourceUrn : set) {
-                    suggestions.add(resourceUrn.toString());
-                }
-            }
-        }
-
-        return suggestions;
+        super(UIElement.class, assetManager);
     }
 }

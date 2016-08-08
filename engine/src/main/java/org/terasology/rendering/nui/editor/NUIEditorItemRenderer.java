@@ -86,6 +86,9 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
                 // If the node has no type and is a root node, do not draw an icon.
                 if (node.isRoot()) {
                     return null;
+                } else if (!node.isRoot() && node.getParent().getValue().getKey() != null
+                           && node.getParent().getValue().getKey().equals("elements")) {
+                    textureName = node.getValue().getKey();
                 } else {
                     for (Tree<JsonTreeValue> child : node.getChildren()) {
                         JsonTreeValue childValue = child.getValue();

@@ -21,6 +21,7 @@ import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.Border;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
@@ -107,6 +108,35 @@ public class NUIEditorContextMenuBuilder {
         return contextMenu;
     }
 
+    public ContextMenuBuilder createPrimarySkinContextMenu(JsonTree node) {
+        ContextMenuBuilder contextMenu = new ContextMenuBuilder();
+        ContextMenuLevel primaryLevel = contextMenu.addLevel(true);
+
+        JsonTreeValue.Type type = node.getValue().getType();
+
+        // Create the ADD_EXTENDED level.
+        if (type == JsonTreeValue.Type.ARRAY || (type == JsonTreeValue.Type.OBJECT
+                                                 && !(node.getValue().getKey() != null &&
+                                                      node.getValue().getKey().equals("elements")))) {
+            ContextMenuLevel addLevel = contextMenu.addLevel(false);
+            primaryLevel.addNavigationOption(OPTION_ADD_EXTENDED, addLevel);
+            createAddSkinContextMenu(node, addLevel);
+        }
+
+        // If the node is an "elements" object, add the widget addition option (redirects to WidgetSelectionScreen).
+        if (type == JsonTreeValue.Type.OBJECT && node.getValue().getKey() != null &&
+            node.getValue().getKey().equals("elements")) {
+            primaryLevel.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node, true);
+        }
+
+        // Always add the copy&paste and edit options.
+        primaryLevel.addOption(OPTION_COPY, externalConsumers.get(OPTION_COPY), node, true);
+        primaryLevel.addOption(OPTION_PASTE, externalConsumers.get(OPTION_PASTE), node, true);
+        primaryLevel.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node, true);
+
+        return contextMenu;
+    }
+
     public void createAddContextMenu(JsonTree node, ContextMenuLevel addLevel) {
         JsonTreeValue.Type type = node.getValue().getType();
 
@@ -131,12 +161,38 @@ public class NUIEditorContextMenuBuilder {
                 addContextMenuListeners.forEach(UpdateListener::onAction);
             }, node, true);
 
-            populateContextMenu(node, addLevel);
+            populateContextMenu(node, addLevel, false);
         }
     }
 
-    private void populateContextMenu(JsonTree node, ContextMenuLevel addLevel) {
-        Class clazz = NUIEditorNodeUtils.getNodeClass(node, nuiManager);
+    public void createAddSkinContextMenu(JsonTree node, ContextMenuLevel addLevel) {
+        JsonTreeValue.Type type = node.getValue().getType();
+
+        if (type == JsonTreeValue.Type.OBJECT) {
+            if (node.getValue().getKey() != null && node.getValue().getKey().equals("families")) {
+                addLevel.addOption("New family", n -> {
+                    n.addChild(new JsonTreeValue("", null, JsonTreeValue.Type.OBJECT));
+                    n.getChildAt(0).setExpanded(true);
+                    addContextMenuListeners.forEach(UpdateListener::onAction);
+                }, node, true);
+            } else {
+                addLevel.addOption("Key/value pair", n -> {
+                    n.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
+                    addContextMenuListeners.forEach(UpdateListener::onAction);
+                }, node, true);
+
+                populateContextMenu(node, addLevel, true);
+            }
+        }
+    }
+
+    private void populateContextMenu(JsonTree node, ContextMenuLevel addLevel, boolean isSkin) {
+        Class clazz = null;
+        if (isSkin) {
+            clazz = NUIEditorNodeUtils.getSkinNodeClass(node, nuiManager);
+        } else {
+            clazz = NUIEditorNodeUtils.getNodeClass(node, nuiManager);
+        }
 
         if (clazz != null) {
             for (Field field : ReflectionUtils.getAllFields(clazz)) {
@@ -227,18 +283,30 @@ public class NUIEditorContextMenuBuilder {
         } else {
             Object value;
             if (Binding.class.isAssignableFrom(field.getType())) {
-                Binding binding = (Binding) field.get(clazz.newInstance());
+                Binding binding = (Binding) field.get(newInstance(clazz));
                 value = binding.get();
             } else {
-                value = field.get(clazz.newInstance());
+                value = field.get(newInstance(clazz));
             }
 
             if (value != null && value instanceof Boolean) {
                 value = !(Boolean) value;
             }
 
-            return value != null ? value :
-                field.getType().newInstance();
+            return value != null ? value : newInstance(field.getType());
         }
+    }
+
+    private Object newInstance(Class clazz) throws IllegalAccessException, InstantiationException {
+        if (Boolean.class.isAssignableFrom(clazz)) {
+            return false;
+        }
+        if (Border.class.isAssignableFrom(clazz)) {
+            return Border.ZERO;
+        }
+        if (Number.class.isAssignableFrom(clazz)) {
+            return 0;
+        }
+        return clazz.newInstance();
     }
 }

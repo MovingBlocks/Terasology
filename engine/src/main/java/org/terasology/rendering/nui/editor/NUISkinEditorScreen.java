@@ -39,10 +39,12 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
+import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
@@ -70,7 +72,9 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiSkinEditorScreen");
 
     private static final String AVAILABLE_ASSETS_ID = "availableAssets";
+    private static final String AVAILABLE_SCREENS_ID = "availableScreens";
     private static final String EDITOR_TREE_VIEW_ID = "editor";
+    private static final String SELECTED_SCREEN_ID = "selectedScreen";
     private static final String CREATE_NEW_SKIN = "New Skin";
 
     /**
@@ -89,6 +93,7 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
     @In
     private NUISkinEditorSystem nuiSkinEditorSystem;
 
+    private UIBox selectedScreenBox;
     /**
      * The main editor widget used to display and edit NUI skins.
      */
@@ -98,6 +103,10 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
      */
     private String selectedAsset;
     /**
+     *
+     */
+    private ResourceUrn selectedScreen;
+    /**
      * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
@@ -105,7 +114,9 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         UIDropdownScrollable<String> availableAssetDropdown = find(AVAILABLE_ASSETS_ID, UIDropdownScrollable.class);
+        UIDropdownScrollable<ResourceUrn> availableScreenDropdown = find(AVAILABLE_SCREENS_ID, UIDropdownScrollable.class);
         editor = find(EDITOR_TREE_VIEW_ID, JsonEditorTreeView.class);
+        selectedScreenBox = find(SELECTED_SCREEN_ID, UIBox.class);
 
         // Populate the list of screens.
         List<String> availableAssetList = Lists.newArrayList();
@@ -134,8 +145,52 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
             });
         }
 
-        // TODO: skin editor-specific context menu
-        editor.setContextMenuProducer(node -> new ContextMenuBuilder());
+        if (availableScreenDropdown != null) {
+            List<ResourceUrn> availableScreenList = Lists.newArrayList(assetManager.getAvailableAssets(UIElement.class));
+            Collections.sort(availableScreenList);
+            availableScreenDropdown.setOptions(availableScreenList);
+            availableScreenDropdown.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return selectedAsset != null;
+                }
+            });
+            availableScreenDropdown.bindSelection(new Binding<ResourceUrn>() {
+                @Override
+                public ResourceUrn get() {
+                    return selectedScreen;
+                }
+
+                @Override
+                public void set(ResourceUrn value) {
+                    selectedScreen = value;
+                }
+            });
+        }
+
+        editor.setContextMenuProducer(node -> {
+            NUIEditorContextMenuBuilder contextMenuBuilder = new NUIEditorContextMenuBuilder();
+            contextMenuBuilder.setManager(getManager());
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, editor::copyNode);
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, editor::pasteNode);
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
+            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
+            contextMenuBuilder.subscribeAddContextMenu(() -> editor.fireUpdateListeners());
+            ContextMenuBuilder contextMenu = contextMenuBuilder.createPrimarySkinContextMenu(node);
+
+            contextMenu.subscribeClose(() -> {
+                editor.setAlternativeWidget(null);
+                editor.setSelectedIndex(null);
+            });
+
+            contextMenu.subscribeScreenClosed(() -> {
+                if (editor.getAlternativeWidget() != null) {
+                    focusInlineEditor(node);
+                }
+            });
+
+            return contextMenu;
+        });
 
         editor.setEditor(this::editNode, getManager());
 
@@ -309,18 +364,7 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
      */
     private void resetState(JsonTree node) {
         editor.setTreeViewModel(node, true);
-
         editor.clearHistory();
-
-        // Dispose of the previously loaded asset so that any other copies of it
-        // are properly initialized.
-        if (selectedAsset != null) {
-            Optional<UIElement> asset = assetManager.getAsset(selectedAsset, UIElement.class);
-            if (asset.isPresent()) {
-                asset.get().dispose();
-            }
-        }
-
         updateConfig();
     }
 
@@ -376,5 +420,21 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
                 logger.warn("Could not construct a valid tree from clipboard contents.", e);
             }
         }
+    }
+
+    /**
+     * Set up and display {@link WidgetSelectionScreen}. When a widget is selected, add it as a child
+     * of the specified node.
+     *
+     * @param node The node to add the widget to.
+     */
+    private void addWidget(JsonTree node) {
+        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
+            .getScreen(WidgetSelectionScreen.ASSET_URI);
+        widgetSelectionScreen.setNode(node);
+        widgetSelectionScreen.subscribeClose(() -> {
+            editor.fireUpdateListeners();
+        });
     }
 }
