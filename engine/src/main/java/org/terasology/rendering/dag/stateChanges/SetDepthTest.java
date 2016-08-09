@@ -24,13 +24,13 @@ import org.terasology.rendering.dag.tasks.EnableCapabilityTask;
 /**
  * TODO: Add javadocs
  */
-public final class SetDepthTest extends SetCapability {
+class SetDepthTest extends SetCapability {
     private static final int CAPABILITY = GL_DEPTH_TEST;
     private static StateChange defaultInstance = new SetDepthTest(false);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
-    public SetDepthTest(boolean enabled) {
+    SetDepthTest(boolean enabled) {
         super(enabled);
     }
 

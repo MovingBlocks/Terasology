@@ -24,13 +24,13 @@ import org.terasology.rendering.dag.tasks.EnableCapabilityTask;
 /**
  * TODO: Add javadocs
  */
-public final class SetCullFace extends SetCapability {
+class SetCullFace extends SetCapability {
     private static final int CAPABILITY = GL_CULL_FACE;
     private static StateChange defaultInstance = new SetCullFace(false);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
-    public SetCullFace(boolean enabled) {
+    SetCullFace(boolean enabled) {
         super(enabled);
     }
 

@@ -17,15 +17,15 @@ package org.terasology.rendering.dag.tasks;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetCullFaceMode;
+import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 
 /**
  * TODO: Add javadocs
  */
-public final class SetCullFaceModeTask implements RenderPipelineTask {
+public final class SetWhatFacesToCullTask implements RenderPipelineTask {
     private int mode;
 
-    public SetCullFaceModeTask(int mode) {
+    public SetWhatFacesToCullTask(int mode) {
         this.mode = mode;
     }
 
@@ -36,6 +36,6 @@ public final class SetCullFaceModeTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), SetCullFaceMode.getModeName(mode));
+        return String.format("%21s(%s)", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
     }
 }

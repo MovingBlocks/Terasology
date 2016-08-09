@@ -21,18 +21,18 @@ import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetCullFaceModeTask;
+import org.terasology.rendering.dag.tasks.SetWhatFacesToCullTask;
 
 /**
  * TODO: Add javadocs
  */
-public final class SetCullFaceMode implements StateChange {
+public final class SetFacesToCull implements StateChange {
 
-    private static SetCullFaceMode defaultInstance = new SetCullFaceMode(GL_BACK); // also specified in OpenGL documentation
-    private SetCullFaceModeTask task;
+    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
+    private SetWhatFacesToCullTask task;
     private int mode;
 
-    public SetCullFaceMode(int mode) {
+    public SetFacesToCull(int mode) {
         this.mode = mode;
         validate();
     }
@@ -57,7 +57,7 @@ public final class SetCullFaceMode implements StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new SetCullFaceModeTask(mode);
+            task = new SetWhatFacesToCullTask(mode);
         }
 
         return task;
@@ -65,8 +65,8 @@ public final class SetCullFaceMode implements StateChange {
 
     @Override
     public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetCullFaceMode) {
-            return mode == ((SetCullFaceMode) stateChange).getMode();
+        if (stateChange instanceof SetFacesToCull) {
+            return mode == ((SetFacesToCull) stateChange).getMode();
         }
         return false;
     }

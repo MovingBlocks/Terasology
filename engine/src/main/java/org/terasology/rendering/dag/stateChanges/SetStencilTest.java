@@ -24,13 +24,13 @@ import org.terasology.rendering.dag.tasks.EnableCapabilityTask;
 /**
  * TODO: Add javadocs
  */
-public final class SetStencilTest extends SetCapability {
+class SetStencilTest extends SetCapability {
     private static final int CAPABILITY = GL_STENCIL_TEST;
     private static StateChange defaultInstance = new SetStencilTest(false);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
-    public SetStencilTest(boolean enabled) {
+    SetStencilTest(boolean enabled) {
         super(enabled);
     }
 

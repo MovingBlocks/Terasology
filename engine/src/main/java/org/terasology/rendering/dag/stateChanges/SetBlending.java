@@ -24,13 +24,13 @@ import org.terasology.rendering.dag.tasks.EnableCapabilityTask;
 /**
  * TODO: Add javadocs
  */
-public final class SetBlend extends SetCapability {
+public class SetBlending extends SetCapability {
     private static final int CAPABILITY = GL_BLEND;
     private static StateChange defaultInstance = new SetCullFace(false);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
-    public SetBlend(boolean enabled) {
+    public SetBlending(boolean enabled) {
         super(enabled);
     }
 
