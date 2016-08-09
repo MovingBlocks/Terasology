@@ -17,11 +17,10 @@ package org.terasology.rendering.nui.editor;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -29,34 +28,27 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.NUIEditorConfig;
-import org.terasology.input.Keyboard;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.logic.clipboard.ClipboardManager;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UISkinData;
+import org.terasology.rendering.nui.skin.UISkinFormat;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.utilities.Assets;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
@@ -65,7 +57,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class NUISkinEditorScreen extends CoreScreenLayer {
+public final class NUISkinEditorScreen extends AbstractEditorScreen {
 
     private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
@@ -94,16 +86,13 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
     private NUISkinEditorSystem nuiSkinEditorSystem;
 
     private UIBox selectedScreenBox;
-    /**
-     * The main editor widget used to display and edit NUI skins.
-     */
-    private JsonEditorTreeView editor;
+
     /**
      * The Urn of the currently edited asset.
      */
     private String selectedAsset;
     /**
-     *
+     * The Urn of the currently selected preview screen.
      */
     private ResourceUrn selectedScreen;
     /**
@@ -113,10 +102,14 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        // Retrieve the widgets based on their identifiers.
         UIDropdownScrollable<String> availableAssetDropdown = find(AVAILABLE_ASSETS_ID, UIDropdownScrollable.class);
         UIDropdownScrollable<ResourceUrn> availableScreenDropdown = find(AVAILABLE_SCREENS_ID, UIDropdownScrollable.class);
-        editor = find(EDITOR_TREE_VIEW_ID, JsonEditorTreeView.class);
+        JsonEditorTreeView editor = find(EDITOR_TREE_VIEW_ID, JsonEditorTreeView.class);
         selectedScreenBox = find(SELECTED_SCREEN_ID, UIBox.class);
+
+        super.setEditorSystem(nuiSkinEditorSystem);
+        super.setEditor(editor);
 
         // Populate the list of screens.
         List<String> availableAssetList = Lists.newArrayList();
@@ -164,6 +157,7 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
                 @Override
                 public void set(ResourceUrn value) {
                     selectedScreen = value;
+                    resetPreviewWidget();
                 }
             });
         }
@@ -185,7 +179,7 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
 
             contextMenu.subscribeScreenClosed(() -> {
                 if (editor.getAlternativeWidget() != null) {
-                    focusInlineEditor(node);
+                    focusInlineEditor(node, inlineEditorEntry);
                 }
             });
 
@@ -196,6 +190,7 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
 
         editor.subscribeTreeViewUpdate(() -> {
             editor.addToHistory();
+            resetPreviewWidget();
             updateConfig();
         });
 
@@ -204,59 +199,16 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
             getManager().pushScreen(NUIEditorSettingsScreen.ASSET_URI, NUIEditorSettingsScreen.class));
         WidgetUtil.trySubscribe(this, "copy", button -> copyJson());
         WidgetUtil.trySubscribe(this, "paste", button -> pasteJson());
-        WidgetUtil.trySubscribe(this, "undo", button -> {
-            if (editor.undo()) {
-                updateConfig();
-            }
-        });
-        WidgetUtil.trySubscribe(this, "redo", button -> {
-            if (editor.redo()) {
-                updateConfig();
-            }
-        });
+        WidgetUtil.trySubscribe(this, "undo", button -> undo());
+        WidgetUtil.trySubscribe(this, "redo", button -> redo());
 
         updateConfig();
     }
 
-    @Override
-    public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown()) {
-            int id = event.getKey().getId();
-            KeyboardDevice keyboard = event.getKeyboard();
-            boolean ctrlDown = keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL);
-
-            if (id == Keyboard.KeyId.ESCAPE) {
-                nuiSkinEditorSystem.toggleEditor();
-                return true;
-            } else if (ctrlDown && id == Keyboard.KeyId.Z) {
-                if (editor.undo()) {
-                    updateConfig();
-                }
-                return true;
-            } else if (ctrlDown && id == Keyboard.KeyId.Y) {
-                if (editor.redo()) {
-                    updateConfig();
-                }
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean isEscapeToCloseAllowed() {
-        // Escape to close is handled in onKeyEvent() to pass the editor's state to NUIEditorSystem.
-        return false;
-    }
-
     /**
-     * Resets the editor's state to a tree representation of a specified {@link UISkin}.
-     *
-     * @param urn The Urn of the UI asset.
+     * {@inheritDoc}
      */
+    @Override
     public void selectAsset(ResourceUrn urn) {
         Optional<UISkin> asset = assetManager.getAsset(urn, UISkin.class);
         if (asset.isPresent()) {
@@ -281,22 +233,49 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * Updates the editor's state based on config changes.
-     * <p>
-     * Should also be called to update the {@link NUIEditorItemRenderer} when the model is changed.
+     * {@inheritDoc}
      */
-    public void updateConfig() {
-        NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
-        editor.setItemRenderer(nuiEditorConfig.isDisableIcons()
-            ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(editor.getModel()));
+    @Override
+    protected void resetState(JsonTree node) {
+        getEditor().setTreeViewModel(node, true);
+        resetPreviewWidget();
+        getEditor().clearHistory();
+        updateConfig();
     }
 
     /**
-     * Creates an inline editor widget for the specified node, activates and focuses it.
-     *
-     * @param node The node an editor widget is to be created for.
+     * {@inheritDoc}
      */
-    private void editNode(JsonTree node) {
+    @Override
+    public void resetPreviewWidget() {
+        if (selectedScreen != null) {
+            try {
+                JsonElement element = JsonTreeConverter.deserialize(getEditor().getRoot());
+                UISkinData data = new UISkinFormat().load(element);
+                UIWidget widget = assetManager.getAsset(selectedScreen, UIElement.class).get().getRootWidget();
+                widget.setSkin(Assets.generateAsset(data, UISkin.class));
+                selectedScreenBox.setContent(widget);
+            } catch (Throwable t) {
+                selectedScreenBox.setContent(new UILabel(ExceptionUtils.getStackTrace(t)));
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void updateConfig() {
+        NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
+        getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
+            ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void editNode(JsonTree node) {
         JsonTreeValue.Type type = node.getValue().getType();
 
         // Create the inline editor depending on the node's type.
@@ -323,118 +302,12 @@ public class NUISkinEditorScreen extends CoreScreenLayer {
                 public void set(JsonTree value) {
                     if (value != null) {
                         node.setValue(value.getValue());
-                        editor.fireUpdateListeners();
+                        getEditor().fireUpdateListeners();
                     }
                 }
             });
-            editor.setAlternativeWidget(inlineEditorEntry);
-            focusInlineEditor(node);
+            getEditor().setAlternativeWidget(inlineEditorEntry);
+            focusInlineEditor(node, inlineEditorEntry);
         }
-    }
-
-    /**
-     * Sets the {@link NUIManager}'s focus to the inline editor widget and select a subset of its' contents.
-     *
-     * @param node The node that is currently being edited.
-     */
-    private void focusInlineEditor(JsonTree node) {
-        getManager().setFocus(inlineEditorEntry);
-        inlineEditorEntry.resetValue();
-
-        if (node.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
-            // If the node is a key/value pair, select the value of the node.
-            if (node.getValue().getValue() instanceof String) {
-                inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":\"".length(), true);
-                inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length() - "\"".length(), false);
-            } else {
-                inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":".length(), true);
-                inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
-            }
-        } else {
-            // Otherwise fully select the contents of the node.
-            inlineEditorEntry.setCursorPosition(0, true);
-            inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
-        }
-    }
-
-    /**
-     * Fully resets the editor state and updates it from a specified {@link JsonTree}.
-     *
-     * @param node The node the editor's state is to be reset to.
-     */
-    private void resetState(JsonTree node) {
-        editor.setTreeViewModel(node, true);
-        editor.clearHistory();
-        updateConfig();
-    }
-
-    /**
-     * Copies the current state of the editor to the system clipboard as a JSON string.
-     * <p>
-     * {@link ClipboardManager} is not used here as it is unavailable within the main menu.
-     */
-    private void copyJson() {
-        if (editor.getModel() != null) {
-            // Deserialize the state of the editor to a JSON string.
-            JsonElement json = JsonTreeConverter.deserialize(editor.getModel().getNode(0).getRoot());
-            String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
-
-            // Set the contents of the system clipboard to it.
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            try {
-                clipboard.setContents(new StringSelection(jsonString), null);
-            } catch (IllegalStateException e) {
-                logger.warn("Clipboard inaccessible.", e);
-            }
-        }
-    }
-
-    /**
-     * Attempts to serialize the system clipboard's contents to a JSON string -
-     * if successful, sets the current state of the editor to it.
-     * <p>
-     * {@link ClipboardManager} is not used here as it is unavailable within the main menu.
-     */
-    private void pasteJson() {
-        // Get the clipboard contents.
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable t = clipboard.getContents(null);
-
-        // Attempt to convert them to a string.
-        String clipboardContents = null;
-        try {
-            if (t != null) {
-                clipboardContents = (String) t.getTransferData(DataFlavor.stringFlavor);
-            }
-        } catch (UnsupportedFlavorException | IOException e) {
-            logger.warn("Could not fetch clipboard contents.", e);
-        }
-
-        if (clipboardContents != null) {
-            try {
-                // Attempt to serialize them to a JsonTree and reset the editor state.
-                JsonElement json = new JsonParser().parse(clipboardContents);
-                JsonTree node = JsonTreeConverter.serialize(json);
-                resetState(node);
-            } catch (JsonSyntaxException | NullPointerException e) {
-                logger.warn("Could not construct a valid tree from clipboard contents.", e);
-            }
-        }
-    }
-
-    /**
-     * Set up and display {@link WidgetSelectionScreen}. When a widget is selected, add it as a child
-     * of the specified node.
-     *
-     * @param node The node to add the widget to.
-     */
-    private void addWidget(JsonTree node) {
-        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
-        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
-            .getScreen(WidgetSelectionScreen.ASSET_URI);
-        widgetSelectionScreen.setNode(node);
-        widgetSelectionScreen.subscribeClose(() -> {
-            editor.fireUpdateListeners();
-        });
     }
 }

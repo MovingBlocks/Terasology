@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.editor;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.network.ClientComponent;
@@ -28,18 +27,14 @@ import org.terasology.rendering.nui.NUIManager;
 
 @RegisterSystem
 @Share(NUIEditorSystem.class)
-public class NUIEditorSystem extends BaseComponentSystem {
-    private static final String NUI_EDITOR_URN = "engine:nuiEditorScreen";
-
+public class NUIEditorSystem extends AbstractEditorSystem {
     @In
     private NUIManager nuiManager;
 
-    /**
-     * Whether the editor is currently active.
-     */
     private boolean editorActive;
 
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class,
+                  priority = EventPriority.PRIORITY_CRITICAL)
     public void showEditor(NUIEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             toggleEditor();
@@ -47,14 +42,13 @@ public class NUIEditorSystem extends BaseComponentSystem {
         }
     }
 
+    @Override
     public void toggleEditor() {
-        nuiManager.toggleScreen(NUI_EDITOR_URN);
+        nuiManager.toggleScreen(NUIEditorScreen.ASSET_URI);
         editorActive = !editorActive;
     }
 
-    /**
-     * @return Whether the editor is currently active.
-     */
+    @Override
     public boolean isEditorActive() {
         return editorActive;
     }
