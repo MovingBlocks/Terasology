@@ -15,27 +15,27 @@
  */
 package org.terasology.rendering.dag.tasks;
 
-import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.glEnable;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetStateParameter;
 
 /**
  * TODO: Add javadocs
  */
-public final class SetWhatFacesToCullTask implements RenderPipelineTask {
-    private int mode;
+public final class EnableStateParameterTask implements RenderPipelineTask {
+    private int capability;
 
-    public SetWhatFacesToCullTask(int mode) {
-        this.mode = mode;
+    public EnableStateParameterTask(int capability) {
+        this.capability = capability;
     }
 
     @Override
     public void execute() {
-        GL11.glCullFace(mode);
+        glEnable(capability);
     }
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
+        return String.format("%21s: enabled", SetStateParameter.getParameterName(capability));
     }
 }

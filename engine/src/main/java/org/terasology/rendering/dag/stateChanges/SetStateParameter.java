@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
@@ -23,17 +25,21 @@ import org.terasology.rendering.dag.StateChange;
  * TODO: Add javadocs
  * Indented for capabilities that are enabled/disabled via glEnable and glDisable.
  */
-public abstract class SetCapability implements StateChange {
+public abstract class SetStateParameter implements StateChange {
+    private static Map<Integer, String> paramaterMap = ImmutableMap.of(GL11.GL_BLEND, "GL_BLEND",
+            GL11.GL_DEPTH_TEST, "GL_DEPTH_TEST",
+            GL11.GL_STENCIL_TEST, "GL_STENCIL_TEST",
+            GL11.GL_CULL_FACE, "GL_CULL_FACE");
     private boolean enabled;
 
-    public SetCapability(boolean enabled) {
+    SetStateParameter(boolean enabled) {
         this.enabled = enabled;
     }
 
     @Override
     public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetCapability) {
-            return this.enabled == ((SetCapability) stateChange).isEnabled();
+        if (stateChange instanceof SetStateParameter) {
+            return this.enabled == ((SetStateParameter) stateChange).isEnabled();
         }
         return false;
     }
@@ -44,7 +50,7 @@ public abstract class SetCapability implements StateChange {
 
     @Override
     public RenderPipelineTask generateTask() {
-        if (isEnabled()) {
+        if (enabled) {
             return getEnablingTask();
         } else {
             return getDisablingTask();
@@ -65,22 +71,7 @@ public abstract class SetCapability implements StateChange {
         return String.format(": capability %s", status);
     }
 
-    public static String getCapabilityName(int capability) {
-        String capabilityName = "N/A";
-        switch (capability) {
-            case GL11.GL_BLEND:
-                capabilityName = "GL_BLEND";
-                break;
-            case GL11.GL_DEPTH_TEST:
-                capabilityName = "GL_DEPTH_TEST";
-                break;
-            case GL11.GL_STENCIL_TEST:
-                capabilityName = "GL_STENCIL_TEST";
-                break;
-            case GL11.GL_CULL_FACE:
-                capabilityName = "GL_CULL_FACE";
-                break;
-        }
-        return capabilityName;
+    public static String getParameterName(int capability) {
+        return paramaterMap.get(capability);
     }
 }

@@ -15,34 +15,34 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetWhatFacesToCullTask;
+import org.terasology.rendering.dag.tasks.SetFacesToCullTask;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetFacesToCull implements StateChange {
-
     private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
-    private SetWhatFacesToCullTask task;
+    private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL11.GL_BACK, "GL_BACK",
+            GL11.GL_FRONT, "GL_FRONT",
+            GL11.GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK");
+    private SetFacesToCullTask task;
     private int mode;
 
     public SetFacesToCull(int mode) {
-        this.mode = mode;
-        validate();
-    }
-
-    private void validate() {
         if (mode != GL_BACK
                 && mode != GL_FRONT
                 && mode != GL_FRONT_AND_BACK) {
             throw new IllegalArgumentException("Mode must be GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.");
         }
+        this.mode = mode;
     }
 
     public int getMode() {
@@ -57,7 +57,7 @@ public final class SetFacesToCull implements StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new SetWhatFacesToCullTask(mode);
+            task = new SetFacesToCullTask(mode);
         }
 
         return task;
@@ -77,19 +77,7 @@ public final class SetFacesToCull implements StateChange {
     }
 
     public static String getModeName(int mode) {
-        String modeName = "N/A";
-        switch (mode) {
-            case GL11.GL_BACK:
-                modeName = "GL_BACK";
-                break;
-            case GL11.GL_FRONT:
-                modeName = "GL_FRONT";
-                break;
-            case GL11.GL_FRONT_AND_BACK:
-                modeName = "GL_FRONT_AND_BACK";
-                break;
-        }
-        return modeName;
+        return modeNameMap.get(mode);
     }
 
     @Override

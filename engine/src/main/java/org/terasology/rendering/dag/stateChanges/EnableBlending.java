@@ -15,11 +15,53 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
+import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
+
 /**
  * TODO: Add javadocs
  */
-public class EnableBlending extends SetBlending {
+public class EnableBlending extends SetStateParameter {
+    private static final int PARAMETER = GL_BLEND;
+    private static StateChange defaultInstance = new EnableBlending(false);
+    private static RenderPipelineTask enablingTask;
+    private static RenderPipelineTask disablingTask;
+
     public EnableBlending() {
-        super(true);
+        this(true);
+    }
+
+    private EnableBlending(boolean enabled) {
+        super(enabled);
+        disablingTask = new DisableStateParameterTask(PARAMETER);
+        enablingTask = new EnableStateParameterTask(PARAMETER);
+    }
+
+    @Override
+    public StateChange getDefaultInstance() {
+        return defaultInstance;
+    }
+
+    @Override
+    protected RenderPipelineTask getDisablingTask() {
+        return disablingTask;
+    }
+
+    @Override
+    protected RenderPipelineTask getEnablingTask() {
+        return enablingTask;
+    }
+
+    @Override
+    public boolean isTheDefaultInstance() {
+        return this == defaultInstance;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s%s", this.getClass().getSimpleName(), super.toString());
     }
 }
