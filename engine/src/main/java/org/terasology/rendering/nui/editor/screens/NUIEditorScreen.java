@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.screens;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -35,7 +35,13 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
+import org.terasology.rendering.nui.contextMenu.ContextMenuTree;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
+import org.terasology.rendering.nui.editor.utils.NUIEditorContextMenuBuilder;
+import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
+import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
+import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UIBox;
@@ -143,33 +149,37 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         });
 
         editor.subscribeTreeViewUpdate(() -> {
-            editor.addToHistory();
+            getEditor().addToHistory();
             resetPreviewWidget();
             updateConfig();
         });
 
         editor.setContextMenuProducer(node -> {
-            NUIEditorContextMenuBuilder contextMenuBuilder = new NUIEditorContextMenuBuilder();
-            contextMenuBuilder.setManager(getManager());
-            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, editor::copyNode);
-            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, editor::pasteNode);
-            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
-            contextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
-            contextMenuBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
-            ContextMenuBuilder contextMenu = contextMenuBuilder.createPrimaryContextMenu(node);
+            NUIEditorContextMenuBuilder nuiEditorContextMenuBuilder = new NUIEditorContextMenuBuilder();
+            nuiEditorContextMenuBuilder.setManager(getManager());
+            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, getEditor()::copyNode);
+            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, getEditor()::pasteNode);
+            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
+            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
+            nuiEditorContextMenuBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
+            ContextMenuTree contextMenuTree = nuiEditorContextMenuBuilder.createPrimaryContextMenu(node);
 
-            contextMenu.subscribeClose(() -> {
-                editor.setAlternativeWidget(null);
-                editor.setSelectedIndex(null);
+            ContextMenuBuilder builder = new ContextMenuBuilder(getManager());
+
+            builder.setTree(contextMenuTree);
+
+            builder.subscribeClose(() -> {
+                getEditor().setAlternativeWidget(null);
+                getEditor().setSelectedIndex(null);
             });
 
-            contextMenu.subscribeScreenClosed(() -> {
-                if (editor.getAlternativeWidget() != null) {
+            builder.subscribeScreenClosed(() -> {
+                if (getEditor().getAlternativeWidget() != null) {
                     focusInlineEditor(node, inlineEditorEntry);
                 }
             });
 
-            return contextMenu;
+            return builder;
         });
 
         editor.setEditor(this::editNode, getManager());

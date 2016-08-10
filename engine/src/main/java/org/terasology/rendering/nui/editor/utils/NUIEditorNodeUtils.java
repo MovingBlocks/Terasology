@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.utils;
 
 import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
@@ -22,6 +22,8 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.editor.screens.NUIEditorScreen;
+import org.terasology.rendering.nui.editor.screens.NUISkinEditorScreen;
 import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
 import org.terasology.rendering.nui.skin.UIStyleFragment;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
@@ -43,7 +45,7 @@ public class NUIEditorNodeUtils {
      */
     public static JsonTree createNewScreen() {
         JsonTree tree = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
-        tree.addChild(new JsonTreeValue("type", "PlaceholderScreenLayer", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        tree.addChild(new JsonTreeValue("type", "PlaceholderScreen", JsonTreeValue.Type.KEY_VALUE_PAIR));
         tree.addChild(new JsonTreeValue("skin", "engine:default", JsonTreeValue.Type.KEY_VALUE_PAIR));
 
         JsonTree layout = new JsonTree(new JsonTreeValue("contents", null, JsonTreeValue.Type.OBJECT));

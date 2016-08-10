@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.systems;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -24,6 +24,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.editor.NUISkinEditorButton;
+import org.terasology.rendering.nui.editor.screens.NUISkinEditorScreen;
 
 @RegisterSystem
 @Share(NUISkinEditorSystem.class)

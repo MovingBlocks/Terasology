@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -42,7 +41,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
     /**
      * A list of context menu levels used within the menu.
      */
-    private List<ContextMenuLevel> menuLevels = Lists.newArrayList();
+    private List<UIList<String>> menuLevels = Lists.newArrayList();
     /**
      * Listeners fired when the menu is closed without selecting an option.
      */
@@ -52,6 +51,10 @@ public class ContextMenuScreen extends CoreScreenLayer {
      * selecting an option.
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
+    /**
+     *
+     */
+    private Vector2i position;
 
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
@@ -89,16 +92,15 @@ public class ContextMenuScreen extends CoreScreenLayer {
         canvas.addInteractionRegion(mainListener);
         Vector2i currentPosition = null;
         int currentWidth = 0;
-        for (ContextMenuLevel level : menuLevels) {
+        for (UIList<String> level : menuLevels) {
             if (level.isVisible()) {
                 if (currentPosition == null) {
-                    currentPosition = new Vector2i(level.getPosition());
+                    currentPosition = new Vector2i(position);
                 } else {
                     currentPosition.addX(currentWidth);
                 }
-                UIWidget menuWidget = level.getMenuWidget();
                 Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
-                    canvas.calculatePreferredSize(menuWidget));
+                    canvas.calculatePreferredSize(level));
                 double percentageThreshold = 0.9;
                 if (region.maxY() > canvas.getRegion().height() * percentageThreshold) {
                     region = Rect2i.createFromMinAndMax(region.minX(),
@@ -107,13 +109,13 @@ public class ContextMenuScreen extends CoreScreenLayer {
                         region.maxX(),
                         canvas.getRegion().height());
                 }
-                currentWidth = canvas.calculatePreferredSize(menuWidget).getX() - 8;
-                canvas.drawWidget(level.getMenuWidget(), region);
+                currentWidth = canvas.calculatePreferredSize(level).getX() - 8;
+                canvas.drawWidget(level, region);
             }
         }
     }
 
-    public void setMenuLevels(List<ContextMenuLevel> levels) {
+    public void setMenuLevels(List<UIList<String>> levels) {
         menuLevels = levels;
     }
 
@@ -135,5 +137,9 @@ public class ContextMenuScreen extends CoreScreenLayer {
     public void unsubscribeScreenClosed(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         screenClosedListeners.remove(listener);
+    }
+
+    public void setPosition(Vector2i position) {
+        this.position = position;
     }
 }

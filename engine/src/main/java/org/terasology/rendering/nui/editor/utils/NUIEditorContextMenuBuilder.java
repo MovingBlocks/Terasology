@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,11 +22,13 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Border;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
-import org.terasology.rendering.nui.contextMenu.ContextMenuLevel;
+import org.terasology.rendering.nui.contextMenu.ContextMenuTree;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UpdateListener;
@@ -34,9 +36,11 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class NUIEditorContextMenuBuilder {
@@ -75,42 +79,39 @@ public class NUIEditorContextMenuBuilder {
         addContextMenuListeners.add(listener);
     }
 
-    public ContextMenuBuilder createPrimaryContextMenu(JsonTree node) {
-        ContextMenuBuilder contextMenu = new ContextMenuBuilder();
-        ContextMenuLevel primaryLevel = contextMenu.addLevel(true);
+    public ContextMenuTree createPrimaryContextMenu(JsonTree node) {
+        ContextMenuTree primaryTree = new ContextMenuTree();
 
         JsonTreeValue.Type type = node.getValue().getType();
 
         // Create the ADD_EXTENDED level.
         if ((type == JsonTreeValue.Type.ARRAY && !node.getValue().getKey().equals("contents"))
             || type == JsonTreeValue.Type.OBJECT) {
-            ContextMenuLevel addLevel = contextMenu.addLevel(false);
-            primaryLevel.addNavigationOption(OPTION_ADD_EXTENDED, addLevel);
-            createAddContextMenu(node, addLevel);
+            ContextMenuTree addTree = createAddContextMenu(node);
+            primaryTree.addSubmenu(OPTION_ADD_EXTENDED, addTree);
         }
 
         // If the node is a "contents" array, add the widget addition option (redirects to WidgetSelectionScreen).
         if (type == JsonTreeValue.Type.ARRAY && node.getValue().getKey().equals("contents")) {
-            primaryLevel.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node, true);
+            primaryTree.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node);
         }
 
         // Always add the copy&paste options.
-        primaryLevel.addOption(OPTION_COPY, externalConsumers.get(OPTION_COPY), node, true);
-        primaryLevel.addOption(OPTION_PASTE, externalConsumers.get(OPTION_PASTE), node, true);
+        primaryTree.addOption(OPTION_COPY, externalConsumers.get(OPTION_COPY), node);
+        primaryTree.addOption(OPTION_PASTE, externalConsumers.get(OPTION_PASTE), node);
 
         // Unless the node is an OBJECT child of an ARRAY (should always have an empty key), add the edit option.
         if (type != JsonTreeValue.Type.NULL && !(type == JsonTreeValue.Type.OBJECT
                                                  && !node.isRoot()
                                                  && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
-            primaryLevel.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node, true);
+            primaryTree.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node);
         }
 
-        return contextMenu;
+        return primaryTree;
     }
 
-    public ContextMenuBuilder createPrimarySkinContextMenu(JsonTree node) {
-        ContextMenuBuilder contextMenu = new ContextMenuBuilder();
-        ContextMenuLevel primaryLevel = contextMenu.addLevel(true);
+    public ContextMenuTree createPrimarySkinContextMenu(JsonTree node) {
+        ContextMenuTree primaryTree = new ContextMenuTree();
 
         JsonTreeValue.Type type = node.getValue().getType();
 
@@ -118,75 +119,80 @@ public class NUIEditorContextMenuBuilder {
         if (type == JsonTreeValue.Type.ARRAY || (type == JsonTreeValue.Type.OBJECT
                                                  && !(node.getValue().getKey() != null &&
                                                       node.getValue().getKey().equals("elements")))) {
-            ContextMenuLevel addLevel = contextMenu.addLevel(false);
-            primaryLevel.addNavigationOption(OPTION_ADD_EXTENDED, addLevel);
-            createAddSkinContextMenu(node, addLevel);
+            ContextMenuTree addTree = createAddSkinContextMenu(node);
+            primaryTree.addSubmenu(OPTION_ADD_EXTENDED, addTree);
         }
 
         // If the node is an "elements" object, add the widget addition option (redirects to WidgetSelectionScreen).
         if (type == JsonTreeValue.Type.OBJECT && node.getValue().getKey() != null &&
             node.getValue().getKey().equals("elements")) {
-            primaryLevel.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node, true);
+            primaryTree.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node);
         }
 
         // Always add the copy&paste and edit options.
-        primaryLevel.addOption(OPTION_COPY, externalConsumers.get(OPTION_COPY), node, true);
-        primaryLevel.addOption(OPTION_PASTE, externalConsumers.get(OPTION_PASTE), node, true);
-        primaryLevel.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node, true);
+        primaryTree.addOption(OPTION_COPY, externalConsumers.get(OPTION_COPY), node);
+        primaryTree.addOption(OPTION_PASTE, externalConsumers.get(OPTION_PASTE), node);
+        primaryTree.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node);
 
-        return contextMenu;
+        return primaryTree;
     }
 
-    public void createAddContextMenu(JsonTree node, ContextMenuLevel addLevel) {
+    public ContextMenuTree createAddContextMenu(JsonTree node) {
+        ContextMenuTree addTree = new ContextMenuTree();
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.ARRAY) {
             // Add generic item addition options.
-            addLevel.addOption("Boolean value", n -> {
+            addTree.addOption("Boolean value", n -> {
                 n.addChild(new JsonTreeValue(null, false, JsonTreeValue.Type.VALUE));
                 addContextMenuListeners.forEach(UpdateListener::onAction);
-            }, node, true);
-            addLevel.addOption("Number value", n -> {
+            }, node);
+            addTree.addOption("Number value", n -> {
                 n.addChild(new JsonTreeValue(null, 0.0f, JsonTreeValue.Type.VALUE));
                 addContextMenuListeners.forEach(UpdateListener::onAction);
-            }, node, true);
-            addLevel.addOption("String value", n -> {
+            }, node);
+            addTree.addOption("String value", n -> {
                 n.addChild(new JsonTreeValue(null, "", JsonTreeValue.Type.VALUE));
                 addContextMenuListeners.forEach(UpdateListener::onAction);
-            }, node, true);
+            }, node);
         } else if (type == JsonTreeValue.Type.OBJECT) {
             // Add a generic key/value pair addition option.
-            addLevel.addOption("Key/value pair", n -> {
+            addTree.addOption("Key/value pair", n -> {
                 n.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
                 addContextMenuListeners.forEach(UpdateListener::onAction);
-            }, node, true);
+            }, node);
 
-            populateContextMenu(node, addLevel, false);
+            populateContextMenu(node, addTree, false);
         }
+
+        return addTree;
     }
 
-    public void createAddSkinContextMenu(JsonTree node, ContextMenuLevel addLevel) {
+    public ContextMenuTree createAddSkinContextMenu(JsonTree node) {
+        ContextMenuTree addTree = new ContextMenuTree();
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.OBJECT) {
             if (node.getValue().getKey() != null && node.getValue().getKey().equals("families")) {
-                addLevel.addOption("New family", n -> {
+                addTree.addOption("New family", n -> {
                     n.addChild(new JsonTreeValue("", null, JsonTreeValue.Type.OBJECT));
                     n.getChildAt(0).setExpanded(true);
                     addContextMenuListeners.forEach(UpdateListener::onAction);
-                }, node, true);
+                }, node);
             } else {
-                addLevel.addOption("Key/value pair", n -> {
+                addTree.addOption("Key/value pair", n -> {
                     n.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
                     addContextMenuListeners.forEach(UpdateListener::onAction);
-                }, node, true);
+                }, node);
 
-                populateContextMenu(node, addLevel, true);
+                populateContextMenu(node, addTree, true);
             }
         }
+
+        return addTree;
     }
 
-    private void populateContextMenu(JsonTree node, ContextMenuLevel addLevel, boolean isSkin) {
+    private void populateContextMenu(JsonTree node, ContextMenuTree addTree, boolean isSkin) {
         Class clazz = null;
         if (isSkin) {
             clazz = NUIEditorNodeUtils.getSkinNodeClass(node, nuiManager);
@@ -196,19 +202,20 @@ public class NUIEditorContextMenuBuilder {
 
         if (clazz != null) {
             for (Field field : ReflectionUtils.getAllFields(clazz)) {
-                if (!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class)) {
+                if ((!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class))
+                    && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
                     field.setAccessible(true);
                     String name = getNodeName(field);
                     Class finalClazz = clazz;
                     if (!node.hasChildWithKey(name)) {
-                        addLevel.addOption(name, n -> {
+                        addTree.addOption(name, n -> {
                             try {
                                 createChild(name, node, field, finalClazz);
                                 addContextMenuListeners.forEach(UpdateListener::onAction);
                             } catch (IllegalAccessException | InstantiationException e) {
                                 logger.warn("Could not add child", e);
                             }
-                        }, node, true);
+                        }, node);
                     }
                 }
             }
@@ -285,6 +292,8 @@ public class NUIEditorContextMenuBuilder {
             if (Binding.class.isAssignableFrom(field.getType())) {
                 Binding binding = (Binding) field.get(newInstance(clazz));
                 value = binding.get();
+            } else if (Optional.class.isAssignableFrom(field.getType())) {
+                value = newInstance((Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
             } else {
                 value = field.get(newInstance(clazz));
             }
@@ -304,8 +313,17 @@ public class NUIEditorContextMenuBuilder {
         if (Border.class.isAssignableFrom(clazz)) {
             return Border.ZERO;
         }
+        if (Color.class.isAssignableFrom(clazz)) {
+            return "000000FF";
+        }
+        if (Font.class.isAssignableFrom(clazz)) {
+            return "NotoSans-Regular";
+        }
         if (Number.class.isAssignableFrom(clazz)) {
             return 0;
+        }
+        if (TextureRegion.class.isAssignableFrom(clazz)) {
+            return "";
         }
         return clazz.newInstance();
     }

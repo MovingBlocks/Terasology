@@ -170,9 +170,9 @@ public class JsonEditorTreeView extends UITreeView<JsonTreeValue> {
                 setSelectedIndex(getModel().indexOf(node));
                 setAlternativeWidget(null);
 
-                ContextMenuBuilder contextMenu = contextMenuProducer.apply((JsonTree) node);
+                ContextMenuBuilder contextMenuBuilder = contextMenuProducer.apply((JsonTree) node);
 
-                contextMenu.show(manager, event.getMouse().getPosition());
+                contextMenuBuilder.showContextMenu(event.getMouse().getPosition());
             }
         });
 

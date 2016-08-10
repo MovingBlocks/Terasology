@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.screens;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -25,6 +25,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UITextEntry;

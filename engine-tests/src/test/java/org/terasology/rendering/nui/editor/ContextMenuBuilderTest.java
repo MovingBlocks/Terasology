@@ -26,6 +26,8 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.i18n.TranslationSystemImpl;
 import org.terasology.input.InputSystem;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.editor.screens.PlaceholderScreen;
+import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -69,7 +71,7 @@ public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
     public void testNodeTypes() {
         JsonTree currentNode = inputTree;
 
-        assertEquals(PlaceholderScreenLayer.class, getNodeType(currentNode));
+        assertEquals(PlaceholderScreen.class, getNodeType(currentNode));
         currentNode = currentNode.getChildWithKey("contents");
         assertEquals(RelativeLayout.class, getNodeType(currentNode));
         currentNode = currentNode.getChildWithKey("contents");

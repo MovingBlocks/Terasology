@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.utils;
 
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.itemRendering.StringTextIconRenderer;

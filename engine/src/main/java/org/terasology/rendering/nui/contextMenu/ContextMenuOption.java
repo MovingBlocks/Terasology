@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.contextMenu;
 import java.util.function.Consumer;
 
 /**
- * A single option in a context menu level.
+ * A single option in a context menu.
  *
  * @param <E> The type of the object passed to the option.
  */

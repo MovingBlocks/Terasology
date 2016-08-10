@@ -20,20 +20,18 @@ import com.google.common.collect.Lists;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
 
-/**
- * A builder class to construct and show {@link ContextMenuScreen} instances.
- * <p>
- * Should be used in favor of manually creating the screen.
- */
 public class ContextMenuBuilder {
+    private NUIManager manager;
     /**
-     * A list of context menu levels used within the menu.
+     *
      */
-    private List<ContextMenuLevel> menuLevels = Lists.newArrayList();
+    private ContextMenuTree tree;
     /**
      * Listeners fired when an item is selected.
      */
@@ -48,98 +46,81 @@ public class ContextMenuBuilder {
      */
     private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
 
-    /**
-     * Adds a new level to the context menu.
-     *
-     * @param visible Whether the level should be initialized as visible.
-     * @return The newly added level.
-     */
-    public ContextMenuLevel addLevel(boolean visible) {
-        ContextMenuLevel level = new ContextMenuLevel();
-        level.setVisible(visible);
-        menuLevels.add(level);
-        return level;
+    public ContextMenuBuilder(NUIManager manager) {
+        this.manager = manager;
     }
 
-    /**
-     * Initializes and pushes the {@link ContextMenuScreen} with the existing list of options.
-     *
-     * @param manager  The {@link NUIManager} the screen is to be pushed to.
-     * @param position The position of the context menu within the screen.
-     */
-    public void show(NUIManager manager, Vector2i position) {
+    public void showContextMenu(Vector2i position) {
         if (!manager.isOpen(ContextMenuScreen.ASSET_URI)) {
             manager.pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
         }
 
-        ContextMenuLevel primaryLevel = menuLevels.get(0);
-        primaryLevel.setVisible(true);
-        primaryLevel.setPosition(position);
-        for (ContextMenuLevel level : menuLevels) {
-            level.getMenuWidget().bindSelection(new Binding<String>() {
-                @Override
-                public String get() {
-                    return null;
-                }
-
-                @Override
-                public void set(String value) {
-                    level.accept(value);
-                    if (((ContextMenuOption) level.getOptions().get(value)).isFinalized()) {
-                        selectionListeners.forEach(UpdateListener::onAction);
-                        manager.closeScreen(ContextMenuScreen.ASSET_URI);
-                    }
-                }
-            });
-        }
-
         ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
-        contextMenuScreen.setMenuLevels(menuLevels);
-
-        contextMenuScreen.subscribeClose(() -> {
-            closeListeners.forEach(UpdateListener::onAction);
-        });
-
-        contextMenuScreen.subscribeScreenClosed(() -> {
-            screenClosedListeners.forEach(UpdateListener::onAction);
-        });
+        tree.setVisible(true);
+        contextMenuScreen.setMenuLevels(getMenuLevelList(tree));
+        contextMenuScreen.setPosition(position);
+        contextMenuScreen.subscribeClose(() -> closeListeners.forEach(UpdateListener::onAction));
+        contextMenuScreen.subscribeScreenClosed(() -> screenClosedListeners.forEach(UpdateListener::onAction));
     }
 
-    /**
-     * Subscribe to an item being selected.
-     *
-     * @param listener The listener to be added.
-     */
+    public void setTree(ContextMenuTree tree) {
+        this.tree = tree;
+    }
+
+    private List<UIList<String>> getMenuLevelList(ContextMenuTree tree) {
+        List<UIList<String>> menuLevels = Lists.newArrayList();
+
+        menuLevels.add(getList(tree));
+        for (ContextMenuTree submenu : tree.getSubmenues().values()) {
+            menuLevels.addAll(getMenuLevelList(submenu));
+        }
+
+        return menuLevels;
+    }
+
+    private UIList<String> getList(ContextMenuTree tree) {
+        UIList<String> list = new UIList<>();
+        list.setList(Lists.newArrayList(tree.getOptions().keySet()));
+        list.bindSelection(new Binding<String>() {
+            @Override
+            public String get() {
+                return null;
+            }
+
+            @Override
+            public void set(String value) {
+                tree.getOptions().get(value).accept();
+                if (tree.getOptions().get(value).isFinalized()) {
+                    selectionListeners.forEach(UpdateListener::onAction);
+                    manager.closeScreen(ContextMenuScreen.ASSET_URI);
+                }
+            }
+        });
+        list.bindVisible(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return tree.isVisible();
+            }
+        });
+
+        return list;
+    }
+
     public void subscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         selectionListeners.add(listener);
     }
 
-    /**
-     * Unsubscribe from an item being selected.
-     *
-     * @param listener The listener to be removed.
-     */
     public void unsubscribeSelection(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         selectionListeners.remove(listener);
     }
 
-    /**
-     * Subscribe to the menu being closed.
-     *
-     * @param listener The listener to be added.
-     */
     public void subscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.add(listener);
     }
 
-    /**
-     * Unsubscribe from an item being selected.
-     *
-     * @param listener The listener to be removed.
-     */
     public void unsubscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);
         closeListeners.remove(listener);

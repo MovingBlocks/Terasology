@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.systems;
 
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 
-/**
- * An empty screen layer override to be used for a new tree.
- */
-public class PlaceholderScreenLayer extends CoreScreenLayer {
-    @Override
-    public void initialise() {
+public abstract class AbstractEditorSystem extends BaseComponentSystem {
+    /**
+     * Toggles the editor's visibility state.
+     */
+    public abstract void toggleEditor();
 
-    }
+    /**
+     * @return Whether the editor is currently active.
+     */
+    public abstract boolean isEditorActive();
 }
