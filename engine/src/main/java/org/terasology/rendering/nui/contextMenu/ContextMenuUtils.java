@@ -114,11 +114,6 @@ public class ContextMenuUtils {
             this.visible = !this.visible;
         }
 
-        @Override
-        public boolean isFinalized() {
-            return false;
-        }
-
         public List<AbstractContextMenuItem> getOptions() {
             return options;
         }

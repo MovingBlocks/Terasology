@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  */
 public final class MenuTree extends AbstractContextMenuItem {
     /**
-     *
+     * The name of the menu.
      */
     private String name;
     /**
@@ -47,15 +47,6 @@ public final class MenuTree extends AbstractContextMenuItem {
 
     public void addSubmenu(MenuTree tree) {
         options.add(tree);
-    }
-
-    @Override
-    public void select() {
-    }
-
-    @Override
-    public boolean isFinalized() {
-        return false;
     }
 
     public String getName() {

@@ -19,10 +19,14 @@ public abstract class AbstractContextMenuItem {
     /**
      * Perform a specific action when this item is selected.
      */
-    public abstract void select();
+    public void select() {
+
+    }
 
     /**
      * @return Whether the option is final, i.e. closes the context menu when selected.
      */
-    public abstract boolean isFinalized();
+    public boolean isFinalized() {
+        return false;
+    }
 }
