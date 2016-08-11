@@ -131,7 +131,7 @@ public class NUIEditorNodeUtils {
                     .getType();
             } else {
                 if (List.class.isAssignableFrom(currentClass) &&
-                    n.getValue().getKey() != null &&
+                    n.getValue().getKey() == null &&
                     "contents".equals(n.getParent().getValue().getKey())) {
                     // Transition from a "contents" list to a UIWidget.
                     currentClass = UIWidget.class;
