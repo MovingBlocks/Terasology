@@ -47,7 +47,7 @@ public class NUIEditorTextEntryBuilder {
                 Double valueDouble = Double.parseDouble(value);
                 return new JsonTree(new JsonTreeValue(null, valueDouble, JsonTreeValue.Type.VALUE));
             } catch (NumberFormatException e) {
-                if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                     return new JsonTree(new JsonTreeValue(null, Boolean.parseBoolean(value), JsonTreeValue.Type.VALUE));
                 } else {
                     return new JsonTree(new JsonTreeValue(null, value, JsonTreeValue.Type.VALUE));

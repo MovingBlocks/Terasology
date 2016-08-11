@@ -131,8 +131,8 @@ public class NUIEditorNodeUtils {
                     .getType();
             } else {
                 if (List.class.isAssignableFrom(currentClass) &&
-                    n.getValue().getKey() == null &&
-                    n.getParent().getValue().getKey().equals("contents")) {
+                    n.getValue().getKey() != null &&
+                    "contents".equals(n.getParent().getValue().getKey())) {
                     // Transition from a "contents" list to a UIWidget.
                     currentClass = UIWidget.class;
                 } else {
@@ -151,10 +151,10 @@ public class NUIEditorNodeUtils {
                         layoutClass = currentClass;
                     }
 
-                    if (UILayout.class.isAssignableFrom(currentClass) && n.getValue().getKey().equals("contents")) {
+                    if (UILayout.class.isAssignableFrom(currentClass) && "contents".equals(n.getValue().getKey())) {
                         // "contents" fields of a layout are always (widget) lists.
                         currentClass = List.class;
-                    } else if (UIWidget.class.isAssignableFrom(currentClass) && n.getValue().getKey().equals("layoutInfo")) {
+                    } else if (UIWidget.class.isAssignableFrom(currentClass) && "layoutInfo".equals(n.getValue().getKey())) {
                         // Set currentClass to the layout hint type for the active layout.
                         currentClass = (Class) ReflectionUtil.getTypeParameter(activeLayoutClass.getGenericSuperclass(), 0);
                     } else {
@@ -219,11 +219,11 @@ public class NUIEditorNodeUtils {
             if (n.isRoot()) {
                 currentClass = UIStyleFragment.class;
             } else {
-                if (n.getValue().getKey().equals("elements") || n.getValue().getKey().equals("families")) {
+                if ("elements".equals(n.getValue().getKey()) || "families".equals(n.getValue().getKey())) {
                     currentClass = null;
                 } else if (n.getParent().getValue().getKey() != null
-                           && (n.getParent().getValue().getKey().equals("elements")
-                               || n.getParent().getValue().getKey().equals("families"))) {
+                           && ("elements".equals(n.getParent().getValue().getKey())
+                               || "families".equals(n.getParent().getValue().getKey()))) {
                     currentClass = UIStyleFragment.class;
                 } else {
                     String value = n.getValue().toString();

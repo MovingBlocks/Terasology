@@ -15,38 +15,59 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * A data structure to store {@link ContextMenuScreen} options and submenues.
  */
-public class MenuTree {
+public class MenuTree extends AbstractContextMenuItem {
+    /**
+     *
+     */
+    private String name;
     /**
      * The options of this menu.
      */
-    protected Map<String, AbstractContextMenuItem> options = Maps.newLinkedHashMap();
+    protected List<AbstractContextMenuItem> options = Lists.newArrayList();
 
-    /**
-     * The submenues of this menu.
-     */
-    protected Map<String, MenuTree> submenues = Maps.newLinkedHashMap();
+    public MenuTree(String name) {
+        this.name = name;
+    }
 
-    Map<String, AbstractContextMenuItem> getOptions() {
+    List<AbstractContextMenuItem> getOptions() {
         return this.options;
     }
 
     public <E> void addOption(String name, Consumer<E> consumer, E item) {
-        options.put(name, new ContextMenuOption<E>(consumer, item, true));
+        options.add(new ContextMenuOption<E>(name, consumer, item, true));
     }
 
-    Map<String, MenuTree> getSubmenues() {
-        return this.submenues;
+    public void addSubmenu(MenuTree tree) {
+        options.add(tree);
     }
 
-    public void addSubmenu(String name, MenuTree tree) {
-        submenues.put(name, tree);
+    @Override
+    public void select() {
+    }
+
+    @Override
+    public boolean isFinalized() {
+        return false;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

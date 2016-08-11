@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
+import org.terasology.rendering.nui.contextMenu.ContextMenuUtils;
 import org.terasology.rendering.nui.contextMenu.MenuTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
@@ -173,7 +173,7 @@ public class JsonEditorTreeView extends UITreeView<JsonTreeValue> {
 
                 MenuTree menuTree = contextMenuTreeProducer.apply((JsonTree) node);
 
-                ContextMenuBuilder.showContextMenu(manager, event.getMouse().getPosition(), menuTree);
+                ContextMenuUtils.showContextMenu(manager, event.getMouse().getPosition(), menuTree);
             }
         });
 

@@ -24,6 +24,10 @@ import java.util.function.Consumer;
  */
 public class ContextMenuOption<E> extends AbstractContextMenuItem {
     /**
+     * The name of the option.
+     */
+    private String name;
+    /**
      * A consumer operation.
      */
     private Consumer<E> consumer;
@@ -37,7 +41,8 @@ public class ContextMenuOption<E> extends AbstractContextMenuItem {
      */
     private boolean finalized;
 
-    public ContextMenuOption(Consumer<E> consumer, E object, boolean finalized) {
+    public ContextMenuOption(String name, Consumer<E> consumer, E object, boolean finalized) {
+        this.name = name;
         this.consumer = consumer;
         this.object = object;
         this.finalized = finalized;
@@ -65,5 +70,10 @@ public class ContextMenuOption<E> extends AbstractContextMenuItem {
      */
     public E getObject() {
         return object;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

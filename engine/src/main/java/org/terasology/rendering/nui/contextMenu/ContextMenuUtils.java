@@ -25,12 +25,12 @@ import org.terasology.rendering.nui.widgets.UIList;
 import java.util.List;
 
 /**
- * A builder class to initialize and display {@link ContextMenuScreen} instances.
+ * A utility class to initialize and display {@link ContextMenuScreen} instances.
  * <p>
  * Should be used in favor of manually creating the screen.
  */
-public class ContextMenuBuilder {
-    private ContextMenuBuilder() {
+public class ContextMenuUtils {
+    private ContextMenuUtils() {
 
     }
 
@@ -51,31 +51,33 @@ public class ContextMenuBuilder {
         contextMenuScreen.setPosition(position);
     }
 
-    private static List<UIList<String>> getMenuLevelList(NUIManager manager, VisibleTree tree) {
-        List<UIList<String>> menuLevels = Lists.newArrayList();
+    private static List<UIList<AbstractContextMenuItem>> getMenuLevelList(NUIManager manager, VisibleTree tree) {
+        List<UIList<AbstractContextMenuItem>> menuLevels = Lists.newArrayList();
 
         menuLevels.add(getList(manager, tree));
-        for (MenuTree submenu : tree.getSubmenues().values()) {
-            menuLevels.addAll(getMenuLevelList(manager, (VisibleTree) submenu));
+        for (AbstractContextMenuItem item : tree.getOptions()) {
+            if (item instanceof VisibleTree) {
+                menuLevels.addAll(getMenuLevelList(manager, (VisibleTree) item));
+            }
         }
 
         return menuLevels;
     }
 
-    private static UIList<String> getList(NUIManager manager, VisibleTree tree) {
-        UIList<String> list = new UIList<>();
-        list.setList(Lists.newArrayList(tree.getOptions().keySet()));
+    private static UIList<AbstractContextMenuItem> getList(NUIManager manager, VisibleTree tree) {
+        UIList<AbstractContextMenuItem> list = new UIList<>();
+        list.setList(tree.getOptions());
         list.setCanBeFocus(false);
-        list.bindSelection(new Binding<String>() {
+        list.bindSelection(new Binding<AbstractContextMenuItem>() {
             @Override
-            public String get() {
+            public AbstractContextMenuItem get() {
                 return null;
             }
 
             @Override
-            public void set(String value) {
-                tree.getOptions().get(value).select();
-                if (tree.getOptions().get(value).isFinalized()) {
+            public void set(AbstractContextMenuItem value) {
+                value.select();
+                if (value.isFinalized()) {
                     manager.closeScreen(ContextMenuScreen.ASSET_URI);
                 }
             }
@@ -83,7 +85,7 @@ public class ContextMenuBuilder {
         list.bindVisible(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
-                return tree.isVisible();
+                return tree.visible;
             }
         });
 
@@ -94,33 +96,20 @@ public class ContextMenuBuilder {
         private boolean visible;
 
         public VisibleTree(MenuTree tree, boolean visible) {
-            this.options = tree.getOptions();
-            for (String name : tree.submenues.keySet()) {
-                this.addSubmenu(name, new VisibleTree(tree.submenues.get(name), false));
+            super(tree.getName());
+            for (AbstractContextMenuItem option : tree.getOptions()) {
+                if (option instanceof MenuTree) {
+                    this.options.add(new VisibleTree((MenuTree) option, false));
+                } else {
+                    this.options.add(option);
+                }
             }
             this.visible = visible;
         }
 
         @Override
-        public void addSubmenu(String name, MenuTree tree) {
-            submenues.put(name, tree);
-            options.put(name, new ContextMenuOption<>(t -> {
-                // If a submenu is shown, hide all the other submenues of this menu.
-                if (!t.isVisible()) {
-                    for (MenuTree submenu : submenues.values()) {
-                        ((VisibleTree) submenu).setVisible(false);
-                    }
-                }
-                t.setVisible(!t.isVisible());
-            }, (VisibleTree) tree, false));
-        }
-
-        private boolean isVisible() {
-            return visible;
-        }
-
-        private void setVisible(boolean visible) {
-            this.visible = visible;
+        public void select() {
+            this.visible = !this.visible;
         }
     }
 }

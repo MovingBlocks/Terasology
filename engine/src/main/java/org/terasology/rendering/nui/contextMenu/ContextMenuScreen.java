@@ -39,7 +39,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
     /**
      * A list of widgets to be used to draw the context menu.
      */
-    private List<UIList<String>> menuWidgets = Lists.newArrayList();
+    private List<UIList<AbstractContextMenuItem>> menuWidgets = Lists.newArrayList();
     /**
      * The initial position of the menu.
      */
@@ -74,7 +74,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
         canvas.addInteractionRegion(mainListener);
         Vector2i currentPosition = null;
         int currentWidth = 0;
-        for (UIList<String> level : menuWidgets) {
+        for (UIList<AbstractContextMenuItem> level : menuWidgets) {
             if (level.isVisible()) {
                 if (currentPosition == null) {
                     currentPosition = new Vector2i(position);
@@ -97,7 +97,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
         }
     }
 
-    public void setMenuWidgets(List<UIList<String>> levels) {
+    public void setMenuWidgets(List<UIList<AbstractContextMenuItem>> levels) {
         menuWidgets = levels;
     }
 

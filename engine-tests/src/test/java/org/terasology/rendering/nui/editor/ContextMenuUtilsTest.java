@@ -47,7 +47,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
+public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
 
     @BeforeClass
@@ -57,7 +57,7 @@ public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
         context.put(NUIManager.class, new NUIManagerInternal(context.get(CanvasRenderer.class), context));
 
-        File file = new File(ContextMenuBuilderTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
+        File file = new File(ContextMenuUtilsTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
         String content = null;
         try {
             content = Files.toString(file, Charsets.UTF_8);

@@ -80,19 +80,19 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createPrimaryContextMenu(JsonTree node) {
-        MenuTree primaryTree = new MenuTree();
+        MenuTree primaryTree = new MenuTree(null);
 
         JsonTreeValue.Type type = node.getValue().getType();
 
         // Create the ADD_EXTENDED level.
-        if ((type == JsonTreeValue.Type.ARRAY && !node.getValue().getKey().equals("contents"))
+        if ((type == JsonTreeValue.Type.ARRAY && !"contents".equals(node.getValue().getKey()))
             || type == JsonTreeValue.Type.OBJECT) {
             MenuTree addTree = createAddContextMenu(node);
-            primaryTree.addSubmenu(OPTION_ADD_EXTENDED, addTree);
+            primaryTree.addSubmenu(addTree);
         }
 
         // If the node is a "contents" array, add the widget addition option (redirects to WidgetSelectionScreen).
-        if (type == JsonTreeValue.Type.ARRAY && node.getValue().getKey().equals("contents")) {
+        if (type == JsonTreeValue.Type.ARRAY && "contents".equals(node.getValue().getKey())) {
             primaryTree.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node);
         }
 
@@ -111,21 +111,19 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createPrimarySkinContextMenu(JsonTree node) {
-        MenuTree primaryTree = new MenuTree();
+        MenuTree primaryTree = new MenuTree(null);
 
         JsonTreeValue.Type type = node.getValue().getType();
 
         // Create the ADD_EXTENDED level.
         if (type == JsonTreeValue.Type.ARRAY || (type == JsonTreeValue.Type.OBJECT
-                                                 && !(node.getValue().getKey() != null &&
-                                                      node.getValue().getKey().equals("elements")))) {
+                                                 && !"elements".equals(node.getValue().getKey()))) {
             MenuTree addTree = createAddSkinContextMenu(node);
-            primaryTree.addSubmenu(OPTION_ADD_EXTENDED, addTree);
+            primaryTree.addSubmenu(addTree);
         }
 
         // If the node is an "elements" object, add the widget addition option (redirects to WidgetSelectionScreen).
-        if (type == JsonTreeValue.Type.OBJECT && node.getValue().getKey() != null &&
-            node.getValue().getKey().equals("elements")) {
+        if (type == JsonTreeValue.Type.OBJECT && "elements".equals(node.getValue().getKey())) {
             primaryTree.addOption(OPTION_ADD_WIDGET, externalConsumers.get(OPTION_ADD_WIDGET), node);
         }
 
@@ -138,7 +136,7 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createAddContextMenu(JsonTree node) {
-        MenuTree addTree = new MenuTree();
+        MenuTree addTree = new MenuTree(OPTION_ADD_EXTENDED);
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.ARRAY) {
@@ -169,11 +167,11 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createAddSkinContextMenu(JsonTree node) {
-        MenuTree addTree = new MenuTree();
+        MenuTree addTree = new MenuTree(OPTION_ADD_EXTENDED);
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.OBJECT) {
-            if (node.getValue().getKey() != null && node.getValue().getKey().equals("families")) {
+            if ("families".equals(node.getValue().getKey())) {
                 addTree.addOption("New family", n -> {
                     n.addChild(new JsonTreeValue("", null, JsonTreeValue.Type.OBJECT));
                     n.getChildAt(0).setExpanded(true);

@@ -137,7 +137,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
 
             @Override
             public void set(String value) {
-                if (value.equals(CREATE_NEW_SCREEN)) {
+                if (CREATE_NEW_SCREEN.equals(value)) {
                     resetState(NUIEditorNodeUtils.createNewScreen());
                     selectedAsset = value;
                 } else {

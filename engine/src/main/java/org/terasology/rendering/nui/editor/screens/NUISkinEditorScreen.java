@@ -132,7 +132,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
 
                 @Override
                 public void set(String value) {
-                    if (value.equals(CREATE_NEW_SKIN)) {
+                    if (CREATE_NEW_SKIN.equals(value)) {
                         resetState(NUIEditorNodeUtils.createNewSkin());
                         selectedAsset = value;
                     } else {
