@@ -15,72 +15,53 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
 
+/**
+ * A builder class to initialize and display {@link ContextMenuScreen} instances.
+ * <p>
+ * Should be used in favor of manually creating the screen.
+ */
 public class ContextMenuBuilder {
-    private NUIManager manager;
     /**
+     * Initialize and display a {@link ContextMenuScreen} based on a given menu tree.
      *
+     * @param manager  The {@link NUIManager} to be used to display the screen.
+     * @param position The position of the initial menu tree.
+     * @param tree     The menu tree the context menu is based on.
      */
-    private ContextMenuTree tree;
-    /**
-     * Listeners fired when an item is selected.
-     */
-    private List<UpdateListener> selectionListeners = Lists.newArrayList();
-    /**
-     * Listeners fired when the menu is closed.
-     */
-    private List<UpdateListener> closeListeners = Lists.newArrayList();
-    /**
-     * Listeners fired when the menu is closed, either with or without
-     * selecting an option.
-     */
-    private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
-
-    public ContextMenuBuilder(NUIManager manager) {
-        this.manager = manager;
-    }
-
-    public void showContextMenu(Vector2i position) {
+    public static void showContextMenu(NUIManager manager, Vector2i position, MenuTree tree) {
         if (!manager.isOpen(ContextMenuScreen.ASSET_URI)) {
             manager.pushScreen(ContextMenuScreen.ASSET_URI, ContextMenuScreen.class);
         }
 
         ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
-        tree.setVisible(true);
-        contextMenuScreen.setMenuLevels(getMenuLevelList(tree));
+        contextMenuScreen.setMenuWidgets(getMenuLevelList(manager, tree));
         contextMenuScreen.setPosition(position);
-        contextMenuScreen.subscribeClose(() -> closeListeners.forEach(UpdateListener::onAction));
-        contextMenuScreen.subscribeScreenClosed(() -> screenClosedListeners.forEach(UpdateListener::onAction));
     }
 
-    public void setTree(ContextMenuTree tree) {
-        this.tree = tree;
-    }
-
-    private List<UIList<String>> getMenuLevelList(ContextMenuTree tree) {
+    private static List<UIList<String>> getMenuLevelList(NUIManager manager, MenuTree tree) {
         List<UIList<String>> menuLevels = Lists.newArrayList();
 
-        menuLevels.add(getList(tree));
-        for (ContextMenuTree submenu : tree.getSubmenues().values()) {
-            menuLevels.addAll(getMenuLevelList(submenu));
+        menuLevels.add(getList(manager, tree));
+        for (MenuTree submenu : tree.getSubmenues().values()) {
+            menuLevels.addAll(getMenuLevelList(manager, submenu));
         }
 
         return menuLevels;
     }
 
-    private UIList<String> getList(ContextMenuTree tree) {
+    private static UIList<String> getList(NUIManager manager, MenuTree tree) {
         UIList<String> list = new UIList<>();
         list.setList(Lists.newArrayList(tree.getOptions().keySet()));
+        list.setCanBeFocus(false);
         list.bindSelection(new Binding<String>() {
             @Override
             public String get() {
@@ -89,9 +70,8 @@ public class ContextMenuBuilder {
 
             @Override
             public void set(String value) {
-                tree.getOptions().get(value).accept();
+                tree.getOptions().get(value).select();
                 if (tree.getOptions().get(value).isFinalized()) {
-                    selectionListeners.forEach(UpdateListener::onAction);
                     manager.closeScreen(ContextMenuScreen.ASSET_URI);
                 }
             }
@@ -104,35 +84,5 @@ public class ContextMenuBuilder {
         });
 
         return list;
-    }
-
-    public void subscribeSelection(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        selectionListeners.add(listener);
-    }
-
-    public void unsubscribeSelection(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        selectionListeners.remove(listener);
-    }
-
-    public void subscribeClose(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        closeListeners.add(listener);
-    }
-
-    public void unsubscribeClose(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        closeListeners.remove(listener);
-    }
-
-    public void subscribeScreenClosed(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        screenClosedListeners.add(listener);
-    }
-
-    public void unsubscribeScreenclosed(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        screenClosedListeners.remove(listener);
     }
 }

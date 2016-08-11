@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  *
  * @param <E> The type of the object passed to the option.
  */
-public class ContextMenuOption<E> {
+public class ContextMenuOption<E> extends AbstractContextMenuItem {
     /**
      * A consumer operation.
      */
@@ -43,6 +43,16 @@ public class ContextMenuOption<E> {
         this.finalized = finalized;
     }
 
+    @Override
+    public void select() {
+        consumer.accept(object);
+    }
+
+    @Override
+    public boolean isFinalized() {
+        return finalized;
+    }
+
     /**
      * @return The consumer operation.
      */
@@ -55,20 +65,5 @@ public class ContextMenuOption<E> {
      */
     public E getObject() {
         return object;
-    }
-
-    /**
-     * @return Whether the option is final (i.e. on selection closes the context menu
-     * and triggers the relevant listeners, if any)
-     */
-    public boolean isFinalized() {
-        return finalized;
-    }
-
-    /**
-     * Perform the consumer operation on the input object instance.
-     */
-    public void accept() {
-        consumer.accept(object);
     }
 }

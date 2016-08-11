@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;
@@ -27,7 +26,6 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UpdateListener;
 
 import java.util.List;
 
@@ -39,20 +37,11 @@ public class ContextMenuScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:contextMenuScreen");
 
     /**
-     * A list of context menu levels used within the menu.
+     * A list of widgets to be used to draw the context menu.
      */
-    private List<UIList<String>> menuLevels = Lists.newArrayList();
+    private List<UIList<String>> menuWidgets = Lists.newArrayList();
     /**
-     * Listeners fired when the menu is closed without selecting an option.
-     */
-    private List<UpdateListener> closeListeners = Lists.newArrayList();
-    /**
-     * Listeners fired when the menu is closed, either with or without
-     * selecting an option.
-     */
-    private List<UpdateListener> screenClosedListeners = Lists.newArrayList();
-    /**
-     *
+     * The initial position of the menu.
      */
     private Vector2i position;
 
@@ -60,7 +49,6 @@ public class ContextMenuScreen extends CoreScreenLayer {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             // Close the context menu on click outside it.
-            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
 
             return false;
@@ -69,7 +57,6 @@ public class ContextMenuScreen extends CoreScreenLayer {
         @Override
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
             // Close the context menu on mouse wheel scroll outside it.
-            closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
 
             // Consume the event to prevent awkward rendering if the menu is within a scrollable widget.
@@ -83,16 +70,11 @@ public class ContextMenuScreen extends CoreScreenLayer {
     }
 
     @Override
-    public void onClosed() {
-        screenClosedListeners.forEach(UpdateListener::onAction);
-    }
-
-    @Override
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(mainListener);
         Vector2i currentPosition = null;
         int currentWidth = 0;
-        for (UIList<String> level : menuLevels) {
+        for (UIList<String> level : menuWidgets) {
             if (level.isVisible()) {
                 if (currentPosition == null) {
                     currentPosition = new Vector2i(position);
@@ -115,28 +97,8 @@ public class ContextMenuScreen extends CoreScreenLayer {
         }
     }
 
-    public void setMenuLevels(List<UIList<String>> levels) {
-        menuLevels = levels;
-    }
-
-    public void subscribeClose(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        closeListeners.add(listener);
-    }
-
-    public void unsubscribeClose(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        closeListeners.remove(listener);
-    }
-
-    public void subscribeScreenClosed(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        screenClosedListeners.add(listener);
-    }
-
-    public void unsubscribeScreenClosed(UpdateListener listener) {
-        Preconditions.checkNotNull(listener);
-        screenClosedListeners.remove(listener);
+    public void setMenuWidgets(List<UIList<String>> levels) {
+        menuWidgets = levels;
     }
 
     public void setPosition(Vector2i position) {

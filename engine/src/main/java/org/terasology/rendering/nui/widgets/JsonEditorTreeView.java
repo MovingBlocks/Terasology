@@ -20,6 +20,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
+import org.terasology.rendering.nui.contextMenu.MenuTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.rendering.nui.widgets.treeView.Tree;
@@ -42,9 +43,9 @@ public class JsonEditorTreeView extends UITreeView<JsonTreeValue> {
      */
     private int historyPosition;
     /**
-     * The function used to instantiate a {@link ContextMenuBuilder} from a given node.
+     * The function used to instantiate a {@link MenuTree} from a given node.
      */
-    private Function<JsonTree, ContextMenuBuilder> contextMenuProducer;
+    private Function<JsonTree, MenuTree> contextMenuTreeProducer;
 
     public JsonEditorTreeView() {
     }
@@ -159,8 +160,8 @@ public class JsonEditorTreeView extends UITreeView<JsonTreeValue> {
         setSelectedIndex(null);
     }
 
-    public void setContextMenuProducer(Function<JsonTree, ContextMenuBuilder> contextMenuProducer) {
-        this.contextMenuProducer = contextMenuProducer;
+    public void setContextMenuTreeProducer(Function<JsonTree, MenuTree> contextMenuTreeProducer) {
+        this.contextMenuTreeProducer = contextMenuTreeProducer;
     }
 
     public void setEditor(Consumer<JsonTree> editorFunction, NUIManager manager) {
@@ -170,9 +171,9 @@ public class JsonEditorTreeView extends UITreeView<JsonTreeValue> {
                 setSelectedIndex(getModel().indexOf(node));
                 setAlternativeWidget(null);
 
-                ContextMenuBuilder contextMenuBuilder = contextMenuProducer.apply((JsonTree) node);
+                MenuTree menuTree = contextMenuTreeProducer.apply((JsonTree) node);
 
-                contextMenuBuilder.showContextMenu(event.getMouse().getPosition());
+                ContextMenuBuilder.showContextMenu(manager, event.getMouse().getPosition(), menuTree);
             }
         });
 

@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.contextMenu.ContextMenuTree;
+import org.terasology.rendering.nui.contextMenu.MenuTree;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UpdateListener;
@@ -43,9 +43,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class NUIEditorContextMenuBuilder {
+public class NUIEditorMenuTreeBuilder {
 
-    private Logger logger = LoggerFactory.getLogger(NUIEditorContextMenuBuilder.class);
+    private Logger logger = LoggerFactory.getLogger(NUIEditorMenuTreeBuilder.class);
 
     // Context menu options.
     public static final String OPTION_ADD_EXTENDED = "Add...";
@@ -79,15 +79,15 @@ public class NUIEditorContextMenuBuilder {
         addContextMenuListeners.add(listener);
     }
 
-    public ContextMenuTree createPrimaryContextMenu(JsonTree node) {
-        ContextMenuTree primaryTree = new ContextMenuTree();
+    public MenuTree createPrimaryContextMenu(JsonTree node) {
+        MenuTree primaryTree = new MenuTree(true);
 
         JsonTreeValue.Type type = node.getValue().getType();
 
         // Create the ADD_EXTENDED level.
         if ((type == JsonTreeValue.Type.ARRAY && !node.getValue().getKey().equals("contents"))
             || type == JsonTreeValue.Type.OBJECT) {
-            ContextMenuTree addTree = createAddContextMenu(node);
+            MenuTree addTree = createAddContextMenu(node);
             primaryTree.addSubmenu(OPTION_ADD_EXTENDED, addTree);
         }
 
@@ -110,8 +110,8 @@ public class NUIEditorContextMenuBuilder {
         return primaryTree;
     }
 
-    public ContextMenuTree createPrimarySkinContextMenu(JsonTree node) {
-        ContextMenuTree primaryTree = new ContextMenuTree();
+    public MenuTree createPrimarySkinContextMenu(JsonTree node) {
+        MenuTree primaryTree = new MenuTree(true);
 
         JsonTreeValue.Type type = node.getValue().getType();
 
@@ -119,7 +119,7 @@ public class NUIEditorContextMenuBuilder {
         if (type == JsonTreeValue.Type.ARRAY || (type == JsonTreeValue.Type.OBJECT
                                                  && !(node.getValue().getKey() != null &&
                                                       node.getValue().getKey().equals("elements")))) {
-            ContextMenuTree addTree = createAddSkinContextMenu(node);
+            MenuTree addTree = createAddSkinContextMenu(node);
             primaryTree.addSubmenu(OPTION_ADD_EXTENDED, addTree);
         }
 
@@ -137,8 +137,8 @@ public class NUIEditorContextMenuBuilder {
         return primaryTree;
     }
 
-    public ContextMenuTree createAddContextMenu(JsonTree node) {
-        ContextMenuTree addTree = new ContextMenuTree();
+    public MenuTree createAddContextMenu(JsonTree node) {
+        MenuTree addTree = new MenuTree(false);
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.ARRAY) {
@@ -168,8 +168,8 @@ public class NUIEditorContextMenuBuilder {
         return addTree;
     }
 
-    public ContextMenuTree createAddSkinContextMenu(JsonTree node) {
-        ContextMenuTree addTree = new ContextMenuTree();
+    public MenuTree createAddSkinContextMenu(JsonTree node) {
+        MenuTree addTree = new MenuTree(false);
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.OBJECT) {
@@ -192,7 +192,7 @@ public class NUIEditorContextMenuBuilder {
         return addTree;
     }
 
-    private void populateContextMenu(JsonTree node, ContextMenuTree addTree, boolean isSkin) {
+    private void populateContextMenu(JsonTree node, MenuTree addTree, boolean isSkin) {
         Class clazz = null;
         if (isSkin) {
             clazz = NUIEditorNodeUtils.getSkinNodeClass(node, nuiManager);

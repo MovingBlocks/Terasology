@@ -33,12 +33,10 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.asset.UIFormat;
-import org.terasology.rendering.nui.contextMenu.ContextMenuBuilder;
 import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
-import org.terasology.rendering.nui.contextMenu.ContextMenuTree;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
-import org.terasology.rendering.nui.editor.utils.NUIEditorContextMenuBuilder;
+import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
@@ -154,32 +152,15 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
             updateConfig();
         });
 
-        editor.setContextMenuProducer(node -> {
-            NUIEditorContextMenuBuilder nuiEditorContextMenuBuilder = new NUIEditorContextMenuBuilder();
-            nuiEditorContextMenuBuilder.setManager(getManager());
-            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_COPY, getEditor()::copyNode);
-            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_PASTE, getEditor()::pasteNode);
-            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_EDIT, this::editNode);
-            nuiEditorContextMenuBuilder.putConsumer(NUIEditorContextMenuBuilder.OPTION_ADD_WIDGET, this::addWidget);
-            nuiEditorContextMenuBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
-            ContextMenuTree contextMenuTree = nuiEditorContextMenuBuilder.createPrimaryContextMenu(node);
-
-            ContextMenuBuilder builder = new ContextMenuBuilder(getManager());
-
-            builder.setTree(contextMenuTree);
-
-            builder.subscribeClose(() -> {
-                getEditor().setAlternativeWidget(null);
-                getEditor().setSelectedIndex(null);
-            });
-
-            builder.subscribeScreenClosed(() -> {
-                if (getEditor().getAlternativeWidget() != null) {
-                    focusInlineEditor(node, inlineEditorEntry);
-                }
-            });
-
-            return builder;
+        editor.setContextMenuTreeProducer(node -> {
+            NUIEditorMenuTreeBuilder nuiEditorMenuTreeBuilder = new NUIEditorMenuTreeBuilder();
+            nuiEditorMenuTreeBuilder.setManager(getManager());
+            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
+            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
+            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
+            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
+            nuiEditorMenuTreeBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
+            return nuiEditorMenuTreeBuilder.createPrimaryContextMenu(node);
         });
 
         editor.setEditor(this::editNode, getManager());
