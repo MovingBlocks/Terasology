@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 /**
  * A data structure to store {@link ContextMenuScreen} options and submenues.
  */
-public class MenuTree extends AbstractContextMenuItem {
+public final class MenuTree extends AbstractContextMenuItem {
     /**
      *
      */

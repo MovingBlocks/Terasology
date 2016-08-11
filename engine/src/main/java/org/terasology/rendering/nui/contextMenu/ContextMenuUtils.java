@@ -92,11 +92,13 @@ public class ContextMenuUtils {
         return list;
     }
 
-    private static class VisibleTree extends MenuTree {
+    private static class VisibleTree extends AbstractContextMenuItem {
+        private String name;
+        private List<AbstractContextMenuItem> options = Lists.newArrayList();
         private boolean visible;
 
         public VisibleTree(MenuTree tree, boolean visible) {
-            super(tree.getName());
+            this.name = tree.getName();
             for (AbstractContextMenuItem option : tree.getOptions()) {
                 if (option instanceof MenuTree) {
                     this.options.add(new VisibleTree((MenuTree) option, false));
@@ -110,6 +112,20 @@ public class ContextMenuUtils {
         @Override
         public void select() {
             this.visible = !this.visible;
+        }
+
+        @Override
+        public boolean isFinalized() {
+            return false;
+        }
+
+        public List<AbstractContextMenuItem> getOptions() {
+            return options;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }
