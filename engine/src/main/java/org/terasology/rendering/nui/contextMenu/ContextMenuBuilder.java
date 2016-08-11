@@ -30,6 +30,10 @@ import java.util.List;
  * Should be used in favor of manually creating the screen.
  */
 public class ContextMenuBuilder {
+    private ContextMenuBuilder() {
+
+    }
+
     /**
      * Initialize and display a {@link ContextMenuScreen} based on a given menu tree.
      *
@@ -43,22 +47,22 @@ public class ContextMenuBuilder {
         }
 
         ContextMenuScreen contextMenuScreen = (ContextMenuScreen) manager.getScreen(ContextMenuScreen.ASSET_URI);
-        contextMenuScreen.setMenuWidgets(getMenuLevelList(manager, tree));
+        contextMenuScreen.setMenuWidgets(getMenuLevelList(manager, new VisibleTree(tree, true)));
         contextMenuScreen.setPosition(position);
     }
 
-    private static List<UIList<String>> getMenuLevelList(NUIManager manager, MenuTree tree) {
+    private static List<UIList<String>> getMenuLevelList(NUIManager manager, VisibleTree tree) {
         List<UIList<String>> menuLevels = Lists.newArrayList();
 
         menuLevels.add(getList(manager, tree));
         for (MenuTree submenu : tree.getSubmenues().values()) {
-            menuLevels.addAll(getMenuLevelList(manager, submenu));
+            menuLevels.addAll(getMenuLevelList(manager, (VisibleTree) submenu));
         }
 
         return menuLevels;
     }
 
-    private static UIList<String> getList(NUIManager manager, MenuTree tree) {
+    private static UIList<String> getList(NUIManager manager, VisibleTree tree) {
         UIList<String> list = new UIList<>();
         list.setList(Lists.newArrayList(tree.getOptions().keySet()));
         list.setCanBeFocus(false);
@@ -84,5 +88,39 @@ public class ContextMenuBuilder {
         });
 
         return list;
+    }
+
+    private static class VisibleTree extends MenuTree {
+        private boolean visible;
+
+        public VisibleTree(MenuTree tree, boolean visible) {
+            this.options = tree.getOptions();
+            for (String name : tree.submenues.keySet()) {
+                this.addSubmenu(name, new VisibleTree(tree.submenues.get(name), false));
+            }
+            this.visible = visible;
+        }
+
+        @Override
+        public void addSubmenu(String name, MenuTree tree) {
+            submenues.put(name, tree);
+            options.put(name, new ContextMenuOption<>(t -> {
+                // If a submenu is shown, hide all the other submenues of this menu.
+                if (!t.isVisible()) {
+                    for (MenuTree submenu : submenues.values()) {
+                        ((VisibleTree) submenu).setVisible(false);
+                    }
+                }
+                t.setVisible(!t.isVisible());
+            }, (VisibleTree) tree, false));
+        }
+
+        private boolean isVisible() {
+            return visible;
+        }
+
+        private void setVisible(boolean visible) {
+            this.visible = visible;
+        }
     }
 }

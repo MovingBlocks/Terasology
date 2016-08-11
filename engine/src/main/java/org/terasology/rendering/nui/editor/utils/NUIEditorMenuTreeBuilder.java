@@ -80,7 +80,7 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createPrimaryContextMenu(JsonTree node) {
-        MenuTree primaryTree = new MenuTree(true);
+        MenuTree primaryTree = new MenuTree();
 
         JsonTreeValue.Type type = node.getValue().getType();
 
@@ -111,7 +111,7 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createPrimarySkinContextMenu(JsonTree node) {
-        MenuTree primaryTree = new MenuTree(true);
+        MenuTree primaryTree = new MenuTree();
 
         JsonTreeValue.Type type = node.getValue().getType();
 
@@ -138,7 +138,7 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createAddContextMenu(JsonTree node) {
-        MenuTree addTree = new MenuTree(false);
+        MenuTree addTree = new MenuTree();
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.ARRAY) {
@@ -169,7 +169,7 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     public MenuTree createAddSkinContextMenu(JsonTree node) {
-        MenuTree addTree = new MenuTree(false);
+        MenuTree addTree = new MenuTree();
         JsonTreeValue.Type type = node.getValue().getType();
 
         if (type == JsonTreeValue.Type.OBJECT) {
