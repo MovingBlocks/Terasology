@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  *
  * @param <E> The type of the object passed to the option.
  */
-public class ContextMenuOption<E> extends AbstractContextMenuItem {
+public class ContextMenuOption<E> implements AbstractContextMenuItem {
     /**
      * The name of the option.
      */
@@ -48,12 +48,10 @@ public class ContextMenuOption<E> extends AbstractContextMenuItem {
         this.finalized = finalized;
     }
 
-    @Override
     public void select() {
         consumer.accept(object);
     }
 
-    @Override
     public boolean isFinalized() {
         return finalized;
     }

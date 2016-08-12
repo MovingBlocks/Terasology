@@ -76,8 +76,7 @@ public class ContextMenuUtils {
 
             @Override
             public void set(AbstractContextMenuItem value) {
-                value.select();
-                if (value.isFinalized()) {
+                if (tree.select(value)) {
                     manager.closeScreen(ContextMenuScreen.ASSET_URI);
                 }
             }
@@ -92,7 +91,7 @@ public class ContextMenuUtils {
         return list;
     }
 
-    private static class VisibleTree extends AbstractContextMenuItem {
+    private static class VisibleTree implements AbstractContextMenuItem {
         private String name;
         private List<AbstractContextMenuItem> options = Lists.newArrayList();
         private boolean visible;
@@ -109,9 +108,27 @@ public class ContextMenuUtils {
             this.visible = visible;
         }
 
-        @Override
-        public void select() {
-            this.visible = !this.visible;
+        /**
+         * @param option The option to be selected.
+         * @return Whether the context menu should be closed after the option is selected
+         */
+        public boolean select(AbstractContextMenuItem option) {
+            if (options.contains(option)) {
+                if (option instanceof ContextMenuOption) {
+                    ((ContextMenuOption) option).select();
+                    return ((ContextMenuOption) option).isFinalized();
+                } else if (option instanceof VisibleTree) {
+                    ((VisibleTree) option).visible = !((VisibleTree) option).visible;
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public void setVisible(boolean visible) {
+            this.visible = visible;
         }
 
         public List<AbstractContextMenuItem> getOptions() {

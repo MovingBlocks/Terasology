@@ -15,18 +15,5 @@
  */
 package org.terasology.rendering.nui.contextMenu;
 
-public abstract class AbstractContextMenuItem {
-    /**
-     * Perform a specific action when this item is selected.
-     */
-    public void select() {
-
-    }
-
-    /**
-     * @return Whether the option is final, i.e. closes the context menu when selected.
-     */
-    public boolean isFinalized() {
-        return false;
-    }
+public interface AbstractContextMenuItem {
 }
